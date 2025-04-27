@@ -32,6 +32,7 @@ import de.iip_ecosphere.platform.configuration.aas.AasType.EntityType;
 import de.iip_ecosphere.platform.configuration.aas.ParsingUtils.AasEnumResultHandler;
 import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.aas.IdentifierType;
+import de.iip_ecosphere.platform.support.aas.SemanticIdRecognizer;
 
 import static de.iip_ecosphere.platform.configuration.aas.ParsingUtils.*;
 

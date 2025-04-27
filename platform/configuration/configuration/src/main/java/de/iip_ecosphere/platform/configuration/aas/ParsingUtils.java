@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 
 import de.iip_ecosphere.platform.configuration.FallbackLogger;
 import de.iip_ecosphere.platform.support.aas.IdentifierType;
+import de.iip_ecosphere.platform.support.aas.SemanticIdRecognizer;
 
 /**
  * Utilities for text parsing.

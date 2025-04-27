@@ -44,6 +44,7 @@ import de.iip_ecosphere.platform.configuration.FallbackLogger;
 import de.iip_ecosphere.platform.configuration.aas.AasType.EntityType;
 import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.aas.IdentifierType;
+import de.iip_ecosphere.platform.support.aas.SemanticIdRecognizer;
 
 /**
  * Translates AASX IDTA spec files to IVML. Does not rely on AAS abstraction/Basyx as these AASX files cannot be read.
