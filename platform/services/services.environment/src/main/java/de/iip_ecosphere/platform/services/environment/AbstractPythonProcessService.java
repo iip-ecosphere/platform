@@ -366,9 +366,8 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
                 }
                 if (foundRun && envNameIndex > 0) {
                     String env = args.get(envNameIndex);
-                    args.set(envNameIndex,
-                    		InstalledDependenciesSetup.getInstance()
-                    		                         .getEnvironmentMapping(getLocationKey(), env));
+                    args.set(envNameIndex, InstalledDependenciesSetup.getInstance()
+                        .getEnvironmentMapping(getLocationKey(), env));
 
                     args.add(envNameIndex + 1, "python"); // or pyExec?
                 }
