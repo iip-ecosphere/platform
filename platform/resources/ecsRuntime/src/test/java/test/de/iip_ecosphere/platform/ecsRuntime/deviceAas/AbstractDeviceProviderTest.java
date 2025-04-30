@@ -52,12 +52,12 @@ public abstract class AbstractDeviceProviderTest {
         PersistenceType pType = LocalPersistenceType.INMEMORY;
         LoggerFactory.getLogger(AbstractDeviceProviderTest.class).info(
             "Starting " + pType + " AAS registry on " + regEndpoint.toUri());
-        registryServer = rcp.createRegistryServer(regEndpoint, pType);
+        registryServer = rcp.createRegistryServer(AasPartRegistry.getSetup(), pType);
         registryServer.start();
         Endpoint serverEndpoint = AasPartRegistry.getSetup().getServerEndpoint();
         LoggerFactory.getLogger(AbstractDeviceProviderTest.class).info(
             "Starting " + pType + " AAS server on " + serverEndpoint.toUri());
-        aasServer = rcp.createAasServer(serverEndpoint, pType, regEndpoint);
+        aasServer = rcp.createAasServer(AasPartRegistry.getSetup(), pType);
         aasServer.start();
     }
     

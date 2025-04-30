@@ -18,6 +18,7 @@ import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.ElementsAccess;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.Invokable.GetterInvokable;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel;
@@ -41,7 +42,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -373,7 +373,7 @@ public class MetricsAasConstructor {
      * 
      * @author Holger Eichelberger, SSE
      */
-    private static class MeterGetter implements Supplier<Object>, Serializable {
+    private static class MeterGetter implements GetterInvokable, Serializable {
 
         private static final long serialVersionUID = 2294254606334816252L;
         private String name;

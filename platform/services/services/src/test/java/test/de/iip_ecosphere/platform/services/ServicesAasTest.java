@@ -35,7 +35,6 @@ import de.iip_ecosphere.platform.services.ServicesAasClient;
 import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.support.CollectionUtils;
-import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.LifecycleHandler;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
@@ -129,12 +128,11 @@ public class ServicesAasTest {
         ServiceFactory.setAasSetup(aasSetup);
 
         ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
-        Endpoint regEndpoint = aasSetup.getRegistryEndpoint();
         Server registryServer = rcp
-            .createRegistryServer(regEndpoint, ServerRecipe.LocalPersistenceType.INMEMORY)
+            .createRegistryServer(aasSetup, ServerRecipe.LocalPersistenceType.INMEMORY)
             .start();
         AasServer aasServer = rcp
-            .createAasServer(aasSetup.getServerEndpoint(), ServerRecipe.LocalPersistenceType.INMEMORY, regEndpoint)
+            .createAasServer(aasSetup, ServerRecipe.LocalPersistenceType.INMEMORY)
             .start();
 
         LifecycleHandler.startup(new String[] {});

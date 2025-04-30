@@ -11,6 +11,7 @@ import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel;
@@ -47,13 +48,14 @@ public class WorkerK8SAas {
         ServerAddress aasServer = new ServerAddress(Schema.HTTP, serverIP, Integer.parseInt(serverPort));
         
         Endpoint aasServerRegistry = new Endpoint(aasServer, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
+        BasicSetupSpec spec = new BasicSetupSpec(aasServerRegistry, aasServer);
 
 //        System.out.println(aasServerRegistry.getEndpoint());
         
         AasFactory factory = AasFactory.getInstance();
         Aas aas = null;
         try {
-            aas = factory.obtainRegistry(aasServerRegistry).retrieveAas("urn:::AAS:::MasterK8SAas#");
+            aas = factory.obtainRegistry(spec).retrieveAas("urn:::AAS:::MasterK8SAas#");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -143,13 +145,13 @@ public class WorkerK8SAas {
 
         ServerAddress vabServer = new ServerAddress(Schema.HTTP, vabPort);
         ServerAddress aasServer = new ServerAddress(Schema.HTTP, aasPort);
-        Endpoint aasServerBase = new Endpoint(aasServer, "");
         Endpoint aasServerRegistry = new Endpoint(aasServer, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
+        BasicSetupSpec spec = new BasicSetupSpec(aasServerRegistry, aasServer);
+        spec.setAssetServerAddress(vabServer, AasFactory.DEFAULT_PROTOCOL);
         
         Aas aas = WorkerAasCreator.createAas(vabServer);
         
-        ProtocolServerBuilder pBuilder = AasFactory.getInstance()
-            .createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, vabServer.getPort());
+        ProtocolServerBuilder pBuilder = AasFactory.getInstance().createProtocolServerBuilder(spec);
         pBuilder.defineProperty(WorkerAasCreator.AAS_SUBMODEL_PROPERTY_NAME, () -> "K8SAasProperty", null);
         pBuilder.defineProperty(WorkerAasCreator.AAS_SUBMODEL_PROPERTY_VERSION, () -> "0.0.1", null);
         pBuilder.defineProperty(WorkerAasCreator.AAS_SUBMODEL_PROPERTY_DESCRIPTION, () -> "K8S AAS", null);
@@ -160,8 +162,8 @@ public class WorkerK8SAas {
         server.start();
         
         Server httpServer = AasFactory.getInstance()
-            .createDeploymentRecipe(aasServerBase)
-            .addInMemoryRegistry(aasServerRegistry)
+            .createDeploymentRecipe(spec)
+            .forRegistry()
             .deploy(aas)
             .createServer()
             .start();

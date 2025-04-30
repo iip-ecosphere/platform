@@ -57,6 +57,7 @@ import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.Version;
@@ -492,7 +493,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     void waitForAdminServer(int waitingTime) {
         if (null != adminAddr) {
             ProtocolServerBuilder psb = AasFactory.getInstance()
-                .createProtocolServerBuilder(serviceProtocol, adminAddr.getPort());
+                .createProtocolServerBuilder(new BasicSetupSpec(serviceProtocol, adminAddr.getPort()));
             psb.isAvailable(adminAddr.getHost(), waitingTime);
         }
     }
@@ -519,8 +520,8 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             proto = serviceProtocol;
         }
         if (null != addr) {
-            iCreator = AasFactory.getInstance().createInvocablesCreator(proto, 
-                addr.getHost(), addr.getPort());
+            iCreator = AasFactory.getInstance().createInvocablesCreator(
+                new BasicSetupSpec(proto, addr.getHost(), addr.getPort()));
         }
         return iCreator;
     }

@@ -18,11 +18,10 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.Invokable;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
@@ -36,9 +35,9 @@ import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
  */
 public class ServiceStub implements Service {
 
-    private Map<String, Supplier<Object>> getters = new HashMap<>();
-    private Map<String, Consumer<Object>> setters = new HashMap<>();
-    private Map<String, Function<Object[], Object>> operations = new HashMap<>();
+    private Map<String, Invokable> getters = new HashMap<>();
+    private Map<String, Invokable> setters = new HashMap<>();
+    private Map<String, Invokable> operations = new HashMap<>();
     
     /**
      * Creates the setup and registers the operations.
@@ -69,7 +68,7 @@ public class ServiceStub implements Service {
      * @param getter the getter functor
      * @param setter the setter functor
      */
-    private void registerProperty(String name, Supplier<Object> getter, Consumer<Object> setter) {
+    private void registerProperty(String name, Invokable getter, Invokable setter) {
         getters.put(name, getter);
         setters.put(name, setter);
     }
@@ -80,37 +79,37 @@ public class ServiceStub implements Service {
      * @param name the (unqualified) name of the property 
      * @param operation the operation functor
      */
-    private void registerOperation(String name, Function<Object[], Object> operation) {
+    private void registerOperation(String name, Invokable operation) {
         operations.put(name, operation);
     }
 
     /**
-     * Returns the getter functor for a given property.
+     * Returns the getter invokable for a given property.
      * 
      * @param name the (unqualified) property name
-     * @return the functor, may be <b>null</b> for none
+     * @return the invokable, may be <b>null</b> for none
      */
-    public Supplier<Object> getGetter(String name) {
+    public Invokable getGetter(String name) {
         return getters.get(name);
     }
 
     /**
-     * Returns the setter functor for a given property.
+     * Returns the setter invokable for a given property.
      * 
      * @param name the (unqualified) property name
-     * @return the functor, may be <b>null</b> for none
+     * @return the invokable, may be <b>null</b> for none
      */
-    public Consumer<Object> getSetter(String name) {
+    public Invokable getSetter(String name) {
         return setters.get(name);
     }
 
     /**
-     * Returns the functor for a given operation.
+     * Returns the invokable for a given operation.
      * 
      * @param name the (unqualified) operation name
-     * @return the functor, may be <b>null</b> for none
+     * @return the invokable, may be <b>null</b> for none
      */
-    public Function<Object[], Object> getOperation(String name) {
+    public Invokable getOperation(String name) {
         return operations.get(name);
     }
 
@@ -125,7 +124,7 @@ public class ServiceStub implements Service {
      */
     private <T> T convertGetterResult(String getId, T dflt, Function<Object, T> conversion) {
         T result;
-        Object response = getters.get(getId).get();
+        Object response = getters.get(getId).getGetter().get();
         if (null == response) {
             result = dflt;
         } else {
@@ -222,40 +221,40 @@ public class ServiceStub implements Service {
     @Override
     public void setState(ServiceState state) throws ExecutionException {
         Object[] param = new Object[] {state.name()};
-        JsonResultWrapper.fromJson(operations.get(NAME_OP_SET_STATE), param);
+        JsonResultWrapper.fromJson(operations.get(NAME_OP_SET_STATE).getOperation(), param);
     }
 
     @Override
     public void migrate(String resourceId) throws ExecutionException {
-        JsonResultWrapper.fromJson(operations.get(NAME_OP_MIGRATE));
+        JsonResultWrapper.fromJson(operations.get(NAME_OP_MIGRATE).getOperation());
     }
 
     @Override
     public void update(URI location) throws ExecutionException {
         Object[] param = new Object[] {location.toString()};
-        JsonResultWrapper.fromJson(operations.get(NAME_OP_UPDATE), param);
+        JsonResultWrapper.fromJson(operations.get(NAME_OP_UPDATE).getOperation(), param);
     }
 
     @Override
     public void switchTo(String targetId) throws ExecutionException {
         Object[] param = new Object[] {targetId};
-        JsonResultWrapper.fromJson(operations.get(NAME_OP_SWITCH), param);
+        JsonResultWrapper.fromJson(operations.get(NAME_OP_SWITCH).getOperation(), param);
     }
 
     @Override
     public void activate() throws ExecutionException {
-        JsonResultWrapper.fromJson(operations.get(NAME_OP_ACTIVATE));
+        JsonResultWrapper.fromJson(operations.get(NAME_OP_ACTIVATE).getOperation());
     }
 
     @Override
     public void passivate() throws ExecutionException {
-        JsonResultWrapper.fromJson(operations.get(NAME_OP_PASSIVATE));
+        JsonResultWrapper.fromJson(operations.get(NAME_OP_PASSIVATE).getOperation());
     }
 
     @Override
     public void reconfigure(Map<String, String> values) throws ExecutionException {
         Object[] param = new Object[] {AasUtils.writeMap(values)};
-        JsonResultWrapper.fromJson(operations.get(NAME_OP_RECONF), param);
+        JsonResultWrapper.fromJson(operations.get(NAME_OP_RECONF).getOperation(), param);
     }
 
 }

@@ -14,11 +14,11 @@ package test.de.iip_ecosphere.platform.services.environment;
 
 import de.iip_ecosphere.platform.services.environment.Service;
 import de.iip_ecosphere.platform.services.environment.ServiceStub;
-import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 
@@ -72,28 +72,26 @@ public class AasCreator {
     /**
      * Creates an AAS for testing.
      * 
-     * @param addr the server address (schema ignored)
+     * @param spec setup specification
      * @param service the service to create the AAS for (qualified naming)
-     * @param protocol the AAS implementation protocol (see {@link AasFactory#getProtocols()}
      * @return the AAS
      */
-    public static Aas createAas(ServerAddress addr, Service service, String protocol) {
-        return createAas(addr, service, protocol, null);
+    public static Aas createAas(SetupSpec spec, Service service) {
+        return createAas(spec, service, null);
     }
     
     /**
      * Creates an AAS for testing.
      * 
-     * @param addr the server address (schema ignored)
+     * @param spec setup specification
      * @param service the service to create the AAS for (qualified naming)
-     * @param protocol the AAS implementation protocol (see {@link AasFactory#getProtocols()}
      * @param result optional instance to be modified as side effect to have more details about the creation, 
      *     may be <b>null</b> for nothing
      * @return the AAS
      */
-    public static Aas createAas(ServerAddress addr, Service service, String protocol, AasResult result) {
+    public static Aas createAas(SetupSpec spec, Service service, AasResult result) {
         AasFactory factory = AasFactory.getInstance();
-        InvocablesCreator iCreator = factory.createInvocablesCreator(protocol, addr.getHost(), addr.getPort());
+        InvocablesCreator iCreator = factory.createInvocablesCreator(spec);
         AasBuilder aasBuilder = factory.createAasBuilder(AAS_NAME, URN_AAS);
         SubmodelBuilder smBuilder = aasBuilder.createSubmodelBuilder(AAS_SUBMODEL_NAME, null);
         ServiceStub stub = new ServiceStub(iCreator, service.getId());

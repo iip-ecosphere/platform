@@ -26,11 +26,11 @@ import de.iip_ecosphere.platform.services.environment.Service;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.ServiceStub;
-import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
+import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
@@ -46,14 +46,14 @@ public abstract class AbstractEnvironmentTest {
     /**
      * Tests the agreed AAS behavior created by {@link AasCreator}.
      * 
-     * @param registry the registry endpoint
+     * @param spec the setup specification
      * @param expected expected service (with values)
      * @throws IOException if accessing the AAS fails
      * @throws ExecutionException if accessing AAS property values or performing operation invocations fails
      */
-    public static void testAas(Endpoint registry, Service expected) throws IOException, ExecutionException {
+    public static void testAas(SetupSpec spec, Service expected) throws IOException, ExecutionException {
         AasFactory factory = AasFactory.getInstance();
-        Aas aas = factory.obtainRegistry(registry).retrieveAas(AasCreator.URN_AAS);
+        Aas aas = factory.obtainRegistry(spec).retrieveAas(AasCreator.URN_AAS);
         Assert.assertNotNull("Aas " + AasCreator.URN_AAS + " shall be there", aas);
         Submodel submodel = aas.getSubmodel(AasCreator.AAS_SUBMODEL_NAME);
         Assert.assertNotNull("Submodel " + AasCreator.AAS_SUBMODEL_NAME + " shall be there", submodel);

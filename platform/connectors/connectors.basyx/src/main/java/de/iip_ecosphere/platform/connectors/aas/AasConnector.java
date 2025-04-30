@@ -45,6 +45,7 @@ import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.ElementsAccess;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
@@ -215,8 +216,8 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
             if (null == regEp) { // fallback, use server and epPath
                 regEp = new Endpoint(schema, params.getHost(), params.getPort(), epPath);
             }
-            
-            registry = factory.obtainRegistry(regEp, schema);
+            BasicSetupSpec spec = new BasicSetupSpec(regEp);
+            registry = factory.obtainRegistry(spec, schema);
             LOGGER.info("Connected to AAS registry: {}, notification interval {}", regEp.toUri(), 
                 params.getNotificationInterval());
             String name = params.getApplicationId();

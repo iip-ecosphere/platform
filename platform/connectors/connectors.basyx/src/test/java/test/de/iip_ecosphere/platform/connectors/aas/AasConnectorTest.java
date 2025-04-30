@@ -33,6 +33,7 @@ import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
@@ -62,7 +63,6 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
     
     private static final Logger LOGGER = LoggerFactory.getLogger(AasConnectorTest.class);
     private static final String AAS_URN = "urn:::AAS:::testMachines#";
-    private static final ServerAddress VAB_SERVER = new ServerAddress(Schema.HTTP); // localhost, ephemeral
     private static KeyStoreDescriptor keyDesc;
     
     private static Server platformAasServer;
@@ -101,33 +101,30 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
         // multiple test runs may load the same descriptor multiple times
         ConnectorRegistry.getRegisteredConnectorDescriptorsLoader().reload();
         oldSetup = AasPartRegistry.setAasSetup(AasSetup.createLocalEphemeralSetup());
-        
+                
         // we don't start all active AAS here as we do not need them for this test
         AasBuildResult bResult = AasPartRegistry.build(d -> d.getKind() != Kind.ACTIVE);
-        Server implServer = bResult.getProtocolServerBuilder().build();
         platformAasServer = AasPartRegistry.deploy(bResult.getAas()).start();
         LOGGER.info("Platform AAS server started");
         
         TestMachine machine = new TestMachine();
         // start required here by basyx-0.1.0-SNAPSHOT
-        ccServer = AasTest.createOperationsServer(VAB_SERVER.getPort(), machine, 
-            AasFactory.DEFAULT_PROTOCOL, null).start(); 
-        Aas aas = createAAS();
+        ccServer = AasTest.createOperationsServer(AasPartRegistry.getSetup(), machine).start(); 
+        Aas aas = createAAS(machine);
         if (null != keyDesc) {
             aasServer = new ServerAddress(Schema.HTTPS); // localhost, ephemeral
         } else {
             aasServer = new ServerAddress(Schema.HTTP); // localhost, ephemeral
         }
-        
         Endpoint registryEndpoint = getRegistryEndpoint();
+        BasicSetupSpec spec = new BasicSetupSpec(registryEndpoint, aasServer, keyDesc);
         DeploymentRecipe dBuilder = AasFactory.getInstance()
-            .createDeploymentRecipe(new Endpoint(aasServer, ""), keyDesc);
+            .createDeploymentRecipe(spec);
         httpServer = dBuilder
-            .addInMemoryRegistry(registryEndpoint)
+            .forRegistry()
             .deploy(aas)
             .createServer();
         httpServer.start();
-        implServer.start();
 
         LOGGER.info("AAS server started");
     }
@@ -161,16 +158,17 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
     /**
      * This method creates and starts the Asset Administration Shell.
      * 
+     * @param machine test machine instance
      * @return the created AAS instance
      * @throws SocketException if the port to be used for the AAS is occupied
      * @throws UnknownHostException shall not occur
      */
-    public static Aas createAAS() throws SocketException, UnknownHostException {
+    public static Aas createAAS(TestMachine machine) throws SocketException, UnknownHostException {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasBuilder = factory.createAasBuilder(AasTest.NAME_AAS, AAS_URN);
         SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(AasTest.NAME_SUBMODEL, null);
         AasTest test = new AasTest(); // add KeyStoreDescriptor here
-        test.createAasOperationsElements(subModelBuilder, VAB_SERVER, AasFactory.DEFAULT_PROTOCOL);
+        test.createAasOperationsElements(subModelBuilder, AasPartRegistry.getSetup(), machine);
         
         subModelBuilder.build();
         return aasBuilder.build();

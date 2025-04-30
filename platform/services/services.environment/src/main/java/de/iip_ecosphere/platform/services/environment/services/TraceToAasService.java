@@ -485,7 +485,7 @@ public class TraceToAasService extends AbstractService {
         if (null != artifact) {
             AasFactory factory = AasFactory.getInstance();
             try {
-                Registry reg = factory.obtainRegistry(Starter.getSetup().getAas().getRegistryEndpoint());
+                Registry reg = factory.obtainRegistry(Starter.getSetup().getAas());
                 for (YamlService s : artifact.getServices()) {
                     String ep = reg.getEndpoint(AasUtils.fixId("service_" + s.getId()));
                     if (null == ep) {

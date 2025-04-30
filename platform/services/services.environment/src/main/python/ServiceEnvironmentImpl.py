@@ -223,7 +223,7 @@ def processRequest(sId, type, data):
                         responseFunction(func(d))
                         updateResponseTime(startTime)
     except Exception as err:
-        sys.stderr.write("Exception/error in python service env:\n")
+        sys.stderr.write("Exception/error in python service code '" + str(sId) + "':\n")
         sys.stderr.write(str(err)+"\n")  
         traceback.print_exc()      
     return result

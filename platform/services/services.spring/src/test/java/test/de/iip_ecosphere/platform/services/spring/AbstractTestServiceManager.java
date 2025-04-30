@@ -61,6 +61,7 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel;
@@ -544,7 +545,7 @@ public class AbstractTestServiceManager {
             }
             ServiceDescriptor desc = mgr.getService(id);
             ProtocolServerBuilder sBuilder = AasFactory.getInstance().createProtocolServerBuilder(
-                config.getServiceProtocol(), addr.getPort());
+                new BasicSetupSpec(config.getServiceProtocol(), addr.getPort()));
             ServiceMapper mapper = new ServiceMapper(sBuilder);
             mapper.mapService(new ServiceImpl(desc));
             Server server = sBuilder.build();

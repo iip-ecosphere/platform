@@ -119,8 +119,7 @@ public class AasxDeviceAasProvider extends DeviceAasProvider {
             
             if (null != aas) {
                 try {
-                    Registry reg = AasFactory.getInstance().obtainRegistry(
-                        AasPartRegistry.getSetup().getRegistryEndpoint());
+                    Registry reg = AasFactory.getInstance().obtainRegistry(AasPartRegistry.getSetup());
                     aasAddress = reg.getEndpoint(aas);
                 } catch (IOException e) {
                     LoggerFactory.getLogger(getClass()).error("Obtaining factory/endpoint: {}", e.getMessage());

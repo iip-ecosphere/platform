@@ -18,7 +18,10 @@ import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.ServiceStub;
 import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 
 import java.io.File;
@@ -100,7 +103,9 @@ public class StarterTest {
         Starter.getSetup().setNotifyServiceNull(false); // prevent exception output
         Starter.mapService(null); // service does not exist
         Starter.getSetup().setNotifyServiceNull(notifyOld);
-        InvocablesCreator iCreator = AasFactory.getInstance().createInvocablesCreator(protocol, "localhost", port);
+        BasicSetupSpec spec = new BasicSetupSpec();
+        spec.setAssetServerAddress(new ServerAddress(Schema.HTTP, port), protocol);
+        InvocablesCreator iCreator = AasFactory.getInstance().createInvocablesCreator(spec);
         ServiceStub stub = new ServiceStub(iCreator, "1234"); // service does not exist
         Assert.assertNull(stub.getState());
         Assert.assertEquals("", stub.getDescription());

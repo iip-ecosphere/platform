@@ -22,6 +22,7 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import org.junit.Assert;
 
@@ -187,20 +188,19 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
         Assert.assertTrue("Python server process not started", started.get());
         
         ServerAddress aasServer = new ServerAddress(Schema.HTTP); 
-        Endpoint aasServerBase = new Endpoint(aasServer, "");
         Endpoint aasServerRegistry = new Endpoint(aasServer, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
+        BasicSetupSpec spec = new BasicSetupSpec(aasServerRegistry, aasServer);
+        spec.setAssetServerAddress(vabServer, protocol);
 
         MyService service = new MyService(); // pendent to Python service, used here as expected value(s)
-        Aas aas = AasCreator.createAas(vabServer, service, protocol);
-        
+        Aas aas = AasCreator.createAas(spec, service);
         Server httpServer = AasFactory.getInstance()
-            .createDeploymentRecipe(aasServerBase)
-            .addInMemoryRegistry(aasServerRegistry)
+            .createDeploymentRecipe(spec)
+            .forRegistry()
             .deploy(aas)
             .createServer()
             .start();
-        
-        AbstractEnvironmentTest.testAas(aasServerRegistry, service);
+        AbstractEnvironmentTest.testAas(spec, service);
 
         httpServer.stop(true);
         python.destroy();

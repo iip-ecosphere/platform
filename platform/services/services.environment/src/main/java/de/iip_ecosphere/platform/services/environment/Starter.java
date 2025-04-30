@@ -38,6 +38,7 @@ import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
@@ -511,7 +512,7 @@ public class Starter {
 
         getLogger().info("Configuring service command server for protocol '" + protocol 
             + "' (empty means default) and port " + port);
-        builder = factory.createProtocolServerBuilder(protocol, port);
+        builder = factory.createProtocolServerBuilder(new BasicSetupSpec(protocol, port));
     }
     
     /**

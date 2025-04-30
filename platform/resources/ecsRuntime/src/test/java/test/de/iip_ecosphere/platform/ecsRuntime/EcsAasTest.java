@@ -127,11 +127,11 @@ public class EcsAasTest {
         PersistenceType pType = LocalPersistenceType.INMEMORY;
         System.out.println("Starting " + pType + " AAS registry on " 
             + AasFactory.getInstance().getFullRegistryUri(regEndpoint));
-        Server registryServer = rcp.createRegistryServer(regEndpoint, pType);
+        Server registryServer = rcp.createRegistryServer(AasPartRegistry.getSetup(), pType);
         registryServer.start();
         Endpoint serverEndpoint = AasPartRegistry.getSetup().getServerEndpoint();
         System.out.println("Starting " + pType + " AAS server on " + serverEndpoint.toUri());
-        Server aasServer = rcp.createAasServer(serverEndpoint, pType, regEndpoint);
+        Server aasServer = rcp.createAasServer(AasPartRegistry.getSetup(), pType);
         aasServer.start();
         
         AasPartRegistry.AasBuildResult res = AasPartRegistry.build(c -> c instanceof EcsAas);
@@ -173,12 +173,11 @@ public class EcsAasTest {
         EcsFactory.getSetup().setAas(aasSetup);
 
         ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
-        Endpoint regEndpoint = aasSetup.getRegistryEndpoint();
         Server registryServer = rcp
-            .createRegistryServer(regEndpoint, ServerRecipe.LocalPersistenceType.INMEMORY)
+            .createRegistryServer(aasSetup, ServerRecipe.LocalPersistenceType.INMEMORY)
             .start();
         AasServer aasServer = rcp
-            .createAasServer(aasSetup.getServerEndpoint(), ServerRecipe.LocalPersistenceType.INMEMORY, regEndpoint)
+            .createAasServer(aasSetup, ServerRecipe.LocalPersistenceType.INMEMORY)
             .start();
 
         LifecycleHandler.startup(new String[] {});

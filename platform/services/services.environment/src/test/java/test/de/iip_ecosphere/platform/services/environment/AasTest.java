@@ -24,6 +24,7 @@ import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import test.de.iip_ecosphere.platform.services.environment.AasCreator.AasResult;
@@ -46,15 +47,15 @@ public class AasTest {
     public void testAas() throws IOException, ExecutionException {
         ServerAddress vabServer = new ServerAddress(Schema.HTTP);
         ServerAddress aasServer = new ServerAddress(Schema.HTTP); 
-        Endpoint aasServerBase = new Endpoint(aasServer, "");
         Endpoint aasServerRegistry = new Endpoint(aasServer, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
+        BasicSetupSpec spec = new BasicSetupSpec(aasServerRegistry, aasServer);
+        spec.setAssetServerAddress(vabServer);
 
         MyService service = new MyService();
         AasResult res = new AasResult();
-        Aas aas = AasCreator.createAas(vabServer, service, AasFactory.DEFAULT_PROTOCOL, res);
+        Aas aas = AasCreator.createAas(spec, service, res);
         
-        ProtocolServerBuilder pBuilder = AasFactory.getInstance()
-            .createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, vabServer.getPort());
+        ProtocolServerBuilder pBuilder = AasFactory.getInstance().createProtocolServerBuilder(spec);
 
         ServiceMapper mapper = new ServiceMapper(pBuilder);
         mapper.mapService(service);
@@ -62,13 +63,13 @@ public class AasTest {
         server.start();
         
         Server httpServer = AasFactory.getInstance()
-            .createDeploymentRecipe(aasServerBase)
-            .addInMemoryRegistry(aasServerRegistry)
+            .createDeploymentRecipe(spec)
+            .forRegistry()
             .deploy(aas)
             .createServer()
             .start();
         
-        AbstractEnvironmentTest.testAas(aasServerRegistry, service);
+        AbstractEnvironmentTest.testAas(spec, service);
         AbstractEnvironmentTest.testAasResult(res, service);
 
         httpServer.stop(true);

@@ -19,6 +19,7 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasServer;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.RegistryDeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Registry;
@@ -146,13 +147,13 @@ public class MasterK8SAas {
  
         ServerAddress vabServer = new ServerAddress(Schema.HTTP, serverIP, vabPort);
         ServerAddress aasServer = new ServerAddress(Schema.HTTP, serverIP, aasPort);
-        Endpoint aasServerBase = new Endpoint(aasServer, "");
         Endpoint aasServerRegistry = new Endpoint(aasServer, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
+        BasicSetupSpec spec = new BasicSetupSpec(aasServerRegistry, aasServer);
+        spec.setAssetServerAddress(vabServer, AasFactory.DEFAULT_PROTOCOL);
 
         Aas aas = MasterAasCreator.createAas(vabServer);
 
-        ProtocolServerBuilder pBuilder = AasFactory.getInstance()
-                .createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, vabServer.getPort());
+        ProtocolServerBuilder pBuilder = AasFactory.getInstance().createProtocolServerBuilder(spec);
         pBuilder.defineProperty(MasterAasCreator.AAS_SUBMODEL_PROPERTY_NAME, () -> "K8SAasProperty", null);
         pBuilder.defineProperty(MasterAasCreator.AAS_SUBMODEL_PROPERTY_VERSION, () -> "0.0.1", null);
         pBuilder.defineProperty(MasterAasCreator.AAS_SUBMODEL_PROPERTY_DESCRIPTION, () -> "K8S AAS", null);
@@ -162,8 +163,8 @@ public class MasterK8SAas {
         Server server = pBuilder.build();
         server.start();
 
-        Server httpServer = AasFactory.getInstance().createDeploymentRecipe(aasServerBase)
-                .addInMemoryRegistry(aasServerRegistry).deploy(aas).createServer().start();
+        Server httpServer = AasFactory.getInstance().createDeploymentRecipe(spec)
+            .forRegistry().deploy(aas).createServer().start();
 
         ArrayList<Server> servers = new ArrayList<Server>();
         servers.add(httpServer);
@@ -190,11 +191,13 @@ public class MasterK8SAas {
         ServerAddress vabServer = new ServerAddress(Schema.HTTPS, serverIP, vabPort);
         ServerAddress aasServer = new ServerAddress(Schema.HTTP, serverIP, aasPort);
         ServerAddress aasServerS = new ServerAddress(Schema.HTTPS, serverIP, 1234);
+        Endpoint regEp = new Endpoint(aasServer, "registry");
+        BasicSetupSpec spec = new BasicSetupSpec(regEp, aasServer, kstore);
+        spec.setAssetServerAddress(vabServer, AasFactory.DEFAULT_PROTOCOL);
 
         Aas aas = MasterAasCreator.createAas(vabServer);
 
-        ProtocolServerBuilder pBuilder = AasFactory.getInstance()
-                .createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, vabServer.getPort());
+        ProtocolServerBuilder pBuilder = AasFactory.getInstance().createProtocolServerBuilder(spec);
         pBuilder.defineProperty(MasterAasCreator.AAS_SUBMODEL_PROPERTY_NAME, () -> "K8SAasProperty", null);
         pBuilder.defineProperty(MasterAasCreator.AAS_SUBMODEL_PROPERTY_VERSION, () -> "0.0.1", null);
         pBuilder.defineProperty(MasterAasCreator.AAS_SUBMODEL_PROPERTY_DESCRIPTION, () -> "K8S AAS", null);
@@ -209,13 +212,13 @@ public class MasterK8SAas {
         ServerRecipe srcp = factory.createServerRecipe();
         
         // start a registry server
-        Endpoint regEp = new Endpoint(aasServer, "registry");
-        Server regServer = srcp.createRegistryServer(regEp, LocalPersistenceType.INMEMORY, kstore).start();
+        Server regServer = srcp.createRegistryServer(spec, LocalPersistenceType.INMEMORY).start();
         
         // Start target deployment server and connect to the registry
         Endpoint serverEp = new Endpoint(aasServerS, "cloud");
-        RegistryDeploymentRecipe regD = factory.createDeploymentRecipe(serverEp, kstore)
-            .setRegistryUrl(regEp);
+        BasicSetupSpec specS = new BasicSetupSpec(regEp, serverEp, kstore);
+        RegistryDeploymentRecipe regD = factory.createDeploymentRecipe(specS)
+            .forRegistry(regEp);
         Registry reg = regD.obtainRegistry();
         AasServer cloudServer = regD.createServer().start();
         

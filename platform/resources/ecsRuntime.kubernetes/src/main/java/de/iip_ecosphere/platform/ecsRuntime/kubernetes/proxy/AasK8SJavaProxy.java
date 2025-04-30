@@ -13,6 +13,7 @@ import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
@@ -57,15 +58,15 @@ public class AasK8SJavaProxy extends AbstractK8SJavaProxy {
         if (proxyType.equals(ProxyType.WorkerProxy)) {
             ServerAddress aasServer = new ServerAddress(Schema.HTTP, serverIP, Integer.parseInt(serverPort));
             Endpoint aasServerRegistry = new Endpoint(aasServer, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
-            
+            BasicSetupSpec spec = new BasicSetupSpec(aasServerRegistry, aasServer);
             AasFactory factory = AasFactory.getInstance();
             
             try {
                 if (tlsCheck) {
-                    aas = factory.obtainRegistry(aasServerRegistry, Schema.HTTPS)
+                    aas = factory.obtainRegistry(spec, Schema.HTTPS)
                             .retrieveAas("urn:::AAS:::MasterK8SAas#");
                 } else {
-                    aas = factory.obtainRegistry(aasServerRegistry).retrieveAas("urn:::AAS:::MasterK8SAas#");
+                    aas = factory.obtainRegistry(spec).retrieveAas("urn:::AAS:::MasterK8SAas#");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -77,10 +78,10 @@ public class AasK8SJavaProxy extends AbstractK8SJavaProxy {
             
             try {
                 if (tlsCheck) {
-                    watchAas = watchFactory.obtainRegistry(aasServerRegistry, Schema.HTTPS)
+                    watchAas = watchFactory.obtainRegistry(spec, Schema.HTTPS)
                             .retrieveAas("urn:::AAS:::MasterK8SAas#");
                 } else {
-                    watchAas = watchFactory.obtainRegistry(aasServerRegistry).retrieveAas("urn:::AAS:::MasterK8SAas#");
+                    watchAas = watchFactory.obtainRegistry(spec).retrieveAas("urn:::AAS:::MasterK8SAas#");
                 }
             } catch (IOException e) {
                 e.printStackTrace();

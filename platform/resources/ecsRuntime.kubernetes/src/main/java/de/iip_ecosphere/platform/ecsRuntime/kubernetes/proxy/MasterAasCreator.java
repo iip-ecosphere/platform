@@ -16,6 +16,7 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
@@ -51,8 +52,8 @@ public class MasterAasCreator {
      */
     public static Aas createAas(ServerAddress addr) {
         AasFactory factory = AasFactory.getInstance();
-        InvocablesCreator iCreator = factory.createInvocablesCreator(AasFactory.DEFAULT_PROTOCOL, 
-            addr.getHost(), addr.getPort());
+        InvocablesCreator iCreator = factory.createInvocablesCreator(new BasicSetupSpec(AasFactory.DEFAULT_PROTOCOL, 
+            addr.getHost(), addr.getPort()));
         AasBuilder aasBuilder = factory.createAasBuilder(AAS_NAME, URN_AAS);
         SubmodelBuilder smBuilder = aasBuilder.createSubmodelBuilder(AAS_SUBMODEL_NAME, null);
         smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_NAME)
