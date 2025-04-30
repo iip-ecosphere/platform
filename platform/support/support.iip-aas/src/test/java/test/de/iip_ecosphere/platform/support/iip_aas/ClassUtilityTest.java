@@ -17,10 +17,7 @@ import java.util.concurrent.ExecutionException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.support.Endpoint;
-import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
-import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
@@ -31,6 +28,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
 import de.iip_ecosphere.platform.support.iip_aas.Skip;
 
@@ -188,11 +186,10 @@ public class ClassUtilityTest {
         aasBuilder.createSubmodelBuilder(NAME_TEST_SUBMODEL, null).build();
         
         // deploy the AAS
-        ServerAddress serverAdr = new ServerAddress(Schema.HTTP);
-        Endpoint regEp = new Endpoint(serverAdr, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
+        AasSetup spec = AasPartRegistry.AasSetup.createLocalEphemeralSetup();
         Server httpServer = AasFactory.getInstance()
-            .createDeploymentRecipe(new Endpoint(serverAdr, ""))
-            .addInMemoryRegistry(regEp)
+            .createDeploymentRecipe(spec)
+            .forRegistry()
             .deploy(aasBuilder.build())
             .createServer()
             .start();
@@ -200,7 +197,7 @@ public class ClassUtilityTest {
         
         // read back the AAS
         factory = AasFactory.getInstance();
-        Aas aas = factory.obtainRegistry(regEp).retrieveAas(URN_AAS);
+        Aas aas = factory.obtainRegistry(spec).retrieveAas(URN_AAS);
         SubmodelBuilder smBuilder = aas.createSubmodelBuilder(NAME_TEST_SUBMODEL, null); // regardless whether it exists
         populateModel(smBuilder);
         smBuilder.build();
@@ -209,7 +206,7 @@ public class ClassUtilityTest {
 
         // and assert again, e.g., different process
         factory = AasFactory.getInstance();
-        aas = factory.obtainRegistry(regEp).retrieveAas(URN_AAS);
+        aas = factory.obtainRegistry(spec).retrieveAas(URN_AAS);
         aas.accept(new AasPrintVisitor());
         assertTypeSubmodel(aas);
 

@@ -348,7 +348,7 @@ public class NameplateSetup {
     /**
      * Returns the manufacturer product designation.
      * 
-     * @return the designation
+     * @return the designation (may be <b>null</b> for none)
      */
     public String getManufacturerProductDesignation() {
         return manufacturerProductDesignation;
@@ -492,7 +492,6 @@ public class NameplateSetup {
      * @return the AAS
      * 
      * @see #createTechnicalDataNameplate(AasBuilder, String)
-     * @see #createSoftwareNameplate(AasBuilder, String)
      */
     public Aas createAas(String urn, String id, Consumer<AasBuilder> further) {
         AasFactory factory = AasFactory.getInstance();
@@ -748,8 +747,7 @@ public class NameplateSetup {
      * @throws IOException if the resolution failed
      */
     public static Aas resolve(String identifier) throws IOException {
-        Registry reg = AasFactory.getInstance().obtainRegistry(
-            AasPartRegistry.getSetup().getRegistryEndpoint());
+        Registry reg = AasFactory.getInstance().obtainRegistry(AasPartRegistry.getSetup());
         return reg.retrieveAas(identifier);
     }
 

@@ -16,7 +16,6 @@ import java.util.function.Supplier;
 
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasServer;
@@ -64,12 +63,11 @@ public class AasLifecycleTest {
         AasSetup oldSetup = AasPartRegistry.setAasSetup(aasSetup);
 
         ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
-        Endpoint regEndpoint = aasSetup.getRegistryEndpoint();
         Server registryServer = rcp
-            .createRegistryServer(regEndpoint, ServerRecipe.LocalPersistenceType.INMEMORY)
+            .createRegistryServer(aasSetup, ServerRecipe.LocalPersistenceType.INMEMORY)
             .start();
         AasServer aasServer = rcp
-            .createAasServer(aasSetup.getServerEndpoint(), ServerRecipe.LocalPersistenceType.INMEMORY, regEndpoint)
+            .createAasServer(aasSetup, ServerRecipe.LocalPersistenceType.INMEMORY)
             .start();
 
         MyAasLifecycle lifecycleDesc = new MyAasLifecycle("test", () -> aasSetup);

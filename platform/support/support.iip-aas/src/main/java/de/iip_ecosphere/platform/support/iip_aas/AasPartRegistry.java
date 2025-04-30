@@ -40,6 +40,8 @@ import de.iip_ecosphere.platform.support.aas.CorsEnabledRecipe;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.ImmediateDeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.RegistryDeploymentRecipe;
+import de.iip_ecosphere.platform.support.aas.SetupSpec.State;
+import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Property;
@@ -50,7 +52,9 @@ import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.config.EndpointHolder;
 import de.iip_ecosphere.platform.support.iip_aas.config.ProtocolAddressHolder;
 import de.iip_ecosphere.platform.support.iip_aas.config.RuntimeSetupEndpointValidator;
+import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
 import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
+import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
 /**
  * A registry for {@link AasContributor} instances to be loaded via the Java Service loader.
@@ -85,7 +89,9 @@ public class AasPartRegistry {
     public static final String DEFAULT_HOST = ServerAddress.LOCALHOST;
     public static final String NO_SPECIFIC_SERVER_HOST = "-";
     public static final int DEFAULT_PORT = 8080;
-    public static final int DEFAULT_REGISTRY_PORT = 8081; // shall also be on 8080; two processes in one needs revision
+    public static final int DEFAULT_SM_PORT = 8082;
+    public static final int DEFAULT_REGISTRY_PORT = 8081; 
+    public static final int DEFAULT_SM_REGISTRY_PORT = 8083;
     public static final int DEFAULT_PROTOCOL_PORT = 9000;
     public static final String DEFAULT_AAS_ENDPOINT = "";
     public static final String DEFAULT_REGISTRY_ENDPOINT = "registry";
@@ -121,13 +127,19 @@ public class AasPartRegistry {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class AasSetup {
+    public static class AasSetup implements SetupSpec {
 
         private EndpointHolder server = new EndpointHolder(AasPartRegistry.DEFAULT_SCHEMA, 
             DEFAULT_HOST, DEFAULT_PORT, DEFAULT_AAS_ENDPOINT);
 
+        private EndpointHolder smServer = new EndpointHolder(AasPartRegistry.DEFAULT_SCHEMA, 
+                DEFAULT_HOST, DEFAULT_SM_PORT, DEFAULT_AAS_ENDPOINT);
+        
         private EndpointHolder registry = new EndpointHolder(DEFAULT_SCHEMA, DEFAULT_HOST, 
             DEFAULT_REGISTRY_PORT, DEFAULT_REGISTRY_ENDPOINT);
+
+        private EndpointHolder smRegistry = new EndpointHolder(DEFAULT_SCHEMA, DEFAULT_HOST, 
+                DEFAULT_SM_REGISTRY_PORT, DEFAULT_REGISTRY_ENDPOINT);
 
         private ProtocolAddressHolder implementation = new ProtocolAddressHolder(Schema.IGNORE, 
             DEFAULT_HOST, DEFAULT_PROTOCOL_PORT, DEFAULT_PROTOCOL);
@@ -138,6 +150,12 @@ public class AasPartRegistry {
         private String accessControlAllowOrigin = DeploymentRecipe.ANY_CORS_ORIGIN;
         private int aasStartupTimeout = 120000;
         private String pluginId; // default of AasFactory
+
+        private State aasRegistryState = State.STOPPED;
+        private State smRegistryState = State.STOPPED;
+        private State aasRepoState = State.STOPPED;
+        private State smRepoState = State.STOPPED;
+        private State assetServerState = State.STOPPED;
 
         /**
          * Default constructor.
@@ -152,7 +170,9 @@ public class AasPartRegistry {
          */
         public AasSetup(AasSetup setup) {
             setServer(setup.server);
+            setSubmodelServer(setup.smServer);
             setRegistry(setup.registry);
+            setSubmodelRegistry(setup.smRegistry);
             setImplementation(setup.implementation);
             setMode(setup.mode);
         }
@@ -207,6 +227,15 @@ public class AasPartRegistry {
         }
 
         /**
+         * Returns the submodel server information.
+         * 
+         * @return the submodel server information
+         */
+        public EndpointHolder getSubmodelServer() {
+            return smServer;
+        }
+
+        /**
          * Defines the AAS server information. [required by data mapper]
          * 
          * @param aas the AAS server information
@@ -217,6 +246,17 @@ public class AasPartRegistry {
         }
 
         /**
+         * Defines the submodel server information. [required by data mapper]
+         * 
+         * @param aas the submodel server information
+         */
+        public void setSubmodelServer(EndpointHolder aas) {
+            this.smServer = new EndpointHolder(aas);
+            this.smServer.setValidator(
+                RuntimeSetupEndpointValidator.create(r -> r.getSubmodelServer(), false)); // false -> v1 optional
+        }
+
+        /**
          * Returns the AAS information. [required by data mapper]
          * 
          * @return the AAS information
@@ -224,7 +264,16 @@ public class AasPartRegistry {
         public EndpointHolder getRegistry() {
             return registry;
         }
-        
+
+        /**
+         * Returns the submodel information. [required by data mapper]
+         * 
+         * @return the submodel information
+         */
+        public EndpointHolder getSubmodelRegistry() {
+            return smRegistry;
+        }
+
         /**
          * Returns the AAS mode.
          * 
@@ -310,6 +359,17 @@ public class AasPartRegistry {
             this.registry = new EndpointHolder(registry);
             this.registry.setValidator(RuntimeSetupEndpointValidator.create(r -> r.getAasRegistry()));
         }
+        
+        /**
+         * Defines the registry information. [required by data mapper, snakeyaml]
+         * 
+         * @param registry the registry information
+         */
+        public void setSubmodelRegistry(EndpointHolder registry) {
+            this.smRegistry = new EndpointHolder(registry);
+            this.smRegistry.setValidator(
+                RuntimeSetupEndpointValidator.create(r -> r.getSubmodelRegistry(), false)); // false -> v1 optional
+        }        
 
         /**
          * Returns the implementation (server) information. [required by data mapper, snakeyaml]
@@ -410,11 +470,132 @@ public class AasPartRegistry {
             }
             result.getServer().setHost(ServerAddress.LOCALHOST);
             result.getServer().setPort(NetUtils.getEphemeralPort());
+            result.getSubmodelServer().setHost(ServerAddress.LOCALHOST);
+            result.getSubmodelServer().setPort(NetUtils.getEphemeralPort());
             result.getRegistry().setHost(ServerAddress.LOCALHOST);
-            result.getRegistry().setPort(regPortSame ? result.getServer().getPort() : NetUtils.getEphemeralPort());
+            result.getRegistry().setPort(regPortSame ? result.getServer().getPort() 
+                : NetUtils.getEphemeralPort());
+            result.getSubmodelRegistry().setHost(ServerAddress.LOCALHOST);
+            result.getSubmodelRegistry().setPort(regPortSame ? result.getServer().getPort() 
+                : NetUtils.getEphemeralPort());
             result.getImplementation().setHost(ServerAddress.LOCALHOST);
             result.getImplementation().setPort(NetUtils.getEphemeralPort()); // could both be the same?
             return result;
+        }
+        
+        @Override
+        @JsonIgnore
+        public Endpoint getAasRegistryEndpoint() {
+            return registry.getEndpoint();
+        }
+        
+        @Override
+        public State getAasRegistryState() {
+            return isRunning(registry, aasRegistryState);
+        }
+
+        @Override
+        public void notifyAasRegistryStateChange(State state) {
+            this.aasRegistryState = state;
+        }
+
+        @Override
+        @JsonIgnore
+        public Endpoint getSubmodelRegistryEndpoint() {
+            return smRegistry.getEndpoint();
+        }
+        
+        @Override
+        public State getSubmodelRegistryState() {
+            return isRunning(smRegistry, smRegistryState);
+        }
+
+        @Override
+        public void notifySubmodelRegistryStateChange(State state) {
+            this.smRegistryState = state;
+        }
+
+        @Override
+        @JsonIgnore
+        public Endpoint getAasRepositoryEndpoint() {
+            return server.getEndpoint();
+        }
+
+        @Override
+        public State getAasRepositoryState() {
+            return isRunning(server, aasRepoState);
+        }
+
+        @Override
+        public void notifyAasRepositoryStateChange(State state) {
+            this.aasRepoState = state;
+        }
+        
+        @Override
+        @JsonIgnore
+        public Endpoint getSubmodelRepositoryEndpoint() {
+            return smServer.getEndpoint();
+        }
+        
+        @Override
+        public State getSubmodelRepositoryState() {
+            return isRunning(smServer, smRepoState);
+        }
+
+        @Override
+        public void notifySubmodelRepositoryStateChange(State state) {
+            this.smRepoState = state;
+        }
+
+        @Override
+        public KeyStoreDescriptor getAasRepositoryKeyStore() {
+            return server.getKeystoreDescriptor();
+        }
+
+        @Override
+        public KeyStoreDescriptor getSubmodelRepositoryKeyStore() {
+            return smServer.getKeystoreDescriptor();
+        }
+
+        @Override
+        public ServerAddress getAssetServerAddress() {
+            return implementation.getServerAddress();
+        }
+        
+        @Override
+        public String getAssetServerProtocol() {
+            return implementation.getProtocol();
+        }
+
+        @Override
+        public State getAssetServerState() {
+            return isRunning(implementation, assetServerState);
+        }
+
+        /**
+         * Returns whether a certain server is running, based on the {@link ServerAddressHolder#isRunning()} in 
+         * {@link State#STOPPED} or based on the notified state else.
+         * 
+         * @param holder the holder
+         * @param state the notified state
+         * @return the actual state
+         */
+        private State isRunning(ServerAddressHolder holder, State state) {
+            State result = state;
+            if (state == State.STOPPED && holder.isRunning()) {
+                result = State.EXTERNAL;
+            }
+            return result;
+        }
+
+        @Override
+        public void notifyAssetServerStateChange(State state) {
+            this.assetServerState = state;
+        }
+
+        @Override
+        public KeyStoreDescriptor getAssetServerKeyStore() {
+            return implementation.getKeystoreDescriptor();
         }
 
     }
@@ -635,13 +816,12 @@ public class AasPartRegistry {
             // make AAS implementation server externally available
             implHost = NetUtils.getOwnIP(NetUtils.getNetMask(impl.getNetmask(), impl.getHost()));
         }
+        impl.setHost(implHost);
         LoggerFactory.getLogger(AasPartRegistry.class).info("Using {}:{} for AAS implementation server", 
             implHost, aasImplPort);
-        InvocablesCreator iCreator = factory.createInvocablesCreator(impl.getProtocol(), implHost, aasImplPort, 
-            impl.getKeystoreDescriptor());
+        InvocablesCreator iCreator = factory.createInvocablesCreator(setup);
         if (null == sBuilder) {
-            sBuilder = factory.createProtocolServerBuilder(impl.getProtocol(), aasImplPort, 
-                impl.getKeystoreDescriptor());
+            sBuilder = factory.createProtocolServerBuilder(setup);
         }
         Iterator<AasContributor> iter = contributors();
         while (iter.hasNext()) {
@@ -716,14 +896,12 @@ public class AasPartRegistry {
      * @throws IOException if the AAS cannot be read due to connection errors
      */
     public static Aas retrieveAas(AasSetup setup, String identifier, boolean populate) throws IOException {
-        Registry reg = AasFactory.getInstance().obtainRegistry(setup.getRegistryEndpoint(), 
-            setup.getServer().getSchema());
+        Registry reg = AasFactory.getInstance().obtainRegistry(setup, setup.getServer().getSchema());
         if (null == reg) {
             throw new IOException("No AAS registry at " + setup.getRegistryEndpoint().toUri());
         }
         try {
-            return AasFactory.getInstance().obtainRegistry(setup.getRegistryEndpoint())
-                .retrieveAas(identifier, populate);
+            return AasFactory.getInstance().obtainRegistry(setup).retrieveAas(identifier, populate);
         } catch (Throwable t) {
             throw new IOException(t);
         }
@@ -753,8 +931,8 @@ public class AasPartRegistry {
      */
     public static Server deploy(List<Aas> aas, String... options) {
         ImmediateDeploymentRecipe dBuilder = applyCorsOrigin(AasFactory.getInstance()
-            .createDeploymentRecipe(setup.getServerEndpoint()), setup)
-            .addInMemoryRegistry(setup.getRegistry().getEndpoint());
+            .createDeploymentRecipe(setup), setup)
+            .forRegistry();
         for (Aas a: aas) {
             dBuilder.deploy(a);
         }
@@ -789,8 +967,8 @@ public class AasPartRegistry {
      */
     public static Server register(List<Aas> aas, Endpoint registry, String... options) throws IOException {
         RegistryDeploymentRecipe dBuilder = applyCorsOrigin(AasFactory.getInstance()
-            .createDeploymentRecipe(setup.getServerEndpoint(), setup.getServer().getKeystoreDescriptor()), setup)
-            .setRegistryUrl(registry);
+            .createDeploymentRecipe(setup), setup)
+            .forRegistry(registry);
         Registry reg = dBuilder.obtainRegistry();
         for (Aas a: aas) {
             for (Submodel s : a.submodels()) {
@@ -820,8 +998,8 @@ public class AasPartRegistry {
     public static void remoteDeploy(AasSetup setup, List<Aas> aas) throws IOException {
         Endpoint aasEndpoint = setup.getServerEndpoint();
         RegistryDeploymentRecipe regD = applyCorsOrigin(AasFactory.getInstance()
-            .createDeploymentRecipe(aasEndpoint, setup.getServer().getKeystoreDescriptor()), setup)
-            .setRegistryUrl(setup.getRegistryEndpoint());
+            .createDeploymentRecipe(setup), setup)
+            .forRegistry(setup.getRegistryEndpoint());
         
         Registry reg = regD.obtainRegistry();
         for (Aas a: aas) {
@@ -862,7 +1040,7 @@ public class AasPartRegistry {
     public static Registry getIipAasRegistry() {
         Registry reg = null; 
         try {
-            reg = AasFactory.getInstance().obtainRegistry(AasPartRegistry.getSetup().getRegistryEndpoint());
+            reg = AasFactory.getInstance().obtainRegistry(AasPartRegistry.getSetup());
         } catch (IOException e) {
             LoggerFactory.getLogger(AasPartRegistry.class).error("Obtaining AAS registry: {}. AAS linking disabled.",
                 e.getMessage());

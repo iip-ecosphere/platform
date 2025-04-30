@@ -35,7 +35,9 @@ public class RuntimeSetup extends AbstractSetup {
     
     private static RuntimeSetup instance;
     private String aasRegistry;
+    private String smRegistry;
     private String aasServer;
+    private String smServer;
 
     /**
      * Returns the AAS registry URI.
@@ -56,6 +58,24 @@ public class RuntimeSetup extends AbstractSetup {
     }
 
     /**
+     * Returns the AAS registry URI.
+     * 
+     * @return the registry URI (may be <b>null</b> for unknown)
+     */
+    public String getSubmodelRegistry() {
+        return smRegistry;
+    }
+
+    /**
+     * Defines the AAS registry URI. [snakeyaml]
+     * 
+     * @param smRegistry the AAS registry URI to set
+     */
+    public void setSubmodelRegistry(String smRegistry) {
+        this.smRegistry = smRegistry;
+    }
+
+    /**
      * Returns the AAS server URI.
      * 
      * @return the AAS server URI (may be <b>null</b> for unknown)
@@ -72,6 +92,24 @@ public class RuntimeSetup extends AbstractSetup {
     public void setAasServer(String aasServer) {
         this.aasServer = aasServer;
     }
+    
+    /**
+     * Returns the AAS server URI.
+     * 
+     * @return the AAS server URI (may be <b>null</b> for unknown)
+     */
+    public String getSubmodelServer() {
+        return smServer;
+    }
+
+    /**
+     * Defines the AAS server URI. [snakeyaml]
+     * 
+     * @param smServer the server URI to set
+     */
+    public void setSubmodelServer(String smServer) {
+        this.smServer = smServer;
+    }    
     
     /**
      * Returns the default location for the runtime setup file.

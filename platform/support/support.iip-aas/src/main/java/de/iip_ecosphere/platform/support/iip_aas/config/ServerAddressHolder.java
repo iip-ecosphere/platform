@@ -18,7 +18,7 @@ public class ServerAddressHolder {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private int port; // negative leads to ephemerial
     private String host;
-    private Schema schema;
+    private Schema schema = Schema.IGNORE;
     private boolean running = false;
 
 

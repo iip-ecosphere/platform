@@ -213,7 +213,8 @@ public class PlatformAas implements AasContributor {
      * Creates the software nameplate.
      * 
      * @param aasBuilder the parent AAS builder
-     * @param urn the URN of the platform AAS
+     * @param appSetup the application setup
+     * @param versionInfo the version information
      */
     private void createSoftwareNameplate(AasBuilder aasBuilder, ApplicationSetup appSetup, IipVersion versionInfo) {
         String version = null == appSetup.getVersion() ? "" : appSetup.getVersion().toString();

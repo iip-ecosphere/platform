@@ -19,6 +19,7 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
@@ -78,17 +79,17 @@ public class NetworkManagerAas implements AasContributor {
             smB.createOperationBuilder(OP_RELEASE_PORT)
                 .addInputVariable("key", Type.STRING)
                 .setInvocable(iCreator.createInvocable(getQName(OP_RELEASE_PORT)))
-                .build(Type.NONE);
+                .build();
             smB.createOperationBuilder(OP_REGISTER_INSTANCE)
                 .addInputVariable("key", Type.STRING)
                 .addInputVariable("hostId", Type.STRING)
                 .setInvocable(iCreator.createInvocable(getQName(OP_REGISTER_INSTANCE)))
-                .build(Type.NONE);
+                .build();
             smB.createOperationBuilder(OP_UNREGISTER_INSTANCE)
                 .addInputVariable("key", Type.STRING)
                 .addInputVariable("hostId", Type.STRING)
                 .setInvocable(iCreator.createInvocable(getQName(OP_UNREGISTER_INSTANCE)))
-                .build(Type.NONE);
+                .build();
             smB.createOperationBuilder(OP_GET_REGISTERED_INSTANCES)
                 .addInputVariable("key", Type.STRING)
                 .setInvocable(iCreator.createInvocable(getQName(OP_GET_REGISTERED_INSTANCES)))
@@ -139,10 +140,10 @@ public class NetworkManagerAas implements AasContributor {
             p -> NetworkManagerFactory.getInstance().getRegisteredInstances(readString(p, 0, null)));
         sBuilder.defineProperty(getQName(PROP_HIGH_PORT), 
             () -> NetworkManagerFactory.getInstance().getHighPort(), 
-            PropertyBuilder.READ_ONLY);
+            PropertyBuilder.READ_ONLY_FUNC);
         sBuilder.defineProperty(getQName(PROP_LOW_PORT), 
             () -> NetworkManagerFactory.getInstance().getLowPort(), 
-            PropertyBuilder.READ_ONLY);
+            PropertyBuilder.READ_ONLY_FUNC);
     }
     
     /**
@@ -152,7 +153,7 @@ public class NetworkManagerAas implements AasContributor {
      * @return the qualified name
      */
     public static String getQName(String elementName) {
-        return NAME_SUBMODEL + "_" + elementName;
+        return AasFactory.composeIdShort(NAME_SUBMODEL, elementName);
     }
 
     /**

@@ -44,14 +44,30 @@ public class RuntimeSetupEndpointValidator extends BasicEndpointValidator {
      * @return the endpoint validator
      */
     public static EndpointValidator create(Function<RuntimeSetup, String> accessor) {
+        return create(accessor, true);
+    }
+    
+    /**
+     * Creates an endpoint validator based on {@link RuntimeSetup}. If there is no runtime setup or the accessed URI 
+     * is invalid, a {@link BasicEndpointValidator} is returned.
+     * 
+     * @param accessor the accessor defining the URI to be used
+     * @return the endpoint validator
+     */
+    public static EndpointValidator create(Function<RuntimeSetup, String> accessor, boolean failIfNull) {
         EndpointValidator result;
         RuntimeSetup setup = RuntimeSetup.load(() -> null, false);
         if (null == setup) {
             result = new BasicEndpointValidator();
         } else {
-            try {
-                result = new RuntimeSetupEndpointValidator(new URI(accessor.apply(setup)));
-            } catch (URISyntaxException e) {
+            String uri = accessor.apply(setup);
+            if (failIfNull || (!failIfNull && uri != null)) {
+                try {
+                    result = new RuntimeSetupEndpointValidator(new URI(uri));
+                } catch (URISyntaxException e) {
+                    result = new BasicEndpointValidator();
+                }
+            } else {
                 result = new BasicEndpointValidator();
             }
         }
