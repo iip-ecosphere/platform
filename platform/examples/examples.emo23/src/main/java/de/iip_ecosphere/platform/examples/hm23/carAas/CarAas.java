@@ -30,6 +30,7 @@ import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder;
 import de.iip_ecosphere.platform.support.aas.types.technicaldata.TechnicalDataBuilder.GeneralInformationBuilder;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 
 /**
@@ -133,9 +134,10 @@ public class CarAas implements Runnable {
             final String registryPath = "registry";
             ServerAddress serverAdr = new ServerAddress(Schema.HTTP, hostname, port);
             Endpoint regEp = new Endpoint(serverAdr, registryPath);
-            ImmediateDeploymentRecipe rcp = factory.createDeploymentRecipe(new Endpoint(serverAdr, ""))
+            BasicSetupSpec spec = new BasicSetupSpec(regEp, serverAdr);
+            ImmediateDeploymentRecipe rcp = factory.createDeploymentRecipe(spec)
                 .setAccessControlAllowOrigin(DeploymentRecipe.ANY_CORS_ORIGIN)
-                .addInMemoryRegistry(regEp);
+                .forRegistry();
     
             for (Car c: yml.getCars()) {
                 System.out.println("Creating AAS for car with id: " + c.getId());

@@ -31,6 +31,7 @@ import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.ImmediateDeploymen
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 
 /**
  * Implements a local car AAS fallback server. This is intentionally not a main program as the 
@@ -110,9 +111,10 @@ public class CarAas {
                 final String registryPath = "registry";
                 ServerAddress serverAdr = new ServerAddress(Schema.HTTP, hostname, 9989);
                 Endpoint regEp = new Endpoint(serverAdr, registryPath);
-                ImmediateDeploymentRecipe rcp = factory.createDeploymentRecipe(new Endpoint(serverAdr, ""))
+                BasicSetupSpec spec = new BasicSetupSpec(regEp, serverAdr);
+                ImmediateDeploymentRecipe rcp = factory.createDeploymentRecipe(spec)
                     .setAccessControlAllowOrigin(DeploymentRecipe.ANY_CORS_ORIGIN)
-                    .addInMemoryRegistry(regEp);
+                    .forRegistry();
         
                 for (Car c: yml.getCars()) {
                     System.out.println("Creating AAS for car with id: " + c.getId());

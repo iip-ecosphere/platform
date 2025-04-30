@@ -135,11 +135,11 @@ public class TraceToAasServiceMain {
         Endpoint regEndpoint = aasSetup.getRegistryEndpoint();
         PersistenceType pType = LocalPersistenceType.INMEMORY;
         System.out.println("Starting " + pType + " AAS registry on " + regEndpoint.toUri());
-        registryServer = rcp.createRegistryServer(regEndpoint, pType);
+        registryServer = rcp.createRegistryServer(aasSetup, pType);
         registryServer.start();
         Endpoint serverEndpoint = aasSetup.getServerEndpoint();
         System.out.println("Starting " + pType + " AAS server on " + serverEndpoint.toUri());
-        aasServer = rcp.createAasServer(aasSetup.getServerEndpoint(), pType, regEndpoint);
+        aasServer = rcp.createAasServer(aasSetup, pType);
         aasServer.start();
         
         // just like the real platform, but with private local descriptor, no full lifecycle

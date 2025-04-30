@@ -33,6 +33,7 @@ import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup;
 import de.iip_ecosphere.platform.transport.status.TraceRecord;
 import iip.datatypes.Command;
@@ -87,8 +88,9 @@ public class AppAas extends TraceToAasService implements iip.interfaces.AppAasIn
         super.augmentCommandsSubmodel(smBuilder);
         ServerAddress vabServer = new ServerAddress(Schema.HTTP); // ephemeral, localhost
         AasFactory factory = AasFactory.getInstance();
-        InvocablesCreator ic = factory.createInvocablesCreator(AasFactory.DEFAULT_PROTOCOL, 
+        BasicSetupSpec spec = new BasicSetupSpec(AasFactory.DEFAULT_PROTOCOL, 
             vabServer.getHost(), vabServer.getPort());
+        InvocablesCreator ic = factory.createInvocablesCreator(spec);
         smBuilder.createOperationBuilder(OP_START)
             .addInputVariable("id", Type.STRING)
             .setInvocable(ic.createInvocable(OP_START))
@@ -104,8 +106,7 @@ public class AppAas extends TraceToAasService implements iip.interfaces.AppAasIn
             .setInvocable(ic.createInvocable(OP_FEEDBACK))
             .build();
         
-        ProtocolServerBuilder psb = factory.createProtocolServerBuilder(
-            AasFactory.DEFAULT_PROTOCOL, vabServer.getPort());
+        ProtocolServerBuilder psb = factory.createProtocolServerBuilder(spec);
         psb.defineOperation(OP_START, 
             p -> sendCommand(Commands.REQUEST_START, AasUtils.readString(p, 0)));
         psb.defineOperation(OP_SWITCH_AI, 
