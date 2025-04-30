@@ -14,9 +14,6 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 import java.io.Serializable;
 
@@ -24,6 +21,10 @@ import org.eclipse.basyx.vab.modelprovider.VABElementProxy;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.Invokable;
+import de.iip_ecosphere.platform.support.aas.Invokable.GetterInvokable;
+import de.iip_ecosphere.platform.support.aas.Invokable.OperationInvokable;
+import de.iip_ecosphere.platform.support.aas.Invokable.SetterInvokable;
 
 /**
  * Implements an abstract invocables creator for the VAB following the naming conventions of 
@@ -151,7 +152,7 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
      * 
      * @author Holger Eichelberger, SSE
      */
-    protected static class Getter extends AbstractFunctor implements Supplier<Object> {
+    protected static class Getter extends AbstractFunctor implements GetterInvokable {
 
         private static final long serialVersionUID = -9126944118648742265L;
 
@@ -191,7 +192,7 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
      * 
      * @author Holger Eichelberger, SSE
      */
-    protected static class Setter extends AbstractFunctor implements Consumer<Object> {
+    protected static class Setter extends AbstractFunctor implements SetterInvokable {
 
         private static final long serialVersionUID = 2420859918496174956L;
 
@@ -229,7 +230,7 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
      * 
      * @author Holger Eichelberger, SSE
      */
-    protected static class Operation extends AbstractFunctor implements Function<Object[], Object> {
+    protected static class Operation extends AbstractFunctor implements OperationInvokable {
 
         private static final long serialVersionUID = -3021593348876711589L;
 
@@ -265,21 +266,21 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
         }
 
         // checkstyle: resume exception type check
-
+        
     }
     
     @Override
-    public Supplier<Object> createGetter(String name) {
+    public Invokable createGetter(String name) {
         return new Getter(this, name);
     }
 
     @Override
-    public Consumer<Object> createSetter(String name) {
+    public Invokable createSetter(String name) {
         return new Setter(this, name);
     }
 
     @Override
-    public Function<Object[], Object> createInvocable(String name) {
+    public Invokable createInvocable(String name) {
         return new Operation(this, name);
     }
 

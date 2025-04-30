@@ -70,7 +70,7 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements B
         @Override
         public Aas build() {
             if (null == instance.getAsset()) {
-                LoggerFactory.getLogger(getClass()).warn("AAS does not have an asset, i.e., the AAS does not indicate"
+                LoggerFactory.getLogger(getClass()).warn("AAS does not have an asset, i.e., the AAS does not indicate "
                     + "whether it is an instance or a type. Further, the missing asset may prevent persisting the "
                     + "AAS.");
             }

@@ -14,7 +14,10 @@ package test.de.iip_ecosphere.platform.support.aas.basyx;
 
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder.PayloadCodec;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder.PayloadConsumer;
@@ -38,7 +41,9 @@ public class BaSyxCodecTest {
         AasFactory factory = AasFactory.getInstance();
         for (String protocol : factory.getProtocols()) {
             if (!AasFactory.LOCAL_PROTOCOL.equals(protocol)) { // only VAB
-                ProtocolServerBuilder builder = factory.createProtocolServerBuilder(protocol, 8080); // port not rel.
+                BasicSetupSpec spec = new BasicSetupSpec();
+                spec.setAssetServerAddress(new ServerAddress(Schema.IGNORE, 8080), protocol);
+                ProtocolServerBuilder builder = factory.createProtocolServerBuilder(spec); // port not relevant
                 PayloadCodec codec = builder.createPayloadCodec();
                 if (null != codec) {
                     Assert.assertNotNull(codec.intendedSchema());

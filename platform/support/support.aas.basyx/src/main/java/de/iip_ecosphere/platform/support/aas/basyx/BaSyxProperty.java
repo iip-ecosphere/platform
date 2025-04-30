@@ -16,8 +16,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
@@ -30,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.Invokable;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Type;
@@ -101,7 +100,7 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
         }
 
         @Override
-        public PropertyBuilder bind(Supplier<Object> get, Consumer<Object> set) {
+        public PropertyBuilder bind(Invokable get, Invokable set) {
             if (null == typeDef) {
                 throw new IllegalArgumentException("setType was not called before");
             }
@@ -115,13 +114,15 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
         }
 
         @Override
-        public PropertyBuilder bindLazy(Supplier<Object> get, Consumer<Object> set) {
+        public PropertyBuilder bindLazy(Invokable get, Invokable set) {
             if (null != get && null == set) {
                 LOGGER.warn("Creating AAS operation " + property.getIdShort() + " with only a bound getter "
                     + "can lead to runtime inconsistencies as setting the value will change the value in the "
                     + "property rather than the value in the underlying representation object.");
             }
-            property.set(VABLambdaProviderHelper.createSimple(get, set), typeDef);
+            property.set(VABLambdaProviderHelper.createSimple(
+                null == get ? null : get.getGetter(), 
+                null == set ? null : set.getSetter()), typeDef);
             return this;
         }
 

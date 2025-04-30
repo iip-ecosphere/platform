@@ -29,6 +29,7 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.FileFormat;
 import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
@@ -38,9 +39,9 @@ import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
+import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.SimpleLocalProtocolCreator;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
-import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
 /**
  * AAS factory for BaSyx. Do not rename, this class is referenced in {@code META-INF/services}.
@@ -64,13 +65,14 @@ public abstract class AbstractBaSyxAasFactory extends AasFactory {
     protected static class VabTcpProtocolCreator implements ProtocolCreator {
 
         @Override
-        public InvocablesCreator createInvocablesCreator(String host, int port, KeyStoreDescriptor kstore) {
-            return new VabTcpInvocablesCreator(host, port); 
+        public InvocablesCreator createInvocablesCreator(SetupSpec spec) {
+            ServerAddress addr = spec.getAssetServerAddress();
+            return new VabTcpInvocablesCreator(addr.getHost(), addr.getPort()); 
         }
 
         @Override
-        public ProtocolServerBuilder createProtocolServerBuilder(int port, KeyStoreDescriptor kstore) {
-            return new VabOperationsProvider.VabTcpOperationsBuilder(port);
+        public ProtocolServerBuilder createProtocolServerBuilder(SetupSpec spec) {
+            return new VabOperationsProvider.VabTcpOperationsBuilder(spec.getAssetServerAddress().getPort());
         }
         
     }
@@ -83,13 +85,15 @@ public abstract class AbstractBaSyxAasFactory extends AasFactory {
     protected static class VabHttpProtocolCreator implements ProtocolCreator {
 
         @Override
-        public InvocablesCreator createInvocablesCreator(String host, int port, KeyStoreDescriptor kstore) {
-            return new VabHttpInvocablesCreator("http://" + host + ":" + port);
+        public InvocablesCreator createInvocablesCreator(SetupSpec spec) {
+            ServerAddress addr = spec.getAssetServerAddress();
+            return new VabHttpInvocablesCreator("http://" + addr.getHost() + ":" + addr.getPort());
         }
 
         @Override
-        public ProtocolServerBuilder createProtocolServerBuilder(int port, KeyStoreDescriptor kstore) {
-            return new VabOperationsProvider.VabHttpOperationsBuilder(port, Schema.HTTP, null);
+        public ProtocolServerBuilder createProtocolServerBuilder(SetupSpec spec) {
+            return new VabOperationsProvider.VabHttpOperationsBuilder(spec.getAssetServerAddress().getPort(), 
+                Schema.HTTP, null);
         }
         
     }
@@ -102,13 +106,16 @@ public abstract class AbstractBaSyxAasFactory extends AasFactory {
     protected static class VabHttpsProtocolCreator implements ProtocolCreator {
         
         @Override
-        public InvocablesCreator createInvocablesCreator(String host, int port, KeyStoreDescriptor kstore) {
-            return new VabHttpsInvocablesCreator("https://" + host + ":" + port, kstore);
+        public InvocablesCreator createInvocablesCreator(SetupSpec spec) {
+            ServerAddress addr = spec.getAssetServerAddress();
+            return new VabHttpsInvocablesCreator("https://" + addr.getHost() + ":" + addr.getPort(), 
+                spec.getAssetServerKeyStore());
         }
 
         @Override
-        public ProtocolServerBuilder createProtocolServerBuilder(int port, KeyStoreDescriptor kstore) {
-            return new VabOperationsProvider.VabHttpOperationsBuilder(port, Schema.HTTPS, kstore);
+        public ProtocolServerBuilder createProtocolServerBuilder(SetupSpec spec) {
+            return new VabOperationsProvider.VabHttpOperationsBuilder(spec.getAssetServerAddress().getPort(), 
+                Schema.HTTPS, spec.getAssetServerKeyStore());
         }
         
     }
@@ -164,19 +171,19 @@ public abstract class AbstractBaSyxAasFactory extends AasFactory {
     }
     
     @Override
-    public Registry obtainRegistry(Endpoint endpoint) throws IOException {
-        return obtainRegistry(endpoint, endpoint.getSchema());
+    public Registry obtainRegistry(SetupSpec spec) throws IOException {
+        return obtainRegistry(spec, spec.getAasRegistryEndpoint().getSchema());
     }
     
     @Override
-    public Registry obtainRegistry(Endpoint endpoint, Schema aasSchema) throws IOException {
+    public Registry obtainRegistry(SetupSpec spec, Schema aasSchema) throws IOException {
         IConnectorFactory cFactory;
         if (Schema.HTTPS == aasSchema) {
             cFactory = new HTTPSConnectorProvider();
         } else {
             cFactory = new HTTPConnectorFactory();
         }
-        return new BaSyxRegistry(endpoint, cFactory);
+        return new BaSyxRegistry(spec.getAasRegistryEndpoint(), cFactory);
     }
     
     @Override
@@ -188,15 +195,10 @@ public abstract class AbstractBaSyxAasFactory extends AasFactory {
     public String getServerBaseUri(Endpoint serverEndpoint) {
         return serverEndpoint.toUri() + "/shells";
     }
-
-    @Override
-    public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint) {
-        return new BaSyxDeploymentRecipe(endpoint);
-    }
     
     @Override
-    public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint, KeyStoreDescriptor kstore) {
-        return new BaSyxDeploymentRecipe(endpoint, kstore);
+    public DeploymentRecipe createDeploymentRecipe(SetupSpec spec) {
+        return new BaSyxDeploymentRecipe(spec);
     }
 
     @Override

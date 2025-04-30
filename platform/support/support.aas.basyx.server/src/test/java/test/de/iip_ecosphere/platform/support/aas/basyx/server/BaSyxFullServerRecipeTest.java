@@ -21,6 +21,7 @@ import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasServer;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.PersistenceType;
@@ -54,24 +55,25 @@ public class BaSyxFullServerRecipeTest {
         
         Endpoint serverEp = new Endpoint(new ServerAddress(Schema.HTTP), "aas");
         Endpoint regEp = new Endpoint(new ServerAddress(Schema.HTTP), "registry");
+        BasicSetupSpec spec = new BasicSetupSpec(regEp, serverEp);
         try {
-            recipe.createRegistryServer(regEp, null, "");
+            recipe.createRegistryServer(spec, null, "");
             Assert.fail("PersistenceType not handled");
         } catch (UnsupportedOperationException e) {
             // this is ok
         }
         
-        Server regServer = recipe.createRegistryServer(regEp, LocalPersistenceType.INMEMORY);
+        Server regServer = recipe.createRegistryServer(spec, LocalPersistenceType.INMEMORY);
         regServer.start();
         
         try {
-            recipe.createAasServer(serverEp, WrongPersistenceType.WRONG, regEp, "");
+            recipe.createAasServer(spec, WrongPersistenceType.WRONG, "");
             Assert.fail("PersistenceType not handled");
         } catch (UnsupportedOperationException e) {
             // this is ok
         }
         
-        AasServer aasServer = recipe.createAasServer(serverEp, LocalPersistenceType.INMEMORY, regEp);
+        AasServer aasServer = recipe.createAasServer(spec, LocalPersistenceType.INMEMORY);
         aasServer.start();
         
         // deployments would be anyway local...

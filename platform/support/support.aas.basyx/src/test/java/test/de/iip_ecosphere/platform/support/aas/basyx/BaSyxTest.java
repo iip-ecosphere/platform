@@ -18,8 +18,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.Invokable;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxAasFactory;
@@ -44,6 +46,11 @@ public class BaSyxTest extends AasTest {
         }
         return result;
     }
+    
+    @Override
+    protected Schema getAasServerAddressSchema(String serverProtocol) {
+        return serverProtocol.length() > 0 ? Schema.HTTPS : Schema.HTTP; // works here, but too much assumption
+    }    
 
     @Override
     protected boolean excludeProtocol(String protocol) {
@@ -60,7 +67,7 @@ public class BaSyxTest extends AasTest {
     public String[] getServerProtocols() {
         return new String[] {"", BaSyxAasFactory.PROTOCOL_VAB_HTTPS};
     }
-    
+
     /**
      * Tests lazy bindings.
      */
@@ -70,18 +77,22 @@ public class BaSyxTest extends AasTest {
         SubmodelBuilder sm = aas.createSubmodelBuilder(NAME_SUBMODEL, null);
         
         try {
-            sm.createPropertyBuilder("prop").setType(Type.INT32).bind(() -> null, null).build();
+            sm.createPropertyBuilder("prop").setType(Type.INT32)
+                .bind(Invokable.createInvokable(() -> null), null).build();
             Assert.fail("IllegalArgumentException not thrown");
         } catch (IllegalArgumentException e) {
         }
-        sm.createPropertyBuilder("prop").setType(Type.INT32).bindLazy(() -> null, null).build();
+        sm.createPropertyBuilder("prop").setType(Type.INT32)
+            .bindLazy(Invokable.createInvokable(() -> null), null).build();
         
         try {
-            sm.createPropertyBuilder("prop").setType(Type.BOOLEAN).bind(null, v -> { }).build();
+            sm.createPropertyBuilder("prop").setType(Type.BOOLEAN)
+                .bind(null, Invokable.createInvokable(v -> { })).build();
             Assert.fail("IllegalArgumentException not thrown");
         } catch (IllegalArgumentException e) {
         }
-        sm.createPropertyBuilder("prop").setType(Type.BOOLEAN).bindLazy(null, v -> { }).build();
+        sm.createPropertyBuilder("prop").setType(Type.BOOLEAN)
+            .bindLazy(null, Invokable.createInvokable(v -> { })).build();
 
         try {
             sm.createPropertyBuilder("prop").bind(null, null).build();
@@ -90,11 +101,11 @@ public class BaSyxTest extends AasTest {
         }
 
         try {
-            sm.createOperationBuilder("op").setInvocable((p) -> null).build();
+            sm.createOperationBuilder("op").setInvocable(Invokable.createInvokable((p) -> null)).build();
             Assert.fail("IllegalArgumentException not thrown");
         } catch (IllegalArgumentException e) {
         }
-        sm.createOperationBuilder("op").setInvocableLazy((p) -> null).build();
+        sm.createOperationBuilder("op").setInvocableLazy(Invokable.createInvokable((p) -> null)).build();
 
         sm.build();
         aas.build();

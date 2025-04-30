@@ -29,14 +29,14 @@ import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.Endpoint;
-import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasServer;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.Registry;
+import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.Submodel;
-import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
 /**
  * An initial BaSyx-specific deployment builder.
@@ -45,37 +45,17 @@ import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
  */
 public class BaSyxDeploymentRecipe implements DeploymentRecipe {
 
+    private SetupSpec spec;
     private DeploymentSpec deploymentSpec;
 
     /**
      * Creates a deployment builder with root/empty document base path.
      * 
-     * @param endpoint the endpoint to create the deployment context for
+     * @param spec the setup spec to create the deployment context for
      */
-    BaSyxDeploymentRecipe(Endpoint endpoint) {
-        deploymentSpec = new DeploymentSpec(endpoint);
-    }
-    
-    /**
-     * Creates a deployment builder with root/empty document base path.
-     * 
-     * @param endpoint the endpoint to create the deployment context for
-     * @param kstore the key store descriptor, ignored if <b>null</b>
-     */
-    BaSyxDeploymentRecipe(Endpoint endpoint, KeyStoreDescriptor kstore) {
-        deploymentSpec = new DeploymentSpec(endpoint, kstore);
-    }
-
-    /**
-     * Creates a deployment builder.
-     * 
-     * @param host the target host
-     * @param port the target IP port
-     * @param contextPath the context base path (may be empty, otherwise shall start with a "/")
-     * @param docBasePath the documents base path (may be empty, otherwise shall start with a "/") 
-     */
-    BaSyxDeploymentRecipe(String host, int port, String contextPath, String docBasePath) {
-        deploymentSpec = new DeploymentSpec(new Endpoint(Schema.IGNORE, host, port, contextPath), docBasePath);
+    BaSyxDeploymentRecipe(SetupSpec spec) {
+        this.spec = spec;
+        deploymentSpec = new DeploymentSpec(spec.getAasRepositoryEndpoint(), spec.getAasRepositoryKeyStore());
     }
     
     @Override
@@ -112,19 +92,16 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
     }
 
     @Override
-    public ImmediateDeploymentRecipe addInMemoryRegistry(Endpoint regEndpoint) {
+    public ImmediateDeploymentRecipe forRegistry() {
+        Endpoint regEndpoint = spec.getAasRegistryEndpoint();
         if (regEndpoint.getSchema() != deploymentSpec.getEndpoint().getSchema()) {
             LoggerFactory.getLogger(getClass()).warn("");
         }
-        return addInMemoryRegistry(regEndpoint.getEndpoint());
-    }
-    
-    @Override
-    public ImmediateDeploymentRecipe addInMemoryRegistry(String regEndpoint) {
         deploymentSpec.setRegistry(new InMemoryRegistry());
         IModelProvider registryProvider = new AASRegistryModelProvider(deploymentSpec.getRegistry());
         HttpServlet registryServlet = new VABHTTPInterface<IModelProvider>(registryProvider);
-        deploymentSpec.getContext().addServletMapping(Endpoint.checkEndpoint(regEndpoint) + "/*", registryServlet);
+        deploymentSpec.getContext().addServletMapping(Endpoint.checkEndpoint(regEndpoint.getEndpoint()) 
+            + "/*", registryServlet);
         return new BaSyxImmediateDeploymentRecipe();
     }
 
@@ -148,7 +125,8 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
         
         @Override
         public Registry obtainRegistry() throws IOException {
-            return AasFactory.getInstance().obtainRegistry(endpoint, deploymentSpec.getEndpoint().getSchema());
+            BasicSetupSpec spec = new BasicSetupSpec(endpoint);
+            return AasFactory.getInstance().obtainRegistry(spec, deploymentSpec.getEndpoint().getSchema());
         }
 
 
@@ -172,8 +150,8 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
     }
  
     @Override
-    public RegistryDeploymentRecipe setRegistryUrl(Endpoint endpoint) {
-        return new BaSyxRegistryDeploymentRecipe(endpoint);
+    public RegistryDeploymentRecipe forRegistry(Endpoint aasEndpoint, Endpoint submodelEndpoint) {
+        return new BaSyxRegistryDeploymentRecipe(aasEndpoint); // for older metamodel
     }
     
     /**

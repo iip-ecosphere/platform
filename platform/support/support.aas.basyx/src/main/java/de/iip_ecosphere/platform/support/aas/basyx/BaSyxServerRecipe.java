@@ -19,10 +19,10 @@ import org.eclipse.basyx.components.registry.configuration.BaSyxRegistryConfigur
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
 import org.slf4j.LoggerFactory;
 
-import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasServer;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
+import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
 /**
@@ -47,23 +47,13 @@ public class BaSyxServerRecipe implements ServerRecipe {
         }
         return result;
     }
-    @Override
-    public AasServer createAasServer(Endpoint serverEndpoint, PersistenceType persistence, Endpoint registryEndpoint, 
-        String... options) {
-        return createAasServer(serverEndpoint, persistence, registryEndpoint, null, options);
-    }
             
     @Override
-    public AasServer createAasServer(Endpoint serverEndpoint, PersistenceType persistence, Endpoint registryEndpoint, 
-        KeyStoreDescriptor kstore, String... options) {
-        DeploymentSpec spec = applyAccessControlAllowOrigin(new DeploymentSpec(serverEndpoint, kstore));
-        return new BaSyxRegistryDeploymentAasServer(spec, registryEndpoint.toUri(), translateForServer(persistence), 
-            options);
-    }
-    
-    @Override
-    public Server createRegistryServer(Endpoint endpoint, PersistenceType persistence, String... options) {
-        return createRegistryServer(endpoint, persistence, null, options);
+    public AasServer createAasServer(SetupSpec spec, PersistenceType persistence, String... options) {
+        DeploymentSpec dspec = applyAccessControlAllowOrigin(
+            new DeploymentSpec(spec.getAasRepositoryEndpoint(), spec.getAasRepositoryKeyStore()));
+        return new BaSyxRegistryDeploymentAasServer(dspec, spec.getAasRegistryEndpoint().toUri(), 
+            translateForServer(persistence), options);
     }
     
     /**
@@ -80,13 +70,13 @@ public class BaSyxServerRecipe implements ServerRecipe {
     }
 
     @Override
-    public Server createRegistryServer(Endpoint endpoint, PersistenceType persistence, KeyStoreDescriptor kstore, 
-        String... options) {
+    public Server createRegistryServer(SetupSpec spec, PersistenceType persistence, String... options) {
         // registries are not encrypted in BaSyx
-        DeploymentSpec spec = applyAccessControlAllowOrigin(new DeploymentSpec(endpoint, (KeyStoreDescriptor) null));
+        DeploymentSpec dspec = applyAccessControlAllowOrigin(new DeploymentSpec(spec.getAasRegistryEndpoint(), 
+            (KeyStoreDescriptor) null));
         RegistryBackend backend = Tools.getOption(options, translateForRegistry(persistence), RegistryBackend.class);
         BaSyxRegistryConfiguration registryConfig = new BaSyxRegistryConfiguration(backend);
-        final IComponent component = new RegistryComponent(spec.getContextConfiguration(), registryConfig);
+        final IComponent component = new RegistryComponent(dspec.getContextConfiguration(), registryConfig);
         return new Server() {
 
             @Override
@@ -99,7 +89,7 @@ public class BaSyxServerRecipe implements ServerRecipe {
             public void stop(boolean dispose) {
                 component.stopComponent();
                 if (dispose) { // if not disposable, schedule for deletion at JVM end
-                    Tools.disposeTomcatWorkingDir(null, endpoint.getPort());
+                    Tools.disposeTomcatWorkingDir(null, spec.getAasRegistryEndpoint().getPort());
                 }
             }
 

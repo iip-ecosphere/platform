@@ -17,18 +17,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.eclipse.basyx.submodel.metamodel.api.qualifier.haskind.ModelingKind;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElement;
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.operation.IOperation;
+import org.eclipse.basyx.submodel.metamodel.api.submodelelement.operation.IOperationVariable;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetype.ValueType;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.OperationVariable;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.Invokable;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
@@ -142,7 +143,7 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
         }
 
         @Override
-        public OperationBuilder setInvocable(Function<Object[], Object> invocable) {
+        public OperationBuilder setInvocable(Invokable invocable) {
             if (invocable != null && !(invocable instanceof Serializable)) {
                 throw new IllegalArgumentException("'invocable' for operation '" + operation.getIdShort() 
                     + "' must be Serializable.");
@@ -151,8 +152,8 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
         }
 
         @Override
-        public OperationBuilder setInvocableLazy(Function<Object[], Object> invocable) {
-            operation.setInvokable(invocable);
+        public OperationBuilder setInvocableLazy(Invokable invocable) {
+            operation.setInvokable(invocable.getOperation());
             return this;
         }
 
@@ -164,6 +165,10 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
                 
         @Override
         public Operation build() {
+            if (operation.getIdShort().contains("_")) {
+                LoggerFactory.getLogger(BaSyxOperation.class).warn("IdShort of operation '{}' contains '_'. "
+                    + "Invocation may fail.", operation.getIdShort());
+            }
             if (null != inputVariables) {
                 operation.setInputVariables(inputVariables);
             }
@@ -171,8 +176,6 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
             // only output variables are considered, not InOut-Variables
             if (null == outputVariables) {
                 addOutputVariable(DEFAULT_RETURN_VAR_NAME, Type.NONE);
-                LoggerFactory.getLogger(BaSyxOperation.class).warn("No result output variable specified for "
-                    + "operation '{}'. Creating an implicit variable of type NONE.", operation.getIdShort());
             }
             if (null != outputVariables) {
                 operation.setOutputVariables(outputVariables);
@@ -216,7 +219,29 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
 
     @Override
     public int getOutArgsCount() {
-        return operation.getOutputVariables().size();
+        int result = operation.getOutputVariables().size();
+        if (isVoid()) { // added implicitly
+            result = 0;
+        }
+        return result;
+    }
+    
+    /**
+     * Returns whether this operation is void, i.e., no return type.
+     * 
+     * @return {@code true} for void, {@code false} else
+     */
+    private boolean isVoid() {
+        int noneCount = 0;
+        for (IOperationVariable v: operation.getOutputVariables()) {
+            if (v.getValue() instanceof Property) {
+                ValueType type = ((Property) v.getValue()).getValueType();
+                if (type == null || type == ValueType.None) {
+                    noneCount++;
+                }
+            }
+        }
+        return operation.getOutputVariables().size() == 1 && noneCount == 1;
     }
 
     @Override
