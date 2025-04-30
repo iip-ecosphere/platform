@@ -49,6 +49,7 @@ import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphNod
 import de.iip_ecosphere.platform.configuration.ivml.IvmlUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
@@ -238,8 +239,9 @@ public class AasIvmlMapperTest {
         
         AasFactory aasFactory = AasFactory.getInstance();
         SubmodelBuilder smb = aasFactory.createSubmodelBuilder(ConfigurationAas.NAME_SUBMODEL, null);
-        InvocablesCreator iCreator = aasFactory.createInvocablesCreator(AasFactory.LOCAL_PROTOCOL, "localhost", 0);
-        ProtocolServerBuilder psb = aasFactory.createProtocolServerBuilder(AasFactory.LOCAL_PROTOCOL, 0);
+        BasicSetupSpec spec = new BasicSetupSpec(AasFactory.LOCAL_PROTOCOL, 0);
+        InvocablesCreator iCreator = aasFactory.createInvocablesCreator(spec);
+        ProtocolServerBuilder psb = aasFactory.createProtocolServerBuilder(spec);
         mapper.mapByType(smb, iCreator);
         mapper.bindOperations(psb);
         String res = assertSubmodel(smb.build(), appName, netIndex, servicesAsserter);
