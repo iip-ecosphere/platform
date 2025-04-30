@@ -45,15 +45,21 @@ public enum Type {
     ANY_URI,
     BASE64_BINARY,
     HEX_BINARY,
+    @Deprecated() // BaSyx1
     NOTATION,
+    @Deprecated() // BaSyx1
     ENTITY,
+    @Deprecated() // BaSyx1
     ID,
+    @Deprecated() // BaSyx1
     IDREF,
     DOUBLE,
     FLOAT, 
     BOOLEAN,
     DURATION, 
+    @Deprecated() // BaSyx1
     DAY_TIME_DURATION, 
+    @Deprecated() // BaSyx1
     YEAR_MONTH_DURATION,
     DATE_TIME, 
     DATE_TIME_STAMP, 
@@ -62,9 +68,13 @@ public enum Type {
     G_MONTH_DAY, 
     G_YEAR, 
     G_YEAR_MONTH,
+    @Deprecated() // BaSyx1
     Q_NAME,
+    @Deprecated() // BaSyx1, // TODO return type void
     NONE, 
+    @Deprecated() // BaSyx1
     ANY_TYPE, 
+    @Deprecated() // BaSyx1
     ANY_SIMPLE_TYPE;
     
 }

@@ -12,11 +12,8 @@
 
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.Invokable;
 
 /**
  * A fake invocables creator that does nothing (in case that the fake AAS is active in basic component tests).
@@ -26,18 +23,18 @@ import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 public class FakeInvocablesCreator implements InvocablesCreator {
 
     @Override
-    public Supplier<Object> createGetter(String name) {
+    public Invokable createGetter(String name) {
         return WRITE_ONLY;
     }
 
     @Override
-    public Consumer<Object> createSetter(String name) {
+    public Invokable createSetter(String name) {
         return READ_ONLY;
     }
 
     @Override
-    public Function<Object[], Object> createInvocable(String name) {
-        return p -> null;
+    public Invokable createInvocable(String name) {
+        return Invokable.createSerializableInvokable(p -> null);
     }
 
 }

@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Supplier;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,11 +31,14 @@ import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.AasServer;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.Invokable.GetterInvokable;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
+import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -67,16 +69,17 @@ public class DeploymentTest {
         Aas aas = aasB.build();
         
         ServerAddress serverAdr = new ServerAddress(Schema.HTTP);
-        Endpoint regEp = new Endpoint(serverAdr, "registry");
-        AasServer server = factory.createDeploymentRecipe(new Endpoint(serverAdr, ""))
-            .addInMemoryRegistry(regEp)
+        Endpoint regEp = createDependentEndpoint(serverAdr, "registry");
+        BasicSetupSpec spec = new BasicSetupSpec(regEp, serverAdr);
+        System.out.println(spec);
+        AasServer server = factory.createDeploymentRecipe(spec)
+            .forRegistry()
             .deploy(aas)
             .createServer()
             .start();
-        Registry reg = factory.obtainRegistry(regEp);
+        Registry reg = factory.obtainRegistry(spec);
         aas = reg.retrieveAas(urn);
         Submodel sub = aas.createSubmodelBuilder("dynamic", null).build();
-
         server.deploy(aas, sub);
 
         aas = reg.retrieveAas(urn);
@@ -107,20 +110,22 @@ public class DeploymentTest {
     public void localDynamicSubmodelElementsCollectionDeployment() throws IOException, ExecutionException {
         final String urn = "urn:::AAS:::testMachines#";
         final ServerAddress serverAddress = new ServerAddress(Schema.HTTP);
-        Endpoint regEp = new Endpoint(serverAddress, "registry");
-        
+        Endpoint regEp = createDependentEndpoint(serverAddress, "registry");
+        BasicSetupSpec spec = new BasicSetupSpec(regEp, serverAddress);
+        System.out.println(spec);
+
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasB = factory.createAasBuilder("myAas", urn);
         aasB.createSubmodelBuilder("sub", null).build();
         Aas aas = aasB.build();
         
-        AasServer server = factory.createDeploymentRecipe(new Endpoint(serverAddress, ""))
-            .addInMemoryRegistry(regEp)
+        AasServer server = factory.createDeploymentRecipe(spec)
+            .forRegistry()
             .deploy(aas)
             .createServer()
             .start();
 
-        Registry reg = factory.obtainRegistry(regEp);
+        Registry reg = factory.obtainRegistry(spec);
         aas = reg.retrieveAas(urn, true);
         Submodel sub = aas.getSubmodel("sub");
         Assert.assertNotNull(sub);
@@ -163,33 +168,34 @@ public class DeploymentTest {
      * @throws IOException shall not occur
      * @throws ExecutionException shall not occur
      */
-    @SuppressWarnings("unchecked")
     @Test
     public void localDynamicSubmodelElementsCollectionPropertyDeployment() throws IOException, ExecutionException {
         final String urn = "urn:::AAS:::testMachines#";
         ServerAddress serverAddress = new ServerAddress(Schema.HTTP);
-        Endpoint regEp = new Endpoint(serverAddress, "registry");
+        Endpoint regEp = createDependentEndpoint(serverAddress, "registry");
+        BasicSetupSpec spec = new BasicSetupSpec(regEp, serverAddress);
+        System.out.println(spec);
         
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasB = factory.createAasBuilder("myAas", urn);
         aasB.createSubmodelBuilder("sub", null).build();
         Aas aas = aasB.build();
         
-        AasServer server = factory.createDeploymentRecipe(new Endpoint(serverAddress, ""))
-            .addInMemoryRegistry(regEp)
+        AasServer server = factory.createDeploymentRecipe(spec)
+            .forRegistry()
             .deploy(aas)
             .createServer()
             .start();
 
-        Registry reg = factory.obtainRegistry(regEp);
+        Registry reg = factory.obtainRegistry(spec);
         aas = reg.retrieveAas(urn);
         Submodel sub = aas.getSubmodel("sub");
         Assert.assertNotNull(sub);
         SubmodelElementCollectionBuilder smcB = sub.createSubmodelElementCollectionBuilder("coll", false, false);
         Assert.assertTrue(smcB.isNew());
         smcB.createPropertyBuilder("prop").setValue(Type.BOOLEAN, true).build();
-        smcB.createPropertyBuilder("prop2").setType(Type.INTEGER)
-            .bind((Supplier<Object> & Serializable) () -> 5, InvocablesCreator.READ_ONLY).build();
+        Utils.setValue(smcB.createPropertyBuilder("prop2").setType(Type.INTEGER), 5,
+            (GetterInvokable & Serializable) () -> 5, InvocablesCreator.READ_ONLY).build();
         smcB.build();
 
         aas = reg.retrieveAas(urn);
@@ -269,7 +275,7 @@ public class DeploymentTest {
         Assert.assertNotNull(prop2);
         Assert.assertEquals(5, prop2.getValue());
         prop2.setValue(8);
-        Assert.assertEquals(5, prop2.getValue());
+        Utils.assertIfPropertyFunction(prop2, 5, 8); // if: cannot overwrite as assigned getter
     }
 
     /**
@@ -304,6 +310,17 @@ public class DeploymentTest {
     }
     
     /**
+     * Creates a dependent endpoint. May have to be overridden for more recent implementations.
+     * 
+     * @param address the address
+     * @param endpoint the endpoint
+     * @return the created enpoint
+     */
+    protected Endpoint createDependentEndpoint(ServerAddress address, String endpoint) {
+        return new Endpoint(address, endpoint);
+    }
+    
+    /**
      * Tests a remote AAS deployment.
      * 
      * @param schema the schema for the servers
@@ -317,14 +334,15 @@ public class DeploymentTest {
 
         ServerRecipe srcp = factory.createServerRecipe();
         
-        // start a registry server
-        Endpoint regEp = new Endpoint(adaptRegistrySchema(schema), "registry");
-        Server regServer = srcp.createRegistryServer(regEp, LocalPersistenceType.INMEMORY, kstore).start();
-        
-        // Start target deployment server and connect to the registry
         Endpoint serverEp = new Endpoint(schema, "cloud");
-        RegistryDeploymentRecipe regD = factory.createDeploymentRecipe(serverEp, kstore)
-            .setRegistryUrl(regEp);
+        Endpoint regEp = new Endpoint(adaptRegistrySchema(schema), "registry");
+        BasicSetupSpec spec = new BasicSetupSpec(regEp, serverEp, kstore);
+        System.out.println(spec);
+        // start a registry server
+        Server regServer = srcp.createRegistryServer(spec, LocalPersistenceType.INMEMORY).start();
+        // Start target deployment server and connect to the registry
+        RegistryDeploymentRecipe regD = factory.createDeploymentRecipe(spec)
+            .forRegistry(regEp);
         Registry reg = regD.obtainRegistry();
         AasServer cloudServer = regD.createServer().start();
 
@@ -348,8 +366,8 @@ public class DeploymentTest {
         smB.createPropertyBuilder("max_temp").setValue(1000).build();
         smB.build();
         
-        assertRemoteAas(regEp, aasUrn, "oven_doc", smUrn, serverEp);
-        assertRemoteAas(regEp, aasUrn, "oven_doc2", smUrn2, serverEp);
+        assertRemoteAas(spec, aasUrn, "oven_doc", smUrn, serverEp);
+        assertRemoteAas(spec, aasUrn, "oven_doc2", smUrn2, serverEp);
 
         cloudServer.stop(true);
         regServer.stop(true);
@@ -358,17 +376,17 @@ public class DeploymentTest {
     /**
      * Asserts the remote AAS created by {@link #remoteAasDeploymentTest()}.
      * 
-     * @param regEp the registry endpoint
+     * @param spec the setup specification
      * @param aasUrn the AAS URN
      * @param submName the name of the submodel to assert for
      * @param smUrn the submodel URN
      * @param aasEp the endpoint of the AAS server
      * @throws IOException in case that obtaining the registry/receiving the AAS fails
      */
-    private void assertRemoteAas(Endpoint regEp, String aasUrn, String submName, String smUrn, Endpoint aasEp) 
+    private void assertRemoteAas(SetupSpec spec, String aasUrn, String submName, String smUrn, Endpoint aasEp) 
         throws IOException {
         // could use reg from above, "simulate" access from other location
-        Registry reg = AasFactory.getInstance().obtainRegistry(regEp, aasEp.getSchema());
+        Registry reg = AasFactory.getInstance().obtainRegistry(spec, aasEp.getSchema());
         Aas aas = reg.retrieveAas(aasUrn);
         Assert.assertNotNull(aas);
         Assert.assertEquals("oven", aas.getIdShort());

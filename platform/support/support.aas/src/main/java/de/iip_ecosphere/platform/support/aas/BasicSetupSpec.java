@@ -103,7 +103,7 @@ public class BasicSetupSpec implements SetupSpec {
      * just for migration purposes
      * 
      * @param registryEndpoint the AAS registry endpoint
-     * @param repositoryAddress the address of the repository
+     * @param repositoryEndpoint the repository endpoint
      * @param desc the server keystore descriptor
      */
     public BasicSetupSpec(Endpoint registryEndpoint, Endpoint repositoryEndpoint, KeyStoreDescriptor desc) {
@@ -117,7 +117,7 @@ public class BasicSetupSpec implements SetupSpec {
      * submodel for metamodel v3.
      * 
      * @param registryEndpoint the AAS registry endpoint
-     * @param repositoryEndpoing the AAS repository endpoint
+     * @param repositoryEndpoint the AAS repository endpoint
      */
     public BasicSetupSpec(Endpoint registryEndpoint, Endpoint repositoryEndpoint) {
         this(registryEndpoint, new Endpoint(registryEndpoint.getSchema(), ""), 
@@ -177,8 +177,7 @@ public class BasicSetupSpec implements SetupSpec {
     /**
      * Sets the registry endpoints for a single registry setup. This is not intended for metamodel v3.
      * 
-     * @param aasRegistryEndpoint the AAS registry endpoint
-     * @param smRegistryEndpoint the submodel registry endpoint
+     * @param endpoint the registry endpoint
      * @return <b>this</b> for chaining
      */
     public BasicSetupSpec setRegistryEndpoint(Endpoint endpoint) {

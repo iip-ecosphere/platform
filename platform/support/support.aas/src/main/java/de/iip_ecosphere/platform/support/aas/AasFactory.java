@@ -29,7 +29,6 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
-import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 import de.iip_ecosphere.platform.support.plugins.Plugin;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
@@ -49,8 +48,8 @@ public abstract class AasFactory {
     /**
      * A protocol involving only local calls, no network. Host/port shall be ignored. Created 
      * {@link InvocablesCreator} and {@link ProtocolServerBuilder} shall refer to the same {@link OperationsProvider} 
-     * instance. {@link #createInvocablesCreator(String, String, int)} creates then the provider instance that is used
-     * for the next {@link #createProtocolServerBuilder(String, int)} calls until the next invocables creator
+     * instance. {@link #createInvocablesCreator(SetupSpec)} creates then the provider instance that is used
+     * for the next {@link #createProtocolServerBuilder(SetupSpec)} calls until the next invocables creator
      * is requested. Clients may also create the instances directly to take control over the 
      * {@link OperationsProvider}. No other protocol shall have this name. The default protocol shall not be 
      * a local protocol.
@@ -89,7 +88,7 @@ public abstract class AasFactory {
         }
 
         @Override
-        public Registry obtainRegistry(Endpoint regEndpoint) throws IOException {
+        public Registry obtainRegistry(SetupSpec spec) throws IOException {
             return new Registry() { // some tests rely on an instance here
 
                 @Override
@@ -148,17 +147,12 @@ public abstract class AasFactory {
         }
         
         @Override
-        public Registry obtainRegistry(Endpoint regEndpoint, Schema aasSchema) throws IOException {
-            return obtainRegistry(regEndpoint);
+        public Registry obtainRegistry(SetupSpec spec, Schema aasSchema) throws IOException {
+            return obtainRegistry(spec);
         }
 
         @Override
-        public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint) {
-            return null;
-        }
-        
-        @Override
-        public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint, KeyStoreDescriptor store) {
+        public DeploymentRecipe createDeploymentRecipe(SetupSpec spec) {
             return null;
         }
 
@@ -194,28 +188,24 @@ public abstract class AasFactory {
         /**
          * Creates an invocables creator for a certain protocol.
          * 
-         * @param host the host name to communicate with
-         * @param port the port number to communicate on
-         * @param kstore the key store descriptor, ignored if <b>null</b>
+         * @param spec the setup specification
          * @return the invocables creator
          * @throws IllegalArgumentException if the protocol is not supported, the host name or the port is not valid
-         * @see #createProtocolServerBuilder(String, int)
+         * @see #createProtocolServerBuilder(SetupSpec)
          */
-        public InvocablesCreator createInvocablesCreator(String host, int port, KeyStoreDescriptor kstore);
+        public InvocablesCreator createInvocablesCreator(SetupSpec spec);
 
         /**
          * Creates a protocol server builder for a certain protocol. The server is supposed to run on localhost
          * and to be accessible. Depending on the AAS implementation, access to the protocol service may be 
-         * required to deploy an AAS, i.e., it is advisable to start the protocol server before 
-         * {@link #createDeploymentRecipe(Endpoint)}.
+         * required to deploy an AAS.
          * 
-         * @param port the port number to communicate on
-         * @param kstore the key store descriptor, ignored if <b>null</b>
+         * @param spec the setup specification
          * @return the builder instance
          * @throws IllegalArgumentException if the protocol is not supported or the port is not valid
-         * @see #createInvocablesCreator(String, String, int)
+         * @see #createInvocablesCreator(SetupSpec)
          */
-        public ProtocolServerBuilder createProtocolServerBuilder(int port, KeyStoreDescriptor kstore);
+        public ProtocolServerBuilder createProtocolServerBuilder(SetupSpec spec);
         
     }    
     
@@ -265,7 +255,7 @@ public abstract class AasFactory {
      * Returns the supported protocols.
      * 
      * @return the protocol names, shall include {@link #DEFAULT_PROTOCOL}
-     * @see #createInvocablesCreator(String, String, int)
+     * @see #createInvocablesCreator(SetupSpec)
      */
     public String[] getProtocols() {
         if (null == protocols) {
@@ -440,21 +430,21 @@ public abstract class AasFactory {
     /**
      * Obtains access to a registry for unencrypted AAS via HTTP.
      * 
-     * @param regEndpoint the registry endpoint
+     * @param spec the setup endpoints for AAS
      * @return the registry access for the given connection information
      * @throws IOException in case that the recipe/connection cannot be created
      */
-    public abstract Registry obtainRegistry(Endpoint regEndpoint) throws IOException;
+    public abstract Registry obtainRegistry(SetupSpec spec) throws IOException;
 
     /**
      * Obtains access to a registry.
      * 
-     * @param regEndpoint the registry endpoint
+     * @param spec the setup endpoints for AAS
      * @param aasSchema the schema to access the AAS server with, must be consistent with encryption settings
      * @return the registry access for the given connection information
      * @throws IOException in case that the recipe/connection cannot be created
      */
-    public abstract Registry obtainRegistry(Endpoint regEndpoint, Schema aasSchema) throws IOException;
+    public abstract Registry obtainRegistry(SetupSpec spec, Schema aasSchema) throws IOException;
     
     /**
      * Returns the full registry URI (without obtaining a registry).
@@ -475,19 +465,10 @@ public abstract class AasFactory {
     /**
      * Creates a deployment recipe for unencrypted deployment.
      * 
-     * @param endpoint the target host (hostname in particular used for endpoint urls)
+     * @param spec the setup specification
      * @return the deployment recipe instance (may be <b>null</b> if no AAS implementation is registered)
      */
-    public abstract DeploymentRecipe createDeploymentRecipe(Endpoint endpoint);
-
-    /**
-     * Creates a deployment recipe for encrypted deployment.
-     * 
-     * @param endpoint the target host (hostname in particular used for endpoint urls)
-     * @param kstore the key store descriptor, ignored if <b>null</b>
-     * @return the deployment recipe instance (may be <b>null</b> if no AAS implementation is registered)
-     */
-    public abstract DeploymentRecipe createDeploymentRecipe(Endpoint endpoint, KeyStoreDescriptor kstore);
+    public abstract DeploymentRecipe createDeploymentRecipe(SetupSpec spec);
     
     /**
      * Creates a persistence recipe.
@@ -499,76 +480,37 @@ public abstract class AasFactory {
     /**
      * Creates an invocables creator for a certain protocol.
      * 
-     * @param protocol the protocol (shall be one from {@link #getProtocols()}, may be {@link #DEFAULT_PROTOCOL} for 
-     *   the default protocol}
-     * @param host the host name to communicate with
-     * @param port the port number to communicate on
+     * @param spec the setup specification with protocol from {@link #getProtocols()}, may be {@link #DEFAULT_PROTOCOL}
      * @return the invocables creator (may be <b>null</b> if the protocol does not exist)
      * @throws IllegalArgumentException if the protocol is not supported, the host name or the port is not valid
-     * @see #createProtocolServerBuilder(String, int)
+     * @see #createProtocolServerBuilder(SetupSpec)
      */
-    public InvocablesCreator createInvocablesCreator(String protocol, String host, int port) {
-        return createInvocablesCreator(protocol, host, port, null);
-    }
-        
-    /**
-     * Creates an invocables creator for a certain protocol.
-     * 
-     * @param protocol the protocol (shall be one from {@link #getProtocols()}, may be {@link #DEFAULT_PROTOCOL} for 
-     *   the default protocol}
-     * @param host the host name to communicate with
-     * @param port the port number to communicate on
-     * @param kstore the key store descriptor, ignored if <b>null</b>
-     * @return the invocables creator (may be <b>null</b> if the protocol does not exist)
-     * @throws IllegalArgumentException if the protocol is not supported, the host name or the port is not valid
-     * @see #createProtocolServerBuilder(String, int)
-     */
-    public InvocablesCreator createInvocablesCreator(String protocol, String host, int port, 
-        KeyStoreDescriptor kstore) {
-        ProtocolCreator creator = protocolCreators.get(protocol);
+    public InvocablesCreator createInvocablesCreator(SetupSpec spec) {
+        ProtocolCreator creator = protocolCreators.get(spec.getAssetServerProtocol());
         if (null == creator) {
-            throw new IllegalArgumentException("Unknown/unregistered protocol: " + protocol);
+            throw new IllegalArgumentException("Unknown/unregistered protocol: " + spec.getAssetServerProtocol());
         }
-        return creator.createInvocablesCreator(host, port, kstore);
-    }
-
-    /**
-     * Creates a protocol server builder for a certain protocol. The server is supposed to run on localhost
-     * and to be accessible. Depending on the AAS implementation, access to the protocol service may be 
-     * required to deploy an AAS, i.e., it is advisable to start the protocol server before 
-     * {@link #createDeploymentRecipe(Endpoint)}.
-     * 
-     * @param protocol the protocol (shall be one from {@link #getProtocols()}, may be {@link #DEFAULT_PROTOCOL} for 
-     *   the default protocol}
-     * @param port the port number to communicate on
-     * @return the builder instance (may be <b>null</b> if the protocol does not exist)
-     * @throws IllegalArgumentException if the protocol is not supported or the port is not valid
-     * @see #createInvocablesCreator(String, String, int)
-     */
-    public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
-        return createProtocolServerBuilder(protocol, port, null);
+        return creator.createInvocablesCreator(spec);
     }
         
     /**
      * Creates a protocol server builder for a certain protocol. The server is supposed to run on localhost
      * and to be accessible. Depending on the AAS implementation, access to the protocol service may be 
      * required to deploy an AAS, i.e., it is advisable to start the protocol server before 
-     * {@link #createDeploymentRecipe(Endpoint)}.
+     * {@link #createDeploymentRecipe(SetupSpec)}.
      * 
-     * @param protocol the protocol (shall be one from {@link #getProtocols()}, may be {@link #DEFAULT_PROTOCOL} for 
-     *   the default protocol}
-     * @param port the port number to communicate on
-     * @param kstore the key store descriptor, ignored if <b>null</b>
+     * @param spec the setup specification with protocol (shall be one from {@link #getProtocols()}, may be 
+     *     {@link #DEFAULT_PROTOCOL} for the default protocol}
      * @return the builder instance (may be <b>null</b> if the protocol does not exist)
      * @throws IllegalArgumentException if the protocol is not supported or the port is not valid
-     * @see #createInvocablesCreator(String, String, int)
+     * @see #createInvocablesCreator(SetupSpec)
      */
-    public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port, KeyStoreDescriptor kstore) {
-        ProtocolCreator creator = protocolCreators.get(protocol);
+    public ProtocolServerBuilder createProtocolServerBuilder(SetupSpec spec) {
+        ProtocolCreator creator = protocolCreators.get(spec.getAssetServerProtocol());
         if (null == creator) {
-            throw new IllegalArgumentException("Unknown/unregistered protocol: " + protocol);
+            throw new IllegalArgumentException("Unknown/unregistered protocol: " + spec.getAssetServerProtocol());
         }
-        return creator.createProtocolServerBuilder(port, kstore);
+        return creator.createProtocolServerBuilder(spec);
     }
 
     /**

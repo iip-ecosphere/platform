@@ -12,12 +12,11 @@
 
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
-import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasServer;
 import de.iip_ecosphere.platform.support.aas.CorsEnabledRecipe;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
-import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
+import de.iip_ecosphere.platform.support.aas.SetupSpec;
 
 /**
  * Implements a fake server recipe.
@@ -27,25 +26,12 @@ import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 public class FakeServerReceipe implements ServerRecipe {
 
     @Override
-    public AasServer createAasServer(Endpoint endpoint, PersistenceType persistence, Endpoint registry, 
-        String... options) {
+    public AasServer createAasServer(SetupSpec spec, PersistenceType persistence, String... options) {
         return null;
     }
 
     @Override
-    public AasServer createAasServer(Endpoint endpoint, PersistenceType persistence, Endpoint registry, 
-        KeyStoreDescriptor kstore, String... options) {
-        return null;
-    }
-
-    @Override
-    public Server createRegistryServer(Endpoint endpoint, PersistenceType persistence, String... options) {
-        return null;
-    }
-
-    @Override
-    public Server createRegistryServer(Endpoint endpoint, PersistenceType persistence, KeyStoreDescriptor kstore, 
-        String... options) {
+    public Server createRegistryServer(SetupSpec spec, PersistenceType persistence, String... options) {
         return null;
     }
 

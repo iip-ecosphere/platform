@@ -31,6 +31,8 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
+import de.iip_ecosphere.platform.support.aas.AasUtils;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Operation;
@@ -39,6 +41,7 @@ import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.Registry;
+import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
@@ -99,32 +102,29 @@ public class AasTest {
     
     /**
      * Creates the operations server for the given machine instance and for the operations in 
-     * {@link #createAasOperationsElements(SubmodelElementContainerBuilder, String, int, String)}.
+     * {@link #createAasOperationsElements(SubmodelElementContainerBuilder, SetupSpec, TestMachine)}.
      * 
-     * @param port the server communication port
+     * @param spec the setup specification
      * @param machine the machine
-     * @param protocol the VAB protocol as used in {@link AasFactory}
-     * @param kstore the keystore descriptor, ignored if <b>null</b>
      * @return the protocol server
      */
-    public static Server createOperationsServer(int port, TestMachine machine, String protocol, 
-        KeyStoreDescriptor kstore) {
+    public static Server createOperationsServer(SetupSpec spec, TestMachine machine) {
         AasFactory instance = AasFactory.getInstance();
         AasFactory.setPluginId("unknown"); // forth and back that it has been called once
         AasFactory.setPluginId(AasFactory.DEFAULT_PLUGIN_ID);
         AasFactory.setInstance(instance);
         AasFactory factory = AasFactory.getInstance();
-        ProtocolServerBuilder builder = factory.createProtocolServerBuilder(protocol, port, kstore);
+        ProtocolServerBuilder builder = factory.createProtocolServerBuilder(spec);
         builder.defineProperty(NAME_VAR_LOTSIZE, () -> {
             return machine.getLotSize(); 
         }, (param) -> {
-                machine.setLotSize((int) param); 
-            });
+            machine.setLotSize((int) param); 
+        });
         builder.defineProperty(NAME_VAR_VENDOR, () -> {
             return machine.getVendor(); 
         }, (param) -> { // whether meaningful or not
-                machine.setVendor((String) param); 
-            });
+            machine.setVendor((String) param); 
+        });
         builder.defineProperty(NAME_VAR_POWCONSUMPTION, () -> {
             return machine.getPowerConsumption(); 
         }, null);
@@ -133,7 +133,7 @@ public class AasTest {
             return null;
         });
         builder.defineOperation(NAME_OP_RECONFIGURE, (params) 
-            -> machine.reconfigure((int) params[0]));
+            -> machine.reconfigure(AasUtils.readInt(params, 0, -1)));
         builder.defineOperation(NAME_OP_STOPMACHINE, (params) -> {
             machine.stop();
             return null;
@@ -143,44 +143,28 @@ public class AasTest {
     }
 
     /**
-     * Creates the corresponding AAS elements for {@link #createOperationsServer(int, TestMachine, 
-     * String, KeyStoreDescriptor)}.
+     * Creates the corresponding AAS elements for {@link #createOperationsServer(SetupSpec, TestMachine)}.
      * 
      * @param subModelBuilder the sub model container builder to add the elements to
-     * @param addr the server address (schema ignored)
-     * @param protocol the VAB protocol as used in {@link AasFactory}
+     * @param spec the setup specification
+     * @param machine the test machine instance
      */
     public void createAasOperationsElements(SubmodelElementContainerBuilder subModelBuilder, 
-        ServerAddress addr, String protocol) {
-        createAasOperationsElements(subModelBuilder, addr.getHost(), addr.getPort(), protocol);
-    }
-
-    /**
-     * Creates the corresponding AAS elements for {@link #createOperationsServer(int, TestMachine, String, 
-     * KeyStoreDescriptor)}.
-     * 
-     * @param subModelBuilder the sub model container builder to add the elements to
-     * @param host the protocol host 
-     * @param port the protocol port
-     * @param protocol the VAB protocol as used in {@link AasFactory}
-     */
-    public void createAasOperationsElements(SubmodelElementContainerBuilder subModelBuilder, 
-        String host, int port, String protocol) {
+        SetupSpec spec, TestMachine machine) {
         AasFactory factory = AasFactory.getInstance();
-        InvocablesCreator invC = factory.createInvocablesCreator(protocol, host, port, 
-            getKeyStoreDescriptor(protocol));
-        subModelBuilder.createPropertyBuilder(NAME_VAR_LOTSIZE)
-            .setType(Type.INTEGER)
-            .bind(invC.createGetter(NAME_VAR_LOTSIZE), invC.createSetter(NAME_VAR_LOTSIZE))
+        InvocablesCreator invC = factory.createInvocablesCreator(spec);
+        Utils.setValue(
+            subModelBuilder.createPropertyBuilder(NAME_VAR_LOTSIZE).setType(Type.INTEGER), 
+            machine.getLotSize(), invC.createGetter(NAME_VAR_LOTSIZE), invC.createSetter(NAME_VAR_LOTSIZE))
             .build();
         subModelBuilder.createPropertyBuilder(NAME_VAR_VENDOR)
             .setType(Type.STRING)
             .bindLazy(invC.createGetter(NAME_VAR_VENDOR), invC.createSetter(NAME_VAR_VENDOR))
             .build();
-        subModelBuilder.createPropertyBuilder(NAME_VAR_POWCONSUMPTION)
-            .setType(Type.DOUBLE)
-            .setSemanticId("irdi:0173-1#02-AAV232#002") // id taken from BaSyX -> temperature ???
-            .bind(invC.createGetter(NAME_VAR_POWCONSUMPTION), InvocablesCreator.READ_ONLY)
+        Utils.setValue(
+            subModelBuilder.createPropertyBuilder(NAME_VAR_POWCONSUMPTION).setType(Type.DOUBLE)
+            .setSemanticId("irdi:0173-1#02-AAV232#002"), // id taken from BaSyX -> temperature ???
+            machine.getPowerConsumption(), invC.createGetter(NAME_VAR_POWCONSUMPTION), InvocablesCreator.READ_ONLY)
             .build();
         subModelBuilder.createOperationBuilder(NAME_OP_STARTMACHINE)
             .setInvocable(invC.createInvocable(NAME_OP_STARTMACHINE))
@@ -213,8 +197,9 @@ public class AasTest {
         for (String sProto : desiredProtocols) {
             for (String proto : providedProtocols) {
                 if (!AasFactory.LOCAL_PROTOCOL.equals(proto) && !excludeProtocol(proto)) { // VAB only
-                    System.out.println("Testing VAB protocol: " + proto 
-                        + (sProto.length() > 0 ? " on server protocol " + sProto : ""));
+                    System.out.println("Testing Asset protocol: " 
+                        + (proto.length() > 0 ? "'" + proto + "'" : "<default>") + " " 
+                        + (sProto.length() > 0 ? "on server protocol '" + sProto + "'" : "<default>"));
                     testVabQuery(proto, sProto);
                 }
             }
@@ -249,6 +234,16 @@ public class AasTest {
     protected boolean excludeProtocol(String protocol) {
         return false;
     }
+    
+    /**
+     * To be overridden: schema per protocol.
+     * 
+     * @param serverProtocol the protocol
+     * @return the schema
+     */
+    protected Schema getAasServerAddressSchema(String serverProtocol) {
+        return Schema.HTTP;
+    }
 
     /**
      * Tests creating/reading an AAS.
@@ -262,55 +257,62 @@ public class AasTest {
      */
     protected void testVabQuery(String protocol, String serverProtocol) 
         throws SocketException, UnknownHostException, ExecutionException, IOException {
-        TestMachine machine = new TestMachine();
-        Server ccServer = createOperationsServer(VAB_SERVER.getPort(), machine, protocol, 
-            getKeyStoreDescriptor(protocol));
-        ccServer.start(); // required here by basyx-0.1.0-SNAPSHOT
-        ProtocolServerBuilder builder = AasFactory.getInstance().createProtocolServerBuilder(protocol, 
-            VAB_SERVER.getPort(), getKeyStoreDescriptor(protocol));
-        Assert.assertTrue(builder.isAvailable(VAB_SERVER.getHost(), 5000));
 
-        Aas aas = createAas(machine, protocol);
-        
+        TestMachine machine = new TestMachine();
+
         AasFactory factory = AasFactory.getInstance();
-        ServerAddress aasServerAddress;
+        ServerAddress aasServerAddress = new ServerAddress(
+            getAasServerAddressSchema(serverProtocol)); // localhost, ephemeral
         Server httpServer;
         Endpoint registryEndpoint;
-        KeyStoreDescriptor ksd;
-        if (serverProtocol.length() > 0) {
-            aasServerAddress = new ServerAddress(Schema.HTTPS); // localhost, ephemeral
-            ksd = getKeyStoreDescriptor(serverProtocol);
-        } else {
-            aasServerAddress = new ServerAddress(Schema.HTTP); // localhost, ephemeral
-            ksd = null;
-        }
-        registryEndpoint = new Endpoint(aasServerAddress, "registry");
-        httpServer = factory.createDeploymentRecipe(new Endpoint(aasServerAddress, ""), ksd)
-            .addInMemoryRegistry(registryEndpoint)
+        KeyStoreDescriptor ksd = getKeyStoreDescriptor(serverProtocol);
+        registryEndpoint = createDependentEndpoint(aasServerAddress, "registry");
+        BasicSetupSpec spec = new BasicSetupSpec(registryEndpoint, aasServerAddress, ksd);
+        spec.setAssetServerAddress(VAB_SERVER, protocol);
+        spec.setAssetServerKeystore(getKeyStoreDescriptor(protocol));
+        Aas aas = createAas(machine, spec);
+        Server ccServer = createOperationsServer(spec, machine);
+        ccServer.start(); // required here by basyx-0.1.0-SNAPSHOT
+        ProtocolServerBuilder builder = AasFactory.getInstance().createProtocolServerBuilder(spec);
+        Assert.assertTrue(builder.isAvailable(VAB_SERVER.getHost(), 5000));
+
+        httpServer = factory.createDeploymentRecipe(spec)
+            .forRegistry()
             .deploy(aas)
             .createServer()
             .start();
 
-        queryAas(registryEndpoint, machine);
+        queryAas(spec, machine);
         Server.stop(httpServer, true);
         Server.stop(ccServer, true);
+    }
+
+    /**
+     * Creates a dependent endpoint. May have to be overridden for more recent implementations.
+     * 
+     * @param address the address
+     * @param endpoint the endpoint
+     * @return the created enpoint
+     */
+    protected Endpoint createDependentEndpoint(ServerAddress address, String endpoint) {
+        return new Endpoint(address, endpoint);
     }
     
     /**
      * This method creates a test Asset Administration Shell.
      * 
      * @param machine the test machine instance
-     * @param protocol the VAB protocol as used in {@link AasFactory}
+     * @param spec the setup specification
      * @return the created AAS
      * @throws SocketException if the port to be used for the AAS is occupied
      * @throws UnknownHostException shall not occur
      */
-    private Aas createAas(TestMachine machine, String protocol) throws SocketException, UnknownHostException {
+    private Aas createAas(TestMachine machine, SetupSpec spec) throws SocketException, UnknownHostException {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, URN_AAS);
         SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
         Assert.assertTrue(subModelBuilder.isNew());
-        createAasOperationsElements(subModelBuilder, VAB_SERVER, protocol);
+        createAasOperationsElements(subModelBuilder, spec, machine);
         Reference subModelBuilderRef = subModelBuilder.createReference();
         Assert.assertNotNull(aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)); // for modification
         subModelBuilder.createPropertyBuilder(NAME_VAR_DESCRIPTION1)
@@ -450,23 +452,31 @@ public class AasTest {
      */
     private static void assertLangString(Object val, String str) {
         Assert.assertNotNull(val);
-        Assert.assertTrue(val instanceof LangString);
+        LangString ls1;
+        if (val instanceof LangString) {
+            ls1 = (LangString) val; // BaSyX v1
+        } else {
+            ls1 = LangString.create(val.toString());
+        }
         LangString ls2 = LangString.create(str);
-        Assert.assertEquals(ls2, val);
+        Assert.assertEquals(ls2, ls1);
     }
+   
+    // checkstyle: stop method length check
     
     /**
      * Queries the created AAS.
      * 
-     * @param registry the registry to get the machine AAS from
+     * @param spec the setup to get the machine AAS from
      * @param machine the test machine as reference
      * @throws ExecutionException if operation invocations fail
      * @throws IOException if retrieving the AAS fails
      */
-    private static void queryAas(Endpoint registry, TestMachine machine) throws ExecutionException, IOException {
+    private static void queryAas(BasicSetupSpec spec, TestMachine machine) throws ExecutionException, IOException {
         AasFactory factory = AasFactory.getInstance();
-        Registry reg = factory.obtainRegistry(registry);
+        Registry reg = factory.obtainRegistry(spec);
         Aas aas = reg.retrieveAas(URN_AAS);
+        Assert.assertNotNull(aas);
         Assert.assertEquals(NAME_AAS, aas.getIdShort());
         Assert.assertEquals(3, aas.getSubmodelCount());
         Submodel subm = aas.submodels().iterator().next();
@@ -486,18 +496,24 @@ public class AasTest {
         Operation op = subm.getOperation(NAME_OP_STARTMACHINE);
         Assert.assertNotNull(op);
         op.invoke();
-        Assert.assertEquals(machine.getLotSize(), lotSize.getValue());
-        Assert.assertEquals(machine.getPowerConsumption(), powConsumption.getValue());
+        if (factory.supportsPropertyFunctions()) {
+            Assert.assertEquals(machine.getLotSize(), lotSize.getValue());
+            Assert.assertEquals(machine.getPowerConsumption(), powConsumption.getValue());
+        }
         op = subm.getOperation(NAME_OP_RECONFIGURE);
         Assert.assertNotNull(op);
         op.invoke(5);
-        Assert.assertEquals(machine.getLotSize(), lotSize.getValue());
-        Assert.assertEquals(machine.getPowerConsumption(), powConsumption.getValue());
+        if (factory.supportsPropertyFunctions()) {
+            Assert.assertEquals(machine.getLotSize(), lotSize.getValue());
+            Assert.assertEquals(machine.getPowerConsumption(), powConsumption.getValue());
+        }
         op = subm.getOperation(NAME_OP_STOPMACHINE);
         Assert.assertNotNull(op);
         op.invoke();
-        Assert.assertEquals(machine.getLotSize(), lotSize.getValue());
-        Assert.assertEquals(machine.getPowerConsumption(), powConsumption.getValue());
+        if (factory.supportsPropertyFunctions()) {
+            Assert.assertEquals(machine.getLotSize(), lotSize.getValue());
+            Assert.assertEquals(machine.getPowerConsumption(), powConsumption.getValue());
+        }
         
         SubmodelElement se = subm.getSubmodelElement(NAME_SUBMODELC_OUTER);
         Assert.assertNotNull(se);
@@ -537,13 +553,14 @@ public class AasTest {
         subm.getSubmodelElementCollection("conn_coll3").deleteElement("cc3_1");
         Assert.assertNull(subm.getSubmodelElementCollection("conn_coll3").getSubmodelElementCollection("cc3_1"));
         aas.accept(new AasPrintVisitor()); // assert the accepts
-        
         Aas aas2 = reg.retrieveAas(reg.getEndpoint(aas));
         Assert.assertNotNull(aas2);
         Assert.assertEquals(aas2.getIdShort(), aas.getIdShort());
         Assert.assertNull(reg.retrieveAas("http://me.here.de/aas"));
     }
-    
+
+    // checkstyle: resume method length check
+
     /**
      * Asserts the description of {@code prop}.
      * 
@@ -586,7 +603,7 @@ public class AasTest {
     }
 
     /**
-     * Tests for illegal short ids. Seems to be valid for all AAs.
+     * Tests for illegal short ids. Seems to be valid for all AAS.
      */
     @Test
     public void testIllegalShortId() {

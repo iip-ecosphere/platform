@@ -18,6 +18,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -443,6 +444,8 @@ public class Utils {
                     result = (Date) value;
                 } else if (value instanceof XMLGregorianCalendar) { 
                     result = ((XMLGregorianCalendar) value).toGregorianCalendar().getTime();
+                } else if (value instanceof Calendar) {
+                    result = ((Calendar) value).getTime();
                 }
             }
             return result;

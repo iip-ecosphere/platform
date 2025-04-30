@@ -12,13 +12,6 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
-import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
-
 /**
  * Creates invocables for AAS, e.g., for a remote protocol. This interface just creates instances, i.e., it is
  * more a factory than a builder. For local direct calls, you may just use lambda expressions. The counterpart
@@ -31,37 +24,37 @@ public interface InvocablesCreator {
     /**
      * A getter implementation that does nothing. [convenience]
      */
-    public static final Supplier<Object> WRITE_ONLY = Property.PropertyBuilder.WRITE_ONLY;
+    public static final Invokable WRITE_ONLY = Property.PropertyBuilder.WRITE_ONLY;
 
     /**
      * A setter implementation that does nothing. [convenience]
      */
-    public static final Consumer<Object> READ_ONLY = Property.PropertyBuilder.READ_ONLY;
+    public static final Invokable READ_ONLY = Property.PropertyBuilder.READ_ONLY;
 
     /**
-     * Creates a getter implementation for a property, i.e., for {@link PropertyBuilder#bind(Supplier, Consumer)}.
+     * Creates a getter implementation for a property.
      * Use {@link #WRITE_ONLY} if no getter is intended but also the value shall not be held locally in the property.
      * 
      * @param name the unique name of the property
      * @return the getter implementation
      */
-    public Supplier<Object> createGetter(String name);
+    public Invokable createGetter(String name);
 
     /**
-     * Creates a setter implementation for a property, i.e., for {@link PropertyBuilder#bind(Supplier, Consumer)}.
+     * Creates a setter implementation for a property.
      * Use {@link #READ_ONLY} if no setter is intended but also the value shall not be held locally in the property.
      * 
      * @param name the unique name of the property
      * @return the setter implementation
      */
-    public Consumer<Object> createSetter(String name);
+    public Invokable createSetter(String name);
     
     /**
-     * Creates an invocable for an operation, i.e., for {@link OperationBuilder#setInvocable(Function)}.
+     * Creates an invokable for an operation.
      * 
      * @param name the unique name of the property
      * @return the function implementation
      */
-    public Function<Object[], Object> createInvocable(String name);
+    public Invokable createInvocable(String name);
     
 }

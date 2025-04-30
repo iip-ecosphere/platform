@@ -66,7 +66,7 @@ public interface DeploymentRecipe extends CorsEnabledRecipe {
     public interface RegistryDeploymentRecipe {
 
         /**
-         * Obtains access to the registry (via {@link AasFactory#obtainRegistry(Endpoint)}.
+         * Obtains access to the registry (via {@link AasFactory#obtainRegistry(SetupSpec)}.
          * 
          * @return the registry instance
          * @throws IOException in case that the recipe/connection cannot be created
@@ -80,7 +80,6 @@ public interface DeploymentRecipe extends CorsEnabledRecipe {
          * 
          * @param aas the AAS to deploy
          * @return <b>this</b>
-         * @throws IllegalArgumentException if {@code aas} was not created by the corresponding {@link AasFactory}
          */
         public RegistryDeploymentRecipe deploy(Aas aas);
 
@@ -97,31 +96,29 @@ public interface DeploymentRecipe extends CorsEnabledRecipe {
     /**
      * Adds an in-memory registry to the deployment.
      * 
-     * @param regEndpoint the registry URL endpoint
      * @return an instance of the sub-recipe
-     * @deprecated Use {@link #addInMemoryRegistry(Endpoint)} instead
      */
-    @Deprecated
-    public ImmediateDeploymentRecipe addInMemoryRegistry(String regEndpoint);
+    public ImmediateDeploymentRecipe forRegistry();
 
     /**
-     * Adds an in-memory registry to the deployment.
+     * Points to a standalone registry for older metamodels, Does not work with metamodel v3.
      * 
-     * @param regEndpoint the registry URL endpoint
+     * @param endpoint the registry endpoint
      * @return an instance of the sub-recipe
      */
-    public default ImmediateDeploymentRecipe addInMemoryRegistry(Endpoint regEndpoint) {
-        return addInMemoryRegistry(regEndpoint.getEndpoint());
+    public default RegistryDeploymentRecipe forRegistry(Endpoint endpoint) {
+        return forRegistry(endpoint, endpoint);
     }
 
     /**
      * Points to a standalone registry.
      * 
-     * @param endpoint the registry endpoint
+     * @param aasRegistry the AAS registry endpoint
+     * @param submodelRegistry the submodel registry endpoint
      * @return an instance of the sub-recipe
      */
-    public RegistryDeploymentRecipe setRegistryUrl(Endpoint endpoint);
-    
+    public RegistryDeploymentRecipe forRegistry(Endpoint aasRegistry, Endpoint submodelRegistry);
+
     @Override
     public DeploymentRecipe setAccessControlAllowOrigin(String accessControlAllowOrigin);
 

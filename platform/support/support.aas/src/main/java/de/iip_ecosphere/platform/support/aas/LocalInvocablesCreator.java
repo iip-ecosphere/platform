@@ -20,6 +20,10 @@ import java.io.Serializable;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.aas.Invokable.GetterInvokable;
+import de.iip_ecosphere.platform.support.aas.Invokable.OperationInvokable;
+import de.iip_ecosphere.platform.support.aas.Invokable.SetterInvokable;
+
 /**
  * A local invocables creator for pure local calls. Functions are mapped to service functions 
  * of {@link InvocablesCreator}.
@@ -42,10 +46,9 @@ public class LocalInvocablesCreator implements InvocablesCreator, Serializable {
 
     // checkstyle: stop exception type check
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Consumer<Object> createSetter(String name) {
-        return (Consumer<Object> & Serializable) (o -> {
+    public Invokable createSetter(String name) {
+        return (SetterInvokable & Serializable) (o -> {
             try {
                 Consumer<Object> tmp = instance.getSetter(name);
                 if (null != tmp) {
@@ -57,10 +60,9 @@ public class LocalInvocablesCreator implements InvocablesCreator, Serializable {
         });
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Function<Object[], Object> createInvocable(String name) {
-        return (Function<Object[], Object> & Serializable) (p -> {
+    public Invokable createInvocable(String name) {
+        return (OperationInvokable & Serializable) (p -> {
             try {
                 Function<Object[], Object> tmp = instance.getServiceFunction(name);
                 return null == tmp ? null : tmp.apply(p);
@@ -71,10 +73,9 @@ public class LocalInvocablesCreator implements InvocablesCreator, Serializable {
         });
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Supplier<Object> createGetter(String name) {
-        return (Supplier<Object> & Serializable) (() -> {
+    public Invokable createGetter(String name) {
+        return (GetterInvokable & Serializable) (() -> {
             try {
                 Supplier<Object> tmp = instance.getGetter(name);
                 return null == tmp ? null : tmp.get();

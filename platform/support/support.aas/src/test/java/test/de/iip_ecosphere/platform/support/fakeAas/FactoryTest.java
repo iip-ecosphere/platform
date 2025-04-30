@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.LangString;
@@ -30,8 +31,10 @@ import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
+import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 import de.iip_ecosphere.platform.support.aas.Type;
@@ -66,23 +69,18 @@ public class FactoryTest {
         }
 
         @Override
-        public Registry obtainRegistry(Endpoint regEndpoint) throws IOException {
-            return DUMMY.obtainRegistry(regEndpoint);
+        public Registry obtainRegistry(SetupSpec spec) throws IOException {
+            return DUMMY.obtainRegistry(spec);
         }
 
         @Override
-        public Registry obtainRegistry(Endpoint regEndpoint, Schema aasSchema) throws IOException {
-            return DUMMY.obtainRegistry(regEndpoint, aasSchema);
+        public Registry obtainRegistry(SetupSpec spec, Schema aasSchema) throws IOException {
+            return DUMMY.obtainRegistry(spec, aasSchema);
         }
 
         @Override
-        public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint) {
-            return DUMMY.createDeploymentRecipe(endpoint);
-        }
-        
-        @Override
-        public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint, KeyStoreDescriptor kstore) {
-            return DUMMY.createDeploymentRecipe(endpoint, kstore);
+        public DeploymentRecipe createDeploymentRecipe(SetupSpec spec) {
+            return DUMMY.createDeploymentRecipe(spec);
         }
         
         @Override
@@ -101,13 +99,13 @@ public class FactoryTest {
         }
 
         @Override
-        public InvocablesCreator createInvocablesCreator(String protocol, String host, int port) {
-            return DUMMY.createInvocablesCreator(protocol, host, port);
+        public InvocablesCreator createInvocablesCreator(SetupSpec spec) {
+            return DUMMY.createInvocablesCreator(spec);
         }
 
         @Override
-        public ProtocolServerBuilder createProtocolServerBuilder(String protocol, int port) {
-            return DUMMY.createProtocolServerBuilder(protocol, port);
+        public ProtocolServerBuilder createProtocolServerBuilder(SetupSpec spec) {
+            return DUMMY.createProtocolServerBuilder(spec);
         }
         
         @Override
@@ -158,21 +156,27 @@ public class FactoryTest {
         Assert.assertNotNull(instance.createSubmodelBuilder("", ""));
 
         Endpoint ep = new Endpoint(Schema.HTTP, "", 1234, "");
+        Endpoint smEp = new Endpoint(Schema.HTTP, "", 1235, "");
         ServerRecipe serverRecipe = instance.createServerRecipe();
         Assert.assertNotNull(serverRecipe);
         Endpoint regEp = new Endpoint(ep, "/registry");
-        Assert.assertNull(serverRecipe.createRegistryServer(regEp, LocalPersistenceType.INMEMORY, ""));
-        Assert.assertNull(serverRecipe.createAasServer(new Endpoint(ep, "/aas"), LocalPersistenceType.INMEMORY, regEp));
-        Assert.assertNull(instance.obtainRegistry(ep));
-        Assert.assertNull(instance.obtainRegistry(ep, Schema.HTTPS));
-        Assert.assertNull(instance.createDeploymentRecipe(ep));
+        Endpoint smRegEp = new Endpoint(ep, "/registry");
+        BasicSetupSpec spec = new BasicSetupSpec(regEp, smRegEp, ep, smEp);
+        
+        Assert.assertNull(serverRecipe.createRegistryServer(spec, LocalPersistenceType.INMEMORY, ""));
+        BasicSetupSpec spec2 = new BasicSetupSpec(spec).setAasRepositoryEndpoint(new Endpoint(ep, "/aas"));
+        Assert.assertNull(serverRecipe.createAasServer(spec2, LocalPersistenceType.INMEMORY));
+        Assert.assertNull(instance.obtainRegistry(spec));
+        Assert.assertNull(instance.obtainRegistry(spec, Schema.HTTPS));
+        Assert.assertNull(instance.createDeploymentRecipe(spec));
 
         Assert.assertNotNull(instance.createPersistenceRecipe());
         
         Assert.assertNotNull(instance.getProtocols());
         Assert.assertTrue(instance.getProtocols().length > 0);
-        Assert.assertNotNull(instance.createInvocablesCreator(AasFactory.DEFAULT_PROTOCOL, "localhost", 123));
-        Assert.assertNotNull(instance.createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, 123));
+        spec.setAssetServerAddress(new ServerAddress(Schema.IGNORE, "localhost", 123), AasFactory.DEFAULT_PROTOCOL);
+        Assert.assertNotNull(instance.createInvocablesCreator(spec));
+        Assert.assertNotNull(instance.createProtocolServerBuilder(spec));
         
         Assert.assertEquals("id", instance.fixId("id"));
         
@@ -201,21 +205,30 @@ public class FactoryTest {
         Assert.assertNull(instance.createSubmodelBuilder("", ""));
 
         Endpoint ep = new Endpoint(Schema.HTTP, "", 1234, "");
+        Endpoint smEp = new Endpoint(Schema.HTTP, "", 1235, "");
         ServerRecipe serverRecipe = instance.createServerRecipe();
         Assert.assertNotNull(serverRecipe);
         Endpoint regEp = new Endpoint(ep, "/registry");
-        Assert.assertNull(serverRecipe.createRegistryServer(regEp, LocalPersistenceType.INMEMORY, ""));
-        Assert.assertNull(serverRecipe.createAasServer(new Endpoint(ep, "/aas"), LocalPersistenceType.INMEMORY, regEp));
-        assertRegistry(instance.obtainRegistry(ep));
-        Assert.assertNull(instance.createDeploymentRecipe(ep));
-        Assert.assertNull(instance.createDeploymentRecipe(ep, new KeyStoreDescriptor(new File("."), "xxx", "xyz")));
+        Endpoint smRegEp = new Endpoint(ep, "/registry");
+        BasicSetupSpec spec = new BasicSetupSpec(regEp, smRegEp, ep, smEp);
+      
+        Assert.assertNull(serverRecipe.createRegistryServer(spec, LocalPersistenceType.INMEMORY, ""));
+        BasicSetupSpec spec2 = new BasicSetupSpec(spec).setAasRepositoryEndpoint(new Endpoint(ep, "/aas"));
+        Assert.assertNull(serverRecipe.createAasServer(spec2, LocalPersistenceType.INMEMORY));
+        assertRegistry(instance.obtainRegistry(spec));
+        Assert.assertNull(instance.createDeploymentRecipe(spec));
+        KeyStoreDescriptor kDesc = new KeyStoreDescriptor(new File("."), "xxx", "xyz");
+        spec.setAasRepositoryKeystore(kDesc);
+        spec.setSubmodelRepositoryKeystore(kDesc);
+        Assert.assertNull(instance.createDeploymentRecipe(spec));
 
         Assert.assertNull(instance.createPersistenceRecipe());
 
         Assert.assertNotNull(instance.getProtocols());
         Assert.assertTrue(instance.getProtocols().length > 0);
-        Assert.assertNotNull(instance.createInvocablesCreator(AasFactory.DEFAULT_PROTOCOL, "localhost", 123));
-        Assert.assertNotNull(instance.createProtocolServerBuilder(AasFactory.DEFAULT_PROTOCOL, 123));
+        spec.setAssetServerAddress(new ServerAddress(Schema.IGNORE, "localhost", 123), AasFactory.DEFAULT_PROTOCOL);
+        Assert.assertNotNull(spec);
+        Assert.assertNotNull(spec);
 
         AasFactory.setInstance(old);
     }

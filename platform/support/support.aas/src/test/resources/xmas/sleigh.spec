@@ -26,9 +26,9 @@ AAS Sleigh
   PROPERTY length = 723 (semanticId: irdi:0173-1#02-AAG001#004)
   PROPERTY material = wood
   PROPERTY width = 339 (semanticId: irdi:0173-1#02-AAB173#006)
-  OPERATION accelerate #args 2
-  OPERATION start #args 1
-  OPERATION stop #args 1
+  OPERATION accelerate #args 1
+  OPERATION start #args 0
+  OPERATION stop #args 0
  SUBMODEL TechnicalData (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/Submodel/1/2)
   SMC FurtherInformation (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/FurtherInformation/1/1)
    PROPERTY ValidDate = 2023/12/24 23:59:59 (semanticId: iri:https://admin-shell.io/ZVEI/TechnicalData/ValidDate/1/1)

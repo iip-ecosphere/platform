@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -185,6 +186,9 @@ public class AasSpecVisitor implements AasVisitor {
             Object obj = property.getValue();
             if (obj instanceof XMLGregorianCalendar) {
                 obj = ((XMLGregorianCalendar) obj).toGregorianCalendar().getTime();
+            }
+            if (obj instanceof Calendar) {
+                obj = ((Calendar) obj).getTime();
             }
             if (obj instanceof Date) {
                 value = DATE_FORMATTER.format((Date) obj);

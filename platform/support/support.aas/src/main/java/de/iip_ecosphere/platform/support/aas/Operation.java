@@ -14,7 +14,6 @@ package de.iip_ecosphere.platform.support.aas;
 
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
@@ -123,23 +122,23 @@ public interface Operation extends Element, SubmodelElement {
         
         /**
          * Sets the invocable of this operation. May apply tests to avoid known failures, 
-         * e.g., regarding the type of the {@code invocable}. Use {@link #setInvocableLazy(Function)}
+         * e.g., regarding the type of the {@code invocable}. Use {@link #setInvocableLazy(Invokable)}
          * to avoid such tests and to take the responsibility for potential later runtime errors.
          * 
          * @param invocable the invocable
          * @return <b>this</b>
          * @throws IllegalArgumentException if the tests on {@code invocable} fail for some reason
          */
-        public OperationBuilder setInvocable(Function<Object[], Object> invocable);
+        public OperationBuilder setInvocable(Invokable invocable);
 
         /**
          * Sets the invocable of this operation.
          * 
          * @param invocable the invocable
          * @return <b>this</b>
-         * @see #setInvocableLazy(Function)
+         * @see #setInvocableLazy(Invokable)
          */
-        public default OperationBuilder setInvocableLazy(Function<Object[], Object> invocable) {
+        public default OperationBuilder setInvocableLazy(Invokable invocable) {
             return setInvocable(invocable);
         }
 

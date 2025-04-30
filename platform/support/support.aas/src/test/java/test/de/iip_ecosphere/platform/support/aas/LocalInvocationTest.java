@@ -22,7 +22,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.Invokable;
 import de.iip_ecosphere.platform.support.aas.LocalInvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.LocalProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
@@ -88,10 +90,10 @@ public class LocalInvocationTest {
         LocalInvocablesCreator creator = new LocalInvocablesCreator(provider);
         LocalProtocolServerBuilder pBuilder = new LocalProtocolServerBuilder(provider);
         
-        Supplier<Object> myGetter = creator.createGetter("prop");
-        Consumer<Object> mySetter = creator.createSetter("prop");
-        Function<Object[], Object> myFunc = creator.createInvocable("myFunc");
-        provider.defineOperation("myCat", "myFunc", myFunc);
+        Invokable myGetter = creator.createGetter("prop");
+        Invokable mySetter = creator.createSetter("prop");
+        Invokable myFunc = creator.createInvocable("myFunc");
+        provider.defineOperation("myCat", "myFunc", myFunc.getOperation());
         
         Assert.assertNull(provider.getGetter("prop"));
         Assert.assertNull(provider.getSetter("prop"));
@@ -110,12 +112,15 @@ public class LocalInvocationTest {
         Assert.assertTrue(provider.getSetter("prop") == implSetter);
         Assert.assertTrue(provider.getServiceFunction("myFunc") == implFunc);
 
-        Assert.assertEquals(propVal, myGetter.get());
-        mySetter.accept(25);
+        Assert.assertNotNull(myGetter.getGetter());
+        Assert.assertEquals(propVal, myGetter.getGetter().get());
+        Assert.assertNotNull(mySetter.getSetter());
+        mySetter.getSetter().accept(25);
         Assert.assertEquals(25, propVal);
-        Assert.assertEquals(propVal, myGetter.get());
+        Assert.assertEquals(propVal, myGetter.getGetter().get());
 
-        Assert.assertEquals("FUNC", myFunc.apply(new Object[0]));
+        Assert.assertNotNull(myFunc.getOperation());
+        Assert.assertEquals("FUNC", myFunc.getOperation().apply(new Object[0]));
     }
 
     /**
@@ -126,24 +131,29 @@ public class LocalInvocationTest {
     public void testLocalInvocationViaFactory() {
         AasFactory factory = AasFactory.getInstance();
         // both must be called as pair, host/port are irrelevant for local protocol
-        InvocablesCreator creator = factory.createInvocablesCreator(AasFactory.LOCAL_PROTOCOL, "", 0); 
-        ProtocolServerBuilder pBuilder = factory.createProtocolServerBuilder(AasFactory.LOCAL_PROTOCOL, 0);
+        BasicSetupSpec spec = new BasicSetupSpec();
+        spec.setAssetServerAddress(null, AasFactory.LOCAL_PROTOCOL);
+        InvocablesCreator creator = factory.createInvocablesCreator(spec); 
+        ProtocolServerBuilder pBuilder = factory.createProtocolServerBuilder(spec);
 
-        Supplier<Object> myGetter = creator.createGetter("prop");
-        Consumer<Object> mySetter = creator.createSetter("prop");
-        Function<Object[], Object> myFunc = creator.createInvocable("myFunc");
+        Invokable myGetter = creator.createGetter("prop");
+        Invokable mySetter = creator.createSetter("prop");
+        Invokable myFunc = creator.createInvocable("myFunc");
         
         Assert.assertNotNull(pBuilder.createPayloadCodec());
         Assert.assertNotNull(pBuilder.build());
         pBuilder.defineOperation("myFunc", param -> "FUNC");
         pBuilder.defineProperty("prop", () -> propVal, p -> setPropVal(p));
         
-        Assert.assertEquals(propVal, myGetter.get());
-        mySetter.accept(25);
+        Assert.assertNotNull(myGetter.getGetter());
+        Assert.assertEquals(propVal, myGetter.getGetter().get());
+        Assert.assertNotNull(mySetter.getSetter());
+        mySetter.getSetter().accept(25);
         Assert.assertEquals(25, propVal);
-        Assert.assertEquals(propVal, myGetter.get());
+        Assert.assertEquals(propVal, myGetter.getGetter().get());
         
-        Assert.assertEquals("FUNC", myFunc.apply(new Object[0]));
+        Assert.assertNotNull(myFunc.getOperation());
+        Assert.assertEquals("FUNC", myFunc.getOperation().apply(new Object[0]));
     }
 
 }

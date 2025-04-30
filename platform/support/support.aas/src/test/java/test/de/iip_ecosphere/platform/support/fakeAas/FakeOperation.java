@@ -14,9 +14,9 @@ package test.de.iip_ecosphere.platform.support.fakeAas;
 
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.Invokable;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
@@ -79,7 +79,7 @@ public class FakeOperation extends FakeElement implements Operation {
         }
 
         @Override
-        public OperationBuilder setInvocable(Function<Object[], Object> invocable) {
+        public OperationBuilder setInvocable(Invokable invocable) {
             return this; // we ignore this for now until we go even for dynamic AAS here
         }
 
@@ -91,9 +91,7 @@ public class FakeOperation extends FakeElement implements Operation {
 
         @Override
         public Operation build() {
-            if (0 == instance.outArgs) {
-                instance.outArgs++; // default NONE
-            }
+            // no default void/none anymore -> outArgs
             parent.register(instance);
             return instance;
         }

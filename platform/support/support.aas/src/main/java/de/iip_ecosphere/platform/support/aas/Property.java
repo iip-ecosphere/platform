@@ -37,13 +37,23 @@ public interface Property extends Element, DataElement {
         /**
          * A getter implementation that does nothing.
          */
-        public static final Supplier<Object> WRITE_ONLY = () -> null;
+        public static final Supplier<Object> WRITE_ONLY_FUNC = () -> null;
 
         /**
          * A setter implementation that does nothing.
          */
         @SuppressWarnings("unchecked")
-        public static final Consumer<Object> READ_ONLY = ((Consumer<Object> & Serializable) (o) -> { });
+        public static final Consumer<Object> READ_ONLY_FUNC = ((Consumer<Object> & Serializable) (o) -> { });        
+        
+        /**
+         * A getter implementation that does nothing.
+         */
+        public static final Invokable WRITE_ONLY = Invokable.createSerializableInvokable(WRITE_ONLY_FUNC);
+
+        /**
+         * A setter implementation that does nothing.
+         */
+        public static final Invokable READ_ONLY = Invokable.createSerializableInvokable(READ_ONLY_FUNC);
         
         /**
          * Returns the parent builder.
@@ -104,8 +114,8 @@ public interface Property extends Element, DataElement {
         /**
          * Binds the value of the property against functions, e.g., accessing an underlying object. May apply tests 
          * to avoid known failures, e.g., regarding the type of the {@code invocable}. Use 
-         * {@link #bindLazy(Supplier, Consumer)} to avoid such tests and to take the responsibility for potential later 
-         * runtime errors.
+         * {@link #bindLazy(Invokable, Invokable)} to avoid such tests and to take the responsibility for potential 
+         * later runtime errors.
          * 
          * @param get the getter function (use {@link #WRITE_ONLY} for write-only)
          * @param set the setter function called when the setter of the property is called (may be <b>bull</b>,
@@ -113,7 +123,7 @@ public interface Property extends Element, DataElement {
          * @return <b>this</b>
          * @throws IllegalArgumentException may be thrown if {@link #setType(Type)} was not called before
          */
-        public PropertyBuilder bind(Supplier<Object> get, Consumer<Object> set);
+        public PropertyBuilder bind(Invokable get, Invokable set);
 
         /**
          * Binds the value of the property against functions, e.g., accessing an underlying object.
@@ -122,9 +132,9 @@ public interface Property extends Element, DataElement {
          * @param set the setter function called when the setter of the property is called (may be <b>bull</b>,
          *   then a new value may override the getter and hold the value locally, use {@link #READ_ONLY} for read-only))
          * @return <b>this</b>
-         * @see #bind(Supplier, Consumer)
+         * @see #bind(Invokable, Invokable)
          */
-        public default PropertyBuilder bindLazy(Supplier<Object> get, Consumer<Object> set) {
+        public default PropertyBuilder bindLazy(Invokable get, Invokable set) {
             return bind(get, set);
         }
 

@@ -17,8 +17,8 @@ import de.iip_ecosphere.platform.support.aas.AasFactory.ProtocolCreator;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.ProtocolDescriptor;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
-import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
 /**
  * A fake protocol descriptor for testing.
@@ -35,12 +35,12 @@ public class FakeProtocolDescriptor implements ProtocolDescriptor {
     static final ProtocolCreator CREATOR = new ProtocolCreator() {
 
         @Override
-        public InvocablesCreator createInvocablesCreator(String host, int port, KeyStoreDescriptor kstore) {
+        public InvocablesCreator createInvocablesCreator(SetupSpec spec) {
             return new FakeInvocablesCreator(); 
         }
 
         @Override
-        public ProtocolServerBuilder createProtocolServerBuilder(int port, KeyStoreDescriptor kstore) {
+        public ProtocolServerBuilder createProtocolServerBuilder(SetupSpec spec) {
             return new FakeProtocolServerBuilder();
         }
         

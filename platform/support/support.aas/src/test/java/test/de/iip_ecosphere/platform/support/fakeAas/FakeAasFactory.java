@@ -26,9 +26,9 @@ import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
+import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
-import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
 /**
  * A faked factory that does nothing - just for testing. Do not rename, this class is referenced in 
@@ -60,12 +60,12 @@ public class FakeAasFactory extends AasFactory {
         registerProtocolCreator(DEFAULT_PROTOCOL, new ProtocolCreator() {
             
             @Override
-            public ProtocolServerBuilder createProtocolServerBuilder(int port, KeyStoreDescriptor kstore) {
+            public ProtocolServerBuilder createProtocolServerBuilder(SetupSpec spec) {
                 return new FakeProtocolServerBuilder();
             }
             
             @Override
-            public InvocablesCreator createInvocablesCreator(String host, int port, KeyStoreDescriptor kstore) {
+            public InvocablesCreator createInvocablesCreator(SetupSpec spec) {
                 return new FakeInvocablesCreator();
             }
         });
@@ -92,22 +92,17 @@ public class FakeAasFactory extends AasFactory {
     }
 
     @Override
-    public Registry obtainRegistry(Endpoint regEndpoint) throws IOException {
+    public Registry obtainRegistry(SetupSpec spec) throws IOException {
         return null;
     }
 
     @Override
-    public Registry obtainRegistry(Endpoint regEndpoint, Schema aasSchema) throws IOException {
+    public Registry obtainRegistry(SetupSpec spec, Schema aasSchema) throws IOException {
         return null;
     }
     
     @Override
-    public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint) {
-        return null;
-    }
-    
-    @Override
-    public DeploymentRecipe createDeploymentRecipe(Endpoint endpoint, KeyStoreDescriptor kstore) {
+    public DeploymentRecipe createDeploymentRecipe(SetupSpec spec) {
         return null;
     }
 

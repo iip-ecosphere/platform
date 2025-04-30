@@ -16,10 +16,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.Invokable;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
@@ -83,7 +82,7 @@ public class FakeProperty extends FakeElement implements Property {
         }
 
         @Override
-        public PropertyBuilder bind(Supplier<Object> get, Consumer<Object> set) {
+        public PropertyBuilder bind(Invokable get, Invokable set) {
             // fake, we ignore this for now until we play even dynamic AAS here
             return this;
         }

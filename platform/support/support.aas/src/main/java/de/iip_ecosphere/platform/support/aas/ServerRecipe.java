@@ -12,9 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
-import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Server;
-import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
 /**
  * A recipe to create a standalone AAS server. For local in-memory deployment or deployment to such a standalone AAS 
@@ -59,39 +57,20 @@ public interface ServerRecipe extends CorsEnabledRecipe {
      * Creates a AAS server. If {@code type} is local, a similar server as in {@link DeploymentRecipe} 
      * is created.
      * 
-     * @param endpoint the server endpoint (host is ignored, i.e., localhost, but endpoint determines the base URL path)
+     * @param spec the setup specification (host is ignored, i.e., localhost, but endpoint determines the base URL path)
      * @param persistence the persistence type
-     * @param registryEndpoint the endpoint where the (running) AAS registry is located 
      * @param options for the server, names of implementation-specific options to be enabled, 
      *    may be empty for none
      * @return the server instance
      * @throws UnsupportedOperationException if the persistence options cannot be fulfilled, e.g., to create a server 
      *    instance on client side without the server parts installed
      */
-    public AasServer createAasServer(Endpoint endpoint, PersistenceType persistence, Endpoint registryEndpoint, 
-        String... options);
-
-    /**
-     * Creates a AAS server. If {@code type} is local, a similar server as in {@link DeploymentRecipe} 
-     * is created.
-     * 
-     * @param endpoint the server endpoint (host is ignored, i.e., localhost, but endpoint determines the base URL path)
-     * @param persistence the persistence type
-     * @param registryEndpoint the endpoint where the (running) AAS registry is located 
-     * @param kstore optional keystore descriptor, ignored if <b>null</b>
-     * @param options for the server, names of implementation-specific options to be enabled, 
-     *    may be empty for none
-     * @return the server instance
-     * @throws UnsupportedOperationException if the persistence options cannot be fulfilled, e.g., to create a server 
-     *    instance on client side without the server parts installed
-     */
-    public AasServer createAasServer(Endpoint endpoint, PersistenceType persistence, Endpoint registryEndpoint, 
-        KeyStoreDescriptor kstore, String... options);
+    public AasServer createAasServer(SetupSpec spec, PersistenceType persistence, String... options);
 
     /**
      * Creates a standalone AAS registry server. 
      * 
-     * @param endpoint the server endpoint (host is ignored, i.e., localhost, but endpoint determines the base URL path)
+     * @param spec the setup specification (host is ignored, i.e., localhost, but endpoint determines the base URL path)
      * @param persistence the persistence type
      * @param options for the server, names of implementation-specific options to be enabled, 
      *    may be empty for none
@@ -99,21 +78,6 @@ public interface ServerRecipe extends CorsEnabledRecipe {
      * @throws UnsupportedOperationException if the persistence options cannot be fulfilled, e.g., to create a server 
      *    instance on client side without the server parts installed
      */
-    public Server createRegistryServer(Endpoint endpoint, PersistenceType persistence, String... options);
-
-    /**
-     * Creates a standalone AAS registry server. 
-     * 
-     * @param endpoint the server endpoint (host is ignored, i.e., localhost, but endpoint determines the base URL path)
-     * @param persistence the persistence type
-     * @param kstore optional keystore descriptor, ignored if <b>null</b>
-     * @param options for the server, names of implementation-specific options to be enabled, 
-     *    may be empty for none
-     * @return the server instance
-     * @throws UnsupportedOperationException if the persistence options cannot be fulfilled, e.g., to create a server 
-     *    instance on client side without the server parts installed
-     */
-    public Server createRegistryServer(Endpoint endpoint, PersistenceType persistence, KeyStoreDescriptor kstore, 
-        String... options);
+    public Server createRegistryServer(SetupSpec spec, PersistenceType persistence, String... options);
 
 }

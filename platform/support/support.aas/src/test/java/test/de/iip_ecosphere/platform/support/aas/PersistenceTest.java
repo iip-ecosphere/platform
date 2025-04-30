@@ -66,7 +66,7 @@ public abstract class PersistenceTest {
         aas = Collections.unmodifiableList(aas);
         PersistenceRecipe recipe = factory.createPersistenceRecipe();
         for (File f : filesToTest()) {
-            System.out.println("Testing " + f);
+            System.out.println("Testing " + recipe.getClass().getName() + " on " + f);
             List<Aas> aasxList = selectedAas(f, aas);
             recipe.writeTo(aasxList, f);
             assertAas(recipe.readFrom(f), assertOnlyFirst(f), assertAsset(f));
