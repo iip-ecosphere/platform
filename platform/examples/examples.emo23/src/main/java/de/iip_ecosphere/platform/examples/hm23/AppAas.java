@@ -39,6 +39,7 @@ import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
+import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.mqttv3.PahoMqttV3TransportConnector;
@@ -137,30 +138,30 @@ public class AppAas extends TraceToAasService implements iip.interfaces.AppAasIn
         super.augmentCommandsSubmodel(smBuilder);
         ServerAddress vabServer = new ServerAddress(Schema.HTTP); // ephemeral, localhost
         AasFactory factory = AasFactory.getInstance();
-        InvocablesCreator ic = factory.createInvocablesCreator(AasFactory.DEFAULT_PROTOCOL, 
-            vabServer.getHost(), vabServer.getPort());
+        BasicSetupSpec spec = new BasicSetupSpec(AasFactory.DEFAULT_PROTOCOL, 
+                vabServer.getHost(), vabServer.getPort());
+        InvocablesCreator ic = factory.createInvocablesCreator(spec);
         smBuilder.createOperationBuilder(OP_START)
             .addInputVariable("id", Type.STRING)
             .setInvocable(ic.createInvocable(OP_START))
-            .build(Type.NONE);
+            .build();
         smBuilder.createOperationBuilder(OP_QUIT_ROBOT)
             .setInvocable(ic.createInvocable(OP_QUIT_ROBOT))
-            .build(Type.NONE);
+            .build();
         smBuilder.createOperationBuilder(OP_FEEDBACK)
             .addInputVariable("feedback", Type.STRING)
             .setInvocable(ic.createInvocable(OP_FEEDBACK))
-            .build(Type.NONE);
+            .build();
         smBuilder.createOperationBuilder(OP_MODEL_CHANGE)
             .addInputVariable("modelId", Type.STRING)
             .setInvocable(ic.createInvocable(OP_MODEL_CHANGE))
-            .build(Type.NONE);
+            .build();
         smBuilder.createOperationBuilder(OP_REQUEST_CAR_AAS)
             .addInputVariable("productId", Type.STRING)
             .setInvocable(ic.createInvocable(OP_REQUEST_CAR_AAS))
-            .build(Type.NONE);
+            .build();
         
-        ProtocolServerBuilder psb = factory.createProtocolServerBuilder(
-            AasFactory.DEFAULT_PROTOCOL, vabServer.getPort());
+        ProtocolServerBuilder psb = factory.createProtocolServerBuilder(spec);
         psb.defineOperation(OP_START, 
             p -> sendCommand(Commands.REQUEST_START_QUALITY_DETECTION, AasUtils.readString(p, 0)));
         psb.defineOperation(OP_QUIT_ROBOT, 

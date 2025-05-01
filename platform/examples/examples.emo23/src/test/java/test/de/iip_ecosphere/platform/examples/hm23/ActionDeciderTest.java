@@ -22,7 +22,8 @@ import iip.datatypes.AiResultImpl;
 import iip.datatypes.DecisionResult;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.platform.commons.util.CollectionUtils;
+
+import de.iip_ecosphere.platform.support.CollectionUtils;
 
 import static de.iip_ecosphere.platform.examples.hm23.ActionDecider.*;
 
