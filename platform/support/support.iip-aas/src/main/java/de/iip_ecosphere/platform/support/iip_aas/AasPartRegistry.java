@@ -819,6 +819,7 @@ public class AasPartRegistry {
         impl.setHost(implHost);
         LoggerFactory.getLogger(AasPartRegistry.class).info("Using {}:{} for AAS implementation server", 
             implHost, aasImplPort);
+        setup.getImplementation().setPort(aasImplPort);
         InvocablesCreator iCreator = factory.createInvocablesCreator(setup);
         if (null == sBuilder) {
             sBuilder = factory.createProtocolServerBuilder(setup);
