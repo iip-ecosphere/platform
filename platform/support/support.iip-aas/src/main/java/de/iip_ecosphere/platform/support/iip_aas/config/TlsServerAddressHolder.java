@@ -28,6 +28,8 @@ public class TlsServerAddressHolder extends ServerAddressHolder {
     private File keystore;
     private String keyPassword;
     private String keyAlias;
+    private boolean appliesToClient = true;
+    private boolean hostnameVerification = true;
 
     /**
      * Creates an instance (deserialization).
@@ -96,6 +98,24 @@ public class TlsServerAddressHolder extends ServerAddressHolder {
     }
 
     /**
+     * Returns whether a SSL client shall use the keytore or rely on the default certificate chain.
+     * 
+     * @return {@code true} for keystore (default), {@code false} else for default chain
+     */
+    public boolean getAppliesToClient() {
+        return appliesToClient;
+    }
+
+    /**
+     * Returns whether SSL hostname verification shall be enabled or not. May not be applied to every HTTP client.
+     * 
+     * @return {@code true} for enabled, {@code false} else
+     */
+    public boolean getHostnameVerification() {
+        return hostnameVerification;
+    }
+
+    /**
      * Returns the optional TLS keystore. [required by data mapper]
      * 
      * @param keystore the TLS keystore (suffix ".jks" points to Java Key store, suffix ".p12" to PKCS12 keystore), may 
@@ -122,7 +142,27 @@ public class TlsServerAddressHolder extends ServerAddressHolder {
     public void setKeyAlias(String alias) {
         this.keyAlias = alias;
     }
-    
+
+    /**
+     * Defines whether a SSL client shall use the keytore or rely on the default certificate chain. [required by 
+     * data mapper]
+     * 
+     * @param {@code true} for keystore (default), {@code false} else for default chain
+     */
+    public void setAppliesToClient(boolean appliesToClient) {
+        this.appliesToClient = appliesToClient;
+    }
+
+    /**
+     * Defines whether SSL hostname verification shall be enabled or not.  May not be applied to every HTTP client. 
+     * [required by data mapper]
+     * 
+     * @param {@code true} for enabled, {@code false} else
+     */
+    public void setHostnameVerification(boolean hostnameVerification) {
+        this.hostnameVerification = hostnameVerification;
+    }
+
     /**
      * Returns a keystore descriptor representing the keystore information.
      * 
@@ -131,7 +171,7 @@ public class TlsServerAddressHolder extends ServerAddressHolder {
     public KeyStoreDescriptor getKeystoreDescriptor() {
         KeyStoreDescriptor result = null;
         if (null != keystore) {
-            result = new KeyStoreDescriptor(keystore, keyPassword, keyAlias);
+            result = new KeyStoreDescriptor(keystore, keyPassword, keyAlias, appliesToClient, hostnameVerification);
         }
         return result;
     }

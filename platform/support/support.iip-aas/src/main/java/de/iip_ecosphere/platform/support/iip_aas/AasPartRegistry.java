@@ -488,7 +488,12 @@ public class AasPartRegistry {
         public Endpoint getAasRegistryEndpoint() {
             return registry.getEndpoint();
         }
-        
+
+        @Override
+        public KeyStoreDescriptor getAasRegistryKeyStore() {
+            return registry.getKeystoreDescriptor();
+        }
+
         @Override
         public State getAasRegistryState() {
             return isRunning(registry, aasRegistryState);
@@ -504,7 +509,12 @@ public class AasPartRegistry {
         public Endpoint getSubmodelRegistryEndpoint() {
             return smRegistry.getEndpoint();
         }
-        
+
+        @Override
+        public KeyStoreDescriptor getSubmodelRegistryKeyStore() {
+            return smRegistry.getKeystoreDescriptor();
+        }
+
         @Override
         public State getSubmodelRegistryState() {
             return isRunning(smRegistry, smRegistryState);
