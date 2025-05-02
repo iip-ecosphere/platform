@@ -149,15 +149,34 @@ template DockerBasics(Configuration config, FileArtifact target) {
                         pythonCondaVersion = "3.8";
                     } else if (genDependency(s) == 'PYTHON39') {
                         pythonCondaVersion = "3.9";
-                    } 
+                    } else if (genDependency(s) == 'PYTHON313') {
+                        pythonCondaVersion = "3.13";
+                    }
                 }
                 
                 if (condaInstallMode) {
-                    'RUN apt-get -qq update -y && apt-get -qq -y install curl bzip2 && curl -sSL https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh && bash /tmp/miniconda.sh -bfp /usr/local && rm -rf /tmp/miniconda.sh && conda install -y python=${pythonCondaVersion} && conda update conda && apt-get -qq -y remove curl bzip2 && apt-get -qq -y autoremove && apt-get autoclean && rm -rf /var/lib/apt/lists/* /var/log/dpkg.log && conda clean --all --yes'
-                    'ENV PATH=/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-                    'RUN conda create --name ${pyService.condaEnv} python=${pythonCondaVersion}'
+                    '# Set environment variables'
+                    'ENV CONDA_DIR=/opt/conda \\'
+                    '    PATH=/opt/conda/bin:$PATH'
+                    
+                    '# Install dependencies'
+                    'RUN apt-get update && apt-get install -y --no-install-recommends \\'
+                    '    wget \\'
+                    '    bzip2 \\'
+                    '    ca-certificates \\'
+                    '    && apt-get clean \\'
+                    '    && rm -rf /var/lib/apt/lists/*'
+
+                    '# Install Miniconda'
+                    'RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh && \\'
+                    '    bash /tmp/miniconda.sh -b -p $CONDA_DIR && \\'
+                    '    rm /tmp/miniconda.sh && \\'
+                    '    conda clean -afy'
+
+                    'RUN conda init'
                 }
                 
+                'RUN conda create --name ${pyService.condaEnv} python=${pythonCondaVersion}'
                 'SHELL ["conda", "run", "-n", "${pyService.condaEnv}", "/bin/bash", "-c"]'
                 'COPY conda.${pyService.condaEnv}.requirements.txt conda.${pyService.condaEnv}.requirements.txt'
                 'RUN python3 -m pip install -r conda.${pyService.condaEnv}.requirements.txt'
