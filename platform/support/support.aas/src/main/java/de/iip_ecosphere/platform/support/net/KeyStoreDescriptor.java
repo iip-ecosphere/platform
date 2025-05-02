@@ -23,11 +23,13 @@ import java.io.Serializable;
  */
 public class KeyStoreDescriptor implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 8475063607431932314L;
     private File path;
     private String password;
     private String alias;
-    
+    private boolean appliesToClient = true;
+    private boolean hostNameVerification = true;
+
     /**
      * Creates a descriptor.
      * 
@@ -36,9 +38,23 @@ public class KeyStoreDescriptor implements Serializable {
      * @param alias the alias denoting the key/certificate to use, ignored if <b>null</b>
      */
     public KeyStoreDescriptor(File path, String password, String alias) {
+        this(path, password, alias, true, true);
+    }
+    
+    /**
+     * Creates a descriptor.
+     * 
+     * @param path the path to the key file/store, no encryption if <b>null</b> or non-existent
+     * @param password the password to access the key file/store
+     * @param alias the alias denoting the key/certificate to use, ignored if <b>null</b>
+     */
+    public KeyStoreDescriptor(File path, String password, String alias, boolean appliesToClient, 
+        boolean hostNameVerification) {
         this.path = path;
         this.password = password;
         this.alias = alias;
+        this.hostNameVerification = true;
+        this.appliesToClient = true;
     }
 
     /**
@@ -83,6 +99,24 @@ public class KeyStoreDescriptor implements Serializable {
      */
     public String getAlias() {
         return alias;
+    }
+    
+    /**
+     * Whether this keystore applies to client instances or shall be ignored there.
+     * 
+     * @return {@code true} for client, {@code false} for not client
+     */
+    public boolean appliesToClient() {
+        return appliesToClient;
+    }
+    
+    /**
+     * Returns whether hostname verification shall be applied. May not be applied to every HTTP client.
+     * 
+     * @return {@code true} for hostname verification, {@code false} els
+     */
+    public boolean applyHostnameVerification() {
+        return hostNameVerification;
     }
     
 }

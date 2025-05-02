@@ -29,8 +29,10 @@ public class BasicSetupSpec implements SetupSpec {
 
     private BasicSetupSpec from;
     private Endpoint aasRegistryEndpoint;
+    private KeyStoreDescriptor aasRegistryKeyStore;
     private State aasRegistryState = State.STOPPED;
     private Endpoint smRegistryEndpoint;
+    private KeyStoreDescriptor smRegistryKeyStore;
     private State smRegistryState = State.STOPPED;
     private Endpoint aasRepoEndpoint;
     private State aasRepoState = State.STOPPED;
@@ -150,7 +152,9 @@ public class BasicSetupSpec implements SetupSpec {
         }
         setRegistryEndpoints(spec.getAasRegistryEndpoint(), spec.getSubmodelRegistryEndpoint());
         this.aasRegistryState = spec.getAasRegistryState();
+        this.aasRegistryKeyStore = spec.getAasRegistryKeyStore();
         this.smRegistryState = spec.getSubmodelRegistryState();
+        this.smRegistryKeyStore = spec.getSubmodelRegistryKeyStore();
         this.aasRepoEndpoint = spec.getAasRepositoryEndpoint();
         this.aasRepoState = spec.getAasRepositoryState();
         this.aasRepoKeyStore = spec.getAasRepositoryKeyStore();
@@ -226,6 +230,22 @@ public class BasicSetupSpec implements SetupSpec {
     }
     
     @Override
+    public KeyStoreDescriptor getAasRegistryKeyStore() {
+        return aasRegistryKeyStore;
+    }
+
+    /**
+     * Sets the AAS registry keystore.
+     * 
+     * @param desc the keystore descriptor, may be <b>null</b> for none
+     * @return <b>this</b> for chaining
+     */
+    public BasicSetupSpec setAasRegistryKeystore(KeyStoreDescriptor desc) {
+        this.aasRegistryKeyStore = desc;
+        return this;
+    }
+
+    @Override
     public State getAasRegistryState() {
         return getState(s -> s.aasRegistryState);
     }
@@ -238,6 +258,23 @@ public class BasicSetupSpec implements SetupSpec {
     @Override
     public Endpoint getSubmodelRegistryEndpoint() {
         return smRegistryEndpoint;
+    }
+
+
+    @Override
+    public KeyStoreDescriptor getSubmodelRegistryKeyStore() {
+        return smRegistryKeyStore;
+    }
+
+    /**
+     * Sets the submodel registry keystore.
+     * 
+     * @param desc the keystore descriptor, may be <b>null</b> for none
+     * @return <b>this</b> for chaining
+     */
+    public BasicSetupSpec setSubmodelRegistryKeystore(KeyStoreDescriptor desc) {
+        this.smRegistryKeyStore = desc;
+        return this;
     }
 
     @Override
@@ -415,9 +452,9 @@ public class BasicSetupSpec implements SetupSpec {
     public String toString() {
         String cr = System.lineSeparator();
         return "Basic AAS setup specification:" + cr 
-            + " - AAS registry:        " + toString(aasRegistryEndpoint) + cr
+            + " - AAS registry:        " + toString(aasRegistryEndpoint) + toString(aasRegistryKeyStore) + cr
             + " - AAS repository:      " + toString(aasRepoEndpoint) + toString(aasRepoKeyStore) + cr
-            + " - Submodel registry:   " + toString(smRegistryEndpoint) + cr
+            + " - Submodel registry:   " + toString(smRegistryEndpoint) + toString(smRegistryKeyStore) + cr
             + " - Submodel repository: " + toString(smRepoEndpoint) + toString(smRepoKeyStore) + cr
             + " - Asset server:        " + toString(assetServerAddress) + toString(assetServerKeyStore) 
                 + " @ '" + assetServerProtocol + "'";

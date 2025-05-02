@@ -48,6 +48,13 @@ public interface SetupSpec {
      * @return the endpoint
      */
     public Endpoint getAasRegistryEndpoint();
+    
+    /**
+     * Returns the keystore descriptor for the AAS registry.
+     * 
+     * @return the keystore descriptor, may be <b>null</b> for none
+     */
+    public KeyStoreDescriptor getAasRegistryKeyStore();
 
     /**
      * Returns the state of the AAS registry .
@@ -69,6 +76,13 @@ public interface SetupSpec {
      * @return the endpoint
      */
     public Endpoint getSubmodelRegistryEndpoint();
+
+    /**
+     * Returns the keystore descriptor for the submodel registry.
+     * 
+     * @return the keystore descriptor, may be <b>null</b> for none
+     */
+    public KeyStoreDescriptor getSubmodelRegistryKeyStore();
 
     /**
      * Returns the state of the submodel registry.
