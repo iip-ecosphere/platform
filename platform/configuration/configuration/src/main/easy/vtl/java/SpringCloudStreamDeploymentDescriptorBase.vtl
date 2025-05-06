@@ -148,6 +148,8 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
             execArg.add("run");
             addCmdArg("-n", condaEnv, execArg);
             p.addList("execArg", execArg);
+        } else if (venvName.trim().length() > 0) {
+            p.addValue("locationKey", "${venvName}");
         } else {
             setOf(SystemDependency) sysDep = service.dependencies->selectByType(SystemDependency);
             SystemDependency dep = sysDep.projectSingle();
