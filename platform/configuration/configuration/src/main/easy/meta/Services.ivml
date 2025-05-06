@@ -245,6 +245,7 @@ project Services {
            String servicesPackageName = null; // use the default, helps in testing/mocking
            PythonIntegrationMode integrationMode = PythonIntegrationMode::console_continuous;
            String condaEnv;
+           String venvName;
        }
        dependencies.uiGroup = UiMandatoryGroup1;
        //Constraint conda = isDefined(condaEnv) and condaEnv <> "" implies dependencies->->selectByType(SystemDependency)->select(d|d.key.startsWith("CONDA")).notEmpty();

@@ -107,6 +107,10 @@ project Devices {
         key = "CONDA"
     };
 
+    SystemDependency VENV = { // symbolic, we use a matching version of the respective Python
+        key = "VENV"
+    };
+    
     SystemDependency PYTHON3 = { // TODO remove if not needed
         key = "PYTHON3",
         dependencies = {refBy(pyyamlNoVersion), refBy(pyflakesNoVersion), refBy(websocketsNoVersion)},
