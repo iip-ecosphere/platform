@@ -7,7 +7,7 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
-		<delete>
+		<delete quiet="true">
 		   <fileset dir="target/jars">
 		      <include name="*"/>
 		   </fileset>
