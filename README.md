@@ -85,6 +85,8 @@ IEEE 28th International Conference on Emerging Technologies and Factory Automati
 
 ## Contributing Student Works
 
+* Monika Staciwa, AAS alternatives for Industry 4.0/IIoT platform oktoflow, MSc project thesis, 2025
+* Christian Nikolajew, REST Konnektor für die oktoflow-Plattform, BSc thesis, 2024
 * Kevin Schaperjahn, Python Code Artifakte für EASy-Producer / oktoflow, BSc project thesis, 2024
 * Christian Nikolajew, Modbus TCP/IP Konnektor für die oktoflow-Plattform, BSc project thesis, 2024
 * Jobst Hillebrandt, Implementierung, Evaluierung und Profiling einer Open Source JNI-Umsetzung für das TwinCat ADS-Protokoll, BSc project thesis, 2024
