@@ -15,11 +15,9 @@ For installation and first steps, see [install guide](platform/documentation/INS
 * Upcoming support for Asset Administration Shells metamodel v3 through BaSyx2
 * Support for Python 3.13 and virtual environments
 * Automated container creation upgraded
-* Mangement UI upgrading to Angular 19.
+* Mangement UI upgraded to Angular 19.
 * Many interesting ideas and proto-requirements from the [ReGaP-community kickoff](https://regap.de/community-kickoff/). Initial contribution: file-based connector for CSV, JSON, etc.
-* Validation of container generation and migration to JDK 21/recent Python ahead
 * oktoflow code generation initially migrated to VTL artifacts, still improving/developing
-* REST connector by Christian Nikolajew
 
 ## Public demonstrations
 
