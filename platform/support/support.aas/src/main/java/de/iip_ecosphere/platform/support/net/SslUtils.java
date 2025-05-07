@@ -37,7 +37,9 @@ import java.util.Base64;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509ExtendedKeyManager;
 import javax.net.ssl.X509KeyManager;
 
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
@@ -275,7 +277,9 @@ public class SslUtils {
         }
         if (null != tmp) {
             final X509KeyManager origKm = tmp;
-            X509KeyManager km = new X509KeyManager() {
+            final X509ExtendedKeyManager origExKm = 
+                tmp instanceof X509ExtendedKeyManager ? (X509ExtendedKeyManager) tmp : null;
+            X509KeyManager km = new X509ExtendedKeyManager() {
                 
                 public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket) {
                     return alias;
@@ -303,6 +307,18 @@ public class SslUtils {
                 @Override
                 public String[] getServerAliases(String keyType, Principal[] issuers) {
                     return origKm.getServerAliases(keyType, issuers);
+                }
+
+                @Override                
+                public String chooseEngineClientAlias(String[] keyType,
+                        Principal[] issuers, SSLEngine engine) {
+                    return null != origExKm ? origExKm.chooseEngineClientAlias(keyType, issuers, engine) : null;
+                }
+                
+                @Override
+                public String chooseEngineServerAlias(String keyType,
+                    Principal[] issuers, SSLEngine engine) {
+                    return null != origExKm ? origExKm.chooseEngineServerAlias(keyType, issuers, engine) : null;
                 }
     
             };

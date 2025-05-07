@@ -101,8 +101,8 @@ public class BasicSetupSpec implements SetupSpec {
     }
 
     /**
-     * Creates a setup instance for old-style AAS with joined registry/repository. Will not work with metamodel v3,
-     * just for migration purposes
+     * Creates a setup instance for old-style AAS with joined registry/repository/asset. Will not work with metamodel 
+     * v3, just for migration purposes
      * 
      * @param registryEndpoint the AAS registry endpoint
      * @param repositoryEndpoint the repository endpoint
@@ -112,6 +112,9 @@ public class BasicSetupSpec implements SetupSpec {
         this(registryEndpoint, repositoryEndpoint);
         setAasRepositoryKeystore(desc);
         setSubmodelRepositoryKeystore(desc);
+        setAasRegistryKeystore(desc);
+        setSubmodelRegistryKeystore(desc);
+        setAssetServerKeystore(desc);
     }
 
     /**
