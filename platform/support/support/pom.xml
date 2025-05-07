@@ -105,7 +105,7 @@
  		 <executions>
 	        <execution>
 	            <id>test-plugin</id>
-	            <phase>generate-test-resources</phase>
+	            <phase>process-test-classes</phase>
 	            <goals>
 	                <goal>run</goal>
 	            </goals>         
