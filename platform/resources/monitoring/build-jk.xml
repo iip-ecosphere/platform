@@ -7,7 +7,6 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
-	    <maven pomFile="pom.xml" goal="install"/>
-		<mvnDeployResolveArtifact folderName="IIP-monitoring" pomFile="pom.xml" jarFolder="target" artifactPattern="monitoring-*.*.*.jar" />
+	    <maven pomFile="pom.xml" goal="deploy"/>
 	</target>
 </project>
