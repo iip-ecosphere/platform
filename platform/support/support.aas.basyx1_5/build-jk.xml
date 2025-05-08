@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="IIP-Ecosphere support BaSyx 1.0 AAS extension" default="maven" basedir=".">
+<project name="IIP-Ecosphere support BaSyx 1.5 AAS extension" default="maven" basedir=".">
 	<!-- import of the global SSE Jenkins properties -->
 	<property file="${user.home}/global-build.properties"/>
 	<property file="${user.home}/qualimaster-build.properties"/>
