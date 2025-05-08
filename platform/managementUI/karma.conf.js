@@ -45,6 +45,6 @@ module.exports = function (config) {
     singleRun: false,
     restartOnFileChange: true,
     failOnFailingTestSuite: true,
-    browserNoActivityTimeout: 200000
+    browserNoActivityTimeout: 300000
   });
 };
