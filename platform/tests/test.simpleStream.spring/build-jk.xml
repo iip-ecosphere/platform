@@ -13,6 +13,5 @@
 		   </fileset>
 		</delete>
 	    <maven pomFile="pom.xml" goal="install"/>
-		<mvnDeployResolveArtifact folderName="IIP-test-simpleStream.spring" pomFile="pom.xml" jarFolder="target" artifactPattern="test.simpleStream.spring-*.*.*.???" />
 	</target>
 </project>
