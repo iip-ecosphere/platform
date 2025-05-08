@@ -2,16 +2,12 @@ import unittest
 
 import sys
 import os
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument("relModelPath", help="relative path to the impl.model project")
-args = parser.parse_args()
-
 """ will be the relativve paths from impl.impl to impl.model, given through pom /gen onwards! """
-sys.path.insert(1, (args.relModelPath))
-sys.path.insert(2, (args.relModelPath + "/iip"))
+sys.path.insert(1, "../../../target/pyEnv")
+sys.path.insert(2, "../../../target/pyEnv/iip")
+sys.path.insert(3, "../../../target/pySrc")
 """ always fixed value as these directorys are generated in the impl.impl """
-sys.path.insert(3, "../../main/python/services") 
+sys.path.insert(4, "../../main/python/services") 
 
 import json
 
