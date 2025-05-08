@@ -270,7 +270,7 @@
               <goal>copy</goal>
             </goals>
             <configuration>
-              <sourceFile>pckg/IIP-Ecosphere-mgtUi-latest.zip</sourceFile>
+              <sourceFile>target/mgtUI.zip</sourceFile>
               <destinationFile>${project.build.directory}/${project.build.finalName}-bin.zip</destinationFile>
             </configuration>
           </execution>
