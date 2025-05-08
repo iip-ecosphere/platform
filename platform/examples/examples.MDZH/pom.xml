@@ -84,6 +84,11 @@
 		      <groupId>de.iip-ecosphere.platform.apps</groupId>
 		      <version>0.1.0-SNAPSHOT</version> <!-- from config -->
    			 </dependency>
+   		     <dependency>
+               <groupId>de.iip-ecosphere.platform</groupId>
+               <artifactId>connectors.serial</artifactId>
+               <version>${project.version}</version>
+             </dependency>
 	    </dependencies>
         <build>
           <plugins>
