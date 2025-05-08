@@ -7,7 +7,6 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
-	    <maven pomFile="pom.xml" goal="install"/>
-		<mvnDeployResolveArtifact folderName="IIP-support-aas-basyx" pomFile="pom.xml" jarFolder="target" artifactPattern="support.aas.basyx-*.*.*.jar" />
+	    <maven pomFile="pom.xml" goal="deploy"/>
 	</target>
 </project>
