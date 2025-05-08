@@ -7,7 +7,6 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
-	    <maven pomFile="pom.xml" goal="install"/>
-		<mvnDeployResolveArtifact folderName="IIP-deviceMgt-Minio" pomFile="pom.xml" jarFolder="target" artifactPattern="deviceMgt.minio-*.*.*.jar" />
+	    <maven pomFile="pom.xml" goal="deploy"/>
 	</target>
 </project>
