@@ -106,7 +106,7 @@
                              </artifactItem>
                              <artifactItem>
                                  <groupId>de.iip-ecosphere.platform</groupId>
-                                 <artifactId>impl.model</artifactId>
+                                 <artifactId>apps.ExamplePythonAppInterfaces</artifactId>
                                  <version>${project.version}</version>
                                  <type>zip</type>
                                  <classifier>python</classifier>
