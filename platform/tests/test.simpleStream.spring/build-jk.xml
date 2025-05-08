@@ -12,6 +12,6 @@
 		      <include name="*"/>
 		   </fileset>
 		</delete>
-	    <maven pomFile="pom.xml" goal="install"/>
+	    <maven pomFile="pom.xml" goal="deploy"/>
 	</target>
 </project>
