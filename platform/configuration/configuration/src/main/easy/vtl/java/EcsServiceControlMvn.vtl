@@ -15,7 +15,7 @@ template EcsServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, Strin
         
         XmlElement project = createMavenRoot(target);
         createMavenProjectAttributes(project, artifactId, "ConfiguredEcsServiceControl", "Configured ECS Runtime for small resources, no container manager, but service control");
-        createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
+        createMavenParent(project, iipGroup, "platformDependenciesSpring", "${config.iipVer}");
         
         XmlElement dep = createDependencies(project);
         appendDependency(dep, iipGroup, "support", projectVersion);
@@ -38,10 +38,10 @@ template EcsServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, Strin
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
         appendMavenJarPlugin(plugins, "2.3", false, main);
-XmlElement dPlug = appendMavenIipDependencyPlugin(plugins);
-XmlElement ex2 = appendExecutionsParent(dPlug);
-appendMavenDependencyPluginCopyDepsExecution(ex2, jarDir="../${dir}", copyOwn=true);
-appendWinLinuxDependencyPluginBuildClasspathExecution(ex2, dir, ownArtifact="${iipGroup}.${artifactId}-${config.iipVer}");
+        XmlElement dPlug = appendMavenIipDependencyPlugin(plugins);
+        XmlElement ex2 = appendExecutionsParent(dPlug);
+        appendMavenDependencyPluginCopyDepsExecution(ex2, jarDir="../${dir}", copyOwn=true);
+        appendWinLinuxDependencyPluginBuildClasspathExecution(ex2, dir, ownArtifact="${iipGroup}.${artifactId}-${config.iipVer}");
 
         sequenceOf(String) files = defltOktoResourceFiles();
         ex2 = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder()+"/devices", files, id="dev-res");

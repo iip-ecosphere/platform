@@ -33,7 +33,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         new XmlElement(project, "groupId", gId);
         new XmlElement(project, "version", "${appVersion}");
         // app version cannot be used with maven parent, use import??
-        createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
+        createMavenParent(project, iipGroup, "platformDependenciesSpring", "${config.iipVer}");
         XmlElement properties = new XmlElement(project, "properties");
         new XmlElement(properties, "maven.jar.forceCreation", "true"); // spring-boot-plugin result grows if not re-built, clean plugin prevents creating the result jar
         addDistributionManagement(project, config);

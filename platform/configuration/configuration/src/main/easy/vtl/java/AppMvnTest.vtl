@@ -26,7 +26,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         new XmlElement(project, "groupId", gId);
         new XmlElement(project, "version", "${appVersion}");
         // app version cannot be used with maven parent, use import??
-        createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
+        createMavenParent(project, iipGroup, "platformDependenciesSpring", "${config.iipVer}");
         addDistributionManagement(project, config);
         
         new XmlComment(project, "Template application/service implementation POM.");

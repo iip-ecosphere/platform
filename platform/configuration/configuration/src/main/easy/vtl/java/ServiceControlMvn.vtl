@@ -14,7 +14,7 @@ template ServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, String d
         
         XmlElement project = createMavenRoot(target);
         createMavenProjectAttributes(project, artifactId, "ConfiguredServiceControl", "Configured service control");
-        createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
+        createMavenParent(project, iipGroup, "platformDependenciesSpring", "${config.iipVer}");
         
         XmlElement dep = createDependencies(project);
         appendDependency(dep, iipGroup, "support", projectVersion);
@@ -33,10 +33,10 @@ template ServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, String d
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
         appendMavenJarPlugin(plugins, "2.3", false, main);
-XmlElement dPlug = appendMavenIipDependencyPlugin(plugins);
-ex = appendExecutionsParent(dPlug);
-appendMavenDependencyPluginCopyDepsExecution(ex, jarDir="../${dir}", copyOwn=true);
-appendWinLinuxDependencyPluginBuildClasspathExecution(ex, dir, ownArtifact="${iipGroup}.${artifactId}-${config.iipVer}");
+        XmlElement dPlug = appendMavenIipDependencyPlugin(plugins);
+        ex = appendExecutionsParent(dPlug);
+        appendMavenDependencyPluginCopyDepsExecution(ex, jarDir="../${dir}", copyOwn=true);
+        appendWinLinuxDependencyPluginBuildClasspathExecution(ex, dir, ownArtifact="${iipGroup}.${artifactId}-${config.iipVer}");
 
         sequenceOf(String) files = defltOktoResourceFiles();
         ex = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder()+"/devices", files, id="dev-res");
