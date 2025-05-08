@@ -62,7 +62,7 @@ project TechnicalSetup {
     // ---------- generation setup ------------
     
    sharedInterfaces = true;
-    //sharedArtifact = "de.iip-ecosphere.platform:apps.WorkshopTemplateExample:" + appVersion(myApp); // for testing all-in-one
+   sharedArtifact = "de.iip-ecosphere.platform.apps:WorkshopTemplateExample:" + iipVer; // for testing all-in-one
 
     // ------------ freezing ------------------
     

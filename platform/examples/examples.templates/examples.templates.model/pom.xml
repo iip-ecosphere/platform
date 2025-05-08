@@ -104,7 +104,7 @@
                   </goals>
               </execution>
                <!-- does not find generated classes at runtime -->
-               <!--<execution> 
+               <execution> 
                    <id>testApp</id>
                    <goals>
                        <goal>testApp</goal>
@@ -115,9 +115,8 @@
                        <logRegExprs>
                            <logRegExpr>.*Output:.*</logRegExpr>
                        </logRegExprs>
-                       <outputDirectory>${iip.gen}</outputDirectory>
                    </configuration>
-               </execution>-->
+               </execution>
           </executions>
           <configuration>
               <model>${iip.model}</model>

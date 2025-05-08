@@ -24,8 +24,8 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>de.iip-ecosphere.platform</groupId>
-                    <artifactId>apps.AppInterfaces</artifactId>
+                    <groupId>de.iip-ecosphere.platform.apps</groupId>
+                    <artifactId>WorkshopTemplateExample</artifactId>
                     <version>${iip.version}</version>
                     <exclusions>
                         <exclusion>
@@ -92,8 +92,8 @@
                                             <destFileName>pyEnv.zip</destFileName>
                                         </artifactItem>
                                         <artifactItem>
-                                            <groupId>de.iip-ecosphere.platform</groupId>
-                                            <artifactId>apps.AppInterfaces</artifactId>
+                                            <groupId>de.iip-ecosphere.platform.apps</groupId>
+                                            <artifactId>WorkshopTemplateExample</artifactId>
                                             <version>${iip.version}</version>
                                             <type>zip</type>
                                             <classifier>python</classifier>
