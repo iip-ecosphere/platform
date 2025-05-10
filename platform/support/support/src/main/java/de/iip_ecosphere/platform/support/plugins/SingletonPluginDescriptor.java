@@ -16,17 +16,13 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
- * Default plugin descriptor implementation. May create per calling {@link #createPlugin()} always a new instance.
+ * Singleton plugin descriptor implementation, creates {@link SingletonPlugin} instances.
  * 
  * @param <T> plugin type
  * @author Holger Eichelberger, SSE
  */
-public class DefaultPluginDescriptor<T> implements PluginDescriptor<T> {
+public class SingletonPluginDescriptor<T> extends DefaultPluginDescriptor<T> {
 
-    private String id;
-    private List<String> ids;
-    private Class<T> pluginClass;
-    private Supplier<T> pluginSupplier;
     
     /**
      * Creates a descriptor instance.
@@ -36,39 +32,13 @@ public class DefaultPluginDescriptor<T> implements PluginDescriptor<T> {
      * @param pluginClass the instance class
      * @param pluginSupplier the creator supplier
      */
-    public DefaultPluginDescriptor(String id, List<String> ids, Class<T> pluginClass, Supplier<T> pluginSupplier) {
-        this.id = id;
-        this.ids = ids;
-        this.pluginClass = pluginClass;
-        this.pluginSupplier = pluginSupplier;
+    public SingletonPluginDescriptor(String id, List<String> ids, Class<T> pluginClass, Supplier<T> pluginSupplier) {
+        super(id, ids, pluginClass, pluginSupplier);
     }
     
     @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public Plugin<T> createPlugin() {
-        return createPlugin(id, ids, pluginClass, pluginSupplier);
-    }
-
-    /**
-     * Creates the plugin instance.
-     * 
-     * @param id the plugin id
-     * @param ids optional secondary ids, may be <b>null</b> or empty
-     * @param pluginClass the instance class
-     * @param pluginSupplier the creator supplier
-     * @return the plugin instance
-     */
     protected Plugin<T> createPlugin(String id, List<String> ids, Class<T> pluginClass, Supplier<T> pluginSupplier) {
-        return new Plugin<T>(id, ids, pluginClass, pluginSupplier);
-    }
-
-    @Override
-    public Class<T> getType() {
-        return pluginClass;
+        return new SingletonPlugin<T>(id, ids, pluginClass, pluginSupplier);
     }
 
 }

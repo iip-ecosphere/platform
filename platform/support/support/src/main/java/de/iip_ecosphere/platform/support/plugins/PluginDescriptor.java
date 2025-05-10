@@ -12,25 +12,44 @@
 
 package de.iip_ecosphere.platform.support.plugins;
 
+import java.util.List;
+
 /**
  * Represents a loaded plugin.
  * 
+ * @param <T> the type of the plugin
  * @author Holger Eichelberger, SSE
  */
-public interface PluginDescriptor {
+public interface PluginDescriptor<T> {
 
     /**
-     * Returns the unique plugin id.
+     * Returns the unique/primary plugin id.
      * 
      * @return the id
      */
     public String getId();
     
     /**
+     * Returns further ids this plugin represents.
+     * 
+     * @return the further ids, may be <b>null</b>, empty, unmodifiable
+     */
+    public default List<String> getFurtherIds() {
+        return null;
+    }
+    
+    /**
      * Creates a plugin instance.
      * 
      * @return the plugin instance
      */
-    public Plugin<?> createPlugin();
+    public Plugin<T> createPlugin();
+    
+    /**
+     * Returns the type of plugin being created.
+     * 
+     * @return
+     */
+    public Class<T> getType();
     
 }

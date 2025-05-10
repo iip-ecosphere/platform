@@ -157,6 +157,12 @@ public class PluginManagerTest {
         plServer.start();
         plServer.stop(false);
 
+        Plugin<Server> plugin3 = PluginManager.getPlugin(Server.class);
+        Assert.assertNotNull(plugin3);
+
+        Plugin<Server> plugin4 = PluginManager.getPlugin(Server.class, id);
+        Assert.assertNotNull(plugin4);
+
         PluginManager.loadPlugins(); // nothing shall happen
         PluginManager.cleanup();
     }

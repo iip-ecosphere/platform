@@ -13,7 +13,9 @@
 package de.iip_ecosphere.platform.support.plugins;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.StringTokenizer;
@@ -33,8 +35,13 @@ import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
  */
 public class PluginManager {
 
+    /**
+     * Postfix of plugin id to indicate a default plugin that is also returned if no plugin id matches.
+     */
+    public static final String POSTFIX_ID_DEFAULT = "-default";
     public static final String FILE_PLUGINS_PROPERTY = "okto.plugins";
     private static Map<String, Plugin<?>> plugins = new HashMap<>();
+    private static Map<Class<?>, List<Plugin<?>>> pluginsByType = new HashMap<>();
     
     /**
      * Returns a specific plugin.
@@ -44,17 +51,17 @@ public class PluginManager {
      * @return the plugin, may be <b>null</b> for none
      */
     public static Plugin<?> getPlugin(String id) {
-        return plugins.get(id);
+        return id == null ? null : plugins.get(id);
     }
 
     /**
      * Returns a specific plugin.
      * 
      * @param <T> the type of plugin to return
-     * @param id the unique id of the plugin
+     * @param id the id of the plugin
      * @param cls the class the plugin shall be of
      * 
-     * @return the plugin, may be <b>null</b> for none
+     * @return the plugin (primary or for secondary ids the first registered one), may be <b>null</b> for none
      */
     @SuppressWarnings("unchecked")
     public static <T> Plugin<T> getPlugin(String id, Class<T> cls) {
@@ -65,6 +72,53 @@ public class PluginManager {
         } else if (tmp != null) {
             LoggerFactory.getLogger(PluginManager.class).warn(
                 "Plugin for id '{}' found, but not compatible with {}", id, cls);
+        }
+        return result;
+    }
+
+    /**
+     * Returns a plugin for a specific type, possibly the default plugin.
+     * 
+     * @param <T> the type of plugin to return
+     * @param cls the class the plugin shall be of
+     * @return the plugin, preferrably the default plugin, may be <b>null</b> for none
+     */
+    public static <T> Plugin<T> getPlugin(Class<T> cls) {
+        return getPlugin(cls, null);
+    }
+
+    /**
+     * Returns a plugin for a specific type.
+     * 
+     * @param <T> the type of plugin to return
+     * @param cls the class the plugin shall be of
+     * @param id the optional id of the plugin to return, may be <b>null</b> or empty leading to the 
+     *     default/first registered plugin 
+     * @return the plugin, preferrably the default plugin if {@code id} does not match, may be <b>null</b> for none
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Plugin<T> getPlugin(Class<T> cls, String id) {
+        Plugin<T> result = null;
+        if (null != cls) {
+            List<Plugin<?>> pls = pluginsByType.get(cls);
+            if (null != pls && pls.size() > 0) {
+                Plugin<?> tmp = null;
+                for (Plugin<?> p : pls) {
+                    if (p.getAllIds().contains(id)) {
+                        tmp = p;
+                        break;
+                    }
+                }
+                if (tmp == null) {
+                    tmp = pls.get(0);
+                }
+                if (null != tmp && cls.isAssignableFrom(tmp.getInstanceClass())) {
+                    result = (Plugin<T>) tmp;
+                } else if (tmp != null) {
+                    LoggerFactory.getLogger(PluginManager.class).warn(
+                        "Plugin for type '{}' found, but not compatible with {}", cls.getName(), cls);
+                }
+            }
         }
         return result;
     }
@@ -158,21 +212,41 @@ public class PluginManager {
      * is already registered and ignores then {@code desc}.
      * 
      * @param desc the descriptor to register
-     * @param onlyNew if {@code true} considers only unknown/new plugins, if {@code false} consides all plugins and 
+     * @param onlyNew if {@code true} considers only unknown/new plugins, if {@code false} considers all plugins and 
      *   issues warnings
      */
-    private static void registerPlugin(PluginDescriptor desc, boolean onlyNew) {
-        String id = desc.getId();
-        Plugin<?> known = plugins.get(id);
-        if (null != known) {
-            if (!onlyNew) {
+    private static void registerPlugin(PluginDescriptor<?> desc, boolean onlyNew) {
+        Plugin<?> plugin = desc.createPlugin();
+        Class<?> pluginClass = plugin.getInstanceClass();
+        List<String> ids = plugin.getAllIds();
+        boolean dflt = ids.stream().anyMatch(i -> i.endsWith(POSTFIX_ID_DEFAULT));
+        boolean isKnown = false;
+        for (String id : ids) {
+            Plugin<?> known = plugins.get(id);
+            if (null != known) {
                 LoggerFactory.getLogger(PluginManager.class).warn(
                     "Plugin id '{}' is already registered for {}. Ignoring descriptor {}.", 
                     id, known.getClass(), desc.getClass());
             }
-        } else {
-            plugins.put(id, desc.createPlugin());
-            LoggerFactory.getLogger(PluginManager.class).info("Plugin {} registered", id);
+        }
+        if ((onlyNew && !isKnown) || !onlyNew) {
+            for (String id : ids) {
+                Plugin<?> known = plugins.get(id);
+                if (null == known) {
+                    plugins.put(id, plugin);
+                    LoggerFactory.getLogger(PluginManager.class).info("Plugin {} registered", id);
+                }
+            }
+            List<Plugin<?>> pls = pluginsByType.get(pluginClass);
+            if (null == pls) {
+                pls = new ArrayList<>();
+                pluginsByType.put(pluginClass, pls);
+            }
+            if (dflt) {
+                pls.add(0, plugin);
+            } else {
+                pls.add(plugin);
+            }
         }
     }
 
