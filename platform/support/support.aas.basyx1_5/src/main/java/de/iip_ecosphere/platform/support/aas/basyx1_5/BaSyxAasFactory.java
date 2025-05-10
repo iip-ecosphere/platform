@@ -15,11 +15,8 @@ package de.iip_ecosphere.platform.support.aas.basyx1_5;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.valuetype.ValueType;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.aas.AasFactoryDescriptor;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.basyx.Tools;
-import de.iip_ecosphere.platform.support.plugins.Plugin;
-import de.iip_ecosphere.platform.support.plugins.PluginDescriptor;
 
 /**
  * AAS factory for BaSyx. Do not rename, this class is referenced in {@code META-INF/services}.
@@ -35,7 +32,7 @@ public class BaSyxAasFactory extends de.iip_ecosphere.platform.support.aas.basyx
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class Descriptor implements AasFactoryDescriptor, PluginDescriptor {
+    public static class Descriptor extends AbstractDescriptor {
 
         @Override
         public AasFactory createInstance() {
@@ -45,11 +42,6 @@ public class BaSyxAasFactory extends de.iip_ecosphere.platform.support.aas.basyx
         @Override
         public String getId() {
             return PLUGIN_ID;
-        }
-
-        @Override
-        public Plugin<?> createPlugin() {
-            return new Plugin<AasFactory>(PLUGIN_ID, AasFactory.class, () -> createInstance());
         }
         
     }

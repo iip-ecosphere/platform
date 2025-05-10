@@ -19,11 +19,8 @@ import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operat
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.aas.AasFactoryDescriptor;
 import de.iip_ecosphere.platform.support.aas.basyx.AbstractBaSyxAasFactory;
 import de.iip_ecosphere.platform.support.aas.basyx.VersionAdjustment;
-import de.iip_ecosphere.platform.support.plugins.Plugin;
-import de.iip_ecosphere.platform.support.plugins.PluginDescriptor;
 
 /**
  * AAS factory for BaSyx. Do not rename, this class is referenced in {@code META-INF/services}.
@@ -39,7 +36,7 @@ public class BaSyxAasFactory extends AbstractBaSyxAasFactory {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class Descriptor implements AasFactoryDescriptor, PluginDescriptor {
+    public static class Descriptor extends AbstractDescriptor {
 
         @Override
         public AasFactory createInstance() {
@@ -49,11 +46,6 @@ public class BaSyxAasFactory extends AbstractBaSyxAasFactory {
         @Override
         public String getId() {
             return PLUGIN_ID;
-        }
-
-        @Override
-        public Plugin<?> createPlugin() {
-            return new Plugin<AasFactory>(PLUGIN_ID, AasFactory.class, () -> createInstance());
         }
         
     }

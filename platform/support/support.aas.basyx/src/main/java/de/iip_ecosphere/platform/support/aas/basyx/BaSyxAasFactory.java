@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx;
 
+import java.util.List;
+
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.submodel.metamodel.connected.submodelelement.operation.ConnectedOperation;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
@@ -20,9 +22,6 @@ import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationConfiguration;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.aas.AasFactoryDescriptor;
-import de.iip_ecosphere.platform.support.plugins.Plugin;
-import de.iip_ecosphere.platform.support.plugins.PluginDescriptor;
 
 /**
  * AAS factory for BaSyx. Do not rename, this class is referenced in {@code META-INF/services}.
@@ -32,13 +31,14 @@ import de.iip_ecosphere.platform.support.plugins.PluginDescriptor;
 public class BaSyxAasFactory extends AbstractBaSyxAasFactory {
 
     static final boolean ENABLE_PROPERTY_LAMBDA = true;
+    private static final String PLUGIN_ID = "aas.basyx-1.3";
 
     /**
      * Factory descriptor for Java Service Loader.
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class Descriptor implements AasFactoryDescriptor, PluginDescriptor {
+    public static class Descriptor extends AbstractDescriptor {
 
         @Override
         public AasFactory createInstance() {
@@ -49,12 +49,12 @@ public class BaSyxAasFactory extends AbstractBaSyxAasFactory {
         public String getId() {
             return DEFAULT_PLUGIN_ID;
         }
-
-        @Override
-        public Plugin<?> createPlugin() {
-            return new Plugin<AasFactory>(DEFAULT_PLUGIN_ID, AasFactory.class, () -> createInstance());
-        }
         
+        @Override
+        public List<String> getFurtherIds() {
+            return List.of(PLUGIN_ID);
+        }
+
     }
     
     /**

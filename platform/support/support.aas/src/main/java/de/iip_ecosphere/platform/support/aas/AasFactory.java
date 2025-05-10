@@ -29,7 +29,9 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+import de.iip_ecosphere.platform.support.plugins.SingletonPlugin;
 import de.iip_ecosphere.platform.support.plugins.Plugin;
+import de.iip_ecosphere.platform.support.plugins.PluginDescriptor;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
 /**
@@ -59,7 +61,26 @@ public abstract class AasFactory {
     /**
      * The plugin ID of the default AAS implementation.
      */
-    public static final String DEFAULT_PLUGIN_ID = "aas-default";
+    public static final String DEFAULT_PLUGIN_ID = "aas" + PluginManager.POSTFIX_ID_DEFAULT;
+
+    /**
+     * Factory descriptor for Java Service Loader.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public abstract static class AbstractDescriptor implements AasFactoryDescriptor, PluginDescriptor<AasFactory> {
+        
+        @Override
+        public Class<AasFactory> getType() {
+            return AasFactory.class;
+        }
+        
+        @Override
+        public Plugin<AasFactory> createPlugin() {
+            return new SingletonPlugin<AasFactory>(getId(), getFurtherIds(), AasFactory.class, () -> createInstance());
+        }
+        
+    }
     
     /**
      * A dummy AAS factory instance that intentionally does nothing. This is the default implementation,
