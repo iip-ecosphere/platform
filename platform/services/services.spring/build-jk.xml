@@ -10,7 +10,6 @@
 		<delete>
 		    <dirset dir="${basedir}" includes="java-server-*" />
 		</delete>
-	    <maven pomFile="pom.xml" goal="install"/>
-		<mvnDeployResolveArtifact folderName="IIP-services-spring" pomFile="pom.xml" jarFolder="target" artifactPattern="services.spring-*.*.*.jar" />
+	    <maven pomFile="pom.xml" goal="deploy"/>
 	</target>
 </project>
