@@ -9,9 +9,8 @@ template DockerfilePlatform(IIPEcosphere config, FileArtifact target) {
     def main(IIPEcosphere config, FileArtifact target) {
 
         'FROM python:3.9.21-slim'
-        //'${containerSettings(config, containerType, device)}'
+        ''
         'RUN apt-get update -y && apt install wget -y && wget https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.deb && dpkg -i jdk-21_linux-x64_bin.deb'
-        //'RUN apt-get install -y openjdk-11-jre'
 
         'COPY requirements.txt requirements.txt'
         'RUN python3 -m pip install -r requirements.txt'
@@ -23,8 +22,6 @@ template DockerfilePlatform(IIPEcosphere config, FileArtifact target) {
         ''
         'WORKDIR /app'
         ''
-        'COPY wrapper_script_platform.sh wrapper_script_platform.sh'
-        ''	
         '# Broker'
         'COPY broker/brokerJars/ brokerJars'
         'COPY broker/src/ src'
@@ -37,6 +34,7 @@ template DockerfilePlatform(IIPEcosphere config, FileArtifact target) {
         ''
         if (hasUI(config)) {
             '# mgtUi'
+            'RUN apt update && apt install -y curl gnupg && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && apt install -y nodejs && npm install -g @angular/cli@19.2.5'
             'COPY mgtUi/ mgtUi'
             'COPY common/ common'
             'COPY mgtUi.sh mgtUi.sh'
@@ -50,7 +48,8 @@ template DockerfilePlatform(IIPEcosphere config, FileArtifact target) {
             ''
         }
         ''
+        'COPY wrapper_script_platform.sh wrapper_script_platform.sh'
         'RUN chmod 777 wrapper_script_platform.sh'
-        'CMD ./wrapper_script_platform.sh >> /var/log/iip.logs'
+        'ENTRYPOINT ["./wrapper_script_platform.sh"]'
     }
 }
