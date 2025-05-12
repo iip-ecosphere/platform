@@ -14,6 +14,7 @@ To demonstrate and validate the oktoflow platform, we collect in this folder a s
 * [EMO'23/HM'23 demonstrator](examples.python/emo23.md): The source code of the EMO'23/HM'23 demonstrator as an example for a more complex AI-enabled application with three AI services.
 * [MODBUS/TCP example](examples.modbusTcp/README.md): Integrating a MODBUS/TCP connector into a simple service mesh.
 * [REST example](examples.rest/README.md): Integrating a REST connector into a simple service mesh.
+* [Python venv example](examples.pythonCondaVenv/README.md): Demonstrating the use of Conda/venv for Python services.
 
 The [examples](examples/README.md) component contains helpful reusable basic functionality for examples and apps.
 
