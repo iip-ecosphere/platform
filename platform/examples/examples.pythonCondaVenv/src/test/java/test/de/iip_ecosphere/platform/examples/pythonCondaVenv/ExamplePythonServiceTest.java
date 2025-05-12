@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package test.de.iip_ecosphere.platform.examples.python;
+package test.de.iip_ecosphere.platform.examples.pythonCondaVenv;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +31,7 @@ import de.iip_ecosphere.platform.support.TimeUtils;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ExamplePythonServiceTest {
+public class ExamplePythonCondaVenvServiceTest {
 
     /**
      * Tests whether the service code can be compiled and basically executed.

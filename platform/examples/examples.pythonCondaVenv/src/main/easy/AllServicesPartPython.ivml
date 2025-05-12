@@ -11,7 +11,7 @@ project AllServicesPartPython {
         ver = "0.1.0",
         deployable = true,
         asynchronous = true,
-        class = "de.iip_ecosphere.platform.examples.python.SimplePythonCondaVenvSourceImpl",
+        class = "de.iip_ecosphere.platform.examples.pythonCondaVenv.SimplePythonCondaVenvSourceImpl",
         artifact = "de.iip-ecosphere.platform:examples.pythonCondaVenv:" + iipVer,
         kind = ServiceKind::SOURCE_SERVICE,
         output = {{type=refBy(PythonCondaTestInput)}}
@@ -53,7 +53,7 @@ project AllServicesPartPython {
         description = "",
         ver = "0.1.0",
         deployable = true,
-        class = "de.iip_ecosphere.platform.examples.python.SimplePythonCondaVenvReceiverImpl",
+        class = "de.iip_ecosphere.platform.examples.pythonCondaVenv.SimplePythonCondaVenvReceiverImpl",
         artifact = "de.iip-ecosphere.platform:examples.pythonCondaVenv:" + iipVer,
         kind = ServiceKind::SINK_SERVICE,
         input = {{type=refBy(PythonVenvTestOutput)}}
