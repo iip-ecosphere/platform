@@ -142,6 +142,7 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
             p.addValue("executable", service.entrypointModule);
         }
         String condaEnv = getStringValueSafe(service.condaEnv, "");
+        String venvName = getStringValueSafe(service.venvName, "");
         if (condaEnv.trim().length() > 0) {
             p.addValue("locationKey", "CONDA");
             sequenceOf(String) execArg = {};
