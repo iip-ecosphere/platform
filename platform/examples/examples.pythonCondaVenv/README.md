@@ -1,4 +1,4 @@
-# oktoflow platform examples: Asynchronous Python
+# oktoflow platform examples: Asynchronous Python Conda and Venv virtual environments
 
 Demonstrates a simple application-specific (asynchronous) Python service in a simple service chain in two virtual environments (Conda and Venv). If compile errors show up, e.g., in Eclipse, this means that the generated code is not yet in place. Run the instantiation/connector generation as described below (generated classes are intentionally not in github, generated example components are intentionally not deployed to Maven). Since version 0.7.1 the generated code is in `target/gen` rather than `gen`.
 
