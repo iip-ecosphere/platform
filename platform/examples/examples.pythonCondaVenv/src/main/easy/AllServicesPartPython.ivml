@@ -1,0 +1,65 @@
+project AllServicesPartPython {
+
+    import AllTypes; 
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+   
+    Service myPythonCondaVenvSourceService = JavaService {
+        id = "SimplePythonCondaVenvSource",
+        name = "Simple Python Conda Venv Data Source",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = true,
+        class = "de.iip_ecosphere.platform.examples.python.SimplePythonCondaVenvSourceImpl",
+        artifact = "de.iip-ecosphere.platform:examples.pythonCondaVenv:" + iipVer,
+        kind = ServiceKind::SOURCE_SERVICE,
+        output = {{type=refBy(PythonCondaTestInput)}}
+    };
+    
+    Service myPythonCondaService = PythonService {
+        id = "ExamplePythonCondaService",
+        name = "Example Python Conda Service",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        input = {{type=refBy(PythonCondaTestInput)}},
+        output = {{type=refBy(PythonVenvTestInput)}},
+        condaEnv = "myConda",
+        artifact = "de.iip-ecosphere.platform:examples.pythonCondaVenv:" + iipVer,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        dependencies = {refBy(PYTHON313)},
+        integrationMode = PythonIntegrationMode::websocket_continuous
+    };
+
+    Service myPythonVenvService = PythonService {
+        id = "ExamplePythonVenvService",
+        name = "Example Python Venv Service",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        input = {{type=refBy(PythonVenvTestInput)}},
+        output = {{type=refBy(PythonVenvTestOutput)}},
+        venvName = "myVenv",
+        artifact = "de.iip-ecosphere.platform:examples.pythonCondaVenv:" + iipVer,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        dependencies = {refBy(PYTHON313)},
+        integrationMode = PythonIntegrationMode::websocket_continuous
+    };
+    
+    Service myPythonCondaVenvReceiverService = JavaService {
+        id = "SimplePythonCondaVenvReceiver",
+        name = "Simple Python Conda Venv Data Receiver",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "de.iip_ecosphere.platform.examples.python.SimplePythonCondaVenvReceiverImpl",
+        artifact = "de.iip-ecosphere.platform:examples.pythonCondaVenv:" + iipVer,
+        kind = ServiceKind::SINK_SERVICE,
+        input = {{type=refBy(PythonVenvTestOutput)}}
+    };
+   
+    freeze {
+        .;
+    }
+}

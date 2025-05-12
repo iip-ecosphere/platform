@@ -1,0 +1,50 @@
+project ServiceMeshPartPythonAppMyMesh {
+
+    import AllServices;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    ServiceMesh myPythonCondaVenvMesh = {
+        description = "VDW Service Net",
+        sources = {refBy(myPythonCondaVenvSource)}
+    };
+
+    MeshSource myPythonCondaVenvSource = {
+       impl = refBy(myPythonCondaVenvSourceService),
+       next = {refBy(myPythonCondaConnMySourceMyTransformer)}
+    };
+
+    MeshConnector myPythonCondaConnMySourceMyTransformer = {
+        name = "Source->CondaTransformer",
+        next = refBy(myPythonCondaTransformer)
+    };
+
+    MeshProcessor myPythonCondaTransformer = {
+        impl = refBy(myPythonCondaService),
+        next = {refBy(myPythonVenvConnMySourceMyTransformer)}
+    };
+
+    MeshConnector myPythonVenvConnMySourceMyTransformer = {
+        name = "CondaTransformer->VenvTransformer",
+        next = refBy(myPythonVenvTransformer)
+    };
+
+    MeshProcessor myPythonVenvTransformer = {
+        impl = refBy(myPythonVenvService),
+        next = {refBy(myPythonCondaVenvConnMyTransformerMyReceiver)}
+    };
+    
+    MeshConnector myPythonCondaVenvConnMyTransformerMyReceiver = {
+        name = "VenvTransformer->Receiver",
+        next = refBy(myPythonCondaVenvReceiver)
+    };
+    
+    MeshSink myPythonCondaVenvReceiver = {
+       impl = refBy(myPythonCondaVenvReceiverService)
+    };
+
+    freeze {
+        .;
+    }
+
+}
