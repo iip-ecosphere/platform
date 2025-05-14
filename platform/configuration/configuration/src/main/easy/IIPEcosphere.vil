@@ -1636,6 +1636,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         pathFile1Artifact.hasSameContent(pathFile2Artifact);
     }
 
+    storeMd5Hash(JsonFileArtifact target, Path path) = { 
+        FileArtifact fileArtifact = path; 
+        String fileArtifactMd5 = fileArtifact.getMd5Hash(); 
+        
+        JsonNode data = target.getData(); 
+        data.addValue(path, fileArtifactMd5);
+    }
+    
     Boolean sameMd5HashFiles(Path newFilePath, Path lastFilePath) = { 
         Boolean result = true;
         JsonFileArtifact jfa = "${lastFilePath}.json";
@@ -1652,7 +1660,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             }
         }
         if (not(result)){
-            vilTemplateProcessor("StoreMd5Hash", config, jfa, path=newFilePath);
+            storeMd5Hash(jfa, newFilePath);
         }
         
         result;
@@ -1679,7 +1687,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             	
                 if (not(fileResult)){
                  	result = false;
-            		vilTemplateProcessor("StoreMd5Hash", config, jfa, path=file.getPath());
+            		storeMd5Hash(jfa, file.getPath());
        			}
             }
         }
@@ -1707,7 +1715,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             
             if (not(fileResult)){
                 result = false;
-        		vilTemplateProcessor("StoreMd5Hash", config, jfa, path=file.getPath());
+        		storeMd5Hash(jfa, file.getPath());
    			}
         }
         
