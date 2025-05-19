@@ -780,21 +780,31 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 if (isPythonService == 1) {
                     Path req = "${appRoot}/../requirements.txt";
                     // TODO #130 consider server dependencies here
-                    vilTemplateProcessor("PythonBaseReq", config, req, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep);
+                    vilTemplateProcessor("PythonBaseReq", config, req, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep, envName="");
                     Path lastReq = "${deviceBaseDf}/requirements.txt";
                     if (not(sameMd5HashFiles(req, lastReq))){
                         newChangeOnContainerFiles = true;
                     }
                     
                     for (PythonService py: pyServices) {
-                        if (isDefined(py.condaEnv) and py.condaEnv.length() > 0) {
-                            Path condaReq = "${appRoot}/../conda.${py.condaEnv}.requirements.txt";
-                            vilTemplateProcessor("PythonBaseReq", config, condaReq, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep);
-                            Path lastCondaReq = "${deviceBaseDf}/conda.${py.condaEnv}.requirements.txt";
+                        String condaEnv = getStringValueSafe(py.condaEnv, "");
+                        String venvName = getStringValueSafe(py.venvName, "");
+                        if (condaEnv.trim().length() > 0) {
+                            Path condaReq = "${appRoot}/../conda.${condaEnv}.requirements.txt";
+                            vilTemplateProcessor("PythonBaseReq", config, condaReq, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep, envName=condaEnv);
+                            Path lastCondaReq = "${deviceBaseDf}/conda.${condaEnv}.requirements.txt";
                             if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
                                 newChangeOnContainerFiles = true; 
                             }
-                        }                    
+                        }
+                        if (venvName.trim().length() > 0) {
+                            Path venvReq = "${appRoot}/../venv.${venvName}.requirements.txt";
+                            vilTemplateProcessor("PythonBaseReq", config, venvReq, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep, envName=venvName);
+                            Path lastVenvReq = "${deviceBaseDf}/venv.${venvName}.requirements.txt";
+                            if (not(sameMd5HashFiles(venvReq, lastVenvReq))){
+                                newChangeOnContainerFiles = true;
+                            }
+                        }
                     }
                 }
 
@@ -807,6 +817,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             
                 Path devicesPath = getResourcesFolder() + "/devices";
                 Path devicesGenPath = "${appRoot}/../resources/devices";
+                copy(devicesPath, devicesGenPath);
                 Path lastDevicesPath = "${deviceBaseDf}/resources/devices";
                 if (not(sameMd5HashFolders(devicesPath, lastDevicesPath))){
                     newChangeOnContainerFiles = true;
@@ -843,23 +854,33 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 if (isPythonService == 1) {
                     Path req = "${appRoot}/../requirements.txt";
                     // TODO #130 consider server dependencies here
-                    vilTemplateProcessor("PythonBaseReq", config, req, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep);
+                    vilTemplateProcessor("PythonBaseReq", config, req, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep, envName="");
 
                     Path commenDepRequirements = "${deviceBaseDf}/requirements.txt";
                     Path allDepRequirements = "${appRoot}/../requirements.txt";
                     Boolean checkDepRequirements = checkFilesEquality(allDepRequirements, commenDepRequirements);
                     
                     for (PythonService py: pyServices) { 
-                        if (isDefined(py.condaEnv) and py.condaEnv.length() > 0) {
-                            Path condaReq = "${appRoot}/../conda.${py.condaEnv}.requirements.txt";
-                            vilTemplateProcessor("PythonBaseReq", config, condaReq, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep);
-                            
-                            Path commenDepCondaReq = "${deviceBaseDf}/conda.${py.condaEnv}.requirements.txt";
-                            Path allDepCondaReq = "${appRoot}/../conda.${py.condaEnv}.requirements.txt";
+                        String condaEnv = getStringValueSafe(py.condaEnv, "");
+                        String venvName = getStringValueSafe(py.venvName, "");
+                        if (condaEnv.trim().length() > 0) {
+                            Path condaReq = "${appRoot}/../conda.${condaEnv}.requirements.txt";
+                            vilTemplateProcessor("PythonBaseReq", config, condaReq, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep, envName=condaEnv);
+                            Path commenDepCondaReq = "${deviceBaseDf}/conda.${condaEnv}.requirements.txt";
+                            Path allDepCondaReq = "${appRoot}/../conda.${condaEnv}.requirements.txt";
                             if (not(checkFilesEquality(allDepCondaReq, commenDepCondaReq))) {
                                 checkDepRequirements = false;
                             }
-                        }                    
+                        }
+                        if (venvName.trim().length() > 0) {
+                            Path venvReq = "${appRoot}/../venv.${venvName}.requirements.txt";
+                            vilTemplateProcessor("PythonBaseReq", config, venvReq, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep, envName=venvName);
+                            Path commenDepVenvReq = "${deviceBaseDf}/Venv.${venvName}.requirements.txt";
+                            Path allDepVenvReq = "${appRoot}/../Venv.${venvName}.requirements.txt";
+                            if (not(checkFilesEquality(allDepVenvReq, commenDepVenvReq))) {
+                                checkDepRequirements = false;
+                            }
+                        }                
                     }
 
                     if (not(checkDepRequirements)){
@@ -872,13 +893,22 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         }
 
                         for (PythonService py: pyServices) {
-                            if (isDefined(py.condaEnv) and py.condaEnv.length() > 0) {                                
-                                Path lastAllDepCondaReq = "${deviceBaseDf}/conda.${py.condaEnv}.requirements.txt";       
-                                Path allDepCondaReq = "${appRoot}/../conda.${py.condaEnv}.requirements.txt";
+                            String condaEnv = getStringValueSafe(py.condaEnv, "");
+                            String venvName = getStringValueSafe(py.venvName, "");
+                            if (condaEnv.trim().length() > 0) {
+                                Path lastAllDepCondaReq = "${deviceBaseDf}/conda.${condaEnv}.requirements.txt";       
+                                Path allDepCondaReq = "${appRoot}/../conda.${condaEnv}.requirements.txt";
                                 if (not(checkFilesEquality(allDepCondaReq, lastAllDepCondaReq))) {
                                     newChangeOnContainerFiles = true;
                                 }
-                            }                    
+                            }
+                            if (venvName.trim().length() > 0) {
+                                Path lastAllDepVenvReq = "${deviceBaseDf}/venv.${venvName}.requirements.txt";       
+                                Path allDepVenvReq = "${appRoot}/../venv.${venvName}.requirements.txt";
+                                if (not(checkFilesEquality(allDepVenvReq, lastAllDepVenvReq))) {
+                                    newChangeOnContainerFiles = true;
+                                }
+                            }  
                         }
 
                         Path b = "${appRoot}/../";
@@ -1015,18 +1045,28 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             if (isPythonService == 1) {
                                 Path req = "${appRoot}/../requirements.txt";
                                 // TODO #130 consider server dependencies here
-                                vilTemplateProcessor("PythonReq", config, req, elements=elements, device=device);
+                                vilTemplateProcessor("PythonReq", config, req, elements=elements, device=device, envName="");
                                 Path lastReq = "${deviceDf}/requirements.txt";
                                 if (not(sameMd5HashFiles(req, lastReq)) and (baseImageCreated == 2)){
                                     newChangeOnContainerFiles = true;
                                 }
                                 
-                                for (PythonService py: pyServices) { 
-                                    if (isDefined(py.condaEnv) and py.condaEnv.length() > 0) {
-                                        Path condaReq = "${appRoot}/../conda.${py.condaEnv}.requirements.txt";
-                                        vilTemplateProcessor("PythonReq", config, condaReq, elements=elements, device=device);
-                                        Path lastCondaReq = "${deviceDf}/conda.${py.condaEnv}.requirements.txt";
+                                for (PythonService py: pyServices) {
+                                    String condaEnv = getStringValueSafe(py.condaEnv, "");
+                                    String venvName = getStringValueSafe(py.venvName, "");
+                                    if (condaEnv.trim().length() > 0) {
+                                        Path condaReq = "${appRoot}/../conda.${condaEnv}.requirements.txt";
+                                        vilTemplateProcessor("PythonReq", config, condaReq, elements=elements, device=device, envName=condaEnv);
+                                        Path lastCondaReq = "${deviceDf}/conda.${condaEnv}.requirements.txt";
                                         if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
+                                            newChangeOnContainerFiles = true;
+                                        }
+                                    }
+                                    if (venvName.trim().length() > 0) {
+                                        Path venvReq = "${appRoot}/../venv.${venvName}.requirements.txt";
+                                        vilTemplateProcessor("PythonReq", config, venvReq, elements=elements, device=device, envName=venvName);
+                                        Path lastVenvReq = "${deviceDf}/venv.${venvName}.requirements.txt";
+                                        if (not(sameMd5HashFiles(venvReq, lastVenvReq))){
                                             newChangeOnContainerFiles = true;
                                         }
                                     }
@@ -1039,18 +1079,28 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         if (isPythonService == 1) {
                             Path req = "${appRoot}/../requirements.txt";
                             // TODO #130 consider server dependencies here
-                            vilTemplateProcessor("PythonReq", config, req, elements=elements, device=device);
+                            vilTemplateProcessor("PythonReq", config, req, elements=elements, device=device, envName="");
                             Path lastReq = "${deviceDf}/requirements.txt";
                             if (not(sameMd5HashFiles(req, lastReq))){
                                 newChangeOnContainerFiles = true;
                             }
                             
                             for (PythonService py: pyServices) {
-                                if (isDefined(py.condaEnv) and py.condaEnv.length() > 0) {
-                                    Path condaReq = "${appRoot}/../conda.${py.condaEnv}.requirements.txt";
-                                    vilTemplateProcessor("PythonReq", config, condaReq, elements=elements, device=device);
-                                    Path lastCondaReq = "${deviceDf}/conda.${py.condaEnv}.requirements.txt";
+                                String condaEnv = getStringValueSafe(py.condaEnv, "");
+                                String venvName = getStringValueSafe(py.venvName, "");
+                                if (condaEnv.trim().length() > 0) {
+                                    Path condaReq = "${appRoot}/../conda.${condaEnv}.requirements.txt";
+                                    vilTemplateProcessor("PythonReq", config, condaReq, elements=elements, device=device, envName=condaEnv);
+                                    Path lastCondaReq = "${deviceDf}/conda.${condaEnv}.requirements.txt";
                                     if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
+                                        newChangeOnContainerFiles = true;
+                                    }
+                                }
+                                if (venvName.trim().length() > 0) {
+                                    Path venvReq = "${appRoot}/../venv.${venvName}.requirements.txt";
+                                    vilTemplateProcessor("PythonReq", config, venvReq, elements=elements, device=device, envName=venvName);
+                                    Path lastVenvReq = "${deviceDf}/venv.${venvName}.requirements.txt";
+                                    if (not(sameMd5HashFiles(venvReq, lastVenvReq))){
                                         newChangeOnContainerFiles = true;
                                     }
                                 }
@@ -1239,21 +1289,31 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 if (isPythonService == 1) {
                     Path req = "${target}/requirements.txt";
                     // TODO #130 consider server dependencies here
-                    vilTemplateProcessor("PythonBaseReq", config, req, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep);
+                    vilTemplateProcessor("PythonBaseReq", config, req, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep, envName="");
                     Path lastReq = "${deviceBaseDf}/requirements.txt";
                     if (not(sameMd5HashFiles(req, lastReq))){
                         newChangeOnContainerFiles = true;
                     }
                     
                     for (PythonService py: pyServices) {
-                        if (isDefined(py.condaEnv) and py.condaEnv.length() > 0) {
-                            Path condaReq = "${target}/conda.${py.condaEnv}.requirements.txt";
-                            vilTemplateProcessor("PythonBaseReq", config, condaReq, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep);
-                            Path lastCondaReq = "${deviceBaseDf}/conda.${py.condaEnv}.requirements.txt";
+                        String condaEnv = getStringValueSafe(py.condaEnv, "");
+                        String venvName = getStringValueSafe(py.venvName, "");
+                        if (condaEnv.trim().length() > 0) {
+                            Path condaReq = "${target}/conda.${condaEnv}.requirements.txt";
+                            vilTemplateProcessor("PythonBaseReq", config, condaReq, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep, envName=condaEnv);
+                            Path lastCondaReq = "${deviceBaseDf}/conda.${condaEnv}.requirements.txt";
                             if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
                                 newChangeOnContainerFiles = true;
                             }
-                        }                    
+                        }  
+                        if (venvName.trim().length() > 0) {
+                            Path venvReq = "${target}/venv.${venvName}.requirements.txt";
+                            vilTemplateProcessor("PythonBaseReq", config, venvReq, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep, envName=venvName);
+                            Path lastVenvReq = "${deviceBaseDf}/venv.${venvName}.requirements.txt";
+                            if (not(sameMd5HashFiles(venvReq, lastVenvReq))){
+                                newChangeOnContainerFiles = true;
+                            }
+                        }                  
                     }
                 }
 
@@ -1304,23 +1364,33 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 if (isPythonService == 1) {
                     Path req = "${target}/requirements.txt";
                     // TODO #130 consider server dependencies here
-                    vilTemplateProcessor("PythonBaseReq", config, req, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep);
+                    vilTemplateProcessor("PythonBaseReq", config, req, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep, envName="");
 
                     Path commenDepRequirements = "${deviceBaseDf}/requirements.txt";
                     Path allDepRequirements = "${target}/requirements.txt";
                     Boolean checkDepRequirements = checkFilesEquality(allDepRequirements, commenDepRequirements);
                     
                     for (PythonService py: pyServices) {
-                        if (isDefined(py.condaEnv) and py.condaEnv.length() > 0) {
-                            Path condaReq = "${target}/conda.${py.condaEnv}.requirements.txt";
-                            vilTemplateProcessor("PythonBaseReq", config, condaReq, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep);
-                            
-                            Path commenDepCondaReq = "${deviceBaseDf}/conda.${py.condaEnv}.requirements.txt";
-                            Path allDepCondaReq = "${target}/conda.${py.condaEnv}.requirements.txt";
+                        String condaEnv = getStringValueSafe(py.condaEnv, "");
+                        String venvName = getStringValueSafe(py.venvName, "");
+                        if (condaEnv.trim().length() > 0) {
+                            Path condaReq = "${target}/conda.${condaEnv}.requirements.txt";
+                            vilTemplateProcessor("PythonBaseReq", config, condaReq, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep, envName=condaEnv);
+                            Path commenDepCondaReq = "${deviceBaseDf}/conda.${condaEnv}.requirements.txt";
+                            Path allDepCondaReq = "${target}/conda.${condaEnv}.requirements.txt";
                             if (not(checkFilesEquality(allDepCondaReq, commenDepCondaReq))) {
                                 checkDepRequirements = false;
                             }
-                        }                    
+                        }
+                        if (venvName.trim().length() > 0) {
+                            Path venvReq = "${target}/venv.${venvName}.requirements.txt";
+                            vilTemplateProcessor("PythonBaseReq", config, venvReq, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep, envName=venvName);
+                            Path commenDepVenvReq = "${deviceBaseDf}/venv.${venvName}.requirements.txt";
+                            Path allDepVenvReq = "${target}/venv.${venvName}.requirements.txt";
+                            if (not(checkFilesEquality(allDepVenvReq, commenDepVenvReq))) {
+                                checkDepRequirements = false;
+                            }
+                        }               
                     }
 
                     if (not(checkDepRequirements)){
@@ -1332,13 +1402,22 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         }
 
                         for (PythonService py: pyServices) {
-                            if (isDefined(py.condaEnv) and py.condaEnv.length() > 0) {                                
-                                Path lastAllDepCondaReq = "${deviceBaseDf}/conda.${py.condaEnv}.requirements.txt";       
-                                Path allDepCondaReq = "${target}/conda.${py.condaEnv}.requirements.txt";
+                            String condaEnv = getStringValueSafe(py.condaEnv, "");
+                            String venvName = getStringValueSafe(py.venvName, "");
+                            if (condaEnv.trim().length() > 0) {
+                                Path lastAllDepCondaReq = "${deviceBaseDf}/conda.${condaEnv}.requirements.txt";       
+                                Path allDepCondaReq = "${target}/conda.${condaEnv}.requirements.txt";
                                 if (not(checkFilesEquality(allDepCondaReq, lastAllDepCondaReq))) {
                                     newChangeOnContainerFiles = true;
                                 }
-                            }                    
+                            }
+                            if (venvName.trim().length() > 0) {
+                                Path lastAllDepVenvReq = "${deviceBaseDf}/venv.${venvName}.requirements.txt";       
+                                Path allDepVenvReq = "${target}/venv.${venvName}.requirements.txt";
+                                if (not(checkFilesEquality(allDepVenvReq, lastAllDepVenvReq))) {
+                                    newChangeOnContainerFiles = true;
+                                }
+                            }                 
                         }
                         
                         Path b = "${target}/";
@@ -1482,18 +1561,28 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                 if (isPythonService == 1) {
                                     Path req = "${target}/requirements.txt";
                                     // TODO #130 consider server dependencies here
-                                    vilTemplateProcessor("PythonReq", config, req, elements=allElements, device=device);
+                                    vilTemplateProcessor("PythonReq", config, req, elements=allElements, device=device, envName="");
                                     Path lastReq = "${deviceDf}/requirements.txt";
                                     if (not(sameMd5HashFiles(req, lastReq)) and (baseImageCreated == 2)){
                                         newChangeOnContainerFiles = true;
                                     }
                                     
                                     for (PythonService py: pyServices) { 
-                                        if (isDefined(py.condaEnv) and py.condaEnv.length() > 0) {
-                                            Path condaReq = "${target}/conda.${py.condaEnv}.requirements.txt";
-                                            vilTemplateProcessor("PythonReq", config, condaReq, elements=allElements, device=device);
-                                            Path lastCondaReq = "${deviceDf}/conda.${py.condaEnv}.requirements.txt";
+                                        String condaEnv = getStringValueSafe(py.condaEnv, ""); 
+                                        String venvName = getStringValueSafe(py.venvName, ""); 
+                                        if (condaEnv.trim().length() > 0) {
+                                            Path condaReq = "${target}/conda.${condaEnv}.requirements.txt";
+                                            vilTemplateProcessor("PythonReq", config, condaReq, elements=allElements, device=device, envName=condaEnv);
+                                            Path lastCondaReq = "${deviceDf}/conda.${condaEnv}.requirements.txt";
                                             if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
+                                                newChangeOnContainerFiles = true;
+                                            }
+                                        }
+                                        if (venvName.trim().length() > 0) {
+                                            Path venvReq = "${target}/venv.${venvName}.requirements.txt";
+                                            vilTemplateProcessor("PythonReq", config, venvReq, elements=allElements, device=device, envName=venvName);
+                                            Path lastVenvReq = "${deviceDf}/venv.${venvName}.requirements.txt";
+                                            if (not(sameMd5HashFiles(venvReq, lastVenvReq))){
                                                 newChangeOnContainerFiles = true;
                                             }
                                         }
@@ -1507,18 +1596,28 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             if (isPythonService == 1) {
                                 Path req = "${target}/requirements.txt";
                                 // TODO #130 consider server dependencies here
-                                vilTemplateProcessor("PythonReq", config, req, elements=allElements, device=device);
+                                vilTemplateProcessor("PythonReq", config, req, elements=allElements, device=device, envName="");
                                 Path lastReq = "${deviceDf}/requirements.txt";
                                 if (not(sameMd5HashFiles(req, lastReq))){
                                     newChangeOnContainerFiles = true;
                                 }
                                 
                                 for (PythonService py: pyServices) {
-                                    if (isDefined(py.condaEnv) and py.condaEnv.length() > 0) {
-                                        Path condaReq = "${target}/conda.${py.condaEnv}.requirements.txt";
-                                        vilTemplateProcessor("PythonReq", config, condaReq, elements=allElements, device=device);
-                                        Path lastCondaReq = "${deviceDf}/conda.${py.condaEnv}.requirements.txt";
+                                    String condaEnv = getStringValueSafe(py.condaEnv, ""); 
+                                    String venvName = getStringValueSafe(py.venvName, ""); 
+                                    if (condaEnv.trim().length() > 0) {
+                                        Path condaReq = "${target}/conda.${condaEnv}.requirements.txt";
+                                        vilTemplateProcessor("PythonReq", config, condaReq, elements=allElements, device=device, envName=condaEnv);
+                                        Path lastCondaReq = "${deviceDf}/conda.${condaEnv}.requirements.txt";
                                         if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
+                                            newChangeOnContainerFiles = true;
+                                        }
+                                    }
+                                    if (venvName.trim().length() > 0) {
+                                        Path venvReq = "${target}/venv.${venvName}.requirements.txt";
+                                        vilTemplateProcessor("PythonReq", config, venvReq, elements=allElements, device=device, envName=venvName);
+                                        Path lastVenvReq = "${deviceDf}/venv.${venvName}.requirements.txt";
+                                        if (not(sameMd5HashFiles(venvReq, lastVenvReq))){
                                             newChangeOnContainerFiles = true;
                                         }
                                     }

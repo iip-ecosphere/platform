@@ -2,9 +2,9 @@ import Basics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template PythonBaseReq(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Dependency) dependencies, Boolean justCommenDep) {
+template PythonBaseReq(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Dependency) dependencies, Boolean justCommenDep, String envName) {
 	
-    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Dependency) dependencies, Boolean justCommenDep) {
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Dependency) dependencies, Boolean justCommenDep, String envName) {
         sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByKind(PythonService);
         sequenceOf(ServiceFamily) families = elements -> collect(e|e.impl) -> selectByKind(ServiceFamily);
         for (ServiceFamily family : families) {
@@ -12,22 +12,23 @@ template PythonBaseReq(IIPEcosphere config, FileArtifact target, sequenceOf(Mesh
                 services.add(serviceMember);
             }
         }
-
-        Integer isCondaReq = 0;
-        Integer isCondaService = 0;
-        if (target.getPath().indexOf("conda.") != -1){
-            isCondaReq = 1;
-        }
         
         setOf(Dependency) deps = {};
 
         for (PythonService pyService : services) {
-            if ((isDefined(pyService.condaEnv) and pyService.condaEnv.length() > 0)) {
-                isCondaService = 1;
-            }else{
-                isCondaService = 0;
+            String condaEnv = getStringValueSafe(pyService.condaEnv, "");
+            String venvName = getStringValueSafe(pyService.venvName, "");
+            String reqEnv = "";
+            
+            if (envName.trim().length() == 0) {
+                reqEnv = "";
+            } else if (condaEnv.trim().length() > 0) {
+                reqEnv = condaEnv;
+            } else if (venvName.trim().length() > 0) {
+                reqEnv = venvName;
             }
-            if (isCondaService == isCondaReq) {
+            
+            if (envName == reqEnv) {
                 setOf(Dependency) systemDeps = pyService.dependencies -> selectByType(SystemDependency);
                 for (SystemDependency systemDep : systemDeps) {
                    for (PythonDependency d : systemDep.dependencies) {

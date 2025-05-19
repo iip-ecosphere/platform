@@ -72,7 +72,7 @@ template Dockerfile_PythonAllApps(IIPEcosphere config, FileArtifact target, sequ
                 '# Install python dependencies'
                 'COPY requirements.txt requirements.txt'
                 '${pythonPipInstalled}'
-                '${genCondePythonEnv(services, false)}'
+                '${genPythonEnvs(services, false, false)}'
                 
             } else {
                 if (baseImageExist == 1) {
@@ -191,7 +191,7 @@ template Dockerfile_PythonAllApps(IIPEcosphere config, FileArtifact target, sequ
                 '# Install python dependencies'
                 'COPY requirements.txt requirements.txt'
                 '${pythonPipInstalled}'
-                '${genCondePythonEnv(services, true)}'
+                '${genPythonEnvs(services, true, true)}'
             }
             ''
             '${genTestingMode(config, "Python")}'

@@ -132,55 +132,76 @@ template DockerBasics(Configuration config, FileArtifact target) {
                         }
                         'RUN wget https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz'
                         'RUN tar xzpvf apache-maven-3.6.3-bin.tar.gz'
-                        'RUN ln -s $PWD/apache-maven-3.6.3/bin/mvn /usr/bin/mvn'
+                        'RUN ln -s \\$PWD/apache-maven-3.6.3/bin/mvn /usr/bin/mvn'
                     }
                 }
             }
         }
     }
     
-    def genCondePythonEnv(sequenceOf(PythonService) services, Boolean condaInstallMode) {
+    def genPythonEnvs(sequenceOf(PythonService) services, Boolean condaInstallMode, Boolean createEnvsMode) {
         for (PythonService pyService : services) {
-            if (isDefined(pyService.condaEnv) and pyService.condaEnv.length() > 0) {
-                setOf(Dependency) deps = pyService.dependencies;
-                String pythonCondaVersion = "";
-                for (Dependency s : deps) {
-                    if (genDependency(s) == 'PYTHON38') {
-                        pythonCondaVersion = "3.8";
-                    } else if (genDependency(s) == 'PYTHON39') {
-                        pythonCondaVersion = "3.9";
-                    } else if (genDependency(s) == 'PYTHON313') {
-                        pythonCondaVersion = "3.13";
-                    }
+            String pythonCondaVersion = "";
+            setOf(Dependency) deps = pyService.dependencies;
+            for (Dependency s : deps) {
+                if (genDependency(s) == 'PYTHON38') {
+                    pythonCondaVersion = "3.8";
+                } else if (genDependency(s) == 'PYTHON39') {
+                    pythonCondaVersion = "3.9";
+                } else if (genDependency(s) == 'PYTHON313') {
+                    pythonCondaVersion = "3.13";
                 }
-                
+            }
+            
+            String venvName = getStringValueSafe(pyService.venvName, "");
+            String condaEnv = getStringValueSafe(pyService.condaEnv, "");
+            if (venvName.trim().length() > 0) {
+                ''
+                if(createEnvsMode){
+                    '# Create venv environment'
+                    'RUN python${pythonCondaVersion} -m venv ${venvName}'
+                }
+                'COPY venv.${venvName}.requirements.txt venv.${venvName}.requirements.txt'
+                'RUN \\$PWD/${venvName}/bin/python -m pip install -r venv.${venvName}.requirements.txt'
+                ''
+            } else if (condaEnv.trim().length() > 0) {
                 if (condaInstallMode) {
+                    ''
                     '# Set environment variables'
-                    'ENV CONDA_DIR=/opt/conda \\'
-                    '    PATH=/opt/conda/bin:$PATH'
-                    
+                    'ENV DEBIAN_FRONTEND=noninteractive \\'
+                    'CONDA_DIR=/opt/conda \\'
+                    'PATH=/opt/conda/bin:\\$PATH'
+                    ''
                     '# Install dependencies'
                     'RUN apt-get update && apt-get install -y --no-install-recommends \\'
-                    '    wget \\'
-                    '    bzip2 \\'
-                    '    ca-certificates \\'
-                    '    && apt-get clean \\'
-                    '    && rm -rf /var/lib/apt/lists/*'
-
+                    'wget \\'
+                    'bzip2 \\'
+                    'ca-certificates \\'
+                    'libglib2.0-0 \\'
+                    'libxext6 \\'
+                    'libsm6 \\'
+                    'libxrender1 \\'
+                    'git \\'
+                    '&& rm -rf /var/lib/apt/lists/*'
+                    ''
                     '# Install Miniconda'
-                    'RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh && \\'
-                    '    bash /tmp/miniconda.sh -b -p $CONDA_DIR && \\'
-                    '    rm /tmp/miniconda.sh && \\'
-                    '    conda clean -afy'
-
+                    'RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /miniconda.sh && \\'
+                    'bash /miniconda.sh -b -p \\$CONDA_DIR && \\'
+                    'rm /miniconda.sh && \\'
+                    '\\$CONDA_DIR/bin/conda clean -afy'
+                    ''
+                    'RUN conda config --set auto_activate_base false'
                     'RUN conda init'
                 }
-                
-                'RUN conda create --name ${pyService.condaEnv} python=${pythonCondaVersion}'
-                'SHELL ["conda", "run", "-n", "${pyService.condaEnv}", "/bin/bash", "-c"]'
-                'COPY conda.${pyService.condaEnv}.requirements.txt conda.${pyService.condaEnv}.requirements.txt'
-                'RUN python3 -m pip install -r conda.${pyService.condaEnv}.requirements.txt'
-            }
+                ''
+                if(createEnvsMode){
+                    '# Create conda environment'
+                    'RUN conda create --name ${condaEnv} python=${pythonCondaVersion}'
+                }
+                'SHELL ["conda", "run", "-n", "${condaEnv}", "/bin/bash", "-c"]'
+                'COPY conda.${condaEnv}.requirements.txt conda.${condaEnv}.requirements.txt'
+                'RUN python -m pip install -r conda.${condaEnv}.requirements.txt'
+            } 
         }
     }
     
