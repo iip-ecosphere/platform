@@ -51,18 +51,25 @@ goto :answerDocker
 if not exist "Platform" mkdir "Platform"
 cd Platform
 
-:prerequisites
+set /a javaLimit=17
+set RecommendMvn=3.9.7
+set RecommendPython=3.9.13
+set RecommendNode=22.14.0
+set RecommendAngular=19.2.5
+
+:answerPrerequisites
 echo =====================================================
-echo "Installing prerequisites Java 17, Maven version 3.9.7, and Python version 3.9"
+echo "Installing prerequisites Java %javaVersion%, Maven version %RecommendMvn%, and Python version %RecommendPython%"
 echo "This action will change Windows Environment Variables"
 set /P c=Do you want to install the prerequisites (skip only if already installed)? [y/n]
 if /I "%c%" EQU "Y" goto :prerequisitesYes
 if /I "%c%" EQU "N" goto :prerequisitesNo
-goto :prerequisites
+goto :answerPrerequisites
 
 :prerequisitesYes
 
 echo =====================================================
+echo "Installing python %RecommendPython%, since 3.9.21 not exist for windows yet. If you want to have python 3.9.21 try to download the sources and compile them."
 echo "Make sure that Python is set to OFF, in the (App execution aliases) for Windows 11 - Settings > Apps > apps & features > App execution aliases"
 pause
 
@@ -79,8 +86,6 @@ for /F "tokens=1* delims=:" %%a in ('java -version 2^>^&1') do (
 set "javaVersion4=!javaVersion3:"=!"
 set /a javaVersion4=%javaVersion4
 
-set /a javaLimit=17
-
 if %javaVersion4% GEQ %javaLimit% set javaVersionCheck="Ok"
 if %javaVersion4% LSS %javaLimit% set javaVersionCheck="Diff"
 if %javaVersion4% EQU 0 set javaVersionCheck="Non"
@@ -95,8 +100,6 @@ for /F "tokens=1* delims=:" %%a in ('mvn -version 2^>^&1') do (
 
 (for /f "tokens=3 delims= " %%a in ('echo "%mvnVersion%"' ) do set "mvnVersion2=%%a")
 
-set RecommendMvn=3.9.7
-
 if "%mvnVersion2%" == "%RecommendMvn%" set mvnVersionCheck="Ok"
 if NOT "%mvnVersion2%" == "%RecommendMvn%" set mvnVersionCheck="Diff"
 if "%mvnVersion2%" == "not" set mvnVersionCheck="Non"
@@ -104,15 +107,14 @@ if "%mvnVersion2%" == "not" set mvnVersionCheck="Non"
 REM Check current Python version
 
 for /F "tokens=1* delims=:" %%a in ('python --version 2^>^&1') do (
-   set pythonVersion=%%a
+   for /f "tokens=2 delims= " %%a in ('echo %pythonVersion%' ) do set pythonVersion2=%%a
    goto :endpythonVersion
 )
 :endpythonVersion
 
-(for /f "tokens=2 delims= " %%a in ('echo %pythonVersion%' ) do set pythonVersion2=%%a)
-(for /f "tokens=1,2 delims=." %%a in ('echo %pythonVersion2%' ) do set pythonVersion3=%%a.%%b)
-
-set RecommendPython=3.9
+if defined pythonVersion2 (
+   (for /f "tokens=1,2 delims=." %%a in ('echo %pythonVersion2%' ) do set pythonVersion3=%%a.%%b)
+)
 
 if "%pythonVersion3%" == "%RecommendPython%" set pythonVersionCheck="Ok"
 if NOT "%pythonVersion3%" == "%RecommendPython%" set pythonVersionCheck="Diff"
@@ -137,8 +139,8 @@ goto :answerJava
 
 curl https://download.oracle.com/java/17/archive/jdk-17.0.10_windows-x64_bin.zip -o openjdk.zip
 tar xzpvf openjdk.zip
-setx JAVA_HOME "%cd%\jdk-17"
-SET JAVA_HOME=%cd%\jdk-17
+setx JAVA_HOME "%cd%\jdk-17.0.10"
+SET JAVA_HOME=%cd%\jdk-17.0.10
 setx Path "%Path%;%JAVA_HOME%\bin"
 SET Path=%Path%;%JAVA_HOME%\bin
 netsh advfirewall firewall add rule name="Java" dir=in action=allow program="%JAVA_HOME%\bin\java.exe" enable=yes
@@ -171,25 +173,25 @@ SET Path=%Path%;%MAVEN_HOME%\bin
 
 :skipMaven
 
-REM Install Python version 3.9
+REM Install Python version 3.9.13
 
 if %pythonVersionCheck% == "Ok" goto :skipPython
 if %pythonVersionCheck% == "Diff" goto :askPython
 if %pythonVersionCheck% == "Non" goto :installPython
 
 :askPython
-echo "You have Maven version %pythonVersion3%, it is recommended to have version %RecommendPython%"
+echo "You have Python version %pythonVersion3%, it is recommended to have version %RecommendPython%"
 
 :answerPython
 set /P c=Do you want to install Python %RecommendPython% and replace Python default to %RecommendPython%? - You might skip this step [y/n]?
 if /I "%c%" EQU "Y" goto :installPython
 if /I "%c%" EQU "N" goto :skipPython
-goto :answerMaven
+goto :answerPython
 
 :installPython
 
-curl https://www.python.org/ftp/python/3.9.6/python-3.9.6-amd64.exe -o python-3.9.6-amd64.exe
-python-3.9.6-amd64.exe InstallAllUsers=1 PrependPath=1 Include_test=0 /quiet
+curl https://www.python.org/ftp/python/3.9.13/python-3.9.13-amd64.exe -o python-3.9.13-amd64.exe
+python-3.9.13-amd64.exe InstallAllUsers=1 PrependPath=1 Include_test=0 /quiet
 SET Path=%Path%;C:\Program Files\Python39\Scripts\;C:\Program Files\Python39\
 pip install pyflakes
 
@@ -227,6 +229,91 @@ docker  run -d --restart=always --name registry -e REGISTRY_HTTP_ADDR=0.0.0.0:50
 RegistryRun="Yes"
 
 :RegistryEnd
+
+REM Check current Node.js version 
+:answerMgtUi
+echo "To use the management UI for the platform, you should install Node.js version %RecommendNode% and Angular version %RecommendAngular%."
+echo "This step requires administrator permissions."
+set /P c=Do you want to continue with the Node.js and Angular installation (else terminate)? [y/n]
+if /I "%c%" EQU "N" goto :NodeEnd
+if /I "%c%" EQU "Y" goto :NodeYes
+goto :answerMgtUi
+
+:NodeYes
+
+for /f %%A in ('node -v 2^>nul') do set nodeVersion=%%A
+
+if defined nodeVersion (
+    set "nodeVersion2=!nodeVersion:~1!"
+    if "%nodeVersion2%" == "%RecommendNode%" set nodeVersionCheck="Ok"
+    if NOT "%nodeVersion2%" == "%RecommendNode%" set nodeVersionCheck="Diff"
+) else (
+    set nodeVersionCheck="Non"
+)
+
+REM Check current Angular version 
+
+for /f "tokens=3 delims=@ " %%A in ('npm list -g @angular/cli --depth=0 2^>nul ^| findstr "@angular/cli@"') do (
+    set angularVersion=%%A
+)
+
+if defined angularVersion (
+    if "%angularVersion%" == "%RecommendAngular%" set angularVersionCheck="Ok"
+    if NOT "%angularVersion%" == "%RecommendAngular%" set angularVersionCheck="Diff"
+) else (
+    set angularVersionCheck="Non"
+)
+
+REM Install Node.js version 22.14.0
+
+if %nodeVersionCheck% == "Ok" goto :skipNode
+if %nodeVersionCheck% == "Diff" goto :askNode
+if %nodeVersionCheck% == "Non" goto :installNode
+
+:askNode
+echo "You have Node.js version %nodeVersion2%, it is recommended to have version %RecommendNode%"
+
+:answerNode
+set /P c=Do you want to install Node.js %RecommendNode%? - You might skip this step [y/n]?
+if /I "%c%" EQU "Y" goto :installNode
+if /I "%c%" EQU "N" goto :skipNode
+goto :answerNode
+
+:installNode
+
+set MSI_PATH=node-v22.14.0-x64.msi
+set LOG_PATH=%TEMP%\node_install.log
+
+curl https://nodejs.org/download/release/v22.14.0/node-v22.14.0-x64.msi -o node-v22.14.0-x64.msi
+echo "Installing node.js. This may take a while..."
+msiexec /i "%MSI_PATH%" /quiet /norestart /log "%LOG_PATH%"
+setx Path "%Path%;C:\Program Files\nodejs"
+SET Path=%Path%;C:\Program Files\nodejs
+
+:skipNode
+
+if %angularVersionCheck% == "Ok" goto :skipAngular
+if %angularVersionCheck% == "Diff" goto :askAngular
+if %angularVersionCheck% == "Non" goto :installAngular
+
+:askAngular
+echo "You have Angular version %angularVersion%, it is recommended to have version %RecommendAngular%"
+
+:answerAngular
+set /P c=Do you want to install Angular %angularVersion%? - You might skip this step [y/n]?
+if /I "%c%" EQU "Y" goto :installAngular
+if /I "%c%" EQU "N" goto :skipAngular
+goto :answerNode
+
+:installAngular
+
+call npm install -g @angular/cli@19.2.5
+call npm install -g express@4.18.1
+call npm install -g cors@2.8.5
+
+:skipAngular
+
+:NodeEnd
 
 if not exist "Install" mkdir "Install"
 cd Install
@@ -311,26 +398,6 @@ move TechnicalSetup.ivml src\main\easy\TechnicalSetup.ivml
 :noRegistryExist
 
 call mvn install -Diip.easy.tracing=TOP
-
-REM Angular version check missing
-echo "To use the management UI for the platform, you should install angular version 14."
-echo "This step requires administrator permissions."
-set /P c=Do you want to continue with the Angular installation (else terminate)? [y/n]
-if /I "%c%" EQU "N" goto :installEndHint
-if /I "%c%" EQU "Y" goto :installAngular
-
-:installAngular
-
-curl https://nodejs.org/download/release/v16.10.0/node-v16.10.0-x64.msi -o node-v16.10.0-x64.msi
-echo "Installing node.js. This may take a while..."
-node-v16.10.0-x64.msi
-setx Path "%Path%;C:\Program Files\nodejs"
-SET Path=%Path%;C:\Program Files\nodejs
-call npm install -g @angular/cli@14.2.11
-call npm install -g express@4.18.1
-call npm install -g cors@2.8.5
-
-:installEndHint
 
 echo "The following commands were created in Platform\Install\gen:"
 echo "- broker\broker.bat starts the configured communication broker (cd needed)"
