@@ -609,21 +609,21 @@ project Connectors {
        Integer dataTimeDiff = 0;
    }
 
-   compound JsonConnector refines FileConnector {
+   compound JsonFileConnector refines FileConnector {
        assign (uiGroup = UiInvisibleGroup) to {
            machineFormatter = JsonFormatter{};
            machineParser = JsonParser{};
        }
    }
 
-   compound CSVConnector refines FileConnector {
+   compound CSVFileConnector refines FileConnector {
        assign (uiGroup = UiInvisibleGroup) to {
            machineFormatter = TextLineFormatter{separator=","};
            machineParser = TextLineParser{separator=","};
        }
    }
 
-   compound TSVConnector refines FileConnector {
+   compound TSVFileConnector refines FileConnector {
        assign (uiGroup = UiInvisibleGroup) to {
            machineFormatter = TextLineFormatter{separator="\\t"};
            machineParser = TextLineParser{separator="\\t"};
