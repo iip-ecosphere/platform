@@ -127,6 +127,7 @@ project DataTypes {
             Boolean optional = false;
             Boolean readOnly = false;
             Boolean nullable = false;
+            String semanticId = "";
         }
         Integer cachingTime = CACHE_ALWAYS;
         Constraint isNameOk = isNameOk(self);
