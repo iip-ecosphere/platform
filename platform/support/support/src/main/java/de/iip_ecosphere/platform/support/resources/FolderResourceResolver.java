@@ -28,6 +28,7 @@ public class FolderResourceResolver implements ResourceResolver {
     
     public static final FolderResourceResolver SYSTEM_ROOT = new FolderResourceResolver();
     public static final FolderResourceResolver USER_HOME = new FolderResourceResolver(System.getProperty("user.home"));
+    public static final FolderResourceResolver THIS_DIR = new FolderResourceResolver(".");
     
     private File basePath;
     private String removePrefix;
