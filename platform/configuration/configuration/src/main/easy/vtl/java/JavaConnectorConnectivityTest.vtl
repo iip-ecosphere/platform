@@ -63,6 +63,10 @@ template JavaConnectorConnectivityTest(IIPEcosphere config, JavaCodeArtifact tar
         mainClsMain.addException("java.io.IOException", "if intended connectivity fails");
         addSerializerRegistration(mainClsMain, platfIn);
         addSerializerRegistration(mainClsMain, platfOut);
+        mainClsMain
+            .addCall("ResourceLoader.registerResourceResolver")
+                .addNewArgument("de.iip_ecosphere.platform.support.resources.FolderResourceResolver.FolderResourceResolver")
+                .addStringArgument(".");
         
         mainClsMain.addEmptyLine();
         mainClsMain.addSLComment("as configured, or create own and customize");
@@ -75,6 +79,7 @@ template JavaConnectorConnectivityTest(IIPEcosphere config, JavaCodeArtifact tar
                 .addArgument("${clsName}.createConnectorAdapter()");
         codeAddShutdownHook(mainClsMain, "conn.disconnectSafe()");
         mainClsMain.addCall("conn.connect").addArgument("params");
+        mainClsMain.addSLComment("// if polling connector, enable: conn.enableNotifications(false);");
         mainClsMain.addCall("conn.setReceptionCallback").addArgument("callback");        
         mainClsMain.addCall("System.out.println").addStringArgument("Connector ${conn.name} created...");
         

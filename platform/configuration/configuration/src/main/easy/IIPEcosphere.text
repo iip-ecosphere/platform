@@ -35,3 +35,5 @@ IIPEcosphere::MavenRepository::id = The id of the maven repository, linking to m
 IIPEcosphere::MavenRepository::name = Name of the repository (default name given).
 IIPEcosphere::MavenRepository::url = URL of the repository, may be http, ftp, scpexe depending on repository installation.
 IIPEcosphere::mavenDeployType = Type of maven deployment indicating additionally required maven build plugins.
+IIPEcosphere::platformPython = The system dependency indicating the platform Python to be installed, e.g., in containers (default see platformPythonDflt).
+IIPEcosphere::platformPythonDflt = The default value of the system dependency indicating the platform Python.

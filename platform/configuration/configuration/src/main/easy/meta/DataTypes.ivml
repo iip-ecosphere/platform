@@ -263,6 +263,12 @@ project DataTypes {
     DateTimeTypeType DateTimeType = {
         name = "DateTime"
     };
+
+    compound GenericDateTimeTypeType refines PrimitiveType {
+        String name = "GenericDateTime";
+        NonEmptyString format;
+    }
+    // needs to be instantiated by application
 	
     compound ByteArrayTypeType refines ArrayType {
     }

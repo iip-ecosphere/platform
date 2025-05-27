@@ -57,11 +57,15 @@ project IIPEcosphere {
     assign (semanticId = Eclass_Unit_ms) to {
         Integer deviceHeartbeatTimeout = deviceHeartbeatTimeoutDflt;
     }
+    
+    refTo(SystemDependency) platformPythonDflt = refBy(PYTHON313);
+    refTo(SystemDependency) platformPython = platformPythonDflt;
  
     freeze {
         instDirDflt;
         javaExeDflt;
         artifactsFolderDflt;
         footprintFolderDflt;
+        platformPythonDflt;
     }
 }

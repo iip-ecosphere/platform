@@ -607,12 +607,17 @@ project Connectors {
        NonEmptyString readFiles;
        String writeFiles;
        Integer dataTimeDiff = 0;
+       Boolean skipFirstLine = false;
    }
 
    compound JsonFileConnector refines FileConnector {
        assign (uiGroup = UiInvisibleGroup) to {
            machineFormatter = JsonFormatter{};
            machineParser = JsonParser{};
+           nameplateInfo = {
+               manufacturerProductDesignation = "JSON file connector@en",
+               manufacturer = refBy(manufacturer_sse)
+           };
        }
    }
 
@@ -620,6 +625,10 @@ project Connectors {
        assign (uiGroup = UiInvisibleGroup) to {
            machineFormatter = TextLineFormatter{separator=","};
            machineParser = TextLineParser{separator=","};
+           nameplateInfo = {
+               manufacturerProductDesignation = "CSV file connector@en",
+               manufacturer = refBy(manufacturer_sse)
+           };
        }
    }
 
@@ -627,6 +636,10 @@ project Connectors {
        assign (uiGroup = UiInvisibleGroup) to {
            machineFormatter = TextLineFormatter{separator="\\t"};
            machineParser = TextLineParser{separator="\\t"};
+           nameplateInfo = {
+               manufacturerProductDesignation = "TSV file connector@en",
+               manufacturer = refBy(manufacturer_sse)
+           };
        }
    }
    

@@ -490,6 +490,11 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     def convName(IEC61131_3DateTimeTypeType type) {
         "Date";
     }
+
+    @DispatchCase
+    def convName(GenericDateTimeTypeType type) {
+        "Date";
+    }
     
     // dispatch basis, additional parameter to be passed to the parser/formatter conversion method, usually empty
     @DispatchBasis
@@ -504,6 +509,11 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     @DispatchCase
     def convParam(IEC61131_3DateTimeTypeType type, Boolean convFrom, JavaCodeMethodCall call) {
         call.addStringArgument("'DT#'YYYY-MM-dd-HH:mm:ss.SS");
+    }
+
+    @DispatchCase
+    def convParam(GenericDateTimeTypeType type, Boolean convFrom, JavaCodeMethodCall call) {
+        call.addStringArgument(type.format);
     }
     
     @DispatchCase

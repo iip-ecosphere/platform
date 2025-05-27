@@ -59,6 +59,11 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
     }
 
     @DispatchCase
+    def String genHashCode(String access, GenericDateTimeTypeType type, Boolean optional) {
+        genHashCodeObject(access, optional);
+    }
+
+    @DispatchCase
     def String genHashCode(String access, DateTimeTypeType type, Boolean optional) {
         genHashCodeObject(access, optional);
     }
@@ -108,6 +113,11 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
     
     @DispatchCase
     def String genEquals(String access, IEC61131_3DateTimeTypeType type, Boolean optional) {
+        genEqualsObject(access, optional);
+    }
+
+    @DispatchCase
+    def String genEquals(String access, GenericDateTimeTypeType type, Boolean optional) {
         genEqualsObject(access, optional);
     }
 

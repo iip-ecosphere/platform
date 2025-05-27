@@ -199,6 +199,11 @@ template JavaBasics(Configuration config, FileArtifact target) {
     def String toTypeName(IEC61131_3DateTimeTypeType type) {
         "java.util.Date";
     }
+
+    @DispatchCase
+    def String toTypeName(GenericDateTimeTypeType type) {
+        "java.util.Date";
+    }
     
     /**
      * Returns whether typeName indicates a Java Object type that is known, from Java

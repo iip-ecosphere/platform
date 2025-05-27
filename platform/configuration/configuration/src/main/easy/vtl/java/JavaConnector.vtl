@@ -901,6 +901,7 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
         r.call("setSpecificSetting").stringArg("READ_FILES").stringArg(getStringValueSafe(conn.readFiles, ""));
         r.call("setSpecificSetting").stringArg("WRITE_FILES").stringArg(getStringValueSafe(conn.writeFiles, ""));
         r.call("setSpecificSetting").stringArg("DATA_TIMEDIFF").arg(conn.dataTimeDiff);
+        r.call("setSpecificSetting").stringArg("SKIP_FIRST_LINE").arg(conn.skipFirstLine);
     }
     
     @DispatchBasis
