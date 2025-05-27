@@ -201,8 +201,7 @@ public class FileConnectorTest {
      * 
      * @param readFiles the files to read as file name, folder name or file/folder-regex
      * @param writeFiles the files to write as file name or folder name, may be <b>null</b>
-     * @param receivedPredicate a predicate testing the expected number of data points
-     * @param sleep the time to sleep
+     * @param expectedReceived expected number of received data points
      * @param determineTimeDiff shall a data dependent time difference be applied/simulated
      * @throws IOException
      */

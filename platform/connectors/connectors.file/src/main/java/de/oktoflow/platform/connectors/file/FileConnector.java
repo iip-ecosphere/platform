@@ -66,6 +66,7 @@ public class FileConnector<CO, CI> extends AbstractChannelConnector<byte[], byte
     public static final String SETTING_READ_FILES = "READ_FILES";
     public static final String SETTING_WRITE_FILES = "WRITE_FILES";
     public static final String SETTING_DATA_TIMEDIFF = "DATA_TIMEDIFF";
+    public static final String SETTING_SKIP_FIRST_LINE = "SKIP_FIRST_LINE";
     public static final String OUT_NAME_PREFIX = "FileConnector_";
     public static final String OUT_NAME_SUFFIX = ".txt";
     
@@ -82,6 +83,7 @@ public class FileConnector<CO, CI> extends AbstractChannelConnector<byte[], byte
     private int pollingFrequency = 0;
     private int fixedDataInterval = 0;
     private int nextDataInterval = -1; // use fixedDataInterval
+    private boolean skipFirstLine = false;
 
     /**
      * The descriptor of this connector (see META-INF/services).
@@ -189,6 +191,7 @@ public class FileConnector<CO, CI> extends AbstractChannelConnector<byte[], byte
         } // warn?
         LOGGER.info("File connected with InputFile(s) " + readFiles + " OutputFile" + writeFiles);
         fixedDataInterval = params.getSpecificIntSetting(SETTING_DATA_TIMEDIFF);
+        skipFirstLine = Boolean.valueOf(params.getSpecificStringSetting(SETTING_SKIP_FIRST_LINE));
         pollingFrequency = params.getNotificationInterval();
         requestTimeout = params.getRequestTimeout();
         readData();
@@ -204,9 +207,21 @@ public class FileConnector<CO, CI> extends AbstractChannelConnector<byte[], byte
     private BufferedReader open(File file) throws IOException {
         BufferedReader result;
         try {
+            LOGGER.info("Trying to open file {}", file);
             result = new BufferedReader(new FileReader(file));
         } catch (IOException e) {
+            LOGGER.info("Trying to read resource {}", file);
             InputStream in = ResourceLoader.getResourceAsStream(file.toString());
+            if (null == in) {
+                // app packaging
+                LOGGER.info("Trying to read resource resources/{}", file);
+                in = ResourceLoader.getResourceAsStream("resources/" + file.toString());
+            }
+            if (null == in) {
+                // testing without packaging
+                LOGGER.info("Trying to read resource resources/software/{}", file);
+                in = ResourceLoader.getResourceAsStream("resources/software/" + file.toString());
+            }
             if (in != null) {
                 result = new BufferedReader(new InputStreamReader(in));
             } else {
@@ -222,30 +237,33 @@ public class FileConnector<CO, CI> extends AbstractChannelConnector<byte[], byte
     private void readData() {
         new Thread(() -> {
             for (File f: readFiles) {
-                
-                
+                boolean firstLine = true;
                 try (BufferedReader br = open(f)) {
                     String line;
                     while (connected && (line = br.readLine()) != null) {
-                        if (pollingFrequency > 0) {
-                            while (connected && (!polling || pollResult != null)) {
-                                TimeUtils.sleep(50);
-                            }
-                            pollResult = line;
-                        } else {
-                            try {
-                                received(f.getName(), line.getBytes());
-                            } catch (IOException e) {
-                                LoggerFactory.getLogger(getClass()).error("When receiving line: {}", e.getMessage(), e);
-                            }
-                            int interval = fixedDataInterval;
-                            if (nextDataInterval >= 0) { // requested by parent class during received
-                                interval = nextDataInterval;
-                            }
-                            if (interval > 0) {
-                                TimeUtils.sleep(interval);
+                        if (!firstLine || (firstLine && !skipFirstLine)) {
+                            if (pollingFrequency > 0) {
+                                while (connected && (!polling || pollResult != null)) {
+                                    TimeUtils.sleep(50);
+                                }
+                                pollResult = line;
+                            } else {
+                                try {
+                                    received(f.getName(), line.getBytes());
+                                } catch (IOException e) {
+                                    LoggerFactory.getLogger(getClass()).error("When receiving line: {}", 
+                                        e.getMessage(), e);
+                                }
+                                int interval = fixedDataInterval;
+                                if (nextDataInterval >= 0) { // requested by parent class during received
+                                    interval = nextDataInterval;
+                                }
+                                if (interval > 0) {
+                                    TimeUtils.sleep(interval);
+                                }
                             }
                         }
+                        firstLine = false;
                     }
                 } catch (IOException e) {
                     LOGGER.error("While reading file {}: {}", f, e.getMessage(), e);
