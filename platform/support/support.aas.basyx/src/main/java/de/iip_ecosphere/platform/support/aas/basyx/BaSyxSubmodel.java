@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.support.aas.basyx;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 
 import java.util.function.Consumer;
 
@@ -20,6 +22,7 @@ import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -168,6 +171,11 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
                 instance.getSubmodel().setSemanticId(ref);
             }
             return this;
+        }
+        
+        @Override
+        public SubmodelBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
+            return AuthenticationDescriptor.submodelRbac(this, auth, role, getInstance().getIdShort(), actions);
         }
 
     }

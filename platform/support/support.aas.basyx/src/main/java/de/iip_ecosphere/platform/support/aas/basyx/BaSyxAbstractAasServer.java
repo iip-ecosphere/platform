@@ -14,7 +14,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
  * 
  * @author Holger Eichelberger, SSE
  */
-abstract class BaSyxAbstractAasServer implements AasServer {
+public abstract class BaSyxAbstractAasServer implements AasServer {
 
     private DeploymentSpec deploymentSpec;
     
@@ -23,7 +23,7 @@ abstract class BaSyxAbstractAasServer implements AasServer {
      * 
      * @param deploymentSpec the deployment set instance for runtime deployments
      */
-    BaSyxAbstractAasServer(DeploymentSpec deploymentSpec) {
+    public BaSyxAbstractAasServer(DeploymentSpec deploymentSpec) {
         this.deploymentSpec = deploymentSpec;
     }
     

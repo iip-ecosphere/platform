@@ -27,10 +27,12 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.RegistryDeploymentRecipe;
+import de.iip_ecosphere.platform.support.aas.IdentityStoreAuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.AasServer;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Invokable.GetterInvokable;
@@ -285,18 +287,41 @@ public class DeploymentTest {
      */
     @Test
     public void remoteAasDeploymentTest() throws IOException {
-        remoteAasDeploymentTestImpl(Schema.HTTP, null);
+        remoteAasDeploymentTestImpl(Schema.HTTP, null, null);
     }
     
     /**
-     * Tests a remote AAS HTTPS deployment.
+     * Tests a remote AAS HTTPS deployment, without authentication.
      * 
      * @throws IOException shall not occur if the test works
      */
     @Test
     public void remoteAasSslDeploymentTest() throws IOException {
+        remoteAasSslDeploymentTest(null);
+    }
+
+    /**
+     * Tests a remote AAS HTTPS deployment, without authentication.
+     * 
+     * @throws IOException shall not occur if the test works
+     */
+    @Test
+    public void remoteAasSslDeploymentAuthTest() throws IOException {
+        if (AasFactory.getInstance().supportsAuthentication()) {
+            remoteAasSslDeploymentTest(new IdentityStoreAuthenticationDescriptor());
+        }
+    }
+    
+    /**
+     * Tests a remote AAS HTTPS deployment.
+     * 
+     * @param aDesc the optional authentication descriptor, may be <b>null</b> for none
+     * 
+     * @throws IOException shall not occur if the test works
+     */
+    private void remoteAasSslDeploymentTest(AuthenticationDescriptor aDesc) throws IOException {
         File keyPath = new File("./src/test/resources/keystore.jks");
-        remoteAasDeploymentTestImpl(Schema.HTTPS, new KeyStoreDescriptor(keyPath, "a1234567", "tomcat"));
+        remoteAasDeploymentTestImpl(Schema.HTTPS, new KeyStoreDescriptor(keyPath, "a1234567", "tomcat"), null);
     }
     
     /**
@@ -325,10 +350,12 @@ public class DeploymentTest {
      * 
      * @param schema the schema for the servers
      * @param kstore the key store descriptor, ignored if <b>null</b>
+     * @param aDesc the authentication descriptor, ignored if <b>null</b>
      * 
      * @throws IOException shall not occur if the test works
      */
-    private void remoteAasDeploymentTestImpl(Schema schema, KeyStoreDescriptor kstore) throws IOException {
+    private void remoteAasDeploymentTestImpl(Schema schema, KeyStoreDescriptor kstore, AuthenticationDescriptor aDesc)
+        throws IOException {
         // adapted from org.eclipse.basyx.examples.scenarios.cloudedgedeployment.CloudEdgeDeploymentScenario
         AasFactory factory = AasFactory.getInstance();
 
@@ -336,7 +363,7 @@ public class DeploymentTest {
         
         Endpoint serverEp = new Endpoint(schema, "cloud");
         Endpoint regEp = new Endpoint(adaptRegistrySchema(schema), "registry");
-        BasicSetupSpec spec = new BasicSetupSpec(regEp, serverEp, kstore);
+        BasicSetupSpec spec = new BasicSetupSpec(regEp, serverEp, kstore, aDesc);
         System.out.println(spec);
         // start a registry server
         Server regServer = srcp.createRegistryServer(spec, LocalPersistenceType.INMEMORY).start();

@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx1_0;
 
+import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
 import org.eclipse.basyx.submodel.metamodel.connected.submodelelement.operation.ConnectedOperation;
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.property.Property;
@@ -19,8 +20,13 @@ import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operat
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.SetupSpec;
+import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
 import de.iip_ecosphere.platform.support.aas.basyx.AbstractBaSyxAasFactory;
+import de.iip_ecosphere.platform.support.aas.basyx.BaSyxAbstractAasServer;
+import de.iip_ecosphere.platform.support.aas.basyx.DeploymentSpec;
 import de.iip_ecosphere.platform.support.aas.basyx.VersionAdjustment;
+import de.iip_ecosphere.platform.support.aas.basyx.VersionAdjustment.RegistryDeploymentServerCreator;
 
 /**
  * AAS factory for BaSyx. Do not rename, this class is referenced in {@code META-INF/services}.
@@ -64,6 +70,20 @@ public class BaSyxAasFactory extends AbstractBaSyxAasFactory {
         VersionAdjustment.registerSetBearerTokenAuthenticationConfiguration(BaSyxContext.class, (c, i, j, r) -> { });
         // property lambdas always active
         VersionAdjustment.registerSetupBaSyxAASServerConfiguration(BaSyxAASServerConfiguration.class, c -> { });
+        // set up default BaSyx Server creator
+        VersionAdjustment.setupBaSyxServerCreator(VersionAdjustment.DEFAULT_SERVER_CREATOR);
+        // checkstyle: stop parameter number check
+
+        VersionAdjustment.setupRegistryDeploymentServerCreator(new RegistryDeploymentServerCreator() {
+            
+            @Override
+            public BaSyxAbstractAasServer createRegistryDeploymentServer(DeploymentSpec deploymentSpec, SetupSpec spec,
+                AasComponent component, String regUrl, AASServerBackend backend, String... options) {
+                return new BaSyxRegistryDeploymentAasServer(deploymentSpec, regUrl, backend, options);
+            }
+        });
+        
+        // checkstyle: resume parameter number check        
     }
 
     @Override
@@ -75,5 +95,10 @@ public class BaSyxAasFactory extends AbstractBaSyxAasFactory {
     public boolean supportsPropertyFunctions() {
         return true;
     }
-
+    
+    @Override
+    public boolean supportsAuthentication() {
+        return false;
+    }
+    
 }

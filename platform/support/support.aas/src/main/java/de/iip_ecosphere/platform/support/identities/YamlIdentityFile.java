@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
@@ -288,9 +290,9 @@ public class YamlIdentityFile {
             result = new YamlIdentityFile();
         } else {
             try {
-                Representer representer = new Representer();
+                Representer representer = new Representer(new DumperOptions());
                 representer.getPropertyUtils().setSkipMissingProperties(true);
-                Yaml yaml = new Yaml(new Constructor(YamlIdentityFile.class), representer);
+                Yaml yaml = new Yaml(new Constructor(YamlIdentityFile.class, new LoaderOptions()), representer);
                 result = yaml.load(in);
                 FileUtils.closeQuietly(in);
             } catch (YAMLException e) {

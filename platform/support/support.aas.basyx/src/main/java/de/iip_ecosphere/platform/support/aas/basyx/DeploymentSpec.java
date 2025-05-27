@@ -15,7 +15,7 @@ import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
  * 
  * @author Holger Eichelberger, SSE
  */
-class DeploymentSpec {
+public class DeploymentSpec {
     
     private Endpoint endpoint;
     private BaSyxContextConfiguration contextConfig;
@@ -116,7 +116,7 @@ class DeploymentSpec {
      * 
      * @return the BaSyx context
      */
-    BaSyxContext getContext() {
+    public BaSyxContext getContext() {
         return context;
     }
 
@@ -134,7 +134,7 @@ class DeploymentSpec {
      * 
      * @return the context configuration (may be <b>null</b> depending on constructor use)
      */
-    BaSyxContextConfiguration getContextConfiguration() {
+    public BaSyxContextConfiguration getContextConfiguration() {
         return contextConfig;
     }
     

@@ -19,8 +19,11 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity;
@@ -201,6 +204,11 @@ public class FakeSubmodel extends FakeElement implements Submodel {
         public RelationshipElementBuilder createRelationshipElementBuilder(String idShort, Reference first,
                 Reference second) {
             return new FakeRelationshipElement.FakeRelationshipElementBuilder(this, idShort, first, second);
+        }
+        
+        @Override
+        public SubmodelBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
+            return AuthenticationDescriptor.submodelRbac(this, auth, role, getInstance().getIdShort(), actions);
         }
 
     }

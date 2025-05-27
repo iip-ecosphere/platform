@@ -424,6 +424,23 @@ public abstract class AasFactory {
     public abstract SubmodelBuilder createSubmodelBuilder(String idShort, String identifier);
 
     /**
+     * Creates a standalone sub-model without parent AAS for a <b>new sub-model</b> (not for adding elements to an 
+     * existing sub-model). Calls {@link #createSubmodelBuilder(String, String)} by default.
+     * 
+     * @param idShort the short id of the sub-model
+     * @param identifier the identifier of the sub-model (may be <b>null</b> or empty for an identification based on 
+     *    {@code idShort}, interpreted as an URN if this starts with {@code urn}, see {@link IdentifierType} for others)
+     * @param spec setup specification needed for encrypted/authentication notification of property changes/execution of
+     *    operation in purely local instances, not needed if registered to/retrieved from repository
+     * @return the sub-model builder (may be <b>null</b> if no AAS implementation is registered)
+     * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty, or if this operation is not 
+     *   supported
+     */
+    public SubmodelBuilder createSubmodelBuilder(String idShort, String identifier, SetupSpec spec) {
+        return createSubmodelBuilder(idShort, identifier);
+    }
+
+    /**
      * Creates a server recipe. Utilizes JLS via {@link AasServerRecipeDescriptor} to determine a specific recipe.
      * If none is found, {@link #createDefaultServerRecipe()} is called.
      * 
@@ -579,6 +596,15 @@ public abstract class AasFactory {
      */
     public boolean supportsPropertyFunctions() {
         return false;
+    }
+
+    /**
+     * Returns whether the implementation supports authentication.
+     * 
+     * @return {@code true} if supported, {@code false}
+     */
+    public boolean supportsAuthentication() {
+        return true;
     }
 
     /**

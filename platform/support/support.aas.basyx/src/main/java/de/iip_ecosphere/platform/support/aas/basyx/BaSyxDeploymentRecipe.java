@@ -36,6 +36,7 @@ import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.SetupSpec;
+import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 
 /**
@@ -86,7 +87,7 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
 
         @Override
         public AasServer createServer(String... options) {
-            return new BaSyxImmediateDeploymentAasServer(deploymentSpec);
+            return new BaSyxImmediateDeploymentAasServer(deploymentSpec, spec, AasComponent.AAS_REPOSITORY);
         }
         
     }
@@ -143,8 +144,8 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
 
         @Override
         public AasServer createServer(String... options) {
-            return new BaSyxRegistryDeploymentAasServer(deploymentSpec, endpoint.toUri(), 
-                AASServerBackend.INMEMORY, options);
+            return VersionAdjustment.createRegistryDeploymentServer(deploymentSpec, spec, AasComponent.AAS_REPOSITORY, 
+                endpoint.toUri(), AASServerBackend.INMEMORY, options);
         }
         
     }

@@ -19,6 +19,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.support.Builder;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 
 /**
  * Represents an AAS Property.
@@ -137,6 +139,16 @@ public interface Property extends Element, DataElement {
         public default PropertyBuilder bindLazy(Invokable get, Invokable set) {
             return bind(get, set);
         }
+        
+        /**
+         * Creates an RBAC rule for the operation under creation and adds the role to {@code auth}.
+         * 
+         * @param auth the authentication descriptor, may be <b>null</b>, ignored then
+         * @param role the role to create the rule for
+         * @param actions the permitted actions
+         * @return <b>this</b> for chaining
+         */
+        public PropertyBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions); 
 
     }
 

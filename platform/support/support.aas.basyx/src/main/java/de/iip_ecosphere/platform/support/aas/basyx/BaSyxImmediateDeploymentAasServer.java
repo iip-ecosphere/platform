@@ -1,8 +1,9 @@
 package de.iip_ecosphere.platform.support.aas.basyx;
 
-import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
-
+import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasServer;
+import de.iip_ecosphere.platform.support.aas.SetupSpec;
+import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
 
 /**
  * A simple, immediate AAS server implementation.
@@ -11,16 +12,18 @@ import de.iip_ecosphere.platform.support.aas.AasServer;
  */
 class BaSyxImmediateDeploymentAasServer extends BaSyxAbstractAasServer {
 
-    private BaSyxHTTPServer server;
+    private Server server;
     
     /**
      * Creates a new BaSyx AAS server.
      * 
-     * @param deploymentSet the deployment set instance for runtime deployments
+     * @param dSpec the deployment specification
+     * @param sSpec the setup specification
+     * @param component the specific component to create the server for
      */
-    BaSyxImmediateDeploymentAasServer(DeploymentSpec deploymentSet) {
-        super(deploymentSet);
-        server = new BaSyxHTTPServer(deploymentSet.getContext());
+    BaSyxImmediateDeploymentAasServer(DeploymentSpec dSpec, SetupSpec sSpec, AasComponent component) {
+        super(dSpec);
+        server = VersionAdjustment.createBaSyxServer(dSpec, sSpec, component);
     }
     
     @Override
@@ -31,7 +34,7 @@ class BaSyxImmediateDeploymentAasServer extends BaSyxAbstractAasServer {
 
     @Override
     public void stop(boolean dispose) {
-        server.shutdown();
+        server.stop(dispose);
         super.stop(dispose); // if not disposable, schedule for deletion at JVM end
     }
 

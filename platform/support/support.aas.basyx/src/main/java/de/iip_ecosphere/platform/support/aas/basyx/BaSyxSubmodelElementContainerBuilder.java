@@ -20,6 +20,7 @@ import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBu
 
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.BlobDataElement.BlobDataElementBuilder;
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
@@ -259,5 +260,27 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubmodel>
     void buildMyDeferred() {
         getInstance().buildDeferred();
     }
-
+    
+    /**
+     * Composes an RBAC path from the parents.
+     * 
+     * @param element optional name of the element to be appended to the path
+     * @return the path, including the parents
+     */
+    public String composeRbacPath(String element) {
+        String result = "";
+        if (getParentBuilder() instanceof BaSyxSubmodelElementContainerBuilder) {
+            result = ((BaSyxSubmodelElementContainerBuilder<?>) getParentBuilder()).composeRbacPath("");
+        }
+        if (result.length() > 0) {
+            result += AuthenticationDescriptor.RbacRule.PATH_SEPARATOR + getInstance().getIdShort();
+        } else {
+            result = getInstance().getIdShort();
+        }
+        if (null != element && element.length() > 0) {
+            result += AuthenticationDescriptor.RbacRule.PATH_SEPARATOR + element;
+        }
+        return result;
+    }
+    
 }

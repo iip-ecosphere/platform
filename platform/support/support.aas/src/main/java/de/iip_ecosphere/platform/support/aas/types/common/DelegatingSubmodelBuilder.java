@@ -14,6 +14,9 @@ package de.iip_ecosphere.platform.support.aas.types.common;
 
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 import de.iip_ecosphere.platform.support.aas.BlobDataElement.BlobDataElementBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityType;
@@ -155,6 +158,11 @@ public class DelegatingSubmodelBuilder implements SubmodelBuilder {
     @Override
     public SubmodelBuilder setSemanticId(String refValue) {
         return delegate.setSemanticId(refValue);
+    }
+
+    @Override
+    public SubmodelBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
+        return delegate.rbac(auth, role, actions);
     }
 
 }

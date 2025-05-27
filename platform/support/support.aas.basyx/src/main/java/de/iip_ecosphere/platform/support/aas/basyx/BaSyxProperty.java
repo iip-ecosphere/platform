@@ -28,10 +28,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.Invokable;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 
 /**
  * Wraps a BaSyx property.
@@ -162,6 +165,12 @@ public class BaSyxProperty extends BaSyxSubmodelElement implements Property {
         @Override
         public Object getValue() throws ExecutionException {
             return property.getValue();
+        }
+        
+        @Override
+        public PropertyBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
+            return AuthenticationDescriptor.elementRbac(this, auth, role, 
+                parentBuilder.composeRbacPath(property.getIdShort()), actions);
         }
 
     }

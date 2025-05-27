@@ -24,11 +24,14 @@ import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
 import de.iip_ecosphere.platform.support.aas.IdentifierType;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 
 /**
  * Abstract implementation of the {@link Aas} interface.
@@ -94,6 +97,11 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
          * @see #defer(String, Builder)
          */
         abstract void buildMyDeferred();
+        
+        @Override
+        public AasBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
+            return AuthenticationDescriptor.aasRbac(this, auth, role, getInstance().getIdShort(), actions);
+        }
         
     }
     

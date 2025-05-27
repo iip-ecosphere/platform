@@ -23,6 +23,7 @@ import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasServer;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.SetupSpec;
+import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
 /**
@@ -52,8 +53,8 @@ public class BaSyxServerRecipe implements ServerRecipe {
     public AasServer createAasServer(SetupSpec spec, PersistenceType persistence, String... options) {
         DeploymentSpec dspec = applyAccessControlAllowOrigin(
             new DeploymentSpec(spec.getAasRepositoryEndpoint(), spec.getAasRepositoryKeyStore()));
-        return new BaSyxRegistryDeploymentAasServer(dspec, spec.getAasRegistryEndpoint().toUri(), 
-            translateForServer(persistence), options);
+        return VersionAdjustment.createRegistryDeploymentServer(dspec, spec, AasComponent.AAS_REGISTRY, 
+            spec.getAasRegistryEndpoint().toUri(), translateForServer(persistence), options);
     }
     
     /**

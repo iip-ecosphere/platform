@@ -21,7 +21,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.basyx.submodel.metamodel.api.submodelelement.SubmodelElementIdShortBlacklist;
+import org.eclipse.basyx.vab.coder.json.connector.JSONConnector;
+import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.protocol.api.IConnectorFactory;
+import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnector;
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnectorFactory;
 import org.eclipse.basyx.vab.protocol.https.HTTPSConnectorProvider;
 
@@ -40,6 +43,8 @@ import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.SetupSpec;
+import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
+import de.iip_ecosphere.platform.support.aas.SetupSpec.ComponentSetup;
 import de.iip_ecosphere.platform.support.aas.SimpleLocalProtocolCreator;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
@@ -92,8 +97,8 @@ public abstract class AbstractBaSyxAasFactory extends AasFactory {
 
         @Override
         public ProtocolServerBuilder createProtocolServerBuilder(SetupSpec spec) {
-            return new VabOperationsProvider.VabHttpOperationsBuilder(spec.getAssetServerAddress().getPort(), 
-                Schema.HTTP, null);
+            return new VabOperationsProvider.VabHttpOperationsBuilder(
+                spec, AasComponent.ASSET, Schema.HTTP);
         }
         
     }
@@ -114,8 +119,8 @@ public abstract class AbstractBaSyxAasFactory extends AasFactory {
 
         @Override
         public ProtocolServerBuilder createProtocolServerBuilder(SetupSpec spec) {
-            return new VabOperationsProvider.VabHttpOperationsBuilder(spec.getAssetServerAddress().getPort(), 
-                Schema.HTTPS, spec.getAssetServerKeyStore());
+            return new VabOperationsProvider.VabHttpOperationsBuilder(
+                spec, AasComponent.ASSET, Schema.HTTPS);
         }
         
     }
@@ -174,16 +179,23 @@ public abstract class AbstractBaSyxAasFactory extends AasFactory {
     public Registry obtainRegistry(SetupSpec spec) throws IOException {
         return obtainRegistry(spec, spec.getAasRegistryEndpoint().getSchema());
     }
-    
+
     @Override
     public Registry obtainRegistry(SetupSpec spec, Schema aasSchema) throws IOException {
         IConnectorFactory cFactory;
+        ComponentSetup cSetup = spec.getSetup(AasComponent.AAS_REGISTRY);
+        // no authentication, not supported by 1.0, must be overridden
         if (Schema.HTTPS == aasSchema) {
             cFactory = new HTTPSConnectorProvider();
         } else {
-            cFactory = new HTTPConnectorFactory();
+            cFactory = new HTTPConnectorFactory() {
+                @Override
+                protected IModelProvider createProvider(String addr) {
+                    return new JSONConnector(new HTTPConnector(addr));
+                }
+            };
         }
-        return new BaSyxRegistry(spec.getAasRegistryEndpoint(), cFactory);
+        return new BaSyxRegistry(cSetup.getEndpoint(), cFactory);
     }
     
     @Override

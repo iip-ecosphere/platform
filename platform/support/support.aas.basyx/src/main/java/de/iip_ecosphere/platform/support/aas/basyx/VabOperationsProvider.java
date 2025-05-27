@@ -26,7 +26,6 @@ import org.eclipse.basyx.vab.modelprovider.VABPathTools;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.modelprovider.generic.IVABElementHandler;
 import org.eclipse.basyx.vab.modelprovider.generic.VABModelProvider;
-import org.eclipse.basyx.vab.protocol.http.server.BaSyxHTTPServer;
 import org.eclipse.basyx.vab.protocol.http.server.VABHTTPInterface;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +35,9 @@ import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.OperationsProvider;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.aas.SetupSpec;
+import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
+import de.iip_ecosphere.platform.support.aas.SetupSpec.ComponentSetup;
 import de.iip_ecosphere.platform.support.aas.basyx.basyx.BaSyxTCPServer;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
@@ -249,6 +251,8 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
      */
     static class VabHttpOperationsBuilder implements ProtocolServerBuilder {
 
+        private SetupSpec setup;
+        private AasComponent component;
         private int port;
         private Schema schema;
         private VabOperationsProvider instance;
@@ -257,14 +261,17 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
         /**
          * Creates a builder instance.
          * 
-         * @param port the target communication port
-         * @param kstore the key store descriptor, ignored if <b>null</b>
+         * @param setup the setup specification
+         * @param component the component to create the server for
          * @param schema the protocol schema, shall be {@link Schema#HTTP} or {@link Schema#HTTPS}
          */
-        VabHttpOperationsBuilder(int port, Schema schema, KeyStoreDescriptor kstore) {
-            this.port = port;
+        VabHttpOperationsBuilder(SetupSpec setup, AasComponent component, Schema schema) {
+            this.setup = setup;
+            this.component = component;
+            ComponentSetup cSetup = setup.getSetup(component);
+            this.port = cSetup.getServerAddress().getPort();
             this.instance = new VabOperationsProvider();
-            this.kstore = kstore;
+            this.kstore = schema == Schema.HTTPS ? cSetup.getKeyStore() : null;
         }
 
         @Override
@@ -286,22 +293,7 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
             DeploymentSpec deploymentSpec = new DeploymentSpec(endpoint, kstore);
             deploymentSpec.getContext().addServletMapping(Endpoint.checkEndpoint(endpoint.getEndpoint()) + "/*", 
                 vabServlet);
-            BaSyxHTTPServer server = new BaSyxHTTPServer(deploymentSpec.getContext());
-            Server result = new Server() {
-
-                @Override
-                public Server start() {
-                    server.start();
-                    return this;
-                }
-
-                @Override
-                public void stop(boolean dispose) {
-                    server.shutdown();
-                }
-
-            };
-            return result;
+            return VersionAdjustment.createBaSyxServer(deploymentSpec, setup, component);
         }
 
         @Override

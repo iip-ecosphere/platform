@@ -18,11 +18,14 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.Invokable;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 
 /**
  * Implements a fake property for testing.
@@ -115,7 +118,13 @@ public class FakeProperty extends FakeElement implements Property {
             }
             return this;
         }
-        
+
+        @Override
+        public PropertyBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
+            // ignore parent paths here
+            return AuthenticationDescriptor.elementRbac(this, auth, role, instance.getIdShort(), actions);
+        }
+
     }
     
     /**

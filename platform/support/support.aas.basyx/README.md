@@ -23,6 +23,5 @@ Please note that in more recent versions of BaSyx, the protocol schema of the AA
 
 **Missing**
 - Various AAS concepts (incremental addition as needed by the platform)
-- Authentication/RBAC
 - Events
 - Improved resilience for failing VAB connections. Currently, failing connections are disabled for 1 minute after the first failure. Consider an integration with the network manager (port release).

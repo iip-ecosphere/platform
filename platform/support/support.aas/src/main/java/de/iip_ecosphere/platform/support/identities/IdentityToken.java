@@ -141,7 +141,22 @@ public class IdentityToken {
         }
         
     }
-    
+
+    /**
+     * Plain UTF-8 based token "encryption".
+     */
+    public static final String ENC_PLAIN_UTF_8 = "UTF-8";
+
+    /**
+     * Bcrypt-based token encryption.
+     */
+    public static final String ENC_BCRYPT = "BCRYPT";
+
+    /**
+     * SHA-based token encryption.
+     */
+    public static final String ENC_SHA256 = "SHA256";
+
     private String tokenPolicyId;
     private TokenType type;
     private String userName;
@@ -157,10 +172,25 @@ public class IdentityToken {
      * @param signatureAlgorithm the signature algorithm used to sign the token
      * @param signature the token signature
      */
-    private IdentityToken(String tokenPolicyId, String signatureAlgorithm, byte[] signature) {
+    protected IdentityToken(String tokenPolicyId, String signatureAlgorithm, byte[] signature) {
         this.tokenPolicyId = tokenPolicyId;
         this.signatureAlgorithm = signatureAlgorithm;
         this.signature = signature;
+    }
+
+    /**
+     * Creates an identity token by copying a given identity token.
+     * 
+     * @param token the token to copy from
+     */
+    protected IdentityToken(IdentityToken token) {
+        this.tokenPolicyId = token.tokenPolicyId;
+        this.type = token.type;
+        this.userName = token.userName;
+        this.tokenData = token.tokenData;
+        this.tokenEncryptionAlgorithm = token.tokenEncryptionAlgorithm;
+        this.signatureAlgorithm = token.signatureAlgorithm;
+        this.signature = token.signature;
     }
     
     /**
@@ -252,7 +282,8 @@ public class IdentityToken {
     /**
      * The token encryption algorithm, for {@link TokenType#ISSUED} or {@link TokenType#USERNAME}.
      * 
-     * @return the token encryption algorithm, may be <b>null</b> for wrong token type
+     * @return the token encryption algorithm (e.g., {@link #ENC_PLAIN_UTF_8}, {@link #ENC_BCRYPT}, 
+     *     {@link #ENC_SHA256}), may be <b>null</b> for wrong token type
      */
     public String getTokenEncryptionAlgorithm() {
         return tokenEncryptionAlgorithm;

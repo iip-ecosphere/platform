@@ -1,4 +1,4 @@
-package de.iip_ecosphere.platform.support.aas.basyx;
+package de.iip_ecosphere.platform.support.aas.basyx1_5;
 
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguration;
@@ -6,7 +6,11 @@ import org.eclipse.basyx.components.aas.configuration.BaSyxAASServerConfiguratio
 import de.iip_ecosphere.platform.support.aas.AasServer;
 import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
-import de.iip_ecosphere.platform.support.aas.basyx.basyx.AASServerComponent;
+import de.iip_ecosphere.platform.support.aas.basyx.BaSyxAbstractAasServer;
+import de.iip_ecosphere.platform.support.aas.basyx.DeploymentSpec;
+import de.iip_ecosphere.platform.support.aas.basyx.VersionAdjustment;
+import de.iip_ecosphere.platform.support.aas.basyx1_5.basyx.AASServerComponent;
+import de.iip_ecosphere.platform.support.aas.basyx.Tools;
 
 /**
  * A registry-based AAS server.

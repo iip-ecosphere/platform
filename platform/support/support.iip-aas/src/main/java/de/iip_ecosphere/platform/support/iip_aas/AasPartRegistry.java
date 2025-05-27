@@ -14,9 +14,11 @@ package de.iip_ecosphere.platform.support.iip_aas;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -36,6 +38,7 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.CorsEnabledRecipe;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.ImmediateDeploymentRecipe;
@@ -150,12 +153,7 @@ public class AasPartRegistry {
         private String accessControlAllowOrigin = DeploymentRecipe.ANY_CORS_ORIGIN;
         private int aasStartupTimeout = 120000;
         private String pluginId; // default of AasFactory
-
-        private State aasRegistryState = State.STOPPED;
-        private State smRegistryState = State.STOPPED;
-        private State aasRepoState = State.STOPPED;
-        private State smRepoState = State.STOPPED;
-        private State assetServerState = State.STOPPED;
+        private Map<AasComponent, ComponentSetup> setups = new HashMap<>();
 
         /**
          * Default constructor.
@@ -175,6 +173,52 @@ public class AasPartRegistry {
             setSubmodelRegistry(setup.smRegistry);
             setImplementation(setup.implementation);
             setMode(setup.mode);
+        }
+        
+        /**
+         * Wraps a component's endpoint into a component setup.
+         * 
+         * @author Holger Eichelberger, SSE
+         */
+        private class WrappingComponentSetup implements ComponentSetup {
+
+            private EndpointHolder endpoint;
+            private State state = State.STOPPED;
+            
+            /**
+             * Creates a wrapping component setup for a given endpoint.
+             * 
+             * @param endpoint the endpoint to wrap
+             */
+            private WrappingComponentSetup(EndpointHolder endpoint) {
+                this.endpoint = endpoint;
+            }
+            
+            @Override
+            public Endpoint getEndpoint() {
+                return endpoint.getEndpoint();
+            }
+
+            @Override
+            public KeyStoreDescriptor getKeyStore() {
+                return endpoint.getKeystoreDescriptor();
+            }
+
+            @Override
+            public AuthenticationDescriptor getAuthentication() {
+                return null; // TODO -> EndpointHolder
+            }
+
+            @Override
+            public State getState() {
+                return isRunning(endpoint, state);
+            }
+
+            @Override
+            public void notifyStateChange(State state) {
+                this.state = state;
+            }
+            
         }
         
         /**
@@ -482,104 +526,53 @@ public class AasPartRegistry {
             result.getImplementation().setPort(NetUtils.getEphemeralPort()); // could both be the same?
             return result;
         }
+
+        {
+            setups.put(AasComponent.AAS_REGISTRY, new WrappingComponentSetup(registry));
+            setups.put(AasComponent.AAS_REPOSITORY, new WrappingComponentSetup(server));
+            setups.put(AasComponent.SUBMODEL_REGISTRY, new WrappingComponentSetup(smRegistry));
+            setups.put(AasComponent.SUBMODEL_REPOSITORY, new WrappingComponentSetup(smServer));
+            setups.put(AasComponent.ASSET, new ComponentSetup() {
+                
+                private State state = State.STOPPED;
+
+                @Override
+                public ServerAddress getServerAddress() {
+                    return implementation.getServerAddress();
+                }
+
+                @Override
+                public Endpoint getEndpoint() {
+                    return new Endpoint(implementation.getServerAddress(), "");
+                }
+
+                @Override
+                public KeyStoreDescriptor getKeyStore() {
+                    return implementation.getKeystoreDescriptor();
+                }
+
+                @Override
+                public AuthenticationDescriptor getAuthentication() {
+                    return null;
+                }
+
+                @Override
+                public State getState() {
+                    return isRunning(implementation, state);                    
+                }
+
+                @Override
+                public void notifyStateChange(State state) {
+                    this.state = state;
+                }
+                
+            });
+        }        
         
         @Override
         @JsonIgnore
-        public Endpoint getAasRegistryEndpoint() {
-            return registry.getEndpoint();
-        }
-
-        @Override
-        public KeyStoreDescriptor getAasRegistryKeyStore() {
-            return registry.getKeystoreDescriptor();
-        }
-
-        @Override
-        public State getAasRegistryState() {
-            return isRunning(registry, aasRegistryState);
-        }
-
-        @Override
-        public void notifyAasRegistryStateChange(State state) {
-            this.aasRegistryState = state;
-        }
-
-        @Override
-        @JsonIgnore
-        public Endpoint getSubmodelRegistryEndpoint() {
-            return smRegistry.getEndpoint();
-        }
-
-        @Override
-        public KeyStoreDescriptor getSubmodelRegistryKeyStore() {
-            return smRegistry.getKeystoreDescriptor();
-        }
-
-        @Override
-        public State getSubmodelRegistryState() {
-            return isRunning(smRegistry, smRegistryState);
-        }
-
-        @Override
-        public void notifySubmodelRegistryStateChange(State state) {
-            this.smRegistryState = state;
-        }
-
-        @Override
-        @JsonIgnore
-        public Endpoint getAasRepositoryEndpoint() {
-            return server.getEndpoint();
-        }
-
-        @Override
-        public State getAasRepositoryState() {
-            return isRunning(server, aasRepoState);
-        }
-
-        @Override
-        public void notifyAasRepositoryStateChange(State state) {
-            this.aasRepoState = state;
-        }
-        
-        @Override
-        @JsonIgnore
-        public Endpoint getSubmodelRepositoryEndpoint() {
-            return smServer.getEndpoint();
-        }
-        
-        @Override
-        public State getSubmodelRepositoryState() {
-            return isRunning(smServer, smRepoState);
-        }
-
-        @Override
-        public void notifySubmodelRepositoryStateChange(State state) {
-            this.smRepoState = state;
-        }
-
-        @Override
-        public KeyStoreDescriptor getAasRepositoryKeyStore() {
-            return server.getKeystoreDescriptor();
-        }
-
-        @Override
-        public KeyStoreDescriptor getSubmodelRepositoryKeyStore() {
-            return smServer.getKeystoreDescriptor();
-        }
-
-        @Override
-        public ServerAddress getAssetServerAddress() {
-            return implementation.getServerAddress();
-        }
-        
-        @Override
         public String getAssetServerProtocol() {
             return implementation.getProtocol();
-        }
-
-        @Override
-        public State getAssetServerState() {
-            return isRunning(implementation, assetServerState);
         }
 
         /**
@@ -599,13 +592,9 @@ public class AasPartRegistry {
         }
 
         @Override
-        public void notifyAssetServerStateChange(State state) {
-            this.assetServerState = state;
-        }
-
-        @Override
-        public KeyStoreDescriptor getAssetServerKeyStore() {
-            return implementation.getKeystoreDescriptor();
+        @JsonIgnore
+        public ComponentSetup getSetup(AasComponent component) {
+            return setups.get(component);
         }
 
     }

@@ -1,0 +1,18 @@
+name: support.aas.basyx
+identities:
+    aas:
+        type: USERNAME
+        userName: user
+        tokenData: password
+        tokenEncryptionAlgorithm: UTF-8
+    aas-admin-1:
+        type: USERNAME
+        userName: admin
+        tokenData: password
+        tokenEncryptionAlgorithm: UTF-8
+    aas-user-1:
+        type: USERNAME
+        userName: user
+        tokenData: password
+        tokenEncryptionAlgorithm: UTF-8
+    

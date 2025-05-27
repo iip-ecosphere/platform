@@ -32,7 +32,9 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
+import de.iip_ecosphere.platform.support.aas.IdentityStoreAuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Operation;
@@ -179,7 +181,7 @@ public class AasTest {
     }
     
     /**
-     * Tests creating/reading an AAS over all protocols of a factory.
+     * Tests creating/reading an AAS over all protocols of a factory, without authentication.
      * 
      * @throws SocketException shall not occur if the test works
      * @throws UnknownHostException shall not occur if the test works
@@ -188,6 +190,34 @@ public class AasTest {
      */
     @Test
     public void testVabQuery() throws SocketException, UnknownHostException, ExecutionException, IOException {
+        testVabQuery(null);
+    }
+
+    /**
+     * Tests creating/reading an AAS over all protocols of a factory, without authentication.
+     * 
+     * @throws SocketException shall not occur if the test works
+     * @throws UnknownHostException shall not occur if the test works
+     * @throws ExecutionException shall not occur if the test works
+     * @throws IOException shall not occur if the test works
+     */
+    @Test
+    public void testVabQueryAuth() throws SocketException, UnknownHostException, ExecutionException, IOException {
+        if (AasFactory.getInstance().supportsAuthentication()) {
+            testVabQuery(new IdentityStoreAuthenticationDescriptor());
+        }
+    }
+
+    /**
+     * Tests creating/reading an AAS over all protocols of a factory.
+     * 
+     * @throws SocketException shall not occur if the test works
+     * @throws UnknownHostException shall not occur if the test works
+     * @throws ExecutionException shall not occur if the test works
+     * @throws IOException shall not occur if the test works
+     */
+    private void testVabQuery(AuthenticationDescriptor aDesc) throws SocketException, UnknownHostException, 
+        ExecutionException, IOException {
         String[] desiredProtocols = getServerProtocols();
         String[] providedProtocols = AasFactory.getInstance().getProtocols();
         desiredProtocols = Stream.of(desiredProtocols) // only intersection counts, test only what is provided
@@ -200,7 +230,7 @@ public class AasTest {
                     System.out.println("Testing Asset protocol: " 
                         + (proto.length() > 0 ? "'" + proto + "'" : "<default>") + " " 
                         + (sProto.length() > 0 ? "on server protocol '" + sProto + "'" : "<default>"));
-                    testVabQuery(proto, sProto);
+                    testVabQuery(proto, sProto, aDesc);
                 }
             }
         }
@@ -255,7 +285,7 @@ public class AasTest {
      * @throws ExecutionException shall not occur if the test works
      * @throws IOException shall not occur if the test works
      */
-    protected void testVabQuery(String protocol, String serverProtocol) 
+    protected void testVabQuery(String protocol, String serverProtocol, AuthenticationDescriptor authDesc) 
         throws SocketException, UnknownHostException, ExecutionException, IOException {
 
         TestMachine machine = new TestMachine();
@@ -267,9 +297,10 @@ public class AasTest {
         Endpoint registryEndpoint;
         KeyStoreDescriptor ksd = getKeyStoreDescriptor(serverProtocol);
         registryEndpoint = createDependentEndpoint(aasServerAddress, "registry");
-        BasicSetupSpec spec = new BasicSetupSpec(registryEndpoint, aasServerAddress, ksd);
+        BasicSetupSpec spec = new BasicSetupSpec(registryEndpoint, aasServerAddress, ksd, authDesc);
         spec.setAssetServerAddress(VAB_SERVER, protocol);
         spec.setAssetServerKeystore(getKeyStoreDescriptor(protocol));
+        spec.setAssetServerAuthentication(authDesc);
         Aas aas = createAas(machine, spec);
         Server ccServer = createOperationsServer(spec, machine);
         ccServer.start(); // required here by basyx-0.1.0-SNAPSHOT

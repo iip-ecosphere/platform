@@ -12,7 +12,8 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
-import java.util.function.Function;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
@@ -27,23 +28,75 @@ import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
  */
 public class BasicSetupSpec implements SetupSpec {
 
+    private Map<AasComponent, BasicComponentSetup> setups = new HashMap<>();
+    
+    /**
+     * Implements the component setup.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    protected class BasicComponentSetup implements ComponentSetup {
+
+        private ServerAddress serverAddress;
+        private Endpoint endpoint;
+        private KeyStoreDescriptor keyStore;
+        private State state = State.STOPPED;
+        private AuthenticationDescriptor authentication;
+        private AasComponent component;
+        
+        /**
+         * Represents the setup for a complete component.
+         * 
+         * @param component the component (type) to represent
+         */
+        protected BasicComponentSetup(AasComponent component) {
+            this.component = component;
+        }
+        
+        @Override
+        public ServerAddress getServerAddress() {
+            return null == serverAddress ? endpoint : serverAddress;
+        }        
+
+        @Override
+        public Endpoint getEndpoint() {
+            return endpoint;
+        }
+
+        @Override
+        public KeyStoreDescriptor getKeyStore() {
+            return keyStore;
+        }
+
+        @Override
+        public AuthenticationDescriptor getAuthentication() {
+            return authentication;
+        }
+
+        @Override
+        public State getState() {
+            return null == from ? state : from.getSetup(component).getState();
+        }
+
+        @Override
+        public void notifyStateChange(State state) {
+            if (null == from) {
+                this.state = state;
+            } else {
+                from.getSetup(component).notifyStateChange(state);
+            }
+        }
+        
+    }
+    
+    {
+        for (AasComponent c : AasComponent.values()) {
+            setups.put(c, new BasicComponentSetup(c));
+        }
+    }
+    
     private BasicSetupSpec from;
-    private Endpoint aasRegistryEndpoint;
-    private KeyStoreDescriptor aasRegistryKeyStore;
-    private State aasRegistryState = State.STOPPED;
-    private Endpoint smRegistryEndpoint;
-    private KeyStoreDescriptor smRegistryKeyStore;
-    private State smRegistryState = State.STOPPED;
-    private Endpoint aasRepoEndpoint;
-    private State aasRepoState = State.STOPPED;
-    private KeyStoreDescriptor aasRepoKeyStore;
-    private Endpoint smRepoEndpoint;
-    private State smRepoState = State.STOPPED;
-    private KeyStoreDescriptor smRepoKeyStore;
-    private ServerAddress assetServerAddress;
-    private State assetServerState = State.STOPPED;
     private String assetServerProtocol = AasFactory.DEFAULT_PROTOCOL;
-    private KeyStoreDescriptor assetServerKeyStore;
 
     /**
      * Creates an empty setup spec. Will not work with metamodel v3, just for testing.
@@ -74,7 +127,7 @@ public class BasicSetupSpec implements SetupSpec {
      * @param registryEndpoint the AAS registry endpoint
      */
     public BasicSetupSpec(Endpoint registryEndpoint) {
-        this(registryEndpoint, registryEndpoint, null, null);
+        this(registryEndpoint, registryEndpoint, (Endpoint) null, (Endpoint) null);
     }
 
     /**
@@ -97,7 +150,21 @@ public class BasicSetupSpec implements SetupSpec {
      * @param desc the server keystore descriptor
      */
     public BasicSetupSpec(Endpoint registryEndpoint, ServerAddress repositoryAddress, KeyStoreDescriptor desc) {
-        this(registryEndpoint, new Endpoint(repositoryAddress, ""), desc);
+        this(registryEndpoint, repositoryAddress, desc, null);
+    }
+
+    /**
+     * Creates a setup instance for old-style AAS with joined registry/repository. Will not work with metamodel v3,
+     * just for migration purposes
+     * 
+     * @param registryEndpoint the AAS registry endpoint
+     * @param repositoryAddress the address of the repository, used to construct an endpoint with empty path
+     * @param kDesc an optional server keystore descriptor (may be <b>null</b> for none)
+     * @param aDesc an optional authentication descriptor (may be <b>null</b> for none)
+     */
+    public BasicSetupSpec(Endpoint registryEndpoint, ServerAddress repositoryAddress, KeyStoreDescriptor kDesc, 
+        AuthenticationDescriptor aDesc) {
+        this(registryEndpoint, new Endpoint(repositoryAddress, ""), kDesc, aDesc);
     }
 
     /**
@@ -106,15 +173,24 @@ public class BasicSetupSpec implements SetupSpec {
      * 
      * @param registryEndpoint the AAS registry endpoint
      * @param repositoryEndpoint the repository endpoint
-     * @param desc the server keystore descriptor
+     * @param kDesc an optional server keystore descriptor (may be <b>null</b> for none)
+     * @param aDesc an optional authentication descriptor (may be <b>null</b> for none)
      */
-    public BasicSetupSpec(Endpoint registryEndpoint, Endpoint repositoryEndpoint, KeyStoreDescriptor desc) {
+    public BasicSetupSpec(Endpoint registryEndpoint, Endpoint repositoryEndpoint, KeyStoreDescriptor kDesc, 
+        AuthenticationDescriptor aDesc) {
         this(registryEndpoint, repositoryEndpoint);
-        setAasRepositoryKeystore(desc);
-        setSubmodelRepositoryKeystore(desc);
-        setAasRegistryKeystore(desc);
-        setSubmodelRegistryKeystore(desc);
-        setAssetServerKeystore(desc);
+        
+        setAasRepositoryKeystore(kDesc);
+        setSubmodelRepositoryKeystore(kDesc);
+        setAasRegistryKeystore(kDesc);
+        setSubmodelRegistryKeystore(kDesc);
+        setAssetServerKeystore(kDesc);
+
+        setAasRepositoryAuthentication(aDesc);
+        setSubmodelRepositoryAuthentication(aDesc);
+        setAasRegistryAuthentication(aDesc);
+        setSubmodelRegistryAuthentication(aDesc);
+        setAssetServerAuthentication(aDesc);
     }
 
     /**
@@ -140,8 +216,8 @@ public class BasicSetupSpec implements SetupSpec {
     public BasicSetupSpec(Endpoint aasRegistryEndpoint, Endpoint smRegistryEndpoint, Endpoint aasRepositoryEndpoint, 
         Endpoint smRepositoryEndpoint) {
         setRegistryEndpoints(aasRegistryEndpoint, smRegistryEndpoint);
-        this.aasRepoEndpoint = aasRepositoryEndpoint;
-        this.smRepoEndpoint = smRepositoryEndpoint;
+        setups.get(AasComponent.AAS_REPOSITORY).endpoint = aasRepositoryEndpoint;
+        setups.get(AasComponent.SUBMODEL_REPOSITORY).endpoint = smRepositoryEndpoint;
     }
     
     /**
@@ -152,21 +228,22 @@ public class BasicSetupSpec implements SetupSpec {
     public BasicSetupSpec(SetupSpec spec) {
         if (spec instanceof BasicSetupSpec) {
             this.from = (BasicSetupSpec) spec;
+            for (AasComponent c : AasComponent.values()) {
+                setups.get(c).state = this.from.setups.get(c).state;
+                setups.get(c).serverAddress = this.from.setups.get(c).serverAddress;
+                setups.get(c).endpoint = this.from.setups.get(c).endpoint;
+                setups.get(c).keyStore = this.from.setups.get(c).keyStore;
+                setups.get(c).authentication = this.from.setups.get(c).authentication;
+            }
+        } else {
+            for (AasComponent c : AasComponent.values()) {
+                setups.get(c).state = spec.getSetup(c).getState();
+                setups.get(c).serverAddress = spec.getSetup(c).getServerAddress(); // may be endpoint
+                setups.get(c).endpoint = spec.getSetup(c).getEndpoint();
+                setups.get(c).keyStore = spec.getSetup(c).getKeyStore();
+                setups.get(c).authentication = spec.getSetup(c).getAuthentication();
+            }
         }
-        setRegistryEndpoints(spec.getAasRegistryEndpoint(), spec.getSubmodelRegistryEndpoint());
-        this.aasRegistryState = spec.getAasRegistryState();
-        this.aasRegistryKeyStore = spec.getAasRegistryKeyStore();
-        this.smRegistryState = spec.getSubmodelRegistryState();
-        this.smRegistryKeyStore = spec.getSubmodelRegistryKeyStore();
-        this.aasRepoEndpoint = spec.getAasRepositoryEndpoint();
-        this.aasRepoState = spec.getAasRepositoryState();
-        this.aasRepoKeyStore = spec.getAasRepositoryKeyStore();
-        this.smRepoEndpoint = spec.getAasRegistryEndpoint();
-        this.smRepoState = spec.getSubmodelRepositoryState();
-        this.smRepoKeyStore = spec.getSubmodelRepositoryKeyStore();
-        this.assetServerAddress = spec.getAssetServerAddress();
-        this.assetServerState = spec.getAssetServerState();
-        this.assetServerKeyStore = spec.getAssetServerKeyStore();
         this.assetServerProtocol = spec.getAssetServerProtocol();
     }
     
@@ -177,7 +254,7 @@ public class BasicSetupSpec implements SetupSpec {
      * @return <b>this</b> for chaining
      */
     public BasicSetupSpec setAasRepositoryEndpoint(Endpoint endpoint) {
-        this.aasRepoEndpoint = endpoint;
+        setups.get(AasComponent.AAS_REPOSITORY).endpoint = endpoint;
         return this;
     }
 
@@ -200,8 +277,8 @@ public class BasicSetupSpec implements SetupSpec {
      * @return <b>this</b> for chaining
      */
     public BasicSetupSpec setRegistryEndpoints(Endpoint aasRegistryEndpoint, Endpoint smRegistryEndpoint) {
-        this.aasRegistryEndpoint = aasRegistryEndpoint;
-        this.smRegistryEndpoint = smRegistryEndpoint;
+        setups.get(AasComponent.AAS_REGISTRY).endpoint = aasRegistryEndpoint;
+        setups.get(AasComponent.SUBMODEL_REGISTRY).endpoint = smRegistryEndpoint;
         return this;
     }
     
@@ -212,9 +289,20 @@ public class BasicSetupSpec implements SetupSpec {
      * @return <b>this</b> for chaining
      */
     public BasicSetupSpec setAasRepositoryKeystore(KeyStoreDescriptor desc) {
-        this.aasRepoKeyStore = desc;
+        setups.get(AasComponent.AAS_REPOSITORY).keyStore = desc;
         return this;
     }
+    
+    /**
+     * Sets the AAS repository authentication descriptor.
+     * 
+     * @param desc the authentication descriptor, may be <b>null</b> for none
+     * @return <b>this</b> for chaining
+     */
+    public BasicSetupSpec setAasRepositoryAuthentication(AuthenticationDescriptor desc) {
+        setups.get(AasComponent.AAS_REPOSITORY).authentication = desc;
+        return this;
+    }    
 
     /**
      * Sets the submodel repository keystore.
@@ -223,19 +311,20 @@ public class BasicSetupSpec implements SetupSpec {
      * @return <b>this</b> for chaining
      */
     public BasicSetupSpec setSubmodelRepositoryKeystore(KeyStoreDescriptor desc) {
-        this.smRepoKeyStore = desc;
+        setups.get(AasComponent.SUBMODEL_REPOSITORY).keyStore = desc;
         return this;
     }
-
-    @Override
-    public Endpoint getAasRegistryEndpoint() {
-        return aasRegistryEndpoint;
-    }
     
-    @Override
-    public KeyStoreDescriptor getAasRegistryKeyStore() {
-        return aasRegistryKeyStore;
-    }
+    /**
+     * Sets the submodel repository authentication descriptor.
+     * 
+     * @param desc the authentication descriptor, may be <b>null</b> for none
+     * @return <b>this</b> for chaining
+     */
+    public BasicSetupSpec setSubmodelRepositoryAuthentication(AuthenticationDescriptor desc) {
+        setups.get(AasComponent.SUBMODEL_REPOSITORY).authentication = desc;
+        return this;
+    }    
 
     /**
      * Sets the AAS registry keystore.
@@ -244,30 +333,20 @@ public class BasicSetupSpec implements SetupSpec {
      * @return <b>this</b> for chaining
      */
     public BasicSetupSpec setAasRegistryKeystore(KeyStoreDescriptor desc) {
-        this.aasRegistryKeyStore = desc;
+        setups.get(AasComponent.AAS_REGISTRY).keyStore = desc;
         return this;
     }
-
-    @Override
-    public State getAasRegistryState() {
-        return getState(s -> s.aasRegistryState);
-    }
-
-    @Override
-    public void notifyAasRegistryStateChange(State state) {
-        setState((o, s) -> o.aasRegistryState = s, state);
-    }
-
-    @Override
-    public Endpoint getSubmodelRegistryEndpoint() {
-        return smRegistryEndpoint;
-    }
-
-
-    @Override
-    public KeyStoreDescriptor getSubmodelRegistryKeyStore() {
-        return smRegistryKeyStore;
-    }
+    
+    /**
+     * Sets the AAS registry registry authentication descriptor.
+     * 
+     * @param desc the authentication descriptor, may be <b>null</b> for none
+     * @return <b>this</b> for chaining
+     */
+    public BasicSetupSpec setAasRegistryAuthentication(AuthenticationDescriptor desc) {
+        setups.get(AasComponent.AAS_REGISTRY).authentication = desc;
+        return this;
+    }    
 
     /**
      * Sets the submodel registry keystore.
@@ -276,59 +355,20 @@ public class BasicSetupSpec implements SetupSpec {
      * @return <b>this</b> for chaining
      */
     public BasicSetupSpec setSubmodelRegistryKeystore(KeyStoreDescriptor desc) {
-        this.smRegistryKeyStore = desc;
+        setups.get(AasComponent.SUBMODEL_REGISTRY).keyStore = desc;
         return this;
     }
 
-    @Override
-    public State getSubmodelRegistryState() {
-        return getState(s -> s.smRegistryState);
-    }
-
-    @Override
-    public void notifySubmodelRegistryStateChange(State state) {
-        setState((o, s) -> o.smRegistryState = s, state);
-    }
-    
-    @Override
-    public Endpoint getAasRepositoryEndpoint() {
-        return aasRepoEndpoint;
-    }
-
-    @Override
-    public State getAasRepositoryState() {
-        return getState(s -> s.aasRepoState);
-    }
-
-    @Override
-    public void notifyAasRepositoryStateChange(State state) {
-        setState((o, s) -> o.aasRepoState = s, state);
-    }
-    
-    @Override
-    public KeyStoreDescriptor getAasRepositoryKeyStore() {
-        return aasRepoKeyStore;
-    }
-
-    @Override
-    public Endpoint getSubmodelRepositoryEndpoint() {
-        return smRepoEndpoint;
-    }
-
-    @Override
-    public State getSubmodelRepositoryState() {
-        return getState(s -> s.smRepoState);
-    }
-
-    @Override
-    public void notifySubmodelRepositoryStateChange(State state) {
-        setState((o, s) -> o.smRepoState = s, state);
-    }
-    
-    @Override
-    public KeyStoreDescriptor getSubmodelRepositoryKeyStore() {
-        return smRepoKeyStore;
-    }
+    /**
+     * Sets the submodel registry authentication descriptor.
+     * 
+     * @param desc the authentication descriptor, may be <b>null</b> for none
+     * @return <b>this</b> for chaining
+     */
+    public BasicSetupSpec setSubmodelRegistryAuthentication(AuthenticationDescriptor desc) {
+        setups.get(AasComponent.SUBMODEL_REGISTRY).authentication = desc;
+        return this;
+    }    
 
     @Override
     public boolean areRegistriesRunning() {
@@ -353,71 +393,14 @@ public class BasicSetupSpec implements SetupSpec {
      * @return <b>this</b> for chaining
      */
     public BasicSetupSpec setAssetServerAddress(ServerAddress address, String protocol) {
-        this.assetServerAddress = address;
+        setups.get(AasComponent.ASSET).serverAddress = address;
         this.assetServerProtocol = protocol;
         return this;
     }
 
     @Override
-    public ServerAddress getAssetServerAddress() {
-        return assetServerAddress;
-    }
-
-    @Override
     public String getAssetServerProtocol() {
         return assetServerProtocol;
-    }
-
-    @Override
-    public State getAssetServerState() {
-        return getState(s -> s.assetServerState);
-    }
-
-    @Override
-    public void notifyAssetServerStateChange(State state) {
-        setState((o, s) -> o.assetServerState = s, state);
-    }
-    
-    @Override
-    public KeyStoreDescriptor getAssetServerKeyStore() {
-        return assetServerKeyStore;
-    }
-    
-    /**
-     * A specific state setter functor.
-     */
-    private interface StateSetter {
-
-        /**
-         * Sets {@code state} on {@code spec}.
-         * 
-         * @param spec the specification object
-         * @param state the new state
-         */
-        void set(BasicSetupSpec spec, State state);
-        
-    }
-
-    /**
-     * Changes the state via the given {@code setter} either on the copy source instance ({@link #from })
-     * or on this instance.
-     * 
-     * @param setter the setter
-     * @param state the new state
-     */
-    private void setState(StateSetter setter, State state) {
-        setter.set(null == from ? this : from, state);
-    }
-
-    /**
-     * Returns the state via the given {@code getter} either from the copy source instance ({@link #from })
-     * or from this instance.
-     * 
-     * @param getter the getter
-     * @return the state
-     */
-    private State getState(Function<BasicSetupSpec, State> getter) {
-        return getter.apply(null == from ? this : from);
     }
 
     /**
@@ -427,9 +410,20 @@ public class BasicSetupSpec implements SetupSpec {
      * @return <b>this</b> for chaining
      */
     public BasicSetupSpec setAssetServerKeystore(KeyStoreDescriptor desc) {
-        this.assetServerKeyStore = desc;
+        setups.get(AasComponent.ASSET).keyStore = desc;
         return this;
     }
+    
+    /**
+     * Sets the asset server authentication descriptor.
+     * 
+     * @param desc the asset server authentication descriptor, may be <b>null</b> for none
+     * @return <b>this</b> for chaining
+     */
+    public BasicSetupSpec setAssetServerAuthentication(AuthenticationDescriptor desc) {
+        setups.get(AasComponent.ASSET).authentication = desc;
+        return this;
+    }    
 
     /**
      * Turns a key store descriptor into an output for {@link #toString()}.
@@ -450,17 +444,31 @@ public class BasicSetupSpec implements SetupSpec {
     private String toString(ServerAddress address) {
         return null == address ? "-" : address.toUri();
     }
-    
+
+    /**
+     * Turns a component setup into a string.
+     * 
+     * @param setup the setup, may be <b>null</b>
+     * @return the textual form
+     */
+    private String toString(ComponentSetup setup) {
+        return toString(setup.getEndpoint()) + toString(setup.getKeyStore());
+    }
+
+    @Override
+    public ComponentSetup getSetup(AasComponent component) {
+        return setups.get(component);
+    }
+
     @Override
     public String toString() {
         String cr = System.lineSeparator();
         return "Basic AAS setup specification:" + cr 
-            + " - AAS registry:        " + toString(aasRegistryEndpoint) + toString(aasRegistryKeyStore) + cr
-            + " - AAS repository:      " + toString(aasRepoEndpoint) + toString(aasRepoKeyStore) + cr
-            + " - Submodel registry:   " + toString(smRegistryEndpoint) + toString(smRegistryKeyStore) + cr
-            + " - Submodel repository: " + toString(smRepoEndpoint) + toString(smRepoKeyStore) + cr
-            + " - Asset server:        " + toString(assetServerAddress) + toString(assetServerKeyStore) 
-                + " @ '" + assetServerProtocol + "'";
+            + " - AAS registry:        " + toString(getSetup(AasComponent.AAS_REGISTRY)) + cr
+            + " - AAS repository:      " + toString(getSetup(AasComponent.AAS_REPOSITORY)) + cr
+            + " - Submodel registry:   " + toString(getSetup(AasComponent.SUBMODEL_REGISTRY)) + cr
+            + " - Submodel repository: " + toString(getSetup(AasComponent.SUBMODEL_REPOSITORY)) + cr
+            + " - Asset server:        " + toString(getSetup(AasComponent.ASSET)) + " @ '" + assetServerProtocol + "'";
     }
 
 }

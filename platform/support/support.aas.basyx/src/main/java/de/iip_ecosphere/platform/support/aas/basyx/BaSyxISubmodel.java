@@ -18,6 +18,11 @@ import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAasComponent;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacRule;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -124,6 +129,15 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
                 if (sm instanceof org.eclipse.basyx.submodel.metamodel.map.Submodel) {
                     ((org.eclipse.basyx.submodel.metamodel.map.Submodel) sm).setSemanticId(ref);
                 }
+            }
+            return this;
+        }
+        
+        @Override
+        public SubmodelBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
+            if (null != auth) {
+                auth.addAccessRule(new RbacRule(RbacAasComponent.SUBMODEL, role, getInstance().getIdShort(), 
+                    null, actions));
             }
             return this;
         }

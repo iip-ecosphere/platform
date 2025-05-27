@@ -29,6 +29,9 @@ import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operat
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 import de.iip_ecosphere.platform.support.aas.Invokable;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Operation;
@@ -194,6 +197,12 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
                 operation.setSemanticId(ref);
             }
             return this;
+        }
+
+        @Override
+        public OperationBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
+            return AuthenticationDescriptor.elementRbac(this, auth, role, 
+                parentBuilder.composeRbacPath(operation.getIdShort()), actions);
         }
 
     }

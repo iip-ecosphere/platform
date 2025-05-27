@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.support.aas;
 
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Asset.AssetBuilder;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
 /**
@@ -30,6 +32,27 @@ public interface Aas extends Element, Identifiable, HasDataSpecification, Deferr
      * @author Holger Eichelberger, SSE
      */
     public interface AasBuilder extends Builder<Aas> {
+
+        /**
+         * Creates a builder for a contained sub-model. Calling this method again with the same name shall
+         * lead to a builder that allows for modifying the sub-model. If the parent AAS was deployed before via 
+         * {@link Registry#createAas(Aas, String)}, the {@link SubmodelBuilder#build()} will automatically deploy
+         * this submodel into the parent AAS via the parent registry. Calls 
+         * {@link #createSubmodelBuilder(String, String)} by default.
+         * 
+         * @param idShort the short id of the sub-model
+         * @param identifier the identifier of the sub-model (may be <b>null</b> or empty for an identification based on
+         *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
+         * @param spec setup specification needed for encrypted/authentication notification of property 
+         *    changes/execution of operation in purely local instances, not needed if registered to/retrieved from 
+         *    repository
+         * @return the builder
+         * @throws IllegalArgumentException if {@code idShort} or {@code urn} is <b>null</b> or empty; or if 
+         *   modification is not possible
+         */
+        public default SubmodelBuilder createSubmodelBuilder(String idShort, String identifier, SetupSpec spec) {
+            return createSubmodelBuilder(idShort, identifier);
+        }
 
         /**
          * Creates a builder for a contained sub-model. Calling this method again with the same name shall
@@ -65,7 +88,17 @@ public interface Aas extends Element, Identifiable, HasDataSpecification, Deferr
          *     work
          */
         public AssetBuilder createAssetBuilder(String idShort, String urn, AssetKind kind);
-        
+       
+        /**
+         * Creates an RBAC rule for the AAS under creation and adds the role to {@code auth}.
+         * 
+         * @param auth the authentication descriptor, may be <b>null</b>, ignored then
+         * @param role the role to create the rule for
+         * @param actions the permitted actions
+         * @return <b>this</b> for chaining
+         */
+        public AasBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions); 
+
     }
     
     /**
@@ -112,6 +145,25 @@ public interface Aas extends Element, Identifiable, HasDataSpecification, Deferr
      */
     public SubmodelBuilder createSubmodelBuilder(String idShort, String identifier);
 
+    /**
+     * Returns a sub-model builder either by providing access to an existing sub-model or by a builder instance to 
+     * create a new one (only if finally {@link Builder#build()} is called). However, added sub-models are
+     * not automatically deployed as the AAS just maintains a reference to the sub-model (in contrast to initial
+     * deployment where we can consider sub-models). If a late sub-model shall be deployed/made available, keep
+     * the instance of the {@link AasServer} and explicitly deploy the new sub-model via 
+     * {@link AasServer#deploy(Aas, Submodel)}. Calls {@link #createSubmodelBuilder(String, String)} by default.
+     * 
+     * @param idShort the short id of the sub-model
+     * @param identifier the identifier of the sub-model (may be <b>null</b> or empty for an identification based on 
+     *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
+     * @param spec setup specification needed for encrypted/authentication notification of property changes/execution of
+     *    operation in purely local instances, not needed if registered to/retrieved from repository
+     * @return the sub-model builder
+     */
+    public default SubmodelBuilder createSubmodelBuilder(String idShort, String identifier, SetupSpec spec) {
+        return createSubmodelBuilder(idShort, identifier);
+    }
+    
     /**
      * Returns the reference to the AAS.
      * 

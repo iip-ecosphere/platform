@@ -15,6 +15,8 @@ package de.iip_ecosphere.platform.support.aas;
 import java.util.function.Consumer;
 
 import de.iip_ecosphere.platform.support.Builder;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 
 /**
@@ -46,6 +48,16 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
          * @return <b>this</b>
          */
         public SubmodelBuilder setSemanticId(String refValue);
+        
+        /**
+         * Creates an RBAC rule for the submodel under creation and adds the role to {@code auth}.
+         * 
+         * @param auth the authentication descriptor, may be <b>null</b>, ignored then
+         * @param role the role to create the rule for
+         * @param actions the permitted actions
+         * @return <b>this</b> for chaining
+         */
+        public SubmodelBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions); 
 
     }
 

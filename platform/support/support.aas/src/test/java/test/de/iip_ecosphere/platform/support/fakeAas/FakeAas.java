@@ -20,7 +20,12 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.Asset;
 import de.iip_ecosphere.platform.support.aas.Asset.AssetBuilder;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAasComponent;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacRule;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.Submodel;
@@ -130,6 +135,14 @@ public class FakeAas extends FakeElement implements Aas {
          */
         void buildMyDeferred() {
             getInstance().buildDeferred();
+        }
+        
+        @Override
+        public AasBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
+            if (null != auth) {
+                auth.addAccessRule(new RbacRule(RbacAasComponent.AAS, role, getInstance().getIdShort(), null, actions));
+            }
+            return this;
         }
 
     }

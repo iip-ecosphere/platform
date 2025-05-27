@@ -24,6 +24,11 @@ import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
  */
 public interface SetupSpec {
     
+    /**
+     * The setup/runtime state of a component.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
     public enum State {
         
         /**
@@ -41,118 +46,225 @@ public interface SetupSpec {
          */
         STOPPED
     }
+    
+    /**
+     * Denotes the supported AAS component types.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public enum AasComponent {
+
+        AAS_REGISTRY,
+        AAS_REPOSITORY,
+        SUBMODEL_REGISTRY,
+        SUBMODEL_REPOSITORY,
+        ASSET
+        // initial, to be extended
+    }
+    
+    /**
+     * Describes the component setup.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface ComponentSetup {
+
+        /**
+         * Returns the component's endpoint.
+         * 
+         * @return the endpoint
+         */
+        public default ServerAddress getServerAddress() {
+            return getEndpoint();
+        }
+        
+        /**
+         * Returns the component's endpoint.
+         * 
+         * @return the endpoint
+         */
+        public Endpoint getEndpoint();
+
+        /**
+         * Returns the component's keystore descriptor.
+         * 
+         * @return the keystore descriptor, may be <b>null</b> for none
+         */
+        public KeyStoreDescriptor getKeyStore();
+
+        /**
+         * Returns the component's authentication descriptor.
+         * 
+         * @return the authentication descriptor, may be <b>null</b> for none
+         */
+        public AuthenticationDescriptor getAuthentication();
+        
+        /**
+         * Returns the component's state.
+         * 
+         * @return the state
+         */
+        public State getState();
+
+        /**
+         * Notifies about a component's state change.
+         * 
+         * @param state the new state
+         */
+        public void notifyStateChange(State state);
+
+    }
+    
+    /**
+     * Returns the setup of a component.
+     * 
+     * @param component the component
+     * @return the setup
+     */
+    public ComponentSetup getSetup(AasComponent component);
 
     /**
      * Returns the AAS registry endpoint.
      * 
      * @return the endpoint
      */
-    public Endpoint getAasRegistryEndpoint();
+    public default Endpoint getAasRegistryEndpoint() {
+        return getSetup(AasComponent.AAS_REGISTRY).getEndpoint();
+    }
     
     /**
      * Returns the keystore descriptor for the AAS registry.
      * 
      * @return the keystore descriptor, may be <b>null</b> for none
      */
-    public KeyStoreDescriptor getAasRegistryKeyStore();
+    public default KeyStoreDescriptor getAasRegistryKeyStore() {
+        return getSetup(AasComponent.AAS_REGISTRY).getKeyStore();
+    }
 
     /**
      * Returns the state of the AAS registry .
      * 
      * @return the state
      */
-    public State getAasRegistryState();
+    public default State getAasRegistryState() {
+        return getSetup(AasComponent.AAS_REGISTRY).getState();
+    }
 
     /**
      * Notifies about a state change of the AAS registry.
      * 
      * @param state the new state
      */
-    public void notifyAasRegistryStateChange(State state);
+    public default void notifyAasRegistryStateChange(State state) {
+        getSetup(AasComponent.AAS_REGISTRY).notifyStateChange(state);
+    }
 
     /**
      * Returns the submodel registry endpoint.
      * 
      * @return the endpoint
      */
-    public Endpoint getSubmodelRegistryEndpoint();
-
+    public default Endpoint getSubmodelRegistryEndpoint() {
+        return getSetup(AasComponent.SUBMODEL_REGISTRY).getEndpoint();
+    }
     /**
      * Returns the keystore descriptor for the submodel registry.
      * 
      * @return the keystore descriptor, may be <b>null</b> for none
      */
-    public KeyStoreDescriptor getSubmodelRegistryKeyStore();
+    public default KeyStoreDescriptor getSubmodelRegistryKeyStore() {
+        return getSetup(AasComponent.SUBMODEL_REGISTRY).getKeyStore();
+    }
 
     /**
      * Returns the state of the submodel registry.
      * 
      * @return the state
      */
-    public State getSubmodelRegistryState();
+    public default State getSubmodelRegistryState() {
+        return getSetup(AasComponent.SUBMODEL_REGISTRY).getState();
+    }
 
     /**
      * Notifies about a state change of the submodel registry.
      * 
      * @param state the new state
      */
-    public void notifySubmodelRegistryStateChange(State state);
+    public default void notifySubmodelRegistryStateChange(State state) {
+        getSetup(AasComponent.SUBMODEL_REGISTRY).notifyStateChange(state);
+    }
 
     /**
      * Returns the AAS repository endpoint.
      * 
      * @return the endpoint
      */
-    public Endpoint getAasRepositoryEndpoint();
-
+    public default Endpoint getAasRepositoryEndpoint() {
+        return getSetup(AasComponent.AAS_REPOSITORY).getEndpoint();
+    }
+    
     /**
      * Returns the state of the AAS repository.
      * 
      * @return the state
      */
-    public State getAasRepositoryState();
+    public default State getAasRepositoryState() {
+        return getSetup(AasComponent.AAS_REPOSITORY).getState();
+    }
 
     /**
      * Notifies about a state change of the AAS repository.
      * 
      * @param state the new state
      */
-    public void notifyAasRepositoryStateChange(State state);
+    public default void notifyAasRepositoryStateChange(State state) {
+        getSetup(AasComponent.AAS_REPOSITORY).notifyStateChange(state);
+    }
 
     /**
      * Returns the keystore descriptor for the AAS repository.
      * 
      * @return the keystore descriptor, may be <b>null</b> for none
      */
-    public KeyStoreDescriptor getAasRepositoryKeyStore();
+    public default KeyStoreDescriptor getAasRepositoryKeyStore() {
+        return getSetup(AasComponent.AAS_REPOSITORY).getKeyStore();
+    }
 
     /**
      * Returns the submodel endpoint.
      * 
      * @return the endpoint
      */
-    public Endpoint getSubmodelRepositoryEndpoint();
+    public default Endpoint getSubmodelRepositoryEndpoint() {
+        return getSetup(AasComponent.SUBMODEL_REPOSITORY).getEndpoint();
+    }
 
     /**
      * Returns the state of the submodel repository.
      * 
      * @return the state
      */
-    public State getSubmodelRepositoryState();
+    public default State getSubmodelRepositoryState() {
+        return getSetup(AasComponent.SUBMODEL_REPOSITORY).getState();
+    }
 
     /**
      * Notifies about a state change of the submodel repository.
      * 
      * @param state the new state
      */
-    public void notifySubmodelRepositoryStateChange(State state);
+    public default void notifySubmodelRepositoryStateChange(State state) {
+        getSetup(AasComponent.SUBMODEL_REPOSITORY).notifyStateChange(state);
+    }
 
     /**
      * Returns the keystore descriptor for the AAS repository.
      * 
      * @return the keystore descriptor, may be <b>null</b> for none
      */
-    public KeyStoreDescriptor getSubmodelRepositoryKeyStore();
+    public default KeyStoreDescriptor getSubmodelRepositoryKeyStore() {
+        return getSetup(AasComponent.SUBMODEL_REPOSITORY).getKeyStore();
+    }
     
     /**
      * Are both registries running.
@@ -168,7 +280,9 @@ public interface SetupSpec {
      * 
      * @return the asset server address
      */
-    public ServerAddress getAssetServerAddress();
+    public default ServerAddress getAssetServerAddress() {
+        return getSetup(AasComponent.ASSET).getServerAddress();
+    }
     
     /**
      * Returns the asset server protocol.
@@ -182,20 +296,26 @@ public interface SetupSpec {
      * 
      * @return the state
      */
-    public State getAssetServerState();
+    public default State getAssetServerState() {
+        return getSetup(AasComponent.ASSET).getState();
+    }
 
     /**
      * Notifies about a state change of the asset server.
      * 
      * @param state the new state
      */
-    public void notifyAssetServerStateChange(State state);
+    public default void notifyAssetServerStateChange(State state) {
+        getSetup(AasComponent.ASSET).notifyStateChange(state);
+    }
     
     /**
      * Returns the keystore descriptor for the asset server repository.
      * 
      * @return the keystore descriptor, may be <b>null</b> for none
      */
-    public KeyStoreDescriptor getAssetServerKeyStore();
+    public default KeyStoreDescriptor getAssetServerKeyStore() {
+        return getSetup(AasComponent.ASSET).getKeyStore();
+    }
     
 }

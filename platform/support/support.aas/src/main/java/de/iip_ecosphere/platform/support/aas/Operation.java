@@ -16,6 +16,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 import de.iip_ecosphere.platform.support.Builder;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 
 /**
@@ -153,6 +155,16 @@ public interface Operation extends Element, SubmodelElement {
             addOutputVariable(DEFAULT_RETURN_VAR_NAME, type);
             return build();
         }
+        
+        /**
+         * Creates an RBAC rule for the operation under creation and adds the role to {@code auth}.
+         * 
+         * @param auth the authentication descriptor, may be <b>null</b>, ignored then
+         * @param role the role to create the rule for
+         * @param actions the permitted actions
+         * @return <b>this</b> for chaining
+         */
+        public OperationBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions); 
         
     }
     

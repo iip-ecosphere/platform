@@ -54,12 +54,11 @@ public class BaSyxRegistry implements Registry {
      * @param connectorFactory connector factory, e.g., HTTP, HTTPS
      * @throws IOException if connecting the registry fails
      */
-    BaSyxRegistry(Endpoint endpoint, IConnectorFactory connectorFactory) throws IOException {
+    public BaSyxRegistry(Endpoint endpoint, IConnectorFactory connectorFactory) throws IOException {
         this.endpoint = endpoint;
         try {
             registry = new AASRegistryProxy(this.endpoint.toUri());
-            manager = new ConnectedAssetAdministrationShellManager(
-                registry, connectorFactory);
+            manager = new ConnectedAssetAdministrationShellManager(registry, connectorFactory);
         } catch (Exception e) {
             throw new IOException(e);
         }
