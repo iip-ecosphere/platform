@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.support;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.DatagramSocket;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.MalformedURLException;
@@ -23,6 +24,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -336,4 +338,40 @@ public class NetUtils {
         }
     }
 
+    /**
+     * Returns whether the connection to {@code url} is ok.
+     * 
+     * @param url the URL
+     * @return {@code true} for ok, {@code false} else
+     */
+    public static boolean connectionOk(String url) {
+        try {
+            return connectionOk(new URL(url));
+        } catch (MalformedURLException e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Returns whether the connection to {@code url} is ok.
+     * 
+     * @param url the URL
+     * @return {@code true} for ok, {@code false} else
+     */
+    public static boolean connectionOk(URL url) {
+        boolean connectionOk = false;
+        try { 
+            URLConnection conn = url.openConnection();
+            if (conn instanceof  HttpURLConnection) {
+                HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+                int responseCode = huc.getResponseCode();
+                connectionOk = responseCode == HttpURLConnection.HTTP_OK;
+                huc.disconnect();
+            }
+        } catch (IOException e) {
+            // ignore, connectionOk == false
+        }
+        return connectionOk;
+    }
+    
 }
