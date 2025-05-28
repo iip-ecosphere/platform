@@ -673,7 +673,7 @@ public abstract class AasFactory {
      * @return {@code true} for available, {@code false} else
      */
     protected boolean isRegistryAvailable(ComponentSetup setup) {
-        return NetUtils.connectionOk(setup.getEndpoint().toUri() + "/health");
+        return NetUtils.connectionOk(getFullRegistryUri(setup.getEndpoint()));
     }
 
     /**
