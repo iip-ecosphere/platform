@@ -182,7 +182,7 @@ public class AasPartRegistry {
          */
         private class WrappingComponentSetup implements ComponentSetup {
 
-            private EndpointHolder endpoint;
+            private Supplier<EndpointHolder> endpoint;
             private State state = State.STOPPED;
             
             /**
@@ -190,18 +190,18 @@ public class AasPartRegistry {
              * 
              * @param endpoint the endpoint to wrap
              */
-            private WrappingComponentSetup(EndpointHolder endpoint) {
+            private WrappingComponentSetup(Supplier<EndpointHolder> endpoint) {
                 this.endpoint = endpoint;
             }
             
             @Override
             public Endpoint getEndpoint() {
-                return endpoint.getEndpoint();
+                return endpoint.get().getEndpoint();
             }
 
             @Override
             public KeyStoreDescriptor getKeyStore() {
-                return endpoint.getKeystoreDescriptor();
+                return endpoint.get().getKeystoreDescriptor();
             }
 
             @Override
@@ -211,7 +211,7 @@ public class AasPartRegistry {
 
             @Override
             public State getState() {
-                return isRunning(endpoint, state);
+                return isRunning(endpoint.get(), state);
             }
 
             @Override
@@ -528,10 +528,10 @@ public class AasPartRegistry {
         }
 
         {
-            setups.put(AasComponent.AAS_REGISTRY, new WrappingComponentSetup(registry));
-            setups.put(AasComponent.AAS_REPOSITORY, new WrappingComponentSetup(server));
-            setups.put(AasComponent.SUBMODEL_REGISTRY, new WrappingComponentSetup(smRegistry));
-            setups.put(AasComponent.SUBMODEL_REPOSITORY, new WrappingComponentSetup(smServer));
+            setups.put(AasComponent.AAS_REGISTRY, new WrappingComponentSetup(() -> registry));
+            setups.put(AasComponent.AAS_REPOSITORY, new WrappingComponentSetup(() -> server));
+            setups.put(AasComponent.SUBMODEL_REGISTRY, new WrappingComponentSetup(() -> smRegistry));
+            setups.put(AasComponent.SUBMODEL_REPOSITORY, new WrappingComponentSetup(() -> smServer));
             setups.put(AasComponent.ASSET, new ComponentSetup() {
                 
                 private State state = State.STOPPED;

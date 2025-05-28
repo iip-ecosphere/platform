@@ -115,7 +115,9 @@ public class PlattformAasLifecycleDescriptor extends AbstractAasLifecycleDescrip
     @Override
     public void shutdown() {
         //StatusConverter.INSTANCE.stop();
-        traceConverter.stop();
+        if (null != traceConverter) {
+            traceConverter.stop();
+        }
         timer.cancel();
         try {
             watcher.uninstallFrom(Transport.getConnector());

@@ -23,9 +23,12 @@ import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
 import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
+import de.iip_ecosphere.platform.support.aas.SetupSpec.ComponentSetup;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
@@ -632,5 +635,65 @@ public abstract class AasFactory {
         }
         return result;
     }
+
+    /**
+     * Returns whether a specific component from {@code setup} is available.
+     * 
+     * @param spec the specification
+     * @param component the component
+     * @return {@code true} for available, {@code false} else
+     */
+    public boolean isAvailable(SetupSpec spec, AasComponent component) {
+        boolean result = false;
+        ComponentSetup setup = spec.getSetup(component);
+        switch (component) {
+        case AAS_REGISTRY:
+            // falls through;
+        case SUBMODEL_REGISTRY:
+            result = isRegistryAvailable(setup);
+            break;
+        case AAS_REPOSITORY:
+            // falls through;
+        case SUBMODEL_REPOSITORY:
+            result = isRepositoryAvailable(setup);
+            break;
+        case ASSET:
+            result = isAssetAvailable(setup);
+            break;
+        default:
+            break;
+        }
+        return result;
+    }
     
+    /**
+     * Returns whether a specific registry {@code setup} is available.
+     * 
+     * @param setup the component setup to test
+     * @return {@code true} for available, {@code false} else
+     */
+    protected boolean isRegistryAvailable(ComponentSetup setup) {
+        return NetUtils.connectionOk(setup.getEndpoint().toUri() + "/health");
+    }
+
+    /**
+     * Returns whether a specific repository {@code setup} is available.
+     * 
+     * @param setup the component setup to test
+     * @return {@code true} for available, {@code false} else
+     */
+    protected boolean isRepositoryAvailable(ComponentSetup setup) {
+        return NetUtils.connectionOk(setup.getEndpoint().toUri() + "/health");
+    }
+
+    /**
+     * Returns whether a specific asset {@code setup} is available.
+     * 
+     * @param setup the component setup to test
+     * @return {@code true} for available, {@code false} else
+     */
+    protected boolean isAssetAvailable(ComponentSetup setup) {
+        return true; // unsupported
+    }
+
 }

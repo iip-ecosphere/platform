@@ -15,6 +15,7 @@ package test.de.iip_ecosphere.platform.support.fakeAas;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
 
 import java.io.IOException;
 
@@ -119,6 +120,11 @@ public class FakeAasFactory extends AasFactory {
     @Override
     public String getServerBaseUri(Endpoint serverEndpoint) {
         return serverEndpoint.toUri();
+    }
+    
+    @Override
+    public boolean isAvailable(SetupSpec spec, AasComponent component) {
+        return true;
     }
 
 }

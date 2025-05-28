@@ -147,7 +147,7 @@ public class TlsServerAddressHolder extends ServerAddressHolder {
      * Defines whether a SSL client shall use the keytore or rely on the default certificate chain. [required by 
      * data mapper]
      * 
-     * @param {@code true} for keystore (default), {@code false} else for default chain
+     * @param appliesToClient {@code true} for keystore (default), {@code false} else for default chain
      */
     public void setAppliesToClient(boolean appliesToClient) {
         this.appliesToClient = appliesToClient;
@@ -157,7 +157,7 @@ public class TlsServerAddressHolder extends ServerAddressHolder {
      * Defines whether SSL hostname verification shall be enabled or not.  May not be applied to every HTTP client. 
      * [required by data mapper]
      * 
-     * @param {@code true} for enabled, {@code false} else
+     * @param hostnameVerification {@code true} for enabled, {@code false} else
      */
     public void setHostnameVerification(boolean hostnameVerification) {
         this.hostnameVerification = hostnameVerification;

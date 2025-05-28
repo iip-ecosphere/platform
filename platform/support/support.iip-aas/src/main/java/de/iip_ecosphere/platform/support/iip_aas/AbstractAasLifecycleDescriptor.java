@@ -13,9 +13,6 @@
 package de.iip_ecosphere.platform.support.iip_aas;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Predicate;
@@ -24,12 +21,12 @@ import java.util.function.Supplier;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
-import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasMode;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
@@ -137,9 +134,8 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
         if (null == timer && enableAasHeartbeat()) {
             AasFactory factory = AasFactory.getInstance();
             AasSetup setup = AasPartRegistry.getSetup();
-            String serverAdr = factory.getServerBaseUri(setup.getServerEndpoint());
+            String serverUrl = setup.getAasRepositoryEndpoint().toServerUri();
             try {
-                final URL serverUrl = NetUtils.createURL(serverAdr);
                 timer = new Timer(true);
                 timer.schedule(new TimerTask() {
                     
@@ -147,28 +143,28 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
     
                     @Override
                     public void run() {
-                        boolean hasConn = connectionOk(serverUrl); // && iipAasExists();
+                        boolean hasConn = factory.isAvailable(setup, AasComponent.AAS_REPOSITORY); // && iipAasExists();
                         if (offline) {
                             if (hasConn) {
                                 offline = false;
-                                LoggerFactory.getLogger(getClass()).warn("AAS server {} back. Re-deploying AAS.", 
+                                LoggerFactory.getLogger(getClass()).warn("AAS repository {} back. Re-deploying AAS.", 
                                     serverUrl);
                                 // AAS contributors shall consider implement exists() 
                                 deploy(args, c ->  !c.exists() && getContributorFilter().test(c));
-                                LoggerFactory.getLogger(getClass()).warn("AAS server {} back. AAS re-deployed.", 
+                                LoggerFactory.getLogger(getClass()).warn("AAS repository {} back. AAS re-deployed.", 
                                     serverUrl);
                             }
                         } else { // online
                             if (!hasConn) {
-                                LoggerFactory.getLogger(getClass()).warn("AAS server {} offline", serverUrl);
+                                LoggerFactory.getLogger(getClass()).warn("AAS repository {} offline", serverUrl);
                                 offline = true; // after multiple trials?
                             }
                         }
                     }
                 }, AAS_HEARTBEAT_PERIOD, AAS_HEARTBEAT_PERIOD);
             } catch (IllegalArgumentException e) {
-                LoggerFactory.getLogger(getClass()).warn("Cannot heartbeat for AAS registry/server. AAS server URL "
-                    + "{} invalid: {}", serverAdr, e.getMessage());
+                LoggerFactory.getLogger(getClass()).warn("Cannot heartbeat for AAS repository. URL "
+                    + "{} invalid: {}", serverUrl, e.getMessage());
             }
         }
     }
@@ -241,16 +237,15 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
     protected void waitForAasServer() {
         AasFactory factory = AasFactory.getInstance();
         AasSetup setup = AasPartRegistry.getSetup();
-        String regAdr = factory.getFullRegistryUri(setup.getRegistryEndpoint());
-        String serverAdr = factory.getServerBaseUri(setup.getServerEndpoint());
+        String regAdr = setup.getRegistryEndpoint().toServerUri();
+        String serverAdr = setup.getServerEndpoint().toServerUri();
         int startupTimeout = setup.getAasStartupTimeout();
         try { 
-            URL regUrl = NetUtils.createURL(regAdr);
-            URL serverUrl = NetUtils.createURL(serverAdr);
-            LoggerFactory.getLogger(getClass()).info("Probing AAS registry {} and server {} for {} ms", 
+            LoggerFactory.getLogger(getClass()).info("Probing AAS registry {} and repository {} for {} ms", 
                 regAdr, serverAdr, startupTimeout);
             if (!TimeUtils.waitFor(() -> {
-                return !connectionOk(regUrl) || !connectionOk(serverUrl) || !iipAasExists();
+                return !factory.isAvailable(setup, AasComponent.AAS_REGISTRY) 
+                    || !factory.isAvailable(setup, AasComponent.AAS_REPOSITORY) || !iipAasExists();
             }, startupTimeout, 500)) {
                 LoggerFactory.getLogger(getClass()).error("No AAS registry/server reached within {} ms", 
                     startupTimeout);
@@ -262,28 +257,6 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
             LoggerFactory.getLogger(getClass()).warn("Cannot wait for AAS registry/server. AAS registry "
                 + "{} or server {} URL invalid: {}", regAdr, serverAdr, e.getMessage());
         }
-    }
-    
-    /**
-     * Returns whether connecting to {@code url} succeeeds.
-     * 
-     * @param url the URK to connect to
-     * @return {@code true} if the connection is ok
-     */
-    private static boolean connectionOk(URL url) {
-        boolean connectionOk = false; // cannot move to NetUtils as difficult to test/mock
-        try { 
-            URLConnection conn = url.openConnection();
-            if (conn instanceof  HttpURLConnection) {
-                HttpURLConnection huc = (HttpURLConnection) url.openConnection();
-                int responseCode = huc.getResponseCode();
-                connectionOk = responseCode == HttpURLConnection.HTTP_OK;
-                huc.disconnect();
-            }
-        } catch (IOException e) {
-            // ignore, connectionOk == false
-        }
-        return connectionOk;
     }
     
     /**

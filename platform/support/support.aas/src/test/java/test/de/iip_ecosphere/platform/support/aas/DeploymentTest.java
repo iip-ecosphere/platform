@@ -41,6 +41,7 @@ import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
 import de.iip_ecosphere.platform.support.aas.SetupSpec;
+import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -79,7 +80,9 @@ public class DeploymentTest {
             .deploy(aas)
             .createServer()
             .start();
+        Assert.assertTrue(factory.isAvailable(spec, AasComponent.AAS_REPOSITORY));
         Registry reg = factory.obtainRegistry(spec);
+        Assert.assertTrue(factory.isAvailable(spec, AasComponent.AAS_REGISTRY));
         aas = reg.retrieveAas(urn);
         Submodel sub = aas.createSubmodelBuilder("dynamic", null).build();
         server.deploy(aas, sub);
