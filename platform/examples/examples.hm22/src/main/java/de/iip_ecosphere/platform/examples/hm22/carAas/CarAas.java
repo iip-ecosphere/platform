@@ -124,7 +124,7 @@ public class CarAas {
                 AasServer server = rcp.createServer();
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> { server.stop(true); }));
                 System.out.println("Starting AAS server: " + serverAdr.toUri());
-                System.out.println("Starting Registry server: " + factory.getFullRegistryUri(regEp));
+                System.out.println("Starting Registry server: " + regEp.toUri());
                 System.out.println("Running until CTRL-C");
                 server.start();
             } catch (IOException e) {

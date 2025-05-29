@@ -149,7 +149,7 @@ public class CarAas implements Runnable {
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> { stop(true); }));
             }
             System.out.println("Starting AAS server: " + serverAdr.toUri());
-            System.out.println("Starting Registry server: " + factory.getFullRegistryUri(regEp));
+            System.out.println("Starting Registry server: " + regEp.toUri());
             if (withHook) {
                 System.out.println("Running until CTRL-C");
             }

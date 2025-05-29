@@ -128,8 +128,7 @@ public class TraceToAasServiceMain {
             }
             aasSetup.getImplementation().setPort(aasProtocolPort);
         }
-        String fullRegUri = AasFactory.getInstance().getFullRegistryUri(aasSetup.getRegistryEndpoint());
-        System.out.println("Registry: " + fullRegUri);
+        System.out.println("Registry: " + aasSetup.getRegistryEndpoint().toUri());
         
         ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
         Endpoint regEndpoint = aasSetup.getRegistryEndpoint();

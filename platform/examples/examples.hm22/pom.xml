@@ -262,27 +262,6 @@
                                 <classpathScope>test</classpathScope>
                             </configuration>
                         </execution>
-                        <execution>
-                            <id>py-test</id>
-                            <goals>
-                               <goal>java</goal>
-                            </goals>
-                 
-                            <configuration>
-                                <arguments>
-                                <!-- Needs to be send the python file to check for, currently can only deal with one
-                                -->
-                                    <arguemnt>${project.basedir}/src/main/python/services/ExamplePythonService.py</arguemnt>
-                                    <argument>1</argument> <!-- 1: allow test to fail build, 0 only information, build will still succeed -->
-                                </arguments>
-                                <!-- Is created in test but not actually supposed to be a test as we 
-                                run the steps on windows -DskipTests which would deactivate it again.
-                                currently requires change of install command as explicit exec:java@py-test is needed
-                                -->
-                                <mainClass>test.de.iip_ecosphere.platform.examples.hm22.PythonSyntaxTest</mainClass>
-                                <classpathScope>test</classpathScope>
-                            </configuration>
-                        </execution>
 		            </executions>
 		        </plugin>
 		    </plugins>
@@ -379,64 +358,6 @@
                    <modelDirectory>src/main/easy</modelDirectory>
                </configuration>
            </plugin>
-	       <plugin>
-	         <groupId>org.codehaus.mojo</groupId>
-	         <artifactId>exec-maven-plugin</artifactId>
-	         <version>3.0.0</version>
-             <executions>
-                 <execution>
-                    <id>generateBroker</id>
-                    <configuration>
-                        <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
-                        <cleanupDaemonThreads>false</cleanupDaemonThreads>
-                        <arguments>
-                            <argument>${iip.model}</argument>
-                            <argument>src/test/easy</argument>
-                            <argument>target/gen/broker</argument>
-                            <argument>generateBroker</argument>
-                        </arguments>
-                    </configuration>
-                 </execution>
-                 <execution>
-                    <id>generateAppsNoDeps</id>
-                    <configuration>
-                        <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
-                        <cleanupDaemonThreads>false</cleanupDaemonThreads>
-                        <arguments>
-                            <argument>${iip.model}</argument>
-                            <argument>src/test/easy</argument>
-                            <argument>${iip.gen}</argument>
-                            <argument>generateAppsNoDeps</argument>
-                        </arguments>
-                        <systemProperties>
-                           <systemProperty>
-                             <key>iip.resources</key>
-                             <value>${iip.resources}</value>
-                           </systemProperty>
-                        </systemProperties>
-                    </configuration>
-                 </execution>
-                 <execution>
-                    <id>generateApps</id>
-                    <configuration>
-                        <mainClass>de.iip_ecosphere.platform.configuration.PlatformInstantiator</mainClass>
-                        <cleanupDaemonThreads>false</cleanupDaemonThreads>
-                        <arguments>
-                            <argument>${iip.model}</argument>
-                            <argument>src/test/easy</argument>
-                            <argument>${iip.gen}</argument>
-                            <argument>generateApps</argument>
-                        </arguments>
-                        <systemProperties>
-                           <systemProperty>
-                             <key>iip.resources</key>
-                             <value>${iip.resources}</value>
-                           </systemProperty>
-                        </systemProperties>
-                    </configuration>
-                 </execution>
-             </executions>
-	       </plugin>
           </plugins>
         </build>
      </profile>
