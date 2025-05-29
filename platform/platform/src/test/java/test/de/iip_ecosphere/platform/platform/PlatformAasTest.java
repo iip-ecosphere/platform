@@ -99,8 +99,7 @@ public class PlatformAasTest {
         ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
         Endpoint regEndpoint = AasPartRegistry.getSetup().getRegistryEndpoint();
         PersistenceType pType = LocalPersistenceType.INMEMORY;
-        System.out.println("Starting " + pType + " AAS registry on " 
-            + AasFactory.getInstance().getFullRegistryUri(regEndpoint));
+        System.out.println("Starting " + pType + " AAS registry on " + regEndpoint.toUri());
         Server registryServer = rcp.createRegistryServer(AasPartRegistry.getSetup(), pType);
         registryServer.start();
         Endpoint serverEndpoint = AasPartRegistry.getSetup().getServerEndpoint();

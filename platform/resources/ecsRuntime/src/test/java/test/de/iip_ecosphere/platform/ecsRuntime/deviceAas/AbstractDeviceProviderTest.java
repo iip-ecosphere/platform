@@ -43,9 +43,7 @@ public abstract class AbstractDeviceProviderTest {
     public static void startup() {
         // adjust the setup 
         orig = AasPartRegistry.setAasSetup(AasSetup.createLocalEphemeralSetup(null, false));
-        String fullRegUri = AasFactory.getInstance().getFullRegistryUri(
-            AasPartRegistry.getSetup().getRegistryEndpoint());
-        System.out.println("Registry: " + fullRegUri);
+        System.out.println("Registry: " + AasPartRegistry.getSetup().getRegistryEndpoint().toUri());
         
         ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
         Endpoint regEndpoint = AasPartRegistry.getSetup().getRegistryEndpoint();
