@@ -92,8 +92,7 @@ public class TestAasIvmlModel {
             Endpoint regEndpoint = aasSetup.adaptEndpoint(aasSetup.getRegistryEndpoint());
             System.out.println("ServerHost " + aasSetup.getServerHost() + " " + regEndpoint.toUri());
             PersistenceType pType = LocalPersistenceType.INMEMORY;
-            String fullRegUri = AasFactory.getInstance().getFullRegistryUri(regEndpoint);
-            System.out.println("Starting " + pType + " AAS registry on " + fullRegUri);
+            System.out.println("Starting " + pType + " AAS registry on " + regEndpoint.toUri());
             Server registryServer = rcp.createRegistryServer(aasSetup, pType);
             registryServer.start();
             Endpoint serverEndpoint = aasSetup.adaptEndpoint(aasSetup.getServerEndpoint());
