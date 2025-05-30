@@ -63,11 +63,11 @@ Also install the required python packages
     sudo python3 -m pip install PyYAML==6.0
     sudo python3 -m pip install websockets==11.0.2
     
-If more than one python version is installed, please ensure that you install the packages into the right version, e.g., by prefixing `python3` with the actual path. In this case, please also set the environment variable ``IIP_PYTHON`` to the intended Python executable.
+If more than one Python version is installed, please ensure that you install the packages into the right version, e.g., by prefixing `python3` with the actual path. In this case, please also set the environment variable ``IIP_PYTHON`` to the intended Python executable.
 
 ### Prepare the devices
 
-On devices, the installation may differ depending on the desired degree of containerization. If you want to run the fundamental platform components on bare metal, please install also JDK 13, maven, python, python packages and docker on the devices. If you plan to run only containers on the devices, docker is sufficient.
+On devices, the installation may differ depending on the desired degree of containerization. If you want to run the fundamental platform components on bare metal, please install also JDK 13, maven, Python, Python packages and docker on the devices. If you plan to run only containers on the devices, docker is sufficient.
 
 Create or edit ``/etc/docker/daemon.json`` in order to access the local Docker registry installed above, here without TLS certificates ("192.168.2.1" should be changed to the IP address of your machine that running the Docker registry). For an empty file, this looks like:
 
@@ -81,9 +81,9 @@ Then execute
 
 ### Prepare Python
 
-Depending on the use of Python in services, the build process for applications may include Python syntax checking and execution of Python unit tests. If you plan to run the platform on bare metal under administrator permissions, e.g., as systemd service, please install the following python dependencies globally, i.e., with administrator permissions.
+Depending on the use of Python in services, the build process for applications may include Python syntax checking and execution of Python unit tests. If you plan to run the platform on bare metal under administrator permissions, e.g., as systemd service, please install the following Python dependencies globally, i.e., with administrator permissions.
 
-At least pyflakes and for service execution PyYaml as well as websockets must be installed (Please check the tested library for each python evrsion [PREREQUISITES](PREREQUISITES.md))
+At least pyflakes and for service execution PyYaml as well as websockets must be installed (Please check the tested library for each version of Python [PREREQUISITES](PREREQUISITES.md))
 
     python3 -m pip install pyflakes==2.5.0
     python3 -m pip install PyYAML==6.0
