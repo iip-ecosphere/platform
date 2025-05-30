@@ -24,6 +24,8 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -40,6 +42,10 @@ import de.iip_ecosphere.platform.support.resources.ResourceLoader;
  * Simple file-based identity store. Tries to load {@code identityStore-ipr.yml} (quietly), {@code identityStore.yml} 
  * or {@code identityStore-test.yml} as fallback from the classpath (root or folder {@code resources}) and further as 
  * development fallbacks from {@code src/main/resources} or {@code src/test/resources}.
+ * 
+ * Identity and token enumeration happens through the pattern "prefix-i" whereby {@code prefix} is given as argument
+ * (compared as is as well as in all lower/upper caps) and {@code i} is is the 1-based index of the consecutively 
+ * numbered token.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -72,7 +78,7 @@ public class YamlIdentityStore extends IdentityStore {
             }
         }
         data = YamlIdentityFile.load(idStream); // can cope with null
-        LoggerFactory.getLogger(YamlIdentityFile.class).info("Loaded identityStore {}", data.getName());
+        LoggerFactory.getLogger(YamlIdentityFile.class).info("Loaded identityStore '{}'", data.getName());
     }
     
     /**
@@ -318,5 +324,29 @@ public class YamlIdentityStore extends IdentityStore {
         return result;
     }
 
+    @Override
+    public Iterable<String> enumerateIdentities(String prefixId) {
+        List<String> results = new ArrayList<>();
+        int i = 1;
+        do {
+            String id = prefixId + i;
+            IdentityInformation info = resolve(id);
+            if (null == info) {
+                id = id.toLowerCase();
+                info = resolve(id);
+            } 
+            if (null == info) {
+                id = id.toUpperCase();
+                info = resolve(id);
+            } 
+            if (null == info) {
+                break;
+            } else {
+                results.add(id);
+            }
+            i++;
+        } while (i < 100); // arbitrary limit for now
+        return results;
+    }
 
 }

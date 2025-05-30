@@ -14,12 +14,15 @@ package test.de.iip_ecosphere.platform.support.identities;
 
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
+import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
 import de.iip_ecosphere.platform.support.identities.YamlIdentityStore;
 
 import java.io.IOException;
 import java.security.KeyStore;
+import java.util.List;
 
 import org.junit.Assert;
 
@@ -55,6 +58,15 @@ public class IdentityStoreTest {
         } catch (IOException e) {
             Assert.fail("No exception shall occur here");
         }
+        
+        Iterable<IdentityToken> iToks = store.enumerateTokens("aas-admin-");
+        Assert.assertNotNull(iToks);
+        List<IdentityToken> toks = CollectionUtils.toList(iToks);
+        Assert.assertEquals(1, toks.size());
+        iToks = store.enumerateTokens("aas-user-");
+        Assert.assertNotNull(iToks);
+        toks = CollectionUtils.toList(iToks);
+        Assert.assertEquals(2, toks.size());
     }
 
 }

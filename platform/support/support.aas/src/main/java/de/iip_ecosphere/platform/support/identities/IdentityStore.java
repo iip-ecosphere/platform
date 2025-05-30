@@ -18,6 +18,8 @@ import java.security.Key;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.net.ssl.KeyManager;
@@ -68,6 +70,29 @@ public abstract class IdentityStore {
      */
     public IdentityToken getToken(String identity, String... fallback) {
         return getToken(identity, false, fallback);
+    }
+    
+    /**
+     * Enumerates known identities based on a given {@code prefixId}.
+     * 
+     * @param prefixId the prefix id
+     * @return the known identities
+     */
+    public abstract Iterable<String> enumerateIdentities(String prefixId);
+
+    /**
+     * Enumerates known identity tokens based on a given {@code prefixId}.
+     * 
+     * @param prefixId the prefix id
+     * @return the known identities
+     * @see #enumerateIdentities(String)
+     */
+    public Iterable<IdentityToken> enumerateTokens(String prefixId) {
+        List<IdentityToken> result = new ArrayList<>();
+        for (String id : enumerateIdentities(prefixId)) {
+            result.add(getToken(id));
+        }
+        return result;
     }
 
     /**

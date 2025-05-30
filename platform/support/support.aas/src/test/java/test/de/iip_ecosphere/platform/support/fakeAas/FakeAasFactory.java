@@ -12,7 +12,6 @@
 
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
-import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
@@ -110,16 +109,6 @@ public class FakeAasFactory extends AasFactory {
     @Override
     public PersistenceRecipe createPersistenceRecipe() {
         return new FakePersistencyRecipe();
-    }
-
-    @Override
-    public String getFullRegistryUri(Endpoint regEndpoint) {
-        return regEndpoint.toUri();
-    }
-    
-    @Override
-    public String getServerBaseUri(Endpoint serverEndpoint) {
-        return serverEndpoint.toUri();
     }
     
     @Override

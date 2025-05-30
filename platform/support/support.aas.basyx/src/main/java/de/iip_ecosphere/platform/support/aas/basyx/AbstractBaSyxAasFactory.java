@@ -31,6 +31,7 @@ import org.eclipse.basyx.vab.protocol.https.HTTPSConnectorProvider;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.FileFormat;
+import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
@@ -145,6 +146,12 @@ public abstract class AbstractBaSyxAasFactory extends AasFactory {
         
         registerPersistenceRecipe(new XmlPersistenceRecipe());
         registerPersistenceRecipe(new JsonPersistenceRecipe());
+        
+        registerAvailabilityFunction(s -> NetUtils.connectionOk(getFullRegistryUri(s.getEndpoint())), 
+            AasComponent.AAS_REGISTRY, AasComponent.SUBMODEL_REGISTRY);
+        registerAvailabilityFunction(s -> NetUtils.connectionOk(s.getEndpoint().toUri() + "/health"), 
+            AasComponent.AAS_REPOSITORY, AasComponent.SUBMODEL_REPOSITORY);
+        // asset unclear, keep -> true
     }
     
     /**
@@ -198,12 +205,20 @@ public abstract class AbstractBaSyxAasFactory extends AasFactory {
         return new BaSyxRegistry(cSetup.getEndpoint(), cFactory);
     }
     
-    @Override
-    public String getFullRegistryUri(Endpoint regEndpoint) {
+    /**
+     * Turns the given endpoint into an URI string for the registry.
+     * 
+     * @return the URI string
+     */
+    protected String getFullRegistryUri(Endpoint regEndpoint) {
         return regEndpoint.toUri() + "/api/v1/registry";
     }
     
-    @Override
+    /**
+     * Turns the given endpoint into an URI string for the server/repository.
+     * 
+     * @return the URI string
+     */
     public String getServerBaseUri(Endpoint serverEndpoint) {
         return serverEndpoint.toUri() + "/shells";
     }
@@ -268,6 +283,5 @@ public abstract class AbstractBaSyxAasFactory extends AasFactory {
         // for now it's ok that it may mapply more global than just to submodel element
         return SubmodelElementIdShortBlacklist.isBlacklisted(id);
     }
-
 
 }

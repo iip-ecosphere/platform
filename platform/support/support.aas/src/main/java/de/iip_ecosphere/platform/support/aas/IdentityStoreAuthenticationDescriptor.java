@@ -15,7 +15,6 @@ package de.iip_ecosphere.platform.support.aas;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
@@ -56,37 +55,15 @@ public class IdentityStoreAuthenticationDescriptor implements AuthenticationDesc
     public IdentityToken getClientToken() {
         return IdentityStore.getInstance().getToken(clientId);
     }
-    
-    /**
-     * Composes a identity token id from role, index and role name transformer.
-     * 
-     * @param role the role to look for
-     * @param index the index of the token id
-     * @param transformer the role name transformer
-     * @return the composed id
-     */
-    private String composeId(Role role, int index, Function<String, String> transformer) {
-        return DEFAULT_ID + "-" + transformer.apply(role.name()) + "-" + index;
-    }
 
     @Override
     public List<IdentityTokenWithRole> getServerUsers() {
         List<IdentityTokenWithRole> result = new ArrayList<>(); // enable, even with no users
         IdentityStore store = IdentityStore.getInstance();
         for (DefaultRole role : DefaultRole.values()) {
-            int i = 1;
-            do {
-                IdentityToken tok = store.getToken(composeId(role, i, s -> s.toUpperCase()));
-                if (null == tok) {
-                    tok = store.getToken(composeId(role, i, s -> s.toLowerCase()));
-                }
-                if (null != tok) {
-                    result.add(new IdentityTokenWithRole(tok, role));
-                } else {
-                    break;
-                }
-                i++;
-            } while (i < 100); // arbitrary limit
+            for (IdentityToken tok : store.enumerateTokens(clientId + "-" + role.name() + "-")) {
+                result.add(new IdentityTokenWithRole(tok, role));
+            }
         }
         return result;
     }

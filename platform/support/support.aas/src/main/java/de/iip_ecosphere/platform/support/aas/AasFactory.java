@@ -20,10 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
-import de.iip_ecosphere.platform.support.Endpoint;
-import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
@@ -190,16 +189,6 @@ public abstract class AasFactory {
             return true; // allow the fake test protocol creator for testing
         }
 
-        @Override
-        public String getFullRegistryUri(Endpoint regEndpoint) {
-            return regEndpoint.toUri();
-        }
-
-        @Override
-        public String getServerBaseUri(Endpoint serverEndpoint) {
-            return serverEndpoint.toUri();
-        }
-
     };
     
     /**
@@ -241,6 +230,7 @@ public abstract class AasFactory {
     
     private Map<String, ProtocolCreator> protocolCreators = new HashMap<>();
     private String[] protocols;
+    private Map<AasComponent, Function<ComponentSetup, Boolean>> available = new HashMap<>();
 
     /**
      * Creates the factory instance.
@@ -488,22 +478,6 @@ public abstract class AasFactory {
     public abstract Registry obtainRegistry(SetupSpec spec, Schema aasSchema) throws IOException;
     
     /**
-     * Returns the full registry URI (without obtaining a registry).
-     * 
-     * @param regEndpoint the endpoint
-     * @return the full address/URI
-     */
-    public abstract String getFullRegistryUri(Endpoint regEndpoint);
-    
-    /**
-     * Returns a base AAS server URI (without accessing the server).
-     * 
-     * @param serverEndpoint the endpoint
-     * @return the address/URI
-     */
-    public abstract String getServerBaseUri(Endpoint serverEndpoint);
-    
-    /**
      * Creates a deployment recipe for unencrypted deployment.
      * 
      * @param spec the setup specification
@@ -644,56 +618,27 @@ public abstract class AasFactory {
      * @return {@code true} for available, {@code false} else
      */
     public boolean isAvailable(SetupSpec spec, AasComponent component) {
-        boolean result = false;
-        ComponentSetup setup = spec.getSetup(component);
-        switch (component) {
-        case AAS_REGISTRY:
-            // falls through;
-        case SUBMODEL_REGISTRY:
-            result = isRegistryAvailable(setup);
-            break;
-        case AAS_REPOSITORY:
-            // falls through;
-        case SUBMODEL_REPOSITORY:
-            result = isRepositoryAvailable(setup);
-            break;
-        case ASSET:
-            result = isAssetAvailable(setup);
-            break;
-        default:
-            break;
+        boolean result;
+        Function<ComponentSetup, Boolean> func = available.get(component);
+        if (null == func) {
+            result = true;
+        } else {
+            result = func.apply(spec.getSetup(component));
         }
         return result;
     }
-    
-    /**
-     * Returns whether a specific registry {@code setup} is available.
-     * 
-     * @param setup the component setup to test
-     * @return {@code true} for available, {@code false} else
-     */
-    protected boolean isRegistryAvailable(ComponentSetup setup) {
-        return NetUtils.connectionOk(getFullRegistryUri(setup.getEndpoint()));
-    }
 
     /**
-     * Returns whether a specific repository {@code setup} is available.
+     * Register a function to determine the (network) availability of the specified components.
      * 
-     * @param setup the component setup to test
-     * @return {@code true} for available, {@code false} else
+     * @param func the function, may be <b>null</b> for replacing the actual function by the default 
+     *     (constant {@code true} function)
+     * @param components the component(s) to register the function for
      */
-    protected boolean isRepositoryAvailable(ComponentSetup setup) {
-        return NetUtils.connectionOk(setup.getEndpoint().toUri() + "/health");
-    }
-
-    /**
-     * Returns whether a specific asset {@code setup} is available.
-     * 
-     * @param setup the component setup to test
-     * @return {@code true} for available, {@code false} else
-     */
-    protected boolean isAssetAvailable(ComponentSetup setup) {
-        return true; // unsupported
+    protected void registerAvailabilityFunction(Function<ComponentSetup, Boolean> func, AasComponent... components) {
+        for (AasComponent c : components) {
+            available.put(c, func);
+        }
     }
 
 }

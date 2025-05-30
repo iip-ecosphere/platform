@@ -25,3 +25,18 @@ identities:
         tokenData: a1234567    
         tokenEncryptionAlgorithm: UTF-8
         file: keystore.jks
+    aas-admin-1:
+        type: USERNAME
+        userName: admin
+        tokenData: password
+        tokenEncryptionAlgorithm: UTF-8
+    aas-user-1:
+        type: USERNAME
+        userName: user
+        tokenData: password
+        tokenEncryptionAlgorithm: UTF-8
+    aas-user-2:
+        type: USERNAME
+        userName: user2
+        tokenData: password
+        tokenEncryptionAlgorithm: UTF-8        

@@ -19,11 +19,9 @@ import org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.prop
 import org.eclipse.basyx.submodel.metamodel.map.submodelelement.operation.Operation;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 
-import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
-import de.iip_ecosphere.platform.support.aas.SetupSpec.ComponentSetup;
 import de.iip_ecosphere.platform.support.aas.basyx.AbstractBaSyxAasFactory;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxAbstractAasServer;
 import de.iip_ecosphere.platform.support.aas.basyx.DeploymentSpec;
@@ -85,7 +83,10 @@ public class BaSyxAasFactory extends AbstractBaSyxAasFactory {
             }
         });
         
-        // checkstyle: resume parameter number check        
+        // checkstyle: resume parameter number check    
+
+        // repository unclear, set to constant true function for now
+        registerAvailabilityFunction(null, AasComponent.AAS_REPOSITORY, AasComponent.SUBMODEL_REPOSITORY);
     }
 
     @Override
@@ -101,16 +102,6 @@ public class BaSyxAasFactory extends AbstractBaSyxAasFactory {
     @Override
     public boolean supportsAuthentication() {
         return false;
-    }
-    
-    @Override
-    protected boolean isRegistryAvailable(ComponentSetup setup) {
-        return NetUtils.connectionOk(getFullRegistryUri(setup.getEndpoint()));
-    }
-
-    @Override
-    protected boolean isRepositoryAvailable(ComponentSetup setup) {
-        return true; // URL unclear
     }
     
 }

@@ -118,16 +118,6 @@ public class FactoryTest {
             return true; // allow the fake test protocol creator for testing
         }
 
-        @Override
-        public String getFullRegistryUri(Endpoint regEndpoint) {
-            return DUMMY.getFullRegistryUri(regEndpoint);
-        }
-        
-        @Override
-        public String getServerBaseUri(Endpoint serverEndpoint) {
-            return DUMMY.getServerBaseUri(serverEndpoint);
-        }
-
     }
     
     /**
@@ -183,9 +173,6 @@ public class FactoryTest {
         Assert.assertEquals(LocalPersistenceType.INMEMORY, serverRecipe.toPersistenceType("")); // fallback
         Assert.assertEquals(LocalPersistenceType.INMEMORY, 
             serverRecipe.toPersistenceType(LocalPersistenceType.INMEMORY.name()));
-        
-        Assert.assertTrue(instance.getFullRegistryUri(regEp).length() > 0);
-        Assert.assertTrue(instance.getServerBaseUri(regEp).length() > 0);
     }
 
     /**
