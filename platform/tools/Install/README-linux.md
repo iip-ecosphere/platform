@@ -95,7 +95,7 @@ Moreover, depending on the utilized platform functions potentially also pyzbar, 
     python3 -m pip install pyzbar==0.1.9
     python3 -m pip install opencv-python==4.5.5.64
     python3 -m pip install Pillow==9.1.0
-    python3 -m pip install pickle==4.0
+    python3 -m pip install pickle4
 
 ### Prepare Angular
 
