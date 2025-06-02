@@ -69,7 +69,7 @@ If more than one Python version is installed, please ensure that you install the
 
 On devices, the installation may differ depending on the desired degree of containerization. If you want to run the fundamental platform components on bare metal, please install also JDK 13, maven, Python, Python packages and docker on the devices. If you plan to run only containers on the devices, docker is sufficient.
 
-Create or edit ``/etc/docker/daemon.json`` in order to access the local Docker registry installed above, here without TLS certificates ("192.168.2.1" should be changed to the IP address of your machine that running the Docker registry). For an empty file, this looks like:
+Create or edit ``/etc/docker/daemon.json`` in order to access the local Docker registry installed above, here without TLS certificates ("147.172.178.145" should be changed to the IP address of your machine that running the Docker registry). For an empty file, this looks like:
 
     {
       "insecure-registries" : ["147.172.178.145:5001"]
