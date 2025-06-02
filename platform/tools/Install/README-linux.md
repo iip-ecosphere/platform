@@ -85,17 +85,17 @@ Depending on the use of Python in services, the build process for applications m
 
 At least pyflakes and for service execution PyYaml as well as websockets must be installed (Please check the tested library for each version of Python [PREREQUISITES](PREREQUISITES.md))
 
-    python3 -m pip install pyflakes==2.5.0
-    python3 -m pip install PyYAML==6.0
-    python3 -m pip install websockets==11.0.2
+    sudo python3 -m pip install pyflakes==2.5.0
+    sudo python3 -m pip install PyYAML==6.0
+    sudo python3 -m pip install websockets==11.0.2
  
 Moreover, depending on the utilized platform functions potentially also pyzbar, opencv-python, numpy, and Pillow are required for the data processing function library:
 
-    python3 -m pip install numpy==1.20.1
-    python3 -m pip install pyzbar==0.1.9
-    python3 -m pip install opencv-python==4.5.5.64
-    python3 -m pip install Pillow==9.1.0
-    python3 -m pip install pickle4
+    sudo python3 -m pip install numpy==1.20.1
+    sudo python3 -m pip install pyzbar==0.1.9
+    sudo python3 -m pip install opencv-python==4.5.5.64
+    sudo python3 -m pip install Pillow==9.1.0
+    sudo python3 -m pip install pickle4
 
 ### Prepare Angular
 
