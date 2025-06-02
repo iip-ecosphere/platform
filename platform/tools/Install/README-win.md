@@ -26,16 +26,16 @@ For Maven 3.9.7 is not installed, please execute
 For Python 3.9, please execute 
 
     curl https://www.python.org/ftp/python/3.9.13/python-3.9.13-amd64.exe -o python-3.9.13-amd64.exe
-    python-3.9.13-amd64.exe InstallAllUsers=1 PrependPath=1 Include_test=0 /quiet
+    python-3.9.13-amd64.exe
     SET Path=%Path%;C:\Program Files\Python39\Scripts\;C:\Program Files\Python39\
 
 Also install the required python packages
 
-    sudo python3 -m pip install numpy==1.20.1
-    sudo python3 -m pip install pickle4
-    sudo python3 -m pip install pyflakes==3.3.2
-    sudo python3 -m pip install PyYAML==6.0
-    sudo python3 -m pip install websockets==11.0.2
+    python -m pip install numpy==1.20.1
+    python -m pip install pickle4
+    python -m pip install pyflakes==3.3.2
+    python -m pip install PyYAML==6.0
+    python -m pip install websockets==11.0.2
     
 If docker 20.10.7 (recommended version) is not installed, please execute 
 
@@ -78,24 +78,24 @@ Depending on the use of Python in services, the build process for applications m
 
 At least pyflakes and for service execution PyYaml as well as websockets must be installed (Please check the tested library for each version of Python [PREREQUISITES](PREREQUISITES.md))
 
-    python3 -m pip install pyflakes==2.5.0
-    python3 -m pip install PyYAML==6.0
-    python3 -m pip install websockets==11.0.2
+    python -m pip install pyflakes==2.5.0
+    python -m pip install PyYAML==6.0
+    python -m pip install websockets==11.0.2
  
 Moreover, depending on the utilized platform functions potentially also pyzbar, opencv-python, numpy, and Pillow are required for the data processing function library:
 
-    python3 -m pip install numpy==1.20.1
-    python3 -m pip install pyzbar==0.1.9
-    python3 -m pip install opencv-python==4.5.5.64
-    python3 -m pip install Pillow==9.1.0
-    python3 -m pip install pickle4
+    python -m pip install numpy==1.20.1
+    python -m pip install pyzbar==0.1.9
+    python -m pip install opencv-python==4.5.5.64
+    python -m pip install Pillow==9.1.0
+    python -m pip install pickle4
 
 ### Prepare Angular
 
 If you intend to use the platform management user interface, Angular 14, express 4.18.1 and cors 2.8.5 are required on the server. 
 
     curl https://nodejs.org/download/release/v22.14.0/node-v22.14.0-x64.msi -o node-v22.14.0-x64.msi
-    msiexec /i "%MSI_PATH%" /quiet /norestart /log "%LOG_PATH%"
+    node-v22.14.0-x64.msi
     setx Path "%Path%;C:\Program Files\nodejs"
     SET Path=%Path%;C:\Program Files\nodejs
     npm install -g @angular/cli@19.2.5
