@@ -169,6 +169,20 @@ public interface AasVisitor {
     public void endSubmodelElementCollection(SubmodelElementCollection collection);
 
     /**
+     * Visits a sub-model element list.
+     * 
+     * @param list the list
+     */
+    public void visitSubmodelElementList(SubmodelElementList collection);
+
+    /**
+     * Notifies ending the visits of a sub-model element list.
+     * 
+     * @param list the list
+     */
+    public void endSubmodelElementList(SubmodelElementList list);
+
+    /**
      * Visits a data element.
      * 
      * @param dataElement the data element

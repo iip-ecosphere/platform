@@ -1,6 +1,6 @@
 /**
  * ******************************************************************************
- * Copyright (c) {2020} The original author or authors
+ * Copyright (c) {2025} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
  * available under the terms of the Eclipse Public License 2.0 which is available 
@@ -12,14 +12,14 @@
 
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
-import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
-import test.de.iip_ecosphere.platform.support.fakeAas.FakeSubmodelElementList.FakeSubmodelElementListBuilder;
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
@@ -32,17 +32,20 @@ import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.RelationshipElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
+import test.de.iip_ecosphere.platform.support.fakeAas.FakeSubmodelElementCollection
+    .FakeSubmodelElementCollectionBuilder;
 
 /**
- * Implements a fake sub-model element collection.
+ * Implements a fake sub-model element list.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class FakeSubmodelElementCollection extends FakeElement implements SubmodelElementCollection {
+public class FakeSubmodelElementList extends FakeElement implements SubmodelElementList {
 
-    private Map<String, SubmodelElement> elements = new HashMap<>();
+    private List<SubmodelElement> elements = new ArrayList<>();
     private Map<String, Builder<?>> deferred;
     
     /**
@@ -50,11 +53,11 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
      * 
      * @author Holger Eichelberger, SSE
      */
-    protected static class FakeSubmodelElementCollectionBuilder extends FakeSubmodelElementContainerBuilder 
-        implements SubmodelElementCollectionBuilder {
+    protected static class FakeSubmodelElementListBuilder extends FakeSubmodelElementContainerBuilder 
+        implements SubmodelElementListBuilder {
 
         private FakeSubmodelElementContainerBuilder parent;
-        private FakeSubmodelElementCollection instance;
+        private FakeSubmodelElementList instance;
         private boolean isNew = true;
         
         /**
@@ -62,11 +65,8 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
          * 
          * @param parent the parent builder
          * @param idShort the short id
-         * @param ordered whether the collection shall be ordered
-         * @param allowDuplicates whether duplicates shall be allowed
          */
-        protected FakeSubmodelElementCollectionBuilder(FakeSubmodelElementContainerBuilder parent, String idShort, 
-            boolean ordered, boolean allowDuplicates) { // fake, forget ordered, allowDuplicates
+        protected FakeSubmodelElementListBuilder(FakeSubmodelElementContainerBuilder parent, String idShort) {
             this.parent = parent;
             this.instance = createInstance(idShort);
         }
@@ -77,8 +77,8 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
          * @param parent the parent builder
          * @param instance the instance
          */
-        protected FakeSubmodelElementCollectionBuilder(FakeSubmodelElementContainerBuilder parent, 
-            FakeSubmodelElementCollection instance) {
+        protected FakeSubmodelElementListBuilder(FakeSubmodelElementContainerBuilder parent, 
+            FakeSubmodelElementList instance) {
             this.parent = parent;
             this.instance = instance;
             this.isNew = false;
@@ -90,8 +90,8 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
          * @param idShort the short id
          * @return the instance
          */
-        protected FakeSubmodelElementCollection createInstance(String idShort) {
-            return new FakeSubmodelElementCollection(idShort);
+        protected FakeSubmodelElementList createInstance(String idShort) {
+            return new FakeSubmodelElementList(idShort);
         }
 
         @Override
@@ -122,7 +122,7 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
         
         @Override
         <T extends SubmodelElement> T registerElement(T elt) {
-            instance.elements.put(elt.getIdShort(), elt);
+            instance.elements.add(elt);
             return elt;
         }
 
@@ -162,7 +162,7 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
         }
 
         @Override
-        public SubmodelElementCollection build() {
+        public SubmodelElementList build() {
             buildMyDeferred();
             parent.register(instance);
             return instance;
@@ -170,11 +170,11 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
 
         @Override
         public boolean hasElement(String idShort) {
-            return instance.elements.containsKey(idShort);
+            return instance.stream(idShort).findAny().isPresent();
         }
 
         @Override
-        public SubmodelElementCollectionBuilder setSemanticId(String semanticId) {
+        public SubmodelElementListBuilder setSemanticId(String semanticId) {
             instance.setSemanticId(semanticId);
             return this;
         }
@@ -186,36 +186,27 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
      * 
      * @param idShort the id
      */
-    protected FakeSubmodelElementCollection(String idShort) {
+    protected FakeSubmodelElementList(String idShort) {
         super(idShort);
     }
 
     @Override
     public void accept(AasVisitor visitor) {
-        visitor.visitSubmodelElementCollection(this);
-        for (SubmodelElement sm : visitor.sortSubmodelElements(elements.values())) {
+        visitor.visitSubmodelElementList(this);
+        for (SubmodelElement sm : visitor.sortSubmodelElements(elements)) {
             sm.accept(visitor);
         }
-        visitor.endSubmodelElementCollection(this);
-    }
-
-    /**
-     * Returns the elements.
-     *
-     * @return the elements
-     */
-    protected Map<String, SubmodelElement> elts() {
-        return elements;
+        visitor.endSubmodelElementList(this);
     }
 
     @Override
     public Iterable<SubmodelElement> submodelElements() {
-        return elements.values();
+        return elements;
     }
     
     @Override
     public Iterable<SubmodelElement> elements() {
-        return elements.values();
+        return elements;
     }
     
     /**
@@ -245,7 +236,7 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
      */
     protected <T extends SubmodelElement> Stream<T> stream(Class<T> type) {
         Predicate<SubmodelElement> filter = null == type ? e -> true : e -> type.isInstance(e);
-        return elements.values().stream().filter(filter).map(e -> type.cast(e));
+        return elements.stream().filter(filter).map(e -> type.cast(e));
     }
 
     @Override
@@ -270,14 +261,38 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
 
     @Override
     public SubmodelElement getSubmodelElement(String idShort) {
-        return elements.get(idShort);
+        return getElement(idShort);
     }
     
     @Override
     public SubmodelElement getElement(String idShort) {
-        return elements.get(idShort);
+        Optional<SubmodelElement> result = stream(idShort)
+            .findFirst();
+        return result.isEmpty() ? null : result.get();
+    }
+    
+    /**
+     * Returns a stream with submodel elements having the given {@code idShort}.
+     * 
+     * @param idShort the idShort to filter for
+     * @return the elements as stream
+     */
+    private Stream<SubmodelElement> stream(String idShort) {
+        return elements
+            .stream()
+            .filter(e -> e.getIdShort().equals(idShort));
     }
 
+    @Override
+    public SubmodelElement getElement(int index) {
+        return elements.get(index);
+    }
+
+    @Override
+    public void deleteElement(int index) {
+        elements.remove(index);
+    }
+    
     @Override
     public SubmodelElementCollection getSubmodelElementCollection(String idShort) {
         return filter(idShort, SubmodelElementCollection.class);
@@ -305,7 +320,7 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
 
     @Override
     public void deleteElement(String idShort) {
-        elements.remove(idShort);
+        elements.removeIf(e -> e.getIdShort().equals(idShort));
     }
 
     @Override

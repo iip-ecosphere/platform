@@ -38,8 +38,11 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 import test.de.iip_ecosphere.platform.support.fakeAas.FakeAas.FakeAasBuilder;
+import test.de.iip_ecosphere.platform.support.fakeAas.FakeSubmodelElementList.FakeSubmodelElementListBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
 
 /**
  * A fake (inefficient) submodel.
@@ -123,6 +126,16 @@ public class FakeSubmodel extends FakeElement implements Submodel {
             }
             return result;
         }
+        
+        @Override
+        public SubmodelElementListBuilder createSubmodelElementListBuilder(String idShort) {
+            SubmodelElementListBuilder result = DeferredBuilder.getDeferred(idShort, 
+                SubmodelElementListBuilder.class, instance.deferred);
+            if (null == result) {
+                result = new FakeSubmodelElementListBuilder(this, idShort); 
+            }
+            return result; 
+        }        
 
         @Override
         public Reference createReference() {
@@ -360,6 +373,11 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     }
 
     @Override
+    public SubmodelElementList getSubmodelElementList(String idShort) {
+        return filter(idShort, SubmodelElementList.class);
+    }
+
+    @Override
     public Entity getEntity(String idShort) {
         return filter(idShort, Entity.class);
     }
@@ -367,13 +385,23 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     @Override
     public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
         boolean allowDuplicates) {
-        SubmodelElementCollectionBuilder result = getDeferred(idShort, 
-                SubmodelElementCollectionBuilder.class);
+        SubmodelElementCollectionBuilder result = getDeferred(idShort, SubmodelElementCollectionBuilder.class);
         if (null == result) {
             FakeSubmodelElementContainerBuilder secb = new FakeSubmodel.FakeSubmodelBuilder(
                 new FakeAasBuilder(parent), this);
             result = new FakeSubmodelElementCollection.FakeSubmodelElementCollectionBuilder(
                 secb, idShort, ordered, allowDuplicates);
+        }
+        return result;
+    }
+
+    @Override
+    public SubmodelElementListBuilder createSubmodelElementListBuilder(String idShort) {
+        SubmodelElementListBuilder result = getDeferred(idShort, SubmodelElementListBuilder.class);
+        if (null == result) {
+            FakeSubmodelElementContainerBuilder secb = new FakeSubmodel.FakeSubmodelBuilder(
+                new FakeAasBuilder(parent), this);
+            result = new FakeSubmodelElementList.FakeSubmodelElementListBuilder(secb, idShort);
         }
         return result;
     }

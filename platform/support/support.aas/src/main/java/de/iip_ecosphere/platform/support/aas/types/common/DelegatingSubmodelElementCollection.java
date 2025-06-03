@@ -22,6 +22,7 @@ import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.RelationshipElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
 
 /**
  * A delegating submodel elements collection.
@@ -89,7 +90,12 @@ public class DelegatingSubmodelElementCollection implements SubmodelElementColle
     public SubmodelElementCollection getSubmodelElementCollection(String idShort) {
         return delegate.getSubmodelElementCollection(idShort);
     }
-    
+
+    @Override
+    public SubmodelElementList getSubmodelElementList(String idShort) {
+        return delegate.getSubmodelElementList(idShort);
+    }
+
     @Override
     public Entity getEntity(String idShort) {
         return delegate.getEntity(idShort);

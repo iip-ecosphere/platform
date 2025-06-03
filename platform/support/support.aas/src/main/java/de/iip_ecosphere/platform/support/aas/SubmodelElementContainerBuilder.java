@@ -12,6 +12,7 @@ import de.iip_ecosphere.platform.support.aas.Range.RangeBuilder;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBuilder;
 import de.iip_ecosphere.platform.support.aas.RelationshipElement.RelationshipElementBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 
 /**
  * Builder interface for something that contains submodel elements.
@@ -121,7 +122,31 @@ public interface SubmodelElementContainerBuilder {
      */
     public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered, 
         boolean allowDuplicates);
-    
+
+    /**
+     * Creates a builder for a contained sub-model element collection (not ordered, no duplicates). Calling this method 
+     * again with the same name shall lead to a builder that allows for modifying the sub-model.
+     * 
+     * @param idShort the short name of the reference element
+     * @param ordered whether the collection is ordered
+     * @param allowDuplicates whether the collection allows duplicates
+     * @return the builder
+     * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty; or if modification is not possible
+     */
+    public default SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort) {
+        return createSubmodelElementCollectionBuilder(idShort, false, false);
+    }
+
+    /**
+     * Creates a builder for a contained sub-model element list. Calling this method 
+     * again with the same name shall lead to a builder that allows for modifying the sub-model.
+     * 
+     * @param idShort the short name of the reference element
+     * @return the builder
+     * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty; or if modification is not possible
+     */
+    public SubmodelElementListBuilder createSubmodelElementListBuilder(String idShort);
+
     /**
      * Returns the parent builder.
      * 

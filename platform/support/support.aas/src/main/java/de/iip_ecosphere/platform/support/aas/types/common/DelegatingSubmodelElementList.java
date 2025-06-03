@@ -1,6 +1,6 @@
 /**
  * ******************************************************************************
- * Copyright (c) {2024} The original author or authors
+ * Copyright (c) {2025} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
  * available under the terms of the Eclipse Public License 2.0 which is available 
@@ -25,20 +25,20 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
 
 /**
- * A delegating entity.
+ * A delegating submodel elements list.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class DelegatingEntity implements Entity {
+public class DelegatingSubmodelElementList implements SubmodelElementList {
     
-    private Entity delegate;
+    private SubmodelElementList delegate;
 
     /**
      * Creates an instance based on the given delegate.
      * 
      * @param delegate the delegate
      */
-    protected DelegatingEntity(Entity delegate) {
+    protected DelegatingSubmodelElementList(SubmodelElementList delegate) {
         this.delegate = delegate;
     }
     
@@ -47,20 +47,20 @@ public class DelegatingEntity implements Entity {
      * 
      * @return the delegate
      */
-    protected SubmodelElementCollection getDelegate() {
+    protected SubmodelElementList getDelegate() {
         return delegate;
     }
-
+    
     @Override
     public Iterable<SubmodelElement> submodelElements() {
         return delegate.submodelElements();
-    }
+    }    
 
     @Override
     public SubmodelElement getSubmodelElement(String idShort) {
         return delegate.getSubmodelElement(idShort);
     }
-    
+
     @Override
     public String getIdShort() {
         return delegate.getIdShort();
@@ -80,7 +80,7 @@ public class DelegatingEntity implements Entity {
     public String getSemanticId(boolean stripPrefix) {
         return delegate.getSemanticId(stripPrefix);
     }
-    
+
     @Override
     public void setSemanticId(String semanticId) {
         delegate.setSemanticId(semanticId);
@@ -152,8 +152,13 @@ public class DelegatingEntity implements Entity {
     }
 
     @Override
-    public EntityType getType() {
-        return delegate.getType();
+    public SubmodelElement getElement(int index) {
+        return delegate.getElement(index);
+    }
+
+    @Override
+    public void deleteElement(int index) {
+        delegate.deleteElement(index);
     }
 
 }

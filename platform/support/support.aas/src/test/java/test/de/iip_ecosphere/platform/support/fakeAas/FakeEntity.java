@@ -30,9 +30,12 @@ import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.RelationshipElement;
 import test.de.iip_ecosphere.platform.support.fakeAas.FakeSubmodelElementCollection
     .FakeSubmodelElementCollectionBuilder;
+import test.de.iip_ecosphere.platform.support.fakeAas.FakeSubmodelElementList.FakeSubmodelElementListBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 
 /**
  * Implements a fake entity.
@@ -119,6 +122,16 @@ public class FakeEntity extends FakeElement implements Entity {
                 SubmodelElementCollectionBuilder.class, instance.deferred);
             if (null == result) {
                 result = new FakeSubmodelElementCollectionBuilder(this, idShort, ordered, allowDuplicates); 
+            }
+            return result; 
+        }
+
+        @Override
+        public SubmodelElementListBuilder createSubmodelElementListBuilder(String idShort) {
+            SubmodelElementListBuilder result = DeferredBuilder.getDeferred(idShort, 
+                SubmodelElementListBuilder.class, instance.deferred);
+            if (null == result) {
+                result = new FakeSubmodelElementListBuilder(this, idShort); 
             }
             return result; 
         }
@@ -214,6 +227,11 @@ public class FakeEntity extends FakeElement implements Entity {
     @Override
     public SubmodelElementCollection getSubmodelElementCollection(String idShort) {
         return filter(idShort, SubmodelElementCollection.class);
+    }
+
+    @Override
+    public SubmodelElementList getSubmodelElementList(String idShort) {
+        return filter(idShort, SubmodelElementList.class);
     }
 
     @Override

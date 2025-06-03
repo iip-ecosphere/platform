@@ -27,6 +27,8 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 
 /**
  * A delegating submodel elements collection.
@@ -140,6 +142,11 @@ public class DelegatingSubmodel implements Submodel {
     }
 
     @Override
+    public SubmodelElementList getSubmodelElementList(String idShort) {
+        return delegate.getSubmodelElementList(idShort);
+    }
+
+    @Override
     public Entity getEntity(String idShort) {
         return delegate.getEntity(idShort);
     }
@@ -188,6 +195,11 @@ public class DelegatingSubmodel implements Submodel {
     public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
         boolean allowDuplicates) {
         return delegate.createSubmodelElementCollectionBuilder(idShort, ordered, allowDuplicates);
+    }
+
+    @Override
+    public SubmodelElementListBuilder createSubmodelElementListBuilder(String idShort) {
+        return delegate.createSubmodelElementListBuilder(idShort);
     }
 
     @Override

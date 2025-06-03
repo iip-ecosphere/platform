@@ -58,6 +58,14 @@ public class BasicAasVisitor implements AasVisitor {
     }
 
     @Override
+    public void visitSubmodelElementList(SubmodelElementList list) {
+    }
+
+    @Override
+    public void endSubmodelElementList(SubmodelElementList list) {
+    }
+
+    @Override
     public void visitAsset(Asset asset) {
     }
 

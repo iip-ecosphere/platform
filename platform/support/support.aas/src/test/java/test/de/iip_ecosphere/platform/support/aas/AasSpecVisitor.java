@@ -53,6 +53,7 @@ import de.iip_ecosphere.platform.support.aas.RelationshipElement;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 import org.junit.Assert;
@@ -238,7 +239,18 @@ public class AasSpecVisitor implements AasVisitor {
     public void endSubmodelElementCollection(SubmodelElementCollection collection) {
         decreaseIndentation();
     }
- 
+
+    @Override
+    public void visitSubmodelElementList(SubmodelElementList list) {
+        log(getHeader("SML", list));
+        increaseIndentation();
+    }
+
+    @Override
+    public void endSubmodelElementList(SubmodelElementList list) {
+        decreaseIndentation();
+    }
+
     /**
      * Returns the header for {@code elt}.
      * 

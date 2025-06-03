@@ -29,6 +29,7 @@ import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBu
 import de.iip_ecosphere.platform.support.aas.RelationshipElement.RelationshipElementBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 
 /**
@@ -111,6 +112,11 @@ public class DelegatingEntityBuilder implements EntityBuilder {
     public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
         boolean allowDuplicates) {
         return delegate.createSubmodelElementCollectionBuilder(idShort, ordered, allowDuplicates);
+    }
+    
+    @Override
+    public SubmodelElementListBuilder createSubmodelElementListBuilder(String idShort) {
+        return delegate.createSubmodelElementListBuilder(idShort);
     }
 
     @Override

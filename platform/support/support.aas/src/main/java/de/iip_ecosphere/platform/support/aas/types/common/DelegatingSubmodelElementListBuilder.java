@@ -12,11 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas.types.common;
 
-import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
-import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
-import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
-import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 import de.iip_ecosphere.platform.support.aas.BlobDataElement.BlobDataElementBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityType;
@@ -25,45 +21,46 @@ import de.iip_ecosphere.platform.support.aas.MultiLanguageProperty.MultiLanguage
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.Range.RangeBuilder;
+import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBuilder;
 import de.iip_ecosphere.platform.support.aas.RelationshipElement.RelationshipElementBuilder;
-import de.iip_ecosphere.platform.support.aas.Submodel;
-import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 
 /**
- * A reusable delegating submodel builder, if a template submodel shall allow for extensible addition
+ * Implements a (basic) SML builder, which delegates all work to an internally created builder. This class shall be 
+ * used, if a template submodel shall allow for extensible addition
  * of further submodel elements other than those defined in a template. If this is not intended,
- * directly use {@link Builder} of {@link Submodel}.
+ * directly use {@link Builder} of {@link SubmodelElementList}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class DelegatingSubmodelBuilder implements SubmodelBuilder {
+public class DelegatingSubmodelElementListBuilder implements SubmodelElementListBuilder {
 
-    private SubmodelBuilder delegate;
+    private SubmodelElementListBuilder delegate;
     
     /**
-     * Creates the builder.
+     * Creates a delegating SML builder.
      * 
      * @param delegate the builder to delegate to
      */
-    public DelegatingSubmodelBuilder(SubmodelBuilder delegate) {
+    protected DelegatingSubmodelElementListBuilder(SubmodelElementListBuilder delegate) {
         this.delegate = delegate;
     }
     
     /**
-     * Returns the delegate.
+     * Returns the builder this builder is delegating to.
      * 
-     * @return the delegate
+     * @return the builder
      */
-    protected SubmodelBuilder getDelegate() {
+    protected SubmodelElementListBuilder getDelegate() {
         return delegate;
     }
-    
+
     @Override
     public PropertyBuilder createPropertyBuilder(String idShort) {
         return delegate.createPropertyBuilder(idShort);
@@ -76,7 +73,7 @@ public class DelegatingSubmodelBuilder implements SubmodelBuilder {
 
     @Override
     public RelationshipElementBuilder createRelationshipElementBuilder(String idShort, Reference first,
-        Reference second) {
+            Reference second) {
         return delegate.createRelationshipElementBuilder(idShort, first, second);
     }
 
@@ -99,12 +96,12 @@ public class DelegatingSubmodelBuilder implements SubmodelBuilder {
     public FileDataElementBuilder createFileDataElementBuilder(String idShort, String contents, String mimeType) {
         return delegate.createFileDataElementBuilder(idShort, contents, mimeType);
     }
-    
+
     @Override
     public RangeBuilder createRangeBuilder(String idShort, Type type, Object min, Object max) {
         return delegate.createRangeBuilder(idShort, type, min, max);
     }
-
+    
     @Override
     public BlobDataElementBuilder createBlobDataElementBuilder(String idShort, String contents, String mimeType) {
         return delegate.createBlobDataElementBuilder(idShort, contents, mimeType);
@@ -152,7 +149,7 @@ public class DelegatingSubmodelBuilder implements SubmodelBuilder {
     }
 
     @Override
-    public Submodel build() {
+    public SubmodelElementList build() {
         return delegate.build();
     }
 
@@ -162,13 +159,8 @@ public class DelegatingSubmodelBuilder implements SubmodelBuilder {
     }
 
     @Override
-    public SubmodelBuilder setSemanticId(String refValue) {
+    public SubmodelElementListBuilder setSemanticId(String refValue) {
         return delegate.setSemanticId(refValue);
-    }
-
-    @Override
-    public SubmodelBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
-        return delegate.rbac(auth, role, actions);
     }
 
 }

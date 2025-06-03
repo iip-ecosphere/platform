@@ -191,6 +191,16 @@ public abstract class FakeSubmodelElementContainerBuilder implements SubmodelEle
     }
 
     /**
+     * Registers a sub-model element collection.
+     * 
+     * @param list the list
+     * @return {@code list}
+     */
+    FakeSubmodelElementList register(FakeSubmodelElementList list)  {
+        return registerElement(list);
+    }
+
+    /**
      * Registers a sub-build as deferred.
      * 
      * @param shortId the shortId of the element

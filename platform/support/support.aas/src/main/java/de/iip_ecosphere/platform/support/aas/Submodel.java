@@ -18,6 +18,7 @@ import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 
 /**
  * Represents an AAS sub-model.
@@ -72,6 +73,15 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
      */
     public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered, 
         boolean allowDuplicates);
+
+    /**
+     * Returns a sub-model element list builder either by providing access to an existing list or through 
+     * a builder to add a new sub-model elements list (ultimately only if {@link Builder#build()} was called).
+     * 
+     * @param ordered whether the collection shall be ordered or not
+     * @return the sub-model collection builder
+     */
+    public SubmodelElementListBuilder createSubmodelElementListBuilder(String idShort);
 
     /**
      * Returns the reference to the AAS.
