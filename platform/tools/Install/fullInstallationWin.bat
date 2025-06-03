@@ -145,6 +145,11 @@ setx Path "%Path%;%JAVA_HOME%\bin"
 SET Path=%Path%;%JAVA_HOME%\bin
 netsh advfirewall firewall add rule name="Java" dir=in action=allow program="%JAVA_HOME%\bin\java.exe" enable=yes
 
+IF %ERRORLEVEL% NEQ 0 (
+    echo Error occurred in Java installation. Exiting.
+    exit /b %ERRORLEVEL%
+)
+
 :skipJava
 
 REM Install Maven version 3.9.7
@@ -171,6 +176,11 @@ SET MAVEN_HOME=%cd%\apache-maven-3.9.7
 setx Path "%Path%;%MAVEN_HOME%\bin"
 SET Path=%Path%;%MAVEN_HOME%\bin
 
+IF %ERRORLEVEL% NEQ 0 (
+    echo Error occurred in Maven installation. Exiting.
+    exit /b %ERRORLEVEL%
+)
+
 :skipMaven
 
 REM Install Python version 3.9.13
@@ -194,6 +204,11 @@ curl https://www.python.org/ftp/python/3.9.13/python-3.9.13-amd64.exe -o python-
 python-3.9.13-amd64.exe InstallAllUsers=1 PrependPath=1 Include_test=0 /quiet
 SET Path=%Path%;C:\Program Files\Python39\Scripts\;C:\Program Files\Python39\
 pip install pyflakes
+
+IF %ERRORLEVEL% NEQ 0 (
+    echo Error occurred in Python installation. Exiting.
+    exit /b %ERRORLEVEL%
+)
 
 :skipPython
 
@@ -290,6 +305,11 @@ msiexec /i "%MSI_PATH%" /quiet /norestart /log "%LOG_PATH%"
 setx Path "%Path%;C:\Program Files\nodejs"
 SET Path=%Path%;C:\Program Files\nodejs
 
+IF %ERRORLEVEL% NEQ 0 (
+    echo Error occurred in Node.js installation. Exiting.
+    exit /b %ERRORLEVEL%
+)
+
 :skipNode
 
 if %angularVersionCheck% == "Ok" goto :skipAngular
@@ -310,6 +330,11 @@ goto :answerNode
 call npm install -g @angular/cli@19.2.5
 call npm install -g express@4.18.1
 call npm install -g cors@2.8.5
+
+IF %ERRORLEVEL% NEQ 0 (
+    echo Error occurred in Angular installation. Exiting.
+    exit /b %ERRORLEVEL%
+)
 
 :skipAngular
 
