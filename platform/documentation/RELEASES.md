@@ -5,7 +5,6 @@
 In progress:
 * [#164](https://github.com/iip-ecosphere/platform/issues/164): UI design revision
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
-* [#174](https://github.com/iip-ecosphere/platform/issues/174): Move examples.hm22 and examples.emo23 to own repository
 * [#170](https://github.com/iip-ecosphere/platform/issues/170): Check out BaSyx2
 * [#165](https://github.com/iip-ecosphere/platform/issues/170): Upgrade automated container building
 
@@ -20,6 +19,7 @@ Improvements:
 * [#166](https://github.com/iip-ecosphere/platform/issues/166): Upgrade Angular for UI.
 * [#173](https://github.com/iip-ecosphere/platform/issues/173): Fix Python version selection for Python services.
 * [#171](https://github.com/iip-ecosphere/platform/issues/171): Migrate build-jk.xml to maven deployment (where possible).
+* [#174](https://github.com/iip-ecosphere/platform/issues/174): Move examples.hm22 and examples.emo23 to own repository
 
 New features:
 * [#169](https://github.com/iip-ecosphere/platform/issues/169): File-based connector for CSV, JSON (ReGaP)
