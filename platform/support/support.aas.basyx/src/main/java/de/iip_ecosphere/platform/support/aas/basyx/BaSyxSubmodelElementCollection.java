@@ -32,6 +32,8 @@ import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxElementTranslator.SubmodelElementsRegistrar;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.Builder;
@@ -192,6 +194,22 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
                 } else {
                     result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(this, 
                        (BaSyxSubmodelElementCollection) sub);
+                }
+            }
+            return result;
+        }
+
+        @Override
+        public SubmodelElementListBuilder createSubmodelElementListBuilder(String idShort) {
+            SubmodelElementListBuilder result = DeferredBuilder.getDeferred(idShort, 
+                SubmodelElementListBuilder.class, instance.deferred);
+            if (null == result) {
+                SubmodelElementList sub = instance.getSubmodelElementList(idShort);
+                if (null == sub) {
+                    result = new BaSyxSubmodelElementList.BaSyxSubmodelElementListBuilder(this, idShort);
+                } else {
+                    result = new BaSyxSubmodelElementList.BaSyxSubmodelElementListBuilder(this, 
+                       (BaSyxSubmodelElementList) sub);
                 }
             }
             return result;
@@ -569,7 +587,12 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     public SubmodelElementCollection getSubmodelElementCollection(String idShort) {
         return getElement(idShort, SubmodelElementCollection.class);
     }
-    
+
+    @Override
+    public SubmodelElementList getSubmodelElementList(String idShort) {
+        return getElement(idShort, SubmodelElementList.class);
+    }
+
     @Override
     public Entity getEntity(String idShort) {
         return getElement(idShort, Entity.class);

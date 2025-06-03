@@ -36,6 +36,7 @@ import de.iip_ecosphere.platform.support.aas.RelationshipElement;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxElementTranslator.SubmodelElementsRegistrar;
 
 /**
@@ -204,7 +205,23 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
         submodelElements.put(id, collection);
         return collection;
     }
-    
+
+    /**
+     * Registers a sub-model element list.
+     * 
+     * @param lsit the element list
+     * @return {@code collection}
+     */
+    public BaSyxSubmodelElementList register(BaSyxSubmodelElementList list) {
+        String id = list.getIdShort();
+        if (submodelElements.containsKey(id)) {
+            warn("There is already a collection/element with short id '" + id + "'. "
+                + "The collection/element may be redefined.");
+        }
+        submodelElements.put(id, list);
+        return list;
+    }
+
     @Override
     public <D extends org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.DataElement> 
         BaSyxDataElement<D> register(BaSyxDataElement<D> dataElement) {
@@ -319,7 +336,17 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
         }
         return result;
     }
-    
+
+    @Override
+    public SubmodelElementList getSubmodelElementList(String idShort) {
+        SubmodelElementList result = null;
+        SubmodelElement tmp = getSubmodelElement(idShort);
+        if (tmp instanceof SubmodelElementList) {
+            result = (SubmodelElementList) tmp;
+        }
+        return result;
+    }
+
     @Override
     public Entity getEntity(String idShort) {
         Entity result = null;

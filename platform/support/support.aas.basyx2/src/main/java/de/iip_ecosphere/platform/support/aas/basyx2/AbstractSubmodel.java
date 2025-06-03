@@ -34,6 +34,7 @@ import de.iip_ecosphere.platform.support.aas.RelationshipElement;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
 import de.iip_ecosphere.platform.support.aas.basyx2.BaSyxElementTranslator.SubmodelElementsRegistrar;
 
 /**
@@ -200,13 +201,29 @@ public abstract class AbstractSubmodel<S extends org.eclipse.digitaltwin.aas4j.v
     public BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
         String id = collection.getIdShort();
         if (submodelElements.containsKey(id)) {
-            warn("There is already a collection/element with short id '" + id + "'. "
-                + "The collection/element may be redefined.");
+            warn("There is already a element with short id '" + id + "'. "
+                + "The element may be redefined.");
         }
         submodelElements.put(id, collection);
         return reg(collection);
     }
-    
+
+    /**
+     * Registers a sub-model element collection.
+     * 
+     * @param collection the element collection
+     * @return {@code collection}
+     */
+    public BaSyxSubmodelElementList register(BaSyxSubmodelElementList list) {
+        String id = list.getIdShort();
+        if (submodelElements.containsKey(id)) {
+            warn("There is already a element with short id '" + id + "'. "
+                + "The element may be redefined.");
+        }
+        submodelElements.put(id, list);
+        return reg(list);
+    }
+
     @Override
     public <D extends org.eclipse.digitaltwin.aas4j.v3.model.DataElement> 
         BaSyxDataElement<D> register(BaSyxDataElement<D> dataElement) {
@@ -327,7 +344,17 @@ public abstract class AbstractSubmodel<S extends org.eclipse.digitaltwin.aas4j.v
         }
         return result;
     }
-    
+
+    @Override
+    public SubmodelElementList getSubmodelElementList(String idShort) {
+        SubmodelElementList result = null;
+        SubmodelElement tmp = getSubmodelElement(idShort);
+        if (tmp instanceof SubmodelElementList) {
+            result = (SubmodelElementList) tmp;
+        }
+        return result;
+    }
+
     @Override
     public Entity getEntity(String idShort) {
         Entity result = null;

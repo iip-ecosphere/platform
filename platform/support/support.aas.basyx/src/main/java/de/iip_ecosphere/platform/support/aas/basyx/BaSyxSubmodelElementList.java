@@ -10,11 +10,10 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.support.aas.basyx2;
+package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -23,16 +22,20 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
+import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
+import org.eclipse.basyx.submodel.metamodel.api.submodelelement.ISubmodelElementCollection;
+
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
-import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
+import de.iip_ecosphere.platform.support.aas.basyx.BaSyxElementTranslator.SubmodelElementsRegistrar;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.Builder;
-import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
@@ -42,19 +45,17 @@ import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBuilder;
-import de.iip_ecosphere.platform.support.aas.basyx2.BaSyxElementTranslator.SubmodelElementsRegistrar;
 import de.iip_ecosphere.platform.support.aas.RelationshipElement;
 
 /**
- * Wrapper for the BaSyx sub-model element collection.
+ * Maps the AAS v3 element list onto a BaSyx sub-model element collection.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement implements SubmodelElementCollection, 
-    SubmodelElementsRegistrar, BaSyxSubmodelElementParent {
+public class BaSyxSubmodelElementList extends BaSyxSubmodelElement implements SubmodelElementList, 
+    SubmodelElementsRegistrar {
     
-    private org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection collection;
-    private Map<String, SubmodelElement> elementsMap;
+    private ISubmodelElementCollection collection;
     private List<SubmodelElement> elementsList; // not nice, shall be two implementations
     private Map<String, Builder<?>> deferred;
     
@@ -63,12 +64,12 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class BaSyxSubmodelElementCollectionBuilder extends BaSyxSubmodelElementContainerBuilder<
-        org.eclipse.digitaltwin.aas4j.v3.model.Submodel> implements SubmodelElementCollectionBuilder {
+    public static class BaSyxSubmodelElementListBuilder extends BaSyxSubmodelElementContainerBuilder<ISubmodel> 
+        implements SubmodelElementListBuilder {
         
         private BaSyxSubmodelElementContainerBuilder<?> parentBuilder;
-        private BaSyxSubmodelElementCollection instance;
-        private org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection collection;
+        private BaSyxSubmodelElementList instance;
+        private ISubmodelElementCollection collection;
         private boolean isNew = true;
         private boolean propagate = true;
         
@@ -77,19 +78,17 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
          * constructor.
          * 
          * @param parentBuilder the parent builder
-         * @param idShort the short name of the sub-model element
-         * @param ordered whether the collection is ordered
          * @param allowDuplicates whether the collection allows duplicates
          * @throws IllegalArgumentException may be thrown if {@code idShort} is not given
          */
-        protected BaSyxSubmodelElementCollectionBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, 
-            String idShort, boolean ordered, boolean allowDuplicates) {
-            this(parentBuilder, idShort, () -> new BaSyxSubmodelElementCollection(), () -> {
-                org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection coll 
-                    = new org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSubmodelElementCollection(); 
+        protected BaSyxSubmodelElementListBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, 
+            String idShort) {
+            this(parentBuilder, idShort, () -> new BaSyxSubmodelElementList(), () -> {
+                org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection coll 
+                    = new org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection(); 
                 coll.setIdShort(Tools.checkId(idShort));
-                /*                coll.setOrdered(ordered); // TODO ??
-                coll.setAllowDuplicates(allowDuplicates);*/
+                coll.setOrdered(true);
+                coll.setAllowDuplicates(true);
                 return coll;
             });
         }
@@ -104,9 +103,9 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
          * @param bCreator creates a BaSyx instance
          * @throws IllegalArgumentException may be thrown if {@code idShort} is not given
          */
-        protected BaSyxSubmodelElementCollectionBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, 
-            String idShort, Supplier<BaSyxSubmodelElementCollection> wCreator, 
-            Supplier<org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection> bCreator) {
+        protected BaSyxSubmodelElementListBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, 
+            String idShort, Supplier<BaSyxSubmodelElementList> wCreator, 
+            Supplier<org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection> bCreator) {
             this.parentBuilder = parentBuilder;
             this.instance = wCreator.get();
             this.collection = bCreator.get();
@@ -119,14 +118,13 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
          * @param parentBuilder the parent builder
          * @param instance the BaSyx instance
          */
-        protected BaSyxSubmodelElementCollectionBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, 
-            BaSyxSubmodelElementCollection instance) {
+        protected BaSyxSubmodelElementListBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, 
+            BaSyxSubmodelElementList instance) {
             this.parentBuilder = parentBuilder;
             this.instance = instance;
             this.isNew = false;
-            if (instance.collection instanceof org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection) {
-                this.collection = (org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection) 
-                    instance.collection;
+            if (instance.collection instanceof ISubmodelElementCollection) {
+                this.collection = (ISubmodelElementCollection) instance.collection;
             } else {
                 throw new IllegalArgumentException("Cannot create a " + getClass().getSimpleName() + " on a " 
                     + instance.collection.getClass().getSimpleName());
@@ -139,7 +137,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
          * 
          * @return the collection
          */
-        protected org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection getCollection() {
+        protected ISubmodelElementCollection getCollection() {
             return collection;
         }
         
@@ -148,18 +146,25 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
          * 
          * @return the collection instance
          */
-        protected BaSyxSubmodelElementCollection getCollectionInstance() {
+        protected BaSyxSubmodelElementList getCollectionInstance() {
             return instance;
         }
         
         @Override
-        public SubmodelElementCollectionBuilder setSemanticId(String refValue) {
-            return Tools.setSemanticId(this, refValue, collection);                
+        public SubmodelElementListBuilder setSemanticId(String refValue) {
+            if (collection instanceof org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElement) {
+                IReference ref = Tools.translateReference(refValue);
+                if (ref != null) {
+                    ((org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElement) collection)
+                        .setSemanticId(ref);
+                }
+            }
+            return this;
         }
 
         @Override
         public PropertyBuilder createPropertyBuilder(String idShort) {
-            return BaSyxProperty.BaSyxPropertyBuilder.create(this, idShort, instance.getProperty(idShort)); 
+            return new BaSyxProperty.BaSyxPropertyBuilder(this, idShort);
         }
 
         @Override
@@ -205,70 +210,80 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
             }
             return result;
         }
-        
+
         @Override
         public Reference createReference() {
-            return BaSyxReference.createModelReference(collection);
+            return new BaSyxReference(collection.getReference());
         }
 
         @Override
         protected BaSyxFile register(BaSyxFile file) {
-            addSubmodelElement(this.collection, file.getSubmodelElement());
+            this.collection.addSubmodelElement(file.getSubmodelElement());
             return instance.register(file);
         }
 
         @Override
         protected BaSyxRange register(BaSyxRange range) {
-            addSubmodelElement(this.collection, range.getSubmodelElement());
+            this.collection.addSubmodelElement(range.getSubmodelElement());
             return instance.register(range);
         }
 
         @Override
         protected BaSyxBlob register(BaSyxBlob blob) {
-            addSubmodelElement(this.collection, blob.getSubmodelElement());
+            this.collection.addSubmodelElement(blob.getSubmodelElement());
             return instance.register(blob);
         }
 
         @Override
         protected BaSyxOperation register(BaSyxOperation operation) {
-            addSubmodelElement(this.collection, operation.getSubmodelElement());
+            this.collection.addSubmodelElement(operation.getSubmodelElement());
             return instance.register(operation);
         }
         
         @Override
         protected BaSyxProperty register(BaSyxProperty property) {
-            addSubmodelElement(this.collection, property.getSubmodelElement());
+            this.collection.addSubmodelElement(property.getSubmodelElement());
             return instance.register(property);
         }
 
         @Override
         protected BaSyxMultiLanguageProperty register(BaSyxMultiLanguageProperty property) {
-            addSubmodelElement(this.collection, property.getSubmodelElement());
+            this.collection.addSubmodelElement(property.getSubmodelElement());
             return instance.register(property);
         }
 
         @Override
         protected BaSyxRelationshipElement register(BaSyxRelationshipElement relationship) {
-            addSubmodelElement(this.collection, relationship.getSubmodelElement());
+            this.collection.addSubmodelElement(relationship.getSubmodelElement());
             return instance.register(relationship);
         }
 
         @Override
         protected BaSyxEntity register(BaSyxEntity entity) {
-            addSubmodelElement(this.collection, entity.getSubmodelElement());
+            this.collection.addSubmodelElement(entity.getSubmodelElement());
             return instance.register(entity);
         }
         
         @Override
         protected BaSyxReferenceElement register(BaSyxReferenceElement reference) {
-            addSubmodelElement(this.collection, reference.getSubmodelElement());
+            this.collection.addSubmodelElement(reference.getSubmodelElement());
             return instance.register(reference);
         }
 
         @Override
         protected BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection, 
             boolean propagate) {
-            addSubmodelElement(this.collection, collection.getSubmodelElement());
+            this.collection.addSubmodelElement(collection.getSubmodelElement());
+            if (propagate) {
+                instance.register(collection);
+            }
+            return collection;
+        }
+
+        @Override
+        protected BaSyxSubmodelElementList register(BaSyxSubmodelElementList collection, 
+            boolean propagate) {
+            this.collection.addSubmodelElement(collection.getSubmodelElement());
             if (propagate) {
                 instance.register(collection);
             }
@@ -296,13 +311,13 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         }
 
         @Override
-        public BaSyxSubmodelElementCollection build() {
+        public BaSyxSubmodelElementList build() {
             buildMyDeferred();
             instance.collection = collection;
             if (isNew) {
                 parentBuilder.register(instance, propagate);
-            } 
-            return updateInBuild(isNew, instance);
+            }
+            return instance;
         }
 
         @Override
@@ -316,7 +331,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         }
 
         @Override
-        protected AbstractSubmodel<org.eclipse.digitaltwin.aas4j.v3.model.Submodel> getInstance() {
+        protected AbstractSubmodel<ISubmodel> getInstance() {
             return null;
         }
 
@@ -344,7 +359,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     /**
      * Creates an instance. Prevents external creation.
      */
-    protected BaSyxSubmodelElementCollection() {
+    protected BaSyxSubmodelElementList() {
     }
  
     /**
@@ -352,48 +367,31 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
      * 
      * @param collection the collection instance
      */
-    protected BaSyxSubmodelElementCollection(org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection 
-        collection) {
+    protected BaSyxSubmodelElementList(ISubmodelElementCollection collection) {
         this.collection = collection;
-    }
-    
-    /**
-     * Adds a submodel element.
-     * 
-     * @param collection the collection to add the element to
-     * @param element the element to add
-     */
-    static void addSubmodelElement(org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection collection,
-        org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement element) {
-        collection.setValue(Tools.addElement(collection.getValue(), element));
     }
     
     /**
      * Creates the actual data structure to use. {@link #collection} shall be set before.
      */
     private void createElementsStructure() {
-        boolean ordered = false;
-        if (ordered) {
-            elementsList = new ArrayList<SubmodelElement>(); // TODO cleanup
-        } else {
-            elementsMap = new HashMap<String, SubmodelElement>();
-        }
+        elementsList = new ArrayList<SubmodelElement>();
     }
 
     /**
      * Dynamically initializes the elements structure.
      */
     private void initialize() {
-        if (null == elementsMap && null == elementsList) {
+        if (null == elementsList) {
             createElementsStructure();
-            BaSyxElementTranslator.registerSubmodelElements(collection.getValue(), this);        
+            BaSyxElementTranslator.registerSubmodelElements(collection.getSubmodelElements(), this);        
         }
     }
 
     @Override
     public int getElementsCount() {
         initialize();
-        return null == elementsMap ? elementsList.size() : elementsMap.size();
+        return elementsList.size();
     }
 
     @Override
@@ -413,9 +411,8 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
      */
     private Collection<SubmodelElement> elementsCollection() {
         initialize();
-        return null == elementsMap ? elementsList : elementsMap.values();
+        return elementsList;
     }
-    
     
     /**
      * Returns the elements as stream.
@@ -435,14 +432,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
      * @return {@code elt}
      */
     private <T extends SubmodelElement> T add(T elt) {
-        if (null == elementsMap) {
-            elementsList.add(elt);
-        } else {
-            elementsMap.put(elt.getIdShort(), elt);
-        }
-        if (elt instanceof BaSyxSubmodelElement) {
-            ((BaSyxSubmodelElement) elt).setParent(this);
-        }
+        elementsList.add(elt);
         return elt;
     }
     
@@ -509,7 +499,12 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     }
 
     @Override
-    public org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection getSubmodelElement() {
+    public String getIdShort() {
+        return collection.getIdShort();
+    }
+
+    @Override
+    public ISubmodelElementCollection getSubmodelElement() {
         return collection;
     }
 
@@ -546,16 +541,10 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     @Override
     public SubmodelElement getElement(String idShort) {
         initialize();
-        SubmodelElement result = null;
-        if (null == elementsMap) {
-            Optional<SubmodelElement> tmp = elementsStream()
-                .filter(s -> s.getIdShort().equals(idShort))
-                .findFirst();
-            result = tmp.isPresent() ? tmp.get() : null; 
-        } else {
-            result = elementsMap.get(idShort); 
-        }
-        return result;
+        Optional<SubmodelElement> tmp = elementsStream()
+            .filter(s -> s.getIdShort().equals(idShort))
+            .findFirst();
+        return tmp.isPresent() ? tmp.get() : null; 
     }
 
     /**
@@ -579,12 +568,12 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     public SubmodelElementCollection getSubmodelElementCollection(String idShort) {
         return getElement(idShort, SubmodelElementCollection.class);
     }
-
+    
     @Override
     public SubmodelElementList getSubmodelElementList(String idShort) {
         return getElement(idShort, SubmodelElementList.class);
     }
-
+    
     @Override
     public Entity getEntity(String idShort) {
         return getElement(idShort, Entity.class);
@@ -644,9 +633,14 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     public BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
         return add(collection);
     }
+
+    @Override
+    public BaSyxSubmodelElementList register(BaSyxSubmodelElementList list) {
+        return add(list);
+    }
     
     @Override
-    public <D extends org.eclipse.digitaltwin.aas4j.v3.model.DataElement> 
+    public <D extends org.eclipse.basyx.submodel.metamodel.map.submodelelement.dataelement.DataElement> 
         BaSyxDataElement<D> register(BaSyxDataElement<D> dataElement) {
         return add(dataElement);
     }
@@ -654,65 +648,59 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     @Override
     public void accept(AasVisitor visitor) {
         initialize();
-        visitor.visitSubmodelElementCollection(this);
+        visitor.visitSubmodelElementList(this);
         for (SubmodelElement se : visitor.sortSubmodelElements(elementsCollection())) {
             se.accept(visitor);
         }
-        visitor.endSubmodelElementCollection(this);
+        visitor.endSubmodelElementList(this);
     }
 
     @Override
     public Reference createReference() {
-        return BaSyxReference.createModelReference(collection);
-    }
-    
-    /**
-     * Removes a submodel element through its idShort.
-     * 
-     * @param idShort the idshort to remove 
-     */
-    void deleteSubmodelElement(String idShort) {
-        collection.setValue(Tools.removeElements(collection.getValue(), e -> e.getIdShort().equals(idShort)));
-        updateConnectedSubmodelElement();
+        return new BaSyxReference(collection.getReference());
     }
 
     @Override
     public void deleteElement(String idShort) {
         initialize();
-        if (null == elementsMap) {
-            for (int i = 0; i < elementsList.size(); i++) {
-                SubmodelElement elt = elementsList.get(i);
-                if (elt.getIdShort().equalsIgnoreCase(idShort)) {
-                    elementsList.remove(i);
-                    deleteSubmodelElement(idShort);
-                    break;
-                }
-            }
-        } else {
-            if (elementsMap.containsKey(idShort)) {
-                elementsMap.remove(idShort);
-                deleteSubmodelElement(idShort);
+        for (int i = 0; i < elementsList.size(); i++) {
+            SubmodelElement elt = elementsList.get(i);
+            if (elt.getIdShort().equalsIgnoreCase(idShort)) {
+                elementsList.remove(i);
+                collection.deleteSubmodelElement(idShort);
+                break;
             }
         }
     }
 
     @Override
     public void update() {
-        elementsMap = null;
         elementsList = null;
-        
-        if (null != getParent()) {
-            org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement elt = getParent().processOnPath(
-                CollectionUtils.toList(collection), true, (sId, p, r) -> r.getSubmodelElement(sId, p));
-            if (elt instanceof org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection) {
-                collection = (org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection) elt;
-            }
+    }
+    
+    @Override
+    public String getSemanticId(boolean stripPrefix) {
+        return Tools.translateReference(collection.getSemanticId(), stripPrefix);
+    }
+
+    @Override
+    public void setSemanticId(String semanticId) {
+        IReference ref = Tools.translateReference(semanticId);
+        if (ref != null && collection instanceof org.eclipse.basyx.submodel.metamodel.map.submodelelement
+            .SubmodelElementCollection) {
+            ((org.eclipse.basyx.submodel.metamodel.map.submodelelement.SubmodelElementCollection) collection)
+                .setSemanticId(ref);
         }
     }
 
     @Override
-    public org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement getPathElement() {
-        return collection;
+    public SubmodelElement getElement(int index) {
+        return elementsList.get(index);
     }
 
+    @Override
+    public void deleteElement(int index) {
+        elementsList.remove(index);
+    }
+    
 }

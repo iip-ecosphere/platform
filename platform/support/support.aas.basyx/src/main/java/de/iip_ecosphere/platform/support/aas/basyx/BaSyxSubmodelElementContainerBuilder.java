@@ -242,6 +242,24 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubmodel>
     }
 
     /**
+     * Registers a sub-model element list.
+     * 
+     * @param list the list
+     * @param propagate enable propagation into the interface instance (usually {@code true}) or take a (performance)
+     * shortcut and only update the BaSyx submodel ({@code false})
+     * @return {@code collection}
+     */
+    protected BaSyxSubmodelElementList register(BaSyxSubmodelElementList list, boolean propagate) {
+        if (null == getInstance().getSubmodelElementList(list.getIdShort())) {
+            getInstance().getSubmodel().addSubmodelElement(list.getSubmodelElement());
+            if (propagate) {
+                getInstance().register(list);
+            }
+        }
+        return list;
+    }
+
+    /**
      * Registers a sub-build as deferred.
      * 
      * @param shortId the shortId of the element

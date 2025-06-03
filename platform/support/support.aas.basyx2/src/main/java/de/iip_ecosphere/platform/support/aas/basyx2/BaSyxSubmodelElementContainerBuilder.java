@@ -248,6 +248,24 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends org.eclipse
     }
 
     /**
+     * Registers a sub-model element list.
+     * 
+     * @param list the list
+     * @param propagate enable propagation into the interface instance (usually {@code true}) or take a (performance)
+     * shortcut and only update the BaSyx submodel ({@code false})
+     * @return {@code list}
+     */
+    protected BaSyxSubmodelElementList register(BaSyxSubmodelElementList list, boolean propagate) {
+        if (null == getInstance().getSubmodelElementCollection(list.getIdShort())) {
+            addSubmodelElement(list.getSubmodelElement());
+            if (propagate) {
+                getInstance().register(list);
+            }
+        }
+        return list;
+    }
+
+    /**
      * Registers a sub-build as deferred.
      * 
      * @param shortId the shortId of the element

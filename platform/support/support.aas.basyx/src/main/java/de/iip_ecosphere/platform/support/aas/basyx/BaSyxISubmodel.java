@@ -28,6 +28,8 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxConnectedAas.BaSyxConnectedAasBuilder;
 
 /**
@@ -74,6 +76,21 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
                 } else {
                     result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(this, 
                        (BaSyxSubmodelElementCollection) sub);                
+                }
+            }
+            return result;
+        }
+
+        @Override
+        public SubmodelElementListBuilder createSubmodelElementListBuilder(String idShort) {
+            SubmodelElementListBuilder result = instance.getDeferred(idShort, SubmodelElementListBuilder.class);
+            if (null == result) {
+                SubmodelElementList sub = instance.getSubmodelElementList(idShort);
+                if (null == sub) {
+                    result = new BaSyxSubmodelElementList.BaSyxSubmodelElementListBuilder(this, idShort);
+                } else {
+                    result = new BaSyxSubmodelElementList.BaSyxSubmodelElementListBuilder(this, 
+                       (BaSyxSubmodelElementList) sub);                
                 }
             }
             return result;
@@ -178,7 +195,25 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
         }
         return result;
     }
+
+    @Override
+    public SubmodelElementListBuilder createSubmodelElementListBuilder(String idShort) {
+        SubmodelElementListBuilder result = getDeferred(idShort, SubmodelElementListBuilder.class);
+        if (null == result) {
+            BaSyxSubmodelElementContainerBuilder<ISubmodel> secb = new BaSyxISubmodelBuilder(
+                new BaSyxConnectedAasBuilder(parent), this);
     
+            SubmodelElementList sub = getSubmodelElementList(idShort);
+            if (null == sub) {
+                result = new BaSyxSubmodelElementList.BaSyxSubmodelElementListBuilder(secb, idShort);
+            } else {
+                result = new BaSyxSubmodelElementList.BaSyxSubmodelElementListBuilder(secb, 
+                   (BaSyxSubmodelElementList) sub);
+            }
+        }
+        return result;
+    }
+
     @Override
     public void update() {
     }

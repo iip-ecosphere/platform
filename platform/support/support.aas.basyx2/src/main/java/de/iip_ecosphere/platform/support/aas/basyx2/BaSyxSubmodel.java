@@ -34,6 +34,8 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelE
 import de.iip_ecosphere.platform.support.aas.basyx2.AbstractAas.BaSyxAbstractAasBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx2.BaSyxSubmodelElement.PathFunction;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 
 /**
  * Wraps a BaSyx sub-model.
@@ -115,6 +117,16 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.digitaltwin.aas4
                 SubmodelElementCollectionBuilder.class);
             if (null == result) {
                 result = instance.obtainSubmodelElementCollectionBuilder(this, idShort, ordered, allowDuplicates);
+            }
+            return result;
+        }
+
+        @Override
+        public SubmodelElementListBuilder createSubmodelElementListBuilder(String idShort) {
+            SubmodelElementListBuilder result = instance.getDeferred(idShort, 
+                SubmodelElementListBuilder.class);
+            if (null == result) {
+                result = instance.obtainSubmodelElementListBuilder(this, idShort);
             }
             return result;
         }
@@ -234,7 +246,31 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.digitaltwin.aas4
         }
         return result;
     }
-    
+
+    /**
+     * Creates a builder for a contained sub-model element list. Calling this method again with the same name 
+     * shall lead to a builder that allows for modifying the sub-model.
+     * 
+     * @param parent the parent builder
+     * @param idShort the short name of the reference element
+     * @return the builder
+     * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty; or if modification is not possible
+     */
+    private SubmodelElementListBuilder obtainSubmodelElementListBuilder(
+        BaSyxSubmodelElementContainerBuilder<?> parent, String idShort) {
+        SubmodelElementListBuilder result = getDeferred(idShort, SubmodelElementListBuilder.class);
+        if (null == result) {
+            SubmodelElementList sub = getSubmodelElementList(idShort);
+            if (null == sub) {
+                result = new BaSyxSubmodelElementList.BaSyxSubmodelElementListBuilder(parent, idShort);
+            } else {
+                result = new BaSyxSubmodelElementList.BaSyxSubmodelElementListBuilder(parent, 
+                   (BaSyxSubmodelElementList) sub);
+            }
+        }
+        return result;
+    }
+
     @Override
     public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
         boolean allowDuplicates) {
@@ -242,6 +278,13 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.digitaltwin.aas4
             + "the deployment of the new submodel (as for initial AAS). If possible, create the submodel in advance.");
         return obtainSubmodelElementCollectionBuilder(new BaSyxSubmodelBuilder(parent.createAasBuilder(), this), 
             idShort, ordered, allowDuplicates);
+    }
+
+    @Override
+    public SubmodelElementListBuilder createSubmodelElementListBuilder(String idShort) {
+        LoggerFactory.getLogger(getClass()).warn("Adding a submodel to a deployed AAS currently does not lead to "
+            + "the deployment of the new submodel (as for initial AAS). If possible, create the submodel in advance.");
+        return obtainSubmodelElementListBuilder(new BaSyxSubmodelBuilder(parent.createAasBuilder(), this), idShort);
     }
 
     @Override

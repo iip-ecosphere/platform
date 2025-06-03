@@ -165,6 +165,16 @@ public class BaSyxElementTranslator {
         public default BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
             return registerElement(collection);
         }
+
+        /**
+         * Registers a sub-model element list.
+         * 
+         * @param list the list
+         * @return {@code list}
+         */
+        public default BaSyxSubmodelElementList register(BaSyxSubmodelElementList list) {
+            return registerElement(list);
+        }
         
         /**
          * Registers a data element.
