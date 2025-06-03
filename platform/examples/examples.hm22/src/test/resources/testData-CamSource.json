@@ -1,3 +1,0 @@
-{"command": {"command": "SOURCE_DO_QR_SCAN", "stringParam": ""}, "$period": 1000}
-{"command": {"command": "SOURCE_TAKE_PICTURE"}, "$period": 1000}
-{"command": {"command": "SOURCE_TAKE_PICTURE"}, "$period": 1000}
