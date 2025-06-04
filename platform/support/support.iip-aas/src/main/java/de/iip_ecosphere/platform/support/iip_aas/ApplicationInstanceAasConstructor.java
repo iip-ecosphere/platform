@@ -79,7 +79,7 @@ public class ApplicationInstanceAasConstructor {
             }
 
             SubmodelElementCollectionBuilder dBuilder 
-                = sub.createSubmodelElementCollectionBuilder(getAasAppInstanceId(appId, newId), false, false);
+                = sub.createSubmodelElementCollectionBuilder(getAasAppInstanceId(appId, newId));
             dBuilder.createPropertyBuilder(NAME_PROP_APPID)
                 .setValue(Type.STRING, appId)
                 .build();

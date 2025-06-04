@@ -45,7 +45,7 @@ import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.ImmediateDeploymen
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.RegistryDeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.State;
 import de.iip_ecosphere.platform.support.aas.SetupSpec;
-import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
@@ -1058,7 +1058,7 @@ public class AasPartRegistry {
      * @param aasId the id of the AAS
      * @return the created AAS property
      */
-    private static Property addAasEndpointProperty(Registry reg, SubmodelElementCollectionBuilder builder, 
+    private static Property addAasEndpointProperty(Registry reg, SubmodelElementContainerBuilder builder, 
         String property, String aasId) {
         String ep = null == reg ? null : reg.getEndpoint(AasUtils.fixId(aasId));
         if (null == ep) {
@@ -1079,7 +1079,7 @@ public class AasPartRegistry {
      * @param serviceId the id of the service, may be empty leading to an empty property value
      * @return the created AAS property
      */
-    public static Property addServiceAasEndpointProperty(Registry reg, SubmodelElementCollectionBuilder builder, 
+    public static Property addServiceAasEndpointProperty(Registry reg, SubmodelElementContainerBuilder builder, 
         String property, String serviceId) {
         return addAasEndpointProperty(reg, builder, property, serviceId.length() == 0 ? "" : "service_" + serviceId);
     }
@@ -1094,7 +1094,7 @@ public class AasPartRegistry {
      * @param deviceId the id of the device, may be empty leading to an empty property value
      * @return the created AAS property
      */
-    public static Property addDeviceAasEndpointProperty(Registry reg, SubmodelElementCollectionBuilder builder, 
+    public static Property addDeviceAasEndpointProperty(Registry reg, SubmodelElementContainerBuilder builder, 
         String property, String deviceId) {
         return addAasEndpointProperty(reg, builder, property, deviceId.length() == 0 ? "" : "device_" + deviceId);
     }
