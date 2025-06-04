@@ -354,9 +354,9 @@ public class AasTest {
             .build();
         
         SubmodelElementCollectionBuilder smcBuilderOuter = subModelBuilder.createSubmodelElementCollectionBuilder(
-            NAME_SUBMODELC_OUTER, false, true);
+            NAME_SUBMODELC_OUTER);
         SubmodelElementCollectionBuilder smcBuilderInner = smcBuilderOuter.createSubmodelElementCollectionBuilder(
-            NAME_SUBMODELC_INNER, false, true);
+            NAME_SUBMODELC_INNER);
         smcBuilderInner.createPropertyBuilder(NAME_VAR_SUBMODELC_INNER_VAR).setType(Type.AAS_INTEGER)
             .setDescription(DESCRIPTION).build();
         smcBuilderInner.createPropertyBuilder(NAME_VAR_SUBMODELC_INNER_INT).setValue(Type.INTEGER, 1).build();
@@ -375,7 +375,7 @@ public class AasTest {
         Assert.assertNotNull(smcOuter.getDataElement(NAME_VAR_SUBMODELC_OUTER_VAR));
         Assert.assertNotNull(smcOuter.getElement(NAME_SUBMODELC_INNER));
         Assert.assertNotNull(subModelBuilder.createSubmodelElementCollectionBuilder(
-            NAME_SUBMODELC_OUTER, false, true)); // for modification
+            NAME_SUBMODELC_OUTER)); // for modification
         
         Submodel submodel = subModelBuilder.build();
         Assert.assertNotNull(submodel.getIdentification());
@@ -392,9 +392,9 @@ public class AasTest {
         // adding on local models
         Submodel subAdd = aas.createSubmodelBuilder("sub_add", null).build();
         Assert.assertNotNull(aas.getSubmodel("sub_add"));
-        subAdd.createSubmodelElementCollectionBuilder("sub_coll", true, true).build();
-        Assert.assertNotNull(aas.getSubmodel("sub_add").getSubmodelElementCollection("sub_coll"));
-        submodel.createSubmodelElementCollectionBuilder("sub_coll2", false, false).build();
+        subAdd.createSubmodelElementListBuilder("sub_coll").build();
+        Assert.assertNotNull(aas.getSubmodel("sub_add").getSubmodelElementList("sub_coll"));
+        submodel.createSubmodelElementCollectionBuilder("sub_coll2").build();
         Assert.assertNotNull(submodel.getSubmodelElementCollection("sub_coll2"));
 
         aas.accept(new AasPrintVisitor());
@@ -413,10 +413,10 @@ public class AasTest {
         // build some submodel with sub-structure
         final int numElts = 10;
         Submodel subAdd = aas.createSubmodelBuilder("sub_ai", null).build();
-        SubmodelElementCollectionBuilder outerB = subAdd.createSubmodelElementCollectionBuilder("outer", true, false);
-        SubmodelElementCollectionBuilder collsB = outerB.createSubmodelElementCollectionBuilder("colls", true, false);
+        SubmodelElementCollectionBuilder outerB = subAdd.createSubmodelElementCollectionBuilder("outer");
+        SubmodelElementCollectionBuilder collsB = outerB.createSubmodelElementCollectionBuilder("colls");
         for (int i = 1; i <= numElts; i++) {
-            SubmodelElementCollectionBuilder b = collsB.createSubmodelElementCollectionBuilder("id_" + i, false, false);
+            SubmodelElementCollectionBuilder b = collsB.createSubmodelElementCollectionBuilder("id_" + i);
             b.createPropertyBuilder("prop")
                 .setValue(Type.STRING, "a")
                 .build();
@@ -465,7 +465,7 @@ public class AasTest {
         // false, submodel does not exist
         Assert.assertFalse(subAdd.create(c -> { }, true, "zyx"));
         Assert.assertTrue(subAdd.create(c-> {
-            c.createSubmodelElementCollectionBuilder("id_100", false, true).build();
+            c.createSubmodelElementCollectionBuilder("id_100").build();
         }, false, "outer", "colls"));
         
         SubmodelElementCollection oc = subAdd.getSubmodelElementCollection("outer")
@@ -565,18 +565,18 @@ public class AasTest {
 
         // the lately added sub-models/elements
         Assert.assertNotNull(aas.getSubmodel("sub_add"));
-        Assert.assertNotNull(aas.getSubmodel("sub_add").getSubmodelElementCollection("sub_coll"));
+        Assert.assertNotNull(aas.getSubmodel("sub_add").getSubmodelElementList("sub_coll"));
         Assert.assertNotNull(subm.getSubmodelElementCollection("sub_coll2"));
 
         // adding on connected models
         Submodel subAdd = aas.createSubmodelBuilder("conn_add", null).build();
         Assert.assertNotNull(aas.getSubmodel("conn_add"));
-        subAdd.createSubmodelElementCollectionBuilder("conn_coll", true, true).build();
-        Assert.assertNotNull(aas.getSubmodel("conn_add").getSubmodelElementCollection("conn_coll"));
-        subm.createSubmodelElementCollectionBuilder("conn_coll2", false, false).build();
+        subAdd.createSubmodelElementListBuilder("conn_coll").build();
+        Assert.assertNotNull(aas.getSubmodel("conn_add").getSubmodelElementList("conn_coll"));
+        subm.createSubmodelElementCollectionBuilder("conn_coll2").build();
         Assert.assertNotNull(subm.getSubmodelElementCollection("conn_coll2"));
-        SubmodelElementCollectionBuilder cc3 = subm.createSubmodelElementCollectionBuilder("conn_coll3", false, false);
-        cc3.createSubmodelElementCollectionBuilder("cc3_1", false, false).build();
+        SubmodelElementCollectionBuilder cc3 = subm.createSubmodelElementCollectionBuilder("conn_coll3");
+        cc3.createSubmodelElementCollectionBuilder("cc3_1").build();
         cc3.build();
         Assert.assertNotNull(subm.getSubmodelElementCollection("conn_coll3"));
         Assert.assertNotNull(subm.getSubmodelElementCollection("conn_coll3").getSubmodelElementCollection("cc3_1"));

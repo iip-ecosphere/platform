@@ -23,6 +23,7 @@ import de.iip_ecosphere.platform.support.aas.BasicAasVisitor;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 
 /**
  * Testing the print visitor against the fake AAS implementation.
@@ -42,12 +43,15 @@ public class PrintVisitorTest {
         SubmodelBuilder smB =  aasB.createSubmodelBuilder("sub", "");
         smB.createPropertyBuilder("prop").build();
         smB.createOperationBuilder("op").build();
-        SubmodelElementCollectionBuilder nB = smB.createSubmodelElementCollectionBuilder("nested", false, false);
+        SubmodelElementCollectionBuilder nB = smB.createSubmodelElementCollectionBuilder("nested");
         nB.createPropertyBuilder("nested").build();
         nB.createReferenceElementBuilder("parent").setValue(smB.createReference()).build();
         SubmodelElementCollectionBuilder nB2 = nB.createSubmodelElementCollectionBuilder("nested2", false, true);
         nB2.createPropertyBuilder("nested2").build();
         nB2.build();
+        SubmodelElementListBuilder nB3 = nB.createSubmodelElementListBuilder("nested3");
+        nB3.createPropertyBuilder("nested2").build();
+        nB3.build();
         nB.build();
         Submodel mySubmodel = smB.build();
         Aas myAas = aasB.build();

@@ -75,6 +75,20 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
         boolean allowDuplicates);
 
     /**
+     * Creates a builder for a contained sub-model element collection (not ordered, no duplicates). Calling this method 
+     * again with the same name shall lead to a builder that allows for modifying the sub-model.
+     * 
+     * @param idShort the short name of the reference element
+     * @param ordered whether the collection is ordered
+     * @param allowDuplicates whether the collection allows duplicates
+     * @return the builder
+     * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty; or if modification is not possible
+     */
+    public default SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort) {
+        return createSubmodelElementCollectionBuilder(idShort, false, false);
+    }
+    
+    /**
      * Returns a sub-model element list builder either by providing access to an existing list or through 
      * a builder to add a new sub-model elements list (ultimately only if {@link Builder#build()} was called).
      * 

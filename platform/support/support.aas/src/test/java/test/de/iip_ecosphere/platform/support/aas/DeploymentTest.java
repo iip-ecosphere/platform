@@ -134,7 +134,7 @@ public class DeploymentTest {
         aas = reg.retrieveAas(urn, true);
         Submodel sub = aas.getSubmodel("sub");
         Assert.assertNotNull(sub);
-        SubmodelElementCollectionBuilder smcB = sub.createSubmodelElementCollectionBuilder("coll", false, true);
+        SubmodelElementCollectionBuilder smcB = sub.createSubmodelElementCollectionBuilder("coll");
         smcB.createPropertyBuilder("prop").setValue(Type.BOOLEAN, true).build();
         smcB.build();
 
@@ -196,7 +196,7 @@ public class DeploymentTest {
         aas = reg.retrieveAas(urn);
         Submodel sub = aas.getSubmodel("sub");
         Assert.assertNotNull(sub);
-        SubmodelElementCollectionBuilder smcB = sub.createSubmodelElementCollectionBuilder("coll", false, false);
+        SubmodelElementCollectionBuilder smcB = sub.createSubmodelElementCollectionBuilder("coll");
         Assert.assertTrue(smcB.isNew());
         smcB.createPropertyBuilder("prop").setValue(Type.BOOLEAN, true).build();
         Utils.setValue(smcB.createPropertyBuilder("prop2").setType(Type.INTEGER), 5,
@@ -212,16 +212,16 @@ public class DeploymentTest {
         assertProp2(coll);
 
         // add dynamically, no sub-model builder available, call buildDeferred at the end
-        smcB = sub.createSubmodelElementCollectionBuilder("coll", false, false);
+        smcB = sub.createSubmodelElementCollectionBuilder("coll");
         smcB.createPropertyBuilder("prop2").setValue(Type.STRING, "aa").build();
         SubmodelElementCollectionBuilder smcBI 
-            = smcB.createSubmodelElementCollectionBuilder("coll_inner", false, false);
+            = smcB.createSubmodelElementCollectionBuilder("coll_inner");
         smcBI.createPropertyBuilder("prop2I").setValue(Type.STRING, "ab").build();
         smcBI.defer();
         smcB.defer();
-        smcB = sub.createSubmodelElementCollectionBuilder("coll", false, false);
+        smcB = sub.createSubmodelElementCollectionBuilder("coll");
         smcB.createPropertyBuilder("prop3").setValue(Type.STRING, "bb").build();
-        smcBI = smcB.createSubmodelElementCollectionBuilder("coll_inner", false, false);
+        smcBI = smcB.createSubmodelElementCollectionBuilder("coll_inner");
         smcBI.createPropertyBuilder("prop3I").setValue(Type.STRING, "ac").build();
         smcBI.defer();
         smcB.buildDeferred();
