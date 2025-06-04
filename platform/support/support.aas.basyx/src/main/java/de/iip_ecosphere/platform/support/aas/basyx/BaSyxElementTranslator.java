@@ -225,7 +225,12 @@ public class BaSyxElementTranslator {
         } else if (se instanceof IReferenceElement) {
             reg.register(new BaSyxReferenceElement((IReferenceElement) se));
         } else if (se instanceof ISubmodelElementCollection) {
-            reg.register(new BaSyxSubmodelElementCollection((ISubmodelElementCollection) se));
+            ISubmodelElementCollection c = (ISubmodelElementCollection) se;
+            if (c.isOrdered()) {
+                reg.register(new BaSyxSubmodelElementList(c));
+            } else {
+                reg.register(new BaSyxSubmodelElementCollection(c));
+            }
         } else if (se instanceof File) {
             reg.register(new BaSyxFile((File) se));
         } else if (se instanceof Blob) {

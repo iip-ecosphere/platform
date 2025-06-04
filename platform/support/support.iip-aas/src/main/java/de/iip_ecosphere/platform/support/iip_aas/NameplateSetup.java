@@ -507,7 +507,7 @@ public class NameplateSetup {
                 if (null != getServices()) {
                     for (Service s: getServices()) {
                         SubmodelElementCollectionBuilder smcb = sub
-                            .createSubmodelElementCollectionBuilder(s.getKey(), false, false);
+                            .createSubmodelElementCollectionBuilder(s.getKey());
                         smcb.createPropertyBuilder(PROPERTY_KEY)
                             .setValue(Type.STRING, s.getKey())
                             .build();

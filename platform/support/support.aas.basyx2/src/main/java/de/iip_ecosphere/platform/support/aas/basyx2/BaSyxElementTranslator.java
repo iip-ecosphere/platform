@@ -154,7 +154,17 @@ public class BaSyxElementTranslator {
         public default BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
             return registerElement(collection);
         }
-        
+
+        /**
+         * Registers a sub-model element list.
+         * 
+         * @param list the list
+         * @return {@code collection}
+         */
+        public default BaSyxSubmodelElementList register(BaSyxSubmodelElementList list) {
+            return registerElement(list);
+        }
+
         /**
          * Registers a data element.
          * 
@@ -210,6 +220,9 @@ public class BaSyxElementTranslator {
         } else if (se instanceof org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection) {
             reg.register(new BaSyxSubmodelElementCollection(
                 (org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementCollection) se));
+        } else if (se instanceof org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementList) {
+            reg.register(new BaSyxSubmodelElementList(
+                (org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementList) se));
         } else if (se instanceof org.eclipse.digitaltwin.aas4j.v3.model.File) {
             reg.register(new BaSyxFile((org.eclipse.digitaltwin.aas4j.v3.model.File) se));
         } else if (se instanceof org.eclipse.digitaltwin.aas4j.v3.model.Blob) {

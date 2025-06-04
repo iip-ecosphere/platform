@@ -92,14 +92,8 @@ public class Tools {
         mapType(Type.ANY_URI, ValueType.AnyURI);
         mapType(Type.BASE64_BINARY, ValueType.Base64Binary);
         mapType(Type.HEX_BINARY, ValueType.HexBinary);
-        mapType(Type.NOTATION, ValueType.NOTATION);
-        mapType(Type.ENTITY, ValueType.ENTITY);
-        mapType(Type.ID, ValueType.ID);
-        mapType(Type.IDREF, ValueType.IDREF);
         
         mapType(Type.DURATION, ValueType.Duration);
-        mapType(Type.DAY_TIME_DURATION, ValueType.DayTimeDuration); 
-        mapType(Type.YEAR_MONTH_DURATION, ValueType.YearMonthDuration);
         mapType(Type.DATE_TIME, ValueType.DateTime);
         mapType(Type.DATE_TIME_STAMP, ValueType.DateTimeStamp);
         mapType(Type.G_DAY, ValueType.GDay);
@@ -107,11 +101,7 @@ public class Tools {
         mapType(Type.G_MONTH_DAY, ValueType.GMonthDay); 
         mapType(Type.G_YEAR, ValueType.GYear);
         mapType(Type.G_YEAR_MONTH, ValueType.GYearMonth);
-        mapType(Type.Q_NAME, ValueType.QName);
         mapType(Type.NONE, ValueType.None);
-        
-        mapType(Type.ANY_TYPE, ValueType.AnyType); 
-        mapType(Type.ANY_SIMPLE_TYPE, ValueType.AnySimpleType);
     }
     
     static {

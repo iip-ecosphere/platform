@@ -55,7 +55,6 @@ import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.SemanticIdRecognizer;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.ComponentSetup;
 import de.iip_ecosphere.platform.support.aas.Type;
-import de.iip_ecosphere.platform.support.identities.IdentityToken;
 
 /**
  * Some utilities, such as for parameter checking. Public for testing.
@@ -120,14 +119,8 @@ public class Tools {
             o -> DatatypeConverter.printBase64Binary((byte[]) o), s -> DatatypeConverter.parseBase64Binary(s));
         mapType(Type.HEX_BINARY, DataTypeDefXsd.HEX_BINARY,
             o -> DatatypeConverter.printHexBinary((byte[]) o), s -> DatatypeConverter.parseHexBinary(s));
-        //mapType(Type.NOTATION, ValueType.NOTATION);
-        //mapType(Type.ENTITY, ValueType.ENTITY);
-        //mapType(Type.ID, ValueType.ID);
-        //mapType(Type.IDREF, ValueType.IDREF);
         
         mapType(Type.DURATION, DataTypeDefXsd.DURATION, DFLT_OBJECT2BASXY, DFLT_BASYX2OBJECT);
-        mapType(Type.DAY_TIME_DURATION, DataTypeDefXsd.DURATION, DFLT_OBJECT2BASXY, DFLT_BASYX2OBJECT); // preliminary
-        mapType(Type.YEAR_MONTH_DURATION, DataTypeDefXsd.DURATION, DFLT_OBJECT2BASXY, DFLT_BASYX2OBJECT); // preliminary
         mapType(Type.DATE_TIME, DataTypeDefXsd.DATE_TIME,
             o -> DatatypeConverter.printDateTime(convertToCalendar(o)), s -> DatatypeConverter.parseDateTime(s));
         mapType(Type.DATE_TIME_STAMP, DataTypeDefXsd.TIME, 
@@ -137,11 +130,7 @@ public class Tools {
         mapType(Type.G_MONTH_DAY, DataTypeDefXsd.GMONTH_DAY, DFLT_OBJECT2BASXY, DFLT_BASYX2OBJECT); 
         mapType(Type.G_YEAR, DataTypeDefXsd.GYEAR, DFLT_OBJECT2BASXY, DFLT_BASYX2OBJECT);
         mapType(Type.G_YEAR_MONTH, DataTypeDefXsd.GYEAR_MONTH, DFLT_OBJECT2BASXY, DFLT_BASYX2OBJECT);
-        //mapType(Type.Q_NAME, ValueType.QName);
         mapType(Type.NONE, null, DFLT_OBJECT2BASXY, DFLT_BASYX2OBJECT); // TODO preliminary
-        
-        //mapType(Type.ANY_TYPE, ValueType.AnyType); 
-        //mapType(Type.ANY_SIMPLE_TYPE, ValueType.AnySimpleType);
     }
     
     static {

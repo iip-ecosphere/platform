@@ -126,7 +126,7 @@ public class ClassUtility {
     public static Reference addType(AasBuilder aasBuilder, Class<?> type) {
         SubmodelBuilder smb = aasBuilder.createSubmodelBuilder(NAME_TYPE_SUBMODEL, null); // create or re-open
         SubmodelElementCollectionBuilder typeCollection = smb.createSubmodelElementCollectionBuilder(
-            getName(type), false, false);
+            getName(type));
         Reference result = addType(typeCollection, type);
         typeCollection.build();
         smb.build(); // ok also in case of re-open
@@ -184,7 +184,7 @@ public class ClassUtility {
                 .build();
         } else if (type.isArray()) {
             SubmodelElementCollectionBuilder cBuilder = subModelBuilder.createSubmodelElementCollectionBuilder(
-                idShort, false, false);
+                idShort);
             addTypeSubModelElement(cBuilder, NAME_ARRAY_PROPERTY_TYPE, type.getComponentType());
             cBuilder
                 .createPropertyBuilder(NAME_ARRAY_PROPERTY_DIMENSIONS)

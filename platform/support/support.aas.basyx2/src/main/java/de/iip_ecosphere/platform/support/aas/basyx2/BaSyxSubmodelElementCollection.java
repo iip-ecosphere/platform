@@ -644,7 +644,12 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     public BaSyxSubmodelElementCollection register(BaSyxSubmodelElementCollection collection) {
         return add(collection);
     }
-    
+
+    @Override
+    public BaSyxSubmodelElementList register(BaSyxSubmodelElementList list) {
+        return add(list);
+    }
+
     @Override
     public <D extends org.eclipse.digitaltwin.aas4j.v3.model.DataElement> 
         BaSyxDataElement<D> register(BaSyxDataElement<D> dataElement) {

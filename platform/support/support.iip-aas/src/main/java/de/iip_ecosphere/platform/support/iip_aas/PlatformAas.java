@@ -257,7 +257,7 @@ public class PlatformAas implements AasContributor {
     public static void createAddress(SubmodelElementContainerBuilder smBuilder, Address address) {
         if (null != address) {
             SubmodelElementCollectionBuilder aBuilder 
-                = smBuilder.createSubmodelElementCollectionBuilder(NAME_SMC_ADDRESS, false, false);
+                = smBuilder.createSubmodelElementCollectionBuilder(NAME_SMC_ADDRESS);
             aBuilder.createPropertyBuilder(NAME_PROPERTY_CITYTOWN)
                 .setValue(Type.LANG_STRING, address.getCityTown())
                 .build();

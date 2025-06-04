@@ -482,6 +482,11 @@ public class BaSyxEntity extends BaSyxSubmodelElement implements Entity, Submode
     }
 
     @Override
+    public BaSyxSubmodelElementList register(BaSyxSubmodelElementList list) {
+        return add(list);
+    }
+
+    @Override
     public <D extends org.eclipse.digitaltwin.aas4j.v3.model.DataElement> 
         BaSyxDataElement<D> register(BaSyxDataElement<D> dataElement) {
         return add(dataElement);

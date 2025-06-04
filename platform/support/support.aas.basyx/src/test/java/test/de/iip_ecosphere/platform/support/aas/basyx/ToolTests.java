@@ -12,6 +12,8 @@
 
 package test.de.iip_ecosphere.platform.support.aas.basyx;
 
+import java.util.Set;
+
 import org.eclipse.basyx.aas.metamodel.api.parts.asset.AssetKind;
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
@@ -94,10 +96,15 @@ public class ToolTests {
                 assertEquals(t, Tools.translate(t));
             }
         }
+        Set<ValueType> notMapped = Set.of(ValueType.NOTATION, ValueType.ENTITY, ValueType.ID, ValueType.IDREF, 
+            ValueType.DayTimeDuration, ValueType.YearMonthDuration, ValueType.QName, ValueType.AnyType, 
+            ValueType.AnySimpleType); // MM v3
         for (ValueType t : ValueType.values()) {
             Type tt = Tools.translate(t);
             if (Tools.isAlias(t)) {
                 Assert.assertNotNull(tt);
+            } else if (notMapped.contains(t)) {
+                Assert.assertNull(tt);
             } else if (tt != Type.AAS_INTEGER) { // default alias
                 assertEquals(t, tt);
             }
