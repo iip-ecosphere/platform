@@ -88,6 +88,11 @@ public interface Entity extends SubmodelElement, SubmodelElementCollection {
          * @return the reference
          */
         public Reference createReference();
+        
+        @Override
+        public default void justBuild() {
+            build();
+        }
 
     }
     

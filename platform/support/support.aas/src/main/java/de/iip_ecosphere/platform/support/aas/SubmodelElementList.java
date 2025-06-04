@@ -42,6 +42,11 @@ public interface SubmodelElementList extends SubmodelElement, ElementsAccess {
          */
         public SubmodelElementListBuilder setSemanticId(String refValue);
         
+        @Override
+        public default void justBuild() {
+            build();
+        }
+        
     }
 
     /**

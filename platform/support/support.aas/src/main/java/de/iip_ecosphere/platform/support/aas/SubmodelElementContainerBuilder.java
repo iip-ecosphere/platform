@@ -1,5 +1,6 @@
 package de.iip_ecosphere.platform.support.aas;
 
+import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.BlobDataElement.BlobDataElementBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
@@ -176,4 +177,9 @@ public interface SubmodelElementContainerBuilder {
      */
     public boolean hasElement(String idShort);
 
+    /**
+     * Generic build method that shall call {@link Builder#build()} but without returning the created instance.
+     */
+    public void justBuild();
+    
 }

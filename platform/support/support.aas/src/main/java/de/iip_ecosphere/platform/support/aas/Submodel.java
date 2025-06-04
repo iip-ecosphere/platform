@@ -60,6 +60,11 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
          */
         public SubmodelBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions); 
 
+        @Override
+        public default void justBuild() {
+            build();
+        }
+        
     }
 
     /**
