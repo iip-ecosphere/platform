@@ -20,14 +20,13 @@ describe('ResourcesComponent', () => {
 
   beforeEach(async () => {
     await EnvConfigService.init();
-    await TestBed
-      .configureTestingModule({
-    declarations: [ResourcesComponent],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    imports: [RouterTestingModule.withRoutes(routes)],
-    providers: [provideHttpClient(withInterceptorsFromDi())]
-})
-      .compileComponents()
+    await TestBed.configureTestingModule({
+        declarations: [ResourcesComponent],
+        schemas: [CUSTOM_ELEMENTS_SCHEMA],
+        imports: [RouterTestingModule.withRoutes(routes)],
+        providers: [provideHttpClient(withInterceptorsFromDi())],
+        teardown: {destroyAfterEach: false} // NG0205: Injector has already been destroyed
+    }).compileComponents()
       .then(() => {
         fixture = TestBed.createComponent(ResourcesComponent);
         component = fixture.componentInstance;

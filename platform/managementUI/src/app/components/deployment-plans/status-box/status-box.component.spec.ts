@@ -19,21 +19,21 @@ describe('StatusBoxComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [StatusBoxComponent, NgVar, FileUploadComponent],
-    imports: [MatDialogModule,
-        BrowserAnimationsModule,
-        MatCardModule,
-        MatIconModule,
-        MatProgressSpinnerModule,
-        MatTooltipModule],
-    providers: [
-        { provide: MatDialogRef, useValue: {} },
-        { provide: MAT_DIALOG_DATA, useValue: [] },
-        provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting(),
-    ]
-})
-    .compileComponents();
+        declarations: [StatusBoxComponent, NgVar, FileUploadComponent],
+        imports: [MatDialogModule,
+            BrowserAnimationsModule,
+            MatCardModule,
+            MatIconModule,
+            MatProgressSpinnerModule,
+            MatTooltipModule],
+        providers: [
+            { provide: MatDialogRef, useValue: {} },
+            { provide: MAT_DIALOG_DATA, useValue: [] },
+            provideHttpClient(withInterceptorsFromDi()),
+            provideHttpClientTesting(),
+        ],
+        teardown: {destroyAfterEach: false} // NG0205: Injector has already been destroyed
+    }).compileComponents();
     fixture = TestBed.createComponent(StatusBoxComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

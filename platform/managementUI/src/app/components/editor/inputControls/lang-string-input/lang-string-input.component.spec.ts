@@ -18,7 +18,8 @@ describe('LangStringInputComponent', () => {
         FormsModule, 
         BrowserAnimationsModule, 
         MatTooltipModule ],
-      declarations: [ LangStringInputComponent ]
+      declarations: [ LangStringInputComponent ],
+      teardown: {destroyAfterEach: false} // NG0205: Injector has already been destroyed
     })
     .compileComponents();
 

@@ -13,7 +13,8 @@ describe('EnumDropdownComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ MatSelectModule, FormsModule, BrowserAnimationsModule ],
-      declarations: [ EnumDropdownComponent ]
+      declarations: [ EnumDropdownComponent ],
+      teardown: {destroyAfterEach: false} // NG0205: Injector has already been destroyed
     })
     .compileComponents();
 

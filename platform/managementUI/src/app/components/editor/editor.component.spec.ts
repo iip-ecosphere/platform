@@ -16,16 +16,16 @@ describe('EditorComponent', () => {
   beforeEach(async () => {
     await EnvConfigService.init();
     await TestBed.configureTestingModule({
-    declarations: [EditorComponent],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    imports: [FormsModule, MatTooltipModule],
-    providers: [
-        { provide: MatDialogRef, useValue: {} },
-        { provide: MAT_DIALOG_DATA, useValue: [] },
-        provideHttpClient(withInterceptorsFromDi()),
-    ]
-})
-    .compileComponents();
+        declarations: [EditorComponent],
+        schemas: [CUSTOM_ELEMENTS_SCHEMA],
+        imports: [FormsModule, MatTooltipModule],
+        providers: [
+            { provide: MatDialogRef, useValue: {} },
+            { provide: MAT_DIALOG_DATA, useValue: [] },
+            provideHttpClient(withInterceptorsFromDi()),
+        ],
+        teardown: {destroyAfterEach: false} // NG0205: Injector has already been destroyed
+    }).compileComponents();
 
     fixture = TestBed.createComponent(EditorComponent);
     component = fixture.componentInstance;

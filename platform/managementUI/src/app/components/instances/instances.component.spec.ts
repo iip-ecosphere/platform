@@ -14,11 +14,11 @@ describe('InstancesComponent', () => {
   beforeEach(async () => {
     await EnvConfigService.init();
     await TestBed.configureTestingModule({
-    declarations: [InstancesComponent],
-    imports: [MatIconModule],
-    providers: [provideHttpClient(withInterceptorsFromDi())]
-})
-    .compileComponents();
+        declarations: [InstancesComponent],
+        imports: [MatIconModule],
+        providers: [provideHttpClient(withInterceptorsFromDi())],
+        teardown: {destroyAfterEach: false} // NG0205: Injector has already been destroyed
+    }).compileComponents();
 
     fixture = TestBed.createComponent(InstancesComponent);
     component = fixture.componentInstance;

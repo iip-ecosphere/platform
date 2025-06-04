@@ -32,22 +32,22 @@ describe('ListComponent', () => {
   beforeEach(async () => {
     await EnvConfigService.init();
     await TestBed.configureTestingModule({
-    declarations: [ListComponent, FileUploadComponent, EditorComponent],
-    imports: [MatTabsModule,
-        MatIconModule,
-        BrowserAnimationsModule,
-        MatDialogModule,
-        MatTooltipModule,
-        MatSelectModule,
-        FormsModule,
-        RouterTestingModule.withRoutes(routes)],
-    providers: [
-        { provide: MatDialogRef, useValue: {} },
-        { provide: MAT_DIALOG_DATA, useValue: [] },
-        provideHttpClient(withInterceptorsFromDi()),
-    ]
-})
-    .compileComponents().then(() => {
+        declarations: [ListComponent, FileUploadComponent, EditorComponent],
+        imports: [MatTabsModule,
+            MatIconModule,
+            BrowserAnimationsModule,
+            MatDialogModule,
+            MatTooltipModule,
+            MatSelectModule,
+            FormsModule,
+            RouterTestingModule.withRoutes(routes)],
+        providers: [
+            { provide: MatDialogRef, useValue: {} },
+            { provide: MAT_DIALOG_DATA, useValue: [] },
+            provideHttpClient(withInterceptorsFromDi()),
+        ],
+        teardown: {destroyAfterEach: false} // NG0205: Injector has already been destroyed
+    }).compileComponents().then(() => {
       fixture = TestBed.createComponent(ListComponent);
       component = fixture.componentInstance;
       component.websocketService.emitInfo = false;

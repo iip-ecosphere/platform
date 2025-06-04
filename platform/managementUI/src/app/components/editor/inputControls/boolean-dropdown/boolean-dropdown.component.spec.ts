@@ -13,7 +13,8 @@ describe('BooleanDropdownComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ MatSelectModule, FormsModule, BrowserAnimationsModule ],
-      declarations: [ BooleanDropdownComponent ]
+      declarations: [ BooleanDropdownComponent ],
+      teardown: {destroyAfterEach: false} // NG0205: Injector has already been destroyed
     })
     .compileComponents();
 

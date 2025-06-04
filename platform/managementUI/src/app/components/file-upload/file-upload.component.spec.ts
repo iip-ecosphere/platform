@@ -18,7 +18,8 @@ describe('FileUploadComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ MatIconModule, MatTooltipModule, FormsModule ],
       declarations: [ FileUploadComponent ],
-      schemas: [NO_ERRORS_SCHEMA] // complains about matTooltip although imported
+      schemas: [NO_ERRORS_SCHEMA], // complains about matTooltip although imported
+      teardown: {destroyAfterEach: false} // NG0205: Injector has already been destroyed
     })
     .compileComponents().then(() => {
       fixture = TestBed.createComponent(FileUploadComponent);

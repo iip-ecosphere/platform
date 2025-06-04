@@ -21,9 +21,9 @@ describe('StatusDetailsComponent', () => {
       providers: [
         {provide: MatDialogRef, useValue: dialogMock},
         {provide: MAT_DIALOG_DATA, useValue: []},
-      ]
-    })
-    .compileComponents();
+      ],
+      teardown: {destroyAfterEach: false} // NG0205: Injector has already been destroyed
+    }).compileComponents();
 
     fixture = TestBed.createComponent(StatusDetailsComponent);
     component = fixture.componentInstance;

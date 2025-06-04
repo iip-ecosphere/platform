@@ -10,7 +10,8 @@ describe('MeshFeedbackComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ MeshFeedbackComponent ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      teardown: {destroyAfterEach: false} // NG0205: Injector has already been destroyed
     })
     .compileComponents();
 

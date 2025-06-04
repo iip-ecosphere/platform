@@ -16,11 +16,11 @@ describe('DeploymentPlansComponent', () => {
   beforeEach(async () => {
     await EnvConfigService.init();
     await TestBed.configureTestingModule({
-    declarations: [DeploymentPlansComponent, FileUploadComponent],
-    imports: [MatIconModule, MatTooltipModule],
-    providers: [provideHttpClient(withInterceptorsFromDi())]
-})
-    .compileComponents();
+        declarations: [DeploymentPlansComponent, FileUploadComponent],
+        imports: [MatIconModule, MatTooltipModule],
+        providers: [provideHttpClient(withInterceptorsFromDi())],
+        teardown: {destroyAfterEach: false} // NG0205: Injector has already been destroyed
+    }).compileComponents();
     fixture = TestBed.createComponent(DeploymentPlansComponent);
     component = fixture.componentInstance;
     component.websocket.emitInfo = false;

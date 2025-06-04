@@ -34,8 +34,7 @@ describe('SubeditorButtonComponent', () => {
             provideHttpClient(withInterceptorsFromDi()),
         ],
         teardown: {destroyAfterEach: false} // NG0205: Injector has already been destroyed
-    })
-    .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(SubeditorButtonComponent);
     component = fixture.componentInstance;

@@ -23,27 +23,27 @@ describe('InputRefSelectComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    declarations: [
-        InputRefSelectComponent,
-        SubeditorButtonComponent
-    ],
-    imports: [MatDialogModule,
-        MatIconModule,
-        MatCardModule,
-        MatTooltipModule,
-        MatToolbarModule,
-        MatFormFieldModule,
-        MatSelectModule,
-        MatInputModule, // required via MatFormFieldModule
-        FormsModule, // required via MatFormFieldModule
-        BrowserAnimationsModule],
-    providers: [
-        { provide: MatDialogRef, useValue: {} },
-        { provide: MAT_DIALOG_DATA, useValue: [] },
-        provideHttpClient(withInterceptorsFromDi()),
-    ]
-})
-    .compileComponents();
+        declarations: [
+            InputRefSelectComponent,
+            SubeditorButtonComponent
+        ],
+        imports: [MatDialogModule,
+            MatIconModule,
+            MatCardModule,
+            MatTooltipModule,
+            MatToolbarModule,
+            MatFormFieldModule,
+            MatSelectModule,
+            MatInputModule, // required via MatFormFieldModule
+            FormsModule, // required via MatFormFieldModule
+            BrowserAnimationsModule],
+        providers: [
+            { provide: MatDialogRef, useValue: {} },
+            { provide: MAT_DIALOG_DATA, useValue: [] },
+            provideHttpClient(withInterceptorsFromDi()),
+        ],
+        teardown: {destroyAfterEach: false} // NG0205: Injector has already been destroyed
+    }).compileComponents();
 
     fixture = TestBed.createComponent(InputRefSelectComponent);
     component = fixture.componentInstance;

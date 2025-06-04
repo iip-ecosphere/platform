@@ -18,20 +18,20 @@ describe('FlowchartComponent', () => {
   beforeEach(async () => {
     await EnvConfigService.init();
     await TestBed.configureTestingModule({
-    declarations: [FlowchartComponent],
-    imports: [RouterTestingModule,
-        MatDialogModule,
-        FormsModule,
-        MatIconModule,
-        MatCardModule,
-        MatInputModule],
-    providers: [
-        { provide: MatDialogRef, useValue: {} },
-        { provide: MAT_DIALOG_DATA, useValue: [] },
-        provideHttpClient(withInterceptorsFromDi()),
-    ]
-})
-    .compileComponents();
+        declarations: [FlowchartComponent],
+        imports: [RouterTestingModule,
+            MatDialogModule,
+            FormsModule,
+            MatIconModule,
+            MatCardModule,
+            MatInputModule],
+        providers: [
+            { provide: MatDialogRef, useValue: {} },
+            { provide: MAT_DIALOG_DATA, useValue: [] },
+            provideHttpClient(withInterceptorsFromDi()),
+        ],
+        teardown: {destroyAfterEach: false} // NG0205: Injector has already been destroyed
+    }).compileComponents();
     fixture = TestBed.createComponent(FlowchartComponent);
     component = fixture.componentInstance;
     await component.ngOnInit();

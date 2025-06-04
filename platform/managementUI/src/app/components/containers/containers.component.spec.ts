@@ -10,7 +10,8 @@ describe('ContainersComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ MatIconModule ],
-      declarations: [ ContainersComponent ]
+      declarations: [ ContainersComponent ],
+      teardown: {destroyAfterEach: false} // NG0205: Injector has already been destroyed
     })
     .compileComponents();
   });
