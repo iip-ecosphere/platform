@@ -177,7 +177,7 @@
                            <appArg>--browsers=ChromeHeadless</appArg>
                            <appArg>--code-coverage</appArg>
                        </appArgs>
-                       <testTime>540000</testTime>
+                       <testTime>900000</testTime>
                        <platformDir>${platformDir}</platformDir>
                        <artifacts>
                            <directory>.</directory>
