@@ -172,6 +172,7 @@ The `testApp` goal (default phase `package`, can be seen as integration test but
   - `startEcsRuntime` (`-Dconfiguration.testApp.startEcsRuntime=...`, default `false`) if `platformDir` is given, try to start the ECS-runtime (transport adjusted to the `brokerPort`). 
   - `startServiceManager` (`-Dconfiguration.testApp.startServiceManager=...`, default `false`) if `platformDir` is given, try to start the service manager (transport adjusted to the `brokerPort`, separated AAS implementation port than ECS-runtime). 
   - `startEcsServiceMgr` (`-Dconfiguration.testApp.startEcsServiceMgr=...`, default `true`) if `platformDir` is given, try to start the combined ECS-Runtime/service manager (transport adjusted to the `brokerPort`). 
+  - `platformStartTimeout` (`-Dconfiguration.testApp.platformStartTimeout=...`, default `120000`) time in ms to wait until a single platform service startup shall be considered as a failure (if not a log pattern match occurred before).
   - `deploymentPlan` (`-Dconfiguration.testApp.deploymentPlan=...`, default `""`) if `testCmd` and `platformDir` are set, defines a deployment plan to be started with the platform around the test, resource in deployment plan must be `deploymentResource`
   - `deploymentResource` (`-Dconfiguration.testApp.deploymentResource=...`, default `local`) the resource to be used in `deploymentPlan`
   - `mgtUiSetupFileTemplate` (`-Dconfiguration.testApp.mgtUiSetupFileTemplate=...`, default `""`) the template on how to derive the management UI setup JSON file

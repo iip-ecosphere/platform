@@ -124,7 +124,10 @@ public class TestAppMojo extends AbstractLoggingMojo {
     @Parameter(property = "configuration.testApp.testTime", required = true, defaultValue = "120000")
     private int testTime;
     private int testTimePlatform;
-    
+
+    @Parameter(property = "configuration.testApp.platformStartTimeout", required = true, defaultValue = "120000")
+    private int platformStartTimeout;
+
     @Parameter(property = "configuration.outputDirectory", required = true, defaultValue = "gen")
     private String outputDirectory;
 
@@ -225,7 +228,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
             }
             return false;
         }, args));
-        TimeUtils.waitFor(() -> !started.get(), 50 * 1000, 300);
+        TimeUtils.waitFor(() -> !started.get(), platformStartTimeout, 300);
         if (!started.get()) {
             throw new MojoExecutionException("Start of " + pu.getDescription() + " did not emit expected regEx");
         }
