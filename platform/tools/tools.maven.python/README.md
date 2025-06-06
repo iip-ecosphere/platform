@@ -79,6 +79,7 @@ The test runner plugin supports the following configuration settings:
   - `skip` (default `false`, user property `python-test.skip`) skips the execution of this plugin. 
   - `test` (default `empty`, user property `python-test.test`), optional (file) name of the test to be executed. If not given, all tests will be executed.  
   - `python.binary` optional absolute path to python binary (may also be given as environment variable `IIP_PYTHON`)
+  - `python.pythonpath` optional PYTHONPATH, if not given composed based on `target/pySrc`, the application interfaces of the generated application in `target/gen` and the python source folders for services in `src/main/python`
     
 ## Combining the goals
 

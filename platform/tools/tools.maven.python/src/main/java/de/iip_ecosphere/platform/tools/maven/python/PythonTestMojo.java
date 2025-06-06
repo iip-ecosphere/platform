@@ -59,7 +59,10 @@ public class PythonTestMojo extends AbstractMojo {
 
     @Parameter(property = "python.binary", required = false, defaultValue = "")
     private String python;
-    
+
+    @Parameter(property = "python.pythonpath", required = false, defaultValue = "")
+    private String pythonPath;
+
     /**
      * A specific <code>fileSet</code> rule to select files and directories.
      */
@@ -112,7 +115,7 @@ public class PythonTestMojo extends AbstractMojo {
     
             String pythonExecutable = PythonUtils.getPythonExecutable(python).toString();
     
-            getLog().info("Using Python " + pythonExecutable);
+            getLog().info("Using Python: " + pythonExecutable);
     
             String output = "";
             String testFile = test == null ? "" : test; // do not modify original
@@ -122,11 +125,12 @@ public class PythonTestMojo extends AbstractMojo {
                 }
                 getLog().info("Seleted test file: " + testFile);
             }
+            String[] envp = composeEnvironment();
             for (File f : pythonFiles) {
                 if (testFile.length() == 0 || f.getName().startsWith(testFile)) {
                     getLog().info("Executing Python test: " + f.getName());
                     String[] cmd = {pythonExecutable.toString(), f.getName(), modelProject}; 
-                    output += runPythonTest(cmd, new File(baseDir, "src/test/python/").getAbsolutePath());
+                    output += runPythonTest(cmd, new File(baseDir, "src/test/python/").getAbsolutePath(), envp);
                     testedFileCount++;
                 }
             }
@@ -142,16 +146,63 @@ public class PythonTestMojo extends AbstractMojo {
     }
     
     /**
+     * Composes the environment for the python exec call.
+     * 
+     * @return the environment, my be <b>null</b> for none
+     */
+    private String[] composeEnvironment() {
+        String[] envp = null;
+        if (null == pythonPath || pythonPath.length() == 0) {
+            List<String> paths = new ArrayList<>();
+            add(paths, "target/pySrc/iip"); // old style
+            add(paths, "target/pySrc"); // all the other directories
+            // target/gen/hm23/ApplicationInterfaces
+            File f = new File("target/gen");
+            if (f.exists()) {
+                File[] sub = f.listFiles();
+                if (null != sub) {
+                    for (File s: sub) {
+                        File sai = new File(s, "ApplicationInterfaces");
+                        if (s.isDirectory() && sai.isDirectory()) {
+                            add(paths, "src/gen/" + s.getName() + "ApplicationInterfaces");
+                        }
+                    }
+                }
+            }            
+            f = new File("src/main/python");
+            if (f.exists()) {
+                File[] sub = f.listFiles();
+                if (null != sub) {
+                    for (File s: sub) {
+                        if (s.isDirectory()) {
+                            add(paths, "src/main/python/" + s.getName());
+                        }
+                    }
+                }
+                add(paths, "src/main/python");
+            }
+            
+            // "src/main/python/services"
+            pythonPath = String.join(File.pathSeparator, paths);
+        }
+        if (pythonPath.length() > 0) {
+            envp = new String[] {"PYTHONPATH=\"" + pythonPath + "\""};
+            getLog().info("Using " + envp[0]);
+        }
+        return envp;
+    }
+    
+    /**
      * Running the syntax check for the python Files.
      * @param cmd  the command to run, shall run a python file
      * @param workingDirectory the directory of the python tests
      * @return The output to add to the other outputs
      */
-    private static String runPythonTest(String[] cmd, String workingDirectory) {
+    private String runPythonTest(String[] cmd, String workingDirectory, String[] envp) {
         Process process;
         String output = "";
         try {
-            process = Runtime.getRuntime().exec(cmd, null, new File(workingDirectory));
+            process = Runtime.getRuntime().exec(cmd, envp, new File(workingDirectory));
             output = PythonCompileMojo.readProcessOutput(process.getInputStream());
             output += PythonCompileMojo.readProcessOutput(process.getErrorStream());
 
@@ -160,6 +211,16 @@ public class PythonTestMojo extends AbstractMojo {
             e.printStackTrace();
         }
         return output;
+    }
+
+    /**
+     * Adds a path given with slashes to {@code paths} as OS-specific path.
+     * 
+     * @param paths the paths list to be modified
+     * @param path the path to be added
+     */
+    private static void add(List<String> paths, String path) {
+        paths.add(path.replace("/", File.separator));
     }
 
 }
