@@ -103,7 +103,7 @@ public class ConnectorsAas implements AasContributor {
                 ConnectorDescriptor desc = iter.next();
                 Class<?> cls = desc.getClass();
                 SubmodelElementCollectionBuilder secB = ismB.createSubmodelElementCollectionBuilder(
-                    ClassUtility.getName(desc.getType()), false, false);
+                    ClassUtility.getName(desc.getType()));
                 secB.createPropertyBuilder(NAME_DESC_VAR_NAME)
                     .setValue(Type.STRING, desc.getName())
                     .build();
@@ -117,8 +117,7 @@ public class ConnectorsAas implements AasContributor {
             while (iterC.hasNext()) {
                 Connector<?, ?, ?, ?> connector = iterC.next();
                 String idShort = ClassUtility.getId(NAME_SMC_CONNECTOR_PREFIX, connector);
-                SubmodelElementCollectionBuilder smcb = csmB.createSubmodelElementCollectionBuilder(idShort, 
-                    false, false);
+                SubmodelElementCollectionBuilder smcb = csmB.createSubmodelElementCollectionBuilder(idShort);
                 addConnector(smcb, connector, descriptors);
                 smcb.build();
             }
@@ -155,8 +154,7 @@ public class ConnectorsAas implements AasContributor {
             Submodel descriptors = aas.getSubmodel(NAME_DESCRIPTORS_SUBMODEL);
             if (null != submodel && null != descriptors) {
                 String idShort = ClassUtility.getId(NAME_SMC_CONNECTOR_PREFIX, connector);
-                SubmodelElementCollectionBuilder smcb = submodel.createSubmodelElementCollectionBuilder(
-                    idShort, false, false);
+                SubmodelElementCollectionBuilder smcb = submodel.createSubmodelElementCollectionBuilder(idShort);
                 addConnector(smcb, connector, descriptors);
                 smcb.build();
             } else {
