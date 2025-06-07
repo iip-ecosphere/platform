@@ -54,7 +54,7 @@ public class DeviceManagementAas implements AasContributor {
         Submodel.SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
 
         SubmodelElementCollection.SubmodelElementCollectionBuilder deviceManager =
-                smB.createSubmodelElementCollectionBuilder(NAME_COLL_DEVICE_MANAGER, false, false);
+                smB.createSubmodelElementCollectionBuilder(NAME_COLL_DEVICE_MANAGER);
 
         deviceManager.createOperationBuilder(NAME_OP_UPDATE_RUNTIME)
                 .setInvocable(iCreator.createInvocable(getQName(NAME_OP_UPDATE_RUNTIME)))

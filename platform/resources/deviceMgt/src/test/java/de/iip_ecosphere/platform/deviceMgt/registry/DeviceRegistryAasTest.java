@@ -277,8 +277,8 @@ public class DeviceRegistryAasTest {
      */
     public static void mockDeviceResource(String aDeviceId) throws IOException {
         ActiveAasBase.getSubmodel(AasPartRegistry.NAME_SUBMODEL_RESOURCES)
-                .createSubmodelElementCollectionBuilder(aDeviceId, false, false)
-                .build();
+            .createSubmodelElementCollectionBuilder(aDeviceId)
+            .build();
     }
 
 }

@@ -57,7 +57,7 @@ public class DeviceRegistryAas implements AasContributor {
         Submodel.SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
 
         SubmodelElementCollectionBuilder registryColl = smB
-                .createSubmodelElementCollectionBuilder(NAME_COLL_DEVICE_REGISTRY, false, false);
+                .createSubmodelElementCollectionBuilder(NAME_COLL_DEVICE_REGISTRY);
 
         registryColl.createOperationBuilder(NAME_OP_DEVICE_ADD)
                 .setInvocable(iCreator.createInvocable(getQName(NAME_OP_DEVICE_ADD)))
@@ -164,10 +164,10 @@ public class DeviceRegistryAas implements AasContributor {
         ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
             Submodel.SubmodelBuilder resources = aas.createSubmodelBuilder(NAME_SUBMODEL, null);
             SubmodelElementCollectionBuilder registry = resources
-                    .createSubmodelElementCollectionBuilder(NAME_COLL_DEVICE_REGISTRY, false, false);
+                    .createSubmodelElementCollectionBuilder(NAME_COLL_DEVICE_REGISTRY);
 
             SubmodelElementCollectionBuilder device = resources
-                .createSubmodelElementCollectionBuilder(fixId(resourceId), false, false);
+                .createSubmodelElementCollectionBuilder(fixId(resourceId));
 
             device.createPropertyBuilder(NAME_PROP_MANAGED_DEVICE_ID)
                     .setValue(Type.STRING, managedId)

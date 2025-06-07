@@ -196,10 +196,10 @@ public class PerformanceTests {
         ids.forEach(id -> {
             try {
                 AasPartRegistry
-                        .retrieveIipAas()
-                        .getSubmodel(AasPartRegistry.NAME_SUBMODEL_RESOURCES)
-                        .createSubmodelElementCollectionBuilder(fixId(id), false, false)
-                        .build();
+                    .retrieveIipAas()
+                    .getSubmodel(AasPartRegistry.NAME_SUBMODEL_RESOURCES)
+                    .createSubmodelElementCollectionBuilder(fixId(id))
+                    .build();
             } catch (IOException e) {
                 e.printStackTrace();
             }

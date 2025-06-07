@@ -62,7 +62,7 @@ public class StubEcsAas implements AasContributor {
         Submodel.SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(AasPartRegistry.NAME_SUBMODEL_RESOURCES, null);
 
         SubmodelElementCollection.SubmodelElementCollectionBuilder device =
-            smB.createSubmodelElementCollectionBuilder(A_DEVICE, false, false);
+            smB.createSubmodelElementCollectionBuilder(A_DEVICE);
 
         device.createOperationBuilder("updateRuntime")
             .setInvocable(iCreator.createInvocable(A_DEVICE + "_" + "updateRuntime"))
