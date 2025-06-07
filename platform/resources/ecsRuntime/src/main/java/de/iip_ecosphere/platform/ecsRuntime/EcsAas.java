@@ -101,9 +101,8 @@ public class EcsAas implements AasContributor {
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         ContainerManager mgr = EcsFactory.getContainerManager();
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
-        smB.createSubmodelElementCollectionBuilder(NAME_COLL_CONTAINERS, false, false).build(); // ensure exist
-        SubmodelElementCollectionBuilder jB = smB.createSubmodelElementCollectionBuilder(Id.getDeviceIdAas(), 
-            false, false);
+        smB.createSubmodelElementCollectionBuilder(NAME_COLL_CONTAINERS).build(); // ensure exist
+        SubmodelElementCollectionBuilder jB = smB.createSubmodelElementCollectionBuilder(Id.getDeviceIdAas());
         //MetricsAasConstructor.addProviderMetricsToAasSubmodel(jB, iCreator, null, s -> getQName(s));
         MetricsAasConstructor.addProviderMetricsToAasSubmodel(jB, null, Monitor.TRANSPORT_METRICS_CHANNEL, 
             Id.getDeviceId(), EcsFactory.getSetup().getTransport());
@@ -317,10 +316,10 @@ public class EcsAas implements AasContributor {
      */
     private static void addContainer(SubmodelBuilder smB, ContainerDescriptor desc) {
         SubmodelElementCollectionBuilder cBuilder // get or create
-            = smB.createSubmodelElementCollectionBuilder(NAME_COLL_CONTAINERS, false, false); 
+            = smB.createSubmodelElementCollectionBuilder(NAME_COLL_CONTAINERS); 
         
         SubmodelElementCollectionBuilder dBuilder 
-            = cBuilder.createSubmodelElementCollectionBuilder(fixId(desc.getId()), false, false);
+            = cBuilder.createSubmodelElementCollectionBuilder(fixId(desc.getId()));
         dBuilder.createPropertyBuilder(NAME_PROP_ID)
             .setValue(Type.STRING, desc.getId())
             .build();
