@@ -90,9 +90,9 @@ public class PlatformAas implements AasContributor {
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_ARTIFACTS, null);
 
-        smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICE_ARTIFACTS, false, false).build();
-        smB.createSubmodelElementCollectionBuilder(NAME_COLL_CONTAINER, false, false).build();
-        smB.createSubmodelElementCollectionBuilder(NAME_COLL_DEPLOYMENT_PLANS, false, false).build();
+        smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICE_ARTIFACTS).build();
+        smB.createSubmodelElementCollectionBuilder(NAME_COLL_CONTAINER).build();
+        smB.createSubmodelElementCollectionBuilder(NAME_COLL_DEPLOYMENT_PLANS).build();
 
         smB.createOperationBuilder(NAME_OPERATION_DEPLOY)
             .addInputVariable("url", Type.STRING)
@@ -337,10 +337,10 @@ public class PlatformAas implements AasContributor {
             }
             if (null != collName) {
                 SubmodelElementCollectionBuilder cBuilder // get or create
-                    = sub.createSubmodelElementCollectionBuilder(collName, false, false);
+                    = sub.createSubmodelElementCollectionBuilder(collName);
                 SubmodelElementCollectionBuilder dBuilder 
                     = cBuilder.createSubmodelElementCollectionBuilder(fixId(art.getId()
-                        + "_" + art.getAccessUri().toString().hashCode()), false, true);
+                        + "_" + art.getAccessUri().toString().hashCode()));
                 dBuilder.createPropertyBuilder(NAME_PROP_ID)
                     .setValue(Type.STRING, art.getId())
                     .build();
