@@ -18,5 +18,11 @@
         <mkdir dir="pckg"/>
         <copy file="target/mgtUI.zip" tofile="pckg/IIP-Ecosphere-mgtUi-latest.zip"/>
         <copy file="target/mgtUI.tgz" tofile="pckg/IIP-Ecosphere-mgtUi-latest.tgz"/>
+        <oscp todir="jenkins@projects.sse.uni-hildesheim.de:/var/www/oktoflow" trust="true" keyfile="${user.home}/.ssh/id_rsa">
+            <fileset dir="pckg">
+                <include name="IIP-Ecosphere-mgtUi-latest.zip"/>
+                <include name="IIP-Ecosphere-mgtUi-latest.tgz"/>
+            </fileset>
+        </oscp> 
 	</target>
 </project>
