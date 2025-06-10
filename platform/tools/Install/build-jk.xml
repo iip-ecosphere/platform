@@ -45,5 +45,11 @@
             <fileset dir="." includes="fullInstallationWin.bat" />
             <fileset dir="." includes="summary.pdf" />
         </tar>
+        <oscp todir="jenkins@projects.sse.uni-hildesheim.de:/var/www/oktoflow" trust="true" keyfile="${user.home}/.ssh/id_rsa">
+            <fileset dir=".">
+                <include name="install.zip"/>
+                <include name="install.tar.gz"/>
+            </fileset>
+        </oscp> 
     </target>
 </project>
