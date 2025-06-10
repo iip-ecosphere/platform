@@ -49,6 +49,8 @@
             <fileset dir=".">
                 <include name="install.zip"/>
                 <include name="install.tar.gz"/>
+                <include name="fullInstallationLinux.sh"/>
+                <include name="fullInstallationWin.bat"/>
             </fileset>
         </oscp> 
     </target>
