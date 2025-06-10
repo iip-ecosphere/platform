@@ -143,16 +143,16 @@ public class ServicesAas implements AasContributor {
             // operations contribute to the operation of the underlying resource (Service JVM or ECS Runtime JVM)
             SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_RESOURCES, ID_SUBMODEL);
             SubmodelElementCollectionBuilder deviceB 
-                = smB.createSubmodelElementCollectionBuilder(Id.getDeviceIdAas(), false, false);
+                = smB.createSubmodelElementCollectionBuilder(Id.getDeviceIdAas());
             // #115 remove as legacy
             if (!deviceB.hasElement(NAME_PROP_SUPPORTED_APPIDS)) { // just keep the first one, avoid overriding
                 createServiceManagerSubmodelElements(deviceB, iCreator); // legacy
             }
 
             SubmodelElementCollectionBuilder svcMgrsB 
-                = deviceB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICE_MANAGERS, false, false);
+                = deviceB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICE_MANAGERS);
             SubmodelElementCollectionBuilder svcMgrB
-                = svcMgrsB.createSubmodelElementCollectionBuilder(Id.getEnvIdAas(), false, false);
+                = svcMgrsB.createSubmodelElementCollectionBuilder(Id.getEnvIdAas());
             createServiceManagerSubmodelElements(svcMgrB, iCreator);
             svcMgrB.build();
             svcMgrsB.build();
@@ -165,9 +165,9 @@ public class ServicesAas implements AasContributor {
             
             smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, ID_SUBMODEL);
             // ensure that these collections do exist
-            smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES, false, false).build();
-            smB.createSubmodelElementCollectionBuilder(NAME_COLL_ARTIFACTS, false, false).build();
-            smB.createSubmodelElementCollectionBuilder(NAME_COLL_RELATIONS, false, false).build();
+            smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES).build();
+            smB.createSubmodelElementCollectionBuilder(NAME_COLL_ARTIFACTS).build();
+            smB.createSubmodelElementCollectionBuilder(NAME_COLL_RELATIONS).build();
     
             for (ArtifactDescriptor a : mgr.getArtifacts()) {
                 addArtifact(smB, a);
@@ -451,10 +451,10 @@ public class ServicesAas implements AasContributor {
      */
     private static void addArtifact(SubmodelBuilder smB, ArtifactDescriptor desc) {
         SubmodelElementCollectionBuilder cBuilder // get or create
-            = smB.createSubmodelElementCollectionBuilder(NAME_COLL_ARTIFACTS, false, false);
+            = smB.createSubmodelElementCollectionBuilder(NAME_COLL_ARTIFACTS);
 
         SubmodelElementCollectionBuilder dBuilder 
-            = cBuilder.createSubmodelElementCollectionBuilder(fixId(desc.getId()), false, false);
+            = cBuilder.createSubmodelElementCollectionBuilder(fixId(desc.getId()));
         dBuilder.createPropertyBuilder(NAME_PROP_ID)
             .setValue(Type.STRING, desc.getId())
             .build();
@@ -477,12 +477,12 @@ public class ServicesAas implements AasContributor {
      */
     private static void addService(SubmodelBuilder smB, ServiceDescriptor desc) {
         SubmodelElementCollectionBuilder serviceBuilder 
-            = smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES, false, false);
+            = smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES);
 
         String serviceId = fixId(desc.getId());
         // Ref to artifact
         SubmodelElementCollectionBuilder descriptorBuilder 
-            = serviceBuilder.createSubmodelElementCollectionBuilder(serviceId, false, false);
+            = serviceBuilder.createSubmodelElementCollectionBuilder(serviceId);
         descriptorBuilder.createPropertyBuilder(NAME_PROP_ID)
             .setValue(Type.STRING, desc.getId())
             .build();
@@ -547,10 +547,10 @@ public class ServicesAas implements AasContributor {
     private static void addTypedData(SubmodelElementCollectionBuilder builder, String name, 
         List<? extends TypedDataDescriptor> descriptors) {
         SubmodelElementCollectionBuilder pBuilder 
-            = builder.createSubmodelElementCollectionBuilder(fixId(name), false, false);
+            = builder.createSubmodelElementCollectionBuilder(fixId(name));
         for (TypedDataDescriptor d : descriptors) {
             SubmodelElementCollectionBuilder dBuilder 
-                = builder.createSubmodelElementCollectionBuilder(fixId(d.getName()), false, false);
+                = builder.createSubmodelElementCollectionBuilder(fixId(d.getName()));
             dBuilder.createPropertyBuilder(NAME_PROP_NAME)
                 .setValue(Type.STRING, d.getName())
                 .build();
@@ -577,7 +577,7 @@ public class ServicesAas implements AasContributor {
         List<? extends TypedDataConnectorDescriptor> descriptors, boolean input, Reference serviceRef) {
         for (TypedDataConnectorDescriptor d : descriptors) {
             SubmodelElementCollectionBuilder dBuilder 
-                = builder.createSubmodelElementCollectionBuilder(fixId(d.getName()), false, false);
+                = builder.createSubmodelElementCollectionBuilder(fixId(d.getName()));
             String name = input ? NAME_PROP_TO : NAME_PROP_FROM;
             dBuilder.createReferenceElementBuilder(name)
                 .setValue(serviceRef)
@@ -846,9 +846,9 @@ public class ServicesAas implements AasContributor {
     private static void registerMetrics(ServiceDescriptor desc, Submodel sub, SubmodelElementCollection elt) {
         if (!MetricsAasConstructor.containsMetrics(elt)) {
             SubmodelElementCollectionBuilder serviceB = 
-                    sub.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES, false, false);
+                    sub.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES);
             SubmodelElementCollectionBuilder subB =
-                serviceB.createSubmodelElementCollectionBuilder(fixId(desc.getId()), false, false);
+                serviceB.createSubmodelElementCollectionBuilder(fixId(desc.getId()));
             
             String devId = Id.getDeviceId();
             TransportSetup tSetup = ServiceFactory.getTransport();
@@ -871,7 +871,7 @@ public class ServicesAas implements AasContributor {
     private static void setupRelations(ServiceDescriptor desc, Submodel sub, SubmodelElementCollection elt) {
         Reference serviceRef = elt.createReference();
         SubmodelElementCollectionBuilder connectionBuilder 
-            = sub.createSubmodelElementCollectionBuilder(NAME_COLL_RELATIONS, false, false); // create or get
+            = sub.createSubmodelElementCollectionBuilder(NAME_COLL_RELATIONS); // create or get
         addRelationData(connectionBuilder, desc.getInputDataConnectors(), true, serviceRef);
         addRelationData(connectionBuilder, desc.getOutputDataConnectors(), false, serviceRef);
         connectionBuilder.build();
