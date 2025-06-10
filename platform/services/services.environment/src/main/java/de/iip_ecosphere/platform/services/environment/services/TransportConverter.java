@@ -524,10 +524,10 @@ public abstract class TransportConverter<T> {
     public static void addEndpointToAas(SubmodelElementContainerBuilder smBuilder, Endpoint endpoint) {
         if (null != endpoint) {
             SubmodelElementCollectionBuilder endpoints = smBuilder.createSubmodelElementCollectionBuilder(
-                NAME_COLL_ENDPOINTS, false, false);
+                NAME_COLL_ENDPOINTS);
             
             SubmodelElementCollectionBuilder eBuilder = smBuilder.createSubmodelElementCollectionBuilder(
-                AasUtils.fixId(toAasEndpointId(endpoint.getEndpoint())), false, false);
+                AasUtils.fixId(toAasEndpointId(endpoint.getEndpoint())));
             
             eBuilder.createPropertyBuilder(NAME_PROP_SCHEMA)
                 .setValue(Type.STRING, endpoint.getSchema().name())

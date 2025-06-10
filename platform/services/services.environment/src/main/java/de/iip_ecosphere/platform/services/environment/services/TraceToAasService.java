@@ -623,7 +623,7 @@ public class TraceToAasService extends AbstractService {
                     .setValue(Type.STRING, mapPayloadType(cls))
                     .build();
                 SubmodelElementCollectionBuilder payloadBuilder = smcBuilder
-                    .createSubmodelElementCollectionBuilder(PROPERTY_PAYLOAD, false, false);
+                    .createSubmodelElementCollectionBuilder(PROPERTY_PAYLOAD);
                 createPayloadEntries(payloadBuilder, data.getPayload());
             }
         }
