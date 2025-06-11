@@ -36,6 +36,7 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -338,8 +339,8 @@ public class PlatformAas implements AasContributor {
             if (null != collName) {
                 SubmodelElementCollectionBuilder cBuilder // get or create
                     = sub.createSubmodelElementCollectionBuilder(collName);
-                SubmodelElementCollectionBuilder dBuilder 
-                    = cBuilder.createSubmodelElementCollectionBuilder(fixId(art.getId()
+                SubmodelElementListBuilder dBuilder 
+                    = cBuilder.createSubmodelElementListBuilder(fixId(art.getId()
                         + "_" + art.getAccessUri().toString().hashCode()));
                 dBuilder.createPropertyBuilder(NAME_PROP_ID)
                     .setValue(Type.STRING, art.getId())
