@@ -274,7 +274,17 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
             }
             return collection;
         }
-        
+
+        @Override
+        protected BaSyxSubmodelElementList register(BaSyxSubmodelElementList collection, 
+            boolean propagate) {
+            addSubmodelElement(this.collection, collection.getSubmodelElement());
+            if (propagate) {
+                instance.register(collection);
+            }
+            return collection;
+        }
+
         @Override
         public void defer() {
             parentBuilder.defer(collection.getIdShort(), this);
