@@ -128,6 +128,59 @@ public abstract class IdentityStore {
     public abstract KeyStore getKeystoreFile(String identity, String... fallback) throws IOException;
  
     /**
+     * Returns a keystore coordinate, i.e., basic information to open a keystore.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class KeystoreCoordinate {
+        
+        private String file;
+        private String password;
+
+        /**
+         * Creates a keystore coordinate.
+         * 
+         * @param file the file of the keystore
+         * @param password the password
+         */
+        public KeystoreCoordinate(String file, String password) {
+            this.file = file;
+            this.password = password;
+        }
+
+        /**
+         * Returns the file.
+         * 
+         * @return the file
+         */
+        public String getFile() {
+            return file;
+        }
+        
+        /**
+         * Returns the password.
+         * 
+         * @return the password
+         */
+        public String getPassword() {
+            return password;
+        }
+        
+    }
+
+    /**
+     * Returns the keystore as coordinate as some mechanisms want the read the keystore by themselves. The result may
+     * be the coordinate of a temporary keystore.
+     * 
+     * @param identity the identity (key) to return the keystore for
+     * @param fallback fallback identities to use instead in given sequence, e.g., instead a specific device a 
+     *     device group
+     * @return the keystore coordinate, <b>null</b> if none was found
+     * @throws IOException if creating/reading/opening a specified keystore fails
+     */
+    public abstract KeystoreCoordinate getKeystoreCoordinate(String identity, String... fallback) throws IOException;
+    
+    /**
      * Returns the key manager(s) for an identity key using a specific key manager factory algorithm.
      * 
      * @param identity the identity (key) to return the key manager(s) for

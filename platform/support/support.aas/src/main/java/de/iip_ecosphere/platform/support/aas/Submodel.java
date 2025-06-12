@@ -71,9 +71,9 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
      * Returns a sub-model elements collection builder either by providing access to an existing collection or through 
      * a builder to add a new sub-model elements collection (ultimately only if {@link Builder#build()} was called).
      * 
+     * @param idShort the short name of the collection
      * @param ordered whether the collection shall be ordered or not
      * @param allowDuplicates whether the collection allows duplicates or not
-     * @param idShort the short id of the sub-model
      * @return the sub-model collection builder
      */
     public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered, 
@@ -83,9 +83,7 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
      * Creates a builder for a contained sub-model element collection (not ordered, no duplicates). Calling this method 
      * again with the same name shall lead to a builder that allows for modifying the sub-model.
      * 
-     * @param idShort the short name of the reference element
-     * @param ordered whether the collection is ordered
-     * @param allowDuplicates whether the collection allows duplicates
+     * @param idShort the short name of the collection
      * @return the builder
      * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty; or if modification is not possible
      */
@@ -97,7 +95,7 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
      * Returns a sub-model element list builder either by providing access to an existing list or through 
      * a builder to add a new sub-model elements list (ultimately only if {@link Builder#build()} was called).
      * 
-     * @param ordered whether the collection shall be ordered or not
+     * @param idShort the short name of the list
      * @return the sub-model collection builder
      */
     public SubmodelElementListBuilder createSubmodelElementListBuilder(String idShort);

@@ -248,6 +248,16 @@ public class YamlIdentityStore extends IdentityStore {
         } 
         return result;
     }
+    
+    @Override
+    public KeystoreCoordinate getKeystoreCoordinate(String identity, String... fallback) throws IOException {
+        KeystoreCoordinate result = null;
+        IdentityInformation info = resolveForKeystore(identity, fallback);
+        if (isOkForKeystore(info)) {
+            result = new KeystoreCoordinate(info.getFile(), info.getTokenData());
+        }
+        return result;
+    }
 
     @Override
     public Key getKeystoreKey(String identity, KeyStore keystore, String alias, String... fallback) throws IOException {

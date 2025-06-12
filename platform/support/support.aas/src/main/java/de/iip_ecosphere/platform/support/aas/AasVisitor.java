@@ -173,7 +173,7 @@ public interface AasVisitor {
      * 
      * @param list the list
      */
-    public void visitSubmodelElementList(SubmodelElementList collection);
+    public void visitSubmodelElementList(SubmodelElementList list);
 
     /**
      * Notifies ending the visits of a sub-model element list.

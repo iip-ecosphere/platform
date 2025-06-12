@@ -74,7 +74,7 @@ public interface SubmodelElementList extends SubmodelElement, ElementsAccess {
     /**
      * Returns a submodel element with the given index.
      * 
-     * @param index the 0-based index of the property, in [{@code 0];{@list #getElementsCount()}[
+     * @param index the 0-based index of the property, in [{@code 0};{@link #getElementsCount()}[
      * @return the submodel element, <b>null</b> for none
      * @throws IndexOutOfBoundsException if index is not within the given range
      */
@@ -83,7 +83,7 @@ public interface SubmodelElementList extends SubmodelElement, ElementsAccess {
     /**
      * Deletes the submodel element with the given index.
      * 
-     * @param index the 0-based index of the property, in [{@code 0];{@list #getElementsCount()}[
+     * @param index the 0-based index of the property, in [{@code 0};{@link #getElementsCount()}[
      * @throws IndexOutOfBoundsException if index is not within the given range
      */
     public void deleteElement(int index);

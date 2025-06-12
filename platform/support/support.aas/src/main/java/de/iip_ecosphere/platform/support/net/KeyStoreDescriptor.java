@@ -16,6 +16,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
+import de.iip_ecosphere.platform.support.identities.IdentityStore;
+import de.iip_ecosphere.platform.support.identities.IdentityStore.KeystoreCoordinate;
+
 /**
  * Describes the location and access to a key/trust store.
  * 
@@ -47,6 +50,8 @@ public class KeyStoreDescriptor implements Serializable {
      * @param path the path to the key file/store, no encryption if <b>null</b> or non-existent
      * @param password the password to access the key file/store
      * @param alias the alias denoting the key/certificate to use, ignored if <b>null</b>
+     * @param appliesToClient whether this keystore applies to client instances or shall be ignored there
+     * @param hostNameVerification enable/disable hostname verification
      */
     public KeyStoreDescriptor(File path, String password, String alias, boolean appliesToClient, 
         boolean hostNameVerification) {
@@ -55,6 +60,38 @@ public class KeyStoreDescriptor implements Serializable {
         this.alias = alias;
         this.hostNameVerification = true;
         this.appliesToClient = true;
+    }
+
+    /**
+     * Creates a descriptor.
+     * 
+     * @param keystore the keystore coordinate containing path and password
+     * @param alias the alias denoting the key/certificate to use, ignored if <b>null</b>
+     * @param appliesToClient whether this keystore applies to client instances or shall be ignored there
+     * @param hostNameVerification enable/disable hostname verification
+     * @throws IOException if the keystore cannot be accessed
+     */
+    public KeyStoreDescriptor(KeystoreCoordinate keystore, String alias, boolean appliesToClient, 
+        boolean hostNameVerification) {
+        this(new File(keystore.getPassword()), keystore.getPassword(), alias, appliesToClient, hostNameVerification);
+    }
+
+    /**
+     * Creates a descriptor from a {@code keystoreKey} via the {@link IdentityStore}.
+     * 
+     * @param keystoreKey the keystore key to obtain the keystore from the identitiy store
+     * @param alias the alias denoting the key/certificate to use, ignored if <b>null</b>
+     * @param appliesToClient whether this keystore applies to client instances or shall be ignored there
+     * @param hostNameVerification enable/disable hostname verification
+     * @throws IOException if the keystore cannot be accessed
+     */
+    public static KeyStoreDescriptor create(String keystoreKey, String alias, boolean appliesToClient, 
+        boolean hostNameVerification) throws IOException {
+        KeystoreCoordinate keystore = IdentityStore.getInstance().getKeystoreCoordinate(keystoreKey);
+        if (null == keystore) {
+            throw new IOException("Keystore with key '" + keystoreKey + "' not found.");
+        }
+        return new KeyStoreDescriptor(keystore, alias, appliesToClient, hostNameVerification);
     }
 
     /**
