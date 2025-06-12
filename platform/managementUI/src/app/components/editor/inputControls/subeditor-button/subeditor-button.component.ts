@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { IvmlRecordValue, MT_metaAbstract, MT_metaRefines, Resource, ResourceAttribute, editorInput, metaTypes } from 'src/interfaces';
 import { EditorComponent } from '../../editor.component';
 import { DataUtils, Utils } from 'src/app/services/utils.service';
-import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
+import { IvmlFormatterService } from 'src/app/components/services/ivml/ivml-formatter.service';
 
 @Component({
     selector: 'app-subeditor-button',

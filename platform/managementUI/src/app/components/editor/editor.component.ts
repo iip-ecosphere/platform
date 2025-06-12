@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ApiService } from 'src/app/services/api.service';
-import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
+import { IvmlFormatterService } from 'src/app/components/services/ivml/ivml-formatter.service';
 import { Resource, uiGroup, editorInput, configMetaContainer, ResourceAttribute, 
   primitiveDataTypes, IvmlRecordValue, IvmlValue, UserFeedback, MT_metaRefines} from 'src/interfaces';
 import { Utils, DataUtils } from 'src/app/services/utils.service';

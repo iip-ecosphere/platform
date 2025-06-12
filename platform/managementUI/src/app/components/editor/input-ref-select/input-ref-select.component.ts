@@ -4,7 +4,7 @@ import { DataUtils, EditorPartition, Utils, WIDTH_CARD, WIDTH_CARD_GRID } from '
 import { EditorComponent } from '../editor.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ApiService } from 'src/app/services/api.service';
-import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
+import { IvmlFormatterService } from 'src/app/components/services/ivml/ivml-formatter.service';
 
 @Component({
     selector: 'app-input-ref-select',

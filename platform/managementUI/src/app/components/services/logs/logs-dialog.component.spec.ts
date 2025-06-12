@@ -5,7 +5,7 @@ import { LogsDialogComponent } from './logs-dialog.component';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { EnvConfigService } from '../../../services/env-config.service';
 
-describe('ServicesComponent', () => {
+describe('LogsDialogComponent', () => {
 
   let component: LogsDialogComponent;
   let fixture: ComponentFixture<LogsDialogComponent>;

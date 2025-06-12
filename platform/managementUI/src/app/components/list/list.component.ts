@@ -10,7 +10,7 @@ import { Utils, DataUtils } from 'src/app/services/utils.service';
 import { WebsocketService } from 'src/app/websocket.service';
 import { StatusCollectionService } from 'src/app/services/status-collection.service';
 import { chunkInput } from '../file-upload/file-upload.component';
-import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
+import { IvmlFormatterService } from 'src/app/components/services/ivml/ivml-formatter.service';
 
 /**
  * Information on a file being uploaded.

@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import Drawflow from 'drawflow';
-import { IvmlFormatterService } from 'src/app/services/ivml-formatter.service';
+import { IvmlFormatterService } from 'src/app/components/services/ivml/ivml-formatter.service';
 import { MeshFeedbackComponent } from './feedback/mesh-feedback/mesh-feedback.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ApiService, GRAPHFORMAT_DRAWFLOW } from 'src/app/services/api.service';

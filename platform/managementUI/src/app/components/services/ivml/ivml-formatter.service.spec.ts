@@ -3,8 +3,8 @@ import { TestBed } from '@angular/core/testing';
 import { IvmlFormatterService } from './ivml-formatter.service';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { IVML_TYPE_Boolean, IVML_TYPE_Integer, IVML_TYPE_PREFIX_enumeration, IVML_TYPE_Real, IVML_TYPE_String, IvmlRecordValue, MT_metaVariable } from 'src/interfaces';
-import { GRAPHFORMAT_DRAWFLOW } from './api.service';
-import { Utils } from './utils.service';
+import { GRAPHFORMAT_DRAWFLOW } from '../../../services/api.service';
+import { Utils } from '../../../services/utils.service';
 
 describe('IvmlFormatterService', () => {
 
@@ -13,9 +13,10 @@ describe('IvmlFormatterService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-    imports: [],
-    providers: [provideHttpClient(withInterceptorsFromDi())]
-});
+      imports: [],
+      providers: [provideHttpClient(withInterceptorsFromDi())],
+      teardown: {destroyAfterEach: false} // NG0205: Injector has already been destroyed
+    });
     service = TestBed.inject(IvmlFormatterService);
   });
 

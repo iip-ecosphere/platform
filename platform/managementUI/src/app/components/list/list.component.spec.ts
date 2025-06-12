@@ -170,11 +170,10 @@ async function test(fixture: ComponentFixture<ListComponent>, component: ListCom
   let tabData = compiled.querySelector('table[id="data"]') as HTMLElement;
   expect(tabData).withContext(tabContext).toBeTruthy();
   let i = 0;
-  
+
   for (let d of component.filteredData) {
     let tabDataRow = tabData.querySelector(`tr:nth-child(${i + 1})`) as HTMLElement;
     let context = `in table row ${i + 1} of ${tabName}`;
-
     expect(tabDataRow).withContext(context).toBeTruthy();
     let td = tabDataRow.querySelector('td[id="data.index"]') as HTMLElement;
     expect(td).withContext(context).toBeTruthy();
@@ -245,7 +244,8 @@ async function test(fixture: ComponentFixture<ListComponent>, component: ListCom
     // click: not implemented so far
     i++;
   }
-  expect(expIdShort.size).withContext("Expected items").toBe(0);
+
+  expect(expIdShort.size).withContext("Expected items leftover: " + Array.from(expIdShort)).toBe(0);
   if (tabName != "Setup" && i > 0) { // TODO button new shall also be there if empty       
     let btnNew = compiled.querySelector(`button[id="btnNew"]`) as HTMLElement;
     expect(btnNew).withContext(`new button of table ${tabName}`).toBeTruthy();
