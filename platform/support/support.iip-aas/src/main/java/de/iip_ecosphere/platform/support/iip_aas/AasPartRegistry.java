@@ -206,7 +206,7 @@ public class AasPartRegistry {
 
             @Override
             public AuthenticationDescriptor getAuthentication() {
-                return null; // TODO -> EndpointHolder
+                return endpoint.get().getAuthentication();
             }
 
             @Override

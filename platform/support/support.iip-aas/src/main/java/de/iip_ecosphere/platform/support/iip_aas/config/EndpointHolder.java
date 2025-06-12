@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
+import de.iip_ecosphere.platform.support.aas.IdentityStoreAuthenticationDescriptor;
 
 /**
  * A proxy for {@link Endpoint} as we do not want to have setters there.
@@ -13,6 +15,7 @@ import de.iip_ecosphere.platform.support.Schema;
 public class EndpointHolder extends TlsServerAddressHolder {
 
     private String path = "";
+    private String idStorePrefix = null;
     private transient EndpointValidator validator = new BasicEndpointValidator();
     
     /**
@@ -118,6 +121,23 @@ public class EndpointHolder extends TlsServerAddressHolder {
     @JsonIgnore
     public Endpoint getEndpoint() {
         return new Endpoint(getServerAddress(), getPath());
+    }
+
+    /**
+     * Returns the authentication descriptor.
+     * 
+     * @return the authentication descriptor, <b>null</b> for none
+     */
+    public AuthenticationDescriptor getAuthentication() {
+        AuthenticationDescriptor result = null;
+        if (idStorePrefix != null) {
+            if (idStorePrefix.length() > 0) {
+                result = new IdentityStoreAuthenticationDescriptor();
+            } else {
+                result = new IdentityStoreAuthenticationDescriptor(idStorePrefix);
+            }
+        }
+        return result;
     }
 
 }

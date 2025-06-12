@@ -13,9 +13,13 @@
 package de.iip_ecosphere.platform.support.iip_aas.config;
 
 import java.io.File;
+import java.io.IOException;
+
+import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
 /**
@@ -27,6 +31,7 @@ public class TlsServerAddressHolder extends ServerAddressHolder {
 
     private File keystore;
     private String keyPassword;
+    private String keystoreKey;
     private String keyAlias;
     private boolean appliesToClient = true;
     private boolean hostnameVerification = true;
@@ -66,6 +71,7 @@ public class TlsServerAddressHolder extends ServerAddressHolder {
         super(holder);
         keyAlias = holder.keyAlias;
         keyPassword = holder.keyPassword;
+        keystoreKey = holder.keystoreKey;
         keystore = holder.keystore;
     }
 
@@ -89,6 +95,16 @@ public class TlsServerAddressHolder extends ServerAddressHolder {
     }
 
     /**
+     * Returns the keystore key, which, via the {@link IdentityStore} may replace {@link #getKeystore()} and 
+     * {@link #getKeyPassword()}.
+     * 
+     * @return the keystore key, may be <b>null</b> for none
+     */
+    public String getKeystoreKey() {
+        return keystoreKey;
+    }
+
+    /**
      * Returns the alias denoting the key to use.
      * 
      * @return the alias, may be <b>null</b> for none/first match
@@ -98,7 +114,7 @@ public class TlsServerAddressHolder extends ServerAddressHolder {
     }
 
     /**
-     * Returns whether a SSL client shall use the keytore or rely on the default certificate chain.
+     * Returns whether a SSL client shall use the keystore or rely on the default certificate chain.
      * 
      * @return {@code true} for keystore (default), {@code false} else for default chain
      */
@@ -116,7 +132,7 @@ public class TlsServerAddressHolder extends ServerAddressHolder {
     }
 
     /**
-     * Returns the optional TLS keystore. [required by data mapper]
+     * Defines the optional TLS keystore. [required by data mapper]
      * 
      * @param keystore the TLS keystore (suffix ".jks" points to Java Key store, suffix ".p12" to PKCS12 keystore), may 
      *   be <b>null</b> for none
@@ -126,7 +142,7 @@ public class TlsServerAddressHolder extends ServerAddressHolder {
     }
 
     /**
-     * Returns the password for the optional TLS keystore. [required by data mapper]
+     * Defines the password for the optional TLS keystore. [required by data mapper]
      * 
      * @param keyPassword the TLS keystore, may be <b>null</b> for none
      */
@@ -135,7 +151,17 @@ public class TlsServerAddressHolder extends ServerAddressHolder {
     }
 
     /**
-     * Returns the alias denoting the key to use. [required by data mapper]
+     * Defines the keystore key, which, via the {@link IdentityStore} may replace {@link #getKeystore()} and 
+     * {@link #getKeyPassword()}. [required by data mapper]
+     * 
+     * @return keystoreKey the keystore key, may be <b>null</b> for none
+     */
+    public void setKeystoreKey(String keystoreKey) {
+        this.keystoreKey = keystoreKey;
+    }
+
+    /**
+     * Changes the alias denoting the key to use. [required by data mapper]
      * 
      * @param alias the alias, may be <b>null</b> for none/first match
      */
@@ -170,7 +196,15 @@ public class TlsServerAddressHolder extends ServerAddressHolder {
      */
     public KeyStoreDescriptor getKeystoreDescriptor() {
         KeyStoreDescriptor result = null;
-        if (null != keystore) {
+        if (null != keystoreKey) {
+            try {
+                result = KeyStoreDescriptor.create(keystoreKey, keyAlias, appliesToClient, hostnameVerification);
+            } catch (IOException e) {
+                LoggerFactory.getLogger(getClass()).warn("Cannot obtain keystore via keystore key '{}' due to {}. "
+                    + "Trying to obtain keystore directly.", keystoreKey, e.getMessage());
+            }
+        }
+        if (null != keystore && null == result) {
             result = new KeyStoreDescriptor(keystore, keyPassword, keyAlias, appliesToClient, hostnameVerification);
         }
         return result;
