@@ -354,7 +354,8 @@ project DataTypes {
     compound SecuritySettings refines AuthenticationSettings {
         String keystoreKey;         // -> keystore in identityStore        
         NonEmptyString keyAlias; 
-        Boolean hostNameVerification = false;        
+        Boolean hostNameVerification = false;
+        String idStoreAuthenticationPrefix = null;
     } 
     
     abstract compound IdentityStore {

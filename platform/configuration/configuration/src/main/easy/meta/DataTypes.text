@@ -49,6 +49,7 @@ DataTypes::ObjectType = Represents the generic type object (any) in data to be p
 DataTypes::RecordType::fieldNamesUnique = Each declared field must have an unique name.
 DataTypes::SByteType = Represents a short byte type in (OPC UA) data to be processed.
 DataTypes::SecuritySettings::hostNameVerification = Requires or disables TLS hostname verification (default false).
+DataTypes::SecuritySettings::idStoreAuthenticationPrefix = Take authentication information from the identity store by the given prefix (default disabled, empty leads to default prefix "aas", else given prefix is taken).
 DataTypes::SecuritySettings::keyAlias = The alias denoting the key to be used from the keystore defined by "keystoreKey".
 DataTypes::SecuritySettings::keystoreKey = Logical name pointing to the keystore information in the identity store.
 DataTypes::ShortType = Represents a short numeral type in data to be processed.

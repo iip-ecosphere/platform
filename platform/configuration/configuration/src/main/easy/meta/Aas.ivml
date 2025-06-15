@@ -6,7 +6,7 @@ project Aas {
     annotate String semanticId = "" to .;
     
     // enum for now
-    enum AasImpl { BaSyx };
+    enum AasImpl { BaSyx, BaSyx2 };
     AasImpl aas = AasImpl::BaSyx;
     isDefined(aas);
 
@@ -14,24 +14,39 @@ project Aas {
 
     abstract compound AasProtocol {
         AasSchema schema;
+        setOf(AasImpl) supportedBy;
     }
     
     compound AasProtocolDefault refines AasProtocol {
         AasSchema schema = AasSchema::TCP; // as implemented
+        setOf(AasImpl) supportedBy = {AasImpl::BaSyx};
     }
     
     compound AasProtocolVabTcp refines AasProtocol {
         AasSchema schema = AasSchema::TCP;
+        setOf(AasImpl) supportedBy = {AasImpl::BaSyx};
     }
     
     compound AasProtocolVabHttp refines AasProtocol {
         AasSchema schema = AasSchema::HTTP;
+        setOf(AasImpl) supportedBy = {AasImpl::BaSyx};
+    }
+
+    compound AasProtocolRest refines AasProtocol {
+        AasSchema schema = AasSchema::HTTP;
+        setOf(AasImpl) supportedBy = {AasImpl::BaSyx2};
+    }
+
+    compound AasProtocolRestSecure refines AasProtocol {
+        AasSchema schema = AasSchema::HTTPS;
+        setOf(AasImpl) supportedBy = {AasImpl::BaSyx2};
     }
         
     // TODO missing VAB-HTTPS -> keystoreKey
     
     AasProtocol aasProtocol = AasProtocolVabTcp{}; // the global default protocol
-    isDefined(aasProtocol);
+    Constraint aasProtocolDefined = isDefined(aasProtocol);
+    Constraint aasProtocolFitsImpl = aasProtocol.supportedBy.includes(aas);
     String aasPluginId;
     
     enum AasSchema {HTTP, HTTPS, TCP};
@@ -43,6 +58,7 @@ project Aas {
     	AasSchema schema = AasSchema::HTTPS;
         NonEmptyString host;
         NonEmptyEphemeralPort port;
+        SecuritySettings security = null;
     }
 
     compound ServerAddress refines EphemeralServerAddress {
@@ -66,10 +82,15 @@ project Aas {
     
     EndpointAddress aasServer;
     isDefined(aasServer);
+    EndpointAddress smServer = null;
+    aas == AasImpl::BaSyx2 implies isDefined(smServer);
     EndpointAddress aasRegistryServer;
     isDefined(aasRegistryServer);
+    EndpointAddress smRegistryServer = null;
+    aas == AasImpl::BaSyx2 implies isDefined(smRegistryServer);
     ImplAddress aasImplServer;
     isDefined(aasImplServer);
+    
     Persistency aasPersistency = Persistency::INMEMORY;
     isDefined(aasPersistency);
     String aasAccessControlAllowOrigin = "*";

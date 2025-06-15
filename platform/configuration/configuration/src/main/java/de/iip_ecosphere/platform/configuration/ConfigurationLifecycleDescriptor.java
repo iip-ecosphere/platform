@@ -223,9 +223,12 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
                 }
             }
             try {
+                getLogger().info("Setting up EASy-Producer locations, loading models");
                 exec.setupLocations();
                 ConfigurationManager.setExecutor(exec);
+                getLogger().info("EASy-Producer models loaded");
                 StatusCache.start();
+                getLogger().info("Status cache started");
             } catch (ModelManagementException e) {
                 getLogger().error("Cannot set model locations. Configuration capabilities may be disabled. " 
                     + e.getMessage(), e);

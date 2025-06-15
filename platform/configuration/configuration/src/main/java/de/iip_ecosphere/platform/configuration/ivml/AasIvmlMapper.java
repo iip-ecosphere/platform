@@ -50,7 +50,7 @@ import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
-import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.FileUtils;
@@ -129,7 +129,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     private Supplier<Configuration> cfgSupplier;
     private Function<String, String> metaShortId = SHORTID_PREFIX_META;
     private Predicate<AbstractVariable> variableFilter = FILTER_NO_CONSTRAINT_VARIABLES.and(FILTER_NO_ANY);
-    private Map<String, SubmodelElementCollectionBuilder> types = new HashMap<>();
+    private Map<String, SubmodelElementContainerBuilder> types = new HashMap<>();
     
     static {
         // tech settings -> parent
@@ -238,7 +238,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                         type = primitiveType; // group them together to simplify the AAS structure
                     } 
                     String typeName = IvmlDatatypeVisitor.getUnqualifiedType(mapType(type));
-                    SubmodelElementCollectionBuilder builder = types.get(typeName);
+                    SubmodelElementContainerBuilder builder = types.get(typeName);
                     if (null == builder) {
                         builder = createTypeCollectionBuilder(smBuilder, typeName);
                         types.put(typeName, builder);
@@ -246,8 +246,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                     mapVariable(var, builder, null);
                 }
             }
-            for (SubmodelElementCollectionBuilder builder : types.values()) {
-                builder.build();
+            for (SubmodelElementContainerBuilder builder : types.values()) {
+                builder.justBuild();
             }
             addOperations(smBuilder, iCreator);
         } else {
@@ -300,7 +300,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @param typeName the type name (turned into an AAS shortID)
      * @return the collection builder
      */
-    private static SubmodelElementCollectionBuilder createTypeCollectionBuilder(SubmodelBuilder smBuilder, 
+    private static SubmodelElementContainerBuilder createTypeCollectionBuilder(SubmodelBuilder smBuilder, 
         String typeName) {
         return smBuilder.createSubmodelElementCollectionBuilder(AasUtils.fixId(typeName), true, false);
     }
@@ -1194,7 +1194,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         smBuilder.createOperationBuilder(OP_CHANGE_VALUES)
             .addInputVariable("valueExprs", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_CHANGE_VALUES))
-            .build(Type.NONE);
+            .build();
         smBuilder.createOperationBuilder(OP_GET_GRAPH)
             .addInputVariable("varName", Type.STRING)
             .addInputVariable("format", Type.STRING)
@@ -1207,12 +1207,12 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             .addInputVariable("format", Type.STRING)
             .addInputVariable("val", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_SET_GRAPH))
-            .build(Type.NONE);
+            .build();
         smBuilder.createOperationBuilder(OP_DELETE_GRAPH)
             .addInputVariable("appName", Type.STRING)
             .addInputVariable("serviceMeshName", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_DELETE_GRAPH))
-            .build(Type.NONE);
+            .build();
         smBuilder.createOperationBuilder(OP_GET_VARIABLE_NAME)
             .addInputVariable("type", Type.STRING)
             .addInputVariable("elementName", Type.STRING)
@@ -1224,11 +1224,11 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             .addInputVariable("type", Type.STRING)
             .addInputVariable("valExpr", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_CREATE_VARIABLE))
-            .build(Type.NONE);
+            .build();
         smBuilder.createOperationBuilder(OP_DELETE_VARIABLE)
             .addInputVariable("varName", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_DELETE_VARIABLE))
-            .build(Type.NONE);
+            .build();
         smBuilder.createOperationBuilder(OP_GEN_APPS)
             .setInvocable(iCreator.createInvocable(OP_GEN_APPS))
             .addInputVariable("appId", Type.STRING)
@@ -1278,7 +1278,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @param id the id to use as variable name instead of the variable name itself, may be <b>null</b> for 
      *     the variable name
      */
-    void mapVariable(IDecisionVariable var, SubmodelElementCollectionBuilder builder, String id) {
+    void mapVariable(IDecisionVariable var, SubmodelElementContainerBuilder builder, String id) {
         if (variableFilter.test(var.getDeclaration())) {
             AbstractVariable decl = var.getDeclaration();
             String varName = decl.getName();
@@ -1296,10 +1296,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                     displayName = getStringValueEmptyNull(attribute);
                 }
             }
-            SubmodelElementCollectionBuilder varBuilder;
+            SubmodelElementContainerBuilder varBuilder;
             if (TypeQueries.isCompound(rVarType)) {
-                varBuilder = builder.createSubmodelElementCollectionBuilder(
-                    AasUtils.fixId(varName), false, false);
+                varBuilder = builder.createSubmodelElementCollectionBuilder(AasUtils.fixId(varName));
                 for (int member = 0; member < var.getNestedElementsCount(); member++) {
                     IDecisionVariable elt = var.getNestedElement(member);
                     mapVariable(elt, varBuilder, null);
@@ -1320,8 +1319,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 pb.build();
             } else {
                 String propName = id == null ? varName : id;
-                varBuilder = builder.createSubmodelElementCollectionBuilder(
-                    AasUtils.fixId(propName), false, false);
+                varBuilder = builder.createSubmodelElementCollectionBuilder(AasUtils.fixId(propName));
                 Object aasValue = getValue(var);
                 varType.getType().accept(TYPE_VISITOR); // resolved anyway
                 Type aasType = TYPE_VISITOR.getAasType();
@@ -1340,7 +1338,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 pb.build();
             }
             addMetaProperties(var, varType, varBuilder, displayName);
-            varBuilder.build();
+            varBuilder.justBuild();
         }
     }
 
@@ -1353,7 +1351,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @param displayName the displac name of {@code var}, may be <b>null</b> for none
      */
     private void addMetaProperties(IDecisionVariable var, IDatatype varType, 
-        SubmodelElementCollectionBuilder varBuilder, String displayName) {
+        SubmodelElementContainerBuilder varBuilder, String displayName) {
         varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("variable")))
             .setValue(Type.STRING, var.getDeclaration().getName())
             .build();
@@ -1447,9 +1445,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @param var the variable
      */
     private void mapVariableToAas(SubmodelBuilder smB, IDecisionVariable var) {
-        SubmodelElementCollectionBuilder builder = createTypeCollectionBuilder(smB, getType(var));
+        SubmodelElementContainerBuilder builder = createTypeCollectionBuilder(smB, getType(var));
         mapVariable(var, builder, null);
-        builder.build();
+        builder.justBuild();
     }
     
     /**

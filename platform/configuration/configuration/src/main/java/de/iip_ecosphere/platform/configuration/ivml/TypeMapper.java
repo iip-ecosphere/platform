@@ -24,6 +24,7 @@ import java.util.function.Predicate;
 
 import de.iip_ecosphere.platform.configuration.ModelInfo;
 import de.iip_ecosphere.platform.support.aas.LangString;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
@@ -65,7 +66,7 @@ class TypeMapper {
     private Configuration cfg;
     private Set<Project> doneProjects = new HashSet<>();
     private Set<String> doneTypes = new HashSet<>();
-    private SubmodelElementCollectionBuilder builder;
+    private SubmodelElementContainerBuilder builder;
     private Predicate<AbstractVariable> variableFilter;
     private Stack<Map<String, Object>> assignments = new Stack<>();
     private Function<String, String> metaShortId;
@@ -80,7 +81,7 @@ class TypeMapper {
      * @param metaShortId function to build a meta shortId property name
      */
     TypeMapper(Configuration cfg, Predicate<AbstractVariable> variableFilter, 
-        SubmodelElementCollectionBuilder builder, Function<String, String> metaShortId) {
+        SubmodelElementContainerBuilder builder, Function<String, String> metaShortId) {
         this.cfg = cfg;
         this.builder = builder;
         this.variableFilter = variableFilter;
@@ -140,7 +141,7 @@ class TypeMapper {
      * @param type the type
      * @param metaShortId function to build a meta shortId property name
      */
-    public static void addTypeKind(SubmodelElementCollectionBuilder typeB, IDatatype type, 
+    public static void addTypeKind(SubmodelElementContainerBuilder typeB, IDatatype type, 
         Function<String, String> metaShortId) {
         addTypeKind(typeB, IvmlTypeKind.asTypeKind(type), metaShortId);
     }
@@ -152,7 +153,7 @@ class TypeMapper {
      * @param kind the type kind
      * @param metaShortId function to build a meta shortId property name
      */
-    public static void addTypeKind(SubmodelElementCollectionBuilder typeB, IvmlTypeKind kind, 
+    public static void addTypeKind(SubmodelElementContainerBuilder typeB, IvmlTypeKind kind, 
         Function<String, String> metaShortId) {
         typeB.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("typeKind")))
             .setValue(Type.INTEGER, kind.getId())
@@ -454,7 +455,7 @@ class TypeMapper {
      * @param varBuilder the variable builder to add the meta-value to
      * @param metaShortId function to build a meta shortId property name
      */
-    static void addMetaDefault(IDecisionVariable var, SubmodelElementCollectionBuilder varBuilder, 
+    static void addMetaDefault(IDecisionVariable var, SubmodelElementContainerBuilder varBuilder, 
         Function<String, String> metaShortId) {
         addMetaDefault(var.getConfiguration(), var.getDeclaration(), varBuilder, metaShortId);
     }
@@ -470,7 +471,7 @@ class TypeMapper {
      * @param metaShortId function to build a meta shortId property name
      */
     static void addMetaDefault(net.ssehub.easy.varModel.confModel.Configuration cfg, AbstractVariable decl, 
-        SubmodelElementCollectionBuilder varBuilder, Function<String, String> metaShortId) {
+        SubmodelElementContainerBuilder varBuilder, Function<String, String> metaShortId) {
         ConstraintSyntaxTree dflt = decl.getDefaultValue();
         if (null != dflt) {
             EvaluationVisitor eval = new EvaluationVisitor(cfg, null, false, null);

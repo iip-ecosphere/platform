@@ -175,6 +175,7 @@ template JavaMapping(Configuration config, FileArtifact target) {
     def String aasClientModule(IIPEcosphere cfg) {
         switch (cfg.aas) {
             AasImpl::BaSyx : "support.aas.basyx",
+            AasImpl::BaSyx2 : "support.aas.basyx2",
             default: ""
         }
     }
@@ -182,6 +183,7 @@ template JavaMapping(Configuration config, FileArtifact target) {
     def String aasServerModule(IIPEcosphere cfg) {
         switch (cfg.aas) {
             AasImpl::BaSyx : "support.aas.basyx.server",
+            // none for AasImpl::BaSyx2 so far
             default: ""
         }
     }
