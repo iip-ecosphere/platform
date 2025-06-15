@@ -231,6 +231,13 @@ describe('UtilsService', () => {
     expect(DataUtils.isEmpty(undefined)).toBeFalse();
   });
 
+  it('should realize string to base64 and back encoding/decoding', () =>{
+    const original = "Hello, 😊 Angular!";
+    const encoded = DataUtils.stringToBase64(original);
+    const decoded = DataUtils.base64ToString(encoded);
+    expect(decoded).toEqual(original);
+  });
+
   // -------------------------- retry -----------------------------------
 
   it('should fail 3 times', async() => {

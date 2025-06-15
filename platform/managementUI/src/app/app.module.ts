@@ -50,6 +50,7 @@ import { MeshFeedbackComponent } from './components/flowchart/feedback/mesh-feed
 import { NgVar } from './directives/ng-var.directive';
 import { FileUploadComponent } from './components/file-upload/file-upload.component';
 import { LangStringInputComponent } from './components/editor/inputControls/lang-string-input/lang-string-input.component';
+import { LoginComponent } from './components/login/login.component';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -74,7 +75,8 @@ import { LangStringInputComponent } from './components/editor/inputControls/lang
         SubeditorButtonComponent,
         MeshFeedbackComponent,
         NgVar,
-        FileUploadComponent
+        FileUploadComponent,
+        LoginComponent
     ],
     bootstrap: [AppComponent], imports: [BrowserModule,
         AppRoutingModule,

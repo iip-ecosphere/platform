@@ -1,7 +1,7 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { PlatformArtifacts, PlatformResources, PlatformServices, ResourceAttribute, InputVariable, platformResponse, Resource, PlatformData, DEFAULT_AAS_OPERATION_TIMEOUT, JsonPlatformOperationResult, SubmodelElementCollection, allMetaTypes, MT_metaDisplayName, MT_metaTypeKind, MTK_container, MT_metaSize, DR_idShort, DR_type, MT_metaType, MTK_compound, MT_varValue, DR_displayName } from 'src/interfaces';
-import { firstValueFrom, Subject } from 'rxjs';
+import { catchError, EMPTY, empty, firstValueFrom, map, Observable, Subject, throwError, timeout } from 'rxjs';
 import { Configuration, EnvConfigService } from './env-config.service';
 import { DataUtils, UtilsService } from './utils.service';
 
@@ -74,6 +74,48 @@ export class ApiService extends UtilsService {
       this.errorEmitter.next(e as HttpErrorResponse);
     }
     return Data;
+  }
+
+  private getRequestUrl(url: string, cfg: Configuration|undefined) {
+    let u = cfg?.ip + '/shells/' + cfg?.urn;
+    if (url) {
+      u = "/" + url;
+    }
+    return u;
+  }
+
+  private async requestData(url: string, fn: (o: Observable<Object>) => Observable<Object> = o => o) {
+    let cfg = await this.envConfigService.initAndGetCfg();
+    let u = this.getRequestUrl(url, cfg);
+    return await firstValueFrom(
+      fn(this.http.get(u)
+        .pipe(
+          timeout(this.envConfigService.getHttpTimeout()), 
+          catchError((error: HttpErrorResponse) => {
+            /*if (error.name === 'TimeoutError') {
+              console.error('Request time out when accessing: ' + u);
+            }*/
+            return fn(EMPTY);
+          })
+        )
+      )
+    );
+  }
+
+  /**
+   * Just returns whether the backend is accessible, possibly taking injected headers into account.
+   * 
+   * @returns whether the backend is accessible
+   */
+  public async isAccessible() {
+      //let cfg = await this.envConfigService.initAndGetCfg();
+      return this.requestData("", o => o.pipe(map(v => v != null))); // mapping may require adjustment, also then in login test
+      //return await firstValueFrom(
+      //  this.http.get(cfg?.ip + '/shells/' + cfg?.urn + '/'));
+  }
+
+  public getAccessibleUrl(cfg: Configuration|undefined) {
+    return this.getRequestUrl("", cfg);
   }
 
   /**

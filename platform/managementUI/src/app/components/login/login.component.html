@@ -1,0 +1,22 @@
+<mat-card class="login-card">
+    <mat-card-title>Login</mat-card-title>
+    <mat-card-content>
+      <form [formGroup]="loginForm" ng-submit="login()">
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Username</mat-label>
+          <input matInput formControlName="username" id="userName" required>
+          <mat-error *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched" id="userNameMsg">
+            Username is required
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput formControlName="password" type="password" id="password" required>
+          <mat-error *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" id="passwordMsg">
+            Password is required
+          </mat-error>
+        </mat-form-field>
+        <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid" id="btnLogin" ng-click="login()">Login</button>
+      </form>
+  </mat-card-content>
+</mat-card>

@@ -469,7 +469,7 @@ export class DataUtils {
   }
 
   /**
-   * Turns abase64 encoded string to an array buffer.
+   * Turns a base64 encoded string to an array buffer.
    * 
    * @param base64 the base64 encoded string
    * @returns the array buffer
@@ -483,6 +483,34 @@ export class DataUtils {
         bytes[i] = binary_string.charCodeAt(i);
     }
     return bytes.buffer;
+  }
+
+  /**
+   * Turns an usual string to a base64 encoded string.
+   * 
+   * @param str the string to encode
+   * @returns the base64 encoded string
+   */
+  public static stringToBase64(str: string): string {
+    // Encode the string as a Uint8Array in UTF-8 and convert to a binary string
+    const utf8Bytes = new TextEncoder().encode(str);
+    const binaryString = Array.from(utf8Bytes)
+      .map(byte => String.fromCharCode(byte))
+      .join('');
+    return btoa(binaryString);
+  }
+
+    /**
+   * Turns a base64 encoded string to an usual string.
+   * 
+   * @param base64 the base64 encoded string
+   * @returns the decoded string
+   */
+  public static base64ToString(base64: string): string {
+    // Decode base64 to binary string, then to Uint8Array, then to UTF-8 string
+    const binaryString = atob(base64);
+    const bytes = Uint8Array.from(binaryString, char => char.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
   }
 
   /**

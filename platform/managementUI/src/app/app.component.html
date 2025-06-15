@@ -24,9 +24,7 @@
   <a mat-tab-link [routerLink]="'resources'"> resources </a>
   <a mat-tab-link [routerLink]="'list'"> configuration </a>
   <a mat-tab-link [routerLink]="'services'"> runtime </a>
-  <!-- <a mat-tab-link [routerLink]="'deploymentPlans'"> deployment plans </a> -->
-  <!-- <a mat-tab-link [routerLink]="'instances'"> instances </a> -->
-  <!-- <a mat-tab-link [routerLink]="'flowchart'"> flow editor </a> -->
+  <a mat-tab-link (click)="logout($event)" *ngIf="showLogout()"> logout </a>
 </nav>
 
 <mat-tab-nav-panel>

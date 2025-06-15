@@ -17,8 +17,10 @@ import { ResourcesComponent }
 import { ServicesComponent }
   from './components/services/services.component';
 import { LogsDialogComponent } from './components/services/logs/logs-dialog.component';
+import { LoginComponent } from './components/login/login.component';
+import { EnvConfigService } from './services/env-config.service';
 
-export const routes: Routes = [
+export const routes: Routes = EnvConfigService.ifAuth([
   { path: '', redirectTo: 'resources', pathMatch: `full` },
   //{ path: '', redirectTo: 'logs', pathMatch: `full` },
   { path: 'resources/:id', component: ResourceDetailsComponent },
@@ -33,13 +35,11 @@ export const routes: Routes = [
   { path: 'list', component: ListComponent},
   { path: 'instances', component: InstancesComponent },
   //{ path: 'list/:ls', component: ListComponent }
-  { path: 'logs', component: LogsDialogComponent}
-
-];
+  { path: 'logs', component: LogsDialogComponent},
+], { path: 'login', component: LoginComponent});
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, {useHash: true})],
   exports: [RouterModule]
-
 })
 export class AppRoutingModule { }

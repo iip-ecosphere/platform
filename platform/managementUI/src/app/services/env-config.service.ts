@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Routes, Route } from '@angular/router';
+
 export type { Configuration };
 declare var window: any;
 
@@ -10,11 +12,20 @@ export enum Environment {
   Local = 'local',
 }
 
+export enum MetaModelVersion {
+  v2 = 'v2',
+  v3 = 'v3',
+}
+
 interface Configuration {
   ip: string;
+  smIp?: string;
   urn?: string;
   stage?: Environment;
   inTest?: boolean;
+  requireAuthentication?: boolean;
+  metaModelVersion?: MetaModelVersion;
+  httpTimeout? : number;
   enableDebug? : boolean;
   enableInfo? : boolean;
   enableLog? : boolean;
@@ -89,8 +100,33 @@ export class EnvConfigService {
       return EnvConfigService.env;      
     }
 
+    public getHttpTimeout() : number {
+      return EnvConfigService.env?.httpTimeout || 1000;
+    }
+
+    public getRequireAuthentication() : boolean {
+      return EnvConfigService.env?.requireAuthentication || false;
+    }
+
+    public getMetaModelVersion() : MetaModelVersion {
+      return EnvConfigService.env?.metaModelVersion || MetaModelVersion.v2;
+    }
+
     public async initAndGetCfg() {
       await EnvConfigService.init(); // only if needed
       return EnvConfigService.env;
     }
+
+    public static ifAuth(routes: Routes, login: Route): Routes {
+      if (EnvConfigService.env?.requireAuthentication) {
+        for (let r of routes) {
+          if (r.path == '') {
+            r.redirectTo = login.path;
+          }
+        }
+        routes.push(login);
+      }
+      return routes;
+    }
+
 }

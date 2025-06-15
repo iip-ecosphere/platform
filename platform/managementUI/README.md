@@ -27,14 +27,18 @@ An installed management UI contains a setup JSON file in `assets/config/config.j
 
     {
         "ip": "http://192.168.0.199:9001",
-        "urn": "urn%3A%3A%3AAAS%3A%3A%3AiipEcosphere%23"
+        "urn": "urn%3A%3A%3AAAS%3A%3A%3AiipEcosphere%23",
+        "metaModelVersion": "v2",
+        "requireAuthentication" : false, 
     }
     
-whereby the `ip` points to the platform AAS server and the the `urn` denotes the URN of the platform AAS.
+whereby the `ip` denotes the IP/base URL platform AAS repository server and the the `urn` denotes the URN of the platform AAS. An AAS metamodel v2 setup shell also include `metaModelVersion` with value `"v2"` as well as a value for `requireAuthentication` (which enables or disables login/logout). Further setup values are `httpTimeout` in milliseconds (default `1000`). For AAS metamodel v3 setup, `metaModelVersion` state value `"v2"` and also give `smIP`, the IP/base URL platform submodel repository server. Further considered values are `enableDebug`, `enableInfo`, `enableLog`, `enableWarn` for different logging levels or `inTest` which may indicate that the current execution is part of testing.
 
 ## Running the test suite
 
-The full test suite requires a running platform instance. This is automatically set up when running `mvn install`, as usual with `-Dunpack.force=true` to update the models or `-Dconfiguration.force` to rebuild the platform.
+The full test suite requires a running platform instance. This is automatically set up when running `mvn install`, as usual with `-Dunpack.force=true` to update the models or `-Dconfiguration.force` to rebuild the platform. 
+
+The test suite currently runs with a static sequence as the `ListComponent` test must run before the `IvmlFormatterService`. As jasmine runs tests based on a breath-first traversal of the source folder, the `IvmlFormatterService` is currently located one folder layer below `ListComponent`. As soon as possible, we will try to resolve that dependency to switch back to randomized testing.
 
 ## Developing with the test suite
 
@@ -68,7 +72,7 @@ If you also need a running application (all tests shall be developed so that exe
 - `cd gen/platform`
 - `cli.sh deploy artifacts/deployment.yaml`
 
-`ng test` or for more "headless" execution
+`ng test` or for more "headless" execution `ng test --no-watch --browsers=ChromeHeadless` or
 `ng test --no-watch --no-progress --browsers=ChromeHeadless` if desirable also with `--code-coverage` or further arguments.
 
 For shutdown of the running application, consider executing `cli.sh undeploy artifacts/deployment.yaml` or an undeployment via the UI.

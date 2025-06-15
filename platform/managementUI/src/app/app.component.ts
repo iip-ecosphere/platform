@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { buildInformation } from 'src/interfaces';
 import { ApiService } from './services/api.service';
+import { EnvConfigService } from './services/env-config.service';
+import { UserService } from './services/user.service';
 
 @Component({
     selector: 'app-root',
@@ -18,7 +20,7 @@ export class AppComponent implements OnInit{
     isRelease: undefined,
   };
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private cfg: EnvConfigService, private user:UserService) {}
 
   async ngOnInit() {
     const response = await this.api.getPlatformData();
@@ -40,4 +42,23 @@ export class AppComponent implements OnInit{
       }
     }
   }
+
+  /**
+   * Returns whether the UI shall show a logout button/link.
+   * 
+   * @returns true for logout functionality, false else
+   */
+  public showLogout() {
+    return this.cfg.getRequireAuthentication();
+  }
+
+  /**
+   * Logs out the current user.
+   * 
+   * @param event click event
+   */
+  public logout(event: Event) {
+    this.user.clear();
+  }
+
 }
