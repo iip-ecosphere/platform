@@ -133,6 +133,11 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
             }
             return result;
         }
+        
+        @Override
+        public SubmodelElementContainerBuilder createSubmodelElementContainerBuilder(String idShort) {
+            return instance.createSubmodelElementContainerBuilder(idShort);
+        }
 
         @Override
         public void defer() {
@@ -259,6 +264,18 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
                 result = new BaSyxSubmodelElementList.BaSyxSubmodelElementListBuilder(parent, 
                    (BaSyxSubmodelElementList) sub);
             }
+        }
+        return result;
+    }
+    
+    @Override
+    public SubmodelElementContainerBuilder createSubmodelElementContainerBuilder(String idShort) {
+        SubmodelElementContainerBuilder result;
+        SubmodelElement sub = getSubmodelElement(idShort);
+        if (sub instanceof SubmodelElementList) {
+            result = createSubmodelElementListBuilder(idShort);
+        } else {
+            result = createSubmodelElementCollectionBuilder(idShort);
         }
         return result;
     }

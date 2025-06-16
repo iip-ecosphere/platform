@@ -216,6 +216,18 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         }
 
         @Override
+        public SubmodelElementContainerBuilder createSubmodelElementContainerBuilder(String idShort) {
+            SubmodelElementContainerBuilder result;
+            SubmodelElement sub = instance.getSubmodelElement(idShort);
+            if (sub instanceof SubmodelElementList) {
+                result = createSubmodelElementListBuilder(idShort);
+            } else {
+                result = createSubmodelElementCollectionBuilder(idShort);
+            }
+            return result;
+        }
+        
+        @Override
         public Reference createReference() {
             return new BaSyxReference(collection.getReference());
         }

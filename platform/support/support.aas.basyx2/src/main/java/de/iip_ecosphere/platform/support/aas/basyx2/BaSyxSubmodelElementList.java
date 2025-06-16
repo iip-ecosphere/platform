@@ -199,6 +199,18 @@ public class BaSyxSubmodelElementList extends BaSyxSubmodelElement implements Su
             }
             return result;
         }
+        
+        @Override
+        public SubmodelElementContainerBuilder createSubmodelElementContainerBuilder(String idShort) {
+            SubmodelElementContainerBuilder result;
+            SubmodelElement sub = instance.getSubmodelElement(idShort);
+            if (sub instanceof SubmodelElementList) {
+                result = createSubmodelElementListBuilder(idShort);
+            } else {
+                result = createSubmodelElementCollectionBuilder(idShort);
+            }
+            return result;
+        }
 
         @Override
         public Reference createReference() {
@@ -354,7 +366,7 @@ public class BaSyxSubmodelElementList extends BaSyxSubmodelElement implements Su
     /**
      * Creates an instance and sets the BaSyx instance directly.
      * 
-     * @param collection the collection instance
+     * @param list the list instance
      */
     protected BaSyxSubmodelElementList(org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementList list) {
         this.list = list;
@@ -372,7 +384,7 @@ public class BaSyxSubmodelElementList extends BaSyxSubmodelElement implements Su
     }
     
     /**
-     * Creates the actual data structure to use. {@link #collection} shall be set before.
+     * Creates the actual data structure to use. {@link #elementsList} shall be set before.
      */
     private void createElementsStructure() {
         elementsList = new ArrayList<SubmodelElement>();

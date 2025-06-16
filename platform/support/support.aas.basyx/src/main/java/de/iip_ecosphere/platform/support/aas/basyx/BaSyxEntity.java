@@ -26,6 +26,7 @@ import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.RelationshipElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 
@@ -153,6 +154,18 @@ public class BaSyxEntity extends BaSyxSubmodelElement implements Entity, Submode
                     result = new BaSyxSubmodelElementList.BaSyxSubmodelElementListBuilder(this, 
                        (BaSyxSubmodelElementList) sub);
                 }
+            }
+            return result;
+        }
+
+        @Override
+        public SubmodelElementContainerBuilder createSubmodelElementContainerBuilder(String idShort) {
+            SubmodelElementContainerBuilder result;
+            SubmodelElement sub = instance.getSubmodelElement(idShort);
+            if (sub instanceof SubmodelElementList) {
+                result = createSubmodelElementListBuilder(idShort);
+            } else {
+                result = createSubmodelElementCollectionBuilder(idShort);
             }
             return result;
         }

@@ -95,6 +95,11 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
             }
             return result;
         }
+        
+        @Override
+        public SubmodelElementContainerBuilder createSubmodelElementContainerBuilder(String idShort) {
+            return instance.createSubmodelElementContainerBuilder(idShort);
+        }
 
         @Override
         public SubmodelElementContainerBuilder getParentBuilder() {
@@ -210,6 +215,18 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
                 result = new BaSyxSubmodelElementList.BaSyxSubmodelElementListBuilder(secb, 
                    (BaSyxSubmodelElementList) sub);
             }
+        }
+        return result;
+    }
+    
+    @Override
+    public SubmodelElementContainerBuilder createSubmodelElementContainerBuilder(String idShort) {
+        SubmodelElementContainerBuilder result;
+        SubmodelElement sub = getSubmodelElement(idShort);
+        if (sub instanceof SubmodelElementList) {
+            result = createSubmodelElementListBuilder(idShort);
+        } else {
+            result = createSubmodelElementCollectionBuilder(idShort);
         }
         return result;
     }

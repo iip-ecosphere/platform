@@ -209,9 +209,9 @@ public abstract class AbstractSubmodel<S extends org.eclipse.digitaltwin.aas4j.v
     }
 
     /**
-     * Registers a sub-model element collection.
+     * Registers a sub-model element list.
      * 
-     * @param collection the element collection
+     * @param list the element list
      * @return {@code collection}
      */
     public BaSyxSubmodelElementList register(BaSyxSubmodelElementList list) {

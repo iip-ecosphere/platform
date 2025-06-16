@@ -78,7 +78,6 @@ public class BaSyxSubmodelElementList extends BaSyxSubmodelElement implements Su
          * constructor.
          * 
          * @param parentBuilder the parent builder
-         * @param allowDuplicates whether the collection allows duplicates
          * @throws IllegalArgumentException may be thrown if {@code idShort} is not given
          */
         protected BaSyxSubmodelElementListBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, 
@@ -207,6 +206,18 @@ public class BaSyxSubmodelElementList extends BaSyxSubmodelElement implements Su
                     result = new BaSyxSubmodelElementList.BaSyxSubmodelElementListBuilder(this, 
                        (BaSyxSubmodelElementList) sub);
                 }
+            }
+            return result;
+        }
+
+        @Override
+        public SubmodelElementContainerBuilder createSubmodelElementContainerBuilder(String idShort) {
+            SubmodelElementContainerBuilder result;
+            SubmodelElement sub = instance.getSubmodelElement(idShort);
+            if (sub instanceof SubmodelElementList) {
+                result = createSubmodelElementListBuilder(idShort);
+            } else {
+                result = createSubmodelElementCollectionBuilder(idShort);
             }
             return result;
         }

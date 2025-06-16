@@ -132,6 +132,11 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.digitaltwin.aas4
         }
         
         @Override
+        public SubmodelElementContainerBuilder createSubmodelElementContainerBuilder(String idShort) {
+            return instance.createSubmodelElementContainerBuilder(idShort);
+        }
+        
+        @Override
         public void defer() {
             parentBuilder.defer(instance.getIdShort(), this);
         }
@@ -267,6 +272,18 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.digitaltwin.aas4
                 result = new BaSyxSubmodelElementList.BaSyxSubmodelElementListBuilder(parent, 
                    (BaSyxSubmodelElementList) sub);
             }
+        }
+        return result;
+    }
+    
+    @Override
+    public SubmodelElementContainerBuilder createSubmodelElementContainerBuilder(String idShort) {
+        SubmodelElementContainerBuilder result;
+        SubmodelElement sub = getSubmodelElement(idShort);
+        if (sub instanceof SubmodelElementList) {
+            result = createSubmodelElementListBuilder(idShort);
+        } else {
+            result = createSubmodelElementCollectionBuilder(idShort);
         }
         return result;
     }

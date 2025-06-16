@@ -429,13 +429,12 @@ public class BaSyxElementTranslator {
         String... path) {
         SubmodelElementContainerBuilder builder = null;
         if (path.length > 0) {
-            // boolean build parameters are not relevant as we aim for an existing builder (chain)
-            builder = sub.createSubmodelElementCollectionBuilder(path[0], true, true);
+            builder = sub.createSubmodelElementContainerBuilder(path[0]);
             if (builder.isNew()) {
                 builder = null;
             } else {
                 for (int i = 1; i < path.length; i++) {
-                    builder = builder.createSubmodelElementCollectionBuilder(path[i], true, true);
+                    builder = builder.createSubmodelElementContainerBuilder(path[i]);
                     if (builder.isNew()) {
                         builder = null;
                         break;
