@@ -10,7 +10,7 @@ import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
-import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.transport.status.ActionType;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
@@ -56,7 +56,7 @@ public class StatusConverter extends TransportToAasConverter<StatusMessage> {
     }
 
     @Override
-    protected void populateSubmodelElementCollection(SubmodelElementCollectionBuilder smcBuilder,
+    protected void populateSubmodelElementCollection(SubmodelElementContainerBuilder smcBuilder,
         StatusMessage data) {
         createPayloadEntries(smcBuilder, data);
     }
