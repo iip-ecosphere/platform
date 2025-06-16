@@ -83,6 +83,8 @@ template AasBasics(Configuration config, FileArtifact target) {
     def getFieldName(AasElementType elt, AasField field) {
         if (elt == AasGenericSubmodelElementCollection) {
             getIdShort(field);
+        } else if (elt == AasGenericSubmodelElementList) {
+            getIdShort(field);
         } else if (elt == AasGenericEntityType) {
             getIdShort(field);
         } else {
@@ -149,6 +151,17 @@ template AasBasics(Configuration config, FileArtifact target) {
     }
 
     @DispatchCase
+    def collectTypeNames(AasSubmodelElementListType type, setOf(String) result, String postfix) {
+        String name = asTypeName(type.name) + postfix;
+        if (type <> AasGenericSubmodelElementList and !result.includes(name)) {
+            result.add(name);
+            if (isDefined(type.fields) and type.fields <> null) {
+                collectFieldTypeNames(type.fields, result, postfix);
+            }
+        }
+    }
+
+    @DispatchCase
     def collectTypeNames(AasEntityType type, setOf(String) result, String postfix) {
 	    String name = asTypeName(type.name) + postfix;
         if (type <> AasGenericEntityType and !result.includes(name)) {
@@ -193,7 +206,7 @@ template AasBasics(Configuration config, FileArtifact target) {
     }
     
     def isImplementedByAPI(Any instance) {
-        instance == AasGenericSubmodelElementCollection or instance == AasGenericEntityType;
+        instance == AasGenericSubmodelElementCollection or instance == AasGenericSubmodelElementList or instance == AasGenericEntityType;
     }
     
     def hasMultiSemId(AasField field) {
@@ -269,7 +282,9 @@ template AasBasics(Configuration config, FileArtifact target) {
         String pkg = "";
         if (clsName == "SubmodelElementCollectionBuilder") {
             pkg = "de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.";
-        } else if (clsName == "Entity") {
+        } else if (clsName == "SubmodelElementListBuilder") {
+            pkg = "de.iip_ecosphere.platform.support.aas.SubmodelElementList.";
+        } else if (clsName == "Entity" or clsName == "SubmodelElementCollection" or clsName == "SubmodelElementList") {
             pkg = "de.iip_ecosphere.platform.support.aas.";
         } else if (clsName == "EntityBuilder" or clsName == "EntityType") {
             pkg = "de.iip_ecosphere.platform.support.aas.Entity.";

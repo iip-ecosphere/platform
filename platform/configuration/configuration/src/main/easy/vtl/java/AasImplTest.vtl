@@ -300,9 +300,9 @@ template AasImplTest(Configuration config, JavaCodeArtifact target, AasSubmodelT
     				f.addAssignment(builderName, bld);
     				
                     String populateStmt = "";
-                    if (type == AasGenericSubmodelElementCollection) {
-    				    bld.addArgument(false); // ordered
-    				    bld.addArgument(false); // allowsDuplicates
+                    if (type == AasGenericSubmodelElementCollection or type == AasGenericSubmodelElementList) {
+    				    //bld.addArgument(false); // ordered
+    				    //bld.addArgument(false); // allowsDuplicates
                     } else if (type == AasGenericEntityType) {
                         m.addImport("de.iip_ecosphere.platform.support.aas.Entity"); // ensure
     				    bld.addArgument('Entity.EntityType.SELFMANAGEDENTITY'); // preliminary default
@@ -358,6 +358,11 @@ template AasImplTest(Configuration config, JavaCodeArtifact target, AasSubmodelT
     def genPopulateField(AasField field, AasSubmodelElementCollectionType type, Integer mode, JavaCodeMethod m) {
         genSubStructure(field, type.name, mode, m);
     }
+
+    @DispatchCase
+    def genPopulateField(AasField field, AasSubmodelElementListType type, Integer mode, JavaCodeMethod m) {
+        genSubStructure(field, type.name, mode, m);
+    }
     
     @DispatchCase
     def genPopulateField(AasField field, AasSubmodelType type, Integer mode, JavaCodeMethod m) {
@@ -385,6 +390,11 @@ template AasImplTest(Configuration config, JavaCodeArtifact target, AasSubmodelT
     @DispatchCase
     def genPopulateMethods(AasField field, AasSubmodelElementCollectionType type, Integer mode, JavaCodeClass cls) {
         genMethod(field, type.name, type.fields, "SMEC", mode, cls);
+    }
+
+    @DispatchCase
+    def genPopulateMethods(AasField field, AasSubmodelElementListType type, Integer mode, JavaCodeClass cls) {
+        genMethod(field, type.name, type.fields, "SMEL", mode, cls);
     }
     
     def genMethod(AasField field, String typeName, sequenceOf(AasField) fields, String aasType, Integer mode, JavaCodeClass cls) {

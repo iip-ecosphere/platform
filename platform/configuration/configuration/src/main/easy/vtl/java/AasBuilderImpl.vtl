@@ -57,6 +57,9 @@ template AasBuilderImpl(Configuration config, JavaCodeArtifact target, AasSubmod
         if (type == AasGenericSubmodelElementCollection) {
             AasElementType t = type;
             produceElementMethods(t, class, field, grouped, mode, cls);
+        } else if (type == AasGenericSubmodelElementList) {
+            AasElementType t = type;
+            produceElementMethods(t, class, field, grouped, mode, cls);
         } else if (type == AasGenericEntityType) {
             AasElementType t = type;
             produceElementMethods(t, class, field, grouped, mode, cls);
@@ -426,9 +429,7 @@ template AasBuilderImpl(Configuration config, JavaCodeArtifact target, AasSubmod
             }
             String builderEx = 'new ${clsName}Builder(${genericParam}this${counterEx}${semIdParamEx})';
             if (type == AasGenericSubmodelElementCollection) {
-                m.addParameter("boolean", "ordered", "whether the collection is ordered");
-                m.addParameter("boolean", "allowDuplicates", "whether the collection allows duplicates");
-                builderEx = 'super.createSubmodelElementCollectionBuilder(${idEx}, ordered, allowDuplicates)';
+                builderEx = 'super.createSubmodelElementCollectionBuilder(${idEx})';
             } else if (type == AasGenericEntityType) {
                 m.addParameter("de.iip_ecosphere.platform.support.aas.Entity.EntityType", "type", "the entity type");
                 builderEx = 'super.createEntityBuilder(${idEx}, type, null)';
@@ -517,6 +518,15 @@ template AasBuilderImpl(Configuration config, JavaCodeArtifact target, AasSubmod
 
     @DispatchCase
     def produceClasses(AasSubmodelElementCollectionType type, Boolean counting, Boolean top, AasField field, JavaCodeClass cls) {
+        produceClasses(type, counting, top, field, "DelegatingSubmodelElementCollectionBuilder", "createSubmodelElementCollectionBuilder", "", "SubmodelElementCollection", "Collection", cls);
+    }
+
+    @DispatchCase // added during AAS v2->v3 transition
+    def produceClasses(AasSubmodelElementListType type, Boolean counting, Boolean top, AasField field, JavaCodeClass cls) {  // added v2->v3
+        produceClasses(type, counting, top, field, "DelegatingSubmodelElementListBuilder", "createSubmodelElementListBuilder", "", "SubmodelElementList", "List", cls);
+    }
+
+    def produceClasses(AasElementType type, Boolean counting, Boolean top, AasField field, String delegationType, String createMethod, String createParam, String targetType, String clsComment, JavaCodeClass cls) { // added v2->v3
         String clsName = asTypeName(type.name);
         if (!done.includes(type.name) and !isImplementedByAPI(type) and notSkip(type)) {
             done.add(type.name);
@@ -527,25 +537,30 @@ template AasBuilderImpl(Configuration config, JavaCodeArtifact target, AasSubmod
                 idShortEx = 'getCountingIdShort(idShort, nr)';
             }
             
-            JavaCodeClass c = cls.addClass("${clsName}Builder", getClassComment(type.description, "Builder", "AAS Builder implementation", false)).setPublic();
-            c.addExtends("de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodelElementCollectionBuilder");
+            JavaCodeClass c = cls.addClass("${clsName}Builder", getClassComment(type.description, "Builder", clsComment + " Builder implementation", false)).setPublic();
+            c.addExtends("de.iip_ecosphere.platform.support.aas.types.common." + delegationType);
             produceFields(type.fields, c);
             
             JavaCodeMethod m = c.addConstructor("Creates a builder instance for ${getIdShort(type)}.").setProtected();
             setupInnerConstructor(type, field, top, false, m);
-            m.add("super(smBuilder.createSubmodelElementCollectionBuilder(${basicIdShortEx}, ${type.ordered}, ${type.allowDuplicates}));");
+            m.add("super(smBuilder.${createMethod}(${basicIdShortEx}${createParam}));");
             produceSetSemanticId(type.semanticId, hasMultiSemId(type), m);
 
             m = c.addConstructor("Creates a builder instance for ${getIdShort(type)}.").setProtected();
             setupInnerConstructor(type, field, top, true, m);
-            m.add("super(smBuilder.createSubmodelElementCollectionBuilder(${idShortEx}, ${type.ordered}, ${type.allowDuplicates}));");
+            m.add("super(smBuilder.${createMethod}(${idShortEx}${createParam}));");
             produceSetSemanticId(type.semanticId, hasMultiSemId(type), m);
             
             produceMethodsForFields(type.fields, "${clsName}Builder", c);
-            produceBuildMethod(type.fields, "de.iip_ecosphere.platform.support.aas.SubmodelElementCollection", c);
+            produceBuildMethod(type.fields, "de.iip_ecosphere.platform.support.aas." + targetType, c);
 
             produceClassesForFields(type.fields, false, cls);
         }
+    }
+
+    @DispatchCase
+    def produceClasses(AasEntityType type, Boolean counting, Boolean top, AasField field, JavaCodeClass cls) {
+        produceClasses(type, counting, top, field, "DelegatingEntityBuilder", "createEntityBuilder", ", Entity.EntityType.${type.type}, null", "Entity", "Entity", cls);
     }
 
     def setupInnerConstructor(AasElementType type, AasField field, Boolean top, Boolean addNrParam, JavaCodeMethod cons) {
@@ -562,39 +577,6 @@ template AasBuilderImpl(Configuration config, JavaCodeArtifact target, AasSubmod
         }
         if (hasMultiSemId(type)) {
             cons.addParameter("String", "semanticId", "the actual semantic ID");
-        }
-    }
-
-    @DispatchCase
-    def produceClasses(AasEntityType type, Boolean counting, Boolean top, AasField field, JavaCodeClass cls) {
-        String clsName = asTypeName(type.name);
-        if (!done.includes(type.name) and !isImplementedByAPI(type) and notSkip(type)) {
-            done.add(type.name);
-            String basicIdShortEx = '"${getIdShort(type)}"';
-            String idShortEx = 'getCountingIdShort("${getIdShort(type)}", nr)';
-            if (type.isGeneric or field.isGeneric) {
-                basicIdShortEx = "idShort";
-                idShortEx = 'getCountingIdShort(idShort, nr)';
-            }
-
-            JavaCodeClass c = cls.addClass("${clsName}Builder", getClassComment(type.description, "Builder", "Entity Builder implementation", false)).setPublic();
-            c.addExtends("de.iip_ecosphere.platform.support.aas.types.common.DelegatingEntityBuilder");
-            produceFields(type.fields, c);
-
-            JavaCodeMethod m = c.addConstructor("Creates a builder instance for ${getIdShort(type)}.").setProtected();
-            setupInnerConstructor(type, field, top, false, m);
-            m.add("super(smBuilder.createEntityBuilder(${basicIdShortEx}, Entity.EntityType.${type.type}, null));");
-            produceSetSemanticId(type.semanticId, hasMultiSemId(type), m);
-
-            m = c.addConstructor("Creates a builder instance for ${getIdShort(type)}.").setProtected();
-            setupInnerConstructor(type, field, top, true, m);
-            m.add("super(smBuilder.createEntityBuilder(${idShortEx}, Entity.EntityType.${type.type}, null));");
-            produceSetSemanticId(type.semanticId, hasMultiSemId(type), m);
-            
-            produceMethodsForFields(type.fields, "${clsName}Builder", c);
-            produceBuildMethod(type.fields, "de.iip_ecosphere.platform.support.aas.Entity", c);
-
-            produceClassesForFields(type.fields, false, cls);
         }
     }
     

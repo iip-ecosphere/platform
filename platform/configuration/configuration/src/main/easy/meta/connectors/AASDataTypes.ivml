@@ -103,14 +103,18 @@ project AASDataTypes {
     compound AasSubmodelType refines AasElementType {
         AasFields fields;
     }
+
+    abstract compound AasSubmodelElementContainerType refines AasElementType {
+    }
     
-    compound AasSubmodelElementCollectionType refines AasElementType {
+    compound AasSubmodelElementCollectionType refines AasSubmodelElementContainerType {
         AasFields fields;
         Boolean ordered = false;
         Boolean allowDuplicates = false;
     }
     
-    // preliminary, as long as platform is not based on BaSyx 2
+    // preliminary, as long as platform is not based on BaSyx 2; also not part of metamodel v3
+    // TODO change refinement, remove ordered/allowDuplicates
     compound AasSubmodelListType refines AasSubmodelElementCollectionType {
         Boolean ordered = true;
         Boolean allowDuplicates = true;
@@ -157,6 +161,12 @@ project AASDataTypes {
 
     AasSubmodelElementCollectionType AasGenericSubmodelElementCollection = {
         name = "SubmodelElementCollection",
+        fields = {
+        }
+    };
+
+    AasSubmodelElementCollectionType AasGenericSubmodelElementList = {
+        name = "SubmodelElementList",
         fields = {
         }
     };

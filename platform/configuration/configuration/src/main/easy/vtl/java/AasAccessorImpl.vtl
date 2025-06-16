@@ -25,6 +25,9 @@ template AasAccessorImpl(Configuration config, JavaCodeArtifact target, AasSubmo
         if (type == AasGenericSubmodelElementCollection) {
             AasElementType t = type;
             produceElementMethods(t, class, field, mode, "getSubmodelElementCollection", mainCls);
+        } else if (type == AasGenericSubmodelElementList) {
+            AasElementType t = type;
+            produceElementMethods(t, class, field, mode, "getSubmodelElementList", mainCls);
         } else if (type == AasGenericEntityType) {
             AasElementType t = type;
             produceElementMethods(t, class, field, mode, "getEntity", mainCls);
@@ -131,6 +134,15 @@ template AasAccessorImpl(Configuration config, JavaCodeArtifact target, AasSubmo
         if (!doneMethods.includes(type.name)) {
             doneMethods.add(type.name);
             produceElementMethods(type, class, field, mode, "getSubmodelElementCollection", mainCls);
+            doneMethods.remove(type.name);
+        }
+    }
+
+    @DispatchCase
+    def produceMethods(AasSubmodelElementListType type, String class, AasField field, Integer mode, JavaCodeClass mainCls) {
+        if (!doneMethods.includes(type.name)) {
+            doneMethods.add(type.name);
+            produceElementMethods(type, class, field, mode, "getSubmodelElementList", mainCls);
             doneMethods.remove(type.name);
         }
     }
@@ -275,36 +287,30 @@ template AasAccessorImpl(Configuration config, JavaCodeArtifact target, AasSubmo
 
     @DispatchCase
     def produceClasses(AasSubmodelElementCollectionType type, Boolean counting, Boolean top, JavaCodeClass mainCls) {
-        String clsName = asTypeName(type.name);
-        if (!done.includes(clsName) and !isImplementedByAPI(type) and notSkip(type)) {
-            done.add(clsName);
-            mainCls.addClass(clsName, 
-                getClassComment(type.description, "Accessor", "AAS accessor implementation", false)).(cls|{
-                cls.setPublic().setStatic();
-            cls.addExtends("de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodelElementCollection");
-                cls.addConstructor("Creates a wrapping instance for ${getIdShort(type)}.")
-                    .setProtected().(cons|{
-            cons.addParameter("de.iip_ecosphere.platform.support.aas.SubmodelElementCollection", "parent", "the parent submodel element collection builder");    
-            cons.add("super(parent);");
-                });
-            produceMethodsForFields(type.fields, clsName, cls);
-            });
-            produceClassesForFields(type.fields, false, mainCls);
-        }
+        produceClasses(type, counting, top, "DelegatingSubmodelElementCollection", "SubmodelElementCollection", "submodel element collection", mainCls);
+    }
+
+    @DispatchCase
+    def produceClasses(AasSubmodelElementListType type, Boolean counting, Boolean top, JavaCodeClass mainCls) { // added v2->v3
+        produceClasses(type, counting, top, "DelegatingSubmodelElementList", "SubmodelElementList", "submodel element list", mainCls);
     }
         
     @DispatchCase
     def produceClasses(AasEntityType type, Boolean counting, Boolean top, JavaCodeClass mainCls) {
+        produceClasses(type, counting, top, "DelegatingEntity", "Entity", "entity", mainCls);
+    }
+
+    def produceClasses(AasElementType type, Boolean counting, Boolean top, String delegateType, String parentType, String parentComment, JavaCodeClass mainCls) { // added v2->v3
         String clsName = asTypeName(type.name);
         if (!done.includes(clsName) and !isImplementedByAPI(type) and notSkip(type)) {
             done.add(clsName);
             mainCls.addClass(clsName, 
                 getClassComment(type.description, "Accessor", "AAS accessor implementation", false)).(cls|{
                 cls.setPublic().setStatic();
-                cls.addExtends("de.iip_ecosphere.platform.support.aas.types.common.DelegatingEntity");
+                cls.addExtends("de.iip_ecosphere.platform.support.aas.types.common." + delegateType);
                 cls.addConstructor("Creates a wrapping instance for ${getIdShort(type)}.")
                     .setProtected().(cons|{
-                    cons.addParameter("de.iip_ecosphere.platform.support.aas.Entity", "parent", "the parent submodel element collection builder");    
+                    cons.addParameter("de.iip_ecosphere.platform.support.aas." + parentType, "parent", "the parent " + parentComment);    
                     cons.add("super(parent);");
                 });
                 produceMethodsForFields(type.fields, clsName, cls);
