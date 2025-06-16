@@ -30,7 +30,8 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
-import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
@@ -162,8 +163,8 @@ public abstract class TransportToAasConverter<T> extends TransportConverter<T> {
                 }
                 // bypass without propagation
                 aas.getSubmodel(submodelIdShort).create(b -> {
-                    SubmodelElementCollectionBuilder smcBuilder = b.createSubmodelElementCollectionBuilder(
-                        getSubmodelElementIdFunction().apply(data), true, true); 
+                    SubmodelElementListBuilder smcBuilder = b.createSubmodelElementListBuilder(
+                        getSubmodelElementIdFunction().apply(data)); 
                     populateSubmodelElementCollection(smcBuilder, data);
                     smcBuilder.build();
                 }, false);
@@ -181,7 +182,7 @@ public abstract class TransportToAasConverter<T> extends TransportConverter<T> {
      * @param smcBuilder the builder for the submodel element collection representing the data value
      * @param data the data that may be used to create the element
      */
-    protected abstract void populateSubmodelElementCollection(SubmodelElementCollectionBuilder smcBuilder, T data);
+    protected abstract void populateSubmodelElementCollection(SubmodelElementContainerBuilder smcBuilder, T data);
     
     /**
      * Returns a function turning a data instance into an id of the submodel representing the data instance.
@@ -260,7 +261,7 @@ public abstract class TransportToAasConverter<T> extends TransportConverter<T> {
      * @param payloadBuilder the payload builder
      * @param payload the payload to be presented
      */
-    protected void createPayloadEntries(SubmodelElementCollectionBuilder payloadBuilder, Object payload) {
+    protected void createPayloadEntries(SubmodelElementContainerBuilder payloadBuilder, Object payload) {
         if (null != payload) {
             Class<?> cls = payload.getClass();
             for (Method m : cls.getMethods()) {
@@ -300,7 +301,7 @@ public abstract class TransportToAasConverter<T> extends TransportConverter<T> {
                     }
                 }
             }
-            payloadBuilder.build();
+            payloadBuilder.justBuild();
         }
     }
 

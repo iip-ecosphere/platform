@@ -46,6 +46,7 @@ import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
@@ -606,7 +607,7 @@ public class TraceToAasService extends AbstractService {
         }
         
         @Override
-        protected void populateSubmodelElementCollection(SubmodelElementCollectionBuilder smcBuilder, 
+        protected void populateSubmodelElementCollection(SubmodelElementContainerBuilder smcBuilder, 
             TraceRecord data) {
             smcBuilder.createPropertyBuilder(PROPERTY_SOURCE)
                 .setValue(Type.STRING, data.getSource())

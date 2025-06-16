@@ -28,7 +28,6 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
-import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
@@ -140,8 +139,7 @@ public class MonitoringAas implements AasContributor {
         try {
             Aas aas = AasPartRegistry.retrieveIipAas();
             SubmodelBuilder smBuilder = aas.createSubmodelBuilder(SUBMODEL_MONITORING, null);
-            SubmodelElementCollectionBuilder smcBuilder = smBuilder.createSubmodelElementCollectionBuilder(
-                SMEC_ALERTS, true, true);
+            SubmodelElementListBuilder smcBuilder = smBuilder.createSubmodelElementListBuilder(SMEC_ALERTS);
             SubmodelElementListBuilder entryBuilder = smBuilder.createSubmodelElementListBuilder(
                 AasUtils.fixId("Alert_" + data.getTimestamp())); // may also be UID
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_UID)
