@@ -4,7 +4,7 @@ AAS DataRetentionPoliciesExample
   REFERENCE InheritedFrom -> true (semanticId: iri:https://admin-shell.io/idta/DataRetentionPolicies/InheritedFrom/1/0)
   SMC Policies (semanticId: iri:https://admin-shell.io/idta/DataRetentionPolicies/Policies/1/0)
    SMC Policy01 (semanticId: iri:https://admin-shell.io/idta/DataRetentionPolicies/Policy/1/0)
-    SMC AuditLog (semanticId: iri:https://admin-shell.io/idta/DataRetentionPolicies/AuditLog/1/0)
+    SML AuditLog (semanticId: iri:https://admin-shell.io/idta/DataRetentionPolicies/AuditLog/1/0)
      SMC generic01 (semanticId: iri:https://admin-shell.io/idta/DataRetentionPolicies/Activity/1/0)
       MLP Identity (semanticId: iri:https://admin-shell.io/idta/DataRetentionPolicies/Identity/1/0)
       MLP Operation (semanticId: iri:https://admin-shell.io/idta/DataRetentionPolicies/Operation/1/0)

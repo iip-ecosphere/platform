@@ -96,9 +96,19 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
      * a builder to add a new sub-model elements list (ultimately only if {@link Builder#build()} was called).
      * 
      * @param idShort the short name of the list
-     * @return the sub-model collection builder
+     * @return the sub-model list builder
      */
     public SubmodelElementListBuilder createSubmodelElementListBuilder(String idShort);
+
+    /**
+     * Returns a sub-model element container builder either by providing access to an existing collection or list or 
+     * through a builder to add a new sub-model elements collection or list (default collection, ultimately only if 
+     * {@link Builder#build()} was called).
+     * 
+     * @param idShort the short name of the list
+     * @return the sub-model collection builder
+     */
+    public SubmodelElementContainerBuilder createSubmodelElementContainerBuilder(String idShort);
 
     /**
      * Returns the reference to the AAS.

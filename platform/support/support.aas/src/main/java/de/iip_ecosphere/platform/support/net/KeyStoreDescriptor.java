@@ -69,7 +69,6 @@ public class KeyStoreDescriptor implements Serializable {
      * @param alias the alias denoting the key/certificate to use, ignored if <b>null</b>
      * @param appliesToClient whether this keystore applies to client instances or shall be ignored there
      * @param hostNameVerification enable/disable hostname verification
-     * @throws IOException if the keystore cannot be accessed
      */
     public KeyStoreDescriptor(KeystoreCoordinate keystore, String alias, boolean appliesToClient, 
         boolean hostNameVerification) {

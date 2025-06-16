@@ -120,6 +120,11 @@ public class DelegatingSubmodelBuilder implements SubmodelBuilder {
     public SubmodelElementListBuilder createSubmodelElementListBuilder(String idShort) {
         return delegate.createSubmodelElementListBuilder(idShort);
     }
+    
+    @Override
+    public SubmodelElementContainerBuilder createSubmodelElementContainerBuilder(String idShort) {
+        return delegate.createSubmodelElementContainerBuilder(idShort);
+    }
 
     @Override
     public SubmodelElementContainerBuilder getParentBuilder() {

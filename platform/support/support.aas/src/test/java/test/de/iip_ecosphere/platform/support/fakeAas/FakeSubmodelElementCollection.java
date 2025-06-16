@@ -113,7 +113,19 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
                 result = new FakeSubmodelElementListBuilder(this, idShort); 
             }
             return result; 
-        }        
+        }    
+        
+        @Override
+        public SubmodelElementContainerBuilder createSubmodelElementContainerBuilder(String idShort) {
+            SubmodelElementContainerBuilder result;
+            SubmodelElement sub = instance.getSubmodelElement(idShort);
+            if (sub instanceof SubmodelElementList) {
+                result = createSubmodelElementListBuilder(idShort);
+            } else {
+                result = createSubmodelElementCollectionBuilder(idShort);
+            }
+            return result;
+        }
 
         @Override
         public Reference createReference() {

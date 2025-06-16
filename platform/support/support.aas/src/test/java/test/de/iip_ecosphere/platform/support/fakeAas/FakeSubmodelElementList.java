@@ -116,6 +116,18 @@ public class FakeSubmodelElementList extends FakeElement implements SubmodelElem
         }        
 
         @Override
+        public SubmodelElementContainerBuilder createSubmodelElementContainerBuilder(String idShort) {
+            SubmodelElementContainerBuilder result;
+            SubmodelElement sub = instance.getSubmodelElement(idShort);
+            if (sub instanceof SubmodelElementList) {
+                result = createSubmodelElementListBuilder(idShort);
+            } else {
+                result = createSubmodelElementContainerBuilder(idShort);
+            }
+            return result;
+        }
+        
+        @Override
         public Reference createReference() {
             return new FakeReference();
         }

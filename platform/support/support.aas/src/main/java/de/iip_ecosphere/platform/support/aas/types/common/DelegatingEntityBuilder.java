@@ -120,6 +120,11 @@ public class DelegatingEntityBuilder implements EntityBuilder {
     }
 
     @Override
+    public SubmodelElementContainerBuilder createSubmodelElementContainerBuilder(String idShort) {
+        return delegate.createSubmodelElementContainerBuilder(idShort);
+    }
+
+    @Override
     public SubmodelElementContainerBuilder getParentBuilder() {
         return delegate.getParentBuilder();
     }

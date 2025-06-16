@@ -135,7 +135,12 @@ public class FakeSubmodel extends FakeElement implements Submodel {
                 result = new FakeSubmodelElementListBuilder(this, idShort); 
             }
             return result; 
-        }        
+        }     
+        
+        @Override
+        public SubmodelElementContainerBuilder createSubmodelElementContainerBuilder(String idShort) {
+            return instance.createSubmodelElementContainerBuilder(idShort);
+        }
 
         @Override
         public Reference createReference() {
@@ -402,6 +407,18 @@ public class FakeSubmodel extends FakeElement implements Submodel {
             FakeSubmodelElementContainerBuilder secb = new FakeSubmodel.FakeSubmodelBuilder(
                 new FakeAasBuilder(parent), this);
             result = new FakeSubmodelElementList.FakeSubmodelElementListBuilder(secb, idShort);
+        }
+        return result;
+    }
+    
+    @Override
+    public SubmodelElementContainerBuilder createSubmodelElementContainerBuilder(String idShort) {
+        SubmodelElementContainerBuilder result;
+        SubmodelElement sub = getSubmodelElement(idShort);
+        if (sub instanceof SubmodelElementList) {
+            result = createSubmodelElementListBuilder(idShort);
+        } else {
+            result = createSubmodelElementCollectionBuilder(idShort);
         }
         return result;
     }
