@@ -46,4 +46,5 @@ AASDataTypes::AasMultiLangStringType = Represents an AAS multi-language string.
 AASDataTypes::AasReferenceType = Represents an AAS reference type.
 AASDataTypes::AasRelationType = Represents an AAS relation type.
 AASDataTypes::AasGenericEntityType = Instance for all non-further specified entity types.
-AASDataTypes::AasGenericSubmodelElementCollection = Instance for all non-further specified submodel element collection types.
+AASDataTypes::AasGenericSubmodelElementCollection = Default instance for all non-further specified submodel element collection types.
+AASDataTypes::AasGenericSubmodelElementList = Default instance for all non-further specified submodel element list types.
