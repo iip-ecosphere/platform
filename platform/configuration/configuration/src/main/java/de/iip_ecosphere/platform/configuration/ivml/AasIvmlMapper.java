@@ -51,6 +51,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.FileUtils;
@@ -300,9 +301,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @param typeName the type name (turned into an AAS shortID)
      * @return the collection builder
      */
-    private static SubmodelElementContainerBuilder createTypeCollectionBuilder(SubmodelBuilder smBuilder, 
+    private static SubmodelElementListBuilder createTypeCollectionBuilder(SubmodelBuilder smBuilder, 
         String typeName) {
-        return smBuilder.createSubmodelElementCollectionBuilder(AasUtils.fixId(typeName), true, false);
+        return smBuilder.createSubmodelElementListBuilder(AasUtils.fixId(typeName));
     }
     
     /**

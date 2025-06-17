@@ -57,6 +57,7 @@ import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.instantiation.core.model.vilTypes.configuration.Configuration;
@@ -335,12 +336,12 @@ public class AasIvmlMapperTest {
     private String assertSubmodel(Submodel sm, String appName, int netIndex, 
         Consumer<SubmodelElementCollection> servicesAsserter) throws ExecutionException {
         
-        SubmodelElementCollection sec = sm.getSubmodelElementCollection("ServiceBase");
-        Assert.assertNotNull(sec); // 2 variables of type service shall exist in the model
+        SubmodelElementList sel = sm.getSubmodelElementList("ServiceBase");
+        Assert.assertNotNull(sel); // 2 variables of type service shall exist in the model
         // Accessing the net as intended
-        sec = sm.getSubmodelElementCollection("Application");
-        Assert.assertNotNull(sec); // 1 variables of type Application shall exist in the model
-        sec = sec.getSubmodelElementCollection(appName);
+        sel = sm.getSubmodelElementList("Application");
+        Assert.assertNotNull(sel); // 1 variables of type Application shall exist in the model
+        SubmodelElementCollection sec = sel.getSubmodelElementCollection(appName);
         Assert.assertNotNull(sec); // this application shall be there
         sec = sec.getSubmodelElementCollection("services");
         Assert.assertNotNull(sec);

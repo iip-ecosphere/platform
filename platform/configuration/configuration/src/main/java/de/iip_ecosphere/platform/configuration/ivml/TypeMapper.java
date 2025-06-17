@@ -25,6 +25,7 @@ import java.util.function.Predicate;
 import de.iip_ecosphere.platform.configuration.ModelInfo;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
@@ -127,8 +128,7 @@ class TypeMapper {
     private void mapPrimitiveType(String name) {
         String typeId = AasUtils.fixId(name);
         if (!isDoneType(typeId)) {
-            SubmodelElementCollectionBuilder typeB = builder.createSubmodelElementCollectionBuilder(
-                typeId, false, false);
+            SubmodelElementCollectionBuilder typeB = builder.createSubmodelElementCollectionBuilder(typeId);
             addTypeKind(typeB, IvmlTypeKind.PRIMITIVE, metaShortId);
             typeB.build();
         }
@@ -168,12 +168,11 @@ class TypeMapper {
     private void mapCompoundType(Compound type) {
         String typeId = AasUtils.fixId(type.getName());
         if (!isDoneType(typeId)) {
-            SubmodelElementCollectionBuilder typeB = builder.createSubmodelElementCollectionBuilder(
-                typeId, false, false);
-            Map<String, SubmodelElementCollectionBuilder> doneSlots = new HashMap<>();
+            SubmodelElementCollectionBuilder typeB = builder.createSubmodelElementCollectionBuilder(typeId);
+            Map<String, SubmodelElementListBuilder> doneSlots = new HashMap<>();
             mapCompoundSlots(type, type, type, typeB, doneSlots);
             mapRefines(type, type, typeB, doneSlots);
-            for (SubmodelElementCollectionBuilder builder : sortMembers(type, doneSlots)) {
+            for (SubmodelElementListBuilder builder : sortMembers(type, doneSlots)) {
                 builder.build();
             }
             typeB.createPropertyBuilder(metaShortId.apply("abstract"))
@@ -194,22 +193,22 @@ class TypeMapper {
      * @param slots the SME builders per slot
      * @return the sorted members
      */
-    private List<SubmodelElementCollectionBuilder> sortMembers(Compound type, 
-        Map<String, SubmodelElementCollectionBuilder> slots) {
-        List<SubmodelElementCollectionBuilder> result = new ArrayList<>();
+    private List<SubmodelElementListBuilder> sortMembers(Compound type, 
+        Map<String, SubmodelElementListBuilder> slots) {
+        List<SubmodelElementListBuilder> result = new ArrayList<>();
         Set<String> done = null;
         if (type instanceof Compound) {
             List<String> names = new ArrayList<String>();
             done = new HashSet<>();
             collectMemberNames((Compound) type, names, done);
-            Map<Integer, List<SubmodelElementCollectionBuilder>> namesByUiGroups = new HashMap<>();
+            Map<Integer, List<SubmodelElementListBuilder>> namesByUiGroups = new HashMap<>();
             for (String name : names) {
-                SubmodelElementCollectionBuilder elt = slots.get(name);
+                SubmodelElementListBuilder elt = slots.get(name);
                 if (null != elt) {
                     int uiGroup = getUiGroup(type.getName(), name);
                     int uiPos = uiGroup % UIGROUP_SPACING;
                     uiGroup /= UIGROUP_SPACING;
-                    List<SubmodelElementCollectionBuilder> tmp = namesByUiGroups.get(uiGroup);
+                    List<SubmodelElementListBuilder> tmp = namesByUiGroups.get(uiGroup);
                     if (null == tmp) {
                         tmp = new ArrayList<>();
                         namesByUiGroups.put(uiGroup, tmp);
@@ -241,8 +240,8 @@ class TypeMapper {
     * @param start the start ui group/key
     * @param inc the increment, terminate immediately after first transfer if {@code 0}
     */
-    private void add(Map<Integer, List<SubmodelElementCollectionBuilder>> src, 
-        List<SubmodelElementCollectionBuilder> tgt, int start, int inc) {
+    private void add(Map<Integer, List<SubmodelElementListBuilder>> src, 
+        List<SubmodelElementListBuilder> tgt, int start, int inc) {
         int u = start;
         while (src.get(u) != null) {
             tgt.addAll(src.get(u));
@@ -319,12 +318,11 @@ class TypeMapper {
     private void mapEnumType(Enum type) {
         String typeId = AasUtils.fixId(type.getName());
         if (!isDoneType(typeId)) {
-            SubmodelElementCollectionBuilder typeB = builder.createSubmodelElementCollectionBuilder(
-                typeId, false, false);
+            SubmodelElementCollectionBuilder typeB = builder.createSubmodelElementCollectionBuilder(typeId);
             for (int l = 0; l < type.getLiteralCount(); l++) {
                 EnumLiteral lit = type.getLiteral(l);
                 SubmodelElementCollectionBuilder litB = typeB.createSubmodelElementCollectionBuilder(
-                    AasUtils.fixId(lit.getName()), false, false);
+                    AasUtils.fixId(lit.getName()));
                 // value is reserved by BaSyx/AAS
                 litB.createPropertyBuilder("varValue")
                     .setValue(Type.STRING, lit.getName())
@@ -363,8 +361,7 @@ class TypeMapper {
         String typeId = AasUtils.fixId(type.getName());
         IDatatype baseType = type.getBasisType();
         if (!isDoneType(typeId)) {
-            SubmodelElementCollectionBuilder typeB = builder.createSubmodelElementCollectionBuilder(
-                typeId, false, false);
+            SubmodelElementCollectionBuilder typeB = builder.createSubmodelElementCollectionBuilder(typeId);
             typeB.createPropertyBuilder(metaShortId.apply("refines"))
                 .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(baseType))
                 .build();
@@ -400,7 +397,7 @@ class TypeMapper {
      * @param doneSlots already done slot names
      */
     private void mapRefines(Compound type, Compound topType, SubmodelElementCollectionBuilder typeB, 
-        Map<String, SubmodelElementCollectionBuilder> doneSlots) {
+        Map<String, SubmodelElementListBuilder> doneSlots) {
         for (int r = 0; r < type.getRefinesCount(); r++) {
             Compound refines = type.getRefines(r);
             mapCompoundSlots(refines, refines, topType, typeB, doneSlots);
@@ -418,7 +415,7 @@ class TypeMapper {
      * @param doneSlots already done slot names
      */
     private void mapCompoundSlots(IDecisionVariableContainer cnt, Compound type, Compound topType, 
-        SubmodelElementCollectionBuilder typeB, Map<String, SubmodelElementCollectionBuilder> doneSlots) {
+        SubmodelElementCollectionBuilder typeB, Map<String, SubmodelElementListBuilder> doneSlots) {
         for (int i = 0; i < cnt.getElementCount(); i++) {
             mapCompoundSlot(cnt.getElement(i), type, topType, typeB, doneSlots);
         }
@@ -507,14 +504,13 @@ class TypeMapper {
      * @param doneSlots already done slot names
      */
     private void mapCompoundSlot(DecisionVariableDeclaration slot, Compound type, Compound topType,
-        SubmodelElementCollectionBuilder typeB, Map<String, SubmodelElementCollectionBuilder> doneSlots) {
+        SubmodelElementCollectionBuilder typeB, Map<String, SubmodelElementListBuilder> doneSlots) {
         // if we get into trouble with property ids, we have to sub-structure that
         String slotName = AasUtils.fixId(slot.getName());
         if (!doneSlots.containsKey(slotName) && variableFilter.test(slot)) {
             String lang = AasIvmlMapper.getLang();
             IDatatype slotType = slot.getType();
-            SubmodelElementCollectionBuilder propB = typeB.createSubmodelElementCollectionBuilder(slotName, 
-                true, false);
+            SubmodelElementListBuilder propB = typeB.createSubmodelElementListBuilder(slotName);
             doneSlots.put(slotName, propB);
             propB.createPropertyBuilder("name")
                 .setValue(Type.STRING, slotName)
