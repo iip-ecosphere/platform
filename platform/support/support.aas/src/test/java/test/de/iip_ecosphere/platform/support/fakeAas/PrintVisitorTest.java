@@ -46,7 +46,7 @@ public class PrintVisitorTest {
         SubmodelElementCollectionBuilder nB = smB.createSubmodelElementCollectionBuilder("nested");
         nB.createPropertyBuilder("nested").build();
         nB.createReferenceElementBuilder("parent").setValue(smB.createReference()).build();
-        SubmodelElementCollectionBuilder nB2 = nB.createSubmodelElementCollectionBuilder("nested2", false, true);
+        SubmodelElementCollectionBuilder nB2 = nB.createSubmodelElementCollectionBuilder("nested2");
         nB2.createPropertyBuilder("nested2").build();
         nB2.build();
         SubmodelElementListBuilder nB3 = nB.createSubmodelElementListBuilder("nested3");

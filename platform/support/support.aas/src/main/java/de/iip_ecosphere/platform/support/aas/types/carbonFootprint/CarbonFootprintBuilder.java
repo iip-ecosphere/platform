@@ -470,7 +470,7 @@ public class CarbonFootprintBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel builder
         */
         protected ProductCarbonFootprintBuilder(SubmodelBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("ProductCarbonFootprint", false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder("ProductCarbonFootprint"));
             setSemanticId(irdi("https://admin-shell.io/idta/CarbonFootprint/ProductCarbonFootprint/0/9"));
         }
         
@@ -481,8 +481,7 @@ public class CarbonFootprintBuilder extends DelegatingSubmodelBuilder {
         * @param nr the structure number
         */
         protected ProductCarbonFootprintBuilder(SubmodelBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("ProductCarbonFootprint", nr),
-                false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("ProductCarbonFootprint", nr)));
             setSemanticId(irdi("https://admin-shell.io/idta/CarbonFootprint/ProductCarbonFootprint/0/9"));
         }
         
@@ -662,7 +661,7 @@ public class CarbonFootprintBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         */
         protected PCFGoodsAddressHandoverBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("PCFGoodsAddressHandover", false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder("PCFGoodsAddressHandover"));
             setSemanticId(irdi("0173-1#02-ABI498#001"));
         }
         
@@ -673,8 +672,7 @@ public class CarbonFootprintBuilder extends DelegatingSubmodelBuilder {
         * @param nr the structure number
         */
         protected PCFGoodsAddressHandoverBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("PCFGoodsAddressHandover", nr),
-                false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("PCFGoodsAddressHandover", nr)));
             setSemanticId(irdi("0173-1#02-ABI498#001"));
         }
         
@@ -788,7 +786,7 @@ public class CarbonFootprintBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel builder
         */
         protected TransportCarbonFootprintBuilder(SubmodelBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("TransportCarbonFootprint", false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder("TransportCarbonFootprint"));
             setSemanticId(irdi("https://admin-shell.io/idta/CarbonFootprint/TransportCarbonFootprint/0/9"));
         }
         
@@ -799,8 +797,7 @@ public class CarbonFootprintBuilder extends DelegatingSubmodelBuilder {
         * @param nr the structure number
         */
         protected TransportCarbonFootprintBuilder(SubmodelBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("TransportCarbonFootprint", nr),
-                false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("TransportCarbonFootprint", nr)));
             setSemanticId(irdi("https://admin-shell.io/idta/CarbonFootprint/TransportCarbonFootprint/0/9"));
         }
         
@@ -990,7 +987,7 @@ public class CarbonFootprintBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         */
         protected TCFGoodsTransportAddressHandoverBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("TCFGoodsTransportAddressHandover", false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder("TCFGoodsTransportAddressHandover"));
             setSemanticId(irdi("0173-1#02-ABI499#001"));
         }
         
@@ -1002,7 +999,7 @@ public class CarbonFootprintBuilder extends DelegatingSubmodelBuilder {
         */
         protected TCFGoodsTransportAddressHandoverBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
             super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort(
-                "TCFGoodsTransportAddressHandover", nr), false, false));
+                "TCFGoodsTransportAddressHandover", nr)));
             setSemanticId(irdi("0173-1#02-ABI499#001"));
         }
         

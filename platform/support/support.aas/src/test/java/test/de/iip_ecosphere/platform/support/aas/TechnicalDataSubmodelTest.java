@@ -176,10 +176,10 @@ public class TechnicalDataSubmodelTest {
      */
     private void createTechnicalProperties(TechnicalDataBuilder tdSmBuilder) {
         TechnicalPropertiesBuilder tpBuilder = tdSmBuilder.createTechnicalPropertiesBuilder();
-        tpBuilder.createMainSectionBuilder(false, false).build();
-        tpBuilder.createMainSectionBuilder(false, false).build();
-        tpBuilder.createSubSectionBuilder(false, false).build();
-        tpBuilder.createSubSectionBuilder(false, false).build();
+        tpBuilder.createMainSectionBuilder().build();
+        tpBuilder.createMainSectionBuilder().build();
+        tpBuilder.createSubSectionBuilder().build();
+        tpBuilder.createSubSectionBuilder().build();
         tpBuilder.build();
     }
 

@@ -148,7 +148,7 @@ public class DeploymentTest {
 
         SubmodelElementCollection coll1 = aas1.getSubmodel("sub").getSubmodelElementCollection("coll");
         Assert.assertNull(coll1.getProperty("prop1")); // does not exist, not yet created (here, forces init)
-        smcB = sub.createSubmodelElementCollectionBuilder("coll", false, true);
+        smcB = sub.createSubmodelElementCollectionBuilder("coll");
         smcB.createPropertyBuilder("prop1").setValue(Type.BOOLEAN, true).build();
         smcB.build();
         Assert.assertNull(coll1.getProperty("prop1")); // exists in other instance, e.g., other process

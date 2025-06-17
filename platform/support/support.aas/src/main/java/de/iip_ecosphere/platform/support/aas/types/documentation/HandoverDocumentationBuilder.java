@@ -157,7 +157,7 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel builder
         */
         protected DocumentBuilder(SubmodelBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("Document", false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder("Document"));
             setSemanticId(irdi("0173-1#01-AHF579#001"));
         }
         
@@ -168,7 +168,7 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
         * @param nr the structure number
         */
         protected DocumentBuilder(SubmodelBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Document", nr), false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Document", nr)));
             setSemanticId(irdi("0173-1#01-AHF579#001"));
         }
         
@@ -251,7 +251,7 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         */
         protected DocumentIdBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("DocumentId", false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder("DocumentId"));
             setSemanticId(irdi("0173-1#01-AHF580#001"));
         }
         
@@ -262,8 +262,7 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
         * @param nr the structure number
         */
         protected DocumentIdBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("DocumentId", nr), false,
-                false));
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("DocumentId", nr)));
             setSemanticId(irdi("0173-1#01-AHF580#001"));
         }
         
@@ -341,7 +340,7 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         */
         protected DocumentClassificationBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("DocumentClassification", false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder("DocumentClassification"));
             setSemanticId(irdi("0173-1#01-AHF581#001"));
         }
         
@@ -352,8 +351,7 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
         * @param nr the structure number
         */
         protected DocumentClassificationBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("DocumentClassification", nr),
-                false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("DocumentClassification", nr)));
             setSemanticId(irdi("0173-1#01-AHF581#001"));
         }
         
@@ -444,7 +442,7 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         */
         protected DocumentVersionBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("DocumentVersion", false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder("DocumentVersion"));
             setSemanticId(irdi("0173-1#01-AHF582#001"));
         }
         
@@ -455,8 +453,7 @@ public class HandoverDocumentationBuilder extends DelegatingSubmodelBuilder {
         * @param nr the structure number
         */
         protected DocumentVersionBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("DocumentVersion", nr), false,
-                false));
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("DocumentVersion", nr)));
             setSemanticId(irdi("0173-1#01-AHF582#001"));
         }
         

@@ -353,7 +353,7 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel builder
         */
         protected ContactInformationBuilder(SubmodelBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("ContactInformation", false, true));
+            super(smBuilder.createSubmodelElementCollectionBuilder("ContactInformation"));
             setSemanticId(iri("https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/ContactInformation"));
         }
         
@@ -364,8 +364,7 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
         * @param nr the structure number
         */
         protected ContactInformationBuilder(SubmodelBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("ContactInformation", nr),
-                false, true));
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("ContactInformation", nr)));
             setSemanticId(iri("https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/ContactInformation"));
         }
         
@@ -763,7 +762,7 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         */
         protected PhoneBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("Phone", false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder("Phone"));
             setSemanticId(iri("https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/ContactInformation/Phone"
                 ));
         }
@@ -775,7 +774,7 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
         * @param nr the structure number
         */
         protected PhoneBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Phone", nr), false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Phone", nr)));
             setSemanticId(iri("https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/ContactInformation/Phone"
                 ));
         }
@@ -853,7 +852,7 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         */
         protected FaxBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("Fax", false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder("Fax"));
             setSemanticId(irdi("0173-1#02-AAQ834#005"));
         }
         
@@ -864,7 +863,7 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
         * @param nr the structure number
         */
         protected FaxBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Fax", nr), false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Fax", nr)));
             setSemanticId(irdi("0173-1#02-AAQ834#005"));
         }
         
@@ -924,7 +923,7 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         */
         protected EmailBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("Email", false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder("Email"));
             setSemanticId(irdi("0173-1#02-AAQ836#005"));
         }
         
@@ -935,7 +934,7 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
         * @param nr the structure number
         */
         protected EmailBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Email", nr), false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Email", nr)));
             setSemanticId(irdi("0173-1#02-AAQ836#005"));
         }
         
@@ -1028,7 +1027,7 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         */
         protected IPCommunicationBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("IPCommunication", false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder("IPCommunication"));
             setSemanticId(iri(
                 "https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/ContactInformation/IPCommunication/"));
         }
@@ -1040,8 +1039,7 @@ public class ContactInformationsBuilder extends DelegatingSubmodelBuilder {
         * @param nr the structure number
         */
         protected IPCommunicationBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("IPCommunication", nr), false,
-                false));
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("IPCommunication", nr)));
             setSemanticId(iri(
                 "https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/ContactInformation/IPCommunication/"));
         }

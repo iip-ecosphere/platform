@@ -152,7 +152,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel builder
         */
         protected MetadataBuilder(SubmodelBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("Metadata", false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder("Metadata"));
             setSemanticId(iri("https://admin-shell.io/idta/TimeSeries/Metadata/1/1"));
         }
         
@@ -163,7 +163,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         * @param nr the structure number
         */
         protected MetadataBuilder(SubmodelBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Metadata", nr), false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Metadata", nr)));
             setSemanticId(iri("https://admin-shell.io/idta/TimeSeries/Metadata/1/1"));
         }
         
@@ -233,7 +233,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         */
         protected RecordBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("Record", false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder("Record"));
             setSemanticId(iri("https://admin-shell.io/idta/TimeSeries/Record/1/1"));
         }
         
@@ -244,7 +244,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         * @param nr the structure number
         */
         protected RecordBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Record", nr), false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Record", nr)));
             setSemanticId(iri("https://admin-shell.io/idta/TimeSeries/Record/1/1"));
         }
         
@@ -288,7 +288,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel builder
         */
         protected SegmentsBuilder(SubmodelBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("Segments", false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder("Segments"));
             setSemanticId(iri("https://admin-shell.io/idta/TimeSeries/Segments/1/1"));
         }
         
@@ -299,7 +299,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         * @param nr the structure number
         */
         protected SegmentsBuilder(SubmodelBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Segments", nr), false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Segments", nr)));
             setSemanticId(iri("https://admin-shell.io/idta/TimeSeries/Segments/1/1"));
         }
         
@@ -371,7 +371,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         */
         protected ExternalSegmentBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("ExternalSegment", false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder("ExternalSegment"));
             setSemanticId(iri("https://admin-shell.io/idta/TimeSeries/Segments/ExternalSegment/1/1"));
         }
         
@@ -382,8 +382,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         * @param nr the structure number
         */
         protected ExternalSegmentBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("ExternalSegment", nr), false,
-                false));
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("ExternalSegment", nr)));
             setSemanticId(iri("https://admin-shell.io/idta/TimeSeries/Segments/ExternalSegment/1/1"));
         }
         
@@ -618,7 +617,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         */
         protected LinkedSegmentBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("LinkedSegment", false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder("LinkedSegment"));
             setSemanticId(iri("https://admin-shell.io/idta/TimeSeries/Segments/LinkedSegment/1/1"));
         }
         
@@ -629,8 +628,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         * @param nr the structure number
         */
         protected LinkedSegmentBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("LinkedSegment", nr), false,
-                false));
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("LinkedSegment", nr)));
             setSemanticId(iri("https://admin-shell.io/idta/TimeSeries/Segments/LinkedSegment/1/1"));
         }
         
@@ -860,7 +858,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         */
         protected InternalSegmentBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("InternalSegment", false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder("InternalSegment"));
             setSemanticId(iri("https://admin-shell.io/idta/TimeSeries/Segments/InternalSegment/1/1"));
         }
         
@@ -871,8 +869,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         * @param nr the structure number
         */
         protected InternalSegmentBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("InternalSegment", nr), false,
-                false));
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("InternalSegment", nr)));
             setSemanticId(iri("https://admin-shell.io/idta/TimeSeries/Segments/InternalSegment/1/1"));
         }
         
@@ -1073,7 +1070,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         */
         protected RecordsBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("Records", false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder("Records"));
             setSemanticId(iri("https://admin-shell.io/idta/TimeSeries/Records/1/1"));
         }
         
@@ -1084,7 +1081,7 @@ public class TimeSeriesBuilder extends DelegatingSubmodelBuilder {
         * @param nr the structure number
         */
         protected RecordsBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Records", nr), false, false));
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Records", nr)));
             setSemanticId(iri("https://admin-shell.io/idta/TimeSeries/Records/1/1"));
         }
         
