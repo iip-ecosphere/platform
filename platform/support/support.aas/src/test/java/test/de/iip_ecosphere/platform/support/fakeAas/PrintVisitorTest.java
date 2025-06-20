@@ -39,7 +39,7 @@ public class PrintVisitorTest {
     public void testVisitor() {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasB = factory.createAasBuilder("aas", "");
-        aasB.createAssetBuilder("asset", null, AssetKind.INSTANCE).build();
+        aasB.createAssetInformationBuilder("asset", null, AssetKind.INSTANCE).build();
         SubmodelBuilder smB =  aasB.createSubmodelBuilder("sub", "");
         smB.createPropertyBuilder("prop").build();
         smB.createOperationBuilder("op").build();

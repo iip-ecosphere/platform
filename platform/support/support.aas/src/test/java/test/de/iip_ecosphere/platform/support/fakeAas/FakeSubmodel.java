@@ -116,13 +116,12 @@ public class FakeSubmodel extends FakeElement implements Submodel {
         }
         
         @Override
-        public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
-            boolean allowDuplicates) {
+        public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort) {
             SubmodelElementCollectionBuilder result = instance.getDeferred(idShort, 
                 SubmodelElementCollectionBuilder.class);
             if (null == result) {
-                result = new FakeSubmodelElementCollection.FakeSubmodelElementCollectionBuilder(this, idShort, ordered, 
-                    allowDuplicates);
+                result = new FakeSubmodelElementCollection.FakeSubmodelElementCollectionBuilder(this, idShort, false, 
+                    false);
             }
             return result;
         }
@@ -388,14 +387,13 @@ public class FakeSubmodel extends FakeElement implements Submodel {
     }
     
     @Override
-    public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
-        boolean allowDuplicates) {
+    public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort) {
         SubmodelElementCollectionBuilder result = getDeferred(idShort, SubmodelElementCollectionBuilder.class);
         if (null == result) {
             FakeSubmodelElementContainerBuilder secb = new FakeSubmodel.FakeSubmodelBuilder(
                 new FakeAasBuilder(parent), this);
             result = new FakeSubmodelElementCollection.FakeSubmodelElementCollectionBuilder(
-                secb, idShort, ordered, allowDuplicates);
+                secb, idShort, false, false);
         }
         return result;
     }

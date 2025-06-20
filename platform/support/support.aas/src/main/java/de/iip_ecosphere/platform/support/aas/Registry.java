@@ -65,8 +65,9 @@ public interface Registry {
      * 
      * @param aas the AAS to deploy
      * @param endpointURL the endpoint URL of the AAS
+     * @throws IOException if the AAS cannot be created, e.g., due to permission issues
      */
-    public void createAas(Aas aas, String endpointURL);
+    public void createAas(Aas aas, String endpointURL) throws IOException;
 
     /**
      * Creates a submodel for the specified stand-alone submodel (as created by 
@@ -75,8 +76,9 @@ public interface Registry {
      * 
      * @param aas the hosting AAS
      * @param submodel the submodel to deploy
+     * @throws IOException if the AAS cannot be created, e.g., due to permission issues
      */
-    public void createSubmodel(Aas aas, Submodel submodel);
+    public void createSubmodel(Aas aas, Submodel submodel) throws IOException;
 
     /**
      * Registers an accessible, already existing sub-model for an AAS.

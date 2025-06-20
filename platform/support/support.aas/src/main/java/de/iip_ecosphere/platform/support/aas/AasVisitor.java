@@ -67,7 +67,7 @@ public interface AasVisitor {
      * 
      * @param asset the asset
      */
-    public void visitAsset(Asset asset);
+    public void visitAsset(AssetInformation asset);
 
     /**
      * Returns a sorted collection of submodels determined by this visitor.

@@ -34,7 +34,7 @@ public interface Property extends Element, DataElement {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public interface PropertyBuilder extends Builder<Property> {
+    public interface PropertyBuilder extends Builder<Property>, RbacReceiver<PropertyBuilder> {
 
         /**
          * A getter implementation that does nothing.
@@ -139,16 +139,18 @@ public interface Property extends Element, DataElement {
         public default PropertyBuilder bindLazy(Invokable get, Invokable set) {
             return bind(get, set);
         }
-        
+
         /**
-         * Creates an RBAC rule for the operation under creation and adds the role to {@code auth}.
+         * Creates RBAC rules for the submodel under creation and adds the roles to {@code auth}.
          * 
          * @param auth the authentication descriptor, may be <b>null</b>, ignored then
-         * @param role the role to create the rule for
+         * @param roles the roles to create the rules for
          * @param actions the permitted actions
          * @return <b>this</b> for chaining
          */
-        public PropertyBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions); 
+        public default PropertyBuilder rbac(AuthenticationDescriptor auth, Role[] roles, RbacAction... actions) {
+            return RbacRoles.rbac(this, auth, roles, actions);
+        }
 
     }
 

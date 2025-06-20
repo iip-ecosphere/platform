@@ -67,7 +67,8 @@ public class PCF extends AbstractAasExample {
     protected void createAas() {
         AasBuilder aasBuilder = AasFactory.getInstance().createAasBuilder("aas_lni1319", 
             iri("https://aas2.uni-h.de/aas/lni1319"));
-        aasBuilder.createAssetBuilder("lni1319", iri("https://aas2.uni-h.de/lni1319"), AssetKind.INSTANCE).build();
+        aasBuilder.createAssetInformationBuilder("lni1319", iri("https://aas2.uni-h.de/lni1319"), AssetKind.INSTANCE)
+            .build();
 
         createPcfSubmodel(aasBuilder);
         createTechnicalDataSubmodel(aasBuilder);
@@ -265,21 +266,21 @@ public class PCF extends AbstractAasExample {
         AasFactory f = AasFactory.getInstance();
         AasBuilder b = f.createAasBuilder("mdzh_configurator", 
             iri("https://aas2.uni-h.de/aas/mdzh_configurator"));
-        b.createAssetBuilder("Vision_mudLaser", iri("https://aas2.uni-h.de/mdzh_configurator"), AssetKind.INSTANCE)
-            .build();
+        b.createAssetInformationBuilder("Vision_mudLaser", iri("https://aas2.uni-h.de/mdzh_configurator"), 
+            AssetKind.INSTANCE).build();
         createNodeHasPartOf(enb, "Station 1 - Configuration", b);
         registerAas(b);
         
         b = f.createAasBuilder("mdzh_pickbylight", 
             iri("https://aas2.uni-h.de/aas/mdzh_pickbylight"));
-        b.createAssetBuilder("mdzh_pickbylight", iri("https://aas2.uni-h.de/mdzh_pickbylight"), AssetKind.INSTANCE)
-            .build();
+        b.createAssetInformationBuilder("mdzh_pickbylight", iri("https://aas2.uni-h.de/mdzh_pickbylight"), 
+            AssetKind.INSTANCE).build();
         createNodeHasPartOf(enb, "Station 2 - Commissioning", b);
         registerAas(b);
 
         b = f.createAasBuilder("aas_DMG_NEF400", 
             iri("https://aas2.uni-h.de/aas/DMG_NEF400"));
-        b.createAssetBuilder("DMG_NEF400", iri("https://aas2.uni-h.de/DMG_NEF400"), AssetKind.INSTANCE)
+        b.createAssetInformationBuilder("DMG_NEF400", iri("https://aas2.uni-h.de/DMG_NEF400"), AssetKind.INSTANCE)
             .build();
         // intentionally no further submodels
         createNodeHasPartOf(enb, "Station 3 - Turning", b);
@@ -317,15 +318,15 @@ public class PCF extends AbstractAasExample {
         
         b = f.createAasBuilder("mdzh_drill", 
             iri("https://aas2.uni-h.de/aas/mdzh_drill"));
-        b.createAssetBuilder("mdzh_drill", iri("https://aas2.uni-h.de/mdzh_drill"), AssetKind.INSTANCE)
+        b.createAssetInformationBuilder("mdzh_drill", iri("https://aas2.uni-h.de/mdzh_drill"), AssetKind.INSTANCE)
             .build();
         createNodeHasPartOf(enb, "Station 4 - Deburring", b);
         registerAas(b);
 
         b = f.createAasBuilder("aas_Vision_mudLaser", 
             iri("https://aas2.uni-h.de/aas/Vision_mudLaser"));
-        b.createAssetBuilder("Vision_mudLaser", iri("https://aas2.uni-h.de/Vision_mudLaser"), AssetKind.INSTANCE)
-            .build();
+        b.createAssetInformationBuilder("Vision_mudLaser", iri("https://aas2.uni-h.de/Vision_mudLaser"), 
+            AssetKind.INSTANCE).build();
         // intentionally no further submodels
         createNodeHasPartOf(enb, "Station 5 - Laser Marking", b);
         setName(enb.createNodeBuilder(), "Station 5 - Assembly")

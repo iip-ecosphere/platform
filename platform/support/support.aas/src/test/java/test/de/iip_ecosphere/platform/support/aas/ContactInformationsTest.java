@@ -49,7 +49,7 @@ public class ContactInformationsTest extends AbstractAasExample {
     protected void createAas() {
         AasBuilder aasBuilder = AasFactory.getInstance().createAasBuilder("ContactInformationsExample", 
             "urn:::AAS:::ContactInformationsExample#");
-        aasBuilder.createAssetBuilder("ci", "urn:::Asset:::ci#", AssetKind.INSTANCE).build();
+        aasBuilder.createAssetInformationBuilder("ci", "urn:::Asset:::ci#", AssetKind.INSTANCE).build();
         ContactInformationsBuilder cis = new ContactInformationsBuilder(aasBuilder, "urn:::SM:::ContactInformations#");
         cis.setCreateMultiLanguageProperties(isCreateMultiLanguageProperties());
         populate(cis.createContactInformationBuilder()).build();

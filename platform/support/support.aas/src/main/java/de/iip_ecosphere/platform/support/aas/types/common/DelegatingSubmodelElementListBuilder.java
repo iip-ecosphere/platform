@@ -106,11 +106,10 @@ public class DelegatingSubmodelElementListBuilder implements SubmodelElementList
     public BlobDataElementBuilder createBlobDataElementBuilder(String idShort, String contents, String mimeType) {
         return delegate.createBlobDataElementBuilder(idShort, contents, mimeType);
     }
-
+    
     @Override
-    public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
-        boolean allowDuplicates) {
-        return delegate.createSubmodelElementCollectionBuilder(idShort, ordered, allowDuplicates);
+    public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort) {
+        return delegate.createSubmodelElementCollectionBuilder(idShort);
     }
     
     @Override

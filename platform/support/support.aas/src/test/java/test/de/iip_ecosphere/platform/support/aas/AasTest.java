@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
@@ -33,13 +34,19 @@ import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.DefaultRole;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.IdentityTokenWithRole;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
+import de.iip_ecosphere.platform.support.aas.DelegatingAuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.IdentityStoreAuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.aas.RbacRoles;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement;
 import de.iip_ecosphere.platform.support.aas.Registry;
@@ -50,6 +57,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
+import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 import de.iip_ecosphere.platform.support.aas.Type;
 
@@ -88,6 +96,14 @@ public class AasTest {
     private static final String NAME_OP_RECONFIGURE = "setLotSize";
     private static final String NAME_OP_STOPMACHINE = "stopMachine";
 
+    private static final String NAME_RBAC_SMOPEN = "openSm";
+    private static final String NAME_RBAC_PROPCLOSED = "closedProp";
+    private static final String NAME_RBAC_OPCLOSED = "closedOp";
+
+    private static final String NAME_RBAC_SMCLOSED = "closedSm";
+    private static final String NAME_RBAC_PROPOPEN = "openProp";
+    private static final String NAME_RBAC_OPOPEN = "openOp";
+    
     private static final ServerAddress VAB_SERVER = new ServerAddress(Schema.HTTP); // localhost, ephemeral
     private static final String URN_AAS = "urn:::AAS:::testMachines#";
     
@@ -141,6 +157,9 @@ public class AasTest {
             return null;
         });
         builder.createPayloadCodec(); // there are specific tests for that, we ignore the result here..
+        
+        builder.defineOperation(NAME_RBAC_OPCLOSED, (params) -> null);
+        builder.defineOperation(NAME_RBAC_OPOPEN, (params) -> null);
         return builder.build();
     }
 
@@ -150,9 +169,10 @@ public class AasTest {
      * @param subModelBuilder the sub model container builder to add the elements to
      * @param spec the setup specification
      * @param machine the test machine instance
+     * @param authDesc the authentication descriptor, may be <b>null</b> for none
      */
     public void createAasOperationsElements(SubmodelElementContainerBuilder subModelBuilder, 
-        SetupSpec spec, TestMachine machine) {
+        SetupSpec spec, TestMachine machine, AuthenticationDescriptor authDesc) {
         AasFactory factory = AasFactory.getInstance();
         InvocablesCreator invC = factory.createInvocablesCreator(spec);
         Utils.setValue(
@@ -170,13 +190,16 @@ public class AasTest {
             .build();
         subModelBuilder.createOperationBuilder(NAME_OP_STARTMACHINE)
             .setInvocable(invC.createInvocable(NAME_OP_STARTMACHINE))
+            .rbacAll(authDesc)
             .build();
         subModelBuilder.createOperationBuilder(NAME_OP_RECONFIGURE)
             .addInputVariable(NAME_VAR_LOTSIZE, Type.INTEGER)
             .setInvocableLazy(invC.createInvocable(NAME_OP_RECONFIGURE))
+            .rbacAll(authDesc)
             .build(Type.BOOLEAN);
         subModelBuilder.createOperationBuilder(NAME_OP_STOPMACHINE)
             .setInvocable(invC.createInvocable(NAME_OP_STOPMACHINE))
+            .rbacAll(authDesc)
             .build();
     }
     
@@ -301,7 +324,7 @@ public class AasTest {
         spec.setAssetServerAddress(VAB_SERVER, protocol);
         spec.setAssetServerKeystore(getKeyStoreDescriptor(protocol));
         spec.setAssetServerAuthentication(authDesc);
-        Aas aas = createAas(machine, spec);
+        Aas aas = createAas(machine, spec, authDesc);
         Server ccServer = createOperationsServer(spec, machine);
         ccServer.start(); // required here by basyx-0.1.0-SNAPSHOT
         ProtocolServerBuilder builder = AasFactory.getInstance().createProtocolServerBuilder(spec);
@@ -313,7 +336,7 @@ public class AasTest {
             .createServer()
             .start();
 
-        queryAas(spec, machine);
+        queryAas(spec, machine, authDesc);
         Server.stop(httpServer, true);
         Server.stop(ccServer, true);
     }
@@ -334,16 +357,28 @@ public class AasTest {
      * 
      * @param machine the test machine instance
      * @param spec the setup specification
+     * @param authDesc optional authentication descriptor (may be <b>null</b>)
      * @return the created AAS
      * @throws SocketException if the port to be used for the AAS is occupied
      * @throws UnknownHostException shall not occur
      */
-    private Aas createAas(TestMachine machine, SetupSpec spec) throws SocketException, UnknownHostException {
+    private Aas createAas(TestMachine machine, SetupSpec spec, AuthenticationDescriptor authDesc) 
+        throws SocketException, UnknownHostException {
         AasFactory factory = AasFactory.getInstance();
-        AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, URN_AAS);
-        SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
+        if (null != authDesc) {
+            System.out.println("USER: " + authDesc.getClientToken());
+            if (null != authDesc.getServerUsers()) {
+                for (IdentityTokenWithRole u : authDesc.getServerUsers()) {
+                    System.out.println("SERVER USER: " + u);
+                }
+            }
+        }
+        AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, URN_AAS)
+            .rbacAll(authDesc);
+        SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)
+            .rbacAll(authDesc);
         Assert.assertTrue(subModelBuilder.isNew());
-        createAasOperationsElements(subModelBuilder, spec, machine);
+        createAasOperationsElements(subModelBuilder, spec, machine, authDesc);
         Reference subModelBuilderRef = subModelBuilder.createReference();
         Assert.assertNotNull(aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)); // for modification
         subModelBuilder.createPropertyBuilder(NAME_VAR_DESCRIPTION1)
@@ -390,7 +425,9 @@ public class AasTest {
         Assert.assertNotNull(aas.getIdentification());
         
         // adding on local models
-        Submodel subAdd = aas.createSubmodelBuilder("sub_add", null).build();
+        Submodel subAdd = aas.createSubmodelBuilder("sub_add", null)
+            .rbacAll(authDesc)
+            .build();
         Assert.assertNotNull(aas.getSubmodel("sub_add"));
         subAdd.createSubmodelElementListBuilder("sub_coll").build();
         Assert.assertNotNull(aas.getSubmodel("sub_add").getSubmodelElementList("sub_coll"));
@@ -399,20 +436,107 @@ public class AasTest {
 
         aas.accept(new AasPrintVisitor());
 
-        testCreateIterate(aas);
+        testCreateIterate(aas, authDesc);
+        testCreateRbac(aas, spec, authDesc);
 
         return aas;
+    }
+    
+    /**
+     * Unused role, just for testing {@link RbacRoles}.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public enum MyRole implements Role {
+        MY_ROLE;
+
+        @Override
+        public boolean anonymous() {
+            return false;
+        }
+    }
+    
+    /**
+     * Asserts roles.
+     * 
+     * @param addMyRole whether {@link MyRole} shall be added/registered or removed/unregistered before asserting
+     */
+    private static void assertRoles(boolean addMyRole) {
+        if (addMyRole) {
+            RbacRoles.registerRole(MyRole.class);
+        } else {
+            RbacRoles.unregisterRole(MyRole.class);
+        }
+        for (Role r : DefaultRole.values()) {
+            Assert.assertTrue(RbacRoles.contains(DefaultRole.values(), r));
+        }
+        Assert.assertEquals(addMyRole, RbacRoles.contains(Role.all(), MyRole.MY_ROLE));
+        Assert.assertFalse(RbacRoles.contains(Role.allAnonymous(), MyRole.MY_ROLE));
+        Assert.assertEquals(addMyRole, RbacRoles.contains(Role.allAuthenticated(), MyRole.MY_ROLE));
+    }
+
+    /**
+     * Creates two submodels, one open to anonymous and one closed to anonymous, both with open and closed elements.
+     * 
+     * @param aas the AAS to create the submodels for
+     * @param spec the setup spec
+     * @param auth the authentication descriptor, may be <b>null</b> for none
+     */
+    private static void testCreateRbac(Aas aas, SetupSpec spec, AuthenticationDescriptor auth) {
+        assertRoles(true);
+        
+        InvocablesCreator invC = AasFactory.getInstance().createInvocablesCreator(spec);
+        SubmodelBuilder sm = aas.createSubmodelBuilder(NAME_RBAC_SMOPEN, null)
+            .rbacAll(auth);
+        sm.createPropertyBuilder(NAME_RBAC_PROPOPEN)
+            .setValue(Type.AAS_INTEGER, 10)
+            .build();
+        sm.createPropertyBuilder(NAME_RBAC_PROPCLOSED)
+            .setValue(Type.AAS_INTEGER, 11)
+            .rbacAllAuthenticated(auth)
+            .build();
+        sm.createOperationBuilder(NAME_RBAC_OPOPEN)
+            .setInvocable(invC.createInvocable(NAME_RBAC_OPOPEN))
+            .build();
+        sm.createOperationBuilder(NAME_RBAC_OPCLOSED)
+            .rbacAllAuthenticated(auth)
+            .setInvocable(invC.createInvocable(NAME_RBAC_OPCLOSED))
+            .build();
+        sm.build();
+
+        sm = aas.createSubmodelBuilder(NAME_RBAC_SMCLOSED, null)
+            .rbacAllAuthenticated(auth);
+        sm.createPropertyBuilder(NAME_RBAC_PROPOPEN)
+            .setValue(Type.AAS_INTEGER, 20)
+            .rbacAll(auth)
+            .build();
+        sm.createPropertyBuilder(NAME_RBAC_PROPCLOSED)
+            .setValue(Type.AAS_INTEGER, 21)
+            .build();
+        sm.createOperationBuilder(NAME_RBAC_OPOPEN)
+            .rbacAll(auth)
+            .setInvocable(invC.createInvocable(NAME_RBAC_OPOPEN))
+            .build();
+        sm.createOperationBuilder(NAME_RBAC_OPCLOSED)
+            .setInvocable(invC.createInvocable(NAME_RBAC_OPCLOSED))
+            .build();
+        sm.build();
+
+        assertRoles(false);
     }
     
     /**
      * Tests the create and iterate functions.
      * 
      * @param aas the aas to test the functions with
+     * @param authDesc the authentication descriptor (may be <b>null</b>)
      */
-    private static void testCreateIterate(Aas aas) {
+    private static void testCreateIterate(Aas aas, AuthenticationDescriptor authDesc) {
         // build some submodel with sub-structure
         final int numElts = 10;
-        Submodel subAdd = aas.createSubmodelBuilder("sub_ai", null).build();
+        Submodel subAdd = aas.createSubmodelBuilder("sub_ai", null)
+            .rbac(authDesc, Role.all(), RbacAction.all())
+            .build();
         SubmodelElementCollectionBuilder outerB = subAdd.createSubmodelElementCollectionBuilder("outer");
         SubmodelElementCollectionBuilder collsB = outerB.createSubmodelElementCollectionBuilder("colls");
         for (int i = 1; i <= numElts; i++) {
@@ -500,17 +624,23 @@ public class AasTest {
      * 
      * @param spec the setup to get the machine AAS from
      * @param machine the test machine as reference
+     * @param authDesc the authentication descriptor
      * @throws ExecutionException if operation invocations fail
-     * @throws IOException if retrieving the AAS fails
+     * @throws IOException if retrieving the AAS/submodel/elements fails
      */
-    private static void queryAas(BasicSetupSpec spec, TestMachine machine) throws ExecutionException, IOException {
+    private static void queryAas(BasicSetupSpec spec, TestMachine machine, AuthenticationDescriptor authDesc) 
+        throws ExecutionException, IOException {
         AasFactory factory = AasFactory.getInstance();
         Registry reg = factory.obtainRegistry(spec);
         Aas aas = reg.retrieveAas(URN_AAS);
         Assert.assertNotNull(aas);
         Assert.assertEquals(NAME_AAS, aas.getIdShort());
-        Assert.assertEquals(3, aas.getSubmodelCount());
-        Submodel subm = aas.submodels().iterator().next();
+        Assert.assertEquals(5, aas.getSubmodelCount());
+        Iterator<? extends Submodel> iter = aas.submodels().iterator();
+        Submodel subm = null;
+        while (iter.hasNext() && (subm == null || !subm.getIdShort().equals(NAME_SUBMODEL))) {
+            subm = iter.next();
+        } 
         Assert.assertNotNull(subm);
         Assert.assertEquals(5, subm.getPropertiesCount());
         Property lotSize = subm.getProperty(NAME_VAR_LOTSIZE);
@@ -587,11 +717,93 @@ public class AasTest {
         Aas aas2 = reg.retrieveAas(reg.getEndpoint(aas));
         Assert.assertNotNull(aas2);
         Assert.assertEquals(aas2.getIdShort(), aas.getIdShort());
-        Assert.assertNull(reg.retrieveAas("http://me.here.de/aas"));
+        Assert.assertNull(reg.retrieveAas("http://me.here.de/aas")); // does not exist, shall lead to null
+        
+        // do authenticated
+        queryRbac(aas, true);
+
+        if (authDesc != null) {
+            // do unauthenticated
+            AuthenticationDescriptor anonDesc = new DelegatingAuthenticationDescriptor(authDesc) {
+                
+                public IdentityToken getClientToken() {
+                    return IdentityToken.IdentityTokenBuilder.newBuilder().build(); // ANONYMOUS
+                }
+    
+            };
+            BasicSetupSpec anonSetup = new BasicSetupSpec(spec).setAuthentication(anonDesc);
+            Registry anonReg = AasFactory.getInstance().obtainRegistry(anonSetup);
+            Aas anonAas = anonReg.retrieveAas(URN_AAS);
+            Assert.assertNotNull(anonAas);
+            queryRbac(anonAas, false);
+        }
     }
 
     // checkstyle: resume method length check
 
+    /**
+     * Queries the RBAC part.
+     * 
+     * @param aas the AAS, obtained via authenticated or non-authenticated access
+     * @throws ExecutionException if operation invocations fail
+     * @throws IOException if retrieving the AAS/submodel/elements fails
+     */
+    private static void queryRbac(Aas aas, boolean authenticated) throws ExecutionException, IOException {
+        Submodel sm = aas.getSubmodel(NAME_RBAC_SMOPEN);
+        Assert.assertNotNull(sm);
+
+        Property prop = sm.getProperty(NAME_RBAC_PROPOPEN);
+        Assert.assertNotNull(prop);
+        Assert.assertEquals(10, prop.getValue());
+        prop = sm.getProperty(NAME_RBAC_PROPCLOSED); // BaSyx 2 does not check
+        Assert.assertNotNull(prop);
+        Assert.assertEquals(11, prop.getValue()); // no online access, BaSyx 2 does not check
+
+        assertOpExecution(sm, NAME_RBAC_OPOPEN, authenticated, true);
+        assertOpExecution(sm, NAME_RBAC_OPCLOSED, authenticated, false); // not without authentication
+
+        sm = aas.getSubmodel(NAME_RBAC_SMCLOSED); // TODO not without authen
+
+        prop = sm.getProperty(NAME_RBAC_PROPOPEN);
+        Assert.assertNotNull(prop);
+        Assert.assertEquals(20, prop.getValue());
+        
+        prop = sm.getProperty(NAME_RBAC_PROPCLOSED); // BaSyx 2 does not check
+        Assert.assertNotNull(prop);
+        Assert.assertEquals(21, prop.getValue()); // no online access, BaSyx 2 does not check
+
+        assertOpExecution(sm, NAME_RBAC_OPOPEN, authenticated, true);
+        assertOpExecution(sm, NAME_RBAC_OPCLOSED, authenticated, false); // not without authentication
+    }
+    
+    /**
+     * Assert authenticated/permitted operation executions.
+     * 
+     * @param sm the containing submodel
+     * @param opName the operation name/idShort
+     * @param authenticated are we in an authenticated or an anonymous/unauthenticated setting
+     * @param expectedSuccess do we expect success
+     * @see AasFactory#supportsOperationExecutionAuthorization()
+     */
+    private static void assertOpExecution(Submodel sm, String opName, boolean authenticated, boolean expectedSuccess) {
+        Operation op = sm.getOperation(opName);
+        Assert.assertNotNull(op); // BaSyx 2 does not check
+        try {
+            op.invoke();
+            if (!authenticated && !expectedSuccess 
+                && AasFactory.getInstance().supportsOperationExecutionAuthorization()) {
+                Assert.fail(opName + "shall not be executable due to missing permissions.");
+            }
+        } catch (ExecutionException e) {
+            if (authenticated) {
+                Assert.fail(opName + " shall not be failing due to granted permissions.");
+            }
+            if (expectedSuccess) {
+                Assert.fail(opName + " shall not fail.");
+            }
+        }
+    }
+    
     /**
      * Asserts the description of {@code prop}.
      * 

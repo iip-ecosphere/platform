@@ -186,13 +186,9 @@ public class BasicSetupSpec implements SetupSpec {
         setSubmodelRegistryKeystore(kDesc);
         setAssetServerKeystore(kDesc);
 
-        setAasRepositoryAuthentication(aDesc);
-        setSubmodelRepositoryAuthentication(aDesc);
-        setAasRegistryAuthentication(aDesc);
-        setSubmodelRegistryAuthentication(aDesc);
-        setAssetServerAuthentication(aDesc);
+        setAuthentication(aDesc);
     }
-
+    
     /**
      * Creates a setup instance for old-style AAS with joined registry/repository. Adds ephemeral endpoints for 
      * submodel for metamodel v3.
@@ -245,6 +241,21 @@ public class BasicSetupSpec implements SetupSpec {
             }
         }
         this.assetServerProtocol = spec.getAssetServerProtocol();
+    }
+
+    /**
+     * Changes the authentication of all elements.
+     * 
+     * @param aDesc the authentication descriptor to use, may be <b>null</b> for none
+     * @return <b>this</b> for chaining
+     */
+    public BasicSetupSpec setAuthentication(AuthenticationDescriptor aDesc) {
+        setAasRepositoryAuthentication(aDesc);
+        setSubmodelRepositoryAuthentication(aDesc);
+        setAasRegistryAuthentication(aDesc);
+        setSubmodelRegistryAuthentication(aDesc);
+        setAssetServerAuthentication(aDesc);
+        return this;
     }
     
     /**

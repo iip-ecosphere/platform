@@ -44,7 +44,7 @@ public class TimeSeriesDataTest extends AbstractAasExample {
     protected void createAas() {
         AasBuilder aasBuilder = AasFactory.getInstance().createAasBuilder("TimeseriesExample", 
             "urn:::AAS:::TimeseriesExample#");
-        aasBuilder.createAssetBuilder("tsd", "urn:::Asset:::tsd#", AssetKind.INSTANCE).build();
+        aasBuilder.createAssetInformationBuilder("tsd", "urn:::Asset:::tsd#", AssetKind.INSTANCE).build();
         TimeSeriesBuilder tsdBuilder = new TimeSeriesBuilder(aasBuilder, "urn:::SM:::TimeSeries#");
         tsdBuilder.setCreateMultiLanguageProperties(isCreateMultiLanguageProperties());
         tsdBuilder.createMetadataBuilder()

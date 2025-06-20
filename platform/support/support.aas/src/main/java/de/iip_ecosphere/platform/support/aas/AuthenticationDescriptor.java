@@ -57,7 +57,7 @@ public interface AuthenticationDescriptor {
     }
 
     /**
-     * Marks a role for AAS access.
+     * Marks a role for AAS access. Register implementing classes with {@link RbacRoles}.
      * 
      * @author Holger Eichelberger, SSE
      */
@@ -70,6 +70,40 @@ public interface AuthenticationDescriptor {
          */
         public String name();
         
+        /**
+         * Returns whether this role represents anonymous users.
+         * 
+         * @return {@code true} for anonymous, {@code false} else
+         */
+        public boolean anonymous();
+
+        /**
+         * Returns all authenticated, non-anonymous roles.
+         * 
+         * @return the authenticated, non-anonymous roles
+         */
+        public static Role[] allAuthenticated() {
+            return RbacRoles.allAuthenticated();
+        }
+
+        /**
+         * Returns all anonymous roles.
+         * 
+         * @return the anonymous roles
+         */
+        public static Role[] allAnonymous() {
+            return RbacRoles.allAnonymous();
+        }
+
+        /**
+         * Returns all roles.
+         * 
+         * @return the roles
+         */
+        public static Role[] all() {
+            return RbacRoles.all();
+        }
+
     }
 
     /**
@@ -78,15 +112,48 @@ public interface AuthenticationDescriptor {
      * @author Holger Eichelberger, SSE
      */
     public enum DefaultRole implements Role {
-        USER,
-        PLATFORM,
-        DEVICE,
-        ADMIN,
+        
+        /**
+         * User via UI.
+         */
+        USER(false),
+
+        /**
+         * Platform services (headless).
+         */
+        PLATFORM(false),
+        
+        /**
+         * Device services, e.g., ECS-Runtime (headless).
+         */
+        DEVICE(false),
+        
+        /**
+         * Administrators (headless, UI).
+         */
+        ADMIN(false),
         
         /**
          * Anonymous.
          */
-        NONE
+        NONE(true);
+        
+        private boolean anonymous;
+
+        /**
+         * Creates a role instance.
+         * 
+         * @param anonymous {@code true} for anonymous, {@code false} else
+         */
+        private DefaultRole(boolean anonymous) {
+            this.anonymous = anonymous;
+        }
+
+        @Override
+        public boolean anonymous() {
+            return anonymous;
+        }
+
     }
     
     /**
@@ -118,6 +185,11 @@ public interface AuthenticationDescriptor {
             return role;
         }
         
+        @Override
+        public String toString() {
+            return super.toString() + " as " + role;
+        }
+        
     }
     
     /**
@@ -146,12 +218,22 @@ public interface AuthenticationDescriptor {
      * @author Holger Eichelberger, SSE
      */
     public enum RbacAction {
-        ALL,
+        
         READ,
         CREATE,
         UPDATE,
         EXECUTE,
         DELETE;
+        
+        /**
+         * Returns all actions.
+         * 
+         * @return all actions
+         */
+        public static RbacAction[] all() {
+            return values();
+        }
+        
     }
     
     /**
@@ -229,6 +311,17 @@ public interface AuthenticationDescriptor {
          */
         public String getPath() {
             return path;
+        }
+        
+        @Override
+        public String toString() {
+            return new StringBuilder("RbacRule{")
+                .append("component='").append(component)
+                .append("', role='").append(role)
+                .append("', actions='").append(actions)
+                .append("', element='").append(element)
+                .append("', path='").append(path)
+                .append("'}").toString();
         }
 
     }
@@ -314,7 +407,7 @@ public interface AuthenticationDescriptor {
     public static <T> T submodelRbac(T caller, AuthenticationDescriptor auth, Role role, String idShort, 
         RbacAction... actions) {
         if (null != auth) {
-            auth.addAccessRule(new RbacRule(RbacAasComponent.SUBMODEL, role, idShort, null, actions));
+            auth.addAccessRule(new RbacRule(RbacAasComponent.SUBMODEL, role, idShort, "*", actions));
         }
         return caller;
     }
@@ -488,6 +581,8 @@ public interface AuthenticationDescriptor {
                     consumer.consume("Authorization", headerValue);
                     break;
                     // TODO bearer...
+                case ANONYMOUS:
+                    break;
                 default:
                     LoggerFactory.getLogger(AuthenticationDescriptor.class).error("Authentication token type {} not "
                         + "supported for setting up HTTP authentication. Staying unauthenticated.", 

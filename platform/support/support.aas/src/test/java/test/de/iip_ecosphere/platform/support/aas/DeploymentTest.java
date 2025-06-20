@@ -379,7 +379,7 @@ public class DeploymentTest {
         // Create/Push the AAS to the cloud server
         final String aasUrn = "urn:::AAS:::oven#";
         AasBuilder aasB = factory.createAasBuilder("oven", aasUrn);
-        aasB.createAssetBuilder("OvenAsset", "urn:::AAS:::ovenAsset#", AssetKind.INSTANCE).build();
+        aasB.createAssetInformationBuilder("OvenAsset", "urn:::AAS:::ovenAsset#", AssetKind.INSTANCE).build();
         Aas aas = aasB.build();
         reg.createAas(aas, serverEp.toUri());
 

@@ -15,20 +15,18 @@ package de.iip_ecosphere.platform.support.aas;
 import de.iip_ecosphere.platform.support.Builder;
 
 /**
- * Defines the basic interface of an Asset.
+ * Defines the basic interface of an Asset (information).
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface Asset {
+public interface AssetInformation {
     
     /**
-     * The builder for {@link Asset}.
+     * The builder for {@link AssetInformation}.
      * 
      * @author Holger Eichelberger, SSE
      */
-    public interface AssetBuilder extends Builder<Asset> {
-        
-        // TODO update to AssetInformation after BaSyx upgrade
+    public interface AssetInformationBuilder extends Builder<AssetInformation> {
 
         /**
          * Sets the description in terms of language strings.
@@ -36,7 +34,7 @@ public interface Asset {
          * @param description the description
          * @return <b>this</b>
          */
-        public AssetBuilder setDescription(LangString... description);
+        public AssetInformationBuilder setDescription(LangString... description);
 
         /**
          * Returns the reference to the AAS.

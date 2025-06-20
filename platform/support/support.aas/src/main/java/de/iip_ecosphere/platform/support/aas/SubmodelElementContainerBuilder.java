@@ -112,19 +112,6 @@ public interface SubmodelElementContainerBuilder {
     public BlobDataElementBuilder createBlobDataElementBuilder(String idShort, String contents, String mimeType);
     
     /**
-     * Creates a builder for a contained sub-model element collection. Calling this method again with the same name 
-     * shall lead to a builder that allows for modifying the sub-model.
-     * 
-     * @param idShort the short name of the reference element
-     * @param ordered whether the collection is ordered
-     * @param allowDuplicates whether the collection allows duplicates
-     * @return the builder
-     * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty; or if modification is not possible
-     */
-    public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered, 
-        boolean allowDuplicates);
-
-    /**
      * Creates a builder for a contained sub-model element collection (not ordered, no duplicates). Calling this method 
      * again with the same name shall lead to a builder that allows for modifying the sub-model.
      * 
@@ -132,9 +119,7 @@ public interface SubmodelElementContainerBuilder {
      * @return the builder
      * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty; or if modification is not possible
      */
-    public default SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort) {
-        return createSubmodelElementCollectionBuilder(idShort, false, false);
-    }
+    public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort);
 
     /**
      * Creates a builder for a contained sub-model element list. Calling this method 

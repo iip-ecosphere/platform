@@ -13,7 +13,7 @@
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
-import de.iip_ecosphere.platform.support.aas.Asset;
+import de.iip_ecosphere.platform.support.aas.AssetInformation;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Reference;
@@ -24,12 +24,12 @@ import test.de.iip_ecosphere.platform.support.fakeAas.FakeAas.FakeAasBuilder;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class FakeAsset implements Asset {
+public class FakeAsset implements AssetInformation {
 
     private String shortId;
     private AssetKind kind;
     
-    static class FakeAssetBuilder implements AssetBuilder {
+    static class FakeAssetBuilder implements AssetInformationBuilder {
 
         private FakeAasBuilder parent;
         private FakeAsset instance;
@@ -48,13 +48,13 @@ public class FakeAsset implements Asset {
         }
 
         @Override
-        public Asset build() {
+        public AssetInformation build() {
             parent.getInstance().setAsset(instance);
             return instance;
         }
 
         @Override
-        public AssetBuilder setDescription(LangString... description) {
+        public AssetInformationBuilder setDescription(LangString... description) {
             // ignore for now
             return this;
         }

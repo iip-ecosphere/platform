@@ -583,6 +583,15 @@ public abstract class AasFactory {
     public boolean supportsAuthentication() {
         return true;
     }
+    
+    /**
+     * Returns whether the implementation supports authorization of operation execution level.
+     * 
+     * @return {@code true} if supported, {@code false}
+     */
+    public boolean supportsOperationExecutionAuthorization() {
+        return true;
+    }
 
     /**
      * Composes an idShort from multiple names.

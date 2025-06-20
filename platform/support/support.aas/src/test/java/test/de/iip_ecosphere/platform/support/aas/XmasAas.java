@@ -83,7 +83,8 @@ public class XmasAas extends AbstractAasExample {
         
         AasBuilder aasBuilder = AasFactory.getInstance().createAasBuilder("Santa_s_Sleigh", 
             "urn:::AAS:::SantasSleigh#");
-        aasBuilder.createAssetBuilder("santasSleigh", "urn:::Asset:::SantasSleigh#", AssetKind.INSTANCE).build();
+        aasBuilder.createAssetInformationBuilder("santasSleigh", "urn:::Asset:::SantasSleigh#", AssetKind.INSTANCE)
+            .build();
         HierarchicalStructuresBuilder hsb = new HierarchicalStructuresBuilder(aasBuilder, 
             "urn:::SM:::SantasSleighBOM#", "BOM").setArcheType(ArcheType.ONEDOWN);
         EntryNodeBuilder enb = setName(hsb.createEntryNodeBuilder(), "SantaSleigh_EntryNode");
@@ -127,7 +128,7 @@ public class XmasAas extends AbstractAasExample {
      */
     private Aas createSleigh() {
         AasBuilder aasBuilder = AasFactory.getInstance().createAasBuilder("Sleigh", "urn:::AAS:::Sleigh#");
-        aasBuilder.createAssetBuilder("sleigh", "urn:::Asset:::Sleigh#", AssetKind.INSTANCE).build();
+        aasBuilder.createAssetInformationBuilder("sleigh", "urn:::Asset:::Sleigh#", AssetKind.INSTANCE).build();
 
         SubmodelBuilder smBuilder = aasBuilder.createSubmodelBuilder("ProductData", 
             "urn:::SM:::productDataSleigh#");
@@ -309,7 +310,7 @@ public class XmasAas extends AbstractAasExample {
      */
     private Aas createSantaAas() {
         AasBuilder aasBuilder = AasFactory.getInstance().createAasBuilder("santa", "urn:::AAS:::aasSanta#");
-        aasBuilder.createAssetBuilder("santa", "urn:::Asset:::aasSanta#", AssetKind.INSTANCE).build();
+        aasBuilder.createAssetInformationBuilder("santa", "urn:::Asset:::aasSanta#", AssetKind.INSTANCE).build();
         SubmodelBuilder smBuilder = aasBuilder.createSubmodelBuilder("LivingData", 
             "urn:::SM:::livingDataSanta#");
         smBuilder.createPropertyBuilder("displayName")
@@ -349,7 +350,8 @@ public class XmasAas extends AbstractAasExample {
         String productResourceName) {
         AasBuilder aasBuilder = AasFactory.getInstance().createAasBuilder(AasUtils.fixId(name), 
             "urn:::AAS:::reindeer" + name + "#");
-        aasBuilder.createAssetBuilder(name, "urn:::Asset:::reindeer" + name + "#", AssetKind.INSTANCE).build();
+        aasBuilder.createAssetInformationBuilder(name, "urn:::Asset:::reindeer" + name + "#", AssetKind.INSTANCE)
+            .build();
 
         SubmodelBuilder smBuilder = aasBuilder.createSubmodelBuilder("LivingData", 
             "urn:::SM:::livingData" + name + "#");

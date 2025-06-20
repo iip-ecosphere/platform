@@ -95,12 +95,11 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
         }
 
         @Override
-        public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
-            boolean allowDuplicates) {
+        public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort) {
             SubmodelElementCollectionBuilder result = DeferredBuilder.getDeferred(idShort, 
                 SubmodelElementCollectionBuilder.class, instance.deferred);
             if (null == result) {
-                result = new FakeSubmodelElementCollectionBuilder(this, idShort, ordered, allowDuplicates); 
+                result = new FakeSubmodelElementCollectionBuilder(this, idShort, false, false); 
             }
             return result; 
         }

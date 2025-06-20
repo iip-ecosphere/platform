@@ -51,7 +51,7 @@ public class SoftwareNameplateTest extends AbstractAasExample {
     protected void createAas() {
         AasBuilder aasBuilder = AasFactory.getInstance().createAasBuilder("SoftwareNameplateExample", 
             "urn:::AAS:::SoftwareNameplateExample#");
-        aasBuilder.createAssetBuilder("ci", "urn:::Asset:::sn#", AssetKind.INSTANCE).build();
+        aasBuilder.createAssetInformationBuilder("ci", "urn:::Asset:::sn#", AssetKind.INSTANCE).build();
         SoftwareNameplateBuilder snp = new SoftwareNameplateBuilder(aasBuilder, "urn:::SM:::SwNp#");
         snp.setCreateMultiLanguageProperties(isCreateMultiLanguageProperties());
         snp.createSoftwareNameplate_TypeBuilder()

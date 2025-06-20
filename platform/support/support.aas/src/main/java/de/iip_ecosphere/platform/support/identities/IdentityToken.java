@@ -289,4 +289,17 @@ public class IdentityToken {
         return tokenEncryptionAlgorithm;
     }
     
+    @Override
+    public String toString() {
+        String result = "IdentityToken [" + type + " ";
+        switch (type) {
+        case USERNAME:
+            result += "user: " + getUserName();
+            break;
+        default:
+            break;
+        }
+        return result + "]";
+    }
+    
 }

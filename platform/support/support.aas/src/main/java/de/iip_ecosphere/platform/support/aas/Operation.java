@@ -32,7 +32,7 @@ public interface Operation extends Element, SubmodelElement {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public interface OperationBuilder extends Builder<Operation> {
+    public interface OperationBuilder extends Builder<Operation>, RbacReceiver<OperationBuilder> {
         
         public static final String DEFAULT_RETURN_VAR_NAME = "result";
         
@@ -157,14 +157,16 @@ public interface Operation extends Element, SubmodelElement {
         }
         
         /**
-         * Creates an RBAC rule for the operation under creation and adds the role to {@code auth}.
+         * Creates RBAC rules for the submodel under creation and adds the roles to {@code auth}.
          * 
          * @param auth the authentication descriptor, may be <b>null</b>, ignored then
-         * @param role the role to create the rule for
+         * @param roles the roles to create the rules for
          * @param actions the permitted actions
          * @return <b>this</b> for chaining
          */
-        public OperationBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions); 
+        public default OperationBuilder rbac(AuthenticationDescriptor auth, Role[] roles, RbacAction... actions) {
+            return RbacRoles.rbac(this, auth, roles, actions);
+        }
         
     }
     

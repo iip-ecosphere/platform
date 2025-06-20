@@ -38,7 +38,7 @@ import org.apache.commons.io.IOUtils;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
-import de.iip_ecosphere.platform.support.aas.Asset;
+import de.iip_ecosphere.platform.support.aas.AssetInformation;
 import de.iip_ecosphere.platform.support.aas.BlobDataElement;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.Entity;
@@ -165,7 +165,7 @@ public class AasSpecVisitor implements AasVisitor {
     }
 
     @Override
-    public void visitAsset(Asset asset) {
+    public void visitAsset(AssetInformation asset) {
         log("ASSET " + asset.getIdShort() + " " + asset.getAssetKind());
     }
 

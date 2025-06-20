@@ -111,9 +111,8 @@ public class DelegatingSubmodelBuilder implements SubmodelBuilder {
     }
 
     @Override
-    public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
-        boolean allowDuplicates) {
-        return delegate.createSubmodelElementCollectionBuilder(idShort, ordered, allowDuplicates);
+    public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort) {
+        return delegate.createSubmodelElementCollectionBuilder(idShort);
     }
     
     @Override

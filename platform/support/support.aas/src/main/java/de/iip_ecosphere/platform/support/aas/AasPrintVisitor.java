@@ -62,7 +62,7 @@ public class AasPrintVisitor implements AasVisitor {
     }
 
     @Override
-    public void visitAsset(Asset asset) {
+    public void visitAsset(AssetInformation asset) {
         log("ASSET " + asset.getIdShort() + " " + asset.getAssetKind());
     }
 

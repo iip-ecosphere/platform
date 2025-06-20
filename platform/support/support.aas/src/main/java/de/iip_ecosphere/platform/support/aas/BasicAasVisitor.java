@@ -66,7 +66,7 @@ public class BasicAasVisitor implements AasVisitor {
     }
 
     @Override
-    public void visitAsset(Asset asset) {
+    public void visitAsset(AssetInformation asset) {
     }
 
     @Override

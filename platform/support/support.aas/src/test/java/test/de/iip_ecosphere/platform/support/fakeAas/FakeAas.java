@@ -18,8 +18,8 @@ import java.util.Map;
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
-import de.iip_ecosphere.platform.support.aas.Asset;
-import de.iip_ecosphere.platform.support.aas.Asset.AssetBuilder;
+import de.iip_ecosphere.platform.support.aas.AssetInformation;
+import de.iip_ecosphere.platform.support.aas.AssetInformation.AssetInformationBuilder;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAasComponent;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacRule;
@@ -39,7 +39,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 public class FakeAas extends FakeElement implements Aas {
 
     private Map<String, Submodel> submodels = new HashMap<String, Submodel>();
-    private Asset asset;
+    private AssetInformation asset;
     private Map<String, Builder<?>> deferred;
     private String identifier;
     
@@ -113,7 +113,7 @@ public class FakeAas extends FakeElement implements Aas {
         }
 
         @Override
-        public AssetBuilder createAssetBuilder(String idShort, String urn, AssetKind kind) {
+        public AssetInformationBuilder createAssetInformationBuilder(String idShort, String urn, AssetKind kind) {
             return new FakeAsset.FakeAssetBuilder(this, idShort, urn, kind);
         }
         
@@ -210,7 +210,7 @@ public class FakeAas extends FakeElement implements Aas {
     }
     
     @Override
-    public Asset getAsset() {
+    public AssetInformation getAsset() {
         return asset;
     }
 

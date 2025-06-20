@@ -44,8 +44,9 @@ public interface DeploymentRecipe extends CorsEnabledRecipe {
          * @param aas the AAS to deploy
          * @return <b>this</b>
          * @throws IllegalArgumentException if {@code aas} was not created by the corresponding {@link AasFactory}
+         * @throws IOException if the deployment cannot be executed, e.g. due to permission issues
          */
-        public ImmediateDeploymentRecipe deploy(Aas aas);
+        public ImmediateDeploymentRecipe deploy(Aas aas) throws IOException;
 
         /**
          * Creates the server instance.
@@ -80,8 +81,9 @@ public interface DeploymentRecipe extends CorsEnabledRecipe {
          * 
          * @param aas the AAS to deploy
          * @return <b>this</b>
+         * @throws IOException if the deployment cannot be executed, e.g. due to permission issues
          */
-        public RegistryDeploymentRecipe deploy(Aas aas);
+        public RegistryDeploymentRecipe deploy(Aas aas) throws IOException;
 
         /**
          * Creates the server instance.

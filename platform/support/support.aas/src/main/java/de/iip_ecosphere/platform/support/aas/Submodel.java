@@ -33,7 +33,8 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
      * 
      * @author Holger Eichelberger, SSE
      */
-    public interface SubmodelBuilder extends SubmodelElementContainerBuilder, DeferredBuilder<Submodel> {
+    public interface SubmodelBuilder extends SubmodelElementContainerBuilder, DeferredBuilder<Submodel>, 
+        RbacReceiver<SubmodelBuilder> {
         
         /**
          * Creates a reference on the sub-model under construction.
@@ -49,16 +50,18 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
          * @return <b>this</b>
          */
         public SubmodelBuilder setSemanticId(String refValue);
-        
+
         /**
-         * Creates an RBAC rule for the submodel under creation and adds the role to {@code auth}.
+         * Creates RBAC rules for the submodel under creation and adds the roles to {@code auth}.
          * 
          * @param auth the authentication descriptor, may be <b>null</b>, ignored then
-         * @param role the role to create the rule for
+         * @param roles the roles to create the rules for
          * @param actions the permitted actions
          * @return <b>this</b> for chaining
          */
-        public SubmodelBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions); 
+        public default SubmodelBuilder rbac(AuthenticationDescriptor auth, Role[] roles, RbacAction... actions) {
+            return RbacRoles.rbac(this, auth, roles, actions);
+        }
 
         @Override
         public default void justBuild() {
@@ -68,18 +71,6 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
     }
 
     /**
-     * Returns a sub-model elements collection builder either by providing access to an existing collection or through 
-     * a builder to add a new sub-model elements collection (ultimately only if {@link Builder#build()} was called).
-     * 
-     * @param idShort the short name of the collection
-     * @param ordered whether the collection shall be ordered or not
-     * @param allowDuplicates whether the collection allows duplicates or not
-     * @return the sub-model collection builder
-     */
-    public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered, 
-        boolean allowDuplicates);
-
-    /**
      * Creates a builder for a contained sub-model element collection (not ordered, no duplicates). Calling this method 
      * again with the same name shall lead to a builder that allows for modifying the sub-model.
      * 
@@ -87,9 +78,7 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
      * @return the builder
      * @throws IllegalArgumentException if {@code idShort} is <b>null</b> or empty; or if modification is not possible
      */
-    public default SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort) {
-        return createSubmodelElementCollectionBuilder(idShort, false, false);
-    }
+    public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort);
     
     /**
      * Returns a sub-model element list builder either by providing access to an existing list or through 
