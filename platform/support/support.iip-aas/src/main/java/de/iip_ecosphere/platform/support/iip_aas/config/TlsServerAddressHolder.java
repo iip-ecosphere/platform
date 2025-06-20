@@ -154,7 +154,7 @@ public class TlsServerAddressHolder extends ServerAddressHolder {
      * Defines the keystore key, which, via the {@link IdentityStore} may replace {@link #getKeystore()} and 
      * {@link #getKeyPassword()}. [required by data mapper]
      * 
-     * @return keystoreKey the keystore key, may be <b>null</b> for none
+     * @param keystoreKey the keystore key, may be <b>null</b> for none
      */
     public void setKeystoreKey(String keystoreKey) {
         this.keystoreKey = keystoreKey;

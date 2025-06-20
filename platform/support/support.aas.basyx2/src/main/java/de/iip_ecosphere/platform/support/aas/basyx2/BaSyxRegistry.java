@@ -64,11 +64,6 @@ public class BaSyxRegistry implements Registry {
      */
     BaSyxRegistry(SetupSpec spec) {
         this.spec = spec;
-/*        aasRegistry = new RegistryAndDiscoveryInterfaceApi(spec.getAasRegistryEndpoint().toServerUri());
-        smRegistry = new SubmodelRegistryApi(spec.getSubmodelRegistryEndpoint().toServerUri());
-        aasRepo = new ConnectedAasRepository(spec.getAasRepositoryEndpoint().toServerUri());
-        smRepo = new ConnectedSubmodelRepository(spec.getSubmodelRepositoryEndpoint().toServerUri());*/
-
         aasRegistry = AasRegistryUtils.createRegistryApi(spec, null);
         smRegistry = SubmodelRegistryUtils.createRegistryApi(spec, null);
         aasRepo = AasRepositoryUtils.createRepositoryApi(spec, null);
@@ -154,13 +149,18 @@ public class BaSyxRegistry implements Registry {
      * @param aasRepo the AAS repository
      * @param aasId the AAS identifier, may be <b>null</b> or empty
      * @return the AAS or <b>null</b> for none
+     * @throws IOException if the AAS cannot be accessed, e.g., as not permitted
      */
-    private AssetAdministrationShell getAas(ConnectedAasRepository aasRepo, String aasId) {
+    private AssetAdministrationShell getAas(ConnectedAasRepository aasRepo, String aasId) throws IOException {
         AssetAdministrationShell result = null;
         if (null != aasRepo && !StringUtils.isBlank(aasId)) {
             try {
                 result = aasRepo.getAas(aasId);
             } catch (ElementDoesNotExistException e) {
+            } catch (org.eclipse.digitaltwin.basyx.client.internal.ApiException e) {
+                if (allAas().anyMatch(a -> a.getId().equals(aasId))) {
+                    throw new IOException("Obtaining AAS " + aasId + ": " + e.getMessage(), e);
+                }  // it's there, we just cannot access it
             }
         }
         return result;
@@ -230,7 +230,7 @@ public class BaSyxRegistry implements Registry {
             ConnectedSubmodelRepository repo = getSubmodelRepo(epUrl);
             result = new BaSyxSubmodel(aas, repo.getSubmodel(submodelId), repo);
         } catch (org.eclipse.digitaltwin.basyx.submodelregistry.client.ApiException e) {
-            throw new IOException(e.getMessage());
+            throw new IOException(e);
         }
         return result;
     }
@@ -265,7 +265,7 @@ public class BaSyxRegistry implements Registry {
     }
     
     @Override
-    public void createAas(Aas aas, String endpointURL) { // TODO endpointURL??
+    public void createAas(Aas aas, String endpointURL) throws IOException { // TODO endpointURL??
         if (!(aas instanceof BaSyxAas)) {
             throw new IllegalArgumentException("The aas must be created by the AasFactory.");
         }
@@ -282,6 +282,8 @@ public class BaSyxRegistry implements Registry {
             known = true;
         } catch (ElementDoesNotExistException e) {
             known = false;
+        } catch (org.eclipse.digitaltwin.basyx.client.internal.ApiException e) {
+            throw new IOException(e);
         }
         if (known) {
             aasRepo.updateAas(a.getIdentification(), a.getAas());
@@ -299,17 +301,21 @@ public class BaSyxRegistry implements Registry {
     }
 
     @Override
-    public void createSubmodel(Aas aas, Submodel submodel) {
+    public void createSubmodel(Aas aas, Submodel submodel) throws IOException {
         if (!(aas instanceof BaSyxAas)) {
             throw new IllegalArgumentException("The aas must be created by the AasFactory.");
         }
         if (!(submodel instanceof BaSyxSubmodel)) {
             throw new IllegalArgumentException("The submodel must be created by the AasFactory.");
         }
-        BaSyxSubmodel bSub = (BaSyxSubmodel) submodel;
-        smRepo.createSubmodel(bSub.getSubmodel());
-        bSub.setRepo(smRepo);
-        SubmodelRegistryUtils.postDescriptor(submodel, smRegistry, smRepo, false);
+        try {
+            BaSyxSubmodel bSub = (BaSyxSubmodel) submodel;
+            smRepo.createSubmodel(bSub.getSubmodel());
+            bSub.setRepo(smRepo);
+            SubmodelRegistryUtils.postDescriptor(submodel, smRegistry, smRepo, false);
+        } catch (org.eclipse.digitaltwin.basyx.client.internal.ApiException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override

@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx2;
 
+import java.io.IOException;
+
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultAssetAdministrationShell;
 import org.eclipse.digitaltwin.basyx.aasrepository.client.ConnectedAasRepository;
 import org.eclipse.digitaltwin.basyx.submodelrepository.client.ConnectedSubmodelRepository;
@@ -19,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Aas;
-import de.iip_ecosphere.platform.support.aas.Asset.AssetBuilder;
+import de.iip_ecosphere.platform.support.aas.AssetInformation.AssetInformationBuilder;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
@@ -108,7 +110,7 @@ public class BaSyxAas extends AbstractAas<org.eclipse.digitaltwin.aas4j.v3.model
         }
 
         @Override
-        public Submodel register(BaSyxSubmodel submodel) {
+        public Submodel register(BaSyxSubmodel submodel) throws IOException {
             if (null == instance.getSubmodel(submodel.getIdShort())) {
                 org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell aas = instance.getAas();
                 aas.setSubmodels(Tools.addElement(aas.getSubmodels(),
@@ -136,12 +138,12 @@ public class BaSyxAas extends AbstractAas<org.eclipse.digitaltwin.aas4j.v3.model
         }
 
         @Override
-        public AssetBuilder createAssetBuilder(String idShort, String urn, AssetKind kind) {
-            return new BaSyxAsset.BaSyxAssetBuilder(this, idShort, urn, kind);
+        public AssetInformationBuilder createAssetInformationBuilder(String idShort, String urn, AssetKind kind) {
+            return new BaSyxAssetInformation.BaSyxAssetInformationBuilder(this, idShort, urn, kind);
         }
 
         @Override
-        void setAsset(BaSyxAsset asset) {
+        void setAsset(BaSyxAssetInformation asset) {
             instance.registerAsset(asset);
         }
         
@@ -157,7 +159,7 @@ public class BaSyxAas extends AbstractAas<org.eclipse.digitaltwin.aas4j.v3.model
         
         @Override
         public AasBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
-            return AuthenticationDescriptor.aasRbac(this, auth, role, getInstance().getIdShort(), actions);
+            return AuthenticationDescriptor.aasRbac(this, auth, role, getInstance().getIdentification(), actions);
         }
         
     }
@@ -199,11 +201,12 @@ public class BaSyxAas extends AbstractAas<org.eclipse.digitaltwin.aas4j.v3.model
     }
 
     /**
-     * Registers an asset and sets the asset reference in this step. {@link #setAsset(BaSyxAsset)} is called in here.
+     * Registers an asset and sets the asset reference in this step. {@link #setAsset(BaSyxAssetInformation)} 
+     * is called in here.
      * 
      * @param asset the asset to set
      */
-    void registerAsset(BaSyxAsset asset) {
+    void registerAsset(BaSyxAssetInformation asset) {
         setAsset(asset);
         getAas().setAssetInformation(asset.getAsset());
     }

@@ -19,7 +19,7 @@ import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.Submodel;
-import de.iip_ecosphere.platform.support.aas.Asset.AssetBuilder;
+import de.iip_ecosphere.platform.support.aas.AssetInformation.AssetInformationBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 
 /**
@@ -85,7 +85,7 @@ public class BaSyxConnectedAas extends AbstractAas<ConnectedAssetAdministrationS
         }
 
         @Override
-        public AssetBuilder createAssetBuilder(String idShort, String urn, AssetKind kind) {
+        public AssetInformationBuilder createAssetInformationBuilder(String idShort, String urn, AssetKind kind) {
             throw new IllegalArgumentException("Asset cannot be created on/assigned to deployed AAS.");
         }
 

@@ -94,9 +94,10 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
      * 
      * @throws SocketException if the port to be used for the AAS is occupied
      * @throws UnknownHostException shall not occur
+     * @throws IOException if deployment fails
      */
     @BeforeClass
-    public static void init() throws SocketException, UnknownHostException {
+    public static void init() throws SocketException, UnknownHostException, IOException {
         oldNotificationMode = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS); // deterministic testing
         // multiple test runs may load the same descriptor multiple times
         ConnectorRegistry.getRegisteredConnectorDescriptorsLoader().reload();
@@ -168,7 +169,7 @@ public class AasConnectorTest extends AbstractInformationModelConnectorTest<Obje
         AasBuilder aasBuilder = factory.createAasBuilder(AasTest.NAME_AAS, AAS_URN);
         SubmodelBuilder subModelBuilder = aasBuilder.createSubmodelBuilder(AasTest.NAME_SUBMODEL, null);
         AasTest test = new AasTest(); // add KeyStoreDescriptor here
-        test.createAasOperationsElements(subModelBuilder, AasPartRegistry.getSetup(), machine);
+        test.createAasOperationsElements(subModelBuilder, AasPartRegistry.getSetup(), machine, null);
         
         subModelBuilder.build();
         return aasBuilder.build();

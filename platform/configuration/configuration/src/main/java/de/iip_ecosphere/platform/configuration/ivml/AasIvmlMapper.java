@@ -1306,10 +1306,11 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 }
             } else if (TypeQueries.isContainer(rVarType)) {
                 boolean isSequence = TypeQueries.isSequence(rVarType);
-                boolean isOrdered = isSequence; // just to clarify
-                boolean allowsDuplicates = isSequence; // just to clarify
-                varBuilder = builder.createSubmodelElementCollectionBuilder(
-                    AasUtils.fixId(varName), isOrdered, allowsDuplicates);
+                if (isSequence) {
+                    varBuilder = builder.createSubmodelElementListBuilder(AasUtils.fixId(varName));
+                } else {
+                    varBuilder = builder.createSubmodelElementCollectionBuilder(AasUtils.fixId(varName));
+                }
                 for (int member = 0; member < var.getNestedElementsCount(); member++) {
                     mapVariable(var.getNestedElement(member), varBuilder, "var_" + member);
                 }

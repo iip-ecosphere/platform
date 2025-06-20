@@ -31,6 +31,7 @@ import de.iip_ecosphere.platform.support.aas.SetupSpec.ComponentSetup;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.State;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.basyx2.apps.common.AssetServerKeyStoreDescriptor;
+import de.iip_ecosphere.platform.support.function.IORunnable;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
 /**
@@ -53,7 +54,7 @@ abstract class BaSyxAbstractAasServer implements AasServer {
     private ConfigurableApplicationContext smRepoCtx;
     private ConfigurableApplicationContext aasRegistryCtx;
     private ConfigurableApplicationContext smRegistryCtx;
-    private List<Runnable> actionsAfterStart;
+    private List<IORunnable> actionsAfterStart;
     
     /**
      * Creates a new BaSyx AAS server.
@@ -73,7 +74,7 @@ abstract class BaSyxAbstractAasServer implements AasServer {
      * @param actions the actions
      * @return <b>this</b> for chaining
      */
-    public BaSyxAbstractAasServer addActionsAfterStart(List<Runnable> actions) {
+    public BaSyxAbstractAasServer addActionsAfterStart(List<IORunnable> actions) {
         if (null == actionsAfterStart) {
             actionsAfterStart = new ArrayList<>();
         }
@@ -508,7 +509,7 @@ abstract class BaSyxAbstractAasServer implements AasServer {
     }
     
     @Override
-    public void deploy(Aas aas, Submodel submodel) {
+    public void deploy(Aas aas, Submodel submodel) throws IOException {
         BaSyxRegistry registry = new BaSyxRegistry(spec);
         registry.createAas(aas, "");
         registry.createSubmodel(aas, submodel);
@@ -554,8 +555,13 @@ abstract class BaSyxAbstractAasServer implements AasServer {
             }
         }
         if (null != actionsAfterStart) {
-            for (Runnable a : actionsAfterStart) {
-                a.run();
+            for (IORunnable a : actionsAfterStart) {
+                try {
+                    a.run();
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(BaSyxAbstractAasServer.class).error("Cannot execute start action: {}", 
+                        e.getMessage());
+                }
             }
         }
         return this;

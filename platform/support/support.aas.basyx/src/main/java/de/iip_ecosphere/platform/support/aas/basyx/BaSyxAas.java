@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Aas;
-import de.iip_ecosphere.platform.support.aas.Asset.AssetBuilder;
+import de.iip_ecosphere.platform.support.aas.AssetInformation.AssetInformationBuilder;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
@@ -119,7 +119,7 @@ public class BaSyxAas extends AbstractAas<AssetAdministrationShell> implements B
         }
 
         @Override
-        public AssetBuilder createAssetBuilder(String idShort, String urn, AssetKind kind) {
+        public AssetInformationBuilder createAssetInformationBuilder(String idShort, String urn, AssetKind kind) {
             return new BaSyxAsset.BaSyxAssetBuilder(this, idShort, urn, kind);
         }
 

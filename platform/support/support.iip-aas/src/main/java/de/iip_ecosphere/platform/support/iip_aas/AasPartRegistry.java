@@ -803,7 +803,7 @@ public class AasPartRegistry {
             // fallback, AAS does not yet exist, top-level
             aasBuilder = factory.createAasBuilder(NAME_AAS, URN_AAS);
             // initial asset
-            aasBuilder.createAssetBuilder(NAME_AAS, URN_AAS_ASSET, AssetKind.INSTANCE).build();
+            aasBuilder.createAssetInformationBuilder(NAME_AAS, URN_AAS_ASSET, AssetKind.INSTANCE).build();
         }
         
         ProtocolAddressHolder impl = setup.getImplementation();
@@ -934,7 +934,12 @@ public class AasPartRegistry {
             .createDeploymentRecipe(setup), setup)
             .forRegistry();
         for (Aas a: aas) {
-            dBuilder.deploy(a);
+            try {
+                dBuilder.deploy(a);
+            } catch (IOException e) {
+                LoggerFactory.getLogger(AasPartRegistry.class).error("Cannot deploy '{}': {}", 
+                    a.getIdShort(), e.getMessage());
+            }
         }
         return dBuilder.createServer(options);
     }

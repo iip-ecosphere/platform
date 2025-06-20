@@ -139,9 +139,9 @@ public class WorkerK8SAas {
      * Start the local aas.
      * 
      * @return the running servers
-     * 
+     * @throws IOException if deployment fails
      */
-    public ArrayList<Server> startLocalAas() {
+    public ArrayList<Server> startLocalAas() throws IOException {
 
         ServerAddress vabServer = new ServerAddress(Schema.HTTP, vabPort);
         ServerAddress aasServer = new ServerAddress(Schema.HTTP, aasPort);

@@ -209,7 +209,7 @@ public abstract class AbstractSubmodel<S extends ISubmodel> implements Submodel,
     /**
      * Registers a sub-model element list.
      * 
-     * @param lsit the element list
+     * @param list the element list
      * @return {@code collection}
      */
     public BaSyxSubmodelElementList register(BaSyxSubmodelElementList list) {

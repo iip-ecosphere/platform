@@ -25,6 +25,7 @@ import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultOperationVariable;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultProperty;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultQualifier;
+import org.eclipse.digitaltwin.basyx.client.internal.ApiException;
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 import org.eclipse.digitaltwin.basyx.submodelrepository.client.ConnectedSubmodelRepository;
 import org.eclipse.digitaltwin.basyx.submodelrepository.feature.operation.delegation.HTTPOperationDelegation;
@@ -282,8 +283,8 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
             OperationVariable[] result = smRepo.invokeOperation(submodelId.toString(), operation.getIdShort(), opArgs);
             return Tools.translateValueFromBaSyx(result == null || result.length == 0 
                 ? null : result[0].getValue(), type);
-        } catch (ElementDoesNotExistException e) {
-            throw new ExecutionException(e);
+        } catch (ElementDoesNotExistException | ApiException e) {
+            throw new ExecutionException("Invoking operation '" + getIdShort() + "': " +  e.getMessage(), e);
         }
     }
 

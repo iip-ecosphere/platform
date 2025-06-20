@@ -16,6 +16,7 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -111,12 +112,11 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.digitaltwin.aas4
         }
 
         @Override
-        public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered, 
-            boolean allowDuplicates) {
+        public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort) {
             SubmodelElementCollectionBuilder result = instance.getDeferred(idShort, 
                 SubmodelElementCollectionBuilder.class);
             if (null == result) {
-                result = instance.obtainSubmodelElementCollectionBuilder(this, idShort, ordered, allowDuplicates);
+                result = instance.obtainSubmodelElementCollectionBuilder(this, idShort, false, false);
             }
             return result;
         }
@@ -149,7 +149,13 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.digitaltwin.aas4
         @Override
         public Submodel build() {
             buildMyDeferred();
-            return null == parentBuilder ? instance : parentBuilder.register(instance);
+            try {
+                return null == parentBuilder ? instance : parentBuilder.register(instance);
+            } catch (IOException e) {
+                LoggerFactory.getLogger(getClass()).error("Cannot register created instance: {}", 
+                    e.getMessage());
+                return instance;
+            }
         }
 
         @Override
@@ -289,12 +295,11 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.digitaltwin.aas4
     }
 
     @Override
-    public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
-        boolean allowDuplicates) {
+    public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort) {
         LoggerFactory.getLogger(getClass()).warn("Adding a submodel to a deployed AAS currently does not lead to "
             + "the deployment of the new submodel (as for initial AAS). If possible, create the submodel in advance.");
         return obtainSubmodelElementCollectionBuilder(new BaSyxSubmodelBuilder(parent.createAasBuilder(), this), 
-            idShort, ordered, allowDuplicates);
+            idShort, false, false);
     }
 
     @Override

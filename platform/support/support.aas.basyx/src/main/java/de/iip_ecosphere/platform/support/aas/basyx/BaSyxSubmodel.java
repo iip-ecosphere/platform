@@ -115,12 +115,11 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
         }
 
         @Override
-        public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered, 
-            boolean allowDuplicates) {
+        public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort) {
             SubmodelElementCollectionBuilder result = instance.getDeferred(idShort, 
                 SubmodelElementCollectionBuilder.class);
             if (null == result) {
-                result = instance.obtainSubmodelElementCollectionBuilder(this, idShort, ordered, allowDuplicates);
+                result = instance.obtainSubmodelElementCollectionBuilder(this, idShort, false, false);
             }
             return result;
         }
@@ -281,12 +280,11 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
     }
 
     @Override
-    public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
-        boolean allowDuplicates) {
+    public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort) {
         LoggerFactory.getLogger(getClass()).warn("Adding a submodel to a deployed AAS currently does not lead to "
             + "the deployment of the new submodel (as for initial AAS). If possible, create the submodel in advance.");
         return obtainSubmodelElementCollectionBuilder(new BaSyxSubmodelBuilder(parent.createAasBuilder(), this), 
-            idShort, ordered, allowDuplicates);
+            idShort, false, false);
     }
 
     @Override

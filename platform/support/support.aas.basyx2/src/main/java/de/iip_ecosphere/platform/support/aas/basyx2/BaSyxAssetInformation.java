@@ -13,7 +13,7 @@
 package de.iip_ecosphere.platform.support.aas.basyx2;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
-import de.iip_ecosphere.platform.support.aas.Asset;
+import de.iip_ecosphere.platform.support.aas.AssetInformation;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Reference;
@@ -24,7 +24,7 @@ import de.iip_ecosphere.platform.support.aas.basyx2.AbstractAas.BaSyxAbstractAas
  * 
  * @author Holger Eichelberger, SSE
  */
-public class BaSyxAsset implements Asset {
+public class BaSyxAssetInformation implements AssetInformation {
 
     private org.eclipse.digitaltwin.aas4j.v3.model.AssetInformation asset;
     
@@ -33,10 +33,10 @@ public class BaSyxAsset implements Asset {
      * 
      * @author Holger Eichelberger, SSE
      */
-    static class BaSyxAssetBuilder implements AssetBuilder {
+    static class BaSyxAssetInformationBuilder implements AssetInformationBuilder {
         
         private BaSyxAbstractAasBuilder parent;
-        private BaSyxAsset instance;
+        private BaSyxAssetInformation instance;
         private org.eclipse.digitaltwin.aas4j.v3.model.AssetInformation asset;
         
         /**
@@ -48,9 +48,10 @@ public class BaSyxAsset implements Asset {
          *    {@code idShort}, interpreted as an URN if this starts with {@code urn})
          * @param kind the asset kind
          */
-        BaSyxAssetBuilder(BaSyxAbstractAasBuilder parent, String idShort, String identifier, AssetKind kind) {
+        BaSyxAssetInformationBuilder(BaSyxAbstractAasBuilder parent, String idShort, String identifier, 
+            AssetKind kind) {
             this.parent = parent;
-            this.instance = new BaSyxAsset();
+            this.instance = new BaSyxAssetInformation();
             this.asset = new org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultAssetInformation();
             this.asset.setGlobalAssetId(idShort); // initial value, may be overwritten
             this.asset.setAssetKind(Tools.translate(kind));
@@ -59,13 +60,13 @@ public class BaSyxAsset implements Asset {
         }
 
         @Override
-        public Asset build() {
+        public AssetInformation build() {
             parent.setAsset(this.instance);
             return this.instance;
         }
 
         @Override
-        public AssetBuilder setDescription(LangString... description) {
+        public AssetInformationBuilder setDescription(LangString... description) {
             // this.asset.setDescription(Tools.translate(description)); // TODO does not exist anymore
             return this;
         }
@@ -80,7 +81,7 @@ public class BaSyxAsset implements Asset {
     /**
      * Creates an instance, prevents external creation.
      */
-    private BaSyxAsset() {
+    private BaSyxAssetInformation() {
     }
     
     /**
@@ -88,7 +89,7 @@ public class BaSyxAsset implements Asset {
      * 
      * @param asset the asset
      */
-    BaSyxAsset(org.eclipse.digitaltwin.aas4j.v3.model.AssetInformation asset) {
+    BaSyxAssetInformation(org.eclipse.digitaltwin.aas4j.v3.model.AssetInformation asset) {
         this.asset = asset;
     }
     

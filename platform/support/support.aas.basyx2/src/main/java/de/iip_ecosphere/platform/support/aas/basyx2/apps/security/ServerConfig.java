@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx2.apps.security;
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 import java.util.ArrayList;
@@ -75,7 +76,11 @@ public class ServerConfig {
         if (null != authDesc) {
             httpSecurity.authorizeHttpRequests(req -> {
                 req.requestMatchers("/error").permitAll();
-                req.anyRequest().authenticated();
+                if (authDesc.requiresAnonymousAccess()) {
+                    req.anyRequest().permitAll();
+                } else {
+                    req.anyRequest().authenticated();
+                }
             });
             /*.formLogin(f -> f.loginPage("/login") // TODO!!!
                 .permitAll()
@@ -86,7 +91,7 @@ public class ServerConfig {
             httpSecurity.httpBasic(Customizer.withDefaults());  // TODO conditional
             if (authDesc.requiresAnonymousAccess()) {
                 AuthenticationDescriptor.Role role = AuthenticationDescriptor.DefaultRole.NONE;
-                httpSecurity.anonymous(c -> c.key(role.name()).authorities(role.name()));
+                httpSecurity.anonymous(c -> c.key(role.name()).authorities(role.name()).principal(role.name()));
             }
             httpSecurity.csrf(c -> c.disable()); // TODO
             return httpSecurity.build();
@@ -127,7 +132,8 @@ public class ServerConfig {
                         users.add(
                             User.withUsername(t.getUserName())
                                 .password(pwPrefix + t.getTokenDataAsString())
-                                .roles(t.getRole().name())
+                                //.roles(t.getRole().name())
+                                .authorities(new SimpleGrantedAuthority(t.getRole().name()))
                                 .build()
                         );
                         break;

@@ -186,7 +186,7 @@ public abstract class AbstractAas<A extends IAssetAdministrationShell> implement
     }
 
     @Override
-    public de.iip_ecosphere.platform.support.aas.Asset getAsset() {
+    public de.iip_ecosphere.platform.support.aas.AssetInformation getAsset() {
         return asset;
     }
 

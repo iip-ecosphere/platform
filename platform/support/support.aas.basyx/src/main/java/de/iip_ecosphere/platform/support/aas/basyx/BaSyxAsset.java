@@ -15,7 +15,7 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 import org.eclipse.basyx.aas.metamodel.api.parts.asset.IAsset;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
-import de.iip_ecosphere.platform.support.aas.Asset;
+import de.iip_ecosphere.platform.support.aas.AssetInformation;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Reference;
@@ -26,7 +26,7 @@ import de.iip_ecosphere.platform.support.aas.basyx.AbstractAas.BaSyxAbstractAasB
  * 
  * @author Holger Eichelberger, SSE
  */
-public class BaSyxAsset implements Asset {
+public class BaSyxAsset implements AssetInformation {
 
     private IAsset asset;
     
@@ -35,7 +35,7 @@ public class BaSyxAsset implements Asset {
      * 
      * @author Holger Eichelberger, SSE
      */
-    static class BaSyxAssetBuilder implements AssetBuilder {
+    static class BaSyxAssetBuilder implements AssetInformationBuilder {
         
         private BaSyxAbstractAasBuilder parent;
         private BaSyxAsset instance;
@@ -59,13 +59,13 @@ public class BaSyxAsset implements Asset {
         }
 
         @Override
-        public Asset build() {
+        public AssetInformation build() {
             parent.setAsset(this.instance);
             return this.instance;
         }
 
         @Override
-        public AssetBuilder setDescription(LangString... description) {
+        public AssetInformationBuilder setDescription(LangString... description) {
             this.asset.setDescription(Tools.translate(description));
             return this;
         }

@@ -284,4 +284,9 @@ public abstract class AbstractBaSyxAasFactory extends AasFactory {
         return SubmodelElementIdShortBlacklist.isBlacklisted(id);
     }
 
+    @Override
+    public boolean supportsOperationExecutionAuthorization() {
+        return false;
+    }
+
 }

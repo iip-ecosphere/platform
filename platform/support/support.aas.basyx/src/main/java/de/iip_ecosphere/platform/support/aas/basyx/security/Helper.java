@@ -46,7 +46,7 @@ public class Helper {
     private static final Map<RbacAction, String> ACTION_MAPPING = new HashMap<>();
 
     static { // preliminary
-        ACTION_MAPPING.put(RbacAction.ALL, RbacAction.ALL.toString());
+//        ACTION_MAPPING.put(RbacAction.ALL, RbacAction.ALL.toString());
         ACTION_MAPPING.put(RbacAction.CREATE, RbacAction.CREATE.toString());
         ACTION_MAPPING.put(RbacAction.DELETE, RbacAction.DELETE.toString());
         ACTION_MAPPING.put(RbacAction.EXECUTE, RbacAction.EXECUTE.toString());

@@ -13,6 +13,7 @@
 package test.de.iip_ecosphere.platform.connectors.aas;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
@@ -33,9 +34,10 @@ public class TlsAasConnectorTest extends AasConnectorTest {
      * 
      * @throws SocketException if the port to be used for the AAS is occupied
      * @throws UnknownHostException shall not occur
+     * @throws IOException if accessing AAS elements fails
      */
     @BeforeClass
-    public static void init() throws SocketException, UnknownHostException {
+    public static void init() throws SocketException, UnknownHostException, IOException {
         setKeystoreDescriptor(new KeyStoreDescriptor(new File("./src/test/keystore.jks"), "a1234567", "tomcat"));
         AasConnectorTest.init();
     }

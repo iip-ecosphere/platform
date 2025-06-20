@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx2;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,8 +47,9 @@ public abstract class AbstractAas<A extends org.eclipse.digitaltwin.aas4j.v3.mod
          * 
          * @param submodel the sub-model
          * @return {@code submodel}
+         * @throws IOException if the submodel cannot be registered, e.g. due to permission issues
          */
-        abstract Submodel register(BaSyxSubmodel submodel);
+        abstract Submodel register(BaSyxSubmodel submodel) throws IOException;
         
         /**
          * Returns the sub-model parent.
@@ -68,7 +70,7 @@ public abstract class AbstractAas<A extends org.eclipse.digitaltwin.aas4j.v3.mod
          * 
          * @param asset the asset
          */
-        abstract void setAsset(BaSyxAsset asset);
+        abstract void setAsset(BaSyxAssetInformation asset);
         
         @Override
         public Reference createReference() {
@@ -95,7 +97,7 @@ public abstract class AbstractAas<A extends org.eclipse.digitaltwin.aas4j.v3.mod
     
     private A aas;
     private Map<String, Submodel> submodels = new HashMap<>();
-    private BaSyxAsset asset;
+    private BaSyxAssetInformation asset;
     private Map<String, Builder<?>> deferred;
 
     /**
@@ -107,7 +109,7 @@ public abstract class AbstractAas<A extends org.eclipse.digitaltwin.aas4j.v3.mod
         this.aas = aas;
         org.eclipse.digitaltwin.aas4j.v3.model.AssetInformation asset = aas.getAssetInformation();
         if (null != asset) {
-            this.asset = new BaSyxAsset(asset);
+            this.asset = new BaSyxAssetInformation(asset);
         }
     }
 
@@ -170,7 +172,7 @@ public abstract class AbstractAas<A extends org.eclipse.digitaltwin.aas4j.v3.mod
     }
 
     @Override
-    public de.iip_ecosphere.platform.support.aas.Asset getAsset() {
+    public de.iip_ecosphere.platform.support.aas.AssetInformation getAsset() {
         return asset;
     }
 
@@ -179,7 +181,7 @@ public abstract class AbstractAas<A extends org.eclipse.digitaltwin.aas4j.v3.mod
      * 
      * @param asset the asset
      */
-    protected void setAsset(BaSyxAsset asset) {
+    protected void setAsset(BaSyxAssetInformation asset) {
         this.asset = asset;
     }
 

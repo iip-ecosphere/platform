@@ -27,6 +27,7 @@ import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
 import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.basyx2.BaSyxAbstractAasServer.ServerType;
+import de.iip_ecosphere.platform.support.function.IORunnable;
 
 /**
  * An initial BaSyx-specific deployment builder.
@@ -66,10 +67,10 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
      */
     private class BaSyxImmediateDeploymentRecipe implements ImmediateDeploymentRecipe {
 
-        private List<Runnable> actions = new ArrayList<>();
+        private List<IORunnable> actions = new ArrayList<>();
         
         @Override
-        public ImmediateDeploymentRecipe deploy(Aas aas) {
+        public ImmediateDeploymentRecipe deploy(Aas aas) throws IOException {
             actions.add(() -> {
                 BaSyxDeploymentRecipe.deploy(setupSpec, aas);
             });
@@ -113,7 +114,7 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
         }
 
         @Override
-        public RegistryDeploymentRecipe deploy(Aas aas) {
+        public RegistryDeploymentRecipe deploy(Aas aas) throws IOException {
             BaSyxDeploymentRecipe.deploy(spec, aas);
             return this;
         }
@@ -137,8 +138,9 @@ public class BaSyxDeploymentRecipe implements DeploymentRecipe {
      * 
      * @param spec the setup specification
      * @param aas the AAS
+     * @throws IOException if the deployment cannot be executed, e.g. due to permission issues
      */
-    static void deploy(SetupSpec spec, Aas aas) {
+    static void deploy(SetupSpec spec, Aas aas) throws IOException {
         BaSyxRegistry registry = new BaSyxRegistry(spec);
         registry.createAas(aas, "");
         String ep = registry.getEndpoint(aas);

@@ -64,15 +64,14 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
         }
 
         @Override
-        public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
-            boolean allowDuplicates) {
+        public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort) {
             SubmodelElementCollectionBuilder result = instance.getDeferred(idShort, 
                 SubmodelElementCollectionBuilder.class);
             if (null == result) {
                 SubmodelElementCollection sub = instance.getSubmodelElementCollection(idShort);
                 if (null == sub) {
                     result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(this, idShort, 
-                        ordered, allowDuplicates);
+                        false, false);
                 } else {
                     result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(this, 
                        (BaSyxSubmodelElementCollection) sub);                
@@ -182,8 +181,7 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
     }
 
     @Override
-    public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered,
-        boolean allowDuplicates) {
+    public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort) {
         SubmodelElementCollectionBuilder result = getDeferred(idShort, SubmodelElementCollectionBuilder.class);
         if (null == result) {
             BaSyxSubmodelElementContainerBuilder<ISubmodel> secb = new BaSyxISubmodelBuilder(
@@ -192,7 +190,7 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
             SubmodelElementCollection sub = getSubmodelElementCollection(idShort);
             if (null == sub) {
                 result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(
-                    secb, idShort, ordered, allowDuplicates);
+                    secb, idShort, false, false);
             } else {
                 result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(secb, 
                    (BaSyxSubmodelElementCollection) sub);

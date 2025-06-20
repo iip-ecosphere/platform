@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.support.aas.basyx.security;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpStatus;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -58,6 +60,7 @@ public class FailNoAuthorizationFilter extends OncePerRequestFilter {
      */
     public FailNoAuthorizationFilter(String exceptionUriRegEx, boolean allowAnonymous) {
         uriException = null == exceptionUriRegEx ? null : Pattern.compile(exceptionUriRegEx);
+        this.allowAnonymous = allowAnonymous;
     }
 
     @Override
@@ -69,7 +72,8 @@ public class FailNoAuthorizationFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
             } else if (allowAnonymous) {
                 AuthenticationDescriptor.Role role = AuthenticationDescriptor.DefaultRole.NONE;
-                AnonymousAuthenticationToken token = new AnonymousAuthenticationToken(role.name(), null, null);
+                AnonymousAuthenticationToken token = new AnonymousAuthenticationToken(role.name(), role.name(), 
+                    List.of(new SimpleGrantedAuthority(role.name())));
                 token.setDetails(role);
                 this.securityContextHolderStrategy.getContext().setAuthentication(token);
                 filterChain.doFilter(request, response);

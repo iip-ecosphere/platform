@@ -177,15 +177,14 @@ public class BaSyxSubmodelElementList extends BaSyxSubmodelElement implements Su
         }
 
         @Override
-        public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort, boolean ordered, 
-            boolean allowDuplicates) {
+        public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort) {
             SubmodelElementCollectionBuilder result = DeferredBuilder.getDeferred(idShort, 
                 SubmodelElementCollectionBuilder.class, instance.deferred);
             if (null == result) {
                 SubmodelElementCollection sub = instance.getSubmodelElementCollection(idShort);
                 if (null == sub) {
                     result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(this, idShort, 
-                        ordered, allowDuplicates);
+                        false, false);
                 } else {
                     result = new BaSyxSubmodelElementCollection.BaSyxSubmodelElementCollectionBuilder(this, 
                        (BaSyxSubmodelElementCollection) sub);
