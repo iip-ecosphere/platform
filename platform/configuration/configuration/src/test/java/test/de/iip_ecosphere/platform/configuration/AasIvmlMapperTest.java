@@ -343,9 +343,9 @@ public class AasIvmlMapperTest {
         Assert.assertNotNull(sel); // 1 variables of type Application shall exist in the model
         SubmodelElementCollection sec = sel.getSubmodelElementCollection(appName);
         Assert.assertNotNull(sec); // this application shall be there
-        sec = sec.getSubmodelElementCollection("services");
-        Assert.assertNotNull(sec);
-        SubmodelElementCollection varSmc = sec.getSubmodelElementCollection("var_" + netIndex);
+        sel = sec.getSubmodelElementList("services");
+        Assert.assertNotNull(sel);
+        SubmodelElementCollection varSmc = sel.getSubmodelElementCollection("var_" + netIndex);
         Assert.assertNotNull(varSmc);
         Property prop = varSmc.getProperty("varValue");
         Assert.assertNotNull(prop);
