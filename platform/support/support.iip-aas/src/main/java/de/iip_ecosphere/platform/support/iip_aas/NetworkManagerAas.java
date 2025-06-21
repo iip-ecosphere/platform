@@ -53,46 +53,56 @@ public class NetworkManagerAas implements AasContributor {
     
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
-        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
+        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)
+            .rbacAllAuthenticated(getSubmodelAuthentication());
         if (smB.isNew()) { // incremental remote deployment, avoid double creation
             smB.createOperationBuilder(OP_RESERVE_PORT)
                 .addInputVariable("key", Type.STRING)
                 .addInputVariable("address", Type.STRING)
                 .setInvocable(iCreator.createInvocable(getQName(OP_RESERVE_PORT)))
+                .rbacAllAuthenticated(getSubmodelAuthentication())
                 .build(Type.STRING);
             smB.createOperationBuilder(OP_OBTAIN_PORT)
                 .addInputVariable("key", Type.STRING)
                 .setInvocable(iCreator.createInvocable(getQName(OP_OBTAIN_PORT)))
+                .rbacAllAuthenticated(getSubmodelAuthentication())
                 .build(Type.STRING);
             smB.createOperationBuilder(OP_GET_PORT)
                 .addInputVariable("key", Type.STRING)
                 .setInvocable(iCreator.createInvocable(getQName(OP_GET_PORT)))
+                .rbacAllAuthenticated(getSubmodelAuthentication())
                 .build(Type.STRING);
             smB.createOperationBuilder(OP_IS_IN_USE_PORT)
                 .addInputVariable("port", Type.INTEGER)
                 .setInvocable(iCreator.createInvocable(getQName(OP_IS_IN_USE_PORT)))
+                .rbacAllAuthenticated(getSubmodelAuthentication())
                 .build(Type.BOOLEAN);
             smB.createOperationBuilder(OP_IS_IN_USE_ADR)
                 .addInputVariable("adr", Type.STRING)
                 .setInvocable(iCreator.createInvocable(getQName(OP_IS_IN_USE_ADR)))
+                .rbacAllAuthenticated(getSubmodelAuthentication())
                 .build(Type.BOOLEAN);
             smB.createOperationBuilder(OP_RELEASE_PORT)
                 .addInputVariable("key", Type.STRING)
                 .setInvocable(iCreator.createInvocable(getQName(OP_RELEASE_PORT)))
+                .rbacAllAuthenticated(getSubmodelAuthentication())
                 .build();
             smB.createOperationBuilder(OP_REGISTER_INSTANCE)
                 .addInputVariable("key", Type.STRING)
                 .addInputVariable("hostId", Type.STRING)
                 .setInvocable(iCreator.createInvocable(getQName(OP_REGISTER_INSTANCE)))
+                .rbacAllAuthenticated(getSubmodelAuthentication())
                 .build();
             smB.createOperationBuilder(OP_UNREGISTER_INSTANCE)
                 .addInputVariable("key", Type.STRING)
                 .addInputVariable("hostId", Type.STRING)
+                .rbacAllAuthenticated(getSubmodelAuthentication())
                 .setInvocable(iCreator.createInvocable(getQName(OP_UNREGISTER_INSTANCE)))
                 .build();
             smB.createOperationBuilder(OP_GET_REGISTERED_INSTANCES)
                 .addInputVariable("key", Type.STRING)
                 .setInvocable(iCreator.createInvocable(getQName(OP_GET_REGISTERED_INSTANCES)))
+                .rbacAllAuthenticated(getSubmodelAuthentication())
                 .build(Type.INTEGER);
             smB.createPropertyBuilder(PROP_HIGH_PORT)
                 .setType(Type.INTEGER)

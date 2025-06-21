@@ -16,6 +16,7 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
 
 /**
@@ -62,6 +63,26 @@ public interface AasContributor {
      */
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator);
     
+    /**
+     * Returns the AAS authentication descriptor. [shortcut]
+     * 
+     * @return the AAS authentication descriptor, may be <b>null</b> for none
+     * @see AasPartRegistry#getAasAuthentication()
+     */
+    public default AuthenticationDescriptor getAasAuthentication() {
+        return AasPartRegistry.getAasAuthentication();
+    }
+
+    /**
+     * Returns the submodel authentication descriptor. [shortcut]
+     * 
+     * @return the submodel authentication descriptor, may be <b>null</b> for none
+     * @see AasPartRegistry#getSubmodelAuthentication()
+     */
+    public default AuthenticationDescriptor getSubmodelAuthentication() {
+        return AasPartRegistry.getSubmodelAuthentication();
+    }
+
     /**
      * Contributes the real implementation functions to the {@code sBuilder}. Names used for the {@code iCreator} in
      * {@link #contributeTo(AasBuilder, InvocablesCreator)} must be the same as used here. Property and function names

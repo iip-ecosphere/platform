@@ -92,7 +92,8 @@ public class PlatformAas implements AasContributor {
 
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
-        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
+        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)
+            .rbacAllAuthenticated(getSubmodelAuthentication());
         if (smB.isNew()) { // incremental remote deployment, avoid double creation
             IipVersion versionInfo = IipVersion.getInstance();
             ApplicationSetup setup = new ApplicationSetup();
@@ -121,13 +122,15 @@ public class PlatformAas implements AasContributor {
                 .setValue(Type.STRING, versionInfo.getBuildId())
                 .setSemanticId(Irdi.AAS_IRDI_PROPERTY_IDENTIFIER)
                 .build();
-            smB.createOperationBuilder(NAME_OPERATION_SNAPSHOTAAS) // TODO restrict access
+            smB.createOperationBuilder(NAME_OPERATION_SNAPSHOTAAS)
                 .addInputVariable("id", Type.STRING)
                 .setInvocable(iCreator.createInvocable(NAME_OPERATION_SNAPSHOTAAS))
+                .rbacAllAuthenticated(getSubmodelAuthentication())
                 .build(Type.STRING);
-            smB.createOperationBuilder(NAME_OPERATION_RESOLVE_SEMANTICID) // TODO restrict access
+            smB.createOperationBuilder(NAME_OPERATION_RESOLVE_SEMANTICID)
                 .addInputVariable("semanticId", Type.STRING)
                 .setInvocable(iCreator.createInvocable(NAME_OPERATION_RESOLVE_SEMANTICID))
+                .rbacAllAuthenticated(getSubmodelAuthentication())
                 .build(Type.STRING);
             smB.build();
         }

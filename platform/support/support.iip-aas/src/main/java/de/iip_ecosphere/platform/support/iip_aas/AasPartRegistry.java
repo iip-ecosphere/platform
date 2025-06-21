@@ -43,6 +43,7 @@ import de.iip_ecosphere.platform.support.aas.CorsEnabledRecipe;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.ImmediateDeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.DeploymentRecipe.RegistryDeploymentRecipe;
+import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.State;
 import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
@@ -799,6 +800,7 @@ public class AasPartRegistry {
         AasBuilder aasBuilder;
         try {
             aasBuilder = retrieveIipAas().createAasBuilder();
+            aasBuilder.rbacAll(getAasAuthentication());
         } catch (IOException e) {
             // fallback, AAS does not yet exist, top-level
             aasBuilder = factory.createAasBuilder(NAME_AAS, URN_AAS);
@@ -1102,6 +1104,26 @@ public class AasPartRegistry {
     public static Property addDeviceAasEndpointProperty(Registry reg, SubmodelElementContainerBuilder builder, 
         String property, String deviceId) {
         return addAasEndpointProperty(reg, builder, property, deviceId.length() == 0 ? "" : "device_" + deviceId);
+    }
+    
+    /**
+     * Returns the AAS authentication descriptor.
+     * 
+     * @return the AAS authentication descriptor, may be <b>null</b> for none
+     * @see AasPartRegistry#getSetup()
+     */
+    public static AuthenticationDescriptor getAasAuthentication() {
+        return AasPartRegistry.getSetup().getSetup(AasComponent.AAS_REPOSITORY).getAuthentication();
+    }
+
+    /**
+     * Returns the submodel authentication descriptor.
+     * 
+     * @return the submodel authentication descriptor, may be <b>null</b> for none
+     * @see AasPartRegistry#getSetup()
+     */
+    public static AuthenticationDescriptor getSubmodelAuthentication() {
+        return AasPartRegistry.getSetup().getSetup(AasComponent.SUBMODEL_REPOSITORY).getAuthentication();
     }
 
 }
