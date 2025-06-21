@@ -580,7 +580,9 @@ public interface AuthenticationDescriptor {
                     String headerValue = "Basic " + Base64.getEncoder().encodeToString(credentials.getBytes());
                     consumer.consume("Authorization", headerValue);
                     break;
-                    // TODO bearer...
+                case ISSUED:
+                    consumer.consume("Authorization", "Bearer " + clientToken.getTokenDataAsString());
+                    break;
                 case ANONYMOUS:
                     break;
                 default:
