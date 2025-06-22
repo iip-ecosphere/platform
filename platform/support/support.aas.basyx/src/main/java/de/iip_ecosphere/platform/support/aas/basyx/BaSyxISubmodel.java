@@ -158,7 +158,7 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
         public SubmodelBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
             if (null != auth) {
                 auth.addAccessRule(new RbacRule(RbacAasComponent.SUBMODEL, role, getInstance().getIdShort(), 
-                    null, actions));
+                    null, actions).creator(this));
             }
             return this;
         }

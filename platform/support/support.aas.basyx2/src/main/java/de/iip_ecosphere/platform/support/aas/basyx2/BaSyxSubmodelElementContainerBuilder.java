@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx2;
 
+import java.util.Arrays;
+
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
@@ -284,7 +286,24 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends org.eclipse
     void buildMyDeferred() {
         getInstance().buildDeferred();
     }
-    
+
+    /**
+     * Returns all parent builders including <b>this</b>.
+     * 
+     * @return the parent builders
+     */
+    protected Object[] parents() {
+        Object[] result;
+        if (getParentBuilder() instanceof BaSyxSubmodelElementContainerBuilder) {
+            result = ((BaSyxSubmodelElementContainerBuilder<?>) getParentBuilder()).parents();
+            result = Arrays.copyOf(result, result.length + 1);
+            result[result.length - 1] = this;
+        } else {
+            result = new Object[] {this};
+        }
+        return result;
+    }
+
     /**
      * Composes an RBAC path from the parents.
      * 

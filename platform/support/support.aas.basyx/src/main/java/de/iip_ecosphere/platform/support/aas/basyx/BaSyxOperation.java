@@ -189,7 +189,7 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
             instance.operation = operation;
             return parentBuilder.register(instance);
         }
-        
+
         @Override
         public OperationBuilder setSemanticId(String refValue) {
             IReference ref = Tools.translateReference(refValue);
@@ -205,6 +205,14 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
                 parentBuilder.composeRbacPath(operation.getIdShort()), actions);
         }
 
+        @Override
+        public OperationBuilder rbac(AuthenticationDescriptor auth) {
+            // must be set explicitly in BaSyx
+            return AuthenticationDescriptor.parentRbac(this, auth, parentBuilder.parents(), 
+                parentBuilder.composeRbacPath(operation.getIdShort()), 
+                RbacAction.READ, RbacAction.EXECUTE);
+        }
+        
     }
     
     /**

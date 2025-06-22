@@ -18,6 +18,8 @@ import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.Range.RangeBuilder;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBuilder;
 
+import java.util.Arrays;
+
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
@@ -277,6 +279,23 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubmodel>
      */
     void buildMyDeferred() {
         getInstance().buildDeferred();
+    }
+
+    /**
+     * Returns all parent builders including <b>this</b>.
+     * 
+     * @return the parent builders
+     */
+    protected Object[] parents() {
+        Object[] result;
+        if (getParentBuilder() instanceof BaSyxSubmodelElementContainerBuilder) {
+            result = ((BaSyxSubmodelElementContainerBuilder<?>) getParentBuilder()).parents();
+            result = Arrays.copyOf(result, result.length + 1);
+            result[result.length - 1] = this;
+        } else {
+            result = new Object[] {this};
+        }
+        return result;
     }
     
     /**

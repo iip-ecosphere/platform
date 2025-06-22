@@ -209,6 +209,14 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
             return AuthenticationDescriptor.elementRbac(this, auth, role, 
                 parentBuilder.composeRbacPath(operation.getIdShort()), actions);
         }
+        
+        @Override
+        public OperationBuilder rbac(AuthenticationDescriptor auth) {
+            // must be set explicitly in BaSyx
+            return AuthenticationDescriptor.parentRbac(this, auth, parentBuilder.parents(), 
+                parentBuilder.composeRbacPath(operation.getIdShort()), 
+                RbacAction.READ, RbacAction.EXECUTE);
+        }
 
     }
     
