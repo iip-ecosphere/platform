@@ -110,6 +110,11 @@ public class FakeOperation extends FakeElement implements Operation {
             // ignore parent paths here
             return AuthenticationDescriptor.elementRbac(this, auth, role, instance.getIdShort(), actions);
         }
+
+        @Override
+        public OperationBuilder rbac(AuthenticationDescriptor auth) {
+            return this; // not needed
+        }
         
     }
     

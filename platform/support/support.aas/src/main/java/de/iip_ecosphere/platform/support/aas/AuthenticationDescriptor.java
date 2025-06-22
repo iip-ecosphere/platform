@@ -12,9 +12,12 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
+import java.lang.ref.WeakReference;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.LoggerFactory;
 
@@ -249,6 +252,7 @@ public interface AuthenticationDescriptor {
         private List<RbacAction> actions;
         private Role role;
         private String element;
+        private WeakReference<Object> creator;
         private String path;
 
         /**
@@ -311,6 +315,55 @@ public interface AuthenticationDescriptor {
          */
         public String getPath() {
             return path;
+        }
+        
+        /**
+         * Returns a reference to the creator of this rule. {@code creator} is stored as a weak reference, i.e., it
+         * is only available as long as the creator (e.g., a builder) is actively used.
+         * 
+         * @return the creator, may be <b>null</b> if not set or already gone
+         */
+        public Object getCreator() {
+            return null != creator ? creator.get() : null;
+        }
+        
+        /**
+         * Sets a reference to the creator of this rule. {@code creator} is stored as a weak reference, i.e., it
+         * is only available as long as the creator (e.g., a builder) is actively used.
+         * 
+         * @param creator the creator or an identification of it for retrieving default rules, may be <b>null</b> 
+         *     for none
+         * @return <b>this</b> for chaining
+         */
+        public RbacRule creator(Object creator) {
+            this.creator = null != creator ? new WeakReference<>(creator) : null;
+            return this;
+        }
+
+        /**
+         * Returns whether {@code object} is the creator of this rule. 
+         * 
+         * @param object the object to test
+         * @return {@code true} for referential or object equality, {@code false} for no equality
+         */
+        public boolean isCreator(Object object) {
+            Object cr = getCreator();
+            return null != cr && (cr == object || cr.equals(object));
+        }
+        
+        /**
+         * Returns whether at least one element in {@code objects} is a creator of this rule. 
+         * 
+         * @param objects the objects to test
+         * @return {@code true} for referential or object equality, {@code false} for no equality
+         * @see #isCreator(Object)
+         */
+        public boolean isCreator(Object[] objects) {
+            boolean found = false;
+            for (int o = 0; !found && o < objects.length; o++) {
+                found = isCreator(objects[o]);
+            }
+            return found;
         }
         
         @Override
@@ -388,7 +441,8 @@ public interface AuthenticationDescriptor {
     public static <T> T aasRbac(T caller, AuthenticationDescriptor auth, Role role, String idShort, 
         RbacAction... actions) {
         if (null != auth) {
-            auth.addAccessRule(new RbacRule(RbacAasComponent.AAS, role, idShort, null, actions));
+            auth.addAccessRule(new RbacRule(RbacAasComponent.AAS, role, idShort, null, actions)
+                .creator(caller));
         }
         return caller;
     }
@@ -407,7 +461,8 @@ public interface AuthenticationDescriptor {
     public static <T> T submodelRbac(T caller, AuthenticationDescriptor auth, Role role, String idShort, 
         RbacAction... actions) {
         if (null != auth) {
-            auth.addAccessRule(new RbacRule(RbacAasComponent.SUBMODEL, role, idShort, "*", actions));
+            auth.addAccessRule(new RbacRule(RbacAasComponent.SUBMODEL, role, idShort, "*", actions)
+                .creator(caller));
         }
         return caller;
     }
@@ -431,8 +486,56 @@ public interface AuthenticationDescriptor {
             if (pos > 0) {
                 String smId = path.substring(0, pos);
                 String pth = path.substring(pos + 1);
-                auth.addAccessRule(new RbacRule(RbacAasComponent.SUBMODEL_ELEMENT, role, smId, pth, actions));
+                auth.addAccessRule(new RbacRule(RbacAasComponent.SUBMODEL_ELEMENT, role, smId, pth, actions)
+                    .creator(caller));
             } 
+        }
+        return caller;
+    }
+
+    /**
+     * Helper function to create a submodel element RBAC rule from joining parent rules but only if {@code caller} 
+     * (as RBAC rule creator) has not already defined own rules.
+     * 
+     * @param <T> the caller type
+     * @param caller the caller
+     * @param auth the authentication descriptor, may be <b>null</b>, ignored then
+     * @param parents the parents to consider as RBAC rule creators
+     * @param path the path to the submodel element, separated by {@link RbacRule#PATH_SEPARATOR} starting with the 
+     *     hosting submodel
+     * @param minActions the minimum required permitted actions
+     * @return the caller
+     */
+    public static <T> T parentRbac(T caller, AuthenticationDescriptor auth, Object[] parents,
+        String path, RbacAction... minActions) {
+        if (null != auth && parents != null && path != null && path.length() > 0) {
+            List<RbacRule> rules = auth.getAccessRules();
+            if (!rules.stream().anyMatch(r -> r.isCreator(caller))) { // there are yet no rules
+                Set<Role> roles = new HashSet<>();
+                Set<RbacAction> actions = new HashSet<>();
+                for (RbacAction a : minActions) {
+                    actions.add(a);
+                }
+                rules.stream().filter(r -> r.isCreator(parents)).forEach(r -> {
+                    roles.add(r.getRole());
+                    actions.addAll(r.actions);
+                });
+                String pth;
+                String smId;
+                int pos = path.indexOf(RbacRule.PATH_SEPARATOR);
+                if (pos > 0) {
+                    smId = path.substring(0, pos);
+                    pth = path.substring(pos + 1);
+                } else {
+                    smId = path;
+                    pth = null;
+                }
+                RbacAction[] act = actions.toArray(new RbacAction[actions.size()]);
+                for (Role r: roles) {
+                    auth.addAccessRule(new RbacRule(RbacAasComponent.SUBMODEL_ELEMENT, r, smId, pth, act)
+                        .creator(caller));
+                }
+            }
         }
         return caller;
     }

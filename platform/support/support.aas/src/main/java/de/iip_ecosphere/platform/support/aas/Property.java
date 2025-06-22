@@ -152,6 +152,30 @@ public interface Property extends Element, DataElement {
             return RbacRoles.rbac(this, auth, roles, actions);
         }
 
+        /**
+         * Creates default RBAC rules based on the rules of the parent builder, i.e., the context this operation
+         * is created within. The implementation decides whether/how this operation shall be implemented or whether
+         * the respective rules are implicit.
+         * 
+         * @param auth the authentication descriptor, may be <b>null</b>, ignored then
+         * @return <b>this</b> for chaining
+         */
+        public default PropertyBuilder rbac(AuthenticationDescriptor auth) {
+            return this;
+        }
+
+        /**
+         * Creates default RBAC rules and builds this operation.
+         * 
+         * @param auth the authentication descriptor, may be <b>null</b>, ignored then
+         * @return return of {@link #build()}.
+         * @see #rbac(AuthenticationDescriptor)
+         */
+        public default Property build(AuthenticationDescriptor auth) {
+            rbac(auth);
+            return build();
+        }
+
     }
 
     /**

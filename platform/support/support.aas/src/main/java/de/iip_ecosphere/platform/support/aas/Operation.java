@@ -155,6 +155,30 @@ public interface Operation extends Element, SubmodelElement {
             addOutputVariable(DEFAULT_RETURN_VAR_NAME, type);
             return build();
         }
+
+        /**
+         * Creates default RBAC rules and builds this operation.
+         * 
+         * @param auth the authentication descriptor, may be <b>null</b>, ignored then
+         * @return return of {@link #build(Type))}.
+         * @see #rbac(AuthenticationDescriptor)
+         */
+        public default Operation build(Type type, AuthenticationDescriptor auth) {
+            rbac(auth);
+            return build(type);
+        }
+
+        /**
+         * Creates default RBAC rules and builds this operation.
+         * 
+         * @param auth the authentication descriptor, may be <b>null</b>, ignored then
+         * @return return of {@link #build()}.
+         * @see #rbac(AuthenticationDescriptor)
+         */
+        public default Operation build(AuthenticationDescriptor auth) {
+            rbac(auth);
+            return build();
+        }
         
         /**
          * Creates RBAC rules for the submodel under creation and adds the roles to {@code auth}.
@@ -167,6 +191,16 @@ public interface Operation extends Element, SubmodelElement {
         public default OperationBuilder rbac(AuthenticationDescriptor auth, Role[] roles, RbacAction... actions) {
             return RbacRoles.rbac(this, auth, roles, actions);
         }
+        
+        /**
+         * Creates default RBAC rules based on the rules of the parent builder, i.e., the context this operation
+         * is created within. The implementation decides whether/how this operation shall be implemented or whether
+         * the respective rules are implicit.
+         * 
+         * @param auth the authentication descriptor, may be <b>null</b>, ignored then
+         * @return <b>this</b> for chaining
+         */
+        public OperationBuilder rbac(AuthenticationDescriptor auth);
         
     }
     

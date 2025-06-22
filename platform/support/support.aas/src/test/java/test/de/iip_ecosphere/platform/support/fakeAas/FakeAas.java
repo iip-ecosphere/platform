@@ -140,7 +140,8 @@ public class FakeAas extends FakeElement implements Aas {
         @Override
         public AasBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
             if (null != auth) {
-                auth.addAccessRule(new RbacRule(RbacAasComponent.AAS, role, getInstance().getIdShort(), null, actions));
+                auth.addAccessRule(new RbacRule(RbacAasComponent.AAS, role, getInstance().getIdShort(), null, actions)
+                    .creator(this));
             }
             return this;
         }

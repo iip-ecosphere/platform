@@ -190,17 +190,14 @@ public class AasTest {
             .build();
         subModelBuilder.createOperationBuilder(NAME_OP_STARTMACHINE)
             .setInvocable(invC.createInvocable(NAME_OP_STARTMACHINE))
-            .rbacAll(authDesc)
-            .build();
+            .build(authDesc);
         subModelBuilder.createOperationBuilder(NAME_OP_RECONFIGURE)
             .addInputVariable(NAME_VAR_LOTSIZE, Type.INTEGER)
             .setInvocableLazy(invC.createInvocable(NAME_OP_RECONFIGURE))
-            .rbacAll(authDesc)
-            .build(Type.BOOLEAN);
+            .build(Type.BOOLEAN, authDesc);
         subModelBuilder.createOperationBuilder(NAME_OP_STOPMACHINE)
             .setInvocable(invC.createInvocable(NAME_OP_STOPMACHINE))
-            .rbacAll(authDesc)
-            .build();
+            .build(authDesc);
     }
     
     /**
@@ -490,14 +487,14 @@ public class AasTest {
             .rbacAll(auth);
         sm.createPropertyBuilder(NAME_RBAC_PROPOPEN)
             .setValue(Type.AAS_INTEGER, 10)
-            .build();
+            .build(auth);
         sm.createPropertyBuilder(NAME_RBAC_PROPCLOSED)
             .setValue(Type.AAS_INTEGER, 11)
             .rbacAllAuthenticated(auth)
             .build();
         sm.createOperationBuilder(NAME_RBAC_OPOPEN)
             .setInvocable(invC.createInvocable(NAME_RBAC_OPOPEN))
-            .build();
+            .build(auth);
         sm.createOperationBuilder(NAME_RBAC_OPCLOSED)
             .rbacAllAuthenticated(auth)
             .setInvocable(invC.createInvocable(NAME_RBAC_OPCLOSED))
@@ -512,14 +509,14 @@ public class AasTest {
             .build();
         sm.createPropertyBuilder(NAME_RBAC_PROPCLOSED)
             .setValue(Type.AAS_INTEGER, 21)
-            .build();
+            .build(auth);
         sm.createOperationBuilder(NAME_RBAC_OPOPEN)
             .rbacAll(auth)
             .setInvocable(invC.createInvocable(NAME_RBAC_OPOPEN))
             .build();
         sm.createOperationBuilder(NAME_RBAC_OPCLOSED)
             .setInvocable(invC.createInvocable(NAME_RBAC_OPCLOSED))
-            .build();
+            .build(auth);
         sm.build();
 
         assertRoles(false);
