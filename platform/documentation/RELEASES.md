@@ -5,8 +5,10 @@
 In progress:
 * [#164](https://github.com/iip-ecosphere/platform/issues/164): UI design revision
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
-* [#170](https://github.com/iip-ecosphere/platform/issues/170): Check out BaSyx2
+* [#170](https://github.com/iip-ecosphere/platform/issues/170): Integrate BaSyx2
 * [#165](https://github.com/iip-ecosphere/platform/issues/170): Upgrade automated container building
+* [#122](https://github.com/iip-ecosphere/platform/issues/122): Transparent encryption, RBAC on AAS (incl. UI authentication)
+* [#175](https://github.com/iip-ecosphere/platform/issues/175): Revise Python tests
 
 Improvements:
 * Support for JDK 21 based on Eclipse 2024-06.
