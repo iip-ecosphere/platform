@@ -489,7 +489,7 @@ template AasImplTest(Configuration config, JavaCodeArtifact target, AasSubmodelT
 			.addCall("de.iip_ecosphere.platform.support.aas.AasFactory.getInstance", JavaCodeImportScope.CLASS)
 			.addCall("createAasBuilder").addStringArgument("${aasName}Example").addStringArgument("urn:::AAS:::${aasName}Example#");
 	    m.addImport("de.iip_ecosphere.platform.support.aas.AssetKind"); // lazy
-        m.addCall("aasBuilder.createAssetBuilder").addStringArgument("ci").addStringArgument("urn:::Asset:::ci#").addArgument("AssetKind.INSTANCE").addCall("build");
+        m.addCall("aasBuilder.createAssetInformationBuilder").addStringArgument("ci").addStringArgument("urn:::Asset:::ci#").addArgument("AssetKind.INSTANCE").addCall("build");
 	    m.addVariable("${apiPkg}.${clsName}Builder", "smBuilder")
 		    .addNew("${clsName}Builder").addArgument("aasBuilder").addStringArgument("urn:::SM:::${aasName}#");
 	    m.addCall("smBuilder.setCreateMultiLanguageProperties", JavaCodeImportScope.NONE).addArgument("isCreateMultiLanguageProperties", JavaCodeImportScope.NONE);

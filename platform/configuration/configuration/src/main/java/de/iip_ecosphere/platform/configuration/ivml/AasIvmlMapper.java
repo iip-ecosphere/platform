@@ -59,6 +59,7 @@ import de.iip_ecosphere.platform.support.TaskRegistry;
 import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.transport.status.TaskUtils;
@@ -1192,15 +1193,16 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @param iCreator the invocables creator for operations
      */
     private void addOperations(SubmodelBuilder smBuilder, InvocablesCreator iCreator) {
+        AuthenticationDescriptor aDesc = AasPartRegistry.getSubmodelAuthentication();
         smBuilder.createOperationBuilder(OP_CHANGE_VALUES)
             .addInputVariable("valueExprs", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_CHANGE_VALUES))
-            .build();
+            .build(aDesc);
         smBuilder.createOperationBuilder(OP_GET_GRAPH)
             .addInputVariable("varName", Type.STRING)
             .addInputVariable("format", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_GET_GRAPH))
-            .build(Type.STRING);
+            .build(Type.STRING, aDesc);
         smBuilder.createOperationBuilder(OP_SET_GRAPH)
             .addInputVariable("appName", Type.STRING)
             .addInputVariable("appValExpr", Type.STRING)
@@ -1208,40 +1210,40 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             .addInputVariable("format", Type.STRING)
             .addInputVariable("val", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_SET_GRAPH))
-            .build();
+            .build(aDesc);
         smBuilder.createOperationBuilder(OP_DELETE_GRAPH)
             .addInputVariable("appName", Type.STRING)
             .addInputVariable("serviceMeshName", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_DELETE_GRAPH))
-            .build();
+            .build(aDesc);
         smBuilder.createOperationBuilder(OP_GET_VARIABLE_NAME)
             .addInputVariable("type", Type.STRING)
             .addInputVariable("elementName", Type.STRING)
             .addInputVariable("elementVersion", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_GET_VARIABLE_NAME))
-            .build(Type.STRING);
+            .build(Type.STRING, aDesc);
         smBuilder.createOperationBuilder(OP_CREATE_VARIABLE)
             .addInputVariable("varName", Type.STRING)
             .addInputVariable("type", Type.STRING)
             .addInputVariable("valExpr", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_CREATE_VARIABLE))
-            .build();
+            .build(aDesc);
         smBuilder.createOperationBuilder(OP_DELETE_VARIABLE)
             .addInputVariable("varName", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_DELETE_VARIABLE))
-            .build();
+            .build(aDesc);
         smBuilder.createOperationBuilder(OP_GEN_APPS)
             .setInvocable(iCreator.createInvocable(OP_GEN_APPS))
             .addInputVariable("appId", Type.STRING)
             .addInputVariable("codeFile", Type.STRING)
-            .build(Type.STRING);
+            .build(Type.STRING, aDesc);
         smBuilder.createOperationBuilder(OP_GEN_APPS_NO_DEPS)
             .setInvocable(iCreator.createInvocable(OP_GEN_APPS_NO_DEPS))
             .addInputVariable("appId", Type.STRING)
-            .build(Type.STRING);
+            .build(Type.STRING, aDesc);
         smBuilder.createOperationBuilder(OP_GEN_INTERFACES)
             .setInvocable(iCreator.createInvocable(OP_GEN_INTERFACES))
-            .build(Type.STRING);
+            .build(Type.STRING, aDesc);
     }
     
     /**

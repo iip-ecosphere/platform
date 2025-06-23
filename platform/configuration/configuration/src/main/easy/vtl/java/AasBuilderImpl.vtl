@@ -543,12 +543,12 @@ template AasBuilderImpl(Configuration config, JavaCodeArtifact target, AasSubmod
             
             JavaCodeMethod m = c.addConstructor("Creates a builder instance for ${getIdShort(type)}.").setProtected();
             setupInnerConstructor(type, field, top, false, m);
-            m.add("super(smBuilder.${createMethod}(${basicIdShortEx}${createParam}));");
+            m.add("super(smBuilder.${createMethod}(${basicIdShortEx}${createParam}), smBuilder);");
             produceSetSemanticId(type.semanticId, hasMultiSemId(type), m);
 
             m = c.addConstructor("Creates a builder instance for ${getIdShort(type)}.").setProtected();
             setupInnerConstructor(type, field, top, true, m);
-            m.add("super(smBuilder.${createMethod}(${idShortEx}${createParam}));");
+            m.add("super(smBuilder.${createMethod}(${idShortEx}${createParam}), smBuilder);");
             produceSetSemanticId(type.semanticId, hasMultiSemId(type), m);
             
             produceMethodsForFields(type.fields, "${clsName}Builder", c);
@@ -568,9 +568,9 @@ template AasBuilderImpl(Configuration config, JavaCodeArtifact target, AasSubmod
             cons.addParameter("String", "idShort", "the actual idShort");
         }
         if (top) {
-            cons.addParameter("de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder", "smBuilder", "the parent submodel builder");
+            cons.addParameter("de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodelBuilder", "smBuilder", "the parent submodel builder");
         } else {
-            cons.addParameter("de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder", "smBuilder", "the parent submodel element container builder");
+            cons.addParameter("de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodelElementContainerBuilder", "smBuilder", "the parent submodel element container builder");
         }
         if (addNrParam) {
             cons.addParameter("int", "nr", "the structure number");

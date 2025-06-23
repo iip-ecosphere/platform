@@ -271,7 +271,8 @@ public class ConfigurationAas implements AasContributor, ConfigurationChangeList
     
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
-        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
+        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)
+            .rbacPlatform(AasPartRegistry.getSubmodelAuthentication());
         AasIvmlMapper mapper = new AasIvmlMapper(() -> ConfigurationManager.getVilConfiguration(), 
             new IipGraphMapper(), this);
         mapper.mapByType(smB, iCreator);
@@ -314,7 +315,8 @@ public class ConfigurationAas implements AasContributor, ConfigurationChangeList
         try {
             Aas aas = AasPartRegistry.retrieveIipAas();
             Submodel sm = aas.getSubmodel(NAME_SUBMODEL);
-            SubmodelBuilder smB = aas.createSubmodelBuilder(NAME_SUBMODEL, null);
+            SubmodelBuilder smB = aas.createSubmodelBuilder(NAME_SUBMODEL, null)
+                .rbacPlatform(AasPartRegistry.getSubmodelAuthentication());
             for (AasChange c : aasChanges) {
                 c.apply(ConfigurationManager.getAasIvmlMapper(), sm, smB);
             }
