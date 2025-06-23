@@ -12,6 +12,9 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
+
 /**
  * Defines the interface of a sub-model element collection.
  * 
@@ -25,7 +28,7 @@ public interface SubmodelElementCollection extends SubmodelElement, ElementsAcce
      * @author Holger Eichelberger, SSE
      */
     public interface SubmodelElementCollectionBuilder extends SubmodelElementContainerBuilder, 
-        DeferredBuilder<SubmodelElementCollection> {
+        DeferredBuilder<SubmodelElementCollection>, RbacReceiver<SubmodelElementCollectionBuilder> {
         
         /**
          * Creates a reference to the sub-model element collection created by this builder.
@@ -41,6 +44,23 @@ public interface SubmodelElementCollection extends SubmodelElement, ElementsAcce
          * @return <b>this</b>
          */
         public SubmodelElementCollectionBuilder setSemanticId(String refValue);
+        
+        @Override
+        public default SubmodelElementCollectionBuilder rbac(AuthenticationDescriptor auth, Role[] roles, 
+            RbacAction... actions) {
+            return RbacRoles.rbac(this, auth, roles, actions);
+        }
+        
+        /**
+         * Builds with inherited RBAC rules if available.
+         * 
+         * @param auth the authentication descriptor, may be <b>null</b> for none
+         * @return the result of {@link #build()}
+         */
+        public default SubmodelElementCollection build(AuthenticationDescriptor auth) {
+            rbac(auth);
+            return build();
+        }
         
         @Override
         public default void justBuild() {

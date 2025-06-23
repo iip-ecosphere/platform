@@ -42,16 +42,27 @@ import de.iip_ecosphere.platform.support.aas.Type;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class DelegatingSubmodelBuilder implements SubmodelBuilder {
+public class DelegatingSubmodelBuilder extends AbstractDelegatingBuilder implements SubmodelBuilder {
 
     private SubmodelBuilder delegate;
+    
+    /**
+     * Creates the builder without parent.
+     * 
+     * @param delegate the builder to delegate to
+     */
+    public DelegatingSubmodelBuilder(SubmodelBuilder delegate) {
+        this(delegate, null);
+    }
     
     /**
      * Creates the builder.
      * 
      * @param delegate the builder to delegate to
+     * @param parent the parent builder for RBAC inheritance, may be <b>null</b> for none
      */
-    public DelegatingSubmodelBuilder(SubmodelBuilder delegate) {
+    public DelegatingSubmodelBuilder(SubmodelBuilder delegate, AbstractDelegatingBuilder parent) {
+        super(parent);
         this.delegate = delegate;
     }
     
@@ -66,7 +77,7 @@ public class DelegatingSubmodelBuilder implements SubmodelBuilder {
     
     @Override
     public PropertyBuilder createPropertyBuilder(String idShort) {
-        return delegate.createPropertyBuilder(idShort);
+        return rbac(delegate.createPropertyBuilder(idShort));
     }
 
     @Override
@@ -82,7 +93,7 @@ public class DelegatingSubmodelBuilder implements SubmodelBuilder {
 
     @Override
     public EntityBuilder createEntityBuilder(String idShort, EntityType type, Reference asset) {
-        return delegate.createEntityBuilder(idShort, type, asset);
+        return rbac(delegate.createEntityBuilder(idShort, type, asset));
     }
 
     @Override
@@ -92,7 +103,7 @@ public class DelegatingSubmodelBuilder implements SubmodelBuilder {
 
     @Override
     public OperationBuilder createOperationBuilder(String idShort) {
-        return delegate.createOperationBuilder(idShort);
+        return rbac(delegate.createOperationBuilder(idShort));
     }
 
     @Override
@@ -172,7 +183,32 @@ public class DelegatingSubmodelBuilder implements SubmodelBuilder {
 
     @Override
     public SubmodelBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
+        setAuthenticationDescriptor(auth);
         return delegate.rbac(auth, role, actions);
+    }
+
+    @Override
+    public SubmodelBuilder rbac(AuthenticationDescriptor auth) {
+        setAuthenticationDescriptor(auth);
+        return delegate.rbac(auth);
+    }
+    
+    @Override
+    public DelegatingSubmodelBuilder nextRbac(Role role, RbacAction... actions) {
+        super.nextRbac(new Role[] {role}, actions);
+        return this;
+    }
+
+    @Override
+    public DelegatingSubmodelBuilder nextRbac(Role[] roles, RbacAction... actions) {
+        super.nextRbac(roles, actions);
+        return this;
+    }
+
+    @Override
+    public DelegatingSubmodelBuilder setAuthenticationDescriptor(AuthenticationDescriptor authDesc) {
+        super.setAuthenticationDescriptor(authDesc);
+        return this;
     }
 
 }

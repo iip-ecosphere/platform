@@ -51,14 +51,7 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
          */
         public SubmodelBuilder setSemanticId(String refValue);
 
-        /**
-         * Creates RBAC rules for the submodel under creation and adds the roles to {@code auth}.
-         * 
-         * @param auth the authentication descriptor, may be <b>null</b>, ignored then
-         * @param roles the roles to create the rules for
-         * @param actions the permitted actions
-         * @return <b>this</b> for chaining
-         */
+        @Override
         public default SubmodelBuilder rbac(AuthenticationDescriptor auth, Role[] roles, RbacAction... actions) {
             return RbacRoles.rbac(this, auth, roles, actions);
         }

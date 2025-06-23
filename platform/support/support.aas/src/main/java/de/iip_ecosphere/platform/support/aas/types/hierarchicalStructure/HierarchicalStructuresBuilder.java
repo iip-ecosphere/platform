@@ -5,7 +5,6 @@ import static de.iip_ecosphere.platform.support.aas.types.common.Utils.*;
 
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
-import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.*;
 import de.iip_ecosphere.platform.support.aas.types.common.*;
 
@@ -154,8 +153,8 @@ public class HierarchicalStructuresBuilder extends DelegatingSubmodelBuilder {
         *
         * @param smBuilder the parent submodel builder
         */
-        protected EntryNodeBuilder(SubmodelBuilder smBuilder) {
-            super(smBuilder.createEntityBuilder("EntryNode", Entity.EntityType.SELFMANAGEDENTITY, null));
+        protected EntryNodeBuilder(DelegatingSubmodelBuilder smBuilder) {
+            super(smBuilder.createEntityBuilder("EntryNode", Entity.EntityType.SELFMANAGEDENTITY, null), smBuilder);
             setSemanticId(iri("https://admin-shell.io/idta/HierarchicalStructures/EntryNode/1/0"));
         }
         
@@ -165,9 +164,9 @@ public class HierarchicalStructuresBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel builder
         * @param nr the structure number
         */
-        protected EntryNodeBuilder(SubmodelBuilder smBuilder, int nr) {
+        protected EntryNodeBuilder(DelegatingSubmodelBuilder smBuilder, int nr) {
             super(smBuilder.createEntityBuilder(getCountingIdShort("EntryNode", nr), Entity.EntityType.
-                SELFMANAGEDENTITY, null));
+                SELFMANAGEDENTITY, null), smBuilder);
             setSemanticId(iri("https://admin-shell.io/idta/HierarchicalStructures/EntryNode/1/0"));
         }                
         
@@ -253,8 +252,8 @@ public class HierarchicalStructuresBuilder extends DelegatingSubmodelBuilder {
         *
         * @param smBuilder the parent submodel element container builder
         */
-        protected NodeBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createEntityBuilder("Node", Entity.EntityType.SELFMANAGEDENTITY, null));
+        protected NodeBuilder(DelegatingSubmodelElementContainerBuilder smBuilder) {
+            super(smBuilder.createEntityBuilder("Node", Entity.EntityType.SELFMANAGEDENTITY, null), smBuilder);
             setSemanticId(iri("https://admin-shell.io/idta/HierarchicalStructures/Node/1/0"));
         }
         
@@ -264,9 +263,9 @@ public class HierarchicalStructuresBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         * @param nr the structure number
         */
-        protected NodeBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
+        protected NodeBuilder(DelegatingSubmodelElementContainerBuilder smBuilder, int nr) {
             super(smBuilder.createEntityBuilder(getCountingIdShort("Node", nr), Entity.EntityType.SELFMANAGEDENTITY,
-                null));
+                null), smBuilder);
             setSemanticId(iri("https://admin-shell.io/idta/HierarchicalStructures/Node/1/0"));
         }                
         

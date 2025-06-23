@@ -161,7 +161,7 @@ public interface Property extends Element, DataElement {
          * @return <b>this</b> for chaining
          */
         public default PropertyBuilder rbac(AuthenticationDescriptor auth) {
-            return this;
+            return this; // usually not needed
         }
 
         /**

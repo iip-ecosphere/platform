@@ -228,6 +228,11 @@ public class FakeSubmodel extends FakeElement implements Submodel {
             return AuthenticationDescriptor.submodelRbac(this, auth, role, getInstance().getIdShort(), actions);
         }
 
+        @Override
+        public SubmodelBuilder rbac(AuthenticationDescriptor auth) {
+            return this; // usually not needed
+        }
+
     }
     
     /**

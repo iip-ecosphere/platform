@@ -120,7 +120,8 @@ public class AasTest {
     
     /**
      * Creates the operations server for the given machine instance and for the operations in 
-     * {@link #createAasOperationsElements(SubmodelElementContainerBuilder, SetupSpec, TestMachine)}.
+     * {@link #createAasOperationsElements(SubmodelElementContainerBuilder, SetupSpec, TestMachine, 
+     * AuthenticationDescriptor)}.
      * 
      * @param spec the setup specification
      * @param machine the machine

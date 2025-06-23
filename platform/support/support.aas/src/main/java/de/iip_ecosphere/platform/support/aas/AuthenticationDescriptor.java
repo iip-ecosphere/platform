@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
@@ -87,6 +88,26 @@ public interface AuthenticationDescriptor {
          */
         public static Role[] allAuthenticated() {
             return RbacRoles.allAuthenticated();
+        }
+
+        /**
+         * Returns all roles except for the given ones.
+         * 
+         * @param authenticated include only authenticated roles
+         * @param except the roles to leave out
+         * @return the roles
+         */
+        public static Role[] allExcept(boolean authenticated, Role... except) {
+            return RbacRoles.allExcept(authenticated, except);
+        }
+
+        /**
+         * Returns the given roles.
+         * 
+         * @return the roles
+         */
+        public static Role[] of(Role... roles) {
+            return roles;
         }
 
         /**
@@ -235,6 +256,16 @@ public interface AuthenticationDescriptor {
          */
         public static RbacAction[] all() {
             return values();
+        }
+
+        /**
+         * Returns the specified actions as array.
+         * 
+         * @param actions the actions
+         * @return the actions as array
+         */
+        public static RbacAction[] of(RbacAction... actions) {
+            return actions;
         }
         
     }
@@ -433,9 +464,9 @@ public interface AuthenticationDescriptor {
      * @param <T> the caller type
      * @param caller the caller
      * @param auth the authentication descriptor, may be <b>null</b>, ignored then
-     * @param role the role
+     * @param role the role (call ignored if <b>null</b>)
      * @param idShort the AAS idShort
-     * @param actions the permitted actions
+     * @param actions the permitted actions (call ignored if <b>null</b>, as array)
      * @return the caller
      */
     public static <T> T aasRbac(T caller, AuthenticationDescriptor auth, Role role, String idShort, 
@@ -453,9 +484,9 @@ public interface AuthenticationDescriptor {
      * @param <T> the caller type
      * @param caller the caller
      * @param auth the authentication descriptor, may be <b>null</b>, ignored then
-     * @param role the role
+     * @param role the role (call ignored if <b>null</b>)
      * @param idShort the submodel idShort
-     * @param actions the permitted actions
+     * @param actions the permitted actions (call ignored if <b>null</b>, as array)
      * @return the caller
      */
     public static <T> T submodelRbac(T caller, AuthenticationDescriptor auth, Role role, String idShort, 
@@ -473,15 +504,15 @@ public interface AuthenticationDescriptor {
      * @param <T> the caller type
      * @param caller the caller
      * @param auth the authentication descriptor, may be <b>null</b>, ignored then
-     * @param role the role
+     * @param role the role (call ignored if <b>null</b>)
      * @param path the path to the submodel element, separated by {@link RbacRule#PATH_SEPARATOR} starting with the 
      *     hosting submodel
-     * @param actions the permitted actions
+     * @param actions the permitted actions (call ignored if <b>null</b>, as array)
      * @return the caller
      */
     public static <T> T elementRbac(T caller, AuthenticationDescriptor auth, Role role, String path, 
         RbacAction... actions) {
-        if (null != auth && path != null && path.length() > 0) {
+        if (null != auth && StringUtils.isNotBlank(path) && null != role && null != actions) {
             int pos = path.indexOf(RbacRule.PATH_SEPARATOR);
             if (pos > 0) {
                 String smId = path.substring(0, pos);

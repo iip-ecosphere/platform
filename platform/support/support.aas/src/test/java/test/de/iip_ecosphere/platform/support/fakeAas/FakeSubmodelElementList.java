@@ -20,8 +20,11 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity;
@@ -190,6 +193,17 @@ public class FakeSubmodelElementList extends FakeElement implements SubmodelElem
             return this;
         }
 
+        @Override
+        public SubmodelElementListBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
+            // ignore parent paths here
+            return AuthenticationDescriptor.elementRbac(this, auth, role, instance.getIdShort(), actions);
+        }        
+
+        @Override
+        public SubmodelElementListBuilder rbac(AuthenticationDescriptor auth) {
+            return this; // usually not needed
+        }        
+        
     }
     
     /**

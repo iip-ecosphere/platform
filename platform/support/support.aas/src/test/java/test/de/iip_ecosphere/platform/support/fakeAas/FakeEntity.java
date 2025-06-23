@@ -19,6 +19,9 @@ import java.util.Map;
 
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity;
@@ -183,6 +186,17 @@ public class FakeEntity extends FakeElement implements Entity {
         public EntityBuilder setAsset(Reference asset) {
             // ignored for now
             return this;
+        }
+
+        @Override
+        public EntityBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
+            // ignore parent paths here
+            return AuthenticationDescriptor.elementRbac(this, auth, role, instance.getIdShort(), actions);
+        }
+
+        @Override
+        public EntityBuilder rbac(AuthenticationDescriptor auth) {
+            return this; // usually not needed
         }
         
     }

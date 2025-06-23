@@ -5,7 +5,6 @@ import static de.iip_ecosphere.platform.support.aas.types.common.Utils.*;
 
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
-import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.*;
 import de.iip_ecosphere.platform.support.aas.types.common.*;
@@ -127,8 +126,8 @@ public class TechnicalDataBuilder extends DelegatingSubmodelBuilder {
         *
         * @param smBuilder the parent submodel builder
         */
-        protected GeneralInformationBuilder(SubmodelBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("GeneralInformation"));
+        protected GeneralInformationBuilder(DelegatingSubmodelBuilder smBuilder) {
+            super(smBuilder.createSubmodelElementCollectionBuilder("GeneralInformation"), smBuilder);
             setSemanticId(iri("https://admin-shell.io/ZVEI/TechnicalData/GeneralInformation/1/1"));
         }
         
@@ -138,8 +137,9 @@ public class TechnicalDataBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel builder
         * @param nr the structure number
         */
-        protected GeneralInformationBuilder(SubmodelBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("GeneralInformation", nr)));
+        protected GeneralInformationBuilder(DelegatingSubmodelBuilder smBuilder, int nr) {
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("GeneralInformation", nr)), 
+                smBuilder);
             setSemanticId(iri("https://admin-shell.io/ZVEI/TechnicalData/GeneralInformation/1/1"));
         }
         
@@ -268,8 +268,8 @@ public class TechnicalDataBuilder extends DelegatingSubmodelBuilder {
         *
         * @param smBuilder the parent submodel builder
         */
-        protected ProductClassificationsBuilder(SubmodelBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("ProductClassifications"));
+        protected ProductClassificationsBuilder(DelegatingSubmodelBuilder smBuilder) {
+            super(smBuilder.createSubmodelElementCollectionBuilder("ProductClassifications"), smBuilder);
             setSemanticId(iri("https://admin-shell.io/ZVEI/TechnicalData/ProductClassifications/1/1"));
         }
         
@@ -279,8 +279,9 @@ public class TechnicalDataBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel builder
         * @param nr the structure number
         */
-        protected ProductClassificationsBuilder(SubmodelBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("ProductClassifications", nr)));
+        protected ProductClassificationsBuilder(DelegatingSubmodelBuilder smBuilder, int nr) {
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("ProductClassifications", nr)), 
+                smBuilder);
             setSemanticId(iri("https://admin-shell.io/ZVEI/TechnicalData/ProductClassifications/1/1"));
         }
         
@@ -319,8 +320,8 @@ public class TechnicalDataBuilder extends DelegatingSubmodelBuilder {
         *
         * @param smBuilder the parent submodel element container builder
         */
-        protected ProductClassificationItemBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("ProductClassificationItem"));
+        protected ProductClassificationItemBuilder(DelegatingSubmodelElementContainerBuilder smBuilder) {
+            super(smBuilder.createSubmodelElementCollectionBuilder("ProductClassificationItem"), smBuilder);
             setSemanticId(iri("https://admin-shell.io/ZVEI/TechnicalData/ProductClassificationItem/1/1"));
         }
         
@@ -330,9 +331,9 @@ public class TechnicalDataBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         * @param nr the structure number
         */
-        protected ProductClassificationItemBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
+        protected ProductClassificationItemBuilder(DelegatingSubmodelElementContainerBuilder smBuilder, int nr) {
             super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("ProductClassificationItem",
-                nr)));
+                nr)), smBuilder);
             setSemanticId(iri("https://admin-shell.io/ZVEI/TechnicalData/ProductClassificationItem/1/1"));
         }
         
@@ -410,8 +411,8 @@ public class TechnicalDataBuilder extends DelegatingSubmodelBuilder {
         *
         * @param smBuilder the parent submodel builder
         */
-        protected TechnicalPropertiesBuilder(SubmodelBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("TechnicalProperties"));
+        protected TechnicalPropertiesBuilder(DelegatingSubmodelBuilder smBuilder) {
+            super(smBuilder.createSubmodelElementCollectionBuilder("TechnicalProperties"), smBuilder);
             setSemanticId(iri("https://admin-shell.io/ZVEI/TechnicalData/TechnicalProperties/1/1"));
         }
         
@@ -421,8 +422,9 @@ public class TechnicalDataBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel builder
         * @param nr the structure number
         */
-        protected TechnicalPropertiesBuilder(SubmodelBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("TechnicalProperties", nr)));
+        protected TechnicalPropertiesBuilder(DelegatingSubmodelBuilder smBuilder, int nr) {
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("TechnicalProperties", nr)), 
+                smBuilder);
             setSemanticId(iri("https://admin-shell.io/ZVEI/TechnicalData/TechnicalProperties/1/1"));
         }
         
@@ -445,8 +447,6 @@ public class TechnicalDataBuilder extends DelegatingSubmodelBuilder {
         /**
         * Creates a builder for MainSection.
         *
-        * @param ordered whether the collection is ordered
-        * @param allowDuplicates whether the collection allows duplicates
         * @return the builder instance, {@link Builder#build()} must be called
         */
         public SubmodelElementCollectionBuilder createMainSectionBuilder() {
@@ -458,8 +458,6 @@ public class TechnicalDataBuilder extends DelegatingSubmodelBuilder {
         /**
         * Creates a builder for SubSection.
         *
-        * @param ordered whether the collection is ordered
-        * @param allowDuplicates whether the collection allows duplicates
         * @return the builder instance, {@link Builder#build()} must be called
         */
         public SubmodelElementCollectionBuilder createSubSectionBuilder() {
@@ -495,8 +493,8 @@ public class TechnicalDataBuilder extends DelegatingSubmodelBuilder {
         *
         * @param smBuilder the parent submodel builder
         */
-        protected FurtherInformationBuilder(SubmodelBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("FurtherInformation"));
+        protected FurtherInformationBuilder(DelegatingSubmodelBuilder smBuilder) {
+            super(smBuilder.createSubmodelElementCollectionBuilder("FurtherInformation"), smBuilder);
             setSemanticId(iri("https://admin-shell.io/ZVEI/TechnicalData/FurtherInformation/1/1"));
         }
         
@@ -506,8 +504,9 @@ public class TechnicalDataBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel builder
         * @param nr the structure number
         */
-        protected FurtherInformationBuilder(SubmodelBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("FurtherInformation", nr)));
+        protected FurtherInformationBuilder(DelegatingSubmodelBuilder smBuilder, int nr) {
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("FurtherInformation", nr)), 
+                smBuilder);
             setSemanticId(iri("https://admin-shell.io/ZVEI/TechnicalData/FurtherInformation/1/1"));
         }
         

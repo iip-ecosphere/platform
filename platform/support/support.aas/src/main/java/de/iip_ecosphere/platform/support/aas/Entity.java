@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.support.aas;
 
 import de.iip_ecosphere.platform.support.Builder;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 
 /**
  * Defines the interface for a reference element.
@@ -38,7 +40,8 @@ public interface Entity extends SubmodelElement, SubmodelElementCollection {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public interface EntityBuilder extends SubmodelElementContainerBuilder, Builder<Entity> {
+    public interface EntityBuilder extends SubmodelElementContainerBuilder, Builder<Entity>, 
+        RbacReceiver<EntityBuilder> {
 
         /**
          * Returns the parent builder.
@@ -88,6 +91,22 @@ public interface Entity extends SubmodelElement, SubmodelElementCollection {
          * @return the reference
          */
         public Reference createReference();
+        
+        @Override
+        public default EntityBuilder rbac(AuthenticationDescriptor auth, Role[] roles, RbacAction... actions) {
+            return RbacRoles.rbac(this, auth, roles, actions);
+        }
+        
+        /**
+         * Builds with inherited RBAC rules if available.
+         * 
+         * @param auth the authentication descriptor, may be <b>null</b> for none
+         * @return the result of {@link #build()}
+         */
+        public default Entity build(AuthenticationDescriptor auth) {
+            rbac(auth);
+            return build();
+        }
         
         @Override
         public default void justBuild() {

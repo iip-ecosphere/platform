@@ -13,6 +13,9 @@
 package de.iip_ecosphere.platform.support.aas.types.common;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 import de.iip_ecosphere.platform.support.aas.BlobDataElement.BlobDataElementBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
@@ -40,19 +43,30 @@ import de.iip_ecosphere.platform.support.aas.Type;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class DelegatingEntityBuilder implements EntityBuilder {
+public class DelegatingEntityBuilder extends DelegatingSubmodelElementContainerBuilder implements EntityBuilder {
 
     private EntityBuilder delegate;
     
     /**
-     * Creates a delegating Entity builder.
+     * Creates a delegating Entity builder without parent builder.
      * 
      * @param delegate the builder to delegate to
      */
     protected DelegatingEntityBuilder(EntityBuilder delegate) {
+        this(delegate, null);
+    }
+
+    /**
+     * Creates a delegating Entity builder.
+     * 
+     * @param delegate the builder to delegate to
+     * @param parent the parent builder for RBAC inheritance, may be <b>null</b> for none
+     */
+    protected DelegatingEntityBuilder(EntityBuilder delegate, AbstractDelegatingBuilder parent) {
+        super(parent);
         this.delegate = delegate;
     }
-    
+
     /**
      * Returns the builder this builder is delegating to.
      * 
@@ -64,7 +78,7 @@ public class DelegatingEntityBuilder implements EntityBuilder {
 
     @Override
     public PropertyBuilder createPropertyBuilder(String idShort) {
-        return delegate.createPropertyBuilder(idShort);
+        return rbac(delegate.createPropertyBuilder(idShort));
     }
 
     @Override
@@ -80,7 +94,7 @@ public class DelegatingEntityBuilder implements EntityBuilder {
 
     @Override
     public EntityBuilder createEntityBuilder(String idShort, EntityType type, Reference asset) {
-        return delegate.createEntityBuilder(idShort, type, asset);
+        return rbac(delegate.createEntityBuilder(idShort, type, asset));
     }
 
     @Override
@@ -90,7 +104,7 @@ public class DelegatingEntityBuilder implements EntityBuilder {
 
     @Override
     public OperationBuilder createOperationBuilder(String idShort) {
-        return delegate.createOperationBuilder(idShort);
+        return rbac(delegate.createOperationBuilder(idShort));
     }
 
     @Override
@@ -174,6 +188,36 @@ public class DelegatingEntityBuilder implements EntityBuilder {
     @Override
     public EntityBuilder setAsset(Reference asset) {
         delegate.setAsset(asset);
+        return this;
+    }
+
+    @Override
+    public EntityBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
+        setAuthenticationDescriptor(auth);
+        return delegate.rbac(auth, role, actions);
+    }
+
+    @Override
+    public EntityBuilder rbac(AuthenticationDescriptor auth) {
+        setAuthenticationDescriptor(auth);
+        return delegate.rbac(auth);
+    }
+
+    @Override
+    public DelegatingEntityBuilder nextRbac(Role role, RbacAction... actions) {
+        super.nextRbac(new Role[] {role}, actions);
+        return this;
+    }
+
+    @Override
+    public DelegatingEntityBuilder nextRbac(Role[] roles, RbacAction... actions) {
+        super.nextRbac(roles, actions);
+        return this;
+    }
+
+    @Override
+    public DelegatingEntityBuilder setAuthenticationDescriptor(AuthenticationDescriptor authDesc) {
+        super.setAuthenticationDescriptor(authDesc);
         return this;
     }
 

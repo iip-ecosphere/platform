@@ -27,7 +27,7 @@ public interface Aas extends Element, Identifiable, HasDataSpecification, Deferr
     
     /**
      * Used to build an AAS. For creating an instance/type AAS, use 
-     * {@link #createAssetBuilder(String, String, AssetKind)}. 
+     * {@link #createAssetInformationBuilder(String, String, AssetKind)}. 
      * 
      * @author Holger Eichelberger, SSE
      */

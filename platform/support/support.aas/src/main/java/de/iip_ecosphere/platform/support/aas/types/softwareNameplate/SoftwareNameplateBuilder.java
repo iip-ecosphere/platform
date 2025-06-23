@@ -5,7 +5,6 @@ import static de.iip_ecosphere.platform.support.aas.types.common.Utils.*;
 
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
-import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.*;
 import de.iip_ecosphere.platform.support.aas.types.common.*;
 
@@ -368,8 +367,8 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         *
         * @param smBuilder the parent submodel builder
         */
-        protected SoftwareNameplate_TypeBuilder(SubmodelBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("SoftwareNameplate_Type"));
+        protected SoftwareNameplate_TypeBuilder(DelegatingSubmodelBuilder smBuilder) {
+            super(smBuilder.createSubmodelElementCollectionBuilder("SoftwareNameplate_Type"), smBuilder);
             setSemanticId(iri("https://admin-shell.io/idta/SoftwareNameplate/1/0/SoftwareNameplateType"));
         }
         
@@ -379,8 +378,9 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel builder
         * @param nr the structure number
         */
-        protected SoftwareNameplate_TypeBuilder(SubmodelBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("SoftwareNameplate_Type", nr)));
+        protected SoftwareNameplate_TypeBuilder(DelegatingSubmodelBuilder smBuilder, int nr) {
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("SoftwareNameplate_Type", nr)), 
+                smBuilder);
             setSemanticId(iri("https://admin-shell.io/idta/SoftwareNameplate/1/0/SoftwareNameplateType"));
         }
         
@@ -720,8 +720,8 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         *
         * @param smBuilder the parent submodel builder
         */
-        protected SoftwareNameplate_InstanceBuilder(SubmodelBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("SoftwareNameplate_Instance"));
+        protected SoftwareNameplate_InstanceBuilder(DelegatingSubmodelBuilder smBuilder) {
+            super(smBuilder.createSubmodelElementCollectionBuilder("SoftwareNameplate_Instance"), smBuilder);
             setSemanticId(iri("https://admin-shell.io/idta/SoftwareNameplate/1/0/SoftwareNameplateInstance"));
         }
         
@@ -731,9 +731,9 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel builder
         * @param nr the structure number
         */
-        protected SoftwareNameplate_InstanceBuilder(SubmodelBuilder smBuilder, int nr) {
+        protected SoftwareNameplate_InstanceBuilder(DelegatingSubmodelBuilder smBuilder, int nr) {
             super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("SoftwareNameplate_Instance",
-                nr)));
+                nr)), smBuilder);
             setSemanticId(iri("https://admin-shell.io/idta/SoftwareNameplate/1/0/SoftwareNameplateInstance"));
         }
         
@@ -981,8 +981,8 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         *
         * @param smBuilder the parent submodel element container builder
         */
-        protected InstalledModulesBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("InstalledModules"));
+        protected InstalledModulesBuilder(DelegatingSubmodelElementContainerBuilder smBuilder) {
+            super(smBuilder.createSubmodelElementCollectionBuilder("InstalledModules"), smBuilder);
             setSemanticId(iri("https://admin-shell.io/idta/SoftwareNameplate/1/0/SoftwareNameplate/"
                 + "SoftwareNameplateInstance/InstalledModules"));
         }
@@ -993,8 +993,9 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         * @param nr the structure number
         */
-        protected InstalledModulesBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("InstalledModules", nr)));
+        protected InstalledModulesBuilder(DelegatingSubmodelElementContainerBuilder smBuilder, int nr) {
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("InstalledModules", nr)), 
+                smBuilder);
             setSemanticId(iri("https://admin-shell.io/idta/SoftwareNameplate/1/0/SoftwareNameplate/"
                 + "SoftwareNameplateInstance/InstalledModules"));
         }
@@ -1036,8 +1037,8 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         *
         * @param smBuilder the parent submodel element container builder
         */
-        protected ConfigurationPathsBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("ConfigurationPaths"));
+        protected ConfigurationPathsBuilder(DelegatingSubmodelElementContainerBuilder smBuilder) {
+            super(smBuilder.createSubmodelElementCollectionBuilder("ConfigurationPaths"), smBuilder);
             setSemanticId(iri("https://admin-shell.io/idta/SoftwareNameplate/1/0/SoftwareNameplate/"
                 + "SoftwareNameplateInstance/ConfigurationPaths"));
         }
@@ -1048,8 +1049,9 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         * @param nr the structure number
         */
-        protected ConfigurationPathsBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("ConfigurationPaths", nr)));
+        protected ConfigurationPathsBuilder(DelegatingSubmodelElementContainerBuilder smBuilder, int nr) {
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("ConfigurationPaths", nr)), 
+                smBuilder);
             setSemanticId(iri("https://admin-shell.io/idta/SoftwareNameplate/1/0/SoftwareNameplate/"
                 + "SoftwareNameplateInstance/ConfigurationPaths"));
         }
@@ -1087,8 +1089,8 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         *
         * @param smBuilder the parent submodel element container builder
         */
-        protected ConfigurationPathBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("ConfigurationPath"));
+        protected ConfigurationPathBuilder(DelegatingSubmodelElementContainerBuilder smBuilder) {
+            super(smBuilder.createSubmodelElementCollectionBuilder("ConfigurationPath"), smBuilder);
             setSemanticId(iri("https://admin-shell.io/idta/SoftwareNameplate/1/0/SoftwareNameplate/"
                 + "SoftwareNameplateInstance/ConfigurationPath"));
         }
@@ -1099,8 +1101,9 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         * @param nr the structure number
         */
-        protected ConfigurationPathBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("ConfigurationPath", nr)));
+        protected ConfigurationPathBuilder(DelegatingSubmodelElementContainerBuilder smBuilder, int nr) {
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("ConfigurationPath", nr)), 
+                smBuilder);
             setSemanticId(iri("https://admin-shell.io/idta/SoftwareNameplate/1/0/SoftwareNameplate/"
                 + "SoftwareNameplateInstance/ConfigurationPath"));
         }
@@ -1182,8 +1185,8 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         *
         * @param smBuilder the parent submodel element container builder
         */
-        protected ContactInformationBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("ContactInformation"));
+        protected ContactInformationBuilder(DelegatingSubmodelElementContainerBuilder smBuilder) {
+            super(smBuilder.createSubmodelElementCollectionBuilder("ContactInformation"), smBuilder);
             setSemanticId(iri("https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/ContactInformation"));
         }
         
@@ -1193,8 +1196,9 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         * @param nr the structure number
         */
-        protected ContactInformationBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("ContactInformation", nr)));
+        protected ContactInformationBuilder(DelegatingSubmodelElementContainerBuilder smBuilder, int nr) {
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("ContactInformation", nr)), 
+                smBuilder);
             setSemanticId(iri("https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/ContactInformation"));
         }
         
@@ -1591,8 +1595,8 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         *
         * @param smBuilder the parent submodel element container builder
         */
-        protected PhoneBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("Phone"));
+        protected PhoneBuilder(DelegatingSubmodelElementContainerBuilder smBuilder) {
+            super(smBuilder.createSubmodelElementCollectionBuilder("Phone"), smBuilder);
             setSemanticId(iri("https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/ContactInformation/Phone"
                 ));
         }
@@ -1603,8 +1607,8 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         * @param nr the structure number
         */
-        protected PhoneBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Phone", nr)));
+        protected PhoneBuilder(DelegatingSubmodelElementContainerBuilder smBuilder, int nr) {
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Phone", nr)), smBuilder);
             setSemanticId(iri("https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/ContactInformation/Phone"
                 ));
         }
@@ -1681,8 +1685,8 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         *
         * @param smBuilder the parent submodel element container builder
         */
-        protected FaxBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("Fax"));
+        protected FaxBuilder(DelegatingSubmodelElementContainerBuilder smBuilder) {
+            super(smBuilder.createSubmodelElementCollectionBuilder("Fax"), smBuilder);
             setSemanticId(irdi("0173-1#02-AAQ834#005"));
         }
         
@@ -1692,8 +1696,8 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         * @param nr the structure number
         */
-        protected FaxBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Fax", nr)));
+        protected FaxBuilder(DelegatingSubmodelElementContainerBuilder smBuilder, int nr) {
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Fax", nr)), smBuilder);
             setSemanticId(irdi("0173-1#02-AAQ834#005"));
         }
         
@@ -1752,8 +1756,8 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         *
         * @param smBuilder the parent submodel element container builder
         */
-        protected EmailBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("Email"));
+        protected EmailBuilder(DelegatingSubmodelElementContainerBuilder smBuilder) {
+            super(smBuilder.createSubmodelElementCollectionBuilder("Email"), smBuilder);
             setSemanticId(irdi("0173-1#02-AAQ836#005"));
         }
         
@@ -1763,8 +1767,8 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         * @param nr the structure number
         */
-        protected EmailBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Email", nr)));
+        protected EmailBuilder(DelegatingSubmodelElementContainerBuilder smBuilder, int nr) {
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("Email", nr)), smBuilder);
             setSemanticId(irdi("0173-1#02-AAQ836#005"));
         }
         
@@ -1856,8 +1860,8 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         *
         * @param smBuilder the parent submodel element container builder
         */
-        protected IPCommunicationBuilder(SubmodelElementContainerBuilder smBuilder) {
-            super(smBuilder.createSubmodelElementCollectionBuilder("IPCommunication"));
+        protected IPCommunicationBuilder(DelegatingSubmodelElementContainerBuilder smBuilder) {
+            super(smBuilder.createSubmodelElementCollectionBuilder("IPCommunication"), smBuilder);
             setSemanticId(iri(
                 "https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/ContactInformation/IPCommunication/"));
         }
@@ -1868,8 +1872,9 @@ public class SoftwareNameplateBuilder extends DelegatingSubmodelBuilder {
         * @param smBuilder the parent submodel element container builder
         * @param nr the structure number
         */
-        protected IPCommunicationBuilder(SubmodelElementContainerBuilder smBuilder, int nr) {
-            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("IPCommunication", nr)));
+        protected IPCommunicationBuilder(DelegatingSubmodelElementContainerBuilder smBuilder, int nr) {
+            super(smBuilder.createSubmodelElementCollectionBuilder(getCountingIdShort("IPCommunication", nr)), 
+                smBuilder);
             setSemanticId(iri(
                 "https://admin-shell.io/zvei/nameplate/1/0/ContactInformations/ContactInformation/IPCommunication/"));
         }

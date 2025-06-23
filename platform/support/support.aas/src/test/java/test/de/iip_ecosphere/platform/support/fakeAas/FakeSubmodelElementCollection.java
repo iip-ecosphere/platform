@@ -18,10 +18,13 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 import test.de.iip_ecosphere.platform.support.fakeAas.FakeSubmodelElementList.FakeSubmodelElementListBuilder;
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity;
@@ -189,7 +192,18 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
             instance.setSemanticId(semanticId);
             return this;
         }
+        
+        @Override
+        public SubmodelElementCollectionBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
+            // ignore parent paths here
+            return AuthenticationDescriptor.elementRbac(this, auth, role, instance.getIdShort(), actions);
+        }        
 
+        @Override
+        public SubmodelElementCollectionBuilder rbac(AuthenticationDescriptor auth) {
+            return this; // usually not needed
+        }        
+        
     }
     
     /**

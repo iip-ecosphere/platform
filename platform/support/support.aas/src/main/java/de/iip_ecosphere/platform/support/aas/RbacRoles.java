@@ -95,6 +95,20 @@ public class RbacRoles {
     public static Role[] allAuthenticated() {
         return roles.stream().filter(r -> !r.anonymous()).toArray(Role[]::new);
     }
+    
+    /**
+     * Returns all roles except for the given ones.
+     * 
+     * @param authenticated include only authenticated roles
+     * @param except the roles to leave out
+     * @return the roles
+     */
+    public static Role[] allExcept(boolean authenticated, Role... except) {
+        return roles.stream()
+            .filter(r -> !authenticated || (authenticated && !r.anonymous()))
+            .filter(r -> !contains(except, r))
+            .toArray(Role[]::new);
+    }
 
     /**
      * Returns all anonymous roles.
@@ -121,14 +135,16 @@ public class RbacRoles {
      * 
      * @param target the target object
      * @param auth the authentication descriptor, may be <b>null</b>, ignored then
-     * @param roles the roles to create the rules for
-     * @param actions the permitted actions
+     * @param roles the roles to create the rules for (call ignored if <b>null</b>)
+     * @param actions the permitted actions (call ignored if <b>null</b>, as array)
      * @return {@code target}
      */
     public static <T extends RbacReceiver<T>> T rbac(T target, AuthenticationDescriptor auth, Role[] roles, 
         RbacAction... actions) {
-        for (Role r: roles) {            
-            target.rbac(auth, r, actions);
+        if (null != roles && null != actions) {
+            for (Role r: roles) {            
+                target.rbac(auth, r, actions);
+            }
         }
         return target;
     }

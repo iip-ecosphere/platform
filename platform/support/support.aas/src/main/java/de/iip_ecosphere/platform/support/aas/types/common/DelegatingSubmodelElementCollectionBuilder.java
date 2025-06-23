@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.support.aas.types.common;
 
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 import de.iip_ecosphere.platform.support.aas.BlobDataElement.BlobDataElementBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityType;
@@ -22,6 +24,7 @@ import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.Range.RangeBuilder;
 import de.iip_ecosphere.platform.support.Builder;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.Reference;
 import de.iip_ecosphere.platform.support.aas.ReferenceElement.ReferenceElementBuilder;
 import de.iip_ecosphere.platform.support.aas.RelationshipElement.RelationshipElementBuilder;
@@ -39,19 +42,32 @@ import de.iip_ecosphere.platform.support.aas.Type;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class DelegatingSubmodelElementCollectionBuilder implements SubmodelElementCollectionBuilder {
+public class DelegatingSubmodelElementCollectionBuilder extends DelegatingSubmodelElementContainerBuilder 
+    implements SubmodelElementCollectionBuilder {
 
     private SubmodelElementCollectionBuilder delegate;
     
     /**
-     * Creates a delegating SMC builder.
+     * Creates a delegating SMC builder without parent builder.
      * 
      * @param delegate the builder to delegate to
      */
     protected DelegatingSubmodelElementCollectionBuilder(SubmodelElementCollectionBuilder delegate) {
+        this(delegate, null);
+    }
+
+    /**
+     * Creates a delegating SMC builder.
+     * 
+     * @param delegate the builder to delegate to
+     * @param parent the parent builder for RBAC inheritance, may be <b>null</b> for none
+     */
+    protected DelegatingSubmodelElementCollectionBuilder(SubmodelElementCollectionBuilder delegate, 
+        AbstractDelegatingBuilder parent) {
+        super(parent);
         this.delegate = delegate;
     }
-    
+
     /**
      * Returns the builder this builder is delegating to.
      * 
@@ -63,7 +79,7 @@ public class DelegatingSubmodelElementCollectionBuilder implements SubmodelEleme
 
     @Override
     public PropertyBuilder createPropertyBuilder(String idShort) {
-        return delegate.createPropertyBuilder(idShort);
+        return rbac(delegate.createPropertyBuilder(idShort));
     }
 
     @Override
@@ -79,7 +95,7 @@ public class DelegatingSubmodelElementCollectionBuilder implements SubmodelEleme
 
     @Override
     public EntityBuilder createEntityBuilder(String idShort, EntityType type, Reference asset) {
-        return delegate.createEntityBuilder(idShort, type, asset);
+        return rbac(delegate.createEntityBuilder(idShort, type, asset));
     }
 
     @Override
@@ -89,7 +105,7 @@ public class DelegatingSubmodelElementCollectionBuilder implements SubmodelEleme
 
     @Override
     public OperationBuilder createOperationBuilder(String idShort) {
-        return delegate.createOperationBuilder(idShort);
+        return rbac(delegate.createOperationBuilder(idShort));
     }
 
     @Override
@@ -165,6 +181,36 @@ public class DelegatingSubmodelElementCollectionBuilder implements SubmodelEleme
     @Override
     public SubmodelElementCollectionBuilder setSemanticId(String refValue) {
         return delegate.setSemanticId(refValue);
+    }
+
+    @Override
+    public SubmodelElementCollectionBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
+        setAuthenticationDescriptor(auth);
+        return delegate.rbac(auth, role, actions);
+    }
+
+    @Override
+    public SubmodelElementCollectionBuilder rbac(AuthenticationDescriptor auth) {
+        setAuthenticationDescriptor(auth);
+        return delegate.rbac(auth);
+    }
+
+    @Override
+    public DelegatingSubmodelElementCollectionBuilder nextRbac(Role role, RbacAction... actions) {
+        super.nextRbac(new Role[] {role}, actions);
+        return this;
+    }
+
+    @Override
+    public DelegatingSubmodelElementCollectionBuilder nextRbac(Role[] roles, RbacAction... actions) {
+        super.nextRbac(roles, actions);
+        return this;
+    }
+
+    @Override
+    public DelegatingSubmodelElementCollectionBuilder setAuthenticationDescriptor(AuthenticationDescriptor authDesc) {
+        super.setAuthenticationDescriptor(authDesc);
+        return this;
     }
 
 }

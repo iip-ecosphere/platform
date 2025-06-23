@@ -146,6 +146,11 @@ public class FakeAas extends FakeElement implements Aas {
             return this;
         }
 
+        @Override
+        public AasBuilder rbac(AuthenticationDescriptor auth) {
+            return this; // usually not needed
+        }
+
     }
     
     /**
