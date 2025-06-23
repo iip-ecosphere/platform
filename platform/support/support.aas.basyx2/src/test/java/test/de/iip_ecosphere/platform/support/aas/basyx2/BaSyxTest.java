@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.support.aas.basyx2;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.Endpoint;
@@ -77,6 +78,7 @@ public class BaSyxTest extends AasTest {
     /**
      * Tests starting/stopping the BaSyx servers.
      */
+    @Ignore("Just for development")
     @Test
     public void testServers() {
         BasicSetupSpec spec = new BasicSetupSpec(new Endpoint(Schema.HTTP, ""), new Endpoint(Schema.HTTP, ""), 
