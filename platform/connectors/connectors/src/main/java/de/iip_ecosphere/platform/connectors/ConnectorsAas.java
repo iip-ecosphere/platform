@@ -93,11 +93,13 @@ public class ConnectorsAas implements AasContributor {
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         // BaSyx: shall not be here, but there seems to be a problem creating a SubModel after first deployment
-        SubmodelBuilder tsmB = aasBuilder.createSubmodelBuilder(ClassUtility.NAME_TYPE_SUBMODEL, null);
+        SubmodelBuilder tsmB = aasBuilder.createSubmodelBuilder(ClassUtility.NAME_TYPE_SUBMODEL, null)
+            .rbacPlatform(getSubmodelAuthentication());
         if (tsmB.isNew()) { // incremental remote deployment, avoid double creation
             tsmB.build();
             
-            SubmodelBuilder ismB = aasBuilder.createSubmodelBuilder(NAME_DESCRIPTORS_SUBMODEL, null);
+            SubmodelBuilder ismB = aasBuilder.createSubmodelBuilder(NAME_DESCRIPTORS_SUBMODEL, null)
+                .rbacPlatform(getSubmodelAuthentication());
             Iterator<ConnectorDescriptor> iter = ConnectorRegistry.getRegisteredConnectorDescriptors();
             while (iter.hasNext()) {
                 ConnectorDescriptor desc = iter.next();
