@@ -141,7 +141,8 @@ public class ServicesAas implements AasContributor {
         ServiceManager mgr = ServiceFactory.getServiceManager();
         if (null != mgr) { // this shall not be needed, but if the Jar is present, the contributor will be executed 
             // operations contribute to the operation of the underlying resource (Service JVM or ECS Runtime JVM)
-            SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_RESOURCES, ID_SUBMODEL);
+            SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_RESOURCES, ID_SUBMODEL)
+                .rbacPlatform(getSubmodelAuthentication());
             SubmodelElementCollectionBuilder deviceB 
                 = smB.createSubmodelElementCollectionBuilder(Id.getDeviceIdAas());
             // #115 remove as legacy
@@ -211,22 +212,22 @@ public class ServicesAas implements AasContributor {
             .setInvocable(iCreator.createInvocable(getQName(NAME_OP_ARTIFACT_ADD)))
             .addInputVariable("url", Type.STRING)
             .addOutputVariable("result", Type.STRING)
-            .build();
+            .build(getSubmodelAuthentication());
         // probably relevant ops only
         builder.createOperationBuilder(NAME_OP_ARTIFACT_ADD_TASK)
             .setInvocable(iCreator.createInvocable(getQName(NAME_OP_ARTIFACT_ADD_TASK)))
             .addInputVariable("url", Type.STRING)
             .addInputVariable("taskId", Type.STRING)
             .addOutputVariable("result", Type.STRING)
-            .build();
+            .build(getSubmodelAuthentication());
         builder.createOperationBuilder(NAME_OP_SERVICE_INSTANCE_COUNT)
             .setInvocable(iCreator.createInvocable(getQName(NAME_OP_SERVICE_INSTANCE_COUNT)))
             .addInputVariable("id", Type.STRING)
-            .build(Type.STRING);
+            .build(Type.STRING, getSubmodelAuthentication());
         builder.createOperationBuilder(NAME_OP_SERVICE_STATE_COUNT)
             .setInvocable(iCreator.createInvocable(getQName(NAME_OP_SERVICE_STATE_COUNT)))
             .addInputVariable("state", Type.STRING)
-            .build(Type.STRING);
+            .build(Type.STRING, getSubmodelAuthentication());
         createIdOp(builder, NAME_OP_ARTIFACT_REMOVE, iCreator);
         createIdOp(builder, NAME_OP_ARTIFACT_REMOVE_TASK, iCreator, "taskId");
         builder.createPropertyBuilder(NAME_PROP_SUPPORTED_APPIDS)
@@ -251,8 +252,9 @@ public class ServicesAas implements AasContributor {
         for (String p : otherParams) {
             oBuilder.addInputVariable(p, Type.STRING);
         }
-        oBuilder.addOutputVariable("result", Type.STRING);
-        oBuilder.build();
+        oBuilder
+            .addOutputVariable("result", Type.STRING)
+            .build(getSubmodelAuthentication());
     }
 
     /**

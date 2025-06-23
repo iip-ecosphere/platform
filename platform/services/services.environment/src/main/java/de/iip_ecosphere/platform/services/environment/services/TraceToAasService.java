@@ -41,6 +41,7 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
@@ -319,18 +320,22 @@ public class TraceToAasService extends AbstractService {
         AasSetup aasSetup = Starter.getSetup().getAas();
         new Thread(() -> { // may block
             try {
+                AuthenticationDescriptor aDesc = AasPartRegistry.getSubmodelAuthentication();
                 AasFactory factory = AasFactory.getInstance();
                 AasBuilder aasBuilder = factory.createAasBuilder(getAasId(), getAasUrn());
                 SubmodelBuilder smBuilder = PlatformAas.createNameplate(aasBuilder, appSetup);
                 PlatformAas.addSoftwareInfo(smBuilder, appSetup);
                 smBuilder.build();
-                smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_COMMANDS, null);
+                smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_COMMANDS, null)
+                    .rbacPlatform(aDesc);
                 augmentCommandsSubmodel(smBuilder);
                 smBuilder.build();                
-                smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_SERVICES, null);
+                smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_SERVICES, null)
+                    .rbacPlatform(aDesc);
                 augmentServicesSubmodel(smBuilder);
                 smBuilder.build();
-                SubmodelBuilder convSubmodel = aasBuilder.createSubmodelBuilder(SUBMODEL_TRACES, null);
+                SubmodelBuilder convSubmodel = aasBuilder.createSubmodelBuilder(SUBMODEL_TRACES, null)
+                    .rbacPlatform(aDesc);
                 converter.initializeSubmodel(convSubmodel);
                 convSubmodel.build();
                 Aas aas = aasBuilder.build();
@@ -609,15 +614,16 @@ public class TraceToAasService extends AbstractService {
         @Override
         protected void populateSubmodelElementCollection(SubmodelElementContainerBuilder smcBuilder, 
             TraceRecord data) {
+            AuthenticationDescriptor aDesc = AasPartRegistry.getSubmodelAuthentication();
             smcBuilder.createPropertyBuilder(PROPERTY_SOURCE)
                 .setValue(Type.STRING, data.getSource())
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ACTION)
                 .setValue(Type.STRING, data.getAction())
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_TIMESTAMP)
                 .setValue(Type.INT64, data.getTimestamp())
-                .build();
+                .build(aDesc);
             if (null != data.getPayload()) {
                 Class<?> cls = data.getPayload().getClass();
                 smcBuilder.createPropertyBuilder(PROPERTY_PAYLOAD_TYPE)
