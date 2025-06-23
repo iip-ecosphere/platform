@@ -42,6 +42,7 @@ import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationInstanceAasConstructor;
@@ -89,7 +90,9 @@ public class PlatformAas implements AasContributor {
     
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
-        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_ARTIFACTS, null);
+        AuthenticationDescriptor aDesc = getSubmodelAuthentication();
+        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_ARTIFACTS, null)
+            .rbacPlatform(aDesc);
 
         smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICE_ARTIFACTS).build();
         smB.createSubmodelElementCollectionBuilder(NAME_COLL_CONTAINER).build();
@@ -98,49 +101,52 @@ public class PlatformAas implements AasContributor {
         smB.createOperationBuilder(NAME_OPERATION_DEPLOY)
             .addInputVariable("url", Type.STRING)
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_DEPLOY))
-            .build(Type.STRING);
+            .build(Type.STRING, aDesc);
         smB.createOperationBuilder(NAME_OPERATION_UNDEPLOY)
             .addInputVariable("url", Type.STRING)
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_UNDEPLOY))
-            .build();
+            .build(aDesc);
         smB.createOperationBuilder(NAME_OPERATION_UNDEPLOY_WITHID)
             .addInputVariable("url", Type.STRING)
             .addInputVariable("instanceId", Type.STRING)
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_UNDEPLOY))
-            .build();
+            .build(aDesc);
         smB.createOperationBuilder(NAME_OPERATION_DEPLOY_ASYNC)
             .addInputVariable("url", Type.STRING)
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_DEPLOY_ASYNC))
-            .build(Type.STRING);
+            .build(Type.STRING, aDesc);
         smB.createOperationBuilder(NAME_OPERATION_UNDEPLOY_ASYNC)
             .addInputVariable("url", Type.STRING)
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_UNDEPLOY_ASYNC))
-            .build(Type.STRING);
+            .build(Type.STRING, aDesc);
         smB.createOperationBuilder(NAME_OPERATION_UNDEPLOY_WITHID_ASYNC)
             .addInputVariable("url", Type.STRING)
             .addInputVariable("instanceId", Type.STRING)
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_UNDEPLOY_WITHID_ASYNC))
-            .build(Type.STRING);
+            .build(Type.STRING, aDesc);
         smB.createOperationBuilder(NAME_OPERATION_GET_TASK_STATUS)
             .addInputVariable("taskId", Type.STRING)
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_GET_TASK_STATUS))
-            .build(Type.STRING);
+            .build(Type.STRING, aDesc);
         smB.createOperationBuilder(NAME_OPERATION_UPLOAD)
             .addInputVariable("kind", Type.STRING)
             .addInputVariable("sequenceNr", Type.INTEGER)
             .addInputVariable("name", Type.STRING)
             .addInputVariable("data", Type.STRING)
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_UPLOAD))
-            .build();
+            .build(aDesc);
         smB.build();
         
         // just that they are there
-        SubmodelBuilder statusBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_STATUS, null);
+        SubmodelBuilder statusBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_STATUS, null)
+            .rbacPlatform(getSubmodelAuthentication());
         PlatformSetup setup = PlatformSetup.getInstance();
         TransportConverter.addEndpointToAas(statusBuilder, TransportConverterFactory.getInstance().
             getGatewayEndpoint(setup.getAas(), setup.getTransport(), PlatformSetup.GATEWAY_PATH_STATUS));
         statusBuilder.build();
-        aasBuilder.createSubmodelBuilder(ApplicationInstanceAasConstructor.NAME_SUBMODEL_APPINSTANCES, null).build();
+        aasBuilder.createSubmodelBuilder(ApplicationInstanceAasConstructor.NAME_SUBMODEL_APPINSTANCES, null)
+            .rbacPlatform(getSubmodelAuthentication())
+            .build();
         return null;
     }
 

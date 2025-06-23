@@ -54,32 +54,34 @@ public class DeviceRegistryAas implements AasContributor {
      */
     @Override
     public Aas contributeTo(Aas.AasBuilder aasBuilder, InvocablesCreator iCreator) {
-        Submodel.SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
+        AuthenticationDescriptor aDesc = getSubmodelAuthentication();
+        Submodel.SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)
+            .rbacDevice(aDesc); // currently all, deviceMgt
 
         SubmodelElementCollectionBuilder registryColl = smB
-                .createSubmodelElementCollectionBuilder(NAME_COLL_DEVICE_REGISTRY);
+            .createSubmodelElementCollectionBuilder(NAME_COLL_DEVICE_REGISTRY);
 
         registryColl.createOperationBuilder(NAME_OP_DEVICE_ADD)
-                .setInvocable(iCreator.createInvocable(getQName(NAME_OP_DEVICE_ADD)))
-                .addInputVariable("deviceId", Type.STRING)
-                .addInputVariable("deviceIp", Type.STRING)
-                .build();
+            .setInvocable(iCreator.createInvocable(getQName(NAME_OP_DEVICE_ADD)))
+            .addInputVariable("deviceId", Type.STRING)
+            .addInputVariable("deviceIp", Type.STRING)
+            .build(aDesc);
 
         registryColl.createOperationBuilder(NAME_OP_DEVICE_REMOVE)
-                .setInvocable(iCreator.createInvocable(getQName(NAME_OP_DEVICE_REMOVE)))
-                .addInputVariable("deviceId", Type.STRING)
-                .build();
+            .setInvocable(iCreator.createInvocable(getQName(NAME_OP_DEVICE_REMOVE)))
+            .addInputVariable("deviceId", Type.STRING)
+            .build(aDesc);
 
         registryColl.createOperationBuilder(NAME_OP_IM_ALIVE)
-                .setInvocable(iCreator.createInvocable(getQName(NAME_OP_IM_ALIVE)))
-                .addInputVariable("deviceId", Type.STRING)
-                .build();
+            .setInvocable(iCreator.createInvocable(getQName(NAME_OP_IM_ALIVE)))
+            .addInputVariable("deviceId", Type.STRING)
+            .build(aDesc);
 
         registryColl.createOperationBuilder(NAME_OP_SEND_TELEMETRY)
-                .setInvocable(iCreator.createInvocable(getQName(NAME_OP_SEND_TELEMETRY)))
-                .addInputVariable("deviceId", Type.STRING)
-                .addInputVariable("telemetryData", Type.STRING)
-                .build();
+            .setInvocable(iCreator.createInvocable(getQName(NAME_OP_SEND_TELEMETRY)))
+            .addInputVariable("deviceId", Type.STRING)
+            .addInputVariable("telemetryData", Type.STRING)
+            .build(aDesc);
 
         registryColl.build();
 
@@ -95,32 +97,32 @@ public class DeviceRegistryAas implements AasContributor {
     @Override
     public void contributeTo(ProtocolServerBuilder sBuilder) {
         sBuilder.defineOperation(getQName(NAME_OP_DEVICE_ADD),
-                new JsonResultWrapper(p -> {
-                    DeviceRegistrationResponse resp = DeviceRegistryFactory.getDeviceRegistry().addDevice(
-                        readString(p), readString(p, 1));
-                    return JsonUtils.toJson(resp);
-                })
+            new JsonResultWrapper(p -> {
+                DeviceRegistrationResponse resp = DeviceRegistryFactory.getDeviceRegistry().addDevice(
+                    readString(p), readString(p, 1));
+                return JsonUtils.toJson(resp);
+            })
         );
 
         sBuilder.defineOperation(getQName(NAME_OP_DEVICE_REMOVE),
-                new JsonResultWrapper(p -> {
-                    DeviceRegistryFactory.getDeviceRegistry().removeDevice(readString(p));
-                    return null;
-                })
+            new JsonResultWrapper(p -> {
+                DeviceRegistryFactory.getDeviceRegistry().removeDevice(readString(p));
+                return null;
+            })
         );
 
         sBuilder.defineOperation(getQName(NAME_OP_IM_ALIVE),
-                new JsonResultWrapper(p -> {
-                    DeviceRegistryFactory.getDeviceRegistry().imAlive(readString(p));
-                    return null;
-                })
+            new JsonResultWrapper(p -> {
+                DeviceRegistryFactory.getDeviceRegistry().imAlive(readString(p));
+                return null;
+            })
         );
 
         sBuilder.defineOperation(getQName(NAME_OP_SEND_TELEMETRY),
-                new JsonResultWrapper(p -> {
-                    DeviceRegistryFactory.getDeviceRegistry().sendTelemetry(readString(p), readString(p, 1));
-                    return null;
-                })
+            new JsonResultWrapper(p -> {
+                DeviceRegistryFactory.getDeviceRegistry().sendTelemetry(readString(p), readString(p, 1));
+                return null;
+            })
         );
     }
 
@@ -162,20 +164,22 @@ public class DeviceRegistryAas implements AasContributor {
      */
     public static void notifyDeviceAdded(String managedId, String resourceId, String resourceIp) {
         ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
-            Submodel.SubmodelBuilder resources = aas.createSubmodelBuilder(NAME_SUBMODEL, null);
+            AuthenticationDescriptor aDesc = AasPartRegistry.getSubmodelAuthentication(); 
+            Submodel.SubmodelBuilder resources = aas.createSubmodelBuilder(NAME_SUBMODEL, null)
+                .rbacDevice(aDesc);
             SubmodelElementCollectionBuilder registry = resources
-                    .createSubmodelElementCollectionBuilder(NAME_COLL_DEVICE_REGISTRY);
+                .createSubmodelElementCollectionBuilder(NAME_COLL_DEVICE_REGISTRY);
 
             SubmodelElementCollectionBuilder device = resources
                 .createSubmodelElementCollectionBuilder(fixId(resourceId));
 
             device.createPropertyBuilder(NAME_PROP_MANAGED_DEVICE_ID)
-                    .setValue(Type.STRING, managedId)
-                    .build();
+                .setValue(Type.STRING, managedId)
+                .build(aDesc);
 
             device.createPropertyBuilder(NAME_PROP_DEVICE_IP)
-                    .setValue(Type.STRING, resourceIp)
-                    .build();
+                .setValue(Type.STRING, resourceIp)
+                .build(aDesc);
 
             device.build();
             registry.build();

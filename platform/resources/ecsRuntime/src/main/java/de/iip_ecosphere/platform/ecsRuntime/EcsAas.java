@@ -29,6 +29,7 @@ import de.iip_ecosphere.platform.ecsRuntime.deviceAas.DeviceAasProvider;
 import de.iip_ecosphere.platform.ecsRuntime.ssh.RemoteAccessServerFactory;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.support.aas.Aas;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
@@ -97,10 +98,14 @@ public class EcsAas implements AasContributor {
     private static final String ID_SUBMODEL = null; // take the short name, shall become public and an URN later
     private static boolean enabled = false;
     
+    // checkstyle: stop method length check
+    
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
+        AuthenticationDescriptor aDesc = getSubmodelAuthentication(); 
         ContainerManager mgr = EcsFactory.getContainerManager();
-        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
+        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)
+            .rbacPlatform(aDesc);
         smB.createSubmodelElementCollectionBuilder(NAME_COLL_CONTAINERS).build(); // ensure exist
         SubmodelElementCollectionBuilder jB = smB.createSubmodelElementCollectionBuilder(Id.getDeviceIdAas());
         //MetricsAasConstructor.addProviderMetricsToAasSubmodel(jB, iCreator, null, s -> getQName(s));
@@ -110,37 +115,37 @@ public class EcsAas implements AasContributor {
         jB.createPropertyBuilder(NAME_PROP_CSYS_NAME)
             .setValue(Type.STRING, null == mgr ? "none" : mgr.getContainerSystemName())
             .setSemanticId(Irdi.AAS_IRDI_PROPERTY_SOFTWARE_NAME)
-            .build();
+            .build(aDesc);
         SystemMetrics sysM = SystemMetricsFactory.getSystemMetrics();
         jB.createPropertyBuilder(NAME_PROP_OPERATING_SYSTEM)
             .setValue(Type.STRING, sysM.getOsName())
             .setSemanticId(Irdi.AAS_IRDI_PROPERTY_SOFTWARE_NAME)
-            .build();
+            .build(aDesc);
         jB.createPropertyBuilder(NAME_PROP_CPU_ARCHITECTURE)
             .setValue(Type.STRING, sysM.getOsArch())
-            .build();
+            .build(aDesc);
         jB.createPropertyBuilder(NAME_PROP_CPU_CAPACITY)
             .setValue(Type.INTEGER, sysM.getNumCpuCores())
-            .build();
+            .build(aDesc);
         jB.createPropertyBuilder(NAME_PROP_GPU_CAPACITY)
             .setValue(Type.INTEGER, sysM.getNumGpuCores())
-            .build();
+            .build(aDesc);
         jB.createPropertyBuilder(NAME_PROP_RUNTIME_NAME)
             .setValue(Type.STRING, null == mgr ? "none" : mgr.getRuntimeName())
             .setSemanticId(Irdi.AAS_IRDI_PROPERTY_SOFTWARE_NAME)
-            .build();
+            .build(aDesc);
         jB.createPropertyBuilder(NAME_PROP_RUNTIME_VERSION)
             .setValue(Type.STRING, null == mgr ? "?" : mgr.getVersion())
             .setSemanticId(Irdi.AAS_IRDI_PROPERTY_SOFTWARE_VERSION)
-            .build();
+            .build(aDesc);
         jB.createPropertyBuilder(NAME_PROP_DEVICE_AAS)
             .setValue(Type.STRING, DeviceAasProvider.getInstance().getDeviceAasAddress())
-            .build();
+            .build(aDesc);
         jB.createOperationBuilder(NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS)
             .setInvocable(iCreator.createInvocable(getQName(NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS)))
             .addOutputVariable("username", Type.STRING)
             .addOutputVariable("password", Type.STRING)
-            .build();
+            .build(aDesc);
         if (null != mgr) {
             jB.createPropertyBuilder(NAME_PROP_CSYS_VERSION)
                 .setValue(Type.STRING, mgr.getContainerSystemVersion())
@@ -157,16 +162,16 @@ public class EcsAas implements AasContributor {
             jB.createOperationBuilder(NAME_OP_CONTAINER_ADD)
                 .setInvocable(iCreator.createInvocable(getQName(NAME_OP_CONTAINER_ADD)))
                 .addInputVariable("url", Type.STRING)
-                .build(Type.STRING);
+                .build(Type.STRING, aDesc);
             jB.createOperationBuilder(NAME_OP_CONTAINER_GETID)
                 .setInvocable(iCreator.createInvocable(getQName(NAME_OP_CONTAINER_GETID)))
                 .addInputVariable("url", Type.STRING)
-                .build(Type.STRING);
+                .build(Type.STRING, aDesc);
             jB.createOperationBuilder(NAME_OP_CONTAINER_ADD_TASK)
                 .setInvocable(iCreator.createInvocable(getQName(NAME_OP_CONTAINER_ADD_TASK)))
                 .addInputVariable("url", Type.STRING)
                 .addInputVariable("taskId", Type.STRING)
-                .build(Type.STRING);
+                .build(Type.STRING, aDesc);
         }
         jB.build();
         if (null != mgr) {
@@ -177,6 +182,8 @@ public class EcsAas implements AasContributor {
         smB.defer(); // join with services if present, build done by AAS
         return null;
     }
+
+    // checkstyle: resume method length check
 
     @Override
     public void contributeTo(ProtocolServerBuilder sBuilder) {
@@ -294,8 +301,9 @@ public class EcsAas implements AasContributor {
         for (String p : otherParams) {
             oBuilder.addInputVariable(p, Type.STRING);
         }
-        oBuilder.addOutputVariable("result", Type.STRING);
-        oBuilder.build();
+        oBuilder.addOutputVariable("result", Type.STRING)
+            .rbacAllAuthenticated(getSubmodelAuthentication())
+            .build();
     }
 
     /**

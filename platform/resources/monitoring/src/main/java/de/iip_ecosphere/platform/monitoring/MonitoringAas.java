@@ -31,6 +31,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.transport.Transport;
@@ -138,74 +139,75 @@ public class MonitoringAas implements AasContributor {
     private void handleNew(Alert data) {
         try {
             Aas aas = AasPartRegistry.retrieveIipAas();
-            SubmodelBuilder smBuilder = aas.createSubmodelBuilder(SUBMODEL_MONITORING, null);
+            AuthenticationDescriptor aDesc = getSubmodelAuthentication(); 
+            SubmodelBuilder smBuilder = aas.createSubmodelBuilder(SUBMODEL_MONITORING, null)
+                .rbacPlatform(aDesc);
             SubmodelElementListBuilder smcBuilder = smBuilder.createSubmodelElementListBuilder(SMEC_ALERTS);
             SubmodelElementListBuilder entryBuilder = smBuilder.createSubmodelElementListBuilder(
                 AasUtils.fixId("Alert_" + data.getTimestamp())); // may also be UID
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_UID)
                 .setValue(Type.STRING, safe(data.getUid()))
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_CORRELATION_ID)
                 .setValue(Type.STRING, safe(data.getCorrelationId()))
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_TIMESTAMP)
                 .setValue(Type.INTEGER, data.getTimestamp())
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_FIRSTTIMESTAMP)
                 .setValue(Type.INTEGER, data.getFirstTimestamp())
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_LASTTIMESTAMP)
                 .setValue(Type.INTEGER, data.getLastTimestamp())
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_CLEARTIMESTAMP)
                 .setValue(Type.INTEGER, data.getClearTimestamp())
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_SOURCE)
                 .setValue(Type.STRING, safe(data.getSource()))
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_NAME)
                 .setValue(Type.STRING, safe(data.getAlertname()))
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_INFO)
                 .setValue(Type.STRING, safe(data.getInfo()))
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_INSTANCE)
                 .setValue(Type.STRING, safe(data.getInstance()))
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_SEVERITY)
                 .setValue(Type.STRING, safe(data.getSeverity()))
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_PRIORITY)
                 .setValue(Type.STRING, safe(data.getPriority()))
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_TAGS)
                 .setValue(Type.STRING, safe(data.getTags()))
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_DESCRIPTION)
                 .setValue(Type.STRING, safe(data.getDescription()))
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_EVENT_TYPE)
                 .setValue(Type.STRING, safe(data.getEventType()))
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_PROBABLE_CAUSE)
                 .setValue(Type.STRING, safe(data.getProbableCause()))
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_CURRENT_VALUE)
                 .setValue(Type.STRING, safe(data.getCurrentValue()))
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_URL)
                 .setValue(Type.STRING, safe(data.getUrl()))
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_STATUS)
                 .setValue(Type.STRING, safe(data.getStatus()))
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_RULE_EXPRESSION)
                 .setValue(Type.STRING, safe(data.getRuleExpression()))
-                .build();
+                .build(aDesc);
             smcBuilder.createPropertyBuilder(PROPERTY_ALERT_RULE_TIME_LIMIT)
                 .setValue(Type.STRING, safe(data.getRuleTimeLimit()))
-                .build();
-            
+                .build(aDesc);
             entryBuilder.build();
             smcBuilder.build();
             smBuilder.build();

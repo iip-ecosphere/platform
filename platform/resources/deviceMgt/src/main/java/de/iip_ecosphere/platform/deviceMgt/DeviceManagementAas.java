@@ -51,26 +51,28 @@ public class DeviceManagementAas implements AasContributor {
      */
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
-        Submodel.SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null);
+        AuthenticationDescriptor aDesc = getSubmodelAuthentication(); 
+        Submodel.SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)
+            .rbacDevice(aDesc);
 
         SubmodelElementCollection.SubmodelElementCollectionBuilder deviceManager =
-                smB.createSubmodelElementCollectionBuilder(NAME_COLL_DEVICE_MANAGER);
+            smB.createSubmodelElementCollectionBuilder(NAME_COLL_DEVICE_MANAGER);
 
         deviceManager.createOperationBuilder(NAME_OP_UPDATE_RUNTIME)
-                .setInvocable(iCreator.createInvocable(getQName(NAME_OP_UPDATE_RUNTIME)))
-                .addInputVariable("deviceId", Type.STRING)
-                .build();
+            .setInvocable(iCreator.createInvocable(getQName(NAME_OP_UPDATE_RUNTIME)))
+            .addInputVariable("deviceId", Type.STRING)
+            .build(aDesc);
         
         deviceManager.createOperationBuilder(NAME_OP_ESTABLISH_SSH)
-                .setInvocable(iCreator.createInvocable(getQName(NAME_OP_ESTABLISH_SSH)))
-                .addInputVariable("deviceId", Type.STRING)
-                .build(Type.STRING);
+            .setInvocable(iCreator.createInvocable(getQName(NAME_OP_ESTABLISH_SSH)))
+            .addInputVariable("deviceId", Type.STRING)
+            .build(Type.STRING, aDesc);
         
         deviceManager.createOperationBuilder(NAME_OP_SET_CONFIG)
-                .setInvocable(iCreator.createInvocable(getQName(NAME_OP_SET_CONFIG)))
-                .addInputVariable("deviceId", Type.STRING)
-                .addInputVariable("configPath", Type.STRING)
-                .build();
+            .setInvocable(iCreator.createInvocable(getQName(NAME_OP_SET_CONFIG)))
+            .addInputVariable("deviceId", Type.STRING)
+            .addInputVariable("configPath", Type.STRING)
+            .build(aDesc);
         
         deviceManager.build();
 
@@ -123,8 +125,8 @@ public class DeviceManagementAas implements AasContributor {
         ActiveAasBase.processNotification(AasPartRegistry.NAME_SUBMODEL_RESOURCES, (sub, aas) -> {
             try {
                 sub.getSubmodelElementCollection(id)
-                        .getOperation("setConfig")
-                        .invoke(downloadUri, location);
+                    .getOperation("setConfig")
+                    .invoke(downloadUri, location);
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
