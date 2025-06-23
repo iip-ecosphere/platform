@@ -48,8 +48,8 @@ goto :answerDocker
 
 :endDockerCheck
 
-if not exist "Platform" mkdir "Platform"
-cd Platform
+if not exist "Setup" mkdir "Setup"
+cd Setup
 
 set /a javaLimit=17
 set RecommendMvn=3.9.7
@@ -340,11 +340,7 @@ IF %ERRORLEVEL% NEQ 0 (
 
 :NodeEnd
 
-if not exist "Install" mkdir "Install"
-cd Install
-
-curl https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/platform/tools/Install/install.zip -o install.zip
-tar xzpvf install.zip
+cd ..
 
 cd platformDependencies/
 python -m pip install -r requirements.txt
