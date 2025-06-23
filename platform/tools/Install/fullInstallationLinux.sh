@@ -1,9 +1,136 @@
 #!/bin/bash
 
+set -e
+
+# Installation functions
+
+install_docker_version() {
+  DOCKER_SHORT_VERSION="$1"
+  if [[ -z "$DOCKER_SHORT_VERSION" ]]; then
+    echo "[ERROR] No Docker version provided."
+    echo "Usage: install_docker_version <version>, e.g., install_docker_version 20.10.7"
+    return 1
+  fi
+
+  # Convert to full APT version prefix
+  DOCKER_VERSION="5:${DOCKER_SHORT_VERSION}~3-0"
+  REPO_URL="https://download.docker.com/linux"
+
+  # Detect OS and codename
+  source /etc/os-release
+  OS_ID="${ID,,}"
+  CODENAME="${VERSION_CODENAME:-$(lsb_release -cs)}"
+
+  echo "[INFO] Detected OS: $OS_ID, Codename: $CODENAME"
+
+  # Compose full package version
+  if [[ "$OS_ID" == "debian" || "$OS_ID" == "ubuntu" ]]; then
+    DOCKER_PKG_VERSION="${DOCKER_VERSION}~${OS_ID}-${CODENAME}"
+  else
+    echo "[ERROR] Unsupported OS: $OS_ID"
+    return 1
+  fi
+
+  sudo apt update
+  sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release wget
+
+  sudo mkdir -p /etc/apt/keyrings
+  curl -fsSL $REPO_URL/$OS_ID/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+  echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] $REPO_URL/$OS_ID \
+    $CODENAME stable" | \
+    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+  sudo apt update
+
+  if apt-cache madison docker-ce | grep -q "$DOCKER_PKG_VERSION"; then
+    echo "[INFO] Found Docker $DOCKER_PKG_VERSION in APT. Installing..."
+    sudo apt install -y \
+      docker-ce="$DOCKER_PKG_VERSION" \
+      docker-ce-cli="$DOCKER_PKG_VERSION" \
+      containerd.io
+  else
+    DOCKER_VERSION="${DOCKER_SHORT_VERSION}~3-0"
+    DOCKER_PKG_VERSION="${DOCKER_VERSION}~${OS_ID}-${CODENAME}"
+
+    mkdir -p docker-debs && cd docker-debs
+
+    # Build Debian package URLs using Bullseye as fallback
+    BASE_URL="https://download.docker.com/linux/debian/dists/bullseye/pool/stable/amd64"
+    echo "[INFO] Downloading .deb packages for Docker $DOCKER_SHORT_VERSION..."
+    wget "$BASE_URL/containerd.io_1.4.6-1_amd64.deb"
+    wget "$BASE_URL/docker-ce-cli_${DOCKER_VERSION}~debian-bullseye_amd64.deb"
+    wget "$BASE_URL/docker-ce_${DOCKER_VERSION}~debian-bullseye_amd64.deb"
+    wget "$BASE_URL/docker-ce-rootless-extras_${DOCKER_VERSION}~debian-bullseye_amd64.deb"
+
+    echo "[INFO] Installing downloaded .deb packages..."
+    sudo apt install -y ./containerd.io_1.4.6-1_amd64.deb \
+                        ./docker-ce-cli_${DOCKER_VERSION}~debian-bullseye_amd64.deb \
+                        ./docker-ce_${DOCKER_VERSION}~debian-bullseye_amd64.deb \
+                        ./docker-ce-rootless-extras_${DOCKER_VERSION}~debian-bullseye_amd64.deb
+
+    cd ..
+    # rm -rf docker-debs  # Optional cleanup
+  fi
+
+  sudo systemctl enable docker
+  sudo systemctl start docker
+
+  echo "Docker $DOCKER_SHORT_VERSION installation completed."
+}
+
+install_python_binary_version() {
+    sudo apt update -y
+    sudo apt install software-properties-common -y
+    sudo echo | add-apt-repository ppa:deadsnakes/ppa
+    sudo apt update -y
+    sudo apt install python3.9 -y
+    sudo wget https://bootstrap.pypa.io/get-pip.py
+    export IIP_PYTHON=$(which python3.9)
+    sudo $IIP_PYTHON get-pip.py
+    echo "Python 3.9 installation completed."
+}
+
+install_python_compile_sources_version() {
+    PYTHON_SHORT_VERSION="$1"
+    sudo apt update -y
+    sudo apt install -y build-essential libssl-dev zlib1g-dev \
+        libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
+        libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev \
+        libgdbm-dev liblzma-dev uuid-dev
+    sudo mkdir -p $CurPath/PyPaths/sources/python3.9
+    cd $CurPath/PyPaths/sources/python3.9
+    sudo wget https://www.python.org/ftp/python/${PYTHON_SHORT_VERSION}/Python-${PYTHON_SHORT_VERSION}.tgz
+    sudo tar xzf Python-${PYTHON_SHORT_VERSION}.tgz
+    cd Python-3.9.21
+    sudo ./configure --prefix=$CurPath/PyPaths/python3.9 --enable-optimizations --with-ensurepip=install
+    sudo make -j$(nproc)
+    sudo make altinstall
+    echo "Python $PYTHON_SHORT_VERSION installation completed."
+}
+
+install_confirm() {
+  local name="$1"
+  local yn="$2"
+  local version="$3"
+
+  case "$yn" in
+    [Yy])
+      echo "Installing $name $version"
+      ;;
+    [Ee])
+      echo "$name is already installed with accepted version, $name $version"
+      ;;
+  esac
+}
+
+# End of installation function
+
+# Start of platform installation
+
 echo "Oktoflow platform installation (Linux)"
 echo "For installing prerequisites, administrator permissions may be required!"
-
-mkdir -p Platform && cd Platform
 
 OktJavaVersion=17
 OktMvnVersion=3.9.7
@@ -17,6 +144,8 @@ echo "Installing prerequisites Java $OktJavaVersion, Maven version $OktMvnVersio
 echo "This action will set and use Environment Variables"
 read -p "Do you want to install the prerequisites (skip only if already installed)? (y/n) " yn
 if [ $yn == "y" ] || [ $yn == "Y" ]; then 
+    
+    mkdir -p Setup && cd Setup
     
     # Check current Java version 
     
@@ -61,42 +190,21 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
         Mavenyn="Y";
     fi
     
-    # Check current Docker version 
-
-    if [ -x "$(command -v docker --version)" ]; then
-        DOCKER_VERSION=$(docker --version | grep -oP '[[:digit:]]{1,2}\.[[:digit:]]{1,2}\.[[:digit:]]{1,2}' | head -1)
-        if ! [ $DOCKER_VERSION == $OktDockerVersion ]; then
-            echo "You have Docker version $DOCKER_VERSION, it is recommended to have version $OktDockerVersion"
-            while true; do
-                read -p "Do you want to install Docker $OktDockerVersion and replace Docker default to $OktDockerVersion? - You might skip this step (y/n) " Dockeryn
-                case $Dockeryn in
-                    [Yy]* ) break;;
-                    [Nn]* ) break;;
-                    * ) echo "Please answer y or n.";;
-                esac
-            done
-        else
-            Dockeryn="E";
-        fi
-    else
-        Dockeryn="Y";
-    fi
-    
     # Check current Python version
 
     echo "Please enter the path for runnable python3.9 or newer. If python 3.9 or newer then please enter (n). "
-    read -p "Runnable python3.9: " PythonPath
+    read -p "Runnable python3.9 or newer: " PythonPath
     while [ -z "$PythonPath" ]; do
         echo "Please enter the path for runnable python3.9 or newer. If python 3.9 or newer then please enter (n). "
-        read -p "Runnable python3.9: " PythonPath
+        read -p "Runnable python3.9 or newer: " PythonPath
     done
 
-    if ! [[ "$PythonPath" == "N" || "$PythonPath" == "n" ]]; then
+    if [[ "$PythonPath" == "Y" || "$PythonPath" == "y" ]]; then
         while true; do
-            read -p "You have Python $OktPythonVersion installed in $PythonPath, correct (y/n)? " CheckPath
+            read -p "You have Python installed in $PythonPath, correct (y/n)? " CheckPath
             case $CheckPath in
                 [Yy]* ) break;;
-                [Nn]* ) read -p "please enter the correct path for runnable python3.9: " PythonPath;;
+                [Nn]* ) read -p "please enter the correct path for runnable python3.9 or newer: " PythonPath;;
                 * ) echo "Please answer y or n.";;
             esac
         done
@@ -119,11 +227,16 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
                 echo "Please choose: (A) Take the most recent 3.9.x (untested), (B) Download source and compile 3.9.21 (It takes more time)."
                 while true; do
                     read -p "Please choose how to install python (A/B): " PythonInstallModeab
-                    case $PythonInstallModeab in
-                        [Aa]* ) break;;
-                        [Bb]* ) break;;
-                        * ) echo "Please answer A or B.";;
-                    esac
+                    os_info=$(grep "^PRETTY_NAME=" /etc/os-release | cut -d= -f2- | tr -d '"')
+                    if [[ "$os_info" == *"Debian GNU/Linux"* && ( "$PythonInstallModeab" == "A" || "$PythonInstallModeab" == "a" ) ]]; then
+                        echo "Detected Debian: $os_info. Debian does not support method (A) to install 3.9.x"
+                    else
+                        case $PythonInstallModeab in
+                            [Aa]* ) break;;
+                            [Bb]* ) break;;
+                            * ) echo "Please answer A or B.";;
+                        esac
+                    fi
                 done
             fi
         else
@@ -134,12 +247,51 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
         echo "Please choose: (A) Take the most recent 3.9.x (untested), (B) Download source and compile 3.9.21 (It takes more time)."
         while true; do
             read -p "Please choose how to install python (A/B): " PythonInstallModeab
-            case $PythonInstallModeab in
-                [Aa]* ) break;;
-                [Bb]* ) break;;
-                * ) echo "Please answer A or B.";;
-            esac
+            os_info=$(grep "^PRETTY_NAME=" /etc/os-release | cut -d= -f2- | tr -d '"')
+            if [[ "$os_info" == *"Debian GNU/Linux"* && ( "$PythonInstallModeab" == "A" || "$PythonInstallModeab" == "a" ) ]]; then
+                echo "Detected Debian: $os_info. Debian does not support method (A) to install 3.9.x"
+            else
+                case $PythonInstallModeab in
+                    [Aa]* ) break;;
+                    [Bb]* ) break;;
+                    * ) echo "Please answer A or B.";;
+                esac
+            fi
         done
+    fi
+
+    while true; do
+        read -p "Do you want to install Docker $OktDockerVersion to use containers in the platform? - You might skip this step (y/n) " InstallDockeryn
+        case $InstallDockeryn in
+            [Yy]* ) break;;
+            [Nn]* ) break;;
+            * ) echo "Please answer y or n.";;
+        esac
+    done
+    
+    if [ $InstallDockeryn == "y" ] || [ $InstallDockeryn == "Y" ]; then 
+        # Check current Docker version 
+
+        if [ -x "$(command -v docker --version)" ]; then
+            DOCKER_VERSION=$(docker --version | grep -oP '[[:digit:]]{1,2}\.[[:digit:]]{1,2}\.[[:digit:]]{1,2}' | head -1)
+            if ! [ $DOCKER_VERSION == $OktDockerVersion ]; then
+                echo "You have Docker version $DOCKER_VERSION, it is recommended to have version $OktDockerVersion"
+                while true; do
+                    read -p "Do you want to install Docker $OktDockerVersion and replace Docker default to $OktDockerVersion? - You might skip this step (y/n) " Dockeryn
+                    case $Dockeryn in
+                        [Yy]* ) break;;
+                        [Nn]* ) break;;
+                        * ) echo "Please answer y or n.";;
+                    esac
+                done
+            else
+                Dockeryn="E";
+            fi
+        else
+            Dockeryn="Y";
+        fi
+    else
+        Dockeryn="N";
     fi
     
     # Check Docker Private Registry
@@ -208,36 +360,16 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
         fi
     fi
 
-    if [[ "$Javayn" == "Y" || "$Javayn" == "y" ]]; then
-        echo "Installing Java $OktJavaVersion"
-    elif [[ "$Javayn" == "E" || "$Javayn" == "e" ]]; then
-        echo "Java is already installed with accepted version, Java $JAVA_VERSION"
-    fi 
-    if [[ "$Mavenyn" == "Y" || "$Mavenyn" == "y" ]]; then
-        echo "Installing Maven $OktMvnVersion"
-    elif [[ "$Mavenyn" == "E" || "$Mavenyn" == "e" ]]; then
-        echo "Maven is already installed with accepted version, Maven $MVN_VERSION"
-    fi 
-    if [[ "$Dockeryn" == "Y" || "$Dockeryn" == "y" ]]; then
-        echo "Installing Maven $OktDockerVersion"
-    elif [[ "$Dockeryn" == "E" || "$Dockeryn" == "e" ]]; then
-        echo "Docker is already installed with accepted version, Docker $DOCKER_VERSION"
-    fi 
-    if [[ "$Pythonyn" == "Y" || "$Pythonyn" == "y" ]]; then
-        echo "Installing Python $OktPythonVersion"
-    elif [[ "$Pythonyn" == "E" || "$Pythonyn" == "e" ]]; then
-        echo "Python is already installed with accepted version, Python $PYTHON_VERSION"
-    fi 
-    if [[ "$Nodeyn" == "Y" || "$Nodeyn" == "y" ]]; then
-        echo "Installing Node.js 22.x (latest) version"
-    elif [[ "$Nodeyn" == "E" || "$Nodeyn" == "e" ]]; then
-        echo "Node.js is already installed with accepted version, Node.js $NODE_VERSION"
-    fi 
-    if [[ "$Angularyn" == "Y" || "$Angularyn" == "y" ]]; then
-        echo "Installing Angular $OktAngularVersion"
-    elif [[ "$Angularyn" == "E" || "$Angularyn" == "e" ]]; then
-        echo "Angular is already installed with accepted version, Angular $ANG_VERSION"
-    fi 
+    install_confirm "Java" "$Javayn" "$OktJavaVersion"
+    install_confirm "Maven" "$Mavenyn" "$OktMvnVersion"
+    install_confirm "Docker" "$Dockeryn" "$OktDockerVersion"
+    install_confirm "Python" "$Pythonyn" "$OktPythonVersion"
+    install_confirm "Node.js" "$Nodeyn" "$OktNodeVersion"
+    install_confirm "Angular" "$Angularyn" "$OktAngularVersion"
+
+    if [[ "$Registryyn" == "Y" || "$Registryyn" == "y" ]]; then
+      echo "Starting Docker Private Registry"
+    fi
     echo "Installing the Platform"
 
     read -p "Press Enter to start the installation..."
@@ -276,43 +408,12 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
     # Install Docker version 20.10.7
     
     if ! [ -x "$(command -v docker --version)" ]; then
-        sudo apt-get update -y
-        sudo apt-get install \
-            ca-certificates \
-            curl \
-            gnupg \
-            lsb-release -y
-    
-        sudo mkdir -p /etc/apt/keyrings
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-    
-        echo \
-          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-          $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    
-        sudo apt-get update -y
-    
-        sudo apt-get install docker-ce=5:20.10.7~3-0~ubuntu-focal docker-ce-cli=5:20.10.7~3-0~ubuntu-focal containerd.io docker-compose-plugin -y
+        install_docker_version $OktDockerVersion
     
         sudo usermod -aG docker $USER
     else
         case $Dockeryn in
-            [Yy]* ) sudo apt-get update -y;
-                    sudo apt-get install \
-                        ca-certificates \
-                        curl \
-                        gnupg \
-                        lsb-release -y;
-
-                    sudo mkdir -p /etc/apt/keyrings;
-                    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg;
-
-                    echo \
-                      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-                      $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null;
-
-                    sudo apt-get update -y;
-                    sudo apt-get install docker-ce=5:20.10.7~3-0~ubuntu-focal docker-ce-cli=5:20.10.7~3-0~ubuntu-focal containerd.io docker-compose-plugin -y;
+            [Yy]* ) install_docker_version $OktDockerVersion;
                     sudo usermod -aG docker $USER;;
             [Nn]* ) break;;
         esac
@@ -322,25 +423,13 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
     
     if [[ "$PythonInstallModeab" == "A" || "$PythonInstallModeab" == "a" ]]; then
         if ! [ -x "$(command -v $PythonPath --version)" ]; then
-            sudo apt update -y
-            sudo apt install software-properties-common -y
-            sudo echo | add-apt-repository ppa:deadsnakes/ppa
-            sudo apt update -y
-            sudo apt install python3.9 -y
-            sudo wget https://bootstrap.pypa.io/get-pip.py
-            sudo export IIP_PYTHON=$(which python3.9)
-            sudo $IIP_PYTHON get-pip.py
+            install_python_binary_version
+            export IIP_PYTHON=$(which python3.9)
             sudo $IIP_PYTHON -m pip install pyflakes
         else
             case $Pythonyn in
-                [Yy]* ) sudo apt update -y;
-                        sudo apt install software-properties-common -y;
-                        sudo echo | add-apt-repository ppa:deadsnakes/ppa;
-                        sudo apt update -y;
-                        sudo apt install python3.9 -y;
-                        sudo wget https://bootstrap.pypa.io/get-pip.py;
-                        sudo export IIP_PYTHON=$(which python3.9)
-                        sudo $IIP_PYTHON get-pip.py;
+                [Yy]* ) install_python_binary_version;
+                        export IIP_PYTHON=$(which python3.9);
                         sudo $IIP_PYTHON -m pip install pyflakes;;
                 [Nn]* ) break;;
             esac
@@ -349,36 +438,12 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
     elif [[ "$PythonInstallModeab" == "B" || "$PythonInstallModeab" == "b" ]]; then
         CurPath=$PWD
         if ! [ -x "$(command -v $PythonPath --version)" ]; then
-            sudo apt update -y
-            sudo apt install -y build-essential libssl-dev zlib1g-dev \
-                libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
-                libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev \
-                libgdbm-dev liblzma-dev uuid-dev
-            sudo mkdir -p $CurPath/PyPaths/sources/python3.9
-            cd $CurPath/PyPaths/sources/python3.9
-            sudo wget https://www.python.org/ftp/python/3.9.21/Python-3.9.21.tgz
-            sudo tar xzf Python-3.9.21.tgz
-            cd Python-3.9.21
-            sudo ./configure --prefix=$CurPath/PyPaths/python3.9 --enable-optimizations --with-ensurepip=install
-            sudo make -j$(nproc)
-            sudo make altinstall
+            install_python_compile_sources_version $OktPythonVersion
             export IIP_PYTHON=$CurPath/PyPaths/python3.9/bin/python3.9
             sudo $IIP_PYTHON -m pip install pyflakes
         else
             case $Pythonyn in
-                [Yy]* ) sudo apt update -y;
-                        sudo apt install -y build-essential libssl-dev zlib1g-dev \
-                            libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
-                            libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev \
-                            libgdbm-dev liblzma-dev uuid-dev;
-                        sudo mkdir -p $CurPath/PyPaths/sources/python3.9;
-                        cd $CurPath/PyPaths/sources/python3.9;
-                        sudo wget https://www.python.org/ftp/python/3.9.21/Python-3.9.21.tgz;
-                        sudo tar xzf Python-3.9.21.tgz;
-                        cd Python-3.9.21;
-                        sudo ./configure --prefix=$CurPath/PyPaths/python3.9 --enable-optimizations --with-ensurepip=install;
-                        sudo make -j$(nproc);
-                        sudo make altinstall;
+                [Yy]* ) install_python_compile_sources_version $OktPythonVersion;
                         export IIP_PYTHON=$CurPath/PyPaths/python3.9/bin/python3.9;
                         sudo $IIP_PYTHON -m pip install pyflakes;;
                 [Nn]* ) break;;
@@ -404,13 +469,10 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
     
     localIP=$(hostname -I | cut -d ' ' -f1)
 
-    mkdir Install && cd Install
-    
-    wget https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/platform/tools/Install/install.tar.gz
-    tar xzpvf install.tar.gz
+    cd ..
     
     cd platformDependencies/
-    python3 -m pip install -r requirements.txt
+    $IIP_PYTHON -m pip install -r requirements.txt
     cd ..
             
     sed -i 's/147.172.178.145/'$localIP'/g' src/main/easy/TechnicalSetup.ivml
@@ -447,10 +509,28 @@ EOF
     
     sudo mvn install -Diip.easy.tracing=TOP
     
-    sudo chown -R $USER ../Install
-    
 elif [ $yn == "n" ] || [ $yn == "N" ]; then 
 
+    mkdir -p Setup && cd Setup
+    
+    echo "Please enter the path for runnable python3.9 or newer."
+    read -p "Runnable python3.9: " PythonPath
+    while [ -z "$PythonPath" ]; do
+        echo "Please enter the path for runnable python3.9 or newer."
+        read -p "Runnable python3.9: " PythonPath
+    done
+
+    while true; do
+        read -p "You have runnable Python in $PythonPath, correct (y/n)? " CheckPath
+        case $CheckPath in
+            [Yy]* ) break;;
+            [Nn]* ) read -p "please enter the correct path for runnable python3.9: " PythonPath;;
+            * ) echo "Please answer y or n.";;
+        esac
+    done
+    
+    export IIP_PYTHON=$PythonPath
+    
     # Check Docker Private Registry
     if [ -x "$(command -v docker --version)" ]; then
        while true; do
@@ -520,16 +600,12 @@ elif [ $yn == "n" ] || [ $yn == "N" ]; then
         fi
     fi
 
-    if [[ "$Nodeyn" == "Y" || "$Nodeyn" == "y" ]]; then
-        echo "Installing Node.js 22.x (latest) version"
-    elif [[ "$Nodeyn" == "E" || "$Nodeyn" == "e" ]]; then
-        echo "Node.js is already installed with accepted version, Node.js $NODE_VERSION"
-    fi 
-    if [[ "$Angularyn" == "Y" || "$Angularyn" == "y" ]]; then
-        echo "Installing Angular $OktAngularVersion"
-    elif [[ "$Angularyn" == "E" || "$Angularyn" == "e" ]]; then
-        echo "Angular is already installed with accepted version, Angular $ANG_VERSION"
-    fi 
+    install_confirm "Node.js" "$Nodeyn" "$OktNodeVersion"
+    install_confirm "Angular" "$Angularyn" "$OktAngularVersion"
+
+    if [[ "$Registryyn" == "Y" || "$Registryyn" == "y" ]]; then
+      echo "Starting Docker Private Registry"
+    fi
     echo "Installing the Platform"
 
     read -p "Press Enter to start the installation..."
@@ -554,15 +630,12 @@ elif [ $yn == "n" ] || [ $yn == "N" ]; then
     
     localIP=$(hostname -I | cut -d ' ' -f1)
 
-    mkdir Install && cd Install
-    
-    wget https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/platform/tools/Install/install.tar.gz
-    tar xzpvf install.tar.gz
-
-    cd platformDependencies/
-    python3 -m pip install -r requirements.txt
     cd ..
-           
+    
+    cd platformDependencies/
+    $IIP_PYTHON -m pip install -r requirements.txt
+    cd ..
+
     sed -i 's/147.172.178.145/'$localIP'/g' src/main/easy/TechnicalSetup.ivml
 
     # Run Docker Private Registry
@@ -596,8 +669,6 @@ EOF
     esac
     
     sudo mvn install -Diip.easy.tracing=ALL
-    
-    sudo chown -R $USER ../Install
 
 else
     echo "Please answer y or n.";
