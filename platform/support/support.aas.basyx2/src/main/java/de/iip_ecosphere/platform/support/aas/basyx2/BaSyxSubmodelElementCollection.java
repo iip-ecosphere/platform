@@ -156,6 +156,11 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         }
         
         @Override
+        protected String getIdShort() {
+            return collection.getIdShort();
+        }
+        
+        @Override
         public SubmodelElementCollectionBuilder setSemanticId(String refValue) {
             return Tools.setSemanticId(this, refValue, collection);                
         }

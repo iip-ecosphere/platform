@@ -194,6 +194,11 @@ public class BaSyxEntity extends BaSyxSubmodelElement implements Entity, Submode
         protected AbstractSubmodel<org.eclipse.digitaltwin.aas4j.v3.model.Submodel> getInstance() {
             return null;
         }
+
+        @Override
+        protected String getIdShort() {
+            return entity.getIdShort();
+        }
         
         @Override
         protected BaSyxFile register(BaSyxFile file) {

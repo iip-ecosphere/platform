@@ -37,7 +37,6 @@ import de.iip_ecosphere.platform.support.aas.basyx.BaSyxElementTranslator.Submod
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
-import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
@@ -151,6 +150,11 @@ public class BaSyxSubmodelElementList extends BaSyxSubmodelElement implements Su
          */
         protected BaSyxSubmodelElementList getCollectionInstance() {
             return instance;
+        }
+        
+        @Override
+        protected String getIdShort() {
+            return collection.getIdShort();
         }
         
         @Override

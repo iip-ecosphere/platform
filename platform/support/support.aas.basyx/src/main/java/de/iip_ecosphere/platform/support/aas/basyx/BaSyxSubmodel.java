@@ -160,6 +160,11 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
         }
 
         @Override
+        protected String getIdShort() {
+            return instance.getIdShort();
+        }
+        
+        @Override
         public SubmodelElementContainerBuilder getParentBuilder() {
             return null;
         }

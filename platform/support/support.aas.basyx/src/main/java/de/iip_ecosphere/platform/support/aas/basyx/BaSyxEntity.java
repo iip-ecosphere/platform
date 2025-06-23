@@ -191,6 +191,11 @@ public class BaSyxEntity extends BaSyxSubmodelElement implements Entity, Submode
         protected AbstractSubmodel<ISubmodel> getInstance() {
             return null;
         }
+
+        @Override
+        protected String getIdShort() {
+            return entity.getIdShort();
+        }
         
         @Override
         protected BaSyxFile register(BaSyxFile file) {

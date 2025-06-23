@@ -109,6 +109,13 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends org.eclipse
     protected abstract AbstractSubmodel<S> getInstance();
 
     /**
+     * Returns the underlying collection instance.
+     * 
+     * @return the instance
+     */
+    protected abstract String getIdShort();
+    
+    /**
      * Registers a relationship element.
      * 
      * @param relationship the relationship element
@@ -316,9 +323,9 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends org.eclipse
             result = ((BaSyxSubmodelElementContainerBuilder<?>) getParentBuilder()).composeRbacPath("");
         }
         if (result.length() > 0) {
-            result += AuthenticationDescriptor.RbacRule.PATH_SEPARATOR + getInstance().getIdShort();
+            result += AuthenticationDescriptor.RbacRule.PATH_SEPARATOR + getIdShort();
         } else {
-            result = getInstance().getIdShort();
+            result = getIdShort();
         }
         if (null != element && element.length() > 0) {
             result += AuthenticationDescriptor.RbacRule.PATH_SEPARATOR + element;

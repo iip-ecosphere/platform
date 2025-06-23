@@ -162,6 +162,11 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.digitaltwin.aas4
         public AasBuilder getAasBuilder() {
             return parentBuilder;
         }
+        
+        @Override
+        protected String getIdShort() {
+            return instance.getIdShort();
+        }
 
         @Override
         public SubmodelElementContainerBuilder getParentBuilder() {

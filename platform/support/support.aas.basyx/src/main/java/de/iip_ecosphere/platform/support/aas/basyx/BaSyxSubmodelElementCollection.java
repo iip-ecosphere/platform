@@ -148,6 +148,11 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
             return collection;
         }
         
+        @Override
+        protected String getIdShort() {
+            return collection.getIdShort();
+        }
+        
         /**
          * Returns the collection instance being created.
          * 

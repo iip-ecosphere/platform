@@ -150,6 +150,11 @@ public class BaSyxSubmodelElementList extends BaSyxSubmodelElement implements Su
         }
         
         @Override
+        protected String getIdShort() {
+            return list.getIdShort();
+        }
+
+        @Override
         public SubmodelElementListBuilder setSemanticId(String refValue) {
             return Tools.setSemanticId(this, refValue, list);                
         }

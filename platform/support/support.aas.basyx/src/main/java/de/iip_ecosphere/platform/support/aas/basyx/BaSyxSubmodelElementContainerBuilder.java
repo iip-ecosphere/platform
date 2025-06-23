@@ -103,11 +103,18 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubmodel>
     }
     
     /**
-     * Returns the underlying instance.
+     * Returns the underlying submodel instance.
      * 
      * @return the instance
      */
     protected abstract AbstractSubmodel<S> getInstance();
+    
+    /**
+     * Returns the underlying collection instance.
+     * 
+     * @return the instance
+     */
+    protected abstract String getIdShort();
 
     /**
      * Registers a relationship element.
@@ -310,9 +317,9 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends ISubmodel>
             result = ((BaSyxSubmodelElementContainerBuilder<?>) getParentBuilder()).composeRbacPath("");
         }
         if (result.length() > 0) {
-            result += AuthenticationDescriptor.RbacRule.PATH_SEPARATOR + getInstance().getIdShort();
+            result += AuthenticationDescriptor.RbacRule.PATH_SEPARATOR + getIdShort();
         } else {
-            result = getInstance().getIdShort();
+            result = getIdShort();
         }
         if (null != element && element.length() > 0) {
             result += AuthenticationDescriptor.RbacRule.PATH_SEPARATOR + element;

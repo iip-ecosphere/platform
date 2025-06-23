@@ -109,6 +109,11 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
         public AasBuilder getAasBuilder() {
             return parentBuilder;
         }
+        
+        @Override
+        protected String getIdShort() {
+            return instance.getIdShort();
+        }
 
         @Override
         public void defer() {
