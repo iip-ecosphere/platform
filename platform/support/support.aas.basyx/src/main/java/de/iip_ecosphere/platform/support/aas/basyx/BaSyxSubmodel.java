@@ -193,6 +193,11 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.basyx.submodel.m
             return AuthenticationDescriptor.submodelRbac(this, auth, role, getInstance().getIdShort(), actions);
         }
 
+        @Override
+        public SubmodelBuilder rbac(AuthenticationDescriptor auth) {
+            return this; // usually not needed
+        }
+
     }
 
     /**

@@ -163,6 +163,11 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
             return this;
         }
 
+        @Override
+        public SubmodelBuilder rbac(AuthenticationDescriptor auth) {
+            return this; // usually not needed
+        }
+
     }
     
     /**

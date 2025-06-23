@@ -22,6 +22,9 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx2.BaSyxElementTranslator.SubmodelElementsRegistrar;
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity;
@@ -252,6 +255,17 @@ public class BaSyxEntity extends BaSyxSubmodelElement implements Entity, Submode
                 entity.setAsset(((BaSyxReference) asset).getReference());
             }*/
             return this;
+        }
+
+        @Override
+        public EntityBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public EntityBuilder rbac(AuthenticationDescriptor auth) {
+            return this; // usually not needed
         }
         
     }

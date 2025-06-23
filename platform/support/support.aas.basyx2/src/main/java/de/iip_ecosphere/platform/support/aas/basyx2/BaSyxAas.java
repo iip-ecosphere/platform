@@ -161,6 +161,11 @@ public class BaSyxAas extends AbstractAas<org.eclipse.digitaltwin.aas4j.v3.model
         public AasBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
             return AuthenticationDescriptor.aasRbac(this, auth, role, getInstance().getIdentification(), actions);
         }
+
+        @Override
+        public AasBuilder rbac(AuthenticationDescriptor auth) {
+            return this; // usually not needed
+        }
         
     }
 

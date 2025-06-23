@@ -549,6 +549,7 @@ public class NameplateSetup {
     private void createTechnicalDataNameplate(AasBuilder aasBuilder, String urn) {
         TechnicalDataBuilder tdBuilder = new TechnicalDataBuilder(aasBuilder, 
             expandUrn(urn, "-technicalData"));
+        tdBuilder.rbac(AasPartRegistry.getSubmodelAuthentication());
         GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder()
             .setManufacturerName(getManufacturerName())
             .setManufacturerArticleNumber(getManufacturerArticleNumber())

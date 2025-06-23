@@ -30,9 +30,12 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelE
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity;
@@ -344,6 +347,18 @@ public class BaSyxSubmodelElementList extends BaSyxSubmodelElement implements Su
         public boolean hasElement(String idShort) {
             return instance.getElement(idShort) != null;
         }
+        
+        @Override
+        public SubmodelElementListBuilder rbac(AuthenticationDescriptor auth, Role role, RbacAction... actions) {
+            return AuthenticationDescriptor.elementRbac(this, auth, role, 
+                parentBuilder.composeRbacPath(instance.getIdShort()), actions);
+        }
+
+        @Override
+        public SubmodelElementListBuilder rbac(AuthenticationDescriptor auth) {
+            // must be set explicitly in BaSyx
+            return this;
+        }        
         
         /**
          * Enables or disables registration propagation into the interface instance.

@@ -24,6 +24,7 @@ import org.apache.commons.io.FileUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
@@ -92,8 +93,9 @@ public class PlatformAas implements AasContributor {
 
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
+        AuthenticationDescriptor auth = getSubmodelAuthentication();
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)
-            .rbacAllAuthenticated(getSubmodelAuthentication());
+            .rbacPlatform(auth);
         if (smB.isNew()) { // incremental remote deployment, avoid double creation
             IipVersion versionInfo = IipVersion.getInstance();
             ApplicationSetup setup = new ApplicationSetup();
@@ -117,21 +119,19 @@ public class PlatformAas implements AasContributor {
             addSoftwareInfo(smB, setup); // old style
             smB.createPropertyBuilder(NAME_PROPERTY_RELEASE)
                 .setValue(Type.BOOLEAN, versionInfo.isRelease())
-                .build();
+                .build(auth);
             smB.createPropertyBuilder(NAME_PROPERTY_BUILDID)
                 .setValue(Type.STRING, versionInfo.getBuildId())
                 .setSemanticId(Irdi.AAS_IRDI_PROPERTY_IDENTIFIER)
-                .build();
+                .build(auth);
             smB.createOperationBuilder(NAME_OPERATION_SNAPSHOTAAS)
                 .addInputVariable("id", Type.STRING)
                 .setInvocable(iCreator.createInvocable(NAME_OPERATION_SNAPSHOTAAS))
-                .rbacAllAuthenticated(getSubmodelAuthentication())
-                .build(Type.STRING);
+                .build(Type.STRING, auth);
             smB.createOperationBuilder(NAME_OPERATION_RESOLVE_SEMANTICID)
                 .addInputVariable("semanticId", Type.STRING)
                 .setInvocable(iCreator.createInvocable(NAME_OPERATION_RESOLVE_SEMANTICID))
-                .rbacAllAuthenticated(getSubmodelAuthentication())
-                .build(Type.STRING);
+                .build(Type.STRING, auth);
             smB.build();
         }
         return null;
@@ -170,6 +170,7 @@ public class PlatformAas implements AasContributor {
      */
     public static SubmodelBuilder createNameplate(AasBuilder aasBuilder, ApplicationSetup appSetup) {
         TechnicalDataBuilder tdBuilder = new TechnicalDataBuilder(aasBuilder, null);
+        tdBuilder.rbac(AasPartRegistry.getSubmodelAuthentication());
         GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder()
             .setManufacturerName(appSetup.getManufacturerName())
             .setManufacturerArticleNumber("oktoflow")
@@ -230,6 +231,7 @@ public class PlatformAas implements AasContributor {
             }
         }
         SoftwareNameplateBuilder snBuilder = new SoftwareNameplateBuilder(aasBuilder, null);
+        snBuilder.rbacPlatform(getSubmodelAuthentication());
         snBuilder.createSoftwareNameplate_TypeBuilder()
             .setManufacturerName(LangString.create(appSetup.getManufacturerName()))
             .setVersion(version)
