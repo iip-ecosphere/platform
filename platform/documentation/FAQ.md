@@ -222,7 +222,7 @@ Is this problematic or dangerous?
 
 *Solution:* This message shall have disappeared after the migration to JDK 17 (see [#106](https://github.com/iip-ecosphere/platform/issues/106) and our [migration story](MigrationStory.md)), but may re-occur with JDK 21.
 
-## When I build more than one own example, builds are failing
+## When I work with more than one own example, builds are failing
 
 *Symptom:* There are more than two (own) all-in-one examples that seem to be conflicting during build.
 
