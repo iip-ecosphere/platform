@@ -8,7 +8,6 @@ In progress:
 * [#170](https://github.com/iip-ecosphere/platform/issues/170): Integrate BaSyx2
 * [#165](https://github.com/iip-ecosphere/platform/issues/170): Upgrade automated container building
 * [#122](https://github.com/iip-ecosphere/platform/issues/122): Transparent encryption, RBAC on AAS (incl. UI authentication)
-* [#175](https://github.com/iip-ecosphere/platform/issues/175): Revise Python tests
 
 Improvements:
 * Support for JDK 21 based on Eclipse 2024-06.
@@ -22,6 +21,7 @@ Improvements:
 * [#173](https://github.com/iip-ecosphere/platform/issues/173): Fix Python version selection for Python services.
 * [#171](https://github.com/iip-ecosphere/platform/issues/171): Migrate build-jk.xml to maven deployment (where possible).
 * [#174](https://github.com/iip-ecosphere/platform/issues/174): Move examples.hm22 and examples.emo23 to own repository
+* [#175](https://github.com/iip-ecosphere/platform/issues/175): Revise Python tests, please check/adjust your Python tests according to the generated Python test templates.
 
 New features:
 * [#169](https://github.com/iip-ecosphere/platform/issues/169): File-based connector for CSV, JSON (ReGaP)

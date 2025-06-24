@@ -18,7 +18,7 @@ The build steps are  explained in more detail in the Platform Handbook.
 
 ## Updating the meta model of apps
 
-The meta-model is not automatically updated. This allows the owner to declide when potential upgrades to own code shall be applied.
+The meta-model is not automatically updated. This allows the owner to declide when potential upgrades to own code shall be applied. This may be needed when platform interface changes occur (seldom), i.e., suddely compile errors appear in your application, which are compensated by a matching configuration meta model.
 
   * To update/upgrade the model, call `mvn -P EasyGen -U generate-sources -Dunpack.force=true`
 
