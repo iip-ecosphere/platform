@@ -1,10 +1,46 @@
 project AllTypes {
 
-    import AllTypesPart*; 
-    
-    // unusual for managed model structure but required for reuse in testing/evaluation environment
+    import IIPEcosphere; 
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    RecordType PythonSyncTestInput = {
+        name = "PythonSyncTestInput",
+        fields = {
+            Field {
+                name = "id",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "value1",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "value2",
+                type = refBy(DoubleType)
+            }
+        }
+    };
+
+    RecordType PythonSyncTestOutput = {
+        name = "PythonSyncTestOutput",
+        fields = {
+            Field {
+                name = "id",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "value1",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "value2",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "confidence",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "prediction",
+                type = refBy(BooleanType)
+            }
+        }
+    };    
     
     freeze {
         .;
