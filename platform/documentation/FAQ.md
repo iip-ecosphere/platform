@@ -51,7 +51,7 @@
 
 *Symptom:* After a first contact with the platform code it seems that you are missing detailed information about applied conventions on how to write code and you cannot find all conventions in this document.
 
-*Reason:* Although we tried to capture the most important conventions in this document, this document is not intended to be a programmer’s guide, i.e., we do not necessarily repeat all coding conventions here.
+*Reason:* Although we tried to capture the most important conventions in this document, this document is not intended to be a programmerâ€™s guide, i.e., we do not necessarily repeat all coding conventions here.
 
 *Solution:* Please refer to the platform coding guidelines in GitHub.
 
@@ -144,7 +144,7 @@ Go to your local Maven repository (usually in your home directory in the folder 
        </profiles>
      </settings>
 
-If there is already a repositories section, please add the contents for the “SSE” repository as shown above. 
+If there is already a repositories section, please add the contents for the â€œSSEâ€� repository as shown above. 
 
 ## My configuration settings do not affect the instantiation
 
@@ -152,7 +152,7 @@ If there is already a repositories section, please add the contents for the “S
 
 *Reason:* A typical reason is that the variables are not frozen after setting the value. Without freezing, the values are not taken over into the instantiation (see also Section 8 of the platform handbook). Please do also consider that adding new variables with values and freezing them must not necessarily lead to an effect. If the type is a service, an application, a mesh etc. the instantiation will take that up as the types are known. Just adding a String, Integer or Real variable somewhere potentially implies that the instantiation does not know how an instantiation of that variable shall take place.
 
-*Solution:* Freeze your variables in the right place. If it is a pre-defined variable, freeze them in one of the top-level IVML modules/projects of your configuration. Services, applications, or meshes are typically frozen in the file where they are defined as new variables. In this case, freezing usually happens automatically as these modules declare a freeze block containing a “.” (freeze all new variables in this project). Please consider that a frozen variable intentionally cannot be changed anymore in IVML projects that import the project where the variable was frozen.
+*Solution:* Freeze your variables in the right place. If it is a pre-defined variable, freeze them in one of the top-level IVML modules/projects of your configuration. Services, applications, or meshes are typically frozen in the file where they are defined as new variables. In this case, freezing usually happens automatically as these modules declare a freeze block containing a â€œ.â€� (freeze all new variables in this project). Please consider that a frozen variable intentionally cannot be changed anymore in IVML projects that import the project where the variable was frozen.
 
 
 ## My application/example build process unintendedly executes Java tests/Javadoc
@@ -198,9 +198,9 @@ If there is already a repositories section, please add the contents for the “S
 
 *Reason:* The platform changes and we publish a release form time to time. Both, applications and applications need to be re-instantiated so that new dependencies are taken up and potentially changed interfaces can be addressed correctly. In seldom cases, the also application-specific code must be adjusted manually.
 
-*Solution:* The platform version depends on the version in the Maven POMs and the configuration meta model. In following cases, adjustments to the platform configuration may be needed depending on the changes that were applied in the upgrade.
+*Solution:* The platform version depends on the version in the Maven POMs and the configuration meta model. In following cases, adjustments to the platform configuration may be needed depending on the changes that were applied in the upgrade. See also [BUILDING](BUILDING).
  
-  * Platform:  
+  * Platform:
     * Grab a new install package, transfer your configuration into that package and run `mvn install`. This will obtain the most recent configuration meta model corresponding to the platform version.
     * Change the version in the Maven POM of your platform, run `mvn -U install -Dunpack.force=true` in the main folder of your platform installation.
   * Application: Change the version in the Maven POM of your platform, run `mvn -U install -Dunpack.force=true` in the main folder of the application.
@@ -221,3 +221,16 @@ Is this problematic or dangerous?
 *Reason:* The platform is based on more than 20 libraries and frameworks, of which some are not on the most recent state for your installed JDK. Some integrated dependencies even prevent the use of more recent JDKs (see [installation](INSTALL.MD) and [development](README.MD) guidelines).
 
 *Solution:* This message shall have disappeared after the migration to JDK 17 (see [#106](https://github.com/iip-ecosphere/platform/issues/106) and our [migration story](MigrationStory.md)), but may re-occur with JDK 21.
+
+## When I build more than one own example, builds are failing
+
+*Symptom:* There are more than two (own) all-in-one examples that seem to be conflicting during build.
+
+*Reason:* All-in-one examples contain everything to build a standalone application, i.e., an entire model. This includes the generated shared code parts for all applications, which are stored in a single (interface) artifact. If two all-in-one applications share the same maven coordinate for the (interface) artifact, each application is overriding the artifact in the maven repository, which may lead to mutual build errors. While all-in-one examples are helpful for initial technical steps as well as for regression tests, a running platform instance maintains all applications in a single model, thus, a single (interface) instance and such conflicts do not occur.
+
+*Solution:* Each application shall have its own artifacts, in particular for the interface artifact, but also for the implemented services and the application. A lazy solution is to just assign unique version numbers for the respective artifacts, a more safe solution is to change the artifact names. Consider the following files in `src/main/easy`:
+ 
+  * `TechnicalSetup.ivml`: Variable `sharedArtifact` defines the maven coordinate for the shared (interface) artifact.  
+  * `AllServices.ivml`: Field `artifact` in all defined services.
+
+After changing the values, run `mvn install` on all affected all-in-one examples.
