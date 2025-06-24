@@ -11,18 +11,7 @@ template PythonTestTemplate(Configuration config, PythonCodeArtifact target, Pyt
         target.addImport("sys");
         target.addImport("os");
         target.addImport("argparse");
-        
-        target.addSysPathInsert(6, "../../../target/pySrc/iip");
-        target.addSysPathInsert(7, "../../../target/pySrc");
         target.addImport("TestUtils", "runTestsFromFile").addName("runTestsFromTestFile").addName("readTestDataJson").addName("runAllTestsFromFile").addName("getListOfDeserializedData");
-        target.addSLComment("will be the relative paths from impl.impl to impl.model, given through pom /gen onwards!", true);
-        target.addSysPathInsert(1, "../../../gen/hm23/ApplicationInterfaces/src/main/python");
-        target.addSysPathInsert(2, "../../../gen/hm23/ApplicationInterfaces/src/main/python/iip");
-        target.addSLComment("always fixed value as these directories are generated in the impl.impl", true);
-        target.addSysPathInsert(3, "../../main/python/services");
-        target.addSysPathInsert(5, '../../main/python/${getStringValueSafe(pythonElements.servicesPackageName, "services")}');
-        target.addSysPathInsert(4, "../../main/python");
-        target.addEmptyLine();
         target.addImport("Service", "ServiceState");
         target.addImport("json");
 
@@ -35,7 +24,7 @@ template PythonTestTemplate(Configuration config, PythonCodeArtifact target, Pyt
         genSerializerImports(pythonElements.input, target);
 
         target.addEmptyLine();
-        target.addCall("os.chdir").addStringArgument("../../main/python");
+        target.addCall("os.chdir").addArgument("os.environ['PRJ_HOME'] + \"/src/main/python\"");
         target.addEmptyLine();
         target.addClass(asTypeName(pythonElements.name) + "Test").addBase("unittest.TestCase", PythonCodeImportScope.NONE).(c|{
             c.addFunc("test_inputTest").(f|{
@@ -46,7 +35,7 @@ template PythonTestTemplate(Configuration config, PythonCodeArtifact target, Pyt
                 f.addCall("service.setState").addArgument("ServiceState.RUNNING");
                 genSerializerInitialization(pythonElements.input, f);
                 f.addCall("service.attachIngestor").addArgument("assertionIngestor");
-                f.addCall("runAllTestsFromFile").addArgument("service.getId()").addStringArgument("../../test/resources/testData-${asTypeName(pythonElements.name)}.json");
+                f.addCall("runAllTestsFromFile").addArgument("service.getId()").addArgument("os.environ['PRJ_HOME'] + \"/src/test/resources/testData-${asTypeName(pythonElements.name)}.json\"");
                 f.addEmptyLine();
                 f.addSLComment('prepare your data, e.g., loading from json');
                 f.addSLComment('Needed to enable the loading of resources like the finished service would', true);
