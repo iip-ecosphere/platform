@@ -40,21 +40,34 @@ def getListOfDeserializedData(path):
     rawData = readTestDataJson(path)
     allPoints = list()
     for line in rawData:
-        for dtype in list(line):
+        lineList = list(line)
+        period = lineList.get("$period", -1)
+        repeats = lineList.get("$repeats", 1)
+        for dtype in lineList:
             dtype = dtype[0].upper() + dtype[1:]#Python serializers seem to register with uppercase, test data files assume lower case keys!(Seems to be fine in java
-            dataPoint = serializeDataFromTestFile(line, dtype)
-            allPoints.append(dataPoint)
+            if dtype[0] != "$":
+                dataPoint = serializeDataFromTestFile(line, dtype)
+                for r in range(1, repeats):
+                    allPoints.append(dataPoint)
     return allPoints
     
 """Runs a single test based on one data point form a test file"""
 def runTestsFromTestFile(sId, rawData):
-    for dtype in list(rawData):
+    lineList = list(rawData)
+    period = rawData.get("$period", -1)
+    repeats = rawData.get("$repeats", 1)
+        
+    for dtype in lineList:
         dtype = dtype[0].upper() + dtype[1:]#Python serializers seem to register with uppercase, test data files assume lower case keys!(Seems to be fine in java
-        dataPoint = serializeDataFromTestFile(rawData, dtype)
-        """might be able to get by without dtype IF we can utilise the output of type(dataPoint) by correctly splitting and extracting the type
-        Unsure IF there is a secure way to split this to always get the needed element!"""
-        result = runTestsFromFile(sId, dataPoint, dtype) 
-        print(result)
+        if dtype[0] != "$":
+            dataPoint = serializeDataFromTestFile(rawData, dtype)
+            """might be able to get by without dtype IF we can utilise the output of type(dataPoint) by correctly splitting and extracting the type
+            Unsure IF there is a secure way to split this to always get the needed element!"""
+            for r in range(1, repeats):
+                result = runTestsFromFile(sId, dataPoint, dtype) 
+                print(result)
+                if period > 0:
+                    time.sleep(period / 1000)
 
 """Method running all Tests of a testFile in one go"""
 def runAllTestsFromFile(sId, path):
