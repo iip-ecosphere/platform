@@ -42,7 +42,7 @@ The compiler plugin supports the following configuration settings:
   
 ## Python test plugin
 
-The Python test plugin currently executes Python files, either those directly located in `src/test/python` or those specified by a file set. The plugin runs by default in the `test` lifecycle phase with the goal `test-python`.
+The Python test plugin currently executes Python files, either those directly located in `src/test/python` or those specified by a file set. The plugin runs by default in the `test` lifecycle phase with the goal `test-python`. The test runner extends the `PYTHONPATH` and sets the environment variable `PRJ_HOME` to the home directory of the project.
 
   ```xml
   <build>

@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -137,6 +138,10 @@ public class PythonTestMojo extends AbstractMojo {
             if (output.length() > 0) {
                 getLog().info(output);
             }
+            File win = new File("src/test/python/%SystemDrive%"); // whyever this is created, side effect of envp?
+            if (win.exists() && win.isDirectory()) {
+                FileUtils.deleteQuietly(win);
+            }
             if (output.contains("Traceback")) {
                 throw new MojoExecutionException(output, null);
             }
@@ -154,8 +159,10 @@ public class PythonTestMojo extends AbstractMojo {
         String[] envp = null;
         if (null == pythonPath || pythonPath.length() == 0) {
             List<String> paths = new ArrayList<>();
-            add(paths, "target/pySrc/iip"); // old style
-            add(paths, "target/pySrc"); // all the other directories
+            add(paths, "./target/pyEnv/iip"); // old style
+            add(paths, "./target/pyEnv"); // old style
+            add(paths, "./target/pySrc/iip"); // old style
+            add(paths, "./target/pySrc"); // all the other directories
             // target/gen/hm23/ApplicationInterfaces
             File f = new File("target/gen");
             if (f.exists()) {
@@ -164,7 +171,7 @@ public class PythonTestMojo extends AbstractMojo {
                     for (File s: sub) {
                         File sai = new File(s, "ApplicationInterfaces");
                         if (s.isDirectory() && sai.isDirectory()) {
-                            add(paths, "src/gen/" + s.getName() + "ApplicationInterfaces");
+                            add(paths, "./src/gen/" + s.getName() + "ApplicationInterfaces");
                         }
                     }
                 }
@@ -175,20 +182,19 @@ public class PythonTestMojo extends AbstractMojo {
                 if (null != sub) {
                     for (File s: sub) {
                         if (s.isDirectory()) {
-                            add(paths, "src/main/python/" + s.getName());
+                            add(paths, "./src/main/python/" + s.getName());
                         }
                     }
                 }
-                add(paths, "src/main/python");
+                add(paths, "./src/main/python");
             }
             
             // "src/main/python/services"
             pythonPath = String.join(File.pathSeparator, paths);
         }
-        if (pythonPath.length() > 0) {
-            envp = new String[] {"PYTHONPATH=\"" + pythonPath + "\""};
-            getLog().info("Using " + envp[0]);
-        }
+        envp = new String[] {"PYTHONPATH=" + pythonPath, // whitespaces? quote does not work with Python
+            "PRJ_HOME=" + (new File("").getAbsolutePath())}; 
+        getLog().info("Using " + String.join(", ", envp));
         return envp;
     }
     
@@ -220,7 +226,14 @@ public class PythonTestMojo extends AbstractMojo {
      * @param path the path to be added
      */
     private static void add(List<String> paths, String path) {
-        paths.add(path.replace("/", File.separator));
+        File f = new File(path);
+        try {
+            f = f.getCanonicalFile();
+        } catch (IOException e) {
+        }
+        if (f.exists()) {
+            paths.add(f.getAbsolutePath());
+        }
     }
 
 }
