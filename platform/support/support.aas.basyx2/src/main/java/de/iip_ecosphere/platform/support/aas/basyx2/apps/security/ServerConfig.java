@@ -73,6 +73,7 @@ public class ServerConfig {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.securityMatcher("/**");
         if (null != authDesc) {
             httpSecurity.authorizeHttpRequests(req -> {
                 req.requestMatchers("/error").permitAll();
@@ -82,7 +83,7 @@ public class ServerConfig {
                     req.anyRequest().authenticated();
                 }
             });
-            /*.formLogin(f -> f.loginPage("/login") // TODO!!!
+            /*.formLogin(f -> f.loginPage("/login")
                 .permitAll()
             ).logout(l -> l.permitAll())*/
             //if (null != authDesc.getOAuth2Setup()) {

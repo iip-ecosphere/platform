@@ -21,7 +21,7 @@
        <dependency>
          <groupId>org.springframework.boot</groupId>
          <artifactId>spring-boot-starter-parent</artifactId>
-         <version>3.2.4</version> <!-- sync version with BaSyX! -->
+         <version>3.4.3</version> <!-- sync version with BaSyX! -->
          <type>pom</type>
          <scope>import</scope>
        </dependency>
@@ -38,7 +38,7 @@
       <dependency>
         <groupId>io.micrometer</groupId>
         <artifactId>micrometer-core</artifactId>
-        <version>1.12.4</version>
+        <version>1.14.4</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
@@ -53,12 +53,12 @@
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>2.16.2</version>
+        <version>2.18.2</version>
       </dependency>
       <dependency>
         <groupId>org.yaml</groupId>
         <artifactId>snakeyaml</artifactId>
-        <version>2.2</version>
+        <version>2.3</version>
       </dependency>      
       <dependency>
         <groupId>jakarta.xml.bind</groupId>
