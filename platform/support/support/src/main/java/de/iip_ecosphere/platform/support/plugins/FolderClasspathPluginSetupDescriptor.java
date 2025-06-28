@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Default plugin setup descriptor based based on loading from a project folder containing jars and the 
- * classpath in "target/classes/classpath".
+ * classpath in "classpath" or in "target/classes/classpath".
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -51,7 +51,11 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
      */
     public static URL[] loadClasspathSafe(File folder) {
         URL[] result = null;
-        try (InputStream in = new FileInputStream(new File(folder, "target/classes/classpath"))) {
+        File f = new File(folder, "classpath"); // unpacked
+        if (!f.exists()) {
+            f = new File(folder, "target/classes/classpath"); // development, in project
+        }
+        try (InputStream in = new FileInputStream(f)) {
             List<File> entries = new ArrayList<File>();
             String contents = IOUtils.toString(in, Charset.defaultCharset());
             StringTokenizer tokenizer = new StringTokenizer(contents, ":;");

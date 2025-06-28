@@ -20,6 +20,8 @@ import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.stream.Stream;
 
+import org.slf4j.LoggerFactory;
+
 /**
  * Helper functions for Java Service Loading.
  * 
@@ -88,6 +90,8 @@ public class ServiceLoaderUtils {
             try {
                 result.add(iterator.next());
             } catch (ServiceConfigurationError e) {
+                LoggerFactory.getLogger(ServiceLoaderUtils.class).error(
+                    "Service configuration error: {}", e.getMessage());
             }
         }
         return result.stream();
@@ -102,5 +106,16 @@ public class ServiceLoaderUtils {
     public static boolean hasExcludeFirst(Object instance) {
         return null != instance && instance.getClass().isAnnotationPresent(ExcludeFirst.class);
     }
-
+    
+    /**
+     * Creates a service loader for the given {@code cls} using the class loader of {@code cls}.
+     * 
+     * @param <D> the descriptor type
+     * @param cls the class of the descriptor type
+     * @return the service loader
+     */
+    public static <D> ServiceLoader<D> load(Class<D> cls) { 
+        return ServiceLoader.load(cls, cls.getClassLoader());
+    }
+    
 }

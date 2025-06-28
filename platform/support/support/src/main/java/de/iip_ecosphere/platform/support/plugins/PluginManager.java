@@ -42,6 +42,7 @@ public class PluginManager {
     public static final String FILE_PLUGINS_PROPERTY = "okto.plugins";
     private static Map<String, Plugin<?>> plugins = new HashMap<>();
     private static Map<Class<?>, List<Plugin<?>>> pluginsByType = new HashMap<>();
+    private static Map<String, PluginDescriptor<?>> descriptors = new HashMap<>();
     
     /**
      * Returns a specific plugin.
@@ -234,6 +235,7 @@ public class PluginManager {
                 Plugin<?> known = plugins.get(id);
                 if (null == known) {
                     plugins.put(id, plugin);
+                    descriptors.put(id, desc);
                     LoggerFactory.getLogger(PluginManager.class).info("Plugin {} registered", id);
                 }
             }
@@ -248,6 +250,23 @@ public class PluginManager {
                 pls.add(plugin);
             }
         }
+    }
+
+    /**
+     * Returns the class loader of the specified plugin.
+     * 
+     * @param id the plugin id
+     * @return the class loader or <b>null</b> if unknown
+     */
+    public static ClassLoader getPluginLoader(String id) {
+        ClassLoader result = null;
+        if (null != id) {
+            PluginDescriptor<?> desc = descriptors.get(id);
+            if (null != desc) {
+                result = desc.getClass().getClassLoader();
+            }
+        }
+        return result;
     }
 
 }
