@@ -288,5 +288,10 @@ public abstract class AbstractBaSyxAasFactory extends AasFactory {
     public boolean supportsOperationExecutionAuthorization() {
         return false;
     }
+    
+    @Override
+    public boolean supportsSamePorts() {
+        return true;
+    }
 
 }

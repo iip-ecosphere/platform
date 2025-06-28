@@ -564,7 +564,16 @@ public abstract class AasFactory {
         }
         return result;
     }
-    
+
+    /**
+     * Returns whether the implementation allows for server instances running on the same port.
+     * 
+     * @return {@code true} if supported, {@code false}
+     */
+    public boolean supportsSamePorts() {
+        return false;
+    }
+
     /**
      * Returns whether the implementation allows for user-defined functions assigned to
      * AAS properties.

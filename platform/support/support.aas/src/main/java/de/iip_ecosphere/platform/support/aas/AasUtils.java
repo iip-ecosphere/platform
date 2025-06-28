@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.resources.ResourceResolver;
@@ -398,6 +399,25 @@ public class AasUtils {
             LoggerFactory.getLogger(AasUtils.class).warn("Cannot set value for AAS property {}: {}", 
                 propIdShort, e.getMessage());
         }
+    }
+    
+    /**
+     * Sets a property value depending on the capabilities of the AAS factory.
+     * 
+     * @param builder the property builder
+     * @param value the value
+     * @param getter the getter as invokable
+     * @param setter the setter as invokable
+     * @return {@code builder} for chaining
+     */
+    public static PropertyBuilder setValue(PropertyBuilder builder, Object value, Invokable getter, Invokable setter) {
+        AasFactory factory = AasFactory.getInstance();
+        if (factory.supportsPropertyFunctions()) {
+            builder.bind(getter, setter);
+        } else {
+            builder.setValue(value);
+        }
+        return builder;
     }
 
 }

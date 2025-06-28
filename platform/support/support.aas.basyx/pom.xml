@@ -207,6 +207,7 @@
                          <overWriteSnapshots>true</overWriteSnapshots>
                          <overWriteIfNewer>true</overWriteIfNewer>
                          <includeScope>compile</includeScope>
+                         <excludeArtifactIds>support.aas, support</excludeArtifactIds>
                      </configuration>
                  </execution>
                  <execution>
@@ -227,6 +228,7 @@
                          <prepends>
                              <prepend>target\${project.artifactId}-${project.version}.jar</prepend>
                          </prepends>
+                         <excludeArtifactIds>support.aas, support</excludeArtifactIds>
                      </configuration>
                  </execution>
              </executions>

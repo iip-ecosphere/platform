@@ -12,19 +12,17 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx2.apps.common;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.Enumeration;
 import java.util.regex.Pattern;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.PropertiesPropertySource;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.UrlResource;
 
 /**
  * Application initializer additionally loading properties from BaSyX.
@@ -47,25 +45,26 @@ public abstract class ClasspathResourceLoadingInitializer
     
     @Override
     public void initialize(ConfigurableApplicationContext applicationContext) {
-        String[] files = System.getProperty("java.class.path").split(File.pathSeparator);
-        Optional<String> file = Arrays.stream(files).filter(f -> classpathPattern.matcher(f).matches()).findFirst();
-        if (file.isPresent()) {
+        ClassLoader loader = getClass().getClassLoader(); // TODO plugin
+        if (null != classpathPattern) {
             try {
-                // just try to get the resource within file
-                URL jarUrl = new File(file.get()).toURI().toURL();
-                URLClassLoader jarLoader = URLClassLoader.newInstance(new URL[]{jarUrl}, 
-                    ClassLoader.getPlatformClassLoader());
-                ClassPathResource sampleResource = new ClassPathResource("application.yml", jarLoader);
-
-                YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
-                factory.setResources(sampleResource);
-                factory.afterPropertiesSet();
-                applicationContext.getEnvironment().getPropertySources().addLast(
-                    new PropertiesPropertySource("Initializer-injected Properties", factory.getObject()));
+                Enumeration<URL> e = loader.getResources("application.yml");
+                while (e.hasMoreElements()) {
+                    URL u = e.nextElement();
+                    if (classpathPattern.matcher(u.toString()).matches()) {
+                        UrlResource resource = new UrlResource(u);
+                        YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
+                        factory.setResources(resource);
+                        factory.afterPropertiesSet();
+                        applicationContext.getEnvironment().getPropertySources().addLast(
+                            new PropertiesPropertySource("Initializer-injected Properties", factory.getObject()));
+                        break;
+                    }
+                }
             } catch (IOException e) {
-                e.printStackTrace();
+                LoggerFactory.getLogger(getClass()).error("Cannot load application.yaml: {}", e.getMessage());
             }
         }
     }
-
+    
 }

@@ -48,7 +48,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.iip_ecosphere.platform.support.aas.basyx2.AasOperationsProvider;
 import de.iip_ecosphere.platform.support.aas.basyx2.apps.common.ExcludeBasyxTypeFilter;
-import de.iip_ecosphere.platform.support.json.JsonUtils;
 
 /**
  * Spring application representing asset operations. Operations must be registered in the operations provider 
@@ -172,7 +171,7 @@ public class AssetSpringApp implements WebMvcConfigurer {
                 for (int r = 0; r < requestData.length; r++) {
                     SubmodelElement re = requestData[r].getValue();
                     if (re instanceof Property) {
-                        params[0] = ((Property) re).getValue();
+                        params[r] = ((Property) re).getValue();
                     }
                 }
                 Object funcResult = func.apply(params);
@@ -180,7 +179,7 @@ public class AssetSpringApp implements WebMvcConfigurer {
                 result[0] = new DefaultOperationVariable();
                 Property resultProperty = new DefaultProperty();
                 result[0].setValue(resultProperty);
-                resultProperty.setValue(null == funcResult ? null : JsonUtils.toJson(funcResult));
+                resultProperty.setValue(null == funcResult ? null : funcResult.toString());
                 responseStatus = HttpStatus.OK;
             } catch (Throwable t) {
                 LoggerFactory.getLogger(AssetSpringApp.class).error("Calling AAS operation '{}': {}", 

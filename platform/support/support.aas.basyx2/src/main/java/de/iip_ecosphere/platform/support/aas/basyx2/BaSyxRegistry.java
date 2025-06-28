@@ -138,6 +138,8 @@ public class BaSyxRegistry implements Registry {
                         }
                     }
                 }
+            } else {
+                throw new IOException("AAS " + identifier + " not exist!");
             }
         }
         return result;

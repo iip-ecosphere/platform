@@ -275,11 +275,19 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
             smRepo = new ConnectedSubmodelRepository(submodelRegistryUrl.toString());
         }
         DataTypeDefXsd type = null;
-        OperationVariable[] opArgs = new OperationVariable[args.length];
+        List<OperationVariable> params = operation.getInputVariables(); // TODO inout
+        OperationVariable[] opArgs = new OperationVariable[Math.min(args.length, params.size())];
         for (int a = 0; a < opArgs.length; a++) {
-            SubmodelElement tmp = new DefaultProperty.Builder()
-                .value(null == args[a] ? null : args[a].toString()).build();
-            opArgs[a] = new DefaultOperationVariable.Builder().value(tmp).build();
+            SubmodelElement paramElt = params.get(a).getValue();
+            if (paramElt instanceof Property) {
+                Property param = ((Property) paramElt);
+                SubmodelElement tmp = new DefaultProperty.Builder()
+                    .value(null == args[a] ? null : args[a].toString())
+                    .valueType(param.getValueType())
+                    .idShort(param.getIdShort())
+                    .build();
+                opArgs[a] = new DefaultOperationVariable.Builder().value(tmp).build();
+            } // TODO others, adjust generic REST Service implementation
         }
         if (operation.getOutputVariables().size() > 0) {
             SubmodelElement outVar = operation.getOutputVariables().iterator().next().getValue();

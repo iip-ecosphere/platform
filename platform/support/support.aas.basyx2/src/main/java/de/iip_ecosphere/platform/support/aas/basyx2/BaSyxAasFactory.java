@@ -21,7 +21,7 @@ import de.iip_ecosphere.platform.support.aas.AasFactory;
  */
 public class BaSyxAasFactory extends AbstractBaSyxAasFactory {
 
-    private static final String PLUGIN_ID = "aas.basyx-2.0";
+    public static final String PLUGIN_ID = "aas.basyx-2.0";
     
     /**
      * Factory descriptor for Java Service Loader.

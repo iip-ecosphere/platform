@@ -19,6 +19,8 @@ import java.util.ServiceLoader;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+
 /**
  * Defines the interface for resolution of semantic ids, IRDIs, IRIs ...
  * 
@@ -83,7 +85,8 @@ public abstract class SemanticIdResolver {
     private static void initialize() {
         if (null == resolvers) {
             resolvers = new ArrayList<>();
-            ServiceLoader<SemanticIdResolverDescriptor> loader = ServiceLoader.load(SemanticIdResolverDescriptor.class);
+            ServiceLoader<SemanticIdResolverDescriptor> loader 
+                = ServiceLoaderUtils.load(SemanticIdResolverDescriptor.class);
             loader.forEach(l -> {
                 SemanticIdResolver resolver = l.createResolver();
                 resolvers.add(resolver);

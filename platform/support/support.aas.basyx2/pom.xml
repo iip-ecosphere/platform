@@ -64,6 +64,16 @@
         <groupId>jakarta.xml.bind</groupId>
         <artifactId>jakarta.xml.bind-api</artifactId>
       </dependency>
+      <dependency>
+        <groupId>io.swagger.core.v3</groupId>
+        <artifactId>swagger-core-jakarta</artifactId>
+        <version>2.2.22</version>
+      </dependency>
+<dependency>
+  <groupId>org.springframework.integration</groupId>
+  <artifactId>spring-integration-file</artifactId>
+  <version>6.4.2</version>
+</dependency>      
       
     <dependency>
         <groupId>org.eclipse.digitaltwin.basyx</groupId>
@@ -202,14 +212,14 @@
     </dependency>
 
 
-<dependency>
-    <groupId>org.springframework</groupId>
-    <artifactId>spring-jdbc</artifactId>
-</dependency>
-<dependency>
-    <groupId>org.springframework</groupId>
-    <artifactId>spring-web</artifactId>
-</dependency>
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-jdbc</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-web</artifactId>
+    </dependency>
 
     
     <dependency>
@@ -279,7 +289,8 @@
                          <overWriteReleases>false</overWriteReleases>
                          <overWriteSnapshots>true</overWriteSnapshots>
                          <overWriteIfNewer>true</overWriteIfNewer>
-                         <includeScope>compile</includeScope>
+                         <includeScope>runtime</includeScope>
+                         <excludeArtifactIds>support.aas, support</excludeArtifactIds>
                      </configuration>
                  </execution>
                  <execution>
@@ -300,6 +311,7 @@
                          <prepends>
                              <prepend>target\${project.artifactId}-${project.version}.jar</prepend>
                          </prepends>
+                         <excludeArtifactIds>support.aas, support</excludeArtifactIds>
                      </configuration>
                  </execution>
              </executions>

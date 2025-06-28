@@ -33,6 +33,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.basyx2.apps.common.AssetServerKeyStoreDescriptor;
 import de.iip_ecosphere.platform.support.function.IORunnable;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
 /**
  * Basic implementation of the the {@link AasServer}.
@@ -90,11 +91,29 @@ abstract class BaSyxAbstractAasServer implements AasServer {
     protected abstract Class<?> getAasRepositoryAppClass();
 
     /**
+     * Returns an optional application context initializer for AAS repositories.
+     * 
+     * @return the initializer, may be <b>null</b> for none
+     */
+    protected ApplicationContextInitializer<ConfigurableApplicationContext> getAasRepositoryAppInitializer() {
+        return null;
+    }
+
+    /**
      * Returns the class to use implementing the submodel repository application/server. 
      * 
      * @return the class
      */
     protected abstract Class<?> getSmRepositoryAppClass();
+
+    /**
+     * Returns an optional application context initializer for submodel repositories.
+     * 
+     * @return the initializer, may be <b>null</b> for none
+     */
+    protected ApplicationContextInitializer<ConfigurableApplicationContext> getSmRepositoryAppInitializer() {
+        return null;
+    }
 
     /**
      * Returns the class to use implementing the AAS registry application/server. 
@@ -484,6 +503,10 @@ abstract class BaSyxAbstractAasServer implements AasServer {
         AppConfigurer configurer, Consumer<State> stateConsumer) {
         ConfigurableApplicationContext result = null;
         if (null != cls) {
+            ClassLoader pLoader = PluginManager.getPluginLoader(BaSyxAasFactory.PLUGIN_ID);
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            Thread.currentThread().setContextClassLoader(pLoader); // BaSyxAbstractAasServer.class.getClassLoader()
+            
             if (null == configurer) {
                 configurer = createConfigurer();
             }
@@ -495,10 +518,13 @@ abstract class BaSyxAbstractAasServer implements AasServer {
             }
             configurer.addPort(port);
             configurer.addConfigName(cls.getSimpleName());
+
             result = app.run(null == configurer ? new String[0] : configurer.getArgs());
             if (null != stateConsumer) {
                 stateConsumer.accept(State.RUNNING);
             }
+
+            Thread.currentThread().setContextClassLoader(cl); // set back, Tomcat may change that anyway
         }
         return result;
     }
@@ -531,12 +557,12 @@ abstract class BaSyxAbstractAasServer implements AasServer {
         if (type == ServerType.COMBINED || type == ServerType.REPOSITORY) {
             if (shallStart(spec.getAasRepositoryState())) {
                 aasRepoCtx = createContext(getAasRepositoryAppClass(), spec.getAasRepositoryEndpoint().getPort(), 
-                    createConfigurer(spec.getSetup(AasComponent.AAS_REPOSITORY)), 
+                    createConfigurer(getAasRepositoryAppInitializer(), spec.getSetup(AasComponent.AAS_REPOSITORY)), 
                     s -> spec.notifyAasRepositoryStateChange(s));
             }
             if (shallStart(spec.getSubmodelRepositoryState())) {
                 smRepoCtx = createContext(getSmRepositoryAppClass(), spec.getSubmodelRepositoryEndpoint().getPort(), 
-                    createConfigurer(spec.getSetup(AasComponent.SUBMODEL_REPOSITORY)), 
+                    createConfigurer(getSmRepositoryAppInitializer(), spec.getSetup(AasComponent.SUBMODEL_REPOSITORY)), 
                         s -> spec.notifySubmodelRepositoryStateChange(s));
             }
         }

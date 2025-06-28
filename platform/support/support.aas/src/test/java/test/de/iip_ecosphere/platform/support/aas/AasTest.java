@@ -12,6 +12,8 @@
 
 package test.de.iip_ecosphere.platform.support.aas;
 
+import static de.iip_ecosphere.platform.support.json.JsonResultWrapper.fromJson;
+
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -58,6 +60,8 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
+import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 import de.iip_ecosphere.platform.support.aas.Type;
 
@@ -95,6 +99,11 @@ public class AasTest {
     private static final String NAME_OP_STARTMACHINE = "startMachine";
     private static final String NAME_OP_RECONFIGURE = "setLotSize";
     private static final String NAME_OP_STOPMACHINE = "stopMachine";
+    private static final String NAME_OP_CONCAT = "concat"; // 2 params
+    private static final String NAME_OP_IDENT = "ident"; // out=in
+    private static final String NAME_OP_JSON = "json"; // json-back, may throw
+
+    private static final String NAME_SUBMODEL_EMPTY = "empty";
 
     private static final String NAME_RBAC_SMOPEN = "openSm";
     private static final String NAME_RBAC_PROPCLOSED = "closedProp";
@@ -157,6 +166,19 @@ public class AasTest {
             machine.stop();
             return null;
         });
+        builder.defineOperation(NAME_OP_CONCAT, (params) -> {
+            return params[0] + "." + params[1];
+        });
+        builder.defineOperation(NAME_OP_IDENT, (params) -> {
+            return params[0];
+        });
+        builder.defineOperation(NAME_OP_JSON, new JsonResultWrapper(p -> { 
+            String param = AasUtils.readString(p);
+            if (param.length() == 0) {
+                throw new ExecutionException("fails", null);
+            }
+            return param;
+        }));
         builder.createPayloadCodec(); // there are specific tests for that, we ignore the result here..
         
         builder.defineOperation(NAME_RBAC_OPCLOSED, (params) -> null);
@@ -176,7 +198,7 @@ public class AasTest {
         SetupSpec spec, TestMachine machine, AuthenticationDescriptor authDesc) {
         AasFactory factory = AasFactory.getInstance();
         InvocablesCreator invC = factory.createInvocablesCreator(spec);
-        Utils.setValue(
+        AasUtils.setValue(
             subModelBuilder.createPropertyBuilder(NAME_VAR_LOTSIZE).setType(Type.INTEGER), 
             machine.getLotSize(), invC.createGetter(NAME_VAR_LOTSIZE), invC.createSetter(NAME_VAR_LOTSIZE))
             .build();
@@ -184,7 +206,7 @@ public class AasTest {
             .setType(Type.STRING)
             .bindLazy(invC.createGetter(NAME_VAR_VENDOR), invC.createSetter(NAME_VAR_VENDOR))
             .build();
-        Utils.setValue(
+        AasUtils.setValue(
             subModelBuilder.createPropertyBuilder(NAME_VAR_POWCONSUMPTION).setType(Type.DOUBLE)
             .setSemanticId("irdi:0173-1#02-AAV232#002"), // id taken from BaSyX -> temperature ???
             machine.getPowerConsumption(), invC.createGetter(NAME_VAR_POWCONSUMPTION), InvocablesCreator.READ_ONLY)
@@ -199,6 +221,19 @@ public class AasTest {
         subModelBuilder.createOperationBuilder(NAME_OP_STOPMACHINE)
             .setInvocable(invC.createInvocable(NAME_OP_STOPMACHINE))
             .build(authDesc);
+        subModelBuilder.createOperationBuilder(NAME_OP_CONCAT)
+            .setInvocable(invC.createInvocable(NAME_OP_CONCAT))
+            .addInputVariable("val1", Type.STRING)
+            .addInputVariable("val2", Type.STRING)
+            .build(Type.STRING, authDesc);
+        subModelBuilder.createOperationBuilder(NAME_OP_IDENT)
+            .setInvocable(invC.createInvocable(NAME_OP_IDENT))
+            .addInputVariable("val", Type.STRING)
+            .build(Type.STRING, authDesc);
+        subModelBuilder.createOperationBuilder(NAME_OP_JSON)
+            .setInvocable(invC.createInvocable(NAME_OP_JSON))
+            .addInputVariable("val", Type.STRING)
+            .build(Type.STRING, authDesc);
     }
     
     /**
@@ -412,12 +447,12 @@ public class AasTest {
         
         Submodel submodel = subModelBuilder.build();
         Assert.assertNotNull(submodel.getIdentification());
-        assertSize(3, submodel.operations());
+        assertSize(6, submodel.operations());
         assertSize(0, submodel.dataElements());
         assertSize(5, submodel.properties());
-        assertSize(9, submodel.submodelElements());
+        assertSize(12, submodel.submodelElements());
         Assert.assertNotNull(submodel.getOperation(NAME_OP_RECONFIGURE));
-        Assert.assertEquals(9, submodel.getSubmodelElementsCount());
+        Assert.assertEquals(12, submodel.getSubmodelElementsCount());
         Assert.assertNull(submodel.getReferenceElement("myRef"));
         Aas aas = aasBuilder.build();
         Assert.assertNotNull(aas.getIdentification());
@@ -436,6 +471,7 @@ public class AasTest {
 
         testCreateIterate(aas, authDesc);
         testCreateRbac(aas, spec, authDesc);
+        testCreateEmpty(aas, spec, authDesc);
 
         return aas;
     }
@@ -522,7 +558,20 @@ public class AasTest {
 
         assertRoles(false);
     }
-    
+
+    /**
+     * Creates an empty submodel for deployment.
+     * 
+     * @param aas the AAS to create the submodels for
+     * @param spec the setup spec
+     * @param auth the authentication descriptor, may be <b>null</b> for none
+     */
+    private static void testCreateEmpty(Aas aas, SetupSpec spec, AuthenticationDescriptor auth) {
+        aas.createSubmodelBuilder(NAME_SUBMODEL_EMPTY, null)
+            .rbacAll(auth)
+            .build(); // just empty
+    }
+
     /**
      * Tests the create and iterate functions.
      * 
@@ -614,8 +663,141 @@ public class AasTest {
         LangString ls2 = LangString.create(str);
         Assert.assertEquals(ls2, ls1);
     }
+
+    /**
+     * Inner JSON test object.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class TestJsonInner {
+        
+        private String id;
+
+        /**
+         * Creates an instance. [JSON]
+         * 
+         * @param id the id
+         */
+        public TestJsonInner() {
+        }
+
+        /**
+         * Creates an instance.
+         * 
+         * @param id the id
+         */
+        public TestJsonInner(String id) {
+            this.id = id;
+        }
+
+        /**
+         * Returns the id.
+         * 
+         * @return the id
+         */
+        public String getId() {
+            return id;
+        }
+
+        /**
+         * Changes the id. [JSON]
+         * 
+         * @param id the id to set
+         */
+        public void setId(String id) {
+            this.id = id;
+        }
+        
+    }
+
+    /**
+     * JSON test object.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class TestJson {
+        
+        private String name;
+        private int value;
+        private TestJsonInner inner;
+
+        /**
+         * Creates an instance. [JSON]
+         * 
+         * @param id the id
+         */
+        public TestJson() {
+        }
+
+        /**
+         * Creates an instance.
+         * 
+         * @param id the id
+         */
+        public TestJson(String name, int value, TestJsonInner inner) {
+            this.name = name;
+            this.value = value;
+            this.inner = inner;
+        }
+
+        /**
+         * Returns the name.
+         * 
+         * @return the name
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * Changes the id. [JSON]
+         * 
+         * @param name the name to set
+         */
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        /**
+         * Returns the value.
+         * 
+         * @return the value
+         */
+        public int getValue() {
+            return value;
+        }
+
+        /**
+         * Changes the value. [JSON]
+         * 
+         * @param value the value to set
+         */
+        public void setValue(int value) {
+            this.value = value;
+        }
+
+        /**
+         * Returns the inner value.
+         * 
+         * @return the inner value
+         */
+        public TestJsonInner getInner() {
+            return inner;
+        }
+
+        /**
+         * Changes the inner value. [JSON]
+         * 
+         * @param inner the inner value to set
+         */
+        public void setInner(TestJsonInner inner) {
+            this.inner = inner;
+        }
+
+    }
    
     // checkstyle: stop method length check
+    // checkstyle: stop exception type check
     
     /**
      * Queries the created AAS.
@@ -633,7 +815,7 @@ public class AasTest {
         Aas aas = reg.retrieveAas(URN_AAS);
         Assert.assertNotNull(aas);
         Assert.assertEquals(NAME_AAS, aas.getIdShort());
-        Assert.assertEquals(5, aas.getSubmodelCount());
+        Assert.assertEquals(6, aas.getSubmodelCount());
         Iterator<? extends Submodel> iter = aas.submodels().iterator();
         Submodel subm = null;
         while (iter.hasNext() && (subm == null || !subm.getIdShort().equals(NAME_SUBMODEL))) {
@@ -651,7 +833,7 @@ public class AasTest {
         assertLangString(subm.getProperty(NAME_VAR_DESCRIPTION1).getValue(), "test@de");
         assertLangString(subm.getProperty(NAME_VAR_DESCRIPTION2).getValue(), "test2@en");
 
-        Assert.assertEquals(3, subm.getOperationsCount());
+        Assert.assertEquals(6, subm.getOperationsCount());
         Operation op = subm.getOperation(NAME_OP_STARTMACHINE);
         Assert.assertNotNull(op);
         op.invoke();
@@ -673,7 +855,7 @@ public class AasTest {
             Assert.assertEquals(machine.getLotSize(), lotSize.getValue());
             Assert.assertEquals(machine.getPowerConsumption(), powConsumption.getValue());
         }
-        
+        basicTests(subm);
         SubmodelElement se = subm.getSubmodelElement(NAME_SUBMODELC_OUTER);
         Assert.assertNotNull(se);
         Assert.assertTrue(se instanceof SubmodelElementCollection);
@@ -715,7 +897,11 @@ public class AasTest {
         Aas aas2 = reg.retrieveAas(reg.getEndpoint(aas));
         Assert.assertNotNull(aas2);
         Assert.assertEquals(aas2.getIdShort(), aas.getIdShort());
-        Assert.assertNull(reg.retrieveAas("http://me.here.de/aas")); // does not exist, shall lead to null
+        try {
+            Assert.assertNull(reg.retrieveAas("http://me.here.de/aas")); // does not exist, shall lead to null
+        } catch (IOException e) {
+            // also ok, BaSyx1 produced both results
+        }
         
         // do authenticated
         queryRbac(aas, true);
@@ -735,9 +921,53 @@ public class AasTest {
             Assert.assertNotNull(anonAas);
             queryRbac(anonAas, false);
         }
+
+        // was the empty submodel deployed?
+        Assert.assertNotNull(aas.getSubmodel(NAME_SUBMODEL_EMPTY));
     }
 
     // checkstyle: resume method length check
+    
+    /**
+     * Basic (operation) tests relevant for oktflow AAS.
+     * 
+     * @param subm the submodel to test on
+     * @throws ExecutionException if executing an operation fails (shall not occur)
+     * @throws IOException if accessing an operation fails (shall not occur)
+     */
+    private static void basicTests(Submodel subm) throws ExecutionException, IOException {
+        // succeeding with multiple params/args
+        Operation op = subm.getOperation(NAME_OP_CONCAT);
+        Assert.assertNotNull(op);
+        Assert.assertEquals("a.b", op.invoke("a", "b"));
+        
+        // succeeding with JSON strings (result = input)
+        op = subm.getOperation(NAME_OP_IDENT);
+        Assert.assertNotNull(op);
+        Assert.assertEquals("a", op.invoke("a"));
+        final TestJson jsonObj = new TestJson("a", 10, new TestJsonInner("in"));
+        final String json = JsonUtils.toJson(jsonObj);
+        final Object jsonOut = op.invoke(json);
+        Assert.assertEquals(json, jsonOut);
+        Assert.assertNotNull(JsonUtils.fromJson(jsonOut, TestJson.class));
+
+        // succeeding/failing via JSON wrapper
+        op = subm.getOperation(NAME_OP_JSON);
+        Assert.assertNotNull(op);
+        try {
+            fromJson(op.invoke(""));
+            Assert.fail("No exception");
+        } catch (Throwable t) {
+            // ok
+        }
+        try {
+            Assert.assertEquals("abc", fromJson(op.invoke("abc")));
+        } catch (Throwable t) {
+            Assert.fail("Unexpected exception");
+        }
+    }
+
+    // checkstyle: resume exception type check
 
     /**
      * Queries the RBAC part.

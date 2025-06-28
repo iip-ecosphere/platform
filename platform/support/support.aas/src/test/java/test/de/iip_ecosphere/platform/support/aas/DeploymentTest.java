@@ -31,6 +31,7 @@ import de.iip_ecosphere.platform.support.aas.IdentityStoreAuthenticationDescript
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.AasServer;
+import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.aas.AssetKind;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
@@ -199,7 +200,7 @@ public class DeploymentTest {
         SubmodelElementCollectionBuilder smcB = sub.createSubmodelElementCollectionBuilder("coll");
         Assert.assertTrue(smcB.isNew());
         smcB.createPropertyBuilder("prop").setValue(Type.BOOLEAN, true).build();
-        Utils.setValue(smcB.createPropertyBuilder("prop2").setType(Type.INTEGER), 5,
+        AasUtils.setValue(smcB.createPropertyBuilder("prop2").setType(Type.INTEGER), 5,
             (GetterInvokable & Serializable) () -> 5, InvocablesCreator.READ_ONLY).build();
         smcB.build();
 

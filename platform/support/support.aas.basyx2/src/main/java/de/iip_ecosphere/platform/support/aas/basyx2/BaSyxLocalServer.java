@@ -63,7 +63,7 @@ public class BaSyxLocalServer extends BaSyxAbstractAasServer {
     protected Class<?> getSmRepositoryAppClass() {
         return SubmodelRepositorySpringApp.class;
     }
-    
+
     @Override
     protected Class<?> getSmRegistryAppClass() {
         return SubmodelRegistrySpringApp.class;

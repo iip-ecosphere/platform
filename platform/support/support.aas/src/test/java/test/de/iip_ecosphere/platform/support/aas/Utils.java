@@ -5,9 +5,7 @@ import java.util.concurrent.ExecutionException;
 import org.junit.Assert;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.aas.Invokable;
 import de.iip_ecosphere.platform.support.aas.Property;
-import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 
 /**
  * ******************************************************************************
@@ -27,25 +25,6 @@ import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
  * @author Holger Eichelberger, SSE
  */
 public class Utils {
-
-    /**
-     * Sets a property value depending on the capabilities of the AAS factory.
-     * 
-     * @param builder the property builder
-     * @param value the value
-     * @param getter the getter as invokable
-     * @param setter the setter as invokable
-     * @return {@code builder} for chaining
-     */
-    public static PropertyBuilder setValue(PropertyBuilder builder, Object value, Invokable getter, Invokable setter) {
-        AasFactory factory = AasFactory.getInstance();
-        if (factory.supportsPropertyFunctions()) {
-            builder.bind(getter, setter);
-        } else {
-            builder.setValue(value);
-        }
-        return builder;
-    }
     
     /**
      * Conditional assert depending on whether property functions are supported.

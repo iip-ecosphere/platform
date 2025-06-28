@@ -41,7 +41,7 @@ public interface Registry {
      *    {@code idShort}, interpreted as an URN if this starts with {@code urn}, see {@link IdentifierType} for 
      *    others, or as an endpoint if it starts with {@code http://} or {@code https://})
      * @param populate the submodels with elements (performance!)   
-     * @return the AAS (may be <b>null</b> if the AAS does not exist)
+     * @return the AAS
      * @throws IOException if accessing the AAS fails for some reason
      */
     public Aas retrieveAas(String identifier, boolean populate) throws IOException;
