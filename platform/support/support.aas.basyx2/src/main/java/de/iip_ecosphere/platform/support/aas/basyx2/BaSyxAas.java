@@ -15,7 +15,6 @@ package de.iip_ecosphere.platform.support.aas.basyx2;
 import java.io.IOException;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultAssetAdministrationShell;
-import org.eclipse.digitaltwin.basyx.aasrepository.client.ConnectedAasRepository;
 import org.eclipse.digitaltwin.basyx.submodelrepository.client.ConnectedSubmodelRepository;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +38,6 @@ public class BaSyxAas extends AbstractAas<org.eclipse.digitaltwin.aas4j.v3.model
     implements BaSyxSubmodelParent {
 
     private BaSyxRegistry registry;
-    private ConnectedAasRepository repo;
     
     /**
      * Builder for {@code BaSyxAas}.
@@ -82,8 +80,8 @@ public class BaSyxAas extends AbstractAas<org.eclipse.digitaltwin.aas4j.v3.model
                     + "AAS.");
             }
             buildMyDeferred();
-            if (instance.repo != null) {
-                instance.repo.updateAas(instance.getIdentification(), instance.getAas());
+            if (instance.registry != null) {
+                instance.registry.getAasRepository().updateAas(instance.getIdentification(), instance.getAas());
             }
             return instance;
         }
@@ -173,10 +171,11 @@ public class BaSyxAas extends AbstractAas<org.eclipse.digitaltwin.aas4j.v3.model
      * Creates an instance. Prevents external creation.
      * 
      * @param aas the BaSyx AAS instance
+     * @param registry the registry {@code aas} is obtained from, may be <b>null</b>
      */
-    BaSyxAas(org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell aas, ConnectedAasRepository repo) {
+    BaSyxAas(org.eclipse.digitaltwin.aas4j.v3.model.AssetAdministrationShell aas, BaSyxRegistry registry) {
         super(aas);
-        this.repo = repo;
+        this.registry = registry;
     }
 
     @Override
@@ -192,6 +191,9 @@ public class BaSyxAas extends AbstractAas<org.eclipse.digitaltwin.aas4j.v3.model
             if (null == submodel) {
                 // spec may be null
                 ConnectedSubmodelRepository sRepo = SubmodelRepositoryUtils.createRepositoryApi(spec); 
+                if (null == sRepo && registry != null) {
+                    sRepo = registry.getSubmodelRepository();
+                }
                 result = new BaSyxSubmodel.BaSyxSubmodelBuilder(new BaSyxAasBuilder(this), idShort, identifier, sRepo);
             } else {
                 result = new BaSyxSubmodel.BaSyxSubmodelBuilder(new BaSyxAasBuilder(this), submodel);
@@ -227,15 +229,6 @@ public class BaSyxAas extends AbstractAas<org.eclipse.digitaltwin.aas4j.v3.model
 
     @Override
     public void update() {
-    }
-    
-    /**
-     * Sets the repository, thus, emulating a connected AAS.
-     * 
-     * @param repo the repository
-     */
-    void setRepo(ConnectedAasRepository repo) {
-        this.repo = repo;
     }
 
 }

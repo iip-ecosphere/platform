@@ -366,9 +366,9 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.digitaltwin.aas4
                 }
                 result = function.apply(getIdShort(), idShortPath, repo);
             } catch (ElementDoesNotExistException e) {
-                e.printStackTrace(System.out); // TODO preliminary
+                LoggerFactory.getLogger(getClass()).debug(e.getMessage(), e);
             } catch (ApiException e) {
-                e.printStackTrace(System.out); // TODO preliminary
+                LoggerFactory.getLogger(getClass()).debug(e.getMessage(), e);
             }
         }
         return result;

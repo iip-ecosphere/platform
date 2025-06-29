@@ -28,6 +28,7 @@ import org.eclipse.digitaltwin.basyx.aasregistry.client.api.RegistryAndDiscovery
 import org.eclipse.digitaltwin.basyx.aasregistry.client.model.AssetAdministrationShellDescriptor;
 import org.eclipse.digitaltwin.basyx.aasregistry.client.model.GetAssetAdministrationShellDescriptorsResult;
 import org.eclipse.digitaltwin.basyx.aasrepository.client.ConnectedAasRepository;
+import org.eclipse.digitaltwin.basyx.core.exceptions.CollidingIdentifierException;
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.api.SubmodelRegistryApi;
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.model.SubmodelDescriptor;
@@ -72,6 +73,24 @@ public class BaSyxRegistry implements Registry {
 
     // checkstyle: resume exception type check
 
+    /**
+     * Returns the default AAS repository of this registry.
+     * 
+     * @return the AAS repository
+     */
+    ConnectedAasRepository getAasRepository() {
+        return aasRepo;
+    }
+
+    /**
+     * Returns the default submodel repository of this registry.
+     * 
+     * @return the submodel repository
+     */
+    ConnectedSubmodelRepository getSubmodelRepository() {
+        return smRepo;
+    }
+    
     @Override
     public Aas retrieveAas(String identifier) throws IOException {
         return retrieveAas(identifier, true);
@@ -126,7 +145,7 @@ public class BaSyxRegistry implements Registry {
                 aas = getAas(aasRepo, identifier);
             }
             if (null != aas) {
-                result = new BaSyxAas(aas, aasRepo);
+                result = new BaSyxAas(aas, this);
                 if (populate) {
                     for (org.eclipse.digitaltwin.aas4j.v3.model.Reference r : result.getAas().getSubmodels()) {
                         Optional<Key> smk = r.getKeys().stream()
@@ -289,10 +308,10 @@ public class BaSyxRegistry implements Registry {
         }
         if (known) {
             aasRepo.updateAas(a.getIdentification(), a.getAas());
-            a.setRepo(aasRepo);
+            a.registerRegistry(this);
         } else {
             aasRepo.createAas(a.getAas());
-            a.setRepo(aasRepo);
+            a.registerRegistry(this);
             try {
                 aasRegistry.postAssetAdministrationShellDescriptor(desc);
             } catch (ApiException e) {
@@ -312,9 +331,15 @@ public class BaSyxRegistry implements Registry {
         }
         try {
             BaSyxSubmodel bSub = (BaSyxSubmodel) submodel;
-            smRepo.createSubmodel(bSub.getSubmodel());
+            try {
+                smRepo.createSubmodel(bSub.getSubmodel());
+            } catch (CollidingIdentifierException e) { // already there, ignore
+            }
             bSub.setRepo(smRepo);
             SubmodelRegistryUtils.postDescriptor(submodel, smRegistry, smRepo, false);
+            
+            BaSyxAas a = (BaSyxAas) aas;
+            aasRepo.updateAas(a.getIdentification(), a.getAas());
         } catch (org.eclipse.digitaltwin.basyx.client.internal.ApiException e) {
             throw new IOException(e);
         }
@@ -404,7 +429,7 @@ public class BaSyxRegistry implements Registry {
      * 
      * @return the internal submodel registry instance
      */
-    SubmodelRegistryApi getSubmodelRepository() {
+    SubmodelRegistryApi getSubmodelRegistry() {
         return smRegistry;
     }
 
