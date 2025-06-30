@@ -29,6 +29,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
 import de.iip_ecosphere.platform.support.iip_aas.Skip;
 
@@ -37,7 +38,7 @@ import de.iip_ecosphere.platform.support.iip_aas.Skip;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ClassUtilityTest {
+public class ClassUtilityTest extends TestWithPlugin {
 
     private static final String NAME_AAS = "test";
     private static final String URN_AAS = "urn:::AAS:::types#";

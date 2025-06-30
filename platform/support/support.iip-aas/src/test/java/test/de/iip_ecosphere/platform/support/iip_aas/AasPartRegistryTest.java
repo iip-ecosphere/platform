@@ -46,6 +46,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformAas;
 import de.iip_ecosphere.platform.support.iip_aas.SubmodelClient;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
 /**
  * Tests {@link AasPartRegistry}, {@link ActiveAasBase} and {@link SubmodelClient}. Do not rename, this class is 
@@ -53,7 +54,7 @@ import de.iip_ecosphere.platform.support.iip_aas.SubmodelClient;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class AasPartRegistryTest {
+public class AasPartRegistryTest extends TestWithPlugin {
     
     private static final String NAME_MY_AAS = "myAas";
 

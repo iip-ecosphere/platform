@@ -25,13 +25,14 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
 /**
  * Tests {@link AbstractAasLifecycleDescriptor}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class AasLifecycleTest {
+public class AasLifecycleTest extends TestWithPlugin {
 
     /**
      * A test lifecycle descriptor.

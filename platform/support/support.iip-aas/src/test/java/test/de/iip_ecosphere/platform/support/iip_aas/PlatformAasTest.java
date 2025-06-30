@@ -30,6 +30,7 @@ import de.iip_ecosphere.platform.support.iip_aas.PlatformAas;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformAasClient;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformClient;
 import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolutionResult;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.Eclass;
 
@@ -38,7 +39,7 @@ import de.iip_ecosphere.platform.support.iip_aas.Eclass;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class PlatformAasTest {
+public class PlatformAasTest extends TestWithPlugin {
     
     /**
      * Tests the transport AAS.

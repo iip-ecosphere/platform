@@ -36,7 +36,7 @@
                     <goals>
                         <goal>unpack</goal>
                     </goals>
-                    <phase>validate</phase>
+                    <phase>test-compile</phase>
                     <configuration>
                         <artifactItems>
                             <artifactItem>
@@ -60,6 +60,10 @@
                                 <destFileName>basyx.zip</destFileName>
                             </artifactItem>
                         </artifactItems>
+                     <cleanup>
+                         <directory>${project.build.directory}/oktoPlugins</directory>
+                     </cleanup>
+                     <skipIfExists>../support</skipIfExists> <!-- test uses local plugin, not on CI -->
                     </configuration>
                 </execution>
             </executions>
@@ -109,19 +113,6 @@
      <type>test-jar</type>
      <scope>test</scope>
     </dependency>  
-<dependency>
-     <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>support.aas.basyx</artifactId>
-     <version>${project.version}</version>
-     <scope>test</scope>
-    </dependency>  
-    <dependency>
-     <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>support.aas.basyx</artifactId>
-     <version>${project.version}</version>
-     <type>test-jar</type>
-     <scope>test</scope>
-</dependency>
     <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
