@@ -52,7 +52,7 @@ public class PlatformAasTest {
         // obtain the plattform AAS and go then on with the transport sub-model
         // shortcut test as AAS is not dynamic/active
 
-        AasSetup oldSetup = AasPartRegistry.setAasSetup(AasSetup.createLocalEphemeralSetup());
+        AasSetup oldSetup = AasPartRegistry.setAasSetup(AasSetup.createLocalEphemeralSetup(), true);
         AasPartRegistry.AasBuildResult res = AasPartRegistry.build(c -> c instanceof PlatformAas);
 
         Server implServer = res.getProtocolServerBuilder().build();

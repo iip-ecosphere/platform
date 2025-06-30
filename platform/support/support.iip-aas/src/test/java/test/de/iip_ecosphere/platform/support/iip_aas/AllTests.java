@@ -34,4 +34,5 @@ import org.junit.runners.Suite;
     AasLifecycleTest.class
 })
 public class AllTests {
+
 }

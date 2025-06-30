@@ -60,7 +60,7 @@ public class AasLifecycleTest {
         boolean waitFor = AbstractAasLifecycleDescriptor.setWaitForIipAas(false);
         NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
         AasSetup aasSetup = AasSetup.createLocalEphemeralSetup(null, false);
-        AasSetup oldSetup = AasPartRegistry.setAasSetup(aasSetup);
+        AasSetup oldSetup = AasPartRegistry.setAasSetup(aasSetup, true);
 
         ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
         Server registryServer = rcp

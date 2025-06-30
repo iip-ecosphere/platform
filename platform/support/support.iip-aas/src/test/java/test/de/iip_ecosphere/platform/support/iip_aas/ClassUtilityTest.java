@@ -209,7 +209,6 @@ public class ClassUtilityTest {
         aas = factory.obtainRegistry(spec).retrieveAas(URN_AAS);
         aas.accept(new AasPrintVisitor());
         assertTypeSubmodel(aas);
-
         httpServer.stop(true);
     }
 

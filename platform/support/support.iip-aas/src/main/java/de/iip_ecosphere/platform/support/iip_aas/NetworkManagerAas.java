@@ -20,6 +20,7 @@ import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
@@ -97,13 +98,13 @@ public class NetworkManagerAas implements AasContributor {
                 .addInputVariable("key", Type.STRING)
                 .setInvocable(iCreator.createInvocable(getQName(OP_GET_REGISTERED_INSTANCES)))
                 .build(Type.INTEGER, auth);
-            smB.createPropertyBuilder(PROP_HIGH_PORT)
-                .setType(Type.INTEGER)
-                .bind(iCreator.createGetter(getQName(PROP_HIGH_PORT)), PropertyBuilder.READ_ONLY)
+            AasUtils.setValue(smB.createPropertyBuilder(PROP_HIGH_PORT)
+                .setType(Type.INTEGER), NetworkManagerFactory.getInstance().getHighPort(),
+                    iCreator.createGetter(getQName(PROP_HIGH_PORT)), PropertyBuilder.READ_ONLY)
                 .build(auth);
-            smB.createPropertyBuilder(PROP_LOW_PORT)
-                .setType(Type.INTEGER)
-                .bind(iCreator.createGetter(getQName(PROP_LOW_PORT)), PropertyBuilder.READ_ONLY)
+            AasUtils.setValue(smB.createPropertyBuilder(PROP_LOW_PORT)
+                .setType(Type.INTEGER), NetworkManagerFactory.getInstance().getLowPort(), 
+                    iCreator.createGetter(getQName(PROP_LOW_PORT)), PropertyBuilder.READ_ONLY)
                 .build(auth);
             smB.build();
         }

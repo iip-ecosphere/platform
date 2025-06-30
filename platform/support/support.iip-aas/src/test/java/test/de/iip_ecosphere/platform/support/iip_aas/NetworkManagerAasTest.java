@@ -47,7 +47,7 @@ public class NetworkManagerAasTest {
     @Test
     public void testAas() throws ExecutionException, IOException {
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(NetworkManagerAas.class));
-        AasSetup oldSetup = AasPartRegistry.setAasSetup(AasSetup.createLocalEphemeralSetup());
+        AasSetup oldSetup = AasPartRegistry.setAasSetup(AasSetup.createLocalEphemeralSetup(), true);
         AasPartRegistry.AasBuildResult res = AasPartRegistry.build();
         // active AAS require two server instances and a deployment
         Server implServer = res.getProtocolServerBuilder().build();

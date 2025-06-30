@@ -505,6 +505,7 @@ public class AasPartRegistry {
          * @param regPortSame shall the registry port be the same as the AAS port
          * @param supplier a supplier for a new instance
          * @return the local ephemeral setup
+         * @see AasFactory#supportsSamePorts()
          */
         @JsonIgnore
         public static <A extends AasSetup> A createLocalEphemeralSetup(A setup, boolean regPortSame, 
@@ -512,6 +513,9 @@ public class AasPartRegistry {
             A result = setup;
             if (null == result) {
                 result = supplier.get();
+            }
+            if (regPortSame) { // overwrite if not supported
+                regPortSame = AasFactory.getInstance().supportsSamePorts();
             }
             result.getServer().setHost(ServerAddress.LOCALHOST);
             result.getServer().setPort(NetUtils.getEphemeralPort());
@@ -728,6 +732,17 @@ public class AasPartRegistry {
          */
         public Server getProtocolServer() {
             return protocolServer;
+        }
+
+        /**
+         * Stops the protocol server. Ignored if there is none
+         *  
+         * @param dispose whether resources shall be disposed
+         */
+        public void stopProtocolServer(boolean dispose) {
+            if (null != protocolServer) {
+                protocolServer.stop(dispose);
+            }
         }
         
     }
