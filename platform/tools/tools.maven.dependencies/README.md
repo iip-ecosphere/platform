@@ -46,7 +46,8 @@ The extended unpack goal supports the following additional configuration setting
   - `initiallyAllowed` (default not given, user property `unpack.initiallyAllowed`) list of colon or semicolon separated relative file names (default empty) or file wildcards (`?` for one character, `*` for arbitrary characters) in one of the `outputDirectory` settings in the `artifactItems`. Path separators may be given in Windows or Linux manner and will be normalized. If an existing `outputDirectory` only contains `initiallyAllowed` files, perform the unpacking anyway, else only if `force` (or `-Dunpack.force`) is given.
   - `initiallyAllowedFile` (default not given, user property `unpack.initiallyAllowed`) like `initiallyAllowed` but given as a text file with one allowed file/wildcard per line. The initially allowed file is automatically part of the initially allowed file set. If both, `initiallyAllowed` and `initiallyAllowedFile` are given, first the allowed files from `initiallyAllowedFile` and then those in `initiallyAllowed` are added to the set of allowed files.
   - `skip` (default `false`, user property `mdep.skip`, inherited from original maven plugin) skips the execution of this plugin.
-  - `skipIfExists` (default `false`) skips the execution of this plugin if the file or folder specified in this property exists.
+  - `skipIfExists` (default `false`, user property `unpack.skipIfExists`) skips the execution of this plugin if the file or folder specified in this property exists.
+  - `forceCleanup` (default `false`, user property `unpack.forceCleanup`) forces the cleanup of `cleanup` before doing any checks/validating the artifacts/executing the plugin.
   
 ## copy-dependencies goal
 

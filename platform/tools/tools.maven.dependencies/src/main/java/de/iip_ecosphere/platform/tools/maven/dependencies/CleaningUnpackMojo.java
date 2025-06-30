@@ -58,7 +58,10 @@ public class CleaningUnpackMojo extends UnpackMojo {
     @Parameter(property = "unpack.force", required = false, defaultValue = "false")
     private boolean force;
     
-    @Parameter( property = "skipIfExists", required = false, defaultValue = "" )
+    @Parameter(property = "unpack.forceCleanup", required = false, defaultValue = "false")
+    private boolean forceCleanup;    
+    
+    @Parameter( property = "unpack.skipIfExists", required = false, defaultValue = "" )
     private File skipIfExists;
 
     /**
@@ -125,6 +128,9 @@ public class CleaningUnpackMojo extends UnpackMojo {
     
     @Override
     protected void doExecute() throws MojoExecutionException, MojoFailureException {
+        if (forceCleanup) {
+            FilesetUtils.deletePaths(cleanup, getLog());
+        }
         boolean execute;
         if (force) {
             execute = true;
@@ -155,7 +161,9 @@ public class CleaningUnpackMojo extends UnpackMojo {
         }        
         
         if (execute) {
-            FilesetUtils.deletePaths(cleanup, getLog());
+            if (!forceCleanup) {
+                FilesetUtils.deletePaths(cleanup, getLog());
+            }
             super.doExecute();
         }
     }
