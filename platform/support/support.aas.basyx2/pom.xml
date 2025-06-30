@@ -309,7 +309,7 @@
                          <pathSeparator>:</pathSeparator>
                          <includeScope>runtime</includeScope>
                          <prepends>
-                             <prepend>target\${project.artifactId}-${project.version}.jar</prepend>
+                             <prepend>target/${project.artifactId}-${project.version}.jar</prepend>
                          </prepends>
                          <excludeArtifactIds>support.aas, support</excludeArtifactIds>
                      </configuration>
