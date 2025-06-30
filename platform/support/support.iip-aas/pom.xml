@@ -63,6 +63,7 @@
                      <cleanup>
                          <directory>${project.build.directory}/oktoPlugins</directory>
                      </cleanup>
+                     <forceCleanup>true</forceCleanup>
                      <skipIfExists>../support</skipIfExists> <!-- test uses local plugin, not on CI -->
                     </configuration>
                 </execution>
