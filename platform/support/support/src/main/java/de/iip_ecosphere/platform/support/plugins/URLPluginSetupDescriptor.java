@@ -112,7 +112,7 @@ public class URLPluginSetupDescriptor implements PluginSetupDescriptor {
     @Override
     public ClassLoader createClassLoader(ClassLoader parent) {
         LoggerFactory.getLogger(URLPluginSetupDescriptor.class)
-            .info("Creating classpath for {}", Arrays.toString(urls));
+            .debug("Creating classpath for {}", Arrays.toString(urls));
         return new ChildFirstURLClassLoader(urls, parent);
     }
 

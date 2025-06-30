@@ -675,8 +675,6 @@ public class AasTest {
 
         /**
          * Creates an instance. [JSON]
-         * 
-         * @param id the id
          */
         public TestJsonInner() {
         }
@@ -723,16 +721,12 @@ public class AasTest {
 
         /**
          * Creates an instance. [JSON]
-         * 
-         * @param id the id
          */
         public TestJson() {
         }
 
         /**
          * Creates an instance.
-         * 
-         * @param id the id
          */
         public TestJson(String name, int value, TestJsonInner inner) {
             this.name = name;
