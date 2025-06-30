@@ -57,6 +57,9 @@ public class CleaningUnpackMojo extends UnpackMojo {
 
     @Parameter(property = "unpack.force", required = false, defaultValue = "false")
     private boolean force;
+    
+    @Parameter( property = "skipIfExists", required = false, defaultValue = "" )
+    private File skipIfExists;
 
     /**
      * Returns whether there is a setup for initially allowed files, considering {@link #initiallyAllowedFile} and 
@@ -143,6 +146,12 @@ public class CleaningUnpackMojo extends UnpackMojo {
                     }
                 }
             }
+            if (skipIfExists != null && skipIfExists.toString().length() > 0) {
+                if (skipIfExists.exists()) {
+                    getLog().info("Disabling execution as " + skipIfExists + " exists");
+                    execute = false;
+                }
+            }            
         }        
         
         if (execute) {
