@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.support.plugins;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 
 import org.slf4j.LoggerFactory;
 
@@ -110,6 +111,8 @@ public class URLPluginSetupDescriptor implements PluginSetupDescriptor {
     
     @Override
     public ClassLoader createClassLoader(ClassLoader parent) {
+        LoggerFactory.getLogger(URLPluginSetupDescriptor.class)
+            .info("Creating classpath for {}", Arrays.toString(urls));
         return new ChildFirstURLClassLoader(urls, parent);
     }
 

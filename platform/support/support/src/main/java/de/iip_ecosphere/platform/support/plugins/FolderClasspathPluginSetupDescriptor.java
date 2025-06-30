@@ -56,6 +56,7 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
             f = new File(folder, "target/classes/classpath"); // development, in project
         }
         try (InputStream in = new FileInputStream(f)) {
+            LoggerFactory.getLogger(URLPluginSetupDescriptor.class).info("Loading classpath from '{}'", f);
             List<File> entries = new ArrayList<File>();
             String contents = IOUtils.toString(in, Charset.defaultCharset());
             StringTokenizer tokenizer = new StringTokenizer(contents, ":;");
@@ -65,7 +66,7 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
             result = toURLSafe(entries.toArray(new File[entries.size()]));
         } catch (IOException e) {
             LoggerFactory.getLogger(URLPluginSetupDescriptor.class).error(
-                "While classpath from '{}': {} Ignoring.", folder, e.getMessage());
+                "While classpath from '{}': {} Ignoring.", f, e.getMessage());
         }
         if (null == result) {
             result = new URL[0];
