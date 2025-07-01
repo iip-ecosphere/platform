@@ -39,9 +39,13 @@ public class TestWithPlugin {
         if (!loaded) {
             loaded = true;
             boolean found = false;
-            File folder = new File("../support.aas.basyx2");
+            final String testFolder = "support.aas.basyx2";
+            File folder = new File("..", testFolder); // for platform parts in "support"
             if (!folder.isDirectory()) {
-                folder = new File("..", folder.toString());
+                folder = new File("../support", testFolder); // just in case
+            }
+            if (!folder.isDirectory()) {
+                folder = new File("../../support", testFolder); // usual nesting of platform part in different folder
             }
             if (folder.isDirectory()) { // in local git repo
                 LoggerFactory.getLogger(TestWithPlugin.class).info("Loading plugins from {} (development)", folder);
