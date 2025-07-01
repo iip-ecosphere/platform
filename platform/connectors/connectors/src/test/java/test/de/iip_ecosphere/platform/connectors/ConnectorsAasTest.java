@@ -47,13 +47,14 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
 /**
  * Tests the connectors AAS.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ConnectorsAasTest {
+public class ConnectorsAasTest extends TestWithPlugin {
 
     private static final String NAME_CONN1 = "Connector1";
     private static final String NAME_CONN2 = "Connector2";
