@@ -25,13 +25,14 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.transport.TransportAas;
 import de.iip_ecosphere.platform.transport.TransportFactory;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
 /**
  * Tests the transport AAS.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class TransportAasTest {
+public class TransportAasTest extends TestWithPlugin {
     
     /**
      * Tests the transport AAS.
