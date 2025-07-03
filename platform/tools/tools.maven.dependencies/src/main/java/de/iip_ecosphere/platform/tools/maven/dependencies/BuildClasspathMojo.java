@@ -14,7 +14,6 @@ package de.iip_ecosphere.platform.tools.maven.dependencies;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,10 +45,16 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
     private static final Function<String, String> TO_LINUX = s -> null == s ? null : s.replace('\\', '/');
 
     @Parameter( property = "mdep.outputFile" )
-    private File outputFile;
+    private File outputFile; // -> setter
     
     @Parameter( property = "mdep.pathSeparator", defaultValue = "" )
-    private String pathSeparator;
+    private String pathSeparator; // -> setter
+    
+    @Parameter( property = "mdep.prefix" )
+    private String prefix; // -> setter
+    
+    @Parameter( property = "mdep.localRepoProperty", defaultValue = "" )
+    private String localRepoProperty; // -> setter
 
     @Parameter( property = "mdep.cleanup", defaultValue = "true" )
     private boolean cleanup;
@@ -75,6 +80,18 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
     public void setPathSeparator(String thePathSeparator) {
         super.setPathSeparator(thePathSeparator);
         this.pathSeparator = thePathSeparator;
+    }
+    
+    @Override
+    public void setLocalRepoProperty(String localRepoProperty) {
+        super.setLocalRepoProperty(localRepoProperty);
+        this.localRepoProperty = localRepoProperty;
+    }
+    
+    @Override
+    public void setPrefix(String thePrefix) {
+        super.setPrefix(thePrefix);
+        this.prefix = thePrefix;
     }
     
     /**
@@ -130,33 +147,14 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
         }
         return result;
     }
-    
-    /**
-     * Returns the value of a parent property by reflection. Whyever we do not get them via annotation.
-     * 
-     * @param name the name of the property/field
-     * @param dflt the default value
-     * @return
-     */
-    private String getParentProperty(String name, String dflt) {
-        Object obj = null; 
-        try {
-            Field f = getClass().getSuperclass().getDeclaredField(name);
-            f.setAccessible(true);
-            obj = f.get(this);
-        } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-            getLog().error("Cannot access parent property " + name + ": " + e.getMessage());            
-        }
-        return null == obj ? dflt : obj.toString();
-    }
 
     @Override
     protected void doExecute() throws MojoExecutionException {
         doExecuteImpl(); // the basic execution
         if (rollout) {
             File initialOutputFile = outputFile;
-            String initialPrefix = getParentProperty("prefix", null); // whyever we do not get the values as property
-            String initialLocalRepoProperty = getParentProperty("localRepoProperty", "");
+            String initialPrefix = prefix; // whyever we do not get the values as property
+            String initialLocalRepoProperty = localRepoProperty;
             List<String> initialAppends = appends;
             List<String> initialPrepends = prepends;
             
