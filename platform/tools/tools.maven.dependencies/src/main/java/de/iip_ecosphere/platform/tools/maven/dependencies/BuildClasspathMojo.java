@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.tools.maven.dependencies;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.function.Function;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -40,6 +42,9 @@ import org.apache.maven.project.MavenProject;
     defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true )
 public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.fromDependencies.BuildClasspathMojo {
 
+    private static final Function<String, String> TO_WIN = s -> null == s ? null : s.replace('/', '\\');
+    private static final Function<String, String> TO_LINUX = s -> null == s ? null : s.replace('\\', '/');
+
     @Parameter( property = "mdep.outputFile" )
     private File outputFile;
     
@@ -54,6 +59,9 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
 
     @Parameter(required = false) 
     private List<String> appends;
+    
+    @Parameter(required = false) 
+    private boolean rollout;
     
     private Set<String> oldEntries;
 
@@ -104,9 +112,82 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
     static List<String> readEntriesToList(String contents) {
         return readEntries(contents, new ArrayList<String>());
     }
+    
+    /**
+     * Copies a given list and applies the specific {@code transform} function to the elements.
+     * 
+     * @param list the list to copy, may be <b>null</b>
+     * @param transform the transform function
+     * @return the copied list, <b>null</b> if {@code list} is <b>null</b>
+     */
+    private static List<String> copy(List<String> list, Function<String, String> transform) {
+        List<String> result = list;
+        if (result != null) {
+            result = new ArrayList<String>(list.size());
+            for (String e : list) {
+                result.add(transform.apply(e));
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Returns the value of a parent property by reflection. Whyever we do not get them via annotation.
+     * 
+     * @param name the name of the property/field
+     * @param dflt the default value
+     * @return
+     */
+    private String getParentProperty(String name, String dflt) {
+        Object obj = null; 
+        try {
+            Field f = getClass().getSuperclass().getDeclaredField(name);
+            f.setAccessible(true);
+            obj = f.get(this);
+        } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+            getLog().error("Cannot access parent property " + name + ": " + e.getMessage());            
+        }
+        return null == obj ? dflt : obj.toString();
+    }
 
     @Override
     protected void doExecute() throws MojoExecutionException {
+        doExecuteImpl(); // the basic execution
+        if (rollout) {
+            File initialOutputFile = outputFile;
+            String initialPrefix = getParentProperty("prefix", null); // whyever we do not get the values as property
+            String initialLocalRepoProperty = getParentProperty("localRepoProperty", "");
+            List<String> initialAppends = appends;
+            List<String> initialPrepends = prepends;
+            
+            outputFile = new File(initialOutputFile.toString() + "-win");
+            setOutputFile(outputFile);
+            setPathSeparator(";");
+            setFileSeparator("\\");
+            setLocalRepoProperty(TO_WIN.apply(initialLocalRepoProperty));
+            setPrefix(TO_WIN.apply(initialPrefix));
+            appends = copy(initialAppends, TO_WIN);
+            prepends = copy(initialPrepends, TO_WIN);
+            doExecuteImpl();
+
+            outputFile = new File(initialOutputFile.toString() + "-linux");
+            setOutputFile(outputFile);
+            setPathSeparator(":");
+            setFileSeparator("/");
+            setLocalRepoProperty(TO_LINUX.apply(initialLocalRepoProperty));
+            setPrefix(TO_LINUX.apply(initialPrefix));
+            appends = copy(initialAppends, TO_LINUX);
+            prepends = copy(initialPrepends, TO_LINUX);
+            doExecuteImpl();
+        }
+    }
+    
+    /**
+     * The actual extended implementation.
+     * 
+     * @throws MojoExecutionException if the execution fails
+     */
+    private void doExecuteImpl() throws MojoExecutionException {
         if (cleanup && outputFile.exists()) {
             try {
                 oldEntries = readEntriesToSet(FileUtils.readFileToString(outputFile, Charset.defaultCharset()));
@@ -165,6 +246,5 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
             }           
         }
     }
-    
 
 }
