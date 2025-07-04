@@ -184,7 +184,7 @@ public class PluginManager {
      * 
      * @param desc the plugin setup descriptor
      * @see #registerPlugin(PluginSetupDescriptor, boolean)
-     * @see #registerPlugin(PluginDescriptor, boolean)
+     * @see #registerPlugin(PluginDescriptor, boolean, File)
      */
     public static void registerPlugin(PluginSetupDescriptor desc) {
         registerPlugin(desc, false);
@@ -197,7 +197,7 @@ public class PluginManager {
      * @param desc the plugin setup descriptor
      * @param onlyNew if {@code true} considers only unknown/new plugins, if {@code false} consides all plugins and 
      *   issues warnings
-     * @see #registerPlugin(PluginDescriptor, boolean)
+     * @see #registerPlugin(PluginDescriptor, boolean, File)
      */
     private static void registerPlugin(PluginSetupDescriptor desc, boolean onlyNew) {
         LoggerFactory.getLogger(PluginManager.class).info("Found plugin setup descriptor {}. Trying registration", 
@@ -205,7 +205,7 @@ public class PluginManager {
         ClassLoader loader = PluginManager.class.getClassLoader();
         ServiceLoaderUtils
             .stream(ServiceLoader.load(PluginDescriptor.class, desc.createClassLoader(loader)))
-            .forEach(d -> registerPlugin(d, onlyNew));
+            .forEach(d -> registerPlugin(d, onlyNew, desc.getInstallDir()));
     }
 
     /**
@@ -215,9 +215,10 @@ public class PluginManager {
      * @param desc the descriptor to register
      * @param onlyNew if {@code true} considers only unknown/new plugins, if {@code false} considers all plugins and 
      *   issues warnings
+     * @param installDir the installation directory, may be <b>null</b>
      */
-    private static void registerPlugin(PluginDescriptor<?> desc, boolean onlyNew) {
-        Plugin<?> plugin = desc.createPlugin();
+    private static void registerPlugin(PluginDescriptor<?> desc, boolean onlyNew, File installDir) {
+        Plugin<?> plugin = desc.createPlugin(installDir);
         Class<?> pluginClass = plugin.getInstanceClass();
         List<String> ids = plugin.getAllIds();
         boolean dflt = ids.stream().anyMatch(i -> i.endsWith(POSTFIX_ID_DEFAULT));
@@ -256,10 +257,20 @@ public class PluginManager {
      * Returns the class loader of the specified plugin.
      * 
      * @param id the plugin id
-     * @return the class loader or <b>null</b> if unknown
+     * @return the class loader or the current cpntext class loader if unknown
      */
     public static ClassLoader getPluginLoader(String id) {
-        ClassLoader result = null;
+        return getPluginLoader(id, Thread.currentThread().getContextClassLoader());
+    }
+
+    /**
+     * Returns the class loader of the specified plugin.
+     * 
+     * @param id the plugin id
+     * @return the class loader or {@code dflt} if unknown
+     */
+    public static ClassLoader getPluginLoader(String id, ClassLoader dflt) {
+        ClassLoader result = dflt;
         if (null != id) {
             PluginDescriptor<?> desc = descriptors.get(id);
             if (null != desc) {

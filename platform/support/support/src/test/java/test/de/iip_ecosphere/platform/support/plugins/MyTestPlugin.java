@@ -36,7 +36,7 @@ public class MyTestPlugin implements Server {
          * Creates an instance.
          */
         public MyTestPluginDescriptor() {
-            super(ID, null, Server.class, () -> INSTANCE);
+            super(ID, null, Server.class, p -> INSTANCE);
         }
         
     }

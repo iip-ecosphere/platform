@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,13 +34,49 @@ import org.slf4j.LoggerFactory;
  */
 public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescriptor {
 
+    private File folder;
+    private boolean descriptorOnly;
+
     /**
      * Creates an instance based on project folder containing jars and the classpath in "target/classes/classpath".
      * 
      * @param folder the basis folder
      */
     public FolderClasspathPluginSetupDescriptor(File folder) {
-        super(loadClasspathSafe(folder));
+        this(folder, false);
+    }
+
+    /**
+     * Creates an instance based on project folder containing jars and the classpath in "target/classes/classpath".
+     * 
+     * @param folder the basis folder
+     * @param descriptorOnly load the descriptor JARs only or the full thing
+     */
+    public FolderClasspathPluginSetupDescriptor(File folder, boolean descriptorOnly) {
+        super(loadClasspathSafe(folder, descriptorOnly));
+        this.folder = folder;
+        this.descriptorOnly = descriptorOnly;
+    }
+
+    @Override
+    public File getInstallDir() {
+        return folder;
+    }
+    
+    /**
+     * Finds the classpath file.
+     * 
+     * @param folder the folder to start searching
+     * @param suffix optional suffix, e.g., "-win", may be empty or <b>null</b> for none
+     * @return the classpath file
+     */
+    public static File findClasspathFile(File folder, String suffix) {
+        suffix = suffix == null ? "" : suffix;
+        File f = new File(folder, "classpath" + suffix); // unpacked
+        if (!f.exists()) {
+            f = new File(folder, "target/classes/classpath" + suffix); // development, in project
+        }
+        return f;
     }
 
     /**
@@ -47,14 +84,12 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
      * exceptions.
      * 
      * @param folder the basis folder
+     * @param descriptorOnly only the first/two entries, the full thing else
      * @return the URLs, may be empty
      */
-    public static URL[] loadClasspathSafe(File folder) {
+    public static URL[] loadClasspathSafe(File folder, boolean descriptorOnly) {
         URL[] result = null;
-        File f = new File(folder, "classpath"); // unpacked
-        if (!f.exists()) {
-            f = new File(folder, "target/classes/classpath"); // development, in project
-        }
+        File f = findClasspathFile(folder, "");
         try (InputStream in = new FileInputStream(f)) {
             LoggerFactory.getLogger(URLPluginSetupDescriptor.class).info("Loading classpath from '{}'", f);
             List<File> entries = new ArrayList<File>();
@@ -62,6 +97,18 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
             StringTokenizer tokenizer = new StringTokenizer(contents, ":;");
             while (tokenizer.hasMoreTokens()) {
                 entries.add(new File(folder, tokenizer.nextToken()));
+            }
+            if (descriptorOnly) {
+                if (entries.size() > 1) {
+                    List<File> tmp = new ArrayList<>();
+                    tmp.add(entries.get(0));
+                    String first = stripExtension(entries.get(0).getName());
+                    String second = stripExtension(entries.get(1).getName());
+                    if (second.startsWith(first)) { // xxx-tests
+                        tmp.add(entries.get(1));
+                    }
+                    entries = tmp;
+                }
             }
             result = toURLSafe(entries.toArray(new File[entries.size()]));
         } catch (IOException e) {
@@ -72,6 +119,25 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
             result = new URL[0];
         }
         return result;
+    }
+    
+    /**
+     * Strip the extension of a file name.
+     * 
+     * @param name the name
+     * @return the stripped name
+     */
+    private static final String stripExtension(String name) {
+        int pos = name.lastIndexOf('.');
+        if (pos > 0) {
+            name = name.substring(0, pos);
+        }
+        return name;
+    }
+
+    @Override
+    protected ClassLoader createClassLoader(URL[] urls, ClassLoader parent) {
+        return descriptorOnly ? new URLClassLoader(urls, parent) : super.createClassLoader(urls, parent);
     }
 
 }

@@ -12,8 +12,9 @@
 
 package de.iip_ecosphere.platform.support.plugins;
 
+import java.io.File;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 /**
  * Represents a singleton plugin, i.e., a plugin holds and returns a singleton instance.
@@ -32,9 +33,11 @@ public class SingletonPlugin<T> extends Plugin<T> {
      * @param ids further (optional) ids, may be empty or <b>null</b>
      * @param instanceCls the instance class
      * @param creator the creator supplier
+     * @param installDir the installation directory, may be <b>null</b>
      */
-    public SingletonPlugin(String id, List<String> ids, Class<T> instanceCls, Supplier<T> creator) {
-        super(id, ids, instanceCls, creator);
+    public SingletonPlugin(String id, List<String> ids, Class<T> instanceCls, Function<Plugin<T>, T> creator, 
+        File installDir) {
+        super(id, ids, instanceCls, creator, installDir);
     }
 
     /**

@@ -12,9 +12,10 @@
 
 package de.iip_ecosphere.platform.support.plugins;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 /**
  * Represents a plugin.
@@ -27,7 +28,8 @@ public class Plugin<T> {
     private String id;
     private List<String> ids;
     private Class<T> instanceCls;
-    private Supplier<T> creator;
+    private Function<Plugin<T>, T> creator;
+    private File installDir;
     
     /**
      * Creates a plugin instance.
@@ -36,12 +38,14 @@ public class Plugin<T> {
      * @param ids further (optional) ids, may be empty or <b>null</b>
      * @param instanceCls the instance class
      * @param creator the creator supplier
+     * @param installDir the installation directory, may be <b>null</b>
      */
-    public Plugin(String id, List<String> ids, Class<T> instanceCls, Supplier<T> creator) {
+    public Plugin(String id, List<String> ids, Class<T> instanceCls, Function<Plugin<T>, T> creator, File installDir) {
         this.id = id;
         this.ids = ids;
         this.instanceCls = instanceCls;
         this.creator = creator;
+        this.installDir = installDir;
     }
     
     /**
@@ -91,13 +95,22 @@ public class Plugin<T> {
      * @return the implementing class
      */
     public T getInstance() {
-        return creator.get();
+        return creator.apply(this);
     }
     
     /**
      * Cleans up this plugin.
      */
     public void cleanup() {
+    }
+
+    /**
+     * Returns the installation directory.
+     * 
+     * @return the directory, may be <b>null</b>
+     */
+    public File getInstallDir() {
+        return installDir;
     }
 
 }

@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.plugins;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -41,9 +42,10 @@ public interface PluginDescriptor<T> {
     /**
      * Creates a plugin instance.
      * 
+     * @param installDir the installation directory, may be <b>null</b>
      * @return the plugin instance
      */
-    public Plugin<T> createPlugin();
+    public Plugin<T> createPlugin(File installDir);
     
     /**
      * Returns the type of plugin being created.

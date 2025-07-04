@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.support.plugins;
 
+import java.io.File;
+
 /**
  * A descriptor to describe the presence of a plugin. Used for setting up the {@link PluginManager}.
  * 
@@ -26,5 +28,14 @@ public interface PluginSetupDescriptor {
      * @return the class loader
      */
     public ClassLoader createClassLoader(ClassLoader parent);
+    
+    /**
+     * Returns the installation directory.
+     * 
+     * @return the installation directory, may be <b>null</b>
+     */
+    public default File getInstallDir() {
+        return null;
+    }
     
 }

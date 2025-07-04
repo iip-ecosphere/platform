@@ -70,8 +70,10 @@ class ChildURLClassLoader extends URLClassLoader {
 
     @Override
     public Class<?> findClass(String name) throws ClassNotFoundException {
-        if (name.startsWith("java.") || name.startsWith("javax.") // Java is Java
-            || name.startsWith("org.slf4j.")) { // different handling, otherwise LinkageError
+        boolean isJava = name.startsWith("java.") || name.startsWith("javax."); // java is java
+        boolean isLogger = name.startsWith("org.slf4j.") // otherwise LinkageError
+            || name.startsWith("ch.qos.logback."); // often instanceof required
+        if (isJava || isLogger) {
             return realParent.loadClass(name);
         }
         try {
