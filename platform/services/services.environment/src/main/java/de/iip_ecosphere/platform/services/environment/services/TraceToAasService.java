@@ -323,7 +323,8 @@ public class TraceToAasService extends AbstractService {
                 AuthenticationDescriptor aDesc = AasPartRegistry.getSubmodelAuthentication();
                 AasFactory factory = AasFactory.getInstance();
                 AasBuilder aasBuilder = factory.createAasBuilder(getAasId(), getAasUrn());
-                SubmodelBuilder smBuilder = PlatformAas.createNameplate(aasBuilder, appSetup);
+                SubmodelBuilder smBuilder = PlatformAas.createNameplate(aasBuilder, appSetup, 
+                    null);
                 PlatformAas.addSoftwareInfo(smBuilder, appSetup);
                 smBuilder.build();
                 smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_COMMANDS, null)
