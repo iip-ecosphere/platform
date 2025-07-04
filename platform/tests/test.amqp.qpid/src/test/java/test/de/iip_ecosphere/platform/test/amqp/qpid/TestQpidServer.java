@@ -19,6 +19,7 @@ import org.apache.qpid.server.SystemLauncher;
 import org.apache.qpid.server.model.Broker;
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -30,6 +31,8 @@ import test.de.iip_ecosphere.platform.transport.AbstractTestServer;
  * @author Holger Eichelberger, SSE
  */
 public class TestQpidServer extends AbstractTestServer {
+    
+    // DO NOT RENAME, REFERENCED BY PLUGIN DESCRIPTOR
     
     public static final String KEYSTORE_PASSWORD = "a1234567";
     public static final String KEY_ALIAS = "qpid";
@@ -89,9 +92,12 @@ public class TestQpidServer extends AbstractTestServer {
     /**
      * Starts the server from the command line.
      * 
-     * @param args the first argument may be the port number, else 8883 is used
+     * @param args the first argument may be the port number, else 8883 is used; the second argument may be the 
+     *    configuration directory, else the default is used
      */
     public static void main(String[] args) {
+        applyBaseDir(args, 1, "./src/test");
+        System.setProperty("QPID_WORK", new File(FileUtils.getTempDirectory(), "qpid").getAbsolutePath());
         TestQpidServer server = new TestQpidServer(new ServerAddress(Schema.IGNORE, getInteger(args, 8883)));
         server.start();
     }
