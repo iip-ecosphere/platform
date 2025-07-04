@@ -59,4 +59,9 @@ public class BaSyxAasFactory extends AbstractBaSyxAasFactory {
         return "AAS/BaSyx v2 M5";
     }
 
+    @Override
+    public String getMetaModelVersion() {
+        return "v3";
+    }
+    
 }

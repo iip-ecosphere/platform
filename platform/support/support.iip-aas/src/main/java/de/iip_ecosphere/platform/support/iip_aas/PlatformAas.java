@@ -69,6 +69,9 @@ public class PlatformAas implements AasContributor {
     public static final String NAME_PROPERTY_STREET = "Street";
     public static final String NAME_PROPERTY_ZIPCODE = "ZipCode";
     
+    public static final String ID_PART_PLATFORM = "PLATF";
+    public static final String ID_PART_TECHNICAL_DATA = "TD";
+    
     private static ResourceResolver imageResolver = AasUtils.CLASSPATH_RESOURCE_RESOLVER;
     
     /**
@@ -94,7 +97,8 @@ public class PlatformAas implements AasContributor {
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         AuthenticationDescriptor auth = getSubmodelAuthentication();
-        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)
+        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, 
+            AasPartRegistry.composeIdentifier(ID_PART_PLATFORM))
             .rbacPlatform(auth);
         if (smB.isNew()) { // incremental remote deployment, avoid double creation
             IipVersion versionInfo = IipVersion.getInstance();
@@ -112,7 +116,8 @@ public class PlatformAas implements AasContributor {
             addr.setCityTown("Hildesheim/Hannover@de");
             setup.setAddress(addr);
             
-            SubmodelBuilder smBuilder = createNameplate(aasBuilder, setup);
+            SubmodelBuilder smBuilder = createNameplate(aasBuilder, setup, 
+                AasPartRegistry.composeIdentifier(ID_PART_TECHNICAL_DATA));
             addSoftwareInfo(smBuilder, setup);
             smBuilder.build();
             createSoftwareNameplate(aasBuilder, setup, versionInfo);
@@ -166,10 +171,12 @@ public class PlatformAas implements AasContributor {
      * 
      * @param aasBuilder the AAS builder, do not call {@link AasBuilder#build()} in here!
      * @param appSetup application setup
+     * @param identifier the submodel identifier, may be <b>null</b> then the submodel is identified via it's 
+     *   idShort only
      * @return submodel builder if something needs to be added
      */
-    public static SubmodelBuilder createNameplate(AasBuilder aasBuilder, ApplicationSetup appSetup) {
-        TechnicalDataBuilder tdBuilder = new TechnicalDataBuilder(aasBuilder, null);
+    public static SubmodelBuilder createNameplate(AasBuilder aasBuilder, ApplicationSetup appSetup, String identifier) {
+        TechnicalDataBuilder tdBuilder = new TechnicalDataBuilder(aasBuilder, identifier);
         tdBuilder.rbac(AasPartRegistry.getSubmodelAuthentication());
         GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder()
             .setManufacturerName(appSetup.getManufacturerName())

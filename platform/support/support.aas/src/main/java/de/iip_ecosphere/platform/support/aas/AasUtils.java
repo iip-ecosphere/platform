@@ -419,5 +419,17 @@ public class AasUtils {
         }
         return builder;
     }
+    
+    /**
+     * Composes a basic and a detailed AAS/submodel identifier.
+     * 
+     * @param basicId the basic ID
+     * @param detailedId the detailed/sub ID
+     * @return
+     */
+    public static String composeIdentifier(String basicId, String detailedId) {
+        // may be more complex if URL, may have to be disabled for BaSyx 1 -> null
+        return basicId + detailedId;
+    }
 
 }

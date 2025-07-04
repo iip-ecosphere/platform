@@ -14,12 +14,16 @@ package de.iip_ecosphere.platform.support.aas.basyx2;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.function.Function;
 
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 import org.eclipse.digitaltwin.basyx.submodelrepository.client.ConnectedSubmodelRepository;
 
+import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Invokable;
+import de.iip_ecosphere.platform.support.aas.ResolvingInvocablesCreator;
+import de.iip_ecosphere.platform.support.function.IOSupplier;
 
 /**
  * Implements an abstract invocables creator for the VAB following the naming conventions of 
@@ -124,5 +128,11 @@ public abstract class AbstractAasRestInvocablesCreator implements InvocablesCrea
     public Invokable createInvocable(String name) {
         return new Operation(name);
     }
+    
+    @Override
+    public InvocablesCreator executableCreator(IOSupplier<Aas> aasSupplier, String[] elementPath, 
+        Function<String, String> unqualifier) {
+        return new ResolvingInvocablesCreator(this, aasSupplier, elementPath, unqualifier);
+    }    
 
 }

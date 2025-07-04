@@ -12,6 +12,10 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
+import java.util.function.Function;
+
+import de.iip_ecosphere.platform.support.function.IOSupplier;
+
 /**
  * Creates invocables for AAS, e.g., for a remote protocol. This interface just creates instances, i.e., it is
  * more a factory than a builder. For local direct calls, you may just use lambda expressions. The counterpart
@@ -56,5 +60,21 @@ public interface InvocablesCreator {
      * @return the function implementation
      */
     public Invokable createInvocable(String name);
+    
+    /**
+     * Create an executable creator, i.e., a creator that truly returns executable invokables in BaSyX 1 style.
+     * Depending on the implementation, a specific creator implementation my be needed that explicitly resolves
+     * the given AAS/element path, obtains the elements and the performs the respective access.
+     * 
+     * @param aasSupplier supplies the AAS where to start at
+     * @param elementPath supplies the element path within the AAS
+     * @param unqualifier a function turning invokable names to unqualified names, may be <b>null</b> for none; 
+     *     qualification is replaced here by {@code elementPath}
+     * @return the creator, by default <b>this</b>
+     */
+    public default InvocablesCreator executableCreator(IOSupplier<Aas> aasSupplier, String[] elementPath, 
+        Function<String, String> unqualifier) {
+        return this;
+    }
     
 }

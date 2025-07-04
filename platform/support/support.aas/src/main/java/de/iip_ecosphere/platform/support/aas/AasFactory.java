@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,8 +79,9 @@ public abstract class AasFactory {
         }
         
         @Override
-        public Plugin<AasFactory> createPlugin() {
-            return new SingletonPlugin<AasFactory>(getId(), getFurtherIds(), AasFactory.class, () -> createInstance());
+        public Plugin<AasFactory> createPlugin(File installDir) {
+            return new SingletonPlugin<AasFactory>(getId(), getFurtherIds(), AasFactory.class, p -> createInstance(), 
+                installDir);
         }
         
     }
@@ -187,6 +189,11 @@ public abstract class AasFactory {
         @Override
         protected boolean accept(ProtocolDescriptor creator) {
             return true; // allow the fake test protocol creator for testing
+        }
+
+        @Override
+        public String getMetaModelVersion() {
+            return "v0";
         }
 
     };
@@ -564,6 +571,13 @@ public abstract class AasFactory {
         }
         return result;
     }
+    
+    /**
+     * Returns the implemented metamodel version.
+     * 
+     * @return the metamodel version (v2, v3)
+     */
+    public abstract String getMetaModelVersion();
 
     /**
      * Returns whether the implementation allows for server instances running on the same port.

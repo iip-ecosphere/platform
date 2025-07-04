@@ -273,6 +273,18 @@ abstract class BaSyxAbstractAasServer implements AasServer {
         }
         
         /**
+         * Adds an application argument as property.
+         * 
+         * @param name the name of the property
+         * @param value the value of the property
+         * @return <b>this</b> for chaining
+         */
+        public AppConfigurer addArg(String name, String value) {
+            args.add("--" + name + "=" + value);
+            return this;
+        }
+        
+        /**
          * Adds an application argument.
          * 
          * @param arg the argument
@@ -518,6 +530,9 @@ abstract class BaSyxAbstractAasServer implements AasServer {
             }
             configurer.addPort(port);
             configurer.addConfigName(cls.getSimpleName());
+            // HTTP_COMPONENTS, JETTY, REACTOR, JDK, SIMPLE; JETTY conflicts with some tests, reactor is taken here
+            // by default
+            configurer.addArg("spring.http.client.factory", "reactor");
 
             result = app.run(null == configurer ? new String[0] : configurer.getArgs());
             if (null != stateConsumer) {

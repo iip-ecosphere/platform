@@ -116,4 +116,9 @@ public class FakeAasFactory extends AasFactory {
         return true;
     }
 
+    @Override
+    public String getMetaModelVersion() {
+        return "v0";
+    }
+
 }

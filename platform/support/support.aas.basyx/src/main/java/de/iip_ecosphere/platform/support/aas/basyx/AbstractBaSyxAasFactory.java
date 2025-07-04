@@ -294,4 +294,9 @@ public abstract class AbstractBaSyxAasFactory extends AasFactory {
         return true;
     }
 
+    @Override
+    public String getMetaModelVersion() {
+        return "v2";
+    }
+
 }

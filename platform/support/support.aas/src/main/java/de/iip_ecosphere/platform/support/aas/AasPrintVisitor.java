@@ -52,7 +52,7 @@ public class AasPrintVisitor implements AasVisitor {
     
     @Override
     public void visitAas(Aas aas) {
-        log("AAS " + aas.getIdShort());
+        log("AAS " + aas.getIdShort() + " [" + aas.getIdentification() + "]");
         increaseIndentation();
     }
     
@@ -68,7 +68,7 @@ public class AasPrintVisitor implements AasVisitor {
 
     @Override
     public void visitSubmodel(Submodel submodel) {
-        log("SUBMODEL " + submodel.getIdShort());
+        log("SUBMODEL " + submodel.getIdShort() + " [" + submodel.getIdentification() + "]");
         increaseIndentation();
     }
 

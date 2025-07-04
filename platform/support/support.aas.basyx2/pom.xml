@@ -69,11 +69,21 @@
         <artifactId>swagger-core-jakarta</artifactId>
         <version>2.2.22</version>
       </dependency>
-<dependency>
-  <groupId>org.springframework.integration</groupId>
-  <artifactId>spring-integration-file</artifactId>
-  <version>6.4.2</version>
-</dependency>      
+      <dependency>
+        <groupId>org.springframework.integration</groupId>
+        <artifactId>spring-integration-file</artifactId>
+        <version>6.4.2</version>
+      </dependency>      
+<!--      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.5.16</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-core</artifactId>
+        <version>1.5.16</version>
+      </dependency>-->
       
     <dependency>
         <groupId>org.eclipse.digitaltwin.basyx</groupId>

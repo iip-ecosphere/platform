@@ -118,6 +118,11 @@ public class FactoryTest {
             return true; // allow the fake test protocol creator for testing
         }
 
+        @Override
+        public String getMetaModelVersion() {
+            return DUMMY.getMetaModelVersion();
+        }
+
     }
     
     /**

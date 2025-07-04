@@ -115,12 +115,12 @@ public abstract class AbstractTestServer implements Server {
     }
     
     /**
-     * Returns the integer number given in (command line) {code args} at {@code argIndex}.
+     * Returns the integer argument given in (command line) {code args} at {@code argIndex}.
      * 
      * @param args the arguments
      * @param argIndex the 0-based argument index to read from 
      * @param dflt the default value if no argument is available
-     * @return the integer number
+     * @return the integer argument
      */
     public static int getInteger(String[] args, int argIndex, int dflt) {
         int result = dflt;
@@ -136,5 +136,47 @@ public abstract class AbstractTestServer implements Server {
         }
         return result;
     }
+
+    /**
+     * Returns the string argument given in (command line) {code args} at {@code argIndex}.
+     * 
+     * @param args the arguments
+     * @param argIndex the 0-based argument index to read from 
+     * @param dflt the default value if no argument is available
+     * @return the string argument
+     */
+    public static String getString(String[] args, int argIndex, String dflt) {
+        String result = dflt;
+        if (args.length > 0 && argIndex < args.length) {
+            result = args[argIndex];
+        }
+        return result;
+    }
     
+    /**
+     * Applies the base directory from the (command line) {code args} at {@code argIndex}. If there is no argument
+     * or the given argument is not an existing directory, the default is used.
+     * 
+     * @param args the arguments
+     * @param argIndex the 0-based argument index to read from 
+     * @return the base directory
+     */
+    public static File applyBaseDir(String[] args, int argIndex, String suffix) {
+        File f = null;
+        String configDir = getString(args, 1, "");
+        if (configDir.length() > 0) {
+            f = new File(configDir);
+            if (f.isDirectory() && suffix != null) {
+                File tmp = new File(configDir, suffix);
+                if (tmp.isDirectory()) {
+                    f = tmp;
+                }
+            }
+            if (f.isDirectory()) {
+                setConfigDir(f);
+            }
+        }
+        return f;
+    }
+
 }

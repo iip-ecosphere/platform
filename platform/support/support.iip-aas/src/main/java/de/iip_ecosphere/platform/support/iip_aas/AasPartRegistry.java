@@ -1140,5 +1140,16 @@ public class AasPartRegistry {
     public static AuthenticationDescriptor getSubmodelAuthentication() {
         return AasPartRegistry.getSetup().getSetup(AasComponent.SUBMODEL_REPOSITORY).getAuthentication();
     }
-
+    
+    /**
+     * Composes an identifier based on {@link #URN_AAS} and the given specific identifier.
+     * 
+     * @param specificId the specific identifier
+     * @return the composed identifier
+     * @see AasUtils#composeIdentifier(String, String)
+     */
+    public static String composeIdentifier(String specificId) {
+        return AasUtils.composeIdentifier(URN_AAS, specificId);
+    }
+    
 }
