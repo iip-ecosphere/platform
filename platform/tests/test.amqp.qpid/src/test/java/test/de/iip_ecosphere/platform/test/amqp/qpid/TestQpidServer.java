@@ -96,8 +96,11 @@ public class TestQpidServer extends AbstractTestServer {
      *    configuration directory, else the default is used
      */
     public static void main(String[] args) {
-        applyBaseDir(args, 1, "./src/test");
-        System.setProperty("QPID_WORK", new File(FileUtils.getTempDirectory(), "qpid").getAbsolutePath());
+        if (applyBaseDir(args, 1, "./src/test") != null) {
+            File tmpWork = new File(FileUtils.getTempDirectory(), "qpid");
+            FileUtils.deleteQuietly(tmpWork);
+            System.setProperty("QPID_WORK", tmpWork.getAbsolutePath());
+        } // leave it as it was, only within process-based plugin executions
         TestQpidServer server = new TestQpidServer(new ServerAddress(Schema.IGNORE, getInteger(args, 8883)));
         server.start();
     }
