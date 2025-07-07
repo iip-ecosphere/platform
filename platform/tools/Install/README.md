@@ -4,7 +4,7 @@ This project supports the installation of the oktoflow platform.
 
 ## Platform dependencies (examples only)
 
-If you just want to execute the examples without installint a full platform, execute `mvn -P DepsOnly install`
+If you just want to execute the examples without installing a full platform, execute `mvn -P DepsOnly install`
 
 ## Full install
 
