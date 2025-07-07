@@ -79,6 +79,8 @@ public class TestWithPlugin {
      */
     public static void addPluginLocation(String parent, String folder, String installFolder, boolean descriptorOnly) {
         locations.add(new PluginLocation(parent, folder, installFolder, descriptorOnly));
+        LoggerFactory.getLogger(TestWithPlugin.class).info("Added plugin location for {} (descriptor only: {})", 
+            folder, descriptorOnly);
     }
 
     /**
