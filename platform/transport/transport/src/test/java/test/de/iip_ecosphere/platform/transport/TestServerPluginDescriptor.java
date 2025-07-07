@@ -28,7 +28,6 @@ import de.iip_ecosphere.platform.support.plugins.FolderClasspathPluginSetupDescr
 import de.iip_ecosphere.platform.support.plugins.StreamGobbler;
 import test.de.iip_ecosphere.platform.transport.TestServerBuilder.InstanceCreator;
 
-
 /**
  * A test server plugin descriptor. May create JVM process to run the server within. Last resort if dependencies are 
  * massively conflicting.
@@ -88,7 +87,7 @@ public class TestServerPluginDescriptor extends DefaultPluginDescriptor<TestServ
         private ServerAddress address;
         private File installDir;
         private ProcessUpSupplier checker;
-        private int upTimeout = 3000;
+        private int upTimeout = 6000; // for laptop on battery
         
         /**
          * Creates the server instance.

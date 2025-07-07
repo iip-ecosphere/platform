@@ -29,16 +29,21 @@ public class TestWithQpid extends TestWithPlugin {
     static {
         addPluginLocation("tests", "test.amqp.qpid", "qpid", true);
     }
+    
+    /**
+     * Adds the Qpid plugin (if inheriting is not possible).
+     */
+    public static void addPlugin() {
+        // implicitly triggers the static initializer
+    }
 
     /**
      * Shuts down qpid.
      */
     @After
     public void stopQpid() {
-        if (null != qpid) {
-            qpid.stop(true); // still running if test fails, double call does not matter
-            qpid = null;
-        }
+        Server.stop(qpid, true);
+        qpid = null;
     }
     
 }
