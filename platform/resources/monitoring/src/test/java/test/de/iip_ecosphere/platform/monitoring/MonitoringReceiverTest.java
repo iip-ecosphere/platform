@@ -17,7 +17,9 @@ import java.util.Set;
 
 import javax.json.JsonObject;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.monitoring.MonitoringReceiver;
@@ -29,7 +31,8 @@ import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.streams.StreamNames;
 import io.micrometer.core.instrument.Meter;
-import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
+import test.de.iip_ecosphere.platform.transport.TestServerBuilder;
+import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 /**
  * Tests {@link MonitoringReceiver}.
@@ -37,6 +40,25 @@ import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
  * @author Holger Eichelberger, SSE
  */
 public class MonitoringReceiverTest extends AbstractMonitoringReceiverTest {
+
+    protected static Server qpid;
+
+    /**
+     * Sets up this text.
+     */
+    @BeforeClass
+    public static void setup() {
+        TestWithQpid.addPlugin();
+        TestWithQpid.loadPlugins();
+    }
+
+    /**
+     * Shuts down this text.
+     */
+    @AfterClass
+    public static void stop() {
+        Server.stop(qpid, true);
+    }
 
     /**
      * A simple receiver for testing.
@@ -120,7 +142,6 @@ public class MonitoringReceiverTest extends AbstractMonitoringReceiverTest {
         }
         
     }
-
     
     /**
      * Simple internal monitoring receiver lifecycle.
@@ -156,7 +177,10 @@ public class MonitoringReceiverTest extends AbstractMonitoringReceiverTest {
 
     @Override
     protected Server createBroker(ServerAddress broker) {
-        return new TestQpidServer(broker);
+        if (null == qpid) {
+            qpid = TestServerBuilder.fromPlugin("test-qpid", broker);
+        }
+        return qpid;
     }
     
     /**
