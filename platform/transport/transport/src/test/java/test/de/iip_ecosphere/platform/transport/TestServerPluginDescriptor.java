@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.commons.lang.SystemUtils;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.Server;
@@ -127,7 +128,8 @@ public class TestServerPluginDescriptor extends DefaultPluginDescriptor<TestServ
                 File java = new File(System.getProperty("java.home") + "/bin/java");
                 File instDir = installDir == null ? new File("") : installDir;  
                 instDir = instDir.getCanonicalFile();
-                File cp = FolderClasspathPluginSetupDescriptor.findClasspathFile(instDir, "-win"); // TODO
+                File cp = FolderClasspathPluginSetupDescriptor.findClasspathFile(instDir, 
+                    SystemUtils.IS_OS_WINDOWS ? "-win" : "-linux");
                 List<String> args = new ArrayList<>();
                 args.add(java.getAbsolutePath());
                 args.add("-cp");
