@@ -339,11 +339,6 @@ public class BaSyxSubmodelElementList extends BaSyxSubmodelElement implements Su
         }
 
         @Override
-        protected AbstractSubmodel<org.eclipse.digitaltwin.aas4j.v3.model.Submodel> getInstance() {
-            return null;
-        }
-
-        @Override
         public boolean isNew() {
             return isNew;
         }

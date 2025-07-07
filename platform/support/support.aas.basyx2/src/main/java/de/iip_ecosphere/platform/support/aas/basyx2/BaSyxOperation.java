@@ -35,6 +35,7 @@ import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
+import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
@@ -296,7 +297,14 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
             }
         }
         try {
-            OperationVariable[] result = smRepo.invokeOperation(submodelId.toString(), operation.getIdShort(), opArgs);
+            String path = operation.getIdShort();
+            BaSyxSubmodelElementParent parent = getParent();
+            while (parent != null && !(parent instanceof Submodel)) {
+                path = parent.getIdShort() + "." + path;
+                parent = parent.getParent();
+            }
+            
+            OperationVariable[] result = smRepo.invokeOperation(submodelId.toString(), path, opArgs);
             return Tools.translateValueFromBaSyx(result == null || result.length == 0 
                 ? null : result[0].getValue(), type);
         } catch (ElementDoesNotExistException | ApiException e) {

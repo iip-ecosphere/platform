@@ -32,6 +32,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.RelationshipElement.RelationshipElementBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.aas.basyx2.BaSyxSubmodel.BaSyxSubmodelBuilder;
 
 /**
  * Basic implementation for a container-based model element. Subclasses must call {@link #buildMyDeferred()} in an 
@@ -106,7 +107,15 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends org.eclipse
      * 
      * @return the instance
      */
-    protected abstract AbstractSubmodel<S> getInstance();
+    @SuppressWarnings("unchecked")
+    protected AbstractSubmodel<S> getInstance() {
+        AbstractSubmodel<S> result = null;
+        Object[] parents = parents();
+        if (parents.length > 0 && parents[0] instanceof BaSyxSubmodelBuilder) {
+            result = (AbstractSubmodel<S>) ((BaSyxSubmodelBuilder) parents[0]).getInstance();
+        }
+        return result;
+    }
 
     /**
      * Returns the underlying collection instance.
