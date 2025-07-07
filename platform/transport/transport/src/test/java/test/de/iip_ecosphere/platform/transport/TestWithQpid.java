@@ -15,6 +15,7 @@ package test.de.iip_ecosphere.platform.transport;
 import org.junit.After;
 
 import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
 /**
@@ -44,6 +45,16 @@ public class TestWithQpid extends TestWithPlugin {
     public void stopQpid() {
         Server.stop(qpid, true);
         qpid = null;
+    }
+    
+    /**
+     * Creates a qpid instance via plugin.
+     * 
+     * @param broker the server address
+     * @return the instance
+     */
+    public static Server fromPlugin(ServerAddress broker) {
+        return TestServerBuilder.fromPlugin("test-qpid", broker);
     }
     
 }
