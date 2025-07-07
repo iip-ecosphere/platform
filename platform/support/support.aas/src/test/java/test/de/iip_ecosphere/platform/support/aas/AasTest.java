@@ -42,6 +42,7 @@ import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.DelegatingAuthenticationDescriptor;
+import de.iip_ecosphere.platform.support.aas.ElementsAccess;
 import de.iip_ecosphere.platform.support.aas.IdentityStoreAuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.LangString;
@@ -183,6 +184,7 @@ public class AasTest {
         
         builder.defineOperation(NAME_RBAC_OPCLOSED, (params) -> null);
         builder.defineOperation(NAME_RBAC_OPOPEN, (params) -> null);
+        builder.defineOperation("inner_" + NAME_RBAC_OPOPEN, (params) -> null);
         return builder.build();
     }
 
@@ -536,6 +538,11 @@ public class AasTest {
             .rbacAllAuthenticated(auth)
             .setInvocable(invC.createInvocable(NAME_RBAC_OPCLOSED))
             .build();
+        SubmodelElementCollectionBuilder smInner = sm.createSubmodelElementCollectionBuilder("inner");
+        smInner.createOperationBuilder(NAME_RBAC_OPOPEN)
+            .setInvocable(invC.createInvocable("inner_" + NAME_RBAC_OPOPEN))
+            .build(auth);
+        smInner.build();
         sm.build();
 
         sm = aas.createSubmodelBuilder(NAME_RBAC_SMCLOSED, null)
@@ -983,7 +990,10 @@ public class AasTest {
 
         assertOpExecution(sm, NAME_RBAC_OPOPEN, authenticated, true);
         assertOpExecution(sm, NAME_RBAC_OPCLOSED, authenticated, false); // not without authentication
-
+        
+        SubmodelElementCollection inner = sm.getSubmodelElementCollection("inner");
+        assertOpExecution(inner, NAME_RBAC_OPOPEN, authenticated, true);
+        
         sm = aas.getSubmodel(NAME_RBAC_SMCLOSED); // TODO not without authen
 
         prop = sm.getProperty(NAME_RBAC_PROPOPEN);
@@ -1007,7 +1017,8 @@ public class AasTest {
      * @param expectedSuccess do we expect success
      * @see AasFactory#supportsOperationExecutionAuthorization()
      */
-    private static void assertOpExecution(Submodel sm, String opName, boolean authenticated, boolean expectedSuccess) {
+    private static void assertOpExecution(ElementsAccess sm, String opName, boolean authenticated, 
+        boolean expectedSuccess) {
         Operation op = sm.getOperation(opName);
         Assert.assertNotNull(op); // BaSyx 2 does not check
         try {
