@@ -79,6 +79,15 @@ public class AasPartRegistry {
     public static final String NAME_SUBMODEL_RESOURCES = "resources"; 
     public static final String NAME_PROP_DEVICE_AAS = "deviceAas";
     
+    public static final String ID_PART_SERVICES = "SVC";
+    public static final String ID_PART_RESOURCES = "RES";
+    public static final String ID_PART_DEVICES = "DEV";
+    public static final String ID_PART_TRANSPORT = "TP";
+    public static final String ID_PART_PLATFORM = "PLATF";
+    public static final String ID_PART_NETWORK = "NET";
+    public static final String ID_PART_TECHNICAL_DATA = "TD";
+    public static final String ID_PART_SW_NAMEPLATE = "SW";
+    
     /**
      * The URN of the top-level AAS created by this registry in {@link #build()}.
      */

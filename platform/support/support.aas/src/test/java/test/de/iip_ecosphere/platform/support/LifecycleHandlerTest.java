@@ -31,7 +31,7 @@ import de.iip_ecosphere.platform.support.TerminatingLifecycleDescriptor;
  */
 public class LifecycleHandlerTest {
 
-    private static String[] cmdArgs;
+    private static String[] cmdArgs = new String[0];
     private static int startupCount = 0;
     private static int shutdownCount = 0;
     private static int shutdownHookCount = 0;

@@ -68,10 +68,7 @@ public class PlatformAas implements AasContributor {
     public static final String NAME_PROPERTY_DEPARTMENT = "Department";
     public static final String NAME_PROPERTY_STREET = "Street";
     public static final String NAME_PROPERTY_ZIPCODE = "ZipCode";
-    
-    public static final String ID_PART_PLATFORM = "PLATF";
-    public static final String ID_PART_TECHNICAL_DATA = "TD";
-    
+        
     private static ResourceResolver imageResolver = AasUtils.CLASSPATH_RESOURCE_RESOLVER;
     
     /**
@@ -98,7 +95,7 @@ public class PlatformAas implements AasContributor {
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         AuthenticationDescriptor auth = getSubmodelAuthentication();
         SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, 
-            AasPartRegistry.composeIdentifier(ID_PART_PLATFORM))
+            AasPartRegistry.composeIdentifier(AasPartRegistry.ID_PART_PLATFORM))
             .rbacPlatform(auth);
         if (smB.isNew()) { // incremental remote deployment, avoid double creation
             IipVersion versionInfo = IipVersion.getInstance();
@@ -117,10 +114,11 @@ public class PlatformAas implements AasContributor {
             setup.setAddress(addr);
             
             SubmodelBuilder smBuilder = createNameplate(aasBuilder, setup, 
-                AasPartRegistry.composeIdentifier(ID_PART_TECHNICAL_DATA));
+                AasPartRegistry.composeIdentifier(AasPartRegistry.ID_PART_TECHNICAL_DATA));
             addSoftwareInfo(smBuilder, setup);
             smBuilder.build();
-            createSoftwareNameplate(aasBuilder, setup, versionInfo);
+            createSoftwareNameplate(aasBuilder, setup, versionInfo, 
+                AasPartRegistry.composeIdentifier(AasPartRegistry.ID_PART_SW_NAMEPLATE));
             addSoftwareInfo(smB, setup); // old style
             smB.createPropertyBuilder(NAME_PROPERTY_RELEASE)
                 .setValue(Type.BOOLEAN, versionInfo.isRelease())
@@ -226,8 +224,10 @@ public class PlatformAas implements AasContributor {
      * @param aasBuilder the parent AAS builder
      * @param appSetup the application setup
      * @param versionInfo the version information
+     * @param identifiaction the identification of the submodel, may be <b>null</b> for idShort
      */
-    private void createSoftwareNameplate(AasBuilder aasBuilder, ApplicationSetup appSetup, IipVersion versionInfo) {
+    private void createSoftwareNameplate(AasBuilder aasBuilder, ApplicationSetup appSetup, IipVersion versionInfo, 
+        String identification) {
         String version = null == appSetup.getVersion() ? "" : appSetup.getVersion().toString();
         Date buildDate = new Date(0);
         if (versionInfo.isBuildIdSet()) {
@@ -237,7 +237,7 @@ public class PlatformAas implements AasContributor {
                 // ignore
             }
         }
-        SoftwareNameplateBuilder snBuilder = new SoftwareNameplateBuilder(aasBuilder, null);
+        SoftwareNameplateBuilder snBuilder = new SoftwareNameplateBuilder(aasBuilder, identification);
         snBuilder.rbacPlatform(getSubmodelAuthentication());
         snBuilder.createSoftwareNameplate_TypeBuilder()
             .setManufacturerName(LangString.create(appSetup.getManufacturerName()))

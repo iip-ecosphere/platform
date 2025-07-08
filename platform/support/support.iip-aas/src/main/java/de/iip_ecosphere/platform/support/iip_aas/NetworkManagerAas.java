@@ -56,7 +56,8 @@ public class NetworkManagerAas implements AasContributor {
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         AuthenticationDescriptor auth = getSubmodelAuthentication();
-        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)
+        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, 
+            AasPartRegistry.composeIdentifier(AasPartRegistry.ID_PART_NETWORK))
             .rbacPlatform(auth);
         if (smB.isNew()) { // incremental remote deployment, avoid double creation
             smB.createOperationBuilder(OP_RESERVE_PORT)
