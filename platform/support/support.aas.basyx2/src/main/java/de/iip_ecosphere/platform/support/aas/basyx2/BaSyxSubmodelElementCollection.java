@@ -712,9 +712,9 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
      * 
      * @param idShort the idshort to remove 
      */
-    void deleteSubmodelElement(String idShort) {
+    void deleteSubmodelElement(String idShort, SubmodelElement element) {
         collection.setValue(Tools.removeElements(collection.getValue(), e -> e.getIdShort().equals(idShort)));
-        updateConnectedSubmodelElement();
+        deleteConnectedSubmodelElement(element);
     }
 
     @Override
@@ -724,15 +724,13 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
             for (int i = 0; i < elementsList.size(); i++) {
                 SubmodelElement elt = elementsList.get(i);
                 if (elt.getIdShort().equalsIgnoreCase(idShort)) {
-                    elementsList.remove(i);
-                    deleteSubmodelElement(idShort);
+                    deleteSubmodelElement(idShort, elementsList.remove(i));
                     break;
                 }
             }
         } else {
             if (elementsMap.containsKey(idShort)) {
-                elementsMap.remove(idShort);
-                deleteSubmodelElement(idShort);
+                deleteSubmodelElement(idShort, elementsMap.remove(idShort));
             }
         }
     }

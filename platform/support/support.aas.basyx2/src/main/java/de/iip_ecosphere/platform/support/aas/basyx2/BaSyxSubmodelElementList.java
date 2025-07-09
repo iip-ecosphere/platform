@@ -701,10 +701,11 @@ public class BaSyxSubmodelElementList extends BaSyxSubmodelElement implements Su
      * Removes a submodel element through its idShort.
      * 
      * @param idShort the idshort to remove 
+     * @param element the element
      */
-    void deleteSubmodelElement(String idShort) {
+    void deleteSubmodelElement(String idShort, SubmodelElement element) {
         list.setValue(Tools.removeElements(list.getValue(), e -> e.getIdShort().equals(idShort)));
-        updateConnectedSubmodelElement();
+        deleteConnectedSubmodelElement(element);
     }
 
     @Override
@@ -713,8 +714,7 @@ public class BaSyxSubmodelElementList extends BaSyxSubmodelElement implements Su
         for (int i = 0; i < elementsList.size(); i++) {
             SubmodelElement elt = elementsList.get(i);
             if (elt.getIdShort().equalsIgnoreCase(idShort)) {
-                elementsList.remove(i);
-                deleteSubmodelElement(idShort);
+                deleteSubmodelElement(idShort, elementsList.remove(i));
                 break;
             }
         }

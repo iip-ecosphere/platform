@@ -109,6 +109,7 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
     
     private Map<String, Property> properties = new HashMap<>();
     private Map<String, Function<Object[], Object>> operationFunctions = new HashMap<>();
+    private Interceptor interceptor;
 
     /**
      * The main kinds of entries.
@@ -242,6 +243,11 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
             return NetUtils.isAvailable(host, port);
         }
         
+        @Override
+        public void setInterceptor(Interceptor interceptor) {
+            instance.setInterceptor(interceptor);
+        }
+        
     }
     
     /**
@@ -304,6 +310,11 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
         @Override
         public boolean isAvailable(String host) {
             return NetUtils.isAvailable(host, port); // may be more specific if required
+        }
+
+        @Override
+        public void setInterceptor(Interceptor interceptor) {
+            instance.setInterceptor(interceptor);
         }
         
     }
@@ -396,6 +407,9 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
                 result = operationFunctions.get(ent.uName);
             }
         }
+        if (interceptor != null) {
+            result = interceptor.getOperation(category, name, result);
+        }
         return result;
     }
 
@@ -420,13 +434,21 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
     @Override
     public Supplier<Object> getGetter(String name) {
         Property prop = properties.get(name);
-        return null == prop ? null : prop.get;
+        Supplier<Object> result = null == prop ? null : prop.get;
+        if (interceptor != null) {
+            result = interceptor.getGetter(name, result);
+        }
+        return result;
     }
 
     @Override
     public Consumer<Object> getSetter(String name) {
         Property prop = properties.get(name);
-        return null == prop ? null : prop.set;
+        Consumer<Object> result = null == prop ? null : prop.set;
+        if (interceptor != null) {
+            result = interceptor.getSetter(name, result);
+        }
+        return result;
     }
     
     /**
@@ -495,6 +517,11 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
             throw new ResourceNotFoundException("Element " + element + " not found.");
         }
         
+    }
+
+    @Override
+    public void setInterceptor(Interceptor interceptor) {
+        this.interceptor = interceptor;
     }
 
 }

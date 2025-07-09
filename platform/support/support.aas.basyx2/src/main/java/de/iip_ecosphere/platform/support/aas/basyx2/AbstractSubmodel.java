@@ -56,10 +56,23 @@ public abstract class AbstractSubmodel<S extends org.eclipse.digitaltwin.aas4j.v
     /**
      * Creates an instance. Prevents external creation.
      * 
-     * @param submodel the sub model instance
+     * @param submodel the submodel instance
      */
     protected AbstractSubmodel(S submodel) {
         this.submodel = submodel;
+    }
+    
+    /**
+     * Resets this submodel with a new instance.
+     * 
+     * @param submodel the new submodel instance
+     */
+    protected void reset(S submodel) {
+        this.submodel = submodel;
+        operations.clear();
+        dataElements.clear();
+        properties.clear();
+        submodelElements.clear();
     }
     
     /**

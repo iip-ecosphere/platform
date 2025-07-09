@@ -94,6 +94,7 @@ public class AasOperationsProvider extends HashMap<String, Object> implements Op
     
     private Map<String, Property> properties = new HashMap<>();
     private Map<String, Function<Object[], Object>> operationFunctions = new HashMap<>();
+    private Interceptor interceptor; // TODO set interceptor
 
     /**
      * The main kinds of entries.
@@ -233,6 +234,11 @@ public class AasOperationsProvider extends HashMap<String, Object> implements Op
         public boolean isAvailable(String host) {
             return NetUtils.isAvailable(host, spec.getAssetServerAddress().getPort());
         }
+
+        @Override
+        public void setInterceptor(Interceptor interceptor) {
+            instance.setInterceptor(interceptor);
+        }
         
     }
     
@@ -315,6 +321,9 @@ public class AasOperationsProvider extends HashMap<String, Object> implements Op
                 result = operationFunctions.get(ent.uName);
             }
         }
+        if (null != interceptor) {
+            result = interceptor.getOperation(category, name, result);
+        }
         return result;
     }
 
@@ -339,13 +348,26 @@ public class AasOperationsProvider extends HashMap<String, Object> implements Op
     @Override
     public Supplier<Object> getGetter(String name) {
         Property prop = properties.get(name);
-        return null == prop ? null : prop.get;
+        Supplier<Object> result = null == prop ? null : prop.get;
+        if (null != interceptor) {
+            result = interceptor.getGetter(name, result);
+        }
+        return result;
     }
 
     @Override
     public Consumer<Object> getSetter(String name) {
         Property prop = properties.get(name);
-        return null == prop ? null : prop.set;
+        Consumer<Object> result = null == prop ? null : prop.set;
+        if (null != interceptor) {
+            result = interceptor.getSetter(name, result);
+        }
+        return result;
+    }
+
+    @Override
+    public void setInterceptor(Interceptor interceptor) {
+        this.interceptor = interceptor;
     }
 
 }

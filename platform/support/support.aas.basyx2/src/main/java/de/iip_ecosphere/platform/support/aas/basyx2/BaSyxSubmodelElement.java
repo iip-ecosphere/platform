@@ -170,6 +170,21 @@ public abstract class BaSyxSubmodelElement implements SubmodelElement {
     }
     
     /**
+     * Uses {@link #processOnPath(List, boolean, PathFunction)} to delete the givenelement in the submodel 
+     * registry (if present). Must be called by setters.
+     */
+    protected void deleteConnectedSubmodelElement(SubmodelElement element) {
+        if (null != getParent() && null != element) {
+            ((BaSyxSubmodelElement) element).getSubmodelElement();
+            getParent().processOnPath(CollectionUtils.toList(getSubmodelElement(), 
+                ((BaSyxSubmodelElement) element).getSubmodelElement()), true, (sId, p, r) -> {
+                    r.deleteSubmodelElement(sId, p);
+                    return null;
+                });
+        }
+    }    
+    
+    /**
      * Uses {@link #processOnPath(List, boolean, PathFunction)} to update this element in the submodel 
      * registry (if present). Must be called by setters.
      */

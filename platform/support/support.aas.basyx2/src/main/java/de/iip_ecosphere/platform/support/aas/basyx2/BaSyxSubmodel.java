@@ -150,7 +150,11 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.digitaltwin.aas4
         public Submodel build() {
             buildMyDeferred();
             try {
-                return null == parentBuilder ? instance : parentBuilder.register(instance);
+                Submodel result = null == parentBuilder ? instance : parentBuilder.register(instance);
+                if (!isNew) {
+                    instance.updateInRepo();
+                }
+                return result;
             } catch (IOException e) {
                 LoggerFactory.getLogger(getClass()).error("Cannot register created instance: {}", 
                     e.getMessage());
@@ -321,6 +325,11 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.digitaltwin.aas4
 
     @Override
     public void update() {
+        if (repo != null) {
+            org.eclipse.digitaltwin.aas4j.v3.model.Submodel instance = repo.getSubmodel(getIdentification());
+            reset(instance);
+            BaSyxElementTranslator.registerSubmodelElements(instance.getSubmodelElements(), this);
+        }
     }
 
     @Override
@@ -364,7 +373,7 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.digitaltwin.aas4
                     IdShortPathBuilder pBuilder = new IdShortPathBuilder(path);
                     idShortPath = pBuilder.build();
                 }
-                result = function.apply(getIdShort(), idShortPath, repo);
+                result = function.apply(getIdentification(), idShortPath, repo);
             } catch (ElementDoesNotExistException e) {
                 LoggerFactory.getLogger(getClass()).debug(e.getMessage(), e);
             } catch (ApiException e) {
@@ -377,18 +386,34 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.digitaltwin.aas4
     @Override
     public void deleteElement(String idShort) {
         super.deleteElement(idShort);
-        if (null != repo) {
-            repo.updateSubmodel(getIdentification(), getSubmodel());
-        }
+        updateOnDelete(idShort);
     }    
 
     @Override
     public void deleteElement(SubmodelElement elt) {
         super.deleteElement(elt);
+        updateOnDelete(elt.getIdShort());
+    }
+
+    /**
+     * Updates this submodel on deleting an element.
+     * 
+     * @param idShortPath the path to the element
+     */
+    private void updateOnDelete(String idShortPath) {
+        if (null != repo) {
+            repo.deleteSubmodelElement(getIdentification(), idShortPath);
+        }
+    }
+
+    /**
+     * Updates this submodel in its repository if connected.
+     */
+    private void updateInRepo() {
         if (null != repo) {
             repo.updateSubmodel(getIdentification(), getSubmodel());
         }
-    }    
+    }
 
     @Override
     public BaSyxSubmodelElementParent getParent() {

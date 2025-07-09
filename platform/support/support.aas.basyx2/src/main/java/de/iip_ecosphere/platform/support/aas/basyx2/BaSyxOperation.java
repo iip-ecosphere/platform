@@ -27,6 +27,8 @@ import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultProperty;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultQualifier;
 import org.eclipse.digitaltwin.basyx.client.internal.ApiException;
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
+import org.eclipse.digitaltwin.basyx.core.exceptions.NotInvokableException;
+import org.eclipse.digitaltwin.basyx.core.exceptions.OperationDelegationException;
 import org.eclipse.digitaltwin.basyx.submodelrepository.client.ConnectedSubmodelRepository;
 import org.eclipse.digitaltwin.basyx.submodelrepository.feature.operation.delegation.HTTPOperationDelegation;
 
@@ -277,18 +279,29 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
         }
         DataTypeDefXsd type = null;
         List<OperationVariable> params = operation.getInputVariables(); // TODO inout
-        OperationVariable[] opArgs = new OperationVariable[Math.min(args.length, params.size())];
+        OperationVariable[] opArgs = new OperationVariable[params.size()];
         for (int a = 0; a < opArgs.length; a++) {
             SubmodelElement paramElt = params.get(a).getValue();
+            String argValue = "";
+            DataTypeDefXsd argType = DataTypeDefXsd.STRING;
+            String argName = "unknown";
+            if (a < args.length) {
+                if (args[a] != null) {
+                    argValue = args[a].toString();
+                }
+            }
             if (paramElt instanceof Property) {
                 Property param = ((Property) paramElt);
-                SubmodelElement tmp = new DefaultProperty.Builder()
-                    .value(null == args[a] ? null : args[a].toString())
-                    .valueType(param.getValueType())
-                    .idShort(param.getIdShort())
-                    .build();
-                opArgs[a] = new DefaultOperationVariable.Builder().value(tmp).build();
+                argName = param.getIdShort();
+                argType = param.getValueType();
+                
             } // TODO others, adjust generic REST Service implementation
+            SubmodelElement tmp = new DefaultProperty.Builder()
+                .value(argValue)
+                .valueType(argType)
+                .idShort(argName)
+                .build();
+            opArgs[a] = new DefaultOperationVariable.Builder().value(tmp).build();
         }
         if (operation.getOutputVariables().size() > 0) {
             SubmodelElement outVar = operation.getOutputVariables().iterator().next().getValue();
@@ -303,13 +316,12 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
                 path = parent.getIdShort() + "." + path;
                 parent = parent.getParent();
             }
-            
             OperationVariable[] result = smRepo.invokeOperation(submodelId.toString(), path, opArgs);
             return Tools.translateValueFromBaSyx(result == null || result.length == 0 
                 ? null : result[0].getValue(), type);
-        } catch (ElementDoesNotExistException | ApiException e) {
+        } catch (ElementDoesNotExistException | OperationDelegationException | NotInvokableException | ApiException e) {
             throw new ExecutionException("Invoking operation '" + getIdShort() + "': " +  e.getMessage(), e);
-        }
+        } 
     }
 
     // checkstyle: resume exception type check
