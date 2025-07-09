@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.support.NoOpServer;
 import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.aas.OperationsProvider.Interceptor;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 
 /**
@@ -38,6 +39,11 @@ public class FakeProtocolServerBuilder implements ProtocolServerBuilder {
     @Override
     public boolean isAvailable(String host) {
         return true; // NoOpServer
+    }
+
+    @Override
+    public void setInterceptor(Interceptor interceptor) {
+        // ignore
     }
 
 }

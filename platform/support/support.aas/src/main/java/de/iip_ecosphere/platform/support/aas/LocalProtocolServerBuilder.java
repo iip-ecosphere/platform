@@ -18,6 +18,7 @@ import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.support.NoOpServer;
 import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.aas.OperationsProvider.Interceptor;
 
 /**
  * A local protocol server builder for pure local calls.
@@ -62,6 +63,11 @@ public class LocalProtocolServerBuilder implements ProtocolServerBuilder {
     @Override
     public boolean isAvailable(String host) {
         return true; // NoOpServer
+    }
+
+    @Override
+    public void setInterceptor(Interceptor interceptor) {
+        instance.setInterceptor(interceptor);
     }
 
 }

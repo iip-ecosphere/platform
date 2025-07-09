@@ -21,6 +21,7 @@ import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.aas.OperationsProvider.Interceptor;
 
 /**
  * The implementing counterpart of {@link InvocablesCreator} in terms of a builder.
@@ -141,6 +142,14 @@ public interface ProtocolServerBuilder extends Builder<Server> {
      * @throws IllegalArgumentException if the property is already registered
      */
     public ProtocolServerBuilder defineProperty(String name, Supplier<Object> get, Consumer<Object> set);
+    
+    /**
+     * Sets an interceptor for all returns, primarily intended for testing/mocking to circumvent implementations that
+     * do not support direct mocking. Shall not be used for regular purposes. May be ignored by the implementation.
+     * 
+     * @param interceptor the intercept instance, may be <b>null</b>
+     */
+    public void setInterceptor(Interceptor interceptor);
    
     /**
      * Creates a code that encodes byte array payload in the style of this protocol server.

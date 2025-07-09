@@ -31,6 +31,7 @@ public class SimpleOperationsProvider implements OperationsProvider {
     private Map<String, Function<Object[], Object>> funcs = new HashMap<>();
     private Map<String, Supplier<Object>> get = new HashMap<>();
     private Map<String, Consumer<Object>> set = new HashMap<>();
+    private Interceptor interceptor;
     
     @Override
     public OperationsProvider defineOperation(String category, String name, Function<Object[], Object> function) {
@@ -40,7 +41,11 @@ public class SimpleOperationsProvider implements OperationsProvider {
 
     @Override
     public Function<Object[], Object> getOperation(String category, String name) {
-        return funcs.get(OP_PREFIX + category + "_" + name);
+        Function<Object[], Object> result = funcs.get(OP_PREFIX + category + "_" + name);
+        if (interceptor != null) {
+            result = interceptor.getOperation(category, name, result);
+        }
+        return result;
     }
 
     @Override
@@ -63,12 +68,25 @@ public class SimpleOperationsProvider implements OperationsProvider {
 
     @Override
     public Supplier<Object> getGetter(String name) {
-        return get.get(name);
+        Supplier<Object> result = get.get(name);
+        if (interceptor != null) {
+            result = interceptor.getGetter(name, result);
+        }
+        return result;
     }
 
     @Override
     public Consumer<Object> getSetter(String name) {
-        return set.get(name);
+        Consumer<Object> result = set.get(name);
+        if (interceptor != null) {
+            result = interceptor.getSetter(name, result);
+        }
+        return result;
+    }
+    
+    @Override
+    public void setInterceptor(Interceptor interceptor) {
+        this.interceptor = interceptor;
     }
 
 }

@@ -18,6 +18,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.aas.OperationsProvider.Interceptor;
 
 /**
  * A delegating protocol server that switches based on predicates between two server builders, 
@@ -84,5 +85,12 @@ public class SelectiveProtocolServerBuilder implements ProtocolServerBuilder {
     public boolean isAvailable(String host) {
         return builder1.isAvailable(host) || builder2.isAvailable(host);
     }
+    
+    @Override
+    public void setInterceptor(Interceptor interceptor) {
+        builder1.setInterceptor(interceptor);
+        builder2.setInterceptor(interceptor);
+    }
+
 
 }
