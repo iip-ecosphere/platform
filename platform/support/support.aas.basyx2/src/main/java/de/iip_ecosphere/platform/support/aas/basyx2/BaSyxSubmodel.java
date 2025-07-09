@@ -425,4 +425,9 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.digitaltwin.aas4
         return null; // this is not a submodel element
     }
     
+    @Override
+    public void refreshOnUse() {
+        update(); // requires explicit update, not really connected
+    }
+    
 }

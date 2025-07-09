@@ -26,6 +26,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 public class SubmodelClient {
 
     private Submodel submodel;
+    private boolean refreshRequested;
     
     /**
      * Creates an instance.
@@ -42,7 +43,17 @@ public class SubmodelClient {
      * @return the submodel
      */
     public Submodel getSubmodel() {
+        if (refreshRequested) {
+            submodel.refreshOnUse();
+        }
         return submodel;
+    }
+    
+    /**
+     * Indicates the submodel may need a refresh. Refresh will be carried out with next {@link #getSubmodel()} call.
+     */
+    public void requestRefresh() {
+        refreshRequested = true;
     }
     
     /**
