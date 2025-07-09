@@ -208,7 +208,6 @@ public class JsonResultWrapper implements Function<Object[], Object>, Serializab
             }
         } catch (Throwable e) { // including AasExecutionException, NPE
             LoggerFactory.getLogger(getClass()).error("Operation execution failed: {}", e.getMessage());
-            System.err.println("okwoflow " + getClass().getName() + " debug output:");
             LoggerFactory.getLogger(getClass()).trace("Oktoflow debug catch: ", e);
             result = new Result(e);
             if (null != listener) {
