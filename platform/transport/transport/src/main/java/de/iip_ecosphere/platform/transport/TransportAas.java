@@ -20,6 +20,7 @@ import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 
 /**
@@ -43,7 +44,8 @@ public class TransportAas implements AasContributor {
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         AuthenticationDescriptor aDesc = getSubmodelAuthentication(); 
-        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)
+        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, 
+            AasPartRegistry.composeIdentifier(AasPartRegistry.ID_PART_TRANSPORT))
             .rbacPlatform(aDesc);
         if (smB.isNew()) {  // incremental remote deployment, avoid double creation
             smB.createPropertyBuilder(NAME_VAR_CONNECTOR)
