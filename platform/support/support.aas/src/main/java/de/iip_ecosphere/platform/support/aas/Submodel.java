@@ -136,4 +136,10 @@ public interface Submodel extends Element, HasSemantics, Identifiable, Qualifiab
      */
     public <T extends SubmodelElement> boolean iterate(IteratorFunction<T> func, Class<T> cls, String... path);    
 
+    /**
+     * Requests a refresh. No need for implementation, if underlying AAS implementation does this implicitly.
+     */
+    public default void refreshOnUse() {
+    }
+    
 }

@@ -187,4 +187,10 @@ public interface Aas extends Element, Identifiable, HasDataSpecification, Deferr
      */
     public void delete(Submodel submodel);
 
+    /**
+     * Requests a refresh. No need for implementation, if underlying AAS implementation does this implicitly.
+     */
+    public default void refreshOnUse() {
+    }
+    
 }
