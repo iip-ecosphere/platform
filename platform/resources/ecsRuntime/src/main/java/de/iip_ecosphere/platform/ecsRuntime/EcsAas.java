@@ -95,27 +95,15 @@ public class EcsAas implements AasContributor {
 
     public static final String NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS = "createRemoteConnectionCredentials";
     
-    private static final String ID_SUBMODEL = null; // take the short name, shall become public and an URN later
     private static boolean enabled = false;
     
     // checkstyle: stop method length check
-    
-    /**
-     * Returns the submodel identifier for the given submodel idShort.
-     * 
-     * @param idShort the idShort
-     * @return the submodel identifier
-     */
-    public static String getResourcesSubmodelId() {
-        return AasPartRegistry.composeIdentifier(AasPartRegistry.ID_PART_RESOURCES);
-    }
         
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         AuthenticationDescriptor aDesc = getSubmodelAuthentication(); 
         ContainerManager mgr = EcsFactory.getContainerManager();
-        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, getResourcesSubmodelId())
-            .rbacPlatform(aDesc);
+        SubmodelBuilder smB = AasPartRegistry.createSubmodelBuilderRbac(aasBuilder, NAME_SUBMODEL);
         smB.createSubmodelElementCollectionBuilder(NAME_COLL_CONTAINERS).build(); // ensure exist
         SubmodelElementCollectionBuilder jB = smB.createSubmodelElementCollectionBuilder(Id.getDeviceIdAas());
         //MetricsAasConstructor.addProviderMetricsToAasSubmodel(jB, iCreator, null, s -> getQName(s));
@@ -366,7 +354,7 @@ public class EcsAas implements AasContributor {
      */
     public static void notifyContainerAdded(ContainerDescriptor desc) {
         ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
-            SubmodelBuilder builder = aas.createSubmodelBuilder(NAME_SUBMODEL, getResourcesSubmodelId());
+            SubmodelBuilder builder = AasPartRegistry.createSubmodelBuilder(aas, NAME_SUBMODEL);
             addContainer(builder, desc);
             builder.build();
         });

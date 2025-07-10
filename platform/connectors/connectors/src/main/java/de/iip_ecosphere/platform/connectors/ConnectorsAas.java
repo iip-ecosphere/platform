@@ -27,6 +27,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
 
@@ -70,7 +71,7 @@ import de.iip_ecosphere.platform.support.iip_aas.ClassUtility;
  */
 public class ConnectorsAas implements AasContributor {
 
-    public static final String NAME_DESCRIPTORS_SUBMODEL = "installedConnectors";
+    public static final String NAME_DESCRIPTORS_SUBMODEL = AasPartRegistry.NAME_SUBMODEL_CONN_INSTALLED;
     public static final String NAME_DESC_VAR_NAME = "name";
     public static final String NAME_DESC_VAR_SUPPORTS_EVENTS = "supportsEvents";
     public static final String NAME_DESC_VAR_HAS_MODEL = "hasModel";
@@ -79,7 +80,7 @@ public class ConnectorsAas implements AasContributor {
     public static final String NAME_DESC_VAR_SUPPORTS_CALLS = "supportsCalls";
     public static final String NAME_DESC_VAR_SUPPORTS_STRUCTS = "supportsStructs"; 
     
-    public static final String NAME_CONNECTORS_SUBMODEL = "activeConnectors";
+    public static final String NAME_CONNECTORS_SUBMODEL = AasPartRegistry.NAME_SUBMODEL_CONN_ACTIVE;
     public static final String NAME_SMC_CONNECTOR_PREFIX = "connector_";
     public static final String NAME_SMC_VAR_CONNECTOR = "name";
     public static final String NAME_SMC_VAR_OUT = "outType";
@@ -93,13 +94,11 @@ public class ConnectorsAas implements AasContributor {
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         // BaSyx: shall not be here, but there seems to be a problem creating a SubModel after first deployment
-        SubmodelBuilder tsmB = aasBuilder.createSubmodelBuilder(ClassUtility.NAME_TYPE_SUBMODEL, null)
-            .rbacPlatform(getSubmodelAuthentication());
+        SubmodelBuilder tsmB = AasPartRegistry.createSubmodelBuilderRbac(aasBuilder, ClassUtility.NAME_TYPE_SUBMODEL);
         if (tsmB.isNew()) { // incremental remote deployment, avoid double creation
             tsmB.build();
             
-            SubmodelBuilder ismB = aasBuilder.createSubmodelBuilder(NAME_DESCRIPTORS_SUBMODEL, null)
-                .rbacPlatform(getSubmodelAuthentication());
+            SubmodelBuilder ismB = AasPartRegistry.createSubmodelBuilderRbac(aasBuilder, NAME_DESCRIPTORS_SUBMODEL);
             Iterator<ConnectorDescriptor> iter = ConnectorRegistry.getRegisteredConnectorDescriptors();
             while (iter.hasNext()) {
                 ConnectorDescriptor desc = iter.next();
@@ -114,7 +113,7 @@ public class ConnectorsAas implements AasContributor {
             }
             Submodel descriptors = ismB.build();
             
-            SubmodelBuilder csmB = aasBuilder.createSubmodelBuilder(NAME_CONNECTORS_SUBMODEL, null);
+            SubmodelBuilder csmB = AasPartRegistry.createSubmodelBuilderRbac(aasBuilder, NAME_CONNECTORS_SUBMODEL);
             Iterator<Connector<?, ?, ?, ?>> iterC = ConnectorRegistry.getRegisteredConnectorInstances();
             while (iterC.hasNext()) {
                 Connector<?, ?, ?, ?> connector = iterC.next();

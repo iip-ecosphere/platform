@@ -36,7 +36,7 @@ import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
  */
 public class TransportAas implements AasContributor {
 
-    public static final String NAME_SUBMODEL = "transport";
+    public static final String NAME_SUBMODEL = AasPartRegistry.NAME_SUBMODEL_TRANSPORT;
     public static final String NAME_VAR_CONNECTOR = "protocol";
     public static final String NAME_VAR_SERIALIZER = "wireFormat";
     // TODO endpoints?
@@ -44,9 +44,7 @@ public class TransportAas implements AasContributor {
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         AuthenticationDescriptor aDesc = getSubmodelAuthentication(); 
-        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, 
-            AasPartRegistry.composeIdentifier(AasPartRegistry.ID_PART_TRANSPORT))
-            .rbacPlatform(aDesc);
+        SubmodelBuilder smB = AasPartRegistry.createSubmodelBuilderRbac(aasBuilder, NAME_SUBMODEL);
         if (smB.isNew()) {  // incremental remote deployment, avoid double creation
             smB.createPropertyBuilder(NAME_VAR_CONNECTOR)
                 .setValue(Type.STRING, TransportFactory.getConnectorName())
