@@ -16,7 +16,18 @@ As usual with Maven projects, you may add the argument `-U` to update snapshots 
 
 The build steps are  explained in more detail in the Platform Handbook.
 
-## Updating the meta model of apps
+## Building all-in-one examples manually
+
+The following build steps are automatically executed by an all-in-one example build process.
+
+* Update the meta-model if needed or forced (see below)
+* Generate service interfaces, serializers and data classes `mvn -P EasyGen process-sources` (see [configuration maven plugin](../configuration/configuration.maven) for the detailed build steps associated with `process-sources`)
+* Compile and package the application `mvn -P App install` (see [configuration maven plugin](../configuration/configuration.maven) for the detailed build steps associated with `package`)
+* Integrate the application `mvn -P EasyGen package`
+
+Sometimes, it makes sense to execute individual steps separately, e.g., `mvn -P EasyGen configuration:generateAppsNoDeps` for a run building all integration code files leaving out all dependencies (no deps). Although this application may not run, the build process creates the application templates in this step.
+
+## Updating the meta-model of apps
 
 The meta-model is not automatically updated. This allows the owner to declide when potential upgrades to own code shall be applied. This may be needed when platform interface changes occur (seldom), i.e., suddely compile errors appear in your application, which are compensated by a matching configuration meta model.
 

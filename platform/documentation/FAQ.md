@@ -234,3 +234,22 @@ Is this problematic or dangerous?
   * `AllServices.ivml`: Field `artifact` in all defined services.
 
 After changing the values, run `mvn install` on all affected all-in-one examples.
+
+## My Python service is not loading its (model) files
+
+*Symptom:* There is a Python service that shall load a model/data file. As Python services are packed by the build process and unpacked in a different (temporary) folder, combined there with Python files from platform and code generation, there might be some confusion where data files are located. In any case, local/absolute paths are discouraged.
+
+*Reason:* Often the relative path to the file is not correct or it is not packaged with the service.
+
+*Solution:* 
+  * Relative paths to Python services start after `src/main/python`, i.e., if your file is `src/main/python/services/myFile.pkl` your service shall use `services/myFile.pkl` as local path.
+  * Check `src/main/assembly/python.yml` whether in addition to `**/*.py` also your model extensions are listed, e.g., `<include>**/*.pkl</include>`. Then run the build process of your application, to be on the safe side with `-U`.
+
+## My Python service does not emit anything when I call print or printf
+
+*Symptom:* You do not see any Python output when you call print or printf in the application log.
+
+*Reason:* For integrations based on the command line streams, we redirect the standard output and standard error streams. This may still be active for webservice-based Python integrations.
+
+*Solution:* We are investigating this. Basically, you may use the original `sys.stdout.write(...)` or `sys.stderr.write(...)`
+
