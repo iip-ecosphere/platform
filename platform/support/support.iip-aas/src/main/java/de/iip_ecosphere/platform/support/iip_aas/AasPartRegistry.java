@@ -52,6 +52,7 @@ import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.config.EndpointHolder;
 import de.iip_ecosphere.platform.support.iip_aas.config.ProtocolAddressHolder;
@@ -78,6 +79,12 @@ public class AasPartRegistry {
     public static final String NAME_COLLECTION_SERVICES = "services";
     public static final String NAME_SUBMODEL_RESOURCES = "resources"; 
     public static final String NAME_PROP_DEVICE_AAS = "deviceAas";
+    public static final String NAME_SUBMODEL_TRANSPORT = "transport";
+    public static final String NAME_SUBMODEL_PLATFORM = "platform";
+    public static final String NAME_SUBMODEL_NETWORK_MGT = "netMgt";
+    public static final String NAME_SUBMODEL_TYPES = "types";
+    public static final String NAME_SUBMODEL_CONN_INSTALLED = "installedConnectors";
+    public static final String NAME_SUBMODEL_CONN_ACTIVE = "activeConnectors";
     
     public static final String ID_PART_SERVICES = "SVC";
     public static final String ID_PART_RESOURCES = "RES";
@@ -87,6 +94,9 @@ public class AasPartRegistry {
     public static final String ID_PART_NETWORK = "NET";
     public static final String ID_PART_TECHNICAL_DATA = "TD";
     public static final String ID_PART_SW_NAMEPLATE = "SW";
+    public static final String ID_PART_TYPES = "TYPES";
+    public static final String ID_PART_CONN_INSTALLED = "CONN_I";
+    public static final String ID_PART_CONN_ACTIVE = "CONN_A";
     
     /**
      * The URN of the top-level AAS created by this registry in {@link #build()}.
@@ -113,6 +123,21 @@ public class AasPartRegistry {
     private static AasSetup setup = new AasSetup();
     private static Supplier<List<Aas>> aasSupplier;
     private static int aasImplPort = -1;
+    private static Map<String, String> idShortIdentificationMapping = new HashMap<>();
+    
+    static {
+        idShortIdentificationMapping.put(NAME_SUBMODEL_SERVICES, ID_PART_SERVICES);
+        idShortIdentificationMapping.put(NAME_SUBMODEL_RESOURCES, ID_PART_RESOURCES);
+        // ID_PART_DEVICES
+        idShortIdentificationMapping.put(NAME_SUBMODEL_TRANSPORT, ID_PART_TRANSPORT);
+        idShortIdentificationMapping.put(NAME_SUBMODEL_PLATFORM, ID_PART_PLATFORM);
+        idShortIdentificationMapping.put(NAME_SUBMODEL_NETWORK_MGT, ID_PART_NETWORK);
+        //ID_PART_TECHNICAL_DATA -> code generation
+        //ID_PART_SW_NAMEPLATE -> code generation
+        idShortIdentificationMapping.put(NAME_SUBMODEL_TYPES, ID_PART_TYPES);
+        idShortIdentificationMapping.put(NAME_SUBMODEL_CONN_INSTALLED, ID_PART_CONN_INSTALLED);
+        idShortIdentificationMapping.put(NAME_SUBMODEL_CONN_ACTIVE, ID_PART_CONN_ACTIVE);
+    }
 
     /**
      * Aas installation/setup modes.
@@ -611,6 +636,56 @@ public class AasPartRegistry {
             return setups.get(component);
         }
 
+    }
+
+    /**
+     * Returns the platform identification.
+     * 
+     * @param idShort the idShort of the submodel
+     * @return the submodel identification, may be <b>null</b> usually leading to an identification through 
+     *     {@code idShort}
+     */
+    public static String getSubmodelIdentification(String idShort) {
+        String id = idShortIdentificationMapping.get(idShort);
+        return null == id ? null : composeIdentifier(id);
+    }
+    
+    /**
+     * Creates a submodel builder for the given {@code aasBuilder} and {@code idShort} deriving the submodel
+     * identification via {@link #getSubmodelIdentification(String)}.
+     * 
+     * @param aasBuilder the "parent" AAS builder
+     * @param idShort the idShort of the submodel
+     * @return the submodel builder
+     */
+    public static SubmodelBuilder createSubmodelBuilder(AasBuilder aasBuilder, String idShort) {
+        return aasBuilder.createSubmodelBuilder(idShort, getSubmodelIdentification(idShort)); // ok if null
+    }
+
+    /**
+     * Creates a submodel builder for the given {@code aas} and {@code idShort} deriving the submodel
+     * identification via {@link #getSubmodelIdentification(String)}.
+     * 
+     * @param aas the "parent" AAS
+     * @param idShort the idShort of the submodel
+     * @return the submodel builder
+     */
+    public static SubmodelBuilder createSubmodelBuilder(Aas aas, String idShort) {
+        return aas.createSubmodelBuilder(idShort, getSubmodelIdentification(idShort)); // ok if null
+    }
+
+    /**
+     * Creates a submodel builder for the given {@code aasBuilder} and {@code idShort} deriving the submodel
+     * identification via {@link #getSubmodelIdentification(String)} with default authentication, i.e. applies 
+     * {@link SubmodelBuilder#rbacPlatform(AuthenticationDescriptor)} with {@link #getSubmodelAuthentication()}
+     * 
+     * @param aasBuilder the "parent" AAS builder
+     * @param idShort the idShort of the submodel
+     * @return the submodel builder
+     */
+    public static SubmodelBuilder createSubmodelBuilderRbac(AasBuilder aasBuilder, String idShort) {
+        return createSubmodelBuilder(aasBuilder, idShort)
+            .rbacPlatform(getSubmodelAuthentication());
     }
     
     /**

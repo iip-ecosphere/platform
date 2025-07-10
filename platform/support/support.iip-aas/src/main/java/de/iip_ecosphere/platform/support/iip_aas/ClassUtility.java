@@ -68,7 +68,7 @@ import static de.iip_ecosphere.platform.support.aas.AasUtils.*;
  */
 public class ClassUtility {
 
-    public static final String NAME_TYPE_SUBMODEL = "types";
+    public static final String NAME_TYPE_SUBMODEL = AasPartRegistry.NAME_SUBMODEL_TYPES;
     public static final String ATTRIBUTE_PREFIX = "attr_"; // AAS id name limitation
     public static final String NAME_ARRAY_PROPERTY_TYPE = "type";
     public static final String NAME_ARRAY_PROPERTY_DIMENSIONS = "nesting";
@@ -124,7 +124,8 @@ public class ClassUtility {
      * @return the reference to the sub-model (<b>null</b> if nothing was created)
      */
     public static Reference addType(AasBuilder aasBuilder, Class<?> type) {
-        SubmodelBuilder smb = aasBuilder.createSubmodelBuilder(NAME_TYPE_SUBMODEL, null); // create or re-open
+        SubmodelBuilder smb = AasPartRegistry.createSubmodelBuilderRbac(aasBuilder, 
+            NAME_TYPE_SUBMODEL); // create or re-open
         SubmodelElementCollectionBuilder typeCollection = smb.createSubmodelElementCollectionBuilder(
             getName(type));
         Reference result = addType(typeCollection, type);

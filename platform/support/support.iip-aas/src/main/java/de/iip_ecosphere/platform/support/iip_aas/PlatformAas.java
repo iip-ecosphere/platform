@@ -50,7 +50,7 @@ import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolver;
  */
 public class PlatformAas implements AasContributor {
 
-    public static final String NAME_SUBMODEL = "platform";
+    public static final String NAME_SUBMODEL = AasPartRegistry.NAME_SUBMODEL_PLATFORM;
     public static final String SUBMODEL_NAMEPLATE = "TechnicalData"; // preliminary, the software "Nameplate"
     public static final String NAME_PROPERTY_NAME = "name";
     public static final String NAME_PROPERTY_VERSION = "version";
@@ -94,9 +94,7 @@ public class PlatformAas implements AasContributor {
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         AuthenticationDescriptor auth = getSubmodelAuthentication();
-        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, 
-            AasPartRegistry.composeIdentifier(AasPartRegistry.ID_PART_PLATFORM))
-            .rbacPlatform(auth);
+        SubmodelBuilder smB = AasPartRegistry.createSubmodelBuilderRbac(aasBuilder, NAME_SUBMODEL);
         if (smB.isNew()) { // incremental remote deployment, avoid double creation
             IipVersion versionInfo = IipVersion.getInstance();
             ApplicationSetup setup = new ApplicationSetup();
@@ -114,11 +112,11 @@ public class PlatformAas implements AasContributor {
             setup.setAddress(addr);
             
             SubmodelBuilder smBuilder = createNameplate(aasBuilder, setup, 
-                AasPartRegistry.composeIdentifier(AasPartRegistry.ID_PART_TECHNICAL_DATA));
+                AasPartRegistry.composeIdentifier(AasPartRegistry.ID_PART_TECHNICAL_DATA)); // rbac included
             addSoftwareInfo(smBuilder, setup);
             smBuilder.build();
             createSoftwareNameplate(aasBuilder, setup, versionInfo, 
-                AasPartRegistry.composeIdentifier(AasPartRegistry.ID_PART_SW_NAMEPLATE));
+                AasPartRegistry.composeIdentifier(AasPartRegistry.ID_PART_SW_NAMEPLATE)); // rbac included
             addSoftwareInfo(smB, setup); // old style
             smB.createPropertyBuilder(NAME_PROPERTY_RELEASE)
                 .setValue(Type.BOOLEAN, versionInfo.isRelease())
@@ -165,7 +163,8 @@ public class PlatformAas implements AasContributor {
 
     /**
      * Creates the "nameplate". Currently a mix of {@link TechnicalDataBuilder} and (for legacy reasons) the 
-     * ZVEI Digital Nameplate for industrial equipment V1.0.
+     * ZVEI Digital Nameplate for industrial equipment V1.0. 
+     * Applies {@link SubmodelBuilder#rbacPlatform(AuthenticationDescriptor)}.
      * 
      * @param aasBuilder the AAS builder, do not call {@link AasBuilder#build()} in here!
      * @param appSetup application setup
@@ -175,7 +174,7 @@ public class PlatformAas implements AasContributor {
      */
     public static SubmodelBuilder createNameplate(AasBuilder aasBuilder, ApplicationSetup appSetup, String identifier) {
         TechnicalDataBuilder tdBuilder = new TechnicalDataBuilder(aasBuilder, identifier);
-        tdBuilder.rbac(AasPartRegistry.getSubmodelAuthentication());
+        tdBuilder.rbacPlatform(AasPartRegistry.getSubmodelAuthentication());
         GeneralInformationBuilder giBuilder = tdBuilder.createGeneralInformationBuilder()
             .setManufacturerName(appSetup.getManufacturerName())
             .setManufacturerArticleNumber("oktoflow")
@@ -219,7 +218,7 @@ public class PlatformAas implements AasContributor {
     }
     
     /**
-     * Creates the software nameplate.
+     * Creates the software nameplate. Applies {@link SubmodelBuilder#rbacPlatform(AuthenticationDescriptor)}.
      * 
      * @param aasBuilder the parent AAS builder
      * @param appSetup the application setup

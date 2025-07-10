@@ -183,7 +183,7 @@ public class ClassUtilityTest extends TestWithPlugin {
     public void addTestTypeToClassWithDeployment() throws IOException, ExecutionException {
         AasFactory factory = AasFactory.getInstance();
         AasBuilder aasBuilder = factory.createAasBuilder(NAME_AAS, URN_AAS);
-        aasBuilder.createSubmodelBuilder(ClassUtility.NAME_TYPE_SUBMODEL, null).build();
+        AasPartRegistry.createSubmodelBuilder(aasBuilder, ClassUtility.NAME_TYPE_SUBMODEL).build();
         aasBuilder.createSubmodelBuilder(NAME_TEST_SUBMODEL, null).build();
         
         // deploy the AAS

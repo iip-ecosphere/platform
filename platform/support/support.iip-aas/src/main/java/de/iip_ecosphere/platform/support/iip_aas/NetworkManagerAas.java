@@ -39,7 +39,7 @@ import static de.iip_ecosphere.platform.support.aas.AasUtils.*;
  */
 public class NetworkManagerAas implements AasContributor {
 
-    public static final String NAME_SUBMODEL = "netMgt";
+    public static final String NAME_SUBMODEL = AasPartRegistry.NAME_SUBMODEL_NETWORK_MGT;
     public static final String OP_RELEASE_PORT = "releasePort";
     public static final String OP_IS_IN_USE_PORT = "isInUsePortPort";
     public static final String OP_IS_IN_USE_ADR = "isInUsePortAdr";
