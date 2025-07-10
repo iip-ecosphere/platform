@@ -24,13 +24,14 @@ import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.PersistenceType;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
 /**
  * Abstract test for device providers.
  * 
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractDeviceProviderTest {
+public abstract class AbstractDeviceProviderTest extends TestWithPlugin {
 
     private static Server registryServer;
     private static Server aasServer;
