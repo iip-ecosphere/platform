@@ -31,7 +31,6 @@ import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.streams.StreamNames;
 import io.micrometer.core.instrument.Meter;
-import test.de.iip_ecosphere.platform.transport.TestServerBuilder;
 import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 /**
@@ -178,7 +177,7 @@ public class MonitoringReceiverTest extends AbstractMonitoringReceiverTest {
     @Override
     protected Server createBroker(ServerAddress broker) {
         if (null == qpid) {
-            qpid = TestServerBuilder.fromPlugin("test-qpid", broker);
+            qpid = TestWithQpid.fromPlugin(broker);
         }
         return qpid;
     }
