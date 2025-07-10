@@ -100,11 +100,21 @@ public class EcsAas implements AasContributor {
     
     // checkstyle: stop method length check
     
+    /**
+     * Returns the submodel identifier for the given submodel idShort.
+     * 
+     * @param idShort the idShort
+     * @return the submodel identifier
+     */
+    public static String getResourcesSubmodelId() {
+        return AasPartRegistry.composeIdentifier(AasPartRegistry.ID_PART_RESOURCES);
+    }
+        
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         AuthenticationDescriptor aDesc = getSubmodelAuthentication(); 
         ContainerManager mgr = EcsFactory.getContainerManager();
-        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)
+        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, getResourcesSubmodelId())
             .rbacPlatform(aDesc);
         smB.createSubmodelElementCollectionBuilder(NAME_COLL_CONTAINERS).build(); // ensure exist
         SubmodelElementCollectionBuilder jB = smB.createSubmodelElementCollectionBuilder(Id.getDeviceIdAas());
@@ -143,9 +153,7 @@ public class EcsAas implements AasContributor {
             .build(aDesc);
         jB.createOperationBuilder(NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS)
             .setInvocable(iCreator.createInvocable(getQName(NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS)))
-            .addOutputVariable("username", Type.STRING)
-            .addOutputVariable("password", Type.STRING)
-            .build(aDesc);
+            .build(Type.STRING, aDesc);
         if (null != mgr) {
             jB.createPropertyBuilder(NAME_PROP_CSYS_VERSION)
                 .setValue(Type.STRING, mgr.getContainerSystemVersion())
@@ -358,7 +366,7 @@ public class EcsAas implements AasContributor {
      */
     public static void notifyContainerAdded(ContainerDescriptor desc) {
         ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
-            SubmodelBuilder builder = aas.createSubmodelBuilder(NAME_SUBMODEL, ID_SUBMODEL);
+            SubmodelBuilder builder = aas.createSubmodelBuilder(NAME_SUBMODEL, getResourcesSubmodelId());
             addContainer(builder, desc);
             builder.build();
         });

@@ -56,7 +56,7 @@ import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.transport.Transport;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Meter;
-import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
+import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
@@ -66,7 +66,7 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class EcsAasTest {
+public class EcsAasTest extends TestWithQpid {
     
     private static Server qpid;
 
@@ -91,8 +91,9 @@ public class EcsAasTest {
      */
     @BeforeClass
     public static void startup() {
+        loadPlugins();
         ServerAddress broker = new ServerAddress(Schema.IGNORE);
-        qpid = new TestQpidServer(broker);
+        qpid = TestWithQpid.fromPlugin(broker);
         EcsFactory.getSetup().getTransport().setPort(broker.getPort());
         qpid.start();
         Transport.setTransportSetup(() -> EcsFactory.getSetup().getTransport());
