@@ -42,6 +42,7 @@ public abstract class AbstractDeviceProviderTest extends TestWithPlugin {
      */
     @BeforeClass
     public static void startup() {
+        loadPlugins();
         // adjust the setup 
         orig = AasPartRegistry.setAasSetup(AasSetup.createLocalEphemeralSetup(null, false));
         System.out.println("Registry: " + AasPartRegistry.getSetup().getRegistryEndpoint().toUri());
