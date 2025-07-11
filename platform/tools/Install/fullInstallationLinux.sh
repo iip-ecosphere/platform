@@ -117,12 +117,36 @@ install_confirm() {
 
   case "$yn" in
     [Yy])
-      echo "Installing $name $version"
+      echo "Installing $name $version $yn"
       ;;
     [Ee])
       echo "$name is already installed with accepted version, $name $version"
       ;;
   esac
+}
+
+install_completed() {
+  localOktDepsOnly="$1"
+
+  if [ -n "$localOktDepsOnly" ] && [ "$localOktDepsOnly" == "DepsOnly" ]; then
+    echo "Only the dependencies of the Platform was installed (Not the full Platform)"
+  else
+    echo "The following commands were created in Platform\Install\gen:"
+    echo "- broker/broker.sh starts the configured communication broker (cd needed)"
+    echo "- platform.sh starts the central platform services"
+    echo "- mgtUi.sh starts the Angular-based management UI (Angular required, http://localhost:4200)"
+    echo "- per device that shall execute services, either ECS-Runtime and service manager or the combined"
+    echo "  combined ECS-Runtime-Servicemanager must be executed"
+    echo "  - ecs.sh starts the ECS-Runtime"
+    echo "  - serviceMgr.sh starts the service manager"
+    echo "  - ecsServiceMgr.sh starts the combined ECS-Runtime/Service-Manager"
+    echo "- cli.sh starts the platform command line interface"
+    echo "In individual shells, start at least the broker, the central services and the device services, then" 
+    echo "the included application (cli.sh deploy artifacts/deployment.yaml). On a permanent installation, only" 
+    echo "accessing the UI or the CLI is needed."
+    echo "Please consult the installation overview for more information."
+  fi
+
 }
 
 # End of installation function
@@ -139,6 +163,13 @@ OktDockerVersion=20.10.7
 OktNodeVersion=22.14.0
 OktNpmVersion=10.9.2
 OktAngularVersion=19.2.5
+
+OktDepsOnly="$1"
+
+if [ -n "$OktDepsOnly" ] && [ "$OktDepsOnly" != "DepsOnly" ]; then
+  echo "Error: Invalid argument '$OktDepsOnly'. Allowed argument is 'DepsOnly': Installing Only the dependencies of the Platform (Not the full Platform)."
+  exit 1
+fi
 
 echo "Installing prerequisites Java $OktJavaVersion, Maven version $OktMvnVersion, and Python version $OktPythonVersion"
 echo "This action will set and use Environment Variables"
@@ -192,19 +223,19 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
     
     # Check current Python version
 
-    echo "Please enter the path for runnable python3.9 or newer. If python 3.9 or newer then please enter (n). "
-    read -p "Runnable python3.9 or newer: " PythonPath
+    echo "Please enter the path for your runnable python3.9 (or newer) or your Python the virtual environment (in case of using one). If Python does not exist then please enter (n). "
+    read -p "Your runnable python3.9 or your Python the virtual environment: " PythonPath
     while [ -z "$PythonPath" ]; do
-        echo "Please enter the path for runnable python3.9 or newer. If python 3.9 or newer then please enter (n). "
-        read -p "Runnable python3.9 or newer: " PythonPath
+        echo "Please enter the path for your runnable python3.9 (or newer) or your Python the virtual environment (in case of using one). If Python does not exist then please enter (n). "
+        read -p "Your runnable python3.9 or your Python the virtual environment: " PythonPath
     done
 
-    if [[ "$PythonPath" == "Y" || "$PythonPath" == "y" ]]; then
+    if [[ "$PythonPath" != "N" || "$PythonPath" != "n" ]]; then
         while true; do
             read -p "You have Python installed in $PythonPath, correct (y/n)? " CheckPath
             case $CheckPath in
                 [Yy]* ) break;;
-                [Nn]* ) read -p "please enter the correct path for runnable python3.9 or newer: " PythonPath;;
+                [Nn]* ) read -p "please enter the correct path for runnable python3.9 or your Python the virtual environment: " PythonPath;;
                 * ) echo "Please answer y or n.";;
             esac
         done
@@ -260,117 +291,128 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
         done
     fi
 
-    while true; do
-        read -p "Do you want to install Docker $OktDockerVersion to use containers in the platform? - You might skip this step (y/n) " InstallDockeryn
-        case $InstallDockeryn in
-            [Yy]* ) break;;
-            [Nn]* ) break;;
-            * ) echo "Please answer y or n.";;
-        esac
-    done
-    
-    if [ $InstallDockeryn == "y" ] || [ $InstallDockeryn == "Y" ]; then 
-        # Check current Docker version 
+    if [ -z "$OktDepsOnly" ]; then
+        while true; do
+            read -p "Do you want to install Docker $OktDockerVersion to use containers in the platform? - You might skip this step (y/n) " InstallDockeryn
+            case $InstallDockeryn in
+                [Yy]* ) break;;
+                [Nn]* ) break;;
+                * ) echo "Please answer y or n.";;
+            esac
+        done
 
-        if [ -x "$(command -v docker --version)" ]; then
-            DOCKER_VERSION=$(docker --version | grep -oP '[[:digit:]]{1,2}\.[[:digit:]]{1,2}\.[[:digit:]]{1,2}' | head -1)
-            if ! [ $DOCKER_VERSION == $OktDockerVersion ]; then
-                echo "You have Docker version $DOCKER_VERSION, it is recommended to have version $OktDockerVersion"
-                while true; do
-                    read -p "Do you want to install Docker $OktDockerVersion and replace Docker default to $OktDockerVersion? - You might skip this step (y/n) " Dockeryn
-                    case $Dockeryn in
-                        [Yy]* ) break;;
-                        [Nn]* ) break;;
-                        * ) echo "Please answer y or n.";;
-                    esac
-                done
+        if [ $InstallDockeryn == "y" ] || [ $InstallDockeryn == "Y" ]; then 
+            # Check current Docker version 
+
+            if [ -x "$(command -v docker --version)" ]; then
+                DOCKER_VERSION=$(docker --version | grep -oP '[[:digit:]]{1,2}\.[[:digit:]]{1,2}\.[[:digit:]]{1,2}' | head -1)
+                if ! [ $DOCKER_VERSION == $OktDockerVersion ]; then
+                    echo "You have Docker version $DOCKER_VERSION, it is recommended to have version $OktDockerVersion"
+                    while true; do
+                        read -p "Do you want to install Docker $OktDockerVersion and replace Docker default to $OktDockerVersion? - You might skip this step (y/n) " Dockeryn
+                        case $Dockeryn in
+                            [Yy]* ) break;;
+                            [Nn]* ) break;;
+                            * ) echo "Please answer y or n.";;
+                        esac
+                    done
+                else
+                    Dockeryn="E";
+                fi
             else
-                Dockeryn="E";
+                Dockeryn="Y";
             fi
         else
-            Dockeryn="Y";
+            Dockeryn="N";
         fi
-    else
+
+        # Check Docker Private Registry
+
+        while true; do
+            read -p "Do you want to start Docker Private Registry (You should have Docker installed, be carefull it will restart Docker service) for the platform? - You might skip this step (y/n) " Registryyn
+            case $Registryyn in
+                [Yy]* ) break;;
+                [Nn]* ) break;;
+                * ) echo "Please answer y or n.";;
+            esac
+        done
+
+        # Check Node.js 22.x and Angular 19
+
+        while true; do
+            echo "To use the management UI for the platform you should have angular version $OktAngularVersion installed (with npm and Node.js)"
+            read -p "Do you want to install Node.js version 22.x (latest), angular version $OktAngularVersion, and npm package manager for the JavaScript? - You might skip this step (y/n) " Nodeyn 
+            case $Nodeyn in
+                [Yy]* ) break;;
+                [Nn]* ) break;;
+                * ) echo "Please answer y or n.";;
+            esac
+        done   
+
+        if [[ "$Nodeyn" == "Y" || "$Nodeyn" == "y" ]]; then
+            if [ -x "$(command -v node --version)" ]; then
+                NODE_VERSION=$(node --version | grep -oP '[[:digit:]]{1,2}\.[[:digit:]]{1,2}\.[[:digit:]]{1,2}' | head -1)
+                if [[ "$NODE_VERSION" == "$OktNodeVersion" ]]; then
+                    Nodeyn="E";
+                elif [[ "$(printf '%s\n' "$NODE_VERSION" "$OktNodeVersion" | sort -V | head -n1)" == "$version_a" ]] && [[ "$version_a" != "$version_b" ]]; then
+                    echo "You have Node.js version $NODE_VERSION, it is recommended to have at least version $OktNodeVersion"
+                    while true; do
+                        read -p "Do you want to install Node.js 22.x (latest) version? - You might skip this step (y/n) " Nodeyn
+                        case $Nodeyn in
+                            [Yy]* ) break;;
+                            [Nn]* ) break;;
+                            * ) echo "Please answer y or n.";;
+                        esac
+                    done
+                else
+                    echo "You have Node.js version $NODE_VERSION, it is newer than $OktNodeVersion. It shall work"
+                    Nodeyn="E";
+                fi
+            else
+                Nodeyn="Y";
+            fi
+
+            if [ -x "$(command -v ng --version)" ]; then
+               ANG_VERSION=$(ng version | grep 'Angular CLI:' | awk '{print $3}')
+               if ! [[ "$ANG_VERSION" == "$OktAngularVersion" ]]; then
+                  echo "You have Angular version $ANG_VERSION, it is recommended to have version $OktAngularVersion"
+                  while true; do
+                      read -p "Do you want to install Angular $OktAngularVersion? - You might skip this step (y/n) " Angularyn
+                      case $Angularyn in
+                          [Yy]* ) break;;
+                          [Nn]* ) break;;
+                          * ) echo "Please answer y or n.";;
+                      esac
+                  done
+               else
+                   Angularyn="E";
+               fi
+            else
+                Angularyn="Y";
+            fi
+        fi
+    elif [ -n "$OktDepsOnly" ] && [ "$OktDepsOnly" == "DepsOnly" ]; then
         Dockeryn="N";
-    fi
-    
-    # Check Docker Private Registry
-    
-    while true; do
-        read -p "Do you want to start Docker Private Registry (You should have Docker installed, be carefull it will restart Docker service) for the platform? - You might skip this step (y/n) " Registryyn
-        case $Registryyn in
-            [Yy]* ) break;;
-            [Nn]* ) break;;
-            * ) echo "Please answer y or n.";;
-        esac
-    done
-   
-    # Check Node.js 22.x and Angular 19
-    
-    while true; do
-        echo "To use the management UI for the platform you should have angular version $OktAngularVersion installed (with npm and Node.js)"
-        read -p "Do you want to install Node.js version 22.x (latest), angular version $OktAngularVersion, and npm package manager for the JavaScript? - You might skip this step (y/n) " Nodeyn 
-        case $Nodeyn in
-            [Yy]* ) break;;
-            [Nn]* ) break;;
-            * ) echo "Please answer y or n.";;
-        esac
-    done   
-    
-    if [[ "$Nodeyn" == "Y" || "$Nodeyn" == "y" ]]; then
-        if [ -x "$(command -v node --version)" ]; then
-            NODE_VERSION=$(node --version | grep -oP '[[:digit:]]{1,2}\.[[:digit:]]{1,2}\.[[:digit:]]{1,2}' | head -1)
-            if [[ "$NODE_VERSION" == "$OktNodeVersion" ]]; then
-                Nodeyn="E";
-            elif [[ "$(printf '%s\n' "$NODE_VERSION" "$OktNodeVersion" | sort -V | head -n1)" == "$version_a" ]] && [[ "$version_a" != "$version_b" ]]; then
-                echo "You have Node.js version $NODE_VERSION, it is recommended to have at least version $OktNodeVersion"
-                while true; do
-                    read -p "Do you want to install Node.js 22.x (latest) version? - You might skip this step (y/n) " Nodeyn
-                    case $Nodeyn in
-                        [Yy]* ) break;;
-                        [Nn]* ) break;;
-                        * ) echo "Please answer y or n.";;
-                    esac
-                done
-            else
-                echo "You have Node.js version $NODE_VERSION, it is newer than $OktNodeVersion. It shall work"
-                Nodeyn="E";
-            fi
-        else
-            Nodeyn="Y";
-        fi
-        
-        if [ -x "$(command -v ng --version)" ]; then
-           ANG_VERSION=$(ng version | grep 'Angular CLI:' | awk '{print $3}')
-           if ! [[ "$ANG_VERSION" == "$OktAngularVersion" ]]; then
-              echo "You have Angular version $ANG_VERSION, it is recommended to have version $OktAngularVersion"
-              while true; do
-                  read -p "Do you want to install Angular $OktAngularVersion? - You might skip this step (y/n) " Angularyn
-                  case $Angularyn in
-                      [Yy]* ) break;;
-                      [Nn]* ) break;;
-                      * ) echo "Please answer y or n.";;
-                  esac
-              done
-           else
-               Angularyn="E";
-           fi
-        else
-            Angularyn="Y";
-        fi
+        Nodeyn="N";
+        Angularyn="N";
+        Registryyn="N";
     fi
 
     install_confirm "Java" "$Javayn" "$OktJavaVersion"
     install_confirm "Maven" "$Mavenyn" "$OktMvnVersion"
-    install_confirm "Docker" "$Dockeryn" "$OktDockerVersion"
     install_confirm "Python" "$Pythonyn" "$OktPythonVersion"
+    install_confirm "Docker" "$Dockeryn" "$OktDockerVersion"
     install_confirm "Node.js" "$Nodeyn" "$OktNodeVersion"
     install_confirm "Angular" "$Angularyn" "$OktAngularVersion"
-
     if [[ "$Registryyn" == "Y" || "$Registryyn" == "y" ]]; then
-      echo "Starting Docker Private Registry"
+        echo "Starting Docker Private Registry"
     fi
-    echo "Installing the Platform"
+
+    if [ -n "$OktDepsOnly" ] && [ "$OktDepsOnly" == "DepsOnly" ]; then
+        echo "Installing Only the dependencies of the Platform (Not the full Platform)"
+    else
+        echo "Installing the full version of the Platform"
+    fi
 
     read -p "Press Enter to start the installation..."
 
@@ -401,7 +443,7 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
             [Yy]* ) sudo wget https://archive.apache.org/dist/maven/maven-3/3.9.7/binaries/apache-maven-3.9.7-bin.tar.gz;
                     sudo tar xzpvf apache-maven-3.9.7-bin.tar.gz;
                     sudo ln -sf $PWD/apache-maven-3.9.7/bin/mvn /usr/bin/mvn;;
-            [Nn]* ) break;;
+            [Nn]* ) echo "";;
         esac
     fi
     
@@ -415,7 +457,7 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
         case $Dockeryn in
             [Yy]* ) install_docker_version $OktDockerVersion;
                     sudo usermod -aG docker $USER;;
-            [Nn]* ) break;;
+            [Nn]* ) echo "";;
         esac
     fi
     
@@ -431,7 +473,7 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
                 [Yy]* ) install_python_binary_version;
                         export IIP_PYTHON=$(which python3.9);
                         sudo $IIP_PYTHON -m pip install pyflakes;;
-                [Nn]* ) break;;
+                [Nn]* ) echo "";;
             esac
         fi
         echo "export IIP_PYTHON=$(which python3.9)" >> ~/.bashrc
@@ -446,23 +488,26 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
                 [Yy]* ) install_python_compile_sources_version $OktPythonVersion;
                         export IIP_PYTHON=$CurPath/PyPaths/python3.9/bin/python3.9;
                         sudo $IIP_PYTHON -m pip install pyflakes;;
-                [Nn]* ) break;;
+                [Nn]* ) echo "";;
             esac
         fi
         echo "export IIP_PYTHON=$CurPath/PyPaths/python3.9/bin/python3.9" >> ~/.bashrc
         cd $CurPath
+    elif [ -n "$PythonPath" ]; then
+        export IIP_PYTHON=$PythonPath;
+        echo "export IIP_PYTHON=$PythonPath" >> ~/.bashrc
     fi
-    
+
     # Install Node.js version 22.x.0 and angular version 19
     
     case $Nodeyn in
         [Yy]* ) sudo apt update && apt install -y curl gnupg && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && apt install -y nodejs;;
-        [Nn]* ) break;;
+        [Nn]* ) echo "";;
     esac
 
     case $Angularyn in
         [Yy]* ) sudo npm install -g @angular/cli@19.2.5;;
-        [Nn]* ) break;;
+        [Nn]* ) echo "";;
     esac
     
     sudo apt install curl -y
@@ -507,97 +552,111 @@ EOF
         [Nn]* ) sudo rm daemon.json;
     esac
     
-    sudo mvn install -Diip.easy.tracing=TOP
+    if [ -n "$OktDepsOnly" ] && [ "$OktDepsOnly" == "DepsOnly" ]; then
+        sudo mvn -P DepsOnly install
+    else
+        sudo mvn install -Diip.easy.tracing=TOP
+    fi
+
+    install_completed "$OktDepsOnly"
     
 elif [ $yn == "n" ] || [ $yn == "N" ]; then 
 
     mkdir -p Setup && cd Setup
     
-    echo "Please enter the path for runnable python3.9 or newer."
-    read -p "Runnable python3.9: " PythonPath
+    echo "Please enter the path for your runnable python3.9 (or newer) or your Python the virtual environment (in case of using one)."
+    read -p "Your runnable python3.9 or your Python the virtual environment: " PythonPath
     while [ -z "$PythonPath" ]; do
-        echo "Please enter the path for runnable python3.9 or newer."
-        read -p "Runnable python3.9: " PythonPath
+        echo "Please enter the path for your runnable python3.9 (or newer) or your Python the virtual environment (in case of using one)."
+        read -p "Your runnable python3.9 or your Python the virtual environment: " PythonPath
     done
 
     while true; do
         read -p "You have runnable Python in $PythonPath, correct (y/n)? " CheckPath
         case $CheckPath in
             [Yy]* ) break;;
-            [Nn]* ) read -p "please enter the correct path for runnable python3.9: " PythonPath;;
+            [Nn]* ) read -p "please enter the correct path for runnable python3.9 or your Python the virtual environment: " PythonPath;;
             * ) echo "Please answer y or n.";;
         esac
     done
     
     export IIP_PYTHON=$PythonPath
-    
-    # Check Docker Private Registry
-    if [ -x "$(command -v docker --version)" ]; then
-       while true; do
-           read -p "Do you want to start Docker Private Registry (You should have Docker installed, be carefull it will restart Docker service) for the platform? - You might skip this step (y/n) " Registryyn
-           case $Registryyn in
-               [Yy]* ) break;;
-               [Nn]* ) break;;
-               * ) echo "Please answer y or n.";;
-           esac
-       done
-    else
-       Registryyn=n
-    fi
+    echo "export IIP_PYTHON=$PythonPath" >> ~/.bashrc
 
-    # Check Node.js 22.x and Angular 19
+    if [ -z "$OktDepsOnly" ]; then
+        # Check Docker Private Registry
+        if [ -x "$(command -v docker --version)" ]; then
+           while true; do
+               read -p "Do you want to start Docker Private Registry (You should have Docker installed, be carefull it will restart Docker service) for the platform? - You might skip this step (y/n) " Registryyn
+               case $Registryyn in
+                   [Yy]* ) break;;
+                   [Nn]* ) break;;
+                   * ) echo "Please answer y or n.";;
+               esac
+           done
+        else
+           Registryyn=n
+        fi
+
+        # Check Node.js 22.x and Angular 19
     
-    while true; do
-        echo "To use the management UI for the platform you should have angular version $OktAngularVersion installed (with npm and Node.js)"
-        read -p "Do you want to install Node.js version 22.x (latest), angular version $OktAngularVersion, and npm package manager for the JavaScript? - You might skip this step (y/n) " Nodeyn 
-        case $Nodeyn in
-            [Yy]* ) break;;
-            [Nn]* ) break;;
-            * ) echo "Please answer y or n.";;
-        esac
-    done   
+        while true; do
+            echo "To use the management UI for the platform you should have angular version $OktAngularVersion installed (with npm and Node.js)"
+            read -p "Do you want to install Node.js version 22.x (latest), angular version $OktAngularVersion, and npm package manager for the JavaScript? - You might skip this step (y/n) " Nodeyn 
+            case $Nodeyn in
+                [Yy]* ) break;;
+                [Nn]* ) break;;
+                * ) echo "Please answer y or n.";;
+            esac
+        done   
     
-    if [[ "$Nodeyn" == "Y" || "$Nodeyn" == "y" ]]; then
-        if [ -x "$(command -v node --version)" ]; then
-            NODE_VERSION=$(node --version | grep -oP '[[:digit:]]{1,2}\.[[:digit:]]{1,2}\.[[:digit:]]{1,2}' | head -1)
-            if [[ "$NODE_VERSION" == "$OktNodeVersion" ]]; then
-                Nodeyn="E";
-            elif [[ "$(printf '%s\n' "$NODE_VERSION" "$OktNodeVersion" | sort -V | head -n1)" == "$version_a" ]] && [[ "$version_a" != "$version_b" ]]; then
-                echo "You have Node.js version $NODE_VERSION, it is recommended to have at least version $OktNodeVersion"
-                while true; do
-                    read -p "Do you want to install Node.js 22.x (latest) version? - You might skip this step (y/n) " Nodeyn
-                    case $Nodeyn in
-                        [Yy]* ) break;;
-                        [Nn]* ) break;;
-                        * ) echo "Please answer y or n.";;
-                    esac
-                done
+        if [[ "$Nodeyn" == "Y" || "$Nodeyn" == "y" ]]; then
+            if [ -x "$(command -v node --version)" ]; then
+                NODE_VERSION=$(node --version | grep -oP '[[:digit:]]{1,2}\.[[:digit:]]{1,2}\.[[:digit:]]{1,2}' | head -1)
+                if [[ "$NODE_VERSION" == "$OktNodeVersion" ]]; then
+                    Nodeyn="E";
+                elif [[ "$(printf '%s\n' "$NODE_VERSION" "$OktNodeVersion" | sort -V | head -n1)" == "$version_a" ]] && [[ "$version_a" != "$version_b" ]]; then
+                    echo "You have Node.js version $NODE_VERSION, it is recommended to have at least version $OktNodeVersion"
+                    while true; do
+                        read -p "Do you want to install Node.js 22.x (latest) version? - You might skip this step (y/n) " Nodeyn
+                        case $Nodeyn in
+                            [Yy]* ) break;;
+                            [Nn]* ) break;;
+                            * ) echo "Please answer y or n.";;
+                        esac
+                    done
+                else
+                    echo "You have Node.js version $NODE_VERSION, it is newer than $OktNodeVersion. It shall work"
+                    Nodeyn="E";
+                fi
             else
-                echo "You have Node.js version $NODE_VERSION, it is newer than $OktNodeVersion. It shall work"
-                Nodeyn="E";
+                Nodeyn="Y";
             fi
-        else
-            Nodeyn="Y";
+
+            if [ -x "$(command -v ng --version)" ]; then
+               ANG_VERSION=$(ng version | grep 'Angular CLI:' | awk '{print $3}')
+               if ! [[ "$ANG_VERSION" == "$OktAngularVersion" ]]; then
+                  echo "You have Angular version $ANG_VERSION, it is recommended to have version $OktAngularVersion"
+                  while true; do
+                      read -p "Do you want to install Angular $OktAngularVersion? - You might skip this step (y/n) " Angularyn
+                      case $Angularyn in
+                          [Yy]* ) break;;
+                          [Nn]* ) break;;
+                          * ) echo "Please answer y or n.";;
+                      esac
+                  done
+               else
+                   Angularyn="E";
+               fi
+            else
+                Angularyn="Y";
+            fi
         fi
-        
-        if [ -x "$(command -v ng --version)" ]; then
-           ANG_VERSION=$(ng version | grep 'Angular CLI:' | awk '{print $3}')
-           if ! [[ "$ANG_VERSION" == "$OktAngularVersion" ]]; then
-              echo "You have Angular version $ANG_VERSION, it is recommended to have version $OktAngularVersion"
-              while true; do
-                  read -p "Do you want to install Angular $OktAngularVersion? - You might skip this step (y/n) " Angularyn
-                  case $Angularyn in
-                      [Yy]* ) break;;
-                      [Nn]* ) break;;
-                      * ) echo "Please answer y or n.";;
-                  esac
-              done
-           else
-               Angularyn="E";
-           fi
-        else
-            Angularyn="Y";
-        fi
+
+    elif [ -n "$OktDepsOnly" ] && [ "$OktDepsOnly" == "DepsOnly" ]; then
+        Nodeyn="N";
+        Angularyn="N";
+        Registryyn="N";
     fi
 
     install_confirm "Node.js" "$Nodeyn" "$OktNodeVersion"
@@ -606,7 +665,12 @@ elif [ $yn == "n" ] || [ $yn == "N" ]; then
     if [[ "$Registryyn" == "Y" || "$Registryyn" == "y" ]]; then
       echo "Starting Docker Private Registry"
     fi
-    echo "Installing the Platform"
+
+    if [ -n "$OktDepsOnly" ] && [ "$OktDepsOnly" == "DepsOnly" ]; then
+        echo "Installing Only the dependencies of the Platform (Not the full Platform)"
+    else
+        echo "Installing the full version of the Platform"
+    fi
 
     read -p "Press Enter to start the installation..."
 
@@ -618,12 +682,12 @@ elif [ $yn == "n" ] || [ $yn == "N" ]; then
     
     case $Nodeyn in
         [Yy]* ) sudo apt update && apt install -y curl gnupg && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && apt install -y nodejs;;
-        [Nn]* ) break;;
+        [Nn]* ) echo "";;
     esac
 
     case $Angularyn in
         [Yy]* ) sudo npm install -g @angular/cli@19.2.5;;
-        [Nn]* ) break;;
+        [Nn]* ) echo "";;
     esac
     
     sudo apt install curl -y
@@ -668,23 +732,13 @@ EOF
         [Nn]* ) sudo rm daemon.json;;
     esac
     
-    sudo mvn install -Diip.easy.tracing=ALL
+    if [ -n "$OktDepsOnly" ] && [ "$OktDepsOnly" == "DepsOnly" ]; then
+        sudo mvn -P DepsOnly install
+    else
+        sudo mvn install -Diip.easy.tracing=TOP
+    fi
 
+    install_completed "$OktDepsOnly"
 else
     echo "Please answer y or n.";
 fi
-
-echo "The following commands were created in Platform\Install\gen:"
-echo "- broker/broker.sh starts the configured communication broker (cd needed)"
-echo "- platform.sh starts the central platform services"
-echo "- mgtUi.sh starts the Angular-based management UI (Angular required, http://localhost:4200)"
-echo "- per device that shall execute services, either ECS-Runtime and service manager or the combined"
-echo "  combined ECS-Runtime-Servicemanager must be executed"
-echo "  - ecs.sh starts the ECS-Runtime"
-echo "  - serviceMgr.sh starts the service manager"
-echo "  - ecsServiceMgr.sh starts the combined ECS-Runtime/Service-Manager"
-echo "- cli.sh starts the platform command line interface"
-echo "In individual shells, start at least the broker, the central services and the device services, then" 
-echo "the included application (cli.sh deploy artifacts/deployment.yaml). On a permanent installation, only" 
-echo "accessing the UI or the CLI is needed."
-echo "Please consult the installation overview for more information."

@@ -57,6 +57,13 @@ set RecommendPython=3.9.13
 set RecommendNode=22.14.0
 set RecommendAngular=19.2.5
 
+set "OktDepsOnly=%1"
+REM Check if the argument is not "DepsOnly" (case-insensitive)
+if /I not "%OktDepsOnly%"=="DepsOnly" (
+    echo "Error: Invalid argument "%OktDepsOnly%". Allowed argument is 'DepsOnly': Installing Only the dependencies of the Platform (Not the full Platform)."
+    exit /b 1
+)
+
 :answerPrerequisites
 echo =====================================================
 echo "Installing prerequisites Java %javaVersion%, Maven version %RecommendMvn%, and Python version %RecommendPython%"
@@ -185,6 +192,25 @@ IF %ERRORLEVEL% NEQ 0 (
 
 REM Install Python version 3.9.13
 
+:answerExistPython
+set /P c=Please enter the path for your runnable python3.9 (or newer) or your Python the virtual environment (in case of using one). If Python does not exist then please enter (n).?
+if /I "%c%" EQU "" goto :answerExistPython
+if /I "%c%" EQU "N" goto :pythonExistEnd
+set PythonPath="%c%"
+
+:checkAnswerExistPython
+set /P c=You have Python installed in %PythonPath%, correct (y/n)?
+if /I "%c%" EQU "Y" goto :updatePythonPath
+if /I "%c%" EQU "N" goto :answerExistPython
+goto :checkAnswerExistPython
+
+:updatePythonPath
+setx IIP_PYTHON "%PythonPath%"
+SET IIP_PYTHON=%PythonPath%
+goto :skipPython
+
+:pythonExistEnd
+
 if %pythonVersionCheck% == "Ok" goto :skipPython
 if %pythonVersionCheck% == "Diff" goto :askPython
 if %pythonVersionCheck% == "Non" goto :installPython
@@ -202,8 +228,11 @@ goto :answerPython
 
 curl https://www.python.org/ftp/python/3.9.13/python-3.9.13-amd64.exe -o python-3.9.13-amd64.exe
 python-3.9.13-amd64.exe InstallAllUsers=1 PrependPath=1 Include_test=0 /quiet
+setx Path "%Path%;C:\Program Files\Python39\Scripts\;C:\Program Files\Python39\"
 SET Path=%Path%;C:\Program Files\Python39\Scripts\;C:\Program Files\Python39\
-pip install pyflakes
+setx IIP_PYTHON "C:\Program Files\Python39\python.exe"
+SET IIP_PYTHON="C:\Program Files\Python39\python.exe"
+%IIP_PYTHON% -m pip install pyflakes
 
 IF %ERRORLEVEL% NEQ 0 (
     echo Error occurred in Python installation. Exiting.
@@ -217,6 +246,10 @@ IF %ERRORLEVEL% NEQ 0 (
 for /f "tokens=1-2 delims=:" %%a in ('ipconfig^|find "IPv4"') do set ip=%%b
 set ip=%ip: =%
 echo %ip%
+
+if /I "%OktDepsOnly%"=="DepsOnly" (
+   goto :DepsOnlyEnd
+)
 
 if %dockerVersionCheck% == "Non" (
    goto :RegistryEnd
@@ -340,10 +373,12 @@ IF %ERRORLEVEL% NEQ 0 (
 
 :NodeEnd
 
+:DepsOnlyEnd
+
 cd ..
 
 cd platformDependencies/
-python -m pip install -r requirements.txt
+%IIP_PYTHON% -m pip install -r requirements.txt
 cd ..
     
 @echo off
@@ -418,22 +453,28 @@ move TechnicalSetup.ivml src\main\easy\TechnicalSetup.ivml
 
 :noRegistryExist
 
-call mvn install -Diip.easy.tracing=TOP
+if /I "%OktDepsOnly%"=="DepsOnly" (
+  call mvn -P DepsOnly install
 
-echo "The following commands were created in Platform\Install\gen:"
-echo "- broker\broker.bat starts the configured communication broker (cd needed)"
-echo "- platform.bat starts the central platform services"
-echo "- mgtUi.bat starts the Angular-based management UI (Angular required, http://localhost:4200)"
-echo "- per device that shall execute services, either ECS-Runtime and service manager or the combined"
-echo "  combined ECS-Runtime-Servicemanager must be executed"
-echo "  - ecs.bat starts the ECS-Runtime"
-echo "  - serviceMgr.bat starts the service manager"
-echo "  - ecsServiceMgr.bat starts the combined ECS-Runtime/Service-Manager"
-echo "- cli.bat starts the platform command line interface"
-echo "In individual shells, start at least the broker, the central services and the device services, then" 
-echo "the included application (cli.bat deploy artifacts/deployment.yaml). On a permanent installation, only" 
-echo "accessing the UI or the CLI is needed."
-echo "Please consult the installation overview for more information."
+  echo "Only the dependencies of the Platform was installed (Not the full Platform)"
+) else (
+  call mvn install -Diip.easy.tracing=TOP
+
+  echo "The following commands were created in Platform\Install\gen:"
+  echo "- broker\broker.bat starts the configured communication broker (cd needed)"
+  echo "- platform.bat starts the central platform services"
+  echo "- mgtUi.bat starts the Angular-based management UI (Angular required, http://localhost:4200)"
+  echo "- per device that shall execute services, either ECS-Runtime and service manager or the combined"
+  echo "  combined ECS-Runtime-Servicemanager must be executed"
+  echo "  - ecs.bat starts the ECS-Runtime"
+  echo "  - serviceMgr.bat starts the service manager"
+  echo "  - ecsServiceMgr.bat starts the combined ECS-Runtime/Service-Manager"
+  echo "- cli.bat starts the platform command line interface"
+  echo "In individual shells, start at least the broker, the central services and the device services, then" 
+  echo "the included application (cli.bat deploy artifacts/deployment.yaml). On a permanent installation, only" 
+  echo "accessing the UI or the CLI is needed."
+  echo "Please consult the installation overview for more information."
+)
 
 :installEndNow
 
