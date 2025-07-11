@@ -85,6 +85,7 @@ public class AasPartRegistry {
     public static final String NAME_SUBMODEL_TYPES = "types";
     public static final String NAME_SUBMODEL_CONN_INSTALLED = "installedConnectors";
     public static final String NAME_SUBMODEL_CONN_ACTIVE = "activeConnectors";
+    public static final String NAME_SUBMODEL_MONITORING = "Monitoring";
     
     public static final String ID_PART_SERVICES = "SVC";
     public static final String ID_PART_RESOURCES = "RES";
@@ -97,6 +98,7 @@ public class AasPartRegistry {
     public static final String ID_PART_TYPES = "TYPES";
     public static final String ID_PART_CONN_INSTALLED = "CONN_I";
     public static final String ID_PART_CONN_ACTIVE = "CONN_A";
+    public static final String ID_PART_MONITORING = "MON";
     
     /**
      * The URN of the top-level AAS created by this registry in {@link #build()}.
@@ -137,6 +139,7 @@ public class AasPartRegistry {
         idShortIdentificationMapping.put(NAME_SUBMODEL_TYPES, ID_PART_TYPES);
         idShortIdentificationMapping.put(NAME_SUBMODEL_CONN_INSTALLED, ID_PART_CONN_INSTALLED);
         idShortIdentificationMapping.put(NAME_SUBMODEL_CONN_ACTIVE, ID_PART_CONN_ACTIVE);
+        idShortIdentificationMapping.put(NAME_SUBMODEL_MONITORING, ID_PART_MONITORING);
     }
 
     /**
@@ -677,7 +680,7 @@ public class AasPartRegistry {
     /**
      * Creates a submodel builder for the given {@code aasBuilder} and {@code idShort} deriving the submodel
      * identification via {@link #getSubmodelIdentification(String)} with default authentication, i.e. applies 
-     * {@link SubmodelBuilder#rbacPlatform(AuthenticationDescriptor)} with {@link #getSubmodelAuthentication()}
+     * {@link SubmodelBuilder#rbacPlatform(AuthenticationDescriptor)} with {@link #getSubmodelAuthentication()}.
      * 
      * @param aasBuilder the "parent" AAS builder
      * @param idShort the idShort of the submodel
@@ -687,7 +690,21 @@ public class AasPartRegistry {
         return createSubmodelBuilder(aasBuilder, idShort)
             .rbacPlatform(getSubmodelAuthentication());
     }
-    
+
+    /**
+     * Creates a submodel builder for the given {@code aas} and {@code idShort} deriving the submodel
+     * identification via {@link #getSubmodelIdentification(String)} with default authentication, i.e. applies 
+     * {@link SubmodelBuilder#rbacPlatform(AuthenticationDescriptor)} with {@link #getSubmodelAuthentication()}.
+     * 
+     * @param aas the "parent" AAS
+     * @param idShort the idShort of the submodel
+     * @return the submodel builder
+     */
+    public static SubmodelBuilder createSubmodelBuilderRbac(Aas aas, String idShort) {
+        return createSubmodelBuilder(aas, idShort) 
+            .rbacPlatform(getSubmodelAuthentication());
+    }
+
     /**
      * Sets a supplier to provide instance to the real AAS server instance (rather than remote/connected instances via 
      * {@link #retrieveIipAas()}. The real instance is e.g., needed to persist/store an AAS. Handle with care. 
