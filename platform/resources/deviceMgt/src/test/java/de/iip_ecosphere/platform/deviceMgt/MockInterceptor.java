@@ -84,7 +84,7 @@ public class MockInterceptor implements Interceptor {
     /**
      * Returns the call counter for the given {@code key}.
      * 
-     * @param key the key ({@link #getKey(String, String))
+     * @param key the key ({@link #getKey(String, String)}
      * @return the number of calls
      */
     private int getCounter(String key) {

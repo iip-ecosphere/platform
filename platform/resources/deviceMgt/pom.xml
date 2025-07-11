@@ -80,18 +80,37 @@
                 <execution>
                     <id>okto plugins</id>
                     <goals>
-                        <goal>unpack-plugins</goal>
+                        <goal>unpack</goal>
                     </goals>
                     <phase>test-compile</phase>
                     <configuration>
-                        <plugins>
-                            <plugin>
+                        <artifactItems>
+                            <artifactItem>
+                                <groupId>de.iip-ecosphere.platform</groupId>
                                 <artifactId>support.aas.basyx2</artifactId>
-                            </plugin>
-                            <plugin>
+                                <version>${iip.version}</version>
+                                <type>zip</type>
+                                <classifier>plugin</classifier>
+                                <overWrite>true</overWrite>
+                                <outputDirectory>${project.build.directory}/oktoPlugins/basyx2</outputDirectory>
+                                <destFileName>basyx2.zip</destFileName>
+                            </artifactItem>
+                            <artifactItem>
+                                <groupId>de.iip-ecosphere.platform</groupId>
                                 <artifactId>support.aas.basyx</artifactId>
-                            </plugin>
-                        </plugins>
+                                <version>${iip.version}</version>
+                                <type>zip</type>
+                                <classifier>plugin</classifier>
+                                <overWrite>true</overWrite>
+                                <outputDirectory>${project.build.directory}/oktoPlugins/basyx</outputDirectory>
+                                <destFileName>basyx.zip</destFileName>
+                            </artifactItem>
+                        </artifactItems>
+                     <cleanup>
+                         <directory>${project.build.directory}/oktoPlugins</directory>
+                     </cleanup>
+                     <forceCleanup>true</forceCleanup>
+                     <skipIfExists>../../support/support</skipIfExists> <!-- test uses local plugin, not on CI -->
                     </configuration>
                 </execution>
             </executions>
