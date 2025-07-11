@@ -106,12 +106,14 @@ public class FilesetUtils {
      * Deletes the specified included and not excluded paths.
      *
      * @param fileset the specifying fileset 
-     * @param log the log instance
+     * @param log the log instance (may be <b>null</b> for none
      * @see #determineFiles(FileSet, boolean, Consumer)
      */
     public static void deletePaths(FileSet fileset, Log log) {
         determineFiles(fileset, true, file -> {
-            log.info("Deleting " + file);
+            if (null != log) {
+                log.info("Deleting " + file);
+            }
             FileUtils.deleteQuietly(file);
         });
     }
