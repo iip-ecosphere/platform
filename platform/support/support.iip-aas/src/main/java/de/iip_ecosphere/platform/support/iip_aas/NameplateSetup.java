@@ -57,7 +57,7 @@ import de.iip_ecosphere.platform.support.setup.AbstractSetup;
  */
 public class NameplateSetup {
 
-    public static final String SUBMODEL_SERVICES = "services";
+    public static final String SUBMODEL_SERVICES = AasPartRegistry.NAME_SUBMODEL_SERVICES;
     public static final String PROPERTY_KEY = "key";
     public static final String PROPERTY_PORT = "port";
     public static final String PROPERTY_HOST = "host";
@@ -503,7 +503,7 @@ public class NameplateSetup {
             try {
                 AasBuilder aasBuilder = factory.createAasBuilder(id, urn);
                 createTechnicalDataNameplate(aasBuilder, urn);
-                SubmodelBuilder sub = aasBuilder.createSubmodelBuilder(SUBMODEL_SERVICES, null);
+                SubmodelBuilder sub = AasPartRegistry.createSubmodelBuilder(aasBuilder, SUBMODEL_SERVICES);
                 if (null != getServices()) {
                     for (Service s: getServices()) {
                         SubmodelElementCollectionBuilder smcb = sub
