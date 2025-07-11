@@ -64,6 +64,9 @@ public class CleaningUnpackMojo extends UnpackMojo {
     @Parameter( property = "unpack.skipIfExists", required = false, defaultValue = "" )
     private File skipIfExists;
 
+    @Parameter( property = "unpack.logCleanup", required = false, defaultValue = "false" )
+    private boolean logCleanup;
+
     /**
      * Returns whether there is a setup for initially allowed files, considering {@link #initiallyAllowedFile} and 
      * {@link #initiallyAllowed}.
@@ -126,10 +129,19 @@ public class CleaningUnpackMojo extends UnpackMojo {
         return false;
     }
     
+    /**
+     * Returns the cleanup log.
+     * 
+     * @return the cleanup log, may be <b>null</b> for none
+     */
+    protected Log getCleanupLog() {
+        return logCleanup ? getLog() : null;
+    }
+    
     @Override
     protected void doExecute() throws MojoExecutionException, MojoFailureException {
         if (forceCleanup) {
-            FilesetUtils.deletePaths(cleanup, getLog());
+            FilesetUtils.deletePaths(cleanup, getCleanupLog());
         }
         boolean execute;
         if (force) {
@@ -162,10 +174,55 @@ public class CleaningUnpackMojo extends UnpackMojo {
         
         if (execute) {
             if (!forceCleanup) {
-                FilesetUtils.deletePaths(cleanup, getLog());
+                FilesetUtils.deletePaths(cleanup, getCleanupLog());
             }
             super.doExecute();
         }
     }
+    
+    /**
+     * Sets the forceCleanup flag.
+     * 
+     * @param forceCleanup enable enforce cleanup
+     */
+    public void setForceCleanup(boolean forceCleanup) {
+        this.forceCleanup = forceCleanup;
+    }
 
+    /**
+     * Sets the file set to clean up.
+     * 
+     * @param cleanup the file set
+     */
+    public void setCleanup(FileSet cleanup) {
+        this.cleanup = cleanup;
+    }
+    
+    /**
+     * Sets the file/folder determining whether we can skip the execution if it exists.
+     * 
+     * @param skipIfExists the file/folder to consider
+     */
+    public void setSkipIfExists(File skipIfExists) {
+        this.skipIfExists = skipIfExists;
+    }
+    
+    /**
+     * Sets whether the cleanup shall be logged.
+     * 
+     * @param logCleanup log the cleanup or not
+     */
+    public void setLogCleanup(boolean logCleanup) {
+        this.logCleanup = logCleanup;
+    }    
+
+    /**
+     * Sets the force flag.
+     * 
+     * @param force execute forcibly
+     */
+    public void setForce(boolean force) {
+        this.force = force;
+    }        
+    
 }

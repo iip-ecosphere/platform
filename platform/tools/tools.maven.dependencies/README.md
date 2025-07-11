@@ -48,6 +48,7 @@ The extended unpack goal supports the following additional configuration setting
   - `skip` (default `false`, user property `mdep.skip`, inherited from original maven plugin) skips the execution of this plugin.
   - `skipIfExists` (default `false`, user property `unpack.skipIfExists`) skips the execution of this plugin if the file or folder specified in this property exists.
   - `forceCleanup` (default `false`, user property `unpack.forceCleanup`) forces the cleanup of `cleanup` before doing any checks/validating the artifacts/executing the plugin.
+  - `logCleanup` (default `false`, user property `unpack.logCleanup`) enables/disables logging the cleaned up files
   
 ## copy-dependencies goal
 
@@ -109,6 +110,50 @@ The delete goal allows to just delete files and directories. At it's core, it is
      </plugins>
   </build>
   ```
+
+## unpack-plugin
+
+oktoflow plugins ship as zip files with contained classpath file(s) and jars in `target/jars`. This extension of the unpack goal eases the unpacking of plugins for tests and platform installation.
+
+In the basic version, for testing, use 
+
+  ```xml
+  <build>
+      <plugins>
+         <plugin>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>dependency-plugin</artifactId>
+            <version>${project.version}</version>
+            <executions>
+                <execution>
+                    <id>plugins</id>
+                    <goals>
+                        <goal>unpack-plugins</goal>
+                    </goals>
+                    <phase>prepare-package</phase>
+                    <configuration>
+                        <plugins>
+                            <plugin>
+                                <name>support.aas.basyx2</name>
+                            </plugin>
+                            <plugin>
+                                <name>support.aas.basyx</name>
+                            </plugin>
+                        </plugins>
+                        <version>${iip.version}</version>
+                    </configuration>
+                </execution>
+            <executions>
+        </plugin>
+     </plugins>
+  </build>
+  ```
+
+for installation just add `<relocate>true</relocate>` to the `configuration`. The `plugins` are extended `artifactItems` which you may use instead. However, a `plugin` allows a more concise notation as we set up the `version` to the global `version` in `configuration`, the `type` to `zip`, the `classifier` to `plugin`, `overWrite` to `true` and `outputDirectory` to `${project.build.directory}/oktoPlugins`. If in a `plugin` the `groupId` is not given, we set it automatically to `de.iip-ecosphere.platform`. 
+
+Moreover, for installations, if `relocate` is enabled, the `outputDirectory` becomes `jars`, all unpacked jars are flattened into that directory and all classpath files are renamed based on the last part of the `artifactId`, stored into `plugins` and relocated to the `jar` folder.
+
+If we are not in `relocate` mode, the plugin is only enabled, if the relative directories `../../support/support` (for arbitrary platform component) or `../support` (for support component) do not exist, which is the case for builds outside a local git workspace, e.g., on CI.
 
 ## Missing
 
