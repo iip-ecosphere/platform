@@ -53,7 +53,7 @@ import de.iip_ecosphere.platform.transport.streams.StreamNames;
  */
 public class MonitoringAas implements AasContributor {
 
-    public static final String SUBMODEL_MONITORING = "Monitoring";
+    public static final String SUBMODEL_MONITORING = AasPartRegistry.NAME_SUBMODEL_MONITORING;
     public static final String SMEC_ALERTS = "Alerts";
 
     public static final String PROPERTY_ALERT_UID = "Uid";
@@ -140,8 +140,7 @@ public class MonitoringAas implements AasContributor {
         try {
             Aas aas = AasPartRegistry.retrieveIipAas();
             AuthenticationDescriptor aDesc = getSubmodelAuthentication(); 
-            SubmodelBuilder smBuilder = aas.createSubmodelBuilder(SUBMODEL_MONITORING, null)
-                .rbacPlatform(aDesc);
+            SubmodelBuilder smBuilder = AasPartRegistry.createSubmodelBuilderRbac(aas, SUBMODEL_MONITORING);
             SubmodelElementListBuilder smcBuilder = smBuilder.createSubmodelElementListBuilder(SMEC_ALERTS);
             SubmodelElementListBuilder entryBuilder = smBuilder.createSubmodelElementListBuilder(
                 AasUtils.fixId("Alert_" + data.getTimestamp())); // may also be UID
