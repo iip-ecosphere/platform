@@ -270,9 +270,9 @@ public class Tools {
             throw new IllegalArgumentException("idShort '" + idShort + "' shall only feature letters, digits, "
                 + "underscore (\"_\"); starting mandatory with a letter.");
         }
-        if (idShort.equals("value") || idShort.equals("invocationList")) { 
+        /*if (idShort.equals("value") || idShort.equals("invocationList")) { 
             throw new IllegalArgumentException("idShort shall not be \"" + idShort + "\"");
-        }
+        }*/
         return idShort;
     }
 

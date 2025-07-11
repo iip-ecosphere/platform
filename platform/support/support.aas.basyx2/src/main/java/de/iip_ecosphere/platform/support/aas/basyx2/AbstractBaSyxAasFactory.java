@@ -188,7 +188,7 @@ public abstract class AbstractBaSyxAasFactory extends AasFactory {
     
     @Override
     protected boolean needsIdFix(String id) {
-        return false; // unclear whether this still applies, before it was on "value", "invocationList"
+        return false; // unclear whether this still applies, before it was on "value", "invocationList" -> Tools.checkId
     }
 
 }
