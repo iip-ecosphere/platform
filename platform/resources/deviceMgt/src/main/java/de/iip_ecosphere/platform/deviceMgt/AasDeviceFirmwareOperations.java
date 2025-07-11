@@ -56,7 +56,7 @@ public class AasDeviceFirmwareOperations implements DeviceFirmwareOperations {
      * @return the highest version, {@code -1} for none
      */
     private Integer getHighestVersion(Storage storage, String runtimeName) {
-        return storage.list().stream()
+        return null == storage ? -1 : storage.list().stream()
             .filter(key -> key.startsWith(storage.getPrefix() + runtimeName + "_"))
             .map(key -> {
                 int lastUnderscore = key.lastIndexOf("_");

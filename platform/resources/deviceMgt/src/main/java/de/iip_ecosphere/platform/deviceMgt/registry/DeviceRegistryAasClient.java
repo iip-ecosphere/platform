@@ -78,6 +78,7 @@ public class DeviceRegistryAasClient extends SubmodelElementsCollectionClient
                     // result = null;
                 }
             }
+            requestRefresh();
         }
         return result;        
     }
@@ -86,6 +87,7 @@ public class DeviceRegistryAasClient extends SubmodelElementsCollectionClient
     public void removeDevice(String id) throws ExecutionException {
         if (null != getSubmodel()) {
             getOperation(DeviceRegistryAas.NAME_OP_DEVICE_REMOVE).invoke(id);
+            requestRefresh();
         }
     }
 

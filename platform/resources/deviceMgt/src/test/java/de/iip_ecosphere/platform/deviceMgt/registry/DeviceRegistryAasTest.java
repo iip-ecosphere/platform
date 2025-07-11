@@ -12,11 +12,14 @@
 
 package de.iip_ecosphere.platform.deviceMgt.registry;
 
+import de.iip_ecosphere.platform.deviceMgt.MockInterceptor;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.*;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
+
 import org.junit.*;
 import org.mockito.Mockito;
 
@@ -32,7 +35,7 @@ import static de.iip_ecosphere.platform.deviceMgt.registry.StubDeviceRegistryFac
  * 
  * @author Dennis Pidun, University of Hildesheim
  */
-public class DeviceRegistryAasTest {
+public class DeviceRegistryAasTest extends TestWithPlugin {
 
     public static final String A_VALID_DEVICE = "A_VALID_DEVICE";
     public static final String AN_INVALID_DEVICE = "AN_INVALID_DEVICE";
@@ -45,6 +48,7 @@ public class DeviceRegistryAasTest {
     private Server aasServer;
     private Submodel resourcesSubmodel;
     private SubmodelElementCollection deviceRegistry;
+    private MockInterceptor interceptor = new MockInterceptor();
 
     // checkstyle: stop exception type check
 
@@ -55,10 +59,12 @@ public class DeviceRegistryAasTest {
      */
     @Before
     public void setUp() throws Exception {
+        super.setup();
         ActiveAasBase.setNotificationMode(ActiveAasBase.NotificationMode.SYNCHRONOUS);
 
         AasPartRegistry.setAasSetup(AasSetup.createLocalEphemeralSetup(), true);
         AasPartRegistry.AasBuildResult res = AasPartRegistry.build(CONTRIBUTOR_CLASS::isInstance);
+        res.getProtocolServerBuilder().setInterceptor(interceptor);
 
         implServer = res.getProtocolServerBuilder().build();
         implServer.start();
@@ -80,6 +86,7 @@ public class DeviceRegistryAasTest {
      */
     @After
     public void tearDown() {
+        interceptor.clear();
         implServer.stop(true);
         aasServer.stop(true);
 

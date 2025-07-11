@@ -17,7 +17,7 @@ import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
-
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
  * 
  * @author Dennis Pidun, University of Hildesheim
  */
-public class DeviceRegistryAasClientTest {
+public class DeviceRegistryAasClientTest extends TestWithPlugin {
 
     public static final String A_DEVICE_ID = "A_DEVICE_ID";
     public static final String AN_INVALID_DEVICE_ID = "AN_INVALID_DEVICE";
@@ -59,6 +59,7 @@ public class DeviceRegistryAasClientTest {
      */
     @Before
     public void setUp() throws Exception {
+        super.setup();
         ActiveAasBase.setNotificationMode(ActiveAasBase.NotificationMode.SYNCHRONOUS);
 
         AasPartRegistry.setAasSetup(AasPartRegistry.AasSetup.createLocalEphemeralSetup(), true);

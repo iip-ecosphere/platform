@@ -151,7 +151,11 @@ public interface DeviceRemoteManagementOperations {
         
         @Override
         public int hashCode() {
-            return host.hashCode() + Integer.hashCode(port) + username.hashCode() + password.hashCode();
+            int result = null == host ? 0 : host.hashCode();
+            result += Integer.hashCode(port);
+            result += null == username ? 0 : username.hashCode();
+            result += null == password ? 0 : password.hashCode();
+            return result;
         }
         
     }

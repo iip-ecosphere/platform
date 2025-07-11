@@ -59,7 +59,8 @@ public class StubEcsAas implements AasContributor {
 
     @Override
     public Aas contributeTo(Aas.AasBuilder aasBuilder, InvocablesCreator iCreator) {
-        Submodel.SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(AasPartRegistry.NAME_SUBMODEL_RESOURCES, null);
+        Submodel.SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(AasPartRegistry.NAME_SUBMODEL_RESOURCES, 
+            AasPartRegistry.composeIdentifier(AasPartRegistry.ID_PART_RESOURCES));
 
         SubmodelElementCollection.SubmodelElementCollectionBuilder device =
             smB.createSubmodelElementCollectionBuilder(A_DEVICE);
@@ -71,9 +72,7 @@ public class StubEcsAas implements AasContributor {
 
         device.createOperationBuilder("createRemoteConnectionCredentials")
             .setInvocable(iCreator.createInvocable(A_DEVICE + "_" + "createRemoteConnectionCredentials"))
-            .addOutputVariable("key", Type.STRING)
-            .addOutputVariable("secret", Type.STRING)
-            .build(); // void
+            .build(Type.STRING); // void
 
         device.createOperationBuilder("setConfig")
             .setInvocable(iCreator.createInvocable(A_DEVICE + "_" + "setConfig"))

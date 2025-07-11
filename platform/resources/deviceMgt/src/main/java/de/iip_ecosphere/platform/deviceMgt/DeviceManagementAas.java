@@ -52,7 +52,7 @@ public class DeviceManagementAas implements AasContributor {
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         AuthenticationDescriptor aDesc = getSubmodelAuthentication(); 
-        Submodel.SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)
+        Submodel.SubmodelBuilder smB = AasPartRegistry.createSubmodelBuilder(aasBuilder, NAME_SUBMODEL)
             .rbacDevice(aDesc);
 
         SubmodelElementCollection.SubmodelElementCollectionBuilder deviceManager =

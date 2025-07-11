@@ -55,7 +55,7 @@ public class DeviceRegistryAas implements AasContributor {
     @Override
     public Aas contributeTo(Aas.AasBuilder aasBuilder, InvocablesCreator iCreator) {
         AuthenticationDescriptor aDesc = getSubmodelAuthentication();
-        Submodel.SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)
+        Submodel.SubmodelBuilder smB = AasPartRegistry.createSubmodelBuilder(aasBuilder, NAME_SUBMODEL)
             .rbacDevice(aDesc); // currently all, deviceMgt
 
         SubmodelElementCollectionBuilder registryColl = smB
@@ -165,7 +165,7 @@ public class DeviceRegistryAas implements AasContributor {
     public static void notifyDeviceAdded(String managedId, String resourceId, String resourceIp) {
         ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
             AuthenticationDescriptor aDesc = AasPartRegistry.getSubmodelAuthentication(); 
-            Submodel.SubmodelBuilder resources = aas.createSubmodelBuilder(NAME_SUBMODEL, null)
+            Submodel.SubmodelBuilder resources = AasPartRegistry.createSubmodelBuilder(aas, NAME_SUBMODEL)
                 .rbacDevice(aDesc);
             SubmodelElementCollectionBuilder registry = resources
                 .createSubmodelElementCollectionBuilder(NAME_COLL_DEVICE_REGISTRY);

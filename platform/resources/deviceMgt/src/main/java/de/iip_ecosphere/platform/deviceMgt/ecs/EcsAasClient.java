@@ -54,10 +54,9 @@ public class EcsAasClient extends SubmodelElementsCollectionClient {
         Credentials credentials = null;
         try {
             credentials = mapper.readValue(result, Credentials.class);
-        } catch (JsonProcessingException ignore) {
+        } catch (IllegalArgumentException | JsonProcessingException ignore) {
             // should not happen
         }
-
         return credentials;
     }
 

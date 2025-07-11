@@ -19,6 +19,8 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -34,7 +36,7 @@ import static de.iip_ecosphere.platform.support.aas.AasUtils.fixId;
  * 
  * @author Dennis Pidun, University of Hildesheim
  */
-public class PerformanceTests {
+public class PerformanceTests extends TestWithPlugin {
 
     @SuppressWarnings("unused")
     private static Aas aas;
@@ -48,6 +50,7 @@ public class PerformanceTests {
      */
     @BeforeClass
     public static void startup() throws IOException {
+        loadPlugins();
         AasPartRegistry.AasBuildResult res = AasPartRegistry.build(); //c -> c instanceof DeviceManagementAas
         AasPartRegistry.setAasSetup(AasPartRegistry.AasSetup.createLocalEphemeralSetup(), true);
         implServer = res.getProtocolServerBuilder().build();
