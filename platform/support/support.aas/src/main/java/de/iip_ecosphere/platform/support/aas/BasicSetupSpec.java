@@ -276,7 +276,7 @@ public class BasicSetupSpec implements SetupSpec {
      * @return <b>this</b> for chaining
      */
     public BasicSetupSpec setRegistryEndpoint(Endpoint endpoint) {
-        setRegistryEndpoints(endpoint, endpoint);
+        setups.get(AasComponent.AAS_REGISTRY).endpoint = endpoint;
         return this;
     }
 
