@@ -223,7 +223,7 @@ public class PlatformAas implements AasContributor {
      * @param aasBuilder the parent AAS builder
      * @param appSetup the application setup
      * @param versionInfo the version information
-     * @param identifiaction the identification of the submodel, may be <b>null</b> for idShort
+     * @param identification the identification of the submodel, may be <b>null</b> for idShort
      */
     private void createSoftwareNameplate(AasBuilder aasBuilder, ApplicationSetup appSetup, IipVersion versionInfo, 
         String identification) {

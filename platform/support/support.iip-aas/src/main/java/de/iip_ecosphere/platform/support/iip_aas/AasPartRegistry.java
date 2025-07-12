@@ -86,6 +86,10 @@ public class AasPartRegistry {
     public static final String NAME_SUBMODEL_CONN_INSTALLED = "installedConnectors";
     public static final String NAME_SUBMODEL_CONN_ACTIVE = "activeConnectors";
     public static final String NAME_SUBMODEL_MONITORING = "Monitoring";
+    public static final String NAME_SUBMODEL_CONFIGURATION = "Configuration";
+    public static final String NAME_SUBMODEL_ARTIFACTS = "Artifacts";
+    public static final String NAME_SUBMODEL_STATUS = "Status";
+    public static final String NAME_SUBMODEL_APPINSTANCES = "ApplicationInstances";
     
     public static final String ID_PART_SERVICES = "SVC";
     public static final String ID_PART_RESOURCES = "RES";
@@ -99,6 +103,10 @@ public class AasPartRegistry {
     public static final String ID_PART_CONN_INSTALLED = "CONN_I";
     public static final String ID_PART_CONN_ACTIVE = "CONN_A";
     public static final String ID_PART_MONITORING = "MON";
+    public static final String ID_PART_CONFIGURATION = "CFG";
+    public static final String ID_PART_ARTIFACTS = "ARTS";
+    public static final String ID_PART_STATUS = "STS";
+    public static final String ID_PART_APPINSTANCES = "APPI";
     
     /**
      * The URN of the top-level AAS created by this registry in {@link #build()}.
@@ -140,6 +148,10 @@ public class AasPartRegistry {
         idShortIdentificationMapping.put(NAME_SUBMODEL_CONN_INSTALLED, ID_PART_CONN_INSTALLED);
         idShortIdentificationMapping.put(NAME_SUBMODEL_CONN_ACTIVE, ID_PART_CONN_ACTIVE);
         idShortIdentificationMapping.put(NAME_SUBMODEL_MONITORING, ID_PART_MONITORING);
+        idShortIdentificationMapping.put(NAME_SUBMODEL_CONFIGURATION, ID_PART_CONFIGURATION);
+        idShortIdentificationMapping.put(NAME_SUBMODEL_ARTIFACTS, ID_PART_ARTIFACTS);
+        idShortIdentificationMapping.put(NAME_SUBMODEL_STATUS, ID_PART_STATUS);
+        idShortIdentificationMapping.put(NAME_SUBMODEL_APPINSTANCES, ID_PART_APPINSTANCES);
     }
 
     /**

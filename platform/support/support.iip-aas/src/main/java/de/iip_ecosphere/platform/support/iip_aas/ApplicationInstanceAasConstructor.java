@@ -36,7 +36,7 @@ import static de.iip_ecosphere.platform.support.aas.AasUtils.fixId;
  */
 public class ApplicationInstanceAasConstructor {
 
-    public static final String NAME_SUBMODEL_APPINSTANCES = "ApplicationInstances";
+    public static final String NAME_SUBMODEL_APPINSTANCES = AasPartRegistry.NAME_SUBMODEL_APPINSTANCES;
     public static final String NAME_PROP_APPID = "appId";
     public static final String NAME_PROP_PLANID = "planId";
     public static final String NAME_PROP_INSTANCEID = "instanceId";
