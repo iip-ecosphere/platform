@@ -12,12 +12,14 @@
 
 package de.iip_ecosphere.platform.services;
 
+import de.iip_ecosphere.platform.services.environment.ServiceMapper;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstants;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
@@ -134,15 +136,12 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_OP_SERVICE_STATE_COUNT  = "getServiceStateCount";
     public static final String NAME_OP_SERVICE_STREAM_LOG = "serviceStreamLog";
     
-    private static final String ID_SUBMODEL = null; // take the short name, shall become public and an URN later
-    
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         ServiceManager mgr = ServiceFactory.getServiceManager();
         if (null != mgr) { // this shall not be needed, but if the Jar is present, the contributor will be executed 
             // operations contribute to the operation of the underlying resource (Service JVM or ECS Runtime JVM)
-            SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_RESOURCES, ID_SUBMODEL)
-                .rbacPlatform(getSubmodelAuthentication());
+            SubmodelBuilder smB = AasPartRegistry.createSubmodelBuilderRbac(aasBuilder, NAME_SUBMODEL_RESOURCES);
             SubmodelElementCollectionBuilder deviceB 
                 = smB.createSubmodelElementCollectionBuilder(Id.getDeviceIdAas());
             // #115 remove as legacy
@@ -164,7 +163,7 @@ public class ServicesAas implements AasContributor {
     
             // service structures go into own part
             
-            smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, ID_SUBMODEL);
+            smB = AasPartRegistry.createSubmodelBuilder(aasBuilder, NAME_SUBMODEL);
             // ensure that these collections do exist
             smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES).build();
             smB.createSubmodelElementCollectionBuilder(NAME_COLL_ARTIFACTS).build();
@@ -510,8 +509,14 @@ public class ServicesAas implements AasContributor {
             .setSemanticId(Eclass.IRDI_PROPERTY_SOFTWARE_NAME)
             .build();
         descriptorBuilder.createPropertyBuilder(NAME_PROP_STATE)
-            .setValue(Type.STRING, desc.getState().toString())
+            .setValue(Type.STRING, desc.getState().toString()) // to be overridden
             .build();
+        // BaSyX 2, required for operation delegation by ServiceStub, map to operation in ServiceMapper
+        AasFactory f = AasFactory.getInstance();
+        InvocablesCreator iCreator = f.createInvocablesCreator(AasPartRegistry.getSetup());
+        descriptorBuilder.createOperationBuilder(NAME_PROP_STATE)
+            .setInvocable(iCreator.createInvocable(ServiceMapper.getQName(NAME_PROP_STATE, serviceId)))
+            .build(Type.STRING, AasPartRegistry.getSubmodelAuthentication());
         descriptorBuilder.createPropertyBuilder(NAME_PROP_KIND)
             .setValue(Type.STRING, desc.getKind().toString())
             .build();
@@ -643,7 +648,7 @@ public class ServicesAas implements AasContributor {
      */
     public static void notifyArtifactAdded(ArtifactDescriptor desc) {
         ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
-            SubmodelBuilder builder = aas.createSubmodelBuilder(NAME_SUBMODEL, ID_SUBMODEL);
+            SubmodelBuilder builder = AasPartRegistry.createSubmodelBuilder(aas, NAME_SUBMODEL);
             addArtifact(builder, desc);
             List<ServiceDescriptor> sTmp = new ArrayList<>(desc.getServices()); // concurrent
             for (ServiceDescriptor s : sTmp) { 
@@ -665,7 +670,7 @@ public class ServicesAas implements AasContributor {
      */
     public static void notifyServiceAdded(ServiceDescriptor desc) {
         ActiveAasBase.processNotification(NAME_SUBMODEL, (sub, aas) -> {
-            SubmodelBuilder builder = aas.createSubmodelBuilder(NAME_SUBMODEL, ID_SUBMODEL);
+            SubmodelBuilder builder = AasPartRegistry.createSubmodelBuilder(aas, NAME_SUBMODEL);
             addService(builder, desc);
         });
         Transport.sendServiceStatus(ActionTypes.ADDED, desc.getId());

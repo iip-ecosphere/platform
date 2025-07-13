@@ -42,6 +42,7 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.AasServer;
+import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
@@ -50,14 +51,14 @@ import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
-import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
+import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 /**
  * Tests the {@link ServicesAas}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ServicesAasTest {
+public class ServicesAasTest extends TestWithQpid {
 
     private static Server qpid;
 
@@ -66,8 +67,9 @@ public class ServicesAasTest {
      */
     @BeforeClass
     public static void startup() {
+        loadPlugins();
         ServerAddress broker = new ServerAddress(Schema.IGNORE);
-        qpid = new TestQpidServer(broker);
+        qpid = TestWithQpid.fromPlugin(broker);
         ServiceFactory.getTransport().setPort(broker.getPort());
         qpid.start();
     }
@@ -98,7 +100,8 @@ public class ServicesAasTest {
         AasPartRegistry.AasBuildResult res = AasPartRegistry.build(c -> c instanceof ServicesAas);
         
         // active AAS require two server instances and a deployment
-        Server implServer = res.getProtocolServerBuilder().build();
+        ProtocolServerBuilder pBuilder = res.getProtocolServerBuilder();
+        Server implServer = pBuilder.build();
         implServer.start();
         Server aasServer = AasPartRegistry.deploy(res.getAas()); 
         aasServer.start();
