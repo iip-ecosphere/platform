@@ -181,6 +181,7 @@ public class EcsAasTest extends TestWithQpid {
             .start();
 
         LifecycleHandler.startup(new String[] {});
+        TimeUtils.sleep(300); // not yet ready v3?
 
         EcsAasClient client = new EcsAasClient(Id.getDeviceIdAas());
         long start = System.currentTimeMillis();
@@ -248,7 +249,7 @@ public class EcsAasTest extends TestWithQpid {
         Assert.assertTrue(id.length() > 0);
         Assert.assertNotNull(client.getContainers());
         
-        final int sleepMs = 600;
+        final int sleepMs = 300;
         ContainerDescriptor cnt = mgr.getContainer(id);
         Assert.assertEquals(ContainerState.AVAILABLE, mgr.getState(id));
         Assert.assertEquals(ContainerState.AVAILABLE, client.getState(id));
