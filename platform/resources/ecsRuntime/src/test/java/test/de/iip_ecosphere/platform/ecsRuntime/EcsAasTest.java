@@ -248,6 +248,7 @@ public class EcsAasTest extends TestWithQpid {
         Assert.assertTrue(id.length() > 0);
         Assert.assertNotNull(client.getContainers());
         
+        final int sleepMs = 600;
         ContainerDescriptor cnt = mgr.getContainer(id);
         Assert.assertEquals(ContainerState.AVAILABLE, mgr.getState(id));
         Assert.assertEquals(ContainerState.AVAILABLE, client.getState(id));
@@ -260,18 +261,18 @@ public class EcsAasTest extends TestWithQpid {
             // this is ok
         }
         client.startContainer(id);
-        TimeUtils.sleep(300);
+        TimeUtils.sleep(sleepMs);
         Assert.assertEquals(ContainerState.DEPLOYED, mgr.getState(id));
         Assert.assertEquals(ContainerState.DEPLOYED, client.getState(id));
         client.updateContainer(id, dummy);
-        TimeUtils.sleep(300);
+        TimeUtils.sleep(sleepMs);
         client.stopContainer(id);
-        TimeUtils.sleep(300);
+        TimeUtils.sleep(sleepMs);
         Assert.assertEquals(ContainerState.STOPPED, mgr.getState(id));
         Assert.assertEquals(ContainerState.STOPPED, client.getState(id));
 
         client.startContainer(id);
-        TimeUtils.sleep(300);
+        TimeUtils.sleep(sleepMs);
         Assert.assertEquals(ContainerState.DEPLOYED, mgr.getState(id));
         Assert.assertEquals(ContainerState.DEPLOYED, client.getState(id));
 
@@ -285,24 +286,24 @@ public class EcsAasTest extends TestWithQpid {
         }
 
         client.stopContainer(id);
-        TimeUtils.sleep(300);
+        TimeUtils.sleep(sleepMs);
         Assert.assertEquals(ContainerState.STOPPED, mgr.getState(id));
         Assert.assertEquals(ContainerState.STOPPED, client.getState(id));
         client.undeployContainer(id);
-        TimeUtils.sleep(300);
+        TimeUtils.sleep(sleepMs);
         Assert.assertEquals(ContainerState.UNKNOWN, mgr.getState(id));
         Assert.assertEquals(ContainerState.UNKNOWN, client.getState(id));
         
         id = client.addContainer(dummy);
-        TimeUtils.sleep(300);
+        TimeUtils.sleep(sleepMs);
         cnt = mgr.getContainer(id);
         client.startContainer(id);
-        TimeUtils.sleep(300);
+        TimeUtils.sleep(sleepMs);
         client.migrateContainer(id, "other");
-        TimeUtils.sleep(300);
+        TimeUtils.sleep(sleepMs);
         if (ContainerState.STOPPED == cnt.getState()) {
             client.undeployContainer(id);
-            TimeUtils.sleep(300);
+            TimeUtils.sleep(sleepMs);
         }
         Assert.assertEquals(ContainerState.UNKNOWN, mgr.getState(id));
         Assert.assertEquals(ContainerState.UNKNOWN, client.getState(id));
