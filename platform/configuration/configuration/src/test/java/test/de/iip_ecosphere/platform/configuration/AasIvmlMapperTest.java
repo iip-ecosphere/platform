@@ -47,15 +47,24 @@ import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphEdge;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphNode;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlUtils;
+import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.aas.Aas;
+import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
+import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
+import de.iip_ecosphere.platform.support.aas.ServerRecipe.PersistenceType;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
@@ -66,13 +75,14 @@ import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.model.ModelQuery;
 import net.ssehub.easy.varModel.model.Project;
 import net.ssehub.easy.varModel.model.ProjectImport;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
 /**
  * Tests {@link AasIvmlMapper}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class AasIvmlMapperTest {
+public class AasIvmlMapperTest extends TestWithPlugin {
     
     private static final String MODEL_NAME = "PlatformConfiguration";
     
@@ -89,18 +99,23 @@ public class AasIvmlMapperTest {
      * @throws IOException if copying fails
      */
     @Before
-    public void setup() throws IOException {
-        EasySetup ep = ConfigurationSetup.getSetup().getEasyProducer();
-        origBase = ep.getBase();
-        origIvmlMeta = ep.getIvmlMetaModelFolder();
-        origIvmlConfig = ep.getIvmlConfigFolder();
-        origIvmlModelName = ep.getIvmlModelName();
-        
-        setupIvmlFiles();
-        ep.setBase(ivmlFolder);
-        ep.setIvmlMetaModelFolder(ivmlFolder);
-        ep.setIvmlConfigFolder(ivmlFolder);
-        ep.setIvmlModelName(MODEL_NAME);
+    public void setup() {
+        super.setup();
+        try {
+            EasySetup ep = ConfigurationSetup.getSetup().getEasyProducer();
+            origBase = ep.getBase();
+            origIvmlMeta = ep.getIvmlMetaModelFolder();
+            origIvmlConfig = ep.getIvmlConfigFolder();
+            origIvmlModelName = ep.getIvmlModelName();
+            
+            setupIvmlFiles();
+            ep.setBase(ivmlFolder);
+            ep.setIvmlMetaModelFolder(ivmlFolder);
+            ep.setIvmlConfigFolder(ivmlFolder);
+            ep.setIvmlModelName(MODEL_NAME);
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+        }
     }
     
     /**
@@ -238,16 +253,44 @@ public class AasIvmlMapperTest {
         AasIvmlMapper mapper = getInstance(false);
         mapper.addGraphFormat(format);        
         
+        AasSetup aasSetup = AasSetup.createLocalEphemeralSetup(null, false);
+        AasPartRegistry.setAasSetup(aasSetup);
+        ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
+        Endpoint regEndpoint = aasSetup.adaptEndpoint(aasSetup.getRegistryEndpoint());
+        System.out.println("ServerHost " + aasSetup.getServerHost() + " " + regEndpoint.toUri());
+        PersistenceType pType = LocalPersistenceType.INMEMORY;
+        System.out.println("Starting " + pType + " AAS registry on " + regEndpoint.toUri());
+        Server registryServer = rcp.createRegistryServer(aasSetup, pType);
+        registryServer.start();
+        Endpoint serverEndpoint = aasSetup.adaptEndpoint(aasSetup.getServerEndpoint());
+        System.out.println("ServerHost " + aasSetup.getServerHost() + " " + serverEndpoint.toUri());
+        System.out.println("Starting " + pType + " AAS server on " + serverEndpoint.toUri());
+        Server aasServer = rcp.createAasServer(aasSetup, pType);
+        aasServer.start();
+
         AasFactory aasFactory = AasFactory.getInstance();
-        SubmodelBuilder smb = aasFactory.createSubmodelBuilder(ConfigurationAas.NAME_SUBMODEL, null);
-        BasicSetupSpec spec = new BasicSetupSpec(AasFactory.LOCAL_PROTOCOL, 0);
-        InvocablesCreator iCreator = aasFactory.createInvocablesCreator(spec);
-        ProtocolServerBuilder psb = aasFactory.createProtocolServerBuilder(spec);
+        AasBuilder aasBuilder = aasFactory.createAasBuilder("Platform", null);
+        SubmodelBuilder smb = AasPartRegistry.createSubmodelBuilder(aasBuilder, ConfigurationAas.NAME_SUBMODEL);
+        InvocablesCreator iCreator = aasFactory.createInvocablesCreator(aasSetup);
+        ProtocolServerBuilder psb = aasFactory.createProtocolServerBuilder(aasSetup);
         mapper.mapByType(smb, iCreator);
         mapper.bindOperations(psb);
-        String res = assertSubmodel(smb.build(), appName, netIndex, servicesAsserter);
-        psb.build();
+        Submodel sm = smb.build();
+        Aas aas = aasBuilder.build();
+        Server implServer = psb.build().start();
+        try {
+            AasPartRegistry.remoteDeploy(CollectionUtils.toList(aas)); 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String res = assertSubmodel(sm, appName, netIndex, servicesAsserter);
         stopEasy(lcd);
+        
+        implServer.stop(false);
+        aasServer.stop(true);
+        registryServer.stop(true);
+        
         return format.fromString(res, mapper.getGraphFactory(), mapper);
     }
 

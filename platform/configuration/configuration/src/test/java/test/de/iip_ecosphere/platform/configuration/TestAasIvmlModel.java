@@ -31,7 +31,6 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
-import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
@@ -42,6 +41,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import net.ssehub.easy.instantiation.core.model.vilTypes.configuration.Configuration;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
 /**
  * Tests an AAS IVML model mapping.
@@ -53,13 +53,14 @@ public class TestAasIvmlModel {
     /**
      * Executes the program.
      * 
-     * @param args name of the configuration mode, folder contaning the configuration, optional names of mesh 
+     * @param args name of the configuration mode, folder containing the configuration, optional names of mesh 
      *     variables to be emitted 
      */
     public static void main(String[] args) {
         if (args.length < 2) { 
             System.out.println("CfgModelName cfgFolder [meshVariables*]");
         } else {
+            TestWithPlugin.loadPlugins();
             EasySetup ep = ConfigurationSetup.getSetup().getEasyProducer();
             File modelFolder = new File("src/main/easy");
             File cfgFolder = new File(args[1]);
@@ -103,16 +104,15 @@ public class TestAasIvmlModel {
 
             AasFactory aasFactory = AasFactory.getInstance();
             AasBuilder aasBuilder = aasFactory.createAasBuilder("Platform", null);
-            SubmodelBuilder smb = aasBuilder.createSubmodelBuilder(ConfigurationAas.NAME_SUBMODEL, null);
-            BasicSetupSpec spec = new BasicSetupSpec(AasFactory.LOCAL_PROTOCOL, 0);
-            InvocablesCreator iCreator = aasFactory.createInvocablesCreator(spec);
-            ProtocolServerBuilder psb = aasFactory.createProtocolServerBuilder(spec);
+            SubmodelBuilder smb = AasPartRegistry.createSubmodelBuilder(aasBuilder, ConfigurationAas.NAME_SUBMODEL);
+            InvocablesCreator iCreator = aasFactory.createInvocablesCreator(aasSetup);
+            ProtocolServerBuilder psb = aasFactory.createProtocolServerBuilder(aasSetup);
             mapper.mapByType(smb, iCreator);
             mapper.bindOperations(psb);
             smb.build();
             Aas aas = aasBuilder.build();
             aas.accept(new AasPrintVisitor());
-            psb.build();
+            Server implServer = psb.build().start();
 
             try {
                 AasPartRegistry.remoteDeploy(CollectionUtils.toList(aas)); 
@@ -129,6 +129,7 @@ public class TestAasIvmlModel {
                 }
             }
             
+            implServer.stop(false);
             aasServer.stop(true);
             registryServer.stop(true);
             lc.shutdown();

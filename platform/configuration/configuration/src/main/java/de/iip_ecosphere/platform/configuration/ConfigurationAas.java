@@ -53,7 +53,7 @@ import net.ssehub.easy.varModel.confModel.IDecisionVariable;
  */
 public class ConfigurationAas implements AasContributor, ConfigurationChangeListener, OperationCompletedListener {
 
-    public static final String NAME_SUBMODEL = "Configuration"; 
+    public static final String NAME_SUBMODEL = AasPartRegistry.NAME_SUBMODEL_CONFIGURATION; 
     private static final GraphFactory GRAPH_FACTORY = new IipGraphFactory();
     
     private transient List<AasChange> aasChanges = new ArrayList<>();
@@ -271,8 +271,7 @@ public class ConfigurationAas implements AasContributor, ConfigurationChangeList
     
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
-        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL, null)
-            .rbacPlatform(AasPartRegistry.getSubmodelAuthentication());
+        SubmodelBuilder smB = AasPartRegistry.createSubmodelBuilderRbac(aasBuilder, NAME_SUBMODEL);
         AasIvmlMapper mapper = new AasIvmlMapper(() -> ConfigurationManager.getVilConfiguration(), 
             new IipGraphMapper(), this);
         mapper.mapByType(smB, iCreator);
@@ -315,8 +314,7 @@ public class ConfigurationAas implements AasContributor, ConfigurationChangeList
         try {
             Aas aas = AasPartRegistry.retrieveIipAas();
             Submodel sm = aas.getSubmodel(NAME_SUBMODEL);
-            SubmodelBuilder smB = aas.createSubmodelBuilder(NAME_SUBMODEL, null)
-                .rbacPlatform(AasPartRegistry.getSubmodelAuthentication());
+            SubmodelBuilder smB = AasPartRegistry.createSubmodelBuilderRbac(aas, NAME_SUBMODEL);
             for (AasChange c : aasChanges) {
                 c.apply(ConfigurationManager.getAasIvmlMapper(), sm, smB);
             }
