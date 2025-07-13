@@ -20,6 +20,7 @@ import java.util.Set;
 import javax.json.JsonObject;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.monitoring.prometheus.IipEcospherePrometheusExporter;
@@ -36,7 +37,7 @@ import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.streams.StreamNames;
 import io.micrometer.core.instrument.Meter;
 import test.de.iip_ecosphere.platform.monitoring.AbstractMonitoringReceiverTest;
-import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer; // QPID-8588
+import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 /**
  * Testing {@link PrometheusLifecycleDescriptor}.
@@ -141,6 +142,15 @@ public class PrometheusLifecycleDescriptorTest extends AbstractMonitoringReceive
 
     }
     
+    /**
+     * Sets up the plugins.
+     */
+    @BeforeClass
+    public static void setup() {
+        TestWithQpid.addPlugin();
+        TestWithQpid.loadPlugins();
+    }
+    
     /** 
      * Tests the descriptor.
      */
@@ -152,7 +162,7 @@ public class PrometheusLifecycleDescriptorTest extends AbstractMonitoringReceive
     
     @Override
     protected Server createBroker(ServerAddress broker) {
-        return new TestQpidServer(broker);
+        return TestWithQpid.fromPlugin(broker);
     }
 
     @Override
