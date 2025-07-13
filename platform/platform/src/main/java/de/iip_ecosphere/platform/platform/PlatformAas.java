@@ -44,6 +44,7 @@ import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationInstanceAasConstructor;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
@@ -58,8 +59,8 @@ import de.iip_ecosphere.platform.transport.status.TaskUtils.TaskCompletedPredica
  */
 public class PlatformAas implements AasContributor {
 
-    public static final String NAME_SUBMODEL_ARTIFACTS = "Artifacts";
-    public static final String NAME_SUBMODEL_STATUS = "Status";
+    public static final String NAME_SUBMODEL_ARTIFACTS = AasPartRegistry.NAME_SUBMODEL_ARTIFACTS;
+    public static final String NAME_SUBMODEL_STATUS = AasPartRegistry.NAME_SUBMODEL_STATUS;
     public static final String NAME_COLL_SERVICE_ARTIFACTS = "ServiceArtifacts";
     public static final String NAME_COLL_CONTAINER = "Container";
     public static final String NAME_COLL_DEPLOYMENT_PLANS = "DeploymentPlans";
@@ -91,8 +92,7 @@ public class PlatformAas implements AasContributor {
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
         AuthenticationDescriptor aDesc = getSubmodelAuthentication();
-        SubmodelBuilder smB = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_ARTIFACTS, null)
-            .rbacPlatform(aDesc);
+        SubmodelBuilder smB = AasPartRegistry.createSubmodelBuilderRbac(aasBuilder, NAME_SUBMODEL_ARTIFACTS);
 
         smB.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICE_ARTIFACTS).build();
         smB.createSubmodelElementCollectionBuilder(NAME_COLL_CONTAINER).build();
@@ -138,14 +138,13 @@ public class PlatformAas implements AasContributor {
         smB.build();
         
         // just that they are there
-        SubmodelBuilder statusBuilder = aasBuilder.createSubmodelBuilder(NAME_SUBMODEL_STATUS, null)
-            .rbacPlatform(getSubmodelAuthentication());
+        SubmodelBuilder statusBuilder = AasPartRegistry.createSubmodelBuilderRbac(aasBuilder, NAME_SUBMODEL_STATUS);
         PlatformSetup setup = PlatformSetup.getInstance();
         TransportConverter.addEndpointToAas(statusBuilder, TransportConverterFactory.getInstance().
             getGatewayEndpoint(setup.getAas(), setup.getTransport(), PlatformSetup.GATEWAY_PATH_STATUS));
         statusBuilder.build();
-        aasBuilder.createSubmodelBuilder(ApplicationInstanceAasConstructor.NAME_SUBMODEL_APPINSTANCES, null)
-            .rbacPlatform(getSubmodelAuthentication())
+        AasPartRegistry.createSubmodelBuilderRbac(aasBuilder, 
+            ApplicationInstanceAasConstructor.NAME_SUBMODEL_APPINSTANCES)
             .build();
         return null;
     }

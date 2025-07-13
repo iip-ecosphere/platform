@@ -32,6 +32,7 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.SubmodelElementsCollectionClient;
+import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +48,7 @@ import org.junit.Assert;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class PlatformTest {
+public class PlatformTest extends TestWithQpid {
     
     /**
      * Simple platform test.

@@ -47,15 +47,14 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationInstanceAasConstructor;
 import de.iip_ecosphere.platform.transport.Transport;
-import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
-
+import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 /**
  * Tests {@link PlatformAas}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class PlatformAasTest {
+public class PlatformAasTest extends TestWithQpid {
 
     private static Server qpid;
     
@@ -64,8 +63,9 @@ public class PlatformAasTest {
      */
     @BeforeClass
     public static void startup() {
+        loadPlugins();
         ServerAddress broker = new ServerAddress(Schema.IGNORE);
-        qpid = new TestQpidServer(broker);
+        qpid = TestWithQpid.fromPlugin(broker);
         EcsFactory.getSetup().getTransport().setPort(broker.getPort());
         qpid.start();
         Transport.setTransportSetup(() -> EcsFactory.getSetup().getTransport());
@@ -76,7 +76,7 @@ public class PlatformAasTest {
      */
     @AfterClass
     public static void shutdown() {
-        qpid.stop(true);
+        Server.stop(qpid, true);
         Transport.setTransportSetup(null);
     }
     

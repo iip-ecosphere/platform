@@ -41,30 +41,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-     <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>support.aas.basyx</artifactId>
-     <version>${project.version}</version>
-     <!--  <scope>test</scope>-->
-    </dependency>
-    <dependency>
-     <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>support.aas.basyx.server</artifactId>
-     <version>${project.version}</version>
-     <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <artifactId>test.amqp.qpid</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.qpid</groupId>
-      <artifactId>qpid-broker</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>transport.amqp</artifactId>
       <version>${project.version}</version>
@@ -79,11 +55,56 @@
     </dependency> 
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>support.aas</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>support</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <scope>test</scope>
+    </dependency>   
   </dependencies>
+  
+  <build>
+    <plugins>
+        <plugin>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>dependency-plugin</artifactId>
+            <version>${iip.version}</version>
+            <executions>
+                <execution>
+                    <id>okto plugins</id>
+                    <goals>
+                        <goal>unpack-plugins</goal>
+                    </goals>
+                    <phase>test-compile</phase>
+                    <configuration>
+                        <plugins>
+                            <plugin>
+                                <artifactId>support.aas.basyx2</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.aas.basyx</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>test.amqp.qpid</artifactId>
+                            </plugin>
+                        </plugins>
+                        <version>${iip.version}</version>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+  </build>
 
 </project>
