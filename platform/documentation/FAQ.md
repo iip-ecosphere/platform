@@ -251,5 +251,5 @@ After changing the values, run `mvn install` on all affected all-in-one examples
 
 *Reason:* By default, Python buffers the standard output streams. If a service is running longer, full buffers are emitted, potentially a bit delayed. For integrations based on the command line streams, delays may cause effects on downstream services. Moreover, as we operate in this case on standard input/output, we redirect standard output to standard error streams.
 
-*Solution:* On regular Python calls of oktoflow (service integration, Python function calls) we now apply the Python argument -u, which disables standard stream buffering. For non-commandline stream integrations, e.g. webservices, we will stop redirecting standard output to standard error.
+*Solution:* On regular Python calls of oktoflow (service integration, Python function calls) we now apply the Python argument -u, which disables standard stream buffering. Non-commandline stream integrations, e.g. webservices, log to usual streams, i.e., print to sysout.
 
