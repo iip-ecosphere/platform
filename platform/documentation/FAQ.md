@@ -247,9 +247,9 @@ After changing the values, run `mvn install` on all affected all-in-one examples
 
 ## My Python service does not emit anything when I call print or printf
 
-*Symptom:* You do not see any Python output when you call print or printf in the application log.
+*Symptom:* You do not see any or delayed Python output when you call print or printf in the application log.
 
-*Reason:* For integrations based on the command line streams, we redirect the standard output and standard error streams. This may still be active for webservice-based Python integrations.
+*Reason:* By default, Python buffers the standard output streams. If a service is running longer, full buffers are emitted, potentially a bit delayed. For integrations based on the command line streams, delays may cause effects on downstream services. Moreover, as we operate in this case on standard input/output, we redirect standard output to standard error streams.
 
-*Solution:* We are investigating this. Basically, you may use the original `sys.stdout.write(...)` or `sys.stderr.write(...)`
+*Solution:* On regular Python calls of oktoflow (service integration, Python function calls) we now apply the Python argument -u, which disables standard stream buffering. For non-commandline stream integrations, e.g. webservices, we will stop redirecting standard output to standard error.
 
