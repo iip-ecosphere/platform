@@ -21,7 +21,7 @@ The build steps are  explained in more detail in the Platform Handbook.
 The following build steps are automatically executed by an all-in-one example build process.
 
 * Update the meta-model if needed or forced (see below)
-* Generate service interfaces, serializers and data classes `mvn -P EasyGen process-sources` (see [configuration maven plugin](../configuration/configuration.maven) for the detailed build steps associated with `process-sources`)
+* Generate application template(s), service interfaces, serializers and data classes `mvn -P EasyGen process-sources` (see [configuration maven plugin](../configuration/configuration.maven) for the detailed build steps associated with `process-sources`)
 * Compile and package the application `mvn -P App install` (see [configuration maven plugin](../configuration/configuration.maven) for the detailed build steps associated with `package`)
 * Integrate the application `mvn -P EasyGen package`
 
