@@ -236,6 +236,7 @@ public class ProcessSupport {
         LoggerFactory.getLogger(ProcessSupport.class).info("Using Python: {}", pythonPath);
         List<String> tmp = new ArrayList<String>();
         tmp.add(pythonPath);
+        tmp.add("-u"); // do not use I/O buffers
         tmp.add(script);
         for (String a : args) {
             tmp.add(a);
