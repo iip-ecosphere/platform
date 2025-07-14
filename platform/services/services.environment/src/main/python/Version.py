@@ -1,5 +1,4 @@
 import logging as logger
-logger.basicConfig(level="DEBUG")
 import re
 
 SEPARATOR = "."

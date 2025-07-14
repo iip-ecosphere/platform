@@ -11,7 +11,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.PythonUtils;
@@ -24,7 +23,10 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
+
 import org.junit.Assert;
+import org.junit.Before;
 
 /**
  * Integration test for the Python environment.
@@ -32,6 +34,14 @@ import org.junit.Assert;
  * @author Sakshi Singh, SSE
  */
 public class PythonEnvironmentTest extends AbstractEnvironmentTest {
+    
+    /**
+     * Sets up plugins. Non-static so that loading is inherited.
+     */
+    @Before
+    public void setup() {
+        TestWithPlugin.loadPlugins();
+    }    
     
     /**
      * Redirects an input stream to another stream (in parallel).
@@ -131,30 +141,7 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
      */
     @Test
     public void testPythonEnvironment() throws IOException, ExecutionException {
-        testPythonEnvironment(AasFactory.DEFAULT_PROTOCOL); // currently "VAB-TCP"
-    }
-    
-    /**
-     * Tests the Python implementation.
-     * 
-     * @throws IOException shall not occur
-     * @throws ExecutionException shall not occur
-     */
-    @Test
-    public void testPythonEnvironmentHttp() throws IOException, ExecutionException {
-        testPythonEnvironment("VAB-HTTP");
-    }
-    
-    /**
-     * Tests the Python implementation.
-     * 
-     * @throws IOException shall not occur
-     * @throws ExecutionException shall not occur
-     */
-    @Test
-    @Ignore("VAB-HTTPS Server does not yet exist, certificate use on in support.aas.BaSyx unclear")
-    public void testPythonEnvironmentHttps() throws IOException, ExecutionException {
-        testPythonEnvironment("VAB-HTTPS");
+        testPythonEnvironment(AasFactory.DEFAULT_PROTOCOL); // TODO test with others?
     }
     
     /**
@@ -174,6 +161,9 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
             args.add("--protocol");
             args.add(protocol);
         }
+        args.add("--metaModel");
+        args.add(AasFactory.getInstance().getMetaModelVersion());
+        args.add("--log=DEBUG");
         String[] tmp = new String[args.size()];
         AtomicBoolean started = new AtomicBoolean(false);
         Consumer<String> bindingConsumer = l -> started.set(l.contains("INFO:root:Bound to"));
@@ -188,7 +178,7 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
         Assert.assertTrue("Python server process not started", started.get());
         
         ServerAddress aasServer = new ServerAddress(Schema.HTTP); 
-        Endpoint aasServerRegistry = new Endpoint(aasServer, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
+        Endpoint aasServerRegistry = new Endpoint(Schema.HTTP, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
         BasicSetupSpec spec = new BasicSetupSpec(aasServerRegistry, aasServer);
         spec.setAssetServerAddress(vabServer, protocol);
 

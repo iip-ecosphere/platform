@@ -1,5 +1,4 @@
 import logging as logger
-logger.basicConfig(level="DEBUG")
 import json
 
 from Service import ServiceState
@@ -65,6 +64,10 @@ def mapService(builder, service):
     def getState():
         return service.getState().name
     builder.defineProperty(getQName(NAME_PROP_STATE, service), getState, None)
+
+    def getStateIntl(params):
+        return composeResult(lambda p: service.getState().name, params)
+    builder.defineOperation(getQName(NAME_PROP_STATE, service), getStateIntl)
 
     def isDeployable():
         return str(service.isDeployable())

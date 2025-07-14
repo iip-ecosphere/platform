@@ -109,6 +109,7 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
     
     @Override
     protected void createScanInputThread(Process proc) {
+        register(AbstractProcessService.redirectIO(proc.getInputStream(), System.out));
         String uri = "ws://localhost:" + instancePort;
         try {
             getLogger().info("Connecting to {}", uri);

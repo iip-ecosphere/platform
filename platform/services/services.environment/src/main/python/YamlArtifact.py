@@ -1,5 +1,4 @@
 import logging as logger
-logger.basicConfig(level="DEBUG")
 import yaml
 from Version import Version
 from Service import ServiceKind 

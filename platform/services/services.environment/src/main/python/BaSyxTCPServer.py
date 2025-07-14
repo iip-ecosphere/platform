@@ -1,6 +1,5 @@
 import socket
 import logging as logger
-logger.basicConfig(level="DEBUG")
 import argparse
 from VABBaSyxTCPInterface import VABBaSyxTCPInterface
 

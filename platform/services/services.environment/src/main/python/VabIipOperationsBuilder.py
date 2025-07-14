@@ -1,14 +1,14 @@
 import logging as logger
-logger.basicConfig(level="DEBUG")
 from Service import ServiceState
 from Service import ServiceKind
+import json
 
 PREFIX_STATUS = "status/"
 PREFIX_SERVICE = "operations/service/"
 
 # mimicks de.iip_ecosphere.platform.support.iip_aas.json.JsonResultWrapper
 def composeResult(function, *args):
-    """Composes a result in the format of the IIP-Ecosphere JsonResultWrapper.
+    """Composes a result in the format of the oktoflow JsonResultWrapper.
     Executes the given function on the given args. Catches exceptions that occur 
     (JsonResultWrapper only ExecutionExceptions) and turns the respective result
     either into an empty string (result is None), a JSON string with the result
@@ -26,18 +26,21 @@ def composeResult(function, *args):
     """
     try:
         args = [x() if callable(x) else x for x in args]
+        logger.info(">HERE")        
         value = function(*args)
+        logger.info("<HERE")        
         if value is None:
             return {}
         else:
             #return value
-            return {"result" : " + value + "}
+            return {"result" : str(value)}
     except Exception as e:
+        logger.info("-EX")        
         return composeException(e)
         
 def composeException(e):
     """Turns an exception into a result String. Made re-usable if needed
-    when exceptions must be caued explicitly, not implicitly through
+    when exceptions must be caused explicitly, not implicitly through
     delayed execution in composeResult.
     
     Parameters:
@@ -48,7 +51,7 @@ def composeException(e):
     """
     msg = "{0}".format(e)
     #return ''
-    return {"exception" : " + msg + "}
+    return {"exception" : str(msg)}
 
 
 # the Python correspondence of the VabIipOperationsBuilder (support.aas.basxy)

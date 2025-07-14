@@ -104,13 +104,24 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
         } else {
             pythonArgs.add(getPythonModule(null, yaml, null));
         }
-        pythonArgs.add(0, "-u"); // do not buffer I/O, officially supported since Python 2.0
+        if (unbuffer()) {
+            pythonArgs.add(0, "-u"); // do not buffer I/O, officially supported since Python 2.0
+        }
         if (null == home) { // shall not occur
             getLogger().warn("No home path given for service " + yaml.getId() + ". Falling back to temporary folder");
             home = FileUtils.createTmpFolder(FileUtils.sanitizeFileName(yaml.getId(), true));
         }
         transportChannel = yaml.getTransportChannel();
         customizePythonArgs(pythonArgs);
+    }
+    
+    /**
+     * Returns whether the python process shall be unbuffered on the console streams ({@code -u}).
+     * 
+     * @return {@code true} for unbuffer (default), {@code false} for buffered console streams
+     */
+    protected boolean unbuffer() {
+        return true;
     }
     
     /**

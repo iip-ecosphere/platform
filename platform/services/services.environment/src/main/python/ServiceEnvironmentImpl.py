@@ -2,7 +2,6 @@ import sys
 
 import traceback
 import logging as logger
-logger.basicConfig(level="DEBUG")
 import argparse
 import importlib
 import time
@@ -116,7 +115,6 @@ def start(a):
         ingestorFunction = consoleIngestResult
         sys.stdout = sys.stderr
     elif wsMode:
-        sys.stdout = sys.stderr
         responseFunction = wsSendResult
         ingestorFunction = wsIngestResult
 

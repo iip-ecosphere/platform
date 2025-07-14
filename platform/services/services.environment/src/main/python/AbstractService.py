@@ -1,5 +1,4 @@
 import logging as logger
-logger.basicConfig(level="DEBUG")
 from Version import Version
 from Service import ServiceState
 from Service import ServiceKind

@@ -7,21 +7,23 @@ from JSONProvider import JSONProvider
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 
 class BaSyxHTTPServer():
-    def __init__(self, builder, port):
+    def __init__(self, builder, port, processor):
         self.port = port
         self.builder = builder
+        self.processor = processor
 
     def start(self):
-        handler = HTTPHandlerFactory(self.builder)
+        handler = HTTPHandlerFactory(self.builder, self.processor)
         server = HTTPServer((HOST, self.port), handler)
         logger.info('Bound to ' + HOST + ':' + str(self.port))
         server.serve_forever()
 
 
-def HTTPHandlerFactory(builder):
+def HTTPHandlerFactory(builder, processor):
     class CustomHandler(BaseHTTPRequestHandler):
         def __init__(self, *args, **kwargs):
             self.providerBackend = JSONProvider(builder)
+            self.processor = processor
             super(CustomHandler, self).__init__(*args, **kwargs)
 
         def do_GET(self):           # BaSyx retrieve
@@ -49,8 +51,13 @@ def HTTPHandlerFactory(builder):
             param_json = self.rfile.read(content_len)
             logger.debug('HTTP POST paramJson: %s', param_json)
 
+            param_json = self.processor.processArguments(param_json)
             result = self.providerBackend.invoke(path, param_json)
-            encodedResult = json.dumps(result).encode('UTF-8')
+            result = self.processor.processResult(result)
+
+            logger.info('HTTP POST result: %s', result)
+
+            encodedResult = result.encode('UTF-8')
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()

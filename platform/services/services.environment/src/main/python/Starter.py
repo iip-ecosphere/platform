@@ -4,12 +4,13 @@ import sys
 assert sys.version_info[0] > 2, 'Python Version needs to be higher than 2.'
 
 import logging as logger
-logger.basicConfig(level="DEBUG")
 import argparse
 from BaSyxTCPServer import BaSyxTCPServer
 from BaSyxHTTPServer import BaSyxHTTPServer
 from VabIipOperationsBuilder import VabIipOperationsBuilder
 from ServiceMapper import mapService
+from RequestProcessor import RequestProcessor
+from BaSyx2RequestProcessor import BaSyx2RequestProcessor
 
 
 def start(services):
@@ -20,23 +21,38 @@ def start(services):
     """
 
     parser = argparse.ArgumentParser(description='VAB/TCP Server')
-    parser.add_argument('--port', dest='port', action='store', nargs=1, type=int, required=True, help='The TCP port.')
-    parser.add_argument('--protocol', dest='protocol', action='store', nargs=1, type=str, required=False,
-                        default="VAB-TCP",
-                        help='The implementation protocol (see AasFactory).')
+    parser.add_argument('--port', dest='port', type=int, required=True, help='The TCP port.')
+    parser.add_argument('--metaModel', dest='metaModel', type=str, required=False, 
+        default="v2", help='The AAS metamodel version (see AasFactory).')
+    parser.add_argument('--protocol', dest='protocol', type=str, required=False,
+        default="", help='The implementation protocol (see AasFactory).')
+    parser.add_argument('--log', dest='log', type=str, required=False,
+        default="ERROR", help='The logging level (ERROR, WARNING, INFO, DEBUG).')
     args = parser.parse_args()
 
+    logger.basicConfig(level=args.log)
+    if args.metaModel == "v3":
+        reqProc = BaSyx2RequestProcessor()
+    else:
+        reqProc = RequestProcessor()
     builder = VabIipOperationsBuilder()
     for service in services:
         mapService(builder, service)
 
-    port = args.port[0]
-    protocol = args.protocol[0]
-    if args.protocol == "" or args.protocol == "VAB-TCP":
+    port = args.port
+    protocol = args.protocol
+    if protocol == "":
+        mm = args.metaModel
+        if mm == "v2":
+            protocol = "VAB-TCP"
+        elif mm == "v3":
+            protocol = "AAS-REST"
+    if protocol == "VAB-TCP":
         server = BaSyxTCPServer(builder, port)
-        # other protocols would go into here
     elif protocol == "VAB-HTTP":
-        server = BaSyxHTTPServer(builder, port)
+        server = BaSyxHTTPServer(builder, port, reqProc)
+    elif protocol == "AAS-REST":
+        server = BaSyxHTTPServer(builder, port, reqProc)
     else:
         logger.info("Protocol '" + protocol + "' unknown. Using default.")
         server = BaSyxTCPServer(builder, port)
