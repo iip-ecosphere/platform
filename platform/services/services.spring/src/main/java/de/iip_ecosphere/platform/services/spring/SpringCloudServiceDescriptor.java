@@ -36,6 +36,7 @@ import org.springframework.core.io.Resource;
 
 import de.iip_ecosphere.platform.services.AbstractServiceDescriptor;
 import de.iip_ecosphere.platform.services.AbstractServiceManager.TypedDataConnection;
+import de.iip_ecosphere.platform.services.ServicesAas;
 import de.iip_ecosphere.platform.services.TypedDataConnectorDescriptor;
 import de.iip_ecosphere.platform.services.TypedDataDescriptor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
@@ -481,7 +482,8 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     void attachStub() {
         InvocablesCreator iCreator = getInvocablesCreator();
         if (null != iCreator) {
-            setStub(new ServiceStub(iCreator, getId()));
+            setStub(new ServiceStub(iCreator, getId(), 
+                ServicesAas.NAME_SUBMODEL, ServicesAas.NAME_COLL_SERVICES, getId()));
         }
     }
     
