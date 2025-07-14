@@ -101,6 +101,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+    <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>connectors</artifactId>
      <version>${project.version}</version>
@@ -108,10 +109,17 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>support.aas</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>  
+    <dependency>
       <groupId>org.apache.qpid</groupId>
       <artifactId>qpid-broker</artifactId>
       <scope>test</scope>
-    </dependency>
+    </dependency>    
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>transport</artifactId>
@@ -137,7 +145,7 @@
       <artifactId>json-simple</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
+    <dependency> <!-- May cause jetty http request factory conflicts with spring -->
         <groupId>com.sparkjava</groupId>
         <artifactId>spark-core</artifactId>
         <version>2.9.3</version>
@@ -209,6 +217,35 @@
                     </goals>
                     <configuration>
                         <failOnError>true</failOnError>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+        
+        <plugin>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>dependency-plugin</artifactId>
+            <version>${iip.version}</version>
+            <executions>
+                <execution>
+                    <id>okto plugins</id>
+                    <goals>
+                        <goal>unpack-plugins</goal>
+                    </goals>
+                    <phase>test-compile</phase>
+                    <configuration>
+                        <plugins>
+                            <plugin>
+                                <artifactId>support.aas.basyx2</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.aas.basyx</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>test.amqp.qpid</artifactId>
+                            </plugin>
+                        </plugins>
+                        <version>${iip.version}</version>
                     </configuration>
                 </execution>
             </executions>
