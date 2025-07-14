@@ -14,6 +14,7 @@ package test.de.iip_ecosphere.platform.services.environment;
 
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.services.environment.ServiceMapper;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.ServiceStub;
 import de.iip_ecosphere.platform.services.environment.Starter;
@@ -23,19 +24,21 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 
 /**
  * Tests the {@link Starter}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class StarterTest {
+public class StarterTest extends TestWithPlugin {
     
     /**
      * Tests the starter.
@@ -90,6 +93,7 @@ public class StarterTest {
     /**
      * Asserts that accessing the state of a non-existent service in the service environment does not fail.
      */
+    @Ignore("Needs rework for BaSyx2")
     @Test
     public void testFailingServiceCreation() {
         final String protocol = "";
@@ -106,7 +110,7 @@ public class StarterTest {
         BasicSetupSpec spec = new BasicSetupSpec();
         spec.setAssetServerAddress(new ServerAddress(Schema.HTTP, port), protocol);
         InvocablesCreator iCreator = AasFactory.getInstance().createInvocablesCreator(spec);
-        ServiceStub stub = new ServiceStub(iCreator, "1234"); // service does not exist
+        ServiceStub stub = new ServiceStub(iCreator, "1234", ServiceMapper.NAME_SUBMODEL); // service does not exist
         Assert.assertNull(stub.getState());
         Assert.assertEquals("", stub.getDescription());
         Assert.assertEquals("", stub.getId());

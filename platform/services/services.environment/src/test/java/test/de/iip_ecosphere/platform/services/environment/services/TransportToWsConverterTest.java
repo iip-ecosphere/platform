@@ -32,14 +32,14 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.status.TraceRecord;
-import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
+import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 /**
  * Tests {@link TransportToWsConverter}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class TransportToWsConverterTest {
+public class TransportToWsConverterTest extends TestWithQpid {
 
     /**
      * Tests {@link TransportToWsConverter}.
@@ -47,7 +47,7 @@ public class TransportToWsConverterTest {
     @Test
     public void testConverter() {
         ServerAddress broker = new ServerAddress(Schema.IGNORE);
-        Server qpid = new TestQpidServer(broker);
+        qpid = TestWithQpid.fromPlugin(broker);
         qpid.start();
 
         AtomicInteger count = new AtomicInteger();
@@ -96,7 +96,7 @@ public class TransportToWsConverterTest {
     @Test 
     public void testFactory() {
         ServerAddress broker = new ServerAddress(Schema.IGNORE);
-        Server qpid = new TestQpidServer(broker);
+        qpid = TestWithQpid.fromPlugin(broker);
         qpid.start();
         Assert.assertNotNull(TransportConverterFactory.getInstance());
 

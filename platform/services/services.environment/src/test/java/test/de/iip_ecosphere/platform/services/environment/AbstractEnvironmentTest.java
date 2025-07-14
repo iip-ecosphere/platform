@@ -57,13 +57,13 @@ public abstract class AbstractEnvironmentTest {
         Assert.assertNotNull("Aas " + AasCreator.URN_AAS + " shall be there", aas);
         Submodel submodel = aas.getSubmodel(AasCreator.AAS_SUBMODEL_NAME);
         Assert.assertNotNull("Submodel " + AasCreator.AAS_SUBMODEL_NAME + " shall be there", submodel);
-
         assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_ID, o -> checkString(o, expected.getId()));
         assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_NAME, o -> checkString(o, expected.getName()));
         assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_DESCRIPTION, 
             o -> checkString(o, expected.getDescription()));
         assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_VERSION, o -> checkVersion(o, expected.getVersion()));
-        assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, o -> checkStateString(o, expected.getState()));
+        assertOperation(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, 
+            o -> checkStateString(o, expected.getState()), null);
         assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_KIND, o -> checkKindString(o, expected.getKind()));
         assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_DEPLOYABLE, 
             o -> checkBoolean(o, expected.isDeployable()));
@@ -73,14 +73,14 @@ public abstract class AbstractEnvironmentTest {
             ServiceState.STARTING.name());
         assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_SETSTATE, null, null,
             ServiceState.RUNNING.name());
-        assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, 
-            o -> checkStateString(o, ServiceState.RUNNING));
+        assertOperation(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, 
+            o -> checkStateString(o, ServiceState.RUNNING), null);
         assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_PASSIVATE, null, null);
-        assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, 
-            o -> checkStateString(o, ServiceState.PASSIVATED));
+        assertOperation(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, 
+            o -> checkStateString(o, ServiceState.PASSIVATED), null);
         assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_ACTIVATE, null, null);
-        assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, 
-            o -> checkStateString(o, ServiceState.RUNNING));
+        assertOperation(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, 
+            o -> checkStateString(o, ServiceState.RUNNING), null);
 
         assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_MIGRATE, null, e -> true, "myResource");
         assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_SWITCH, null, e -> true, "otherService");

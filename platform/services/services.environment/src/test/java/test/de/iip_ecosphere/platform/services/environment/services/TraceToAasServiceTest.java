@@ -39,6 +39,7 @@ import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup;
 import de.iip_ecosphere.platform.support.iip_aas.PlatformAas;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.status.TraceRecord;
+import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 import org.junit.Assert;
 
@@ -47,13 +48,14 @@ import org.junit.Assert;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class TraceToAasServiceTest {
+public class TraceToAasServiceTest extends TestWithQpid {
 
     /**
      * Initializes the test.
      */
     @BeforeClass
     public static void startup() {
+        loadPlugins();
         TraceToAasServiceMain.startup(null, -1, -1, -1);
     }
     

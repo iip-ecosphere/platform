@@ -17,10 +17,13 @@ import de.iip_ecosphere.platform.services.environment.ServiceStub;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.AasUtils;
+import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 
 import static de.iip_ecosphere.platform.services.environment.ServiceMapper.*;
 
@@ -46,7 +49,7 @@ public class AasCreator {
     public static final String AAS_SUBMODEL_OPERATION_SETSTATE = "setState";
     public static final String AAS_SUBMODEL_OPERATION_MIGRATE = "migrate";
     public static final String AAS_SUBMODEL_OPERATION_UPDATE = "update";
-    public static final String AAS_SUBMODEL_OPERATION_SWITCH = "switch";
+    public static final String AAS_SUBMODEL_OPERATION_SWITCH = "switchTo";
     public static final String AAS_SUBMODEL_OPERATION_RECONF = "reconfigure";
     
     /**
@@ -94,71 +97,70 @@ public class AasCreator {
         InvocablesCreator iCreator = factory.createInvocablesCreator(spec);
         AasBuilder aasBuilder = factory.createAasBuilder(AAS_NAME, URN_AAS);
         SubmodelBuilder smBuilder = aasBuilder.createSubmodelBuilder(AAS_SUBMODEL_NAME, null);
-        ServiceStub stub = new ServiceStub(iCreator, service.getId());
+        ServiceStub stub = new ServiceStub(iCreator, service.getId(), 
+            () -> AasFactory.getInstance().obtainRegistry(spec).retrieveAas(URN_AAS), AAS_SUBMODEL_NAME);
+        AuthenticationDescriptor auth = AasPartRegistry.getSubmodelAuthentication();
         
-        smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_ID)
-            .setType(Type.STRING)
-            .bind(stub.getGetter(NAME_PROP_ID), stub.getSetter(NAME_PROP_ID))
-            .build();
-        smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_NAME)
-            .setType(Type.STRING)
-            .bind(stub.getGetter(NAME_PROP_NAME), InvocablesCreator.READ_ONLY)
-            .build();
-        smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_VERSION)
-            .setType(Type.STRING)
-            .bind(stub.getGetter(NAME_PROP_VERSION), InvocablesCreator.READ_ONLY)
-            .build();
-        smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_DESCRIPTION)
-            .setType(Type.STRING)
-            .bind(stub.getGetter(NAME_PROP_DESCRIPTION), InvocablesCreator.READ_ONLY)
-            .build();
-        smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_STATE)
-            .setType(Type.STRING)
-            .bind(stub.getGetter(NAME_PROP_STATE), InvocablesCreator.READ_ONLY)
-            .build();
-        smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_KIND)
-            .setType(Type.STRING)
-            .bind(stub.getGetter(NAME_PROP_KIND), InvocablesCreator.READ_ONLY)
-            .build();
-        smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_DEPLOYABLE)
-            .setType(Type.BOOLEAN)
-            .bind(stub.getGetter(NAME_PROP_DEPLOYABLE), InvocablesCreator.READ_ONLY)
-            .build();
+        AasUtils.setValue(smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_ID).setType(Type.STRING),
+            service.getId(), stub.getGetter(NAME_PROP_ID), stub.getSetter(NAME_PROP_ID)) 
+            .build(auth);
+        AasUtils.setValue(smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_NAME).setType(Type.STRING),
+            service.getName(), stub.getGetter(NAME_PROP_NAME), InvocablesCreator.READ_ONLY)
+            .build(auth);
+        AasUtils.setValue(smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_VERSION).setType(Type.STRING),
+            service.getVersion().toString(), stub.getGetter(NAME_PROP_VERSION), InvocablesCreator.READ_ONLY)
+            .build(auth);
+        AasUtils.setValue(smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_DESCRIPTION).setType(Type.STRING),
+            service.getDescription(), stub.getGetter(NAME_PROP_DESCRIPTION), InvocablesCreator.READ_ONLY)
+            .build(auth);
+        //AasUtils.setValue(smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_STATE).setType(Type.STRING),
+        //    service.getState(), stub.getGetter(NAME_PROP_STATE), InvocablesCreator.READ_ONLY)
+        //    .build(auth); // not updated in BaSyx2, in services overridden on change        
+        AasUtils.setValue(smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_KIND).setType(Type.STRING),
+            service.getKind().toString(), stub.getGetter(NAME_PROP_KIND), InvocablesCreator.READ_ONLY)
+            .build(auth);
+        AasUtils.setValue(smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_DEPLOYABLE).setType(Type.BOOLEAN),
+            service.isDeployable(), stub.getGetter(NAME_PROP_DEPLOYABLE), InvocablesCreator.READ_ONLY)
+            .build(auth);
         
+        // more for testing dynamic state value across BaSyx
+        smBuilder.createOperationBuilder(AAS_SUBMODEL_PROPERTY_STATE)
+            .setInvocable(stub.getOperation(NAME_PROP_STATE))
+            .build(Type.STRING, auth);
         // returns are always strings here through JsonResultWrapper
         smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_ACTIVATE)
             .setInvocable(stub.getOperation(NAME_OP_ACTIVATE))
             .addOutputVariable("result", Type.STRING)
-            .build();
+            .build(auth);
         smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_PASSIVATE)
             .setInvocable(stub.getOperation(NAME_OP_PASSIVATE))
             .addOutputVariable("result", Type.STRING)
-            .build();
+            .build(auth);
         smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_SETSTATE)
             .setInvocable(stub.getOperation(NAME_OP_SET_STATE))
             .addInputVariable("state", Type.STRING)
             .addOutputVariable("result", Type.STRING)
-            .build();
+            .build(auth);
         smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_MIGRATE)
             .setInvocable(stub.getOperation(NAME_OP_MIGRATE))
             .addInputVariable("resourceId", Type.STRING)
             .addOutputVariable("result", Type.STRING)
-            .build();
+            .build(auth);
         smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_UPDATE)
             .setInvocable(stub.getOperation(NAME_OP_UPDATE))
             .addInputVariable("location", Type.STRING)
             .addOutputVariable("result", Type.STRING)
-            .build();
+            .build(auth);
         smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_SWITCH)
             .setInvocable(stub.getOperation(NAME_OP_SWITCH))
             .addInputVariable("targetId", Type.STRING)
             .addOutputVariable("result", Type.STRING)
-            .build();
+            .build(auth);
         smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_RECONF)
             .setInvocable(stub.getOperation(NAME_OP_RECONF))
             .addInputVariable("values", Type.STRING)
             .addOutputVariable("result", Type.STRING)
-            .build();
+            .build(auth);
         smBuilder.build();
         
         if (result != null) {

@@ -22,6 +22,9 @@ import java.util.function.Function;
 
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Invokable;
+import de.iip_ecosphere.platform.support.function.IOSupplier;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
@@ -38,14 +41,33 @@ public class ServiceStub implements Service {
     private Map<String, Invokable> getters = new HashMap<>();
     private Map<String, Invokable> setters = new HashMap<>();
     private Map<String, Invokable> operations = new HashMap<>();
-    
+
     /**
      * Creates the setup and registers the operations.
      * 
      * @param iCreator the AAS invocables creator
      * @param serviceId the service id to create the qualified names via {@link ServiceMapper#getQName(Service, String)}
+     * @param path to submodel element representing {@code serviceId}
      */
-    public ServiceStub(InvocablesCreator iCreator, String serviceId) {
+    public ServiceStub(InvocablesCreator iCreator, String serviceId, String... path) {
+        this(iCreator, serviceId, null, path);
+    }
+
+    /**
+     * Creates the setup and registers the operations.
+     * 
+     * @param iCreator the AAS invocables creator
+     * @param serviceId the service id to create the qualified names via {@link ServiceMapper#getQName(Service, String)}
+     * @param aasSupplier overrides the default AAS supplier ({@link AasPartRegistry#retrieveIipAas()}, may be 
+     *     <b>null</b> for the default
+     * @param path to submodel element representing {@code serviceId}
+     */
+    public ServiceStub(InvocablesCreator iCreator, String serviceId, IOSupplier<Aas> aasSupplier, String... path) {
+        if (aasSupplier == null) {
+            aasSupplier = () -> AasPartRegistry.retrieveIipAas();
+        }
+        // we need something executable here
+        iCreator = iCreator.executableCreator(aasSupplier, path, s -> ServiceMapper.unqualify(s));
         for (String n : PROP_READONLY) {
             registerProperty(n, iCreator.createGetter(getQName(serviceId, n)), InvocablesCreator.READ_ONLY);
         }
@@ -200,7 +222,14 @@ public class ServiceStub implements Service {
 
     @Override
     public ServiceState getState() {
-        return convertGetterResultToEnum(NAME_PROP_STATE, null, ServiceState.class);
+        try {
+            Object[] param = new Object[] {};
+            return convertToEnumSafe(
+                JsonResultWrapper.fromJson(operations.get(NAME_PROP_STATE).getOperation(), param), null, 
+                    ServiceState.class);
+        } catch (ExecutionException e) {
+            return null;
+        }
     }
 
     @Override

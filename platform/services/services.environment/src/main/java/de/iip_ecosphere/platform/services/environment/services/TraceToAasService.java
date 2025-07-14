@@ -311,6 +311,17 @@ public class TraceToAasService extends AbstractService {
         return cls.getName();
     }
     
+    /**
+     * Composes an identifier based on {@link #getAasUrn()} and the given specific identifier.
+     * 
+     * @param specificId the specific identifier
+     * @return the composed identifier
+     * @see AasUtils#composeIdentifier(String, String)
+     */
+    protected String composeIdentifier(String specificId) {
+        return AasUtils.composeIdentifier(getAasUrn(), specificId);
+    }
+    
     @Override
     protected ServiceState start() throws ExecutionException {
         if (null != server) {
@@ -324,18 +335,19 @@ public class TraceToAasService extends AbstractService {
                 AasFactory factory = AasFactory.getInstance();
                 AasBuilder aasBuilder = factory.createAasBuilder(getAasId(), getAasUrn());
                 SubmodelBuilder smBuilder = PlatformAas.createNameplate(aasBuilder, appSetup, 
-                    null);
+                    composeIdentifier(AasPartRegistry.ID_PART_TECHNICAL_DATA));
                 PlatformAas.addSoftwareInfo(smBuilder, appSetup);
                 smBuilder.build();
-                smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_COMMANDS, null)
+                smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_COMMANDS, composeIdentifier("CMDS"))
                     .rbacPlatform(aDesc);
                 augmentCommandsSubmodel(smBuilder);
                 smBuilder.build();                
-                smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_SERVICES, null)
+                smBuilder = aasBuilder.createSubmodelBuilder(SUBMODEL_SERVICES, composeIdentifier("SVC"))
                     .rbacPlatform(aDesc);
                 augmentServicesSubmodel(smBuilder);
                 smBuilder.build();
-                SubmodelBuilder convSubmodel = aasBuilder.createSubmodelBuilder(SUBMODEL_TRACES, null)
+                SubmodelBuilder convSubmodel = aasBuilder.createSubmodelBuilder(SUBMODEL_TRACES, 
+                    composeIdentifier("TRC"))
                     .rbacPlatform(aDesc);
                 converter.initializeSubmodel(convSubmodel);
                 convSubmodel.build();

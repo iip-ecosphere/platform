@@ -22,15 +22,15 @@
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
     </dependency>
-	<dependency>
-	    <groupId>org.apache.commons</groupId>
-	    <artifactId>commons-exec</artifactId>
-	    <version>1.3</version>
-	</dependency>      
-	<dependency>
-	  <groupId>net.bytebuddy</groupId>
-	  <artifactId>byte-buddy</artifactId>
-	</dependency>	
+    <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-exec</artifactId>
+        <version>1.3</version>
+    </dependency>      
+    <dependency>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy</artifactId>
+    </dependency>   
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>support.aas</artifactId>
@@ -75,31 +75,18 @@
       <artifactId>com.springsource.org.apache.commons.logging</artifactId>
       <version>1.1.1</version>
     </dependency>
-	<dependency>
-	    <groupId>com.github.oshi</groupId>
-	    <artifactId>oshi-core</artifactId>
-	    <version>6.1.6</version>
-	</dependency>
-
-	<dependency>
-	  <groupId>org.java-websocket</groupId>
-	  <artifactId>Java-WebSocket</artifactId>
-	  <version>1.5.3</version>
-	</dependency> 
+    <dependency>
+        <groupId>com.github.oshi</groupId>
+        <artifactId>oshi-core</artifactId>
+        <version>6.1.6</version>
+    </dependency>
 
     <dependency>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <artifactId>support.aas.basyx</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <artifactId>test.amqp.qpid</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
+      <groupId>org.java-websocket</groupId>
+      <artifactId>Java-WebSocket</artifactId>
+      <version>1.5.3</version>
+    </dependency> 
+
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>connectors</artifactId>
@@ -114,11 +101,6 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>  
-    <dependency>
-      <groupId>org.apache.qpid</groupId>
-      <artifactId>qpid-broker</artifactId>
-      <scope>test</scope>
-    </dependency>    
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>transport</artifactId>
@@ -144,6 +126,11 @@
       <artifactId>json-simple</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <scope>test</scope>
+    </dependency>   
     <dependency> <!-- May cause jetty http request factory conflicts with spring -->
         <groupId>com.sparkjava</groupId>
         <artifactId>spark-core</artifactId>

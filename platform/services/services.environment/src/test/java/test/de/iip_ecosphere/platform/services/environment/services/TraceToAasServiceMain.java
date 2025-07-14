@@ -41,7 +41,7 @@ import de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup.Address;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.status.TraceRecord;
-import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
+import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 /**
  * Simple program to run TraceToAAS in server environment, e.g., for development. Used as basis for TraceToAasTest!
@@ -89,7 +89,7 @@ public class TraceToAasServiceMain {
     public static void startup(String host, int aasRegistryPort, int aasServerPort, int aasProtocolPort) {
         oldWaitForAas = AbstractAasLifecycleDescriptor.setWaitForIipAas(false);
         ServerAddress broker = new ServerAddress(Schema.IGNORE);
-        qpid = new TestQpidServer(broker);
+        qpid = TestWithQpid.fromPlugin(broker);
         qpid.start();
         
         // adjust the setup 

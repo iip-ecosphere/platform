@@ -28,6 +28,7 @@ import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import test.de.iip_ecosphere.platform.services.environment.AasCreator.AasResult;
+import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 /**
  * Tests the test AAS pretending that there is an environment to test against. The AAS is used in 
@@ -35,8 +36,8 @@ import test.de.iip_ecosphere.platform.services.environment.AasCreator.AasResult;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class AasTest {
-
+public class AasTest extends TestWithQpid {
+    
     /**
      * Tests the AAS.
      * 
@@ -47,7 +48,7 @@ public class AasTest {
     public void testAas() throws IOException, ExecutionException {
         ServerAddress vabServer = new ServerAddress(Schema.HTTP);
         ServerAddress aasServer = new ServerAddress(Schema.HTTP); 
-        Endpoint aasServerRegistry = new Endpoint(aasServer, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
+        Endpoint aasServerRegistry = new Endpoint(Schema.HTTP, AasPartRegistry.DEFAULT_REGISTRY_ENDPOINT);
         BasicSetupSpec spec = new BasicSetupSpec(aasServerRegistry, aasServer);
         spec.setAssetServerAddress(vabServer);
 

@@ -53,14 +53,14 @@ import test.de.iip_ecosphere.platform.services.environment.pythonEnv.Rec13;
 import test.de.iip_ecosphere.platform.services.environment.pythonEnv.Rec13Impl;
 import test.de.iip_ecosphere.platform.services.environment.pythonEnv.Rec13InTranslator;
 import test.de.iip_ecosphere.platform.services.environment.pythonEnv.Rec13OutTranslator;
-import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
+import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 /**
  * Tests the generic Python process service {@link AbstractPythonProcessService}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class PythonProcessServiceTest {
+public class PythonProcessServiceTest extends TestWithQpid {
 
     private String stringParam = null;
     
@@ -258,7 +258,7 @@ public class PythonProcessServiceTest {
     public void testAsyncClientServer() throws IOException, ExecutionException {
         NotificationMode mo = ActiveAasBase.setNotificationMode(NotificationMode.NONE); // no AAS here
         ServerAddress broker = new ServerAddress(Schema.IGNORE);
-        Server qpid = new TestQpidServer(broker);
+        Server qpid = TestWithQpid.fromPlugin(broker);
         qpid.start();
         EnvironmentSetup setup = EnvironmentSetup.readFromYaml(EnvironmentSetup.class, 
             new FileInputStream("src/test/resources/envSetup.yml"));

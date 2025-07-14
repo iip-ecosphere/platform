@@ -48,12 +48,12 @@ public class ServiceMapper {
     public static final String NAME_OP_RECONF = "reconfigure";
     public static final String NAME_OP_SET_STATE = "setState";
     
-    public static final String[] PROP_READONLY = {NAME_PROP_ID, NAME_PROP_NAME, NAME_PROP_STATE, NAME_PROP_DEPLOYABLE, 
+    public static final String[] PROP_READONLY = {NAME_PROP_ID, NAME_PROP_NAME, NAME_PROP_DEPLOYABLE, 
         NAME_PROP_TOPLEVEL, NAME_PROP_KIND, NAME_PROP_VERSION, NAME_PROP_DESCRIPTION}; 
     public static final String[] PROP_WRITEONLY = {}; 
     public static final String[] PROP_READWRITE = {}; 
-    public static final String[] OPERATIONS = {NAME_OP_ACTIVATE, NAME_OP_PASSIVATE, NAME_OP_MIGRATE, NAME_OP_UPDATE, 
-        NAME_OP_SWITCH, NAME_OP_RECONF, NAME_OP_SET_STATE}; 
+    public static final String[] OPERATIONS = {NAME_OP_ACTIVATE, NAME_PROP_STATE, NAME_OP_PASSIVATE, NAME_OP_MIGRATE, 
+        NAME_OP_UPDATE, NAME_OP_SWITCH, NAME_OP_RECONF, NAME_OP_SET_STATE}; 
     
     private ProtocolServerBuilder builder;
     
@@ -81,8 +81,11 @@ public class ServiceMapper {
                 () -> service.getVersion().toString(), null);
             builder.defineProperty(getQName(service, NAME_PROP_KIND), 
                 () -> service.getKind().toString(), null);
-            builder.defineProperty(getQName(service, NAME_PROP_STATE), 
-                () -> service.getState().toString(), null);
+            builder.defineOperation(getQName(service, NAME_PROP_STATE), 
+                new JsonResultWrapper(p -> {
+                    return service.getState().toString();
+                }
+            ));
             builder.defineProperty(getQName(service, NAME_PROP_NAME), 
                 () -> service.getName(), null);
             builder.defineProperty(getQName(service, NAME_PROP_DEPLOYABLE), 
@@ -161,6 +164,20 @@ public class ServiceMapper {
      */
     public static String getQName(String serviceId, String elementName) {
         return NAME_SUBMODEL + "_" + serviceId + "_" + elementName;
+    }
+    
+    /**
+     * Unqualifies a qualified name.
+     * 
+     * @param name the name
+     * @return the unqualified name
+     */
+    public static String unqualify(String name) {
+        int pos = name.lastIndexOf("_");
+        if (pos > 0) {
+            name = name.substring(pos + 1);
+        }
+        return name;
     }
 
 }

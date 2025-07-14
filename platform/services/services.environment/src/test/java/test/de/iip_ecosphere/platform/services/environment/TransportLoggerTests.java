@@ -26,14 +26,15 @@ import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.TraceRecord;
 import de.iip_ecosphere.platform.transport.streams.StreamNames;
 import org.junit.Assert;
-import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
+
+import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 /**
  * Tests {@link TransportLogger}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class TransportLoggerTests {
+public class TransportLoggerTests extends TestWithQpid {
 
     /**
      * Tests {@link TransportLogger}.
@@ -46,7 +47,7 @@ public class TransportLoggerTests {
         final String setupFile = "--setupFile=./src/test/resources/envSetup.yml";
 
         ServerAddress broker = new ServerAddress(Schema.IGNORE);
-        TestQpidServer qpid = new TestQpidServer(broker);
+        qpid = TestWithQpid.fromPlugin(broker);
         qpid.start();
 
         AtomicInteger loopCount = new AtomicInteger(0);
