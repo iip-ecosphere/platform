@@ -26,6 +26,7 @@ The following build steps are automatically executed by an all-in-one example bu
 * Integrate the application `mvn -P EasyGen package`
 
 Sometimes, it makes sense to execute individual steps separately, e.g., `mvn -P EasyGen configuration:generateAppsNoDeps` for a run building all integration code files leaving out all dependencies (no deps). Although this application may not run, the build process creates the application templates in this step.
+Currently the goals `generateInterfaces`, `generateAppsNoDeps` and `generateApps` create as last step the application templates.
 
 ## Updating the meta-model of apps
 
