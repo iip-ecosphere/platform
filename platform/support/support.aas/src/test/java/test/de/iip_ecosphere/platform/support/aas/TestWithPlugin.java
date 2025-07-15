@@ -34,7 +34,22 @@ public class TestWithPlugin {
     
     private static boolean loaded = false;
     private static List<PluginLocation> locations = new ArrayList<>();
-    private static String installDir = "target/oktoPlugins"; // TODO -> property
+    private static String installDir = "target/oktoPlugins";
+    private static String aasPluginId = "aas.basyx-2.0"; // shall become the default id then
+    
+    /**
+     * Changes the AAS plugin Id used for testing.
+     * 
+     * @param id the new plugin Id, ignored if <b>null</b> or empty
+     * @return the plugin id before trying to change the value
+     */
+    public static String setAasPluginId(String id) {
+        String old = aasPluginId;
+        if (null != id && id.length() > 0) {
+            aasPluginId = id;
+        }
+        return old;
+    }
 
     /**
      * Represents a plugin location.
@@ -118,7 +133,7 @@ public class TestWithPlugin {
                 }
             }
             // TODO default from AASFactory
-            AasFactory.setPluginId(System.getProperty("okto.test.aas.pluginId", "aas.basyx-2.0")); 
+            AasFactory.setPluginId(System.getProperty("okto.test.aas.pluginId", aasPluginId)); 
         }
     }
     
