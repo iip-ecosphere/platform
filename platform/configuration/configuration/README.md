@@ -78,3 +78,20 @@ Some of the test models include the RapidMiner RTSA integration. As RTSA is an I
 Some tests are executed for code generation in this project, the remainder is executed by the `examples` project there. Since version 0.7.1 the generated code is in `target/gen` rather than `gen`.
 
 Some tests are executed in own JVMs to prevent conflicting dependencies with Maven. To update the persisted dependency list, call `mvn prepare-package`. To build this component without tests, run `mvn install -DdisableJavaTests=true`. 
+
+## Docker base images for Python (Using Digest)
+
+Sometimes, the base images used to create container images for the platform and applications gets updated (outside of the platform), which might cause errors during container image creation. For avoid that, we used the digest of the base images to always get the exact same image (Digest is a cryptographic hash, specifically a SHA256 hash, that uniquely identifies the contents of a container image).
+
+To get the digest for an image (e.g. `python:3.8.20-slim-bullseye`) use the command:
+```
+docker inspect --format='{{index .RepoDigests 0}}' python:3.8.20-slim-bullseye
+```
+The result should be something like 
+```
+Result: python@sha256:e191a71397fd61fbddb6712cd43ef9a2c17df0b5e7ba67607128554cd6bff267
+```
+Then update the FROM in the dockerfile to 
+```
+FROM python@sha256:e191a71397fd61fbddb6712cd43ef9a2c17df0b5e7ba67607128554cd6bff267
+```

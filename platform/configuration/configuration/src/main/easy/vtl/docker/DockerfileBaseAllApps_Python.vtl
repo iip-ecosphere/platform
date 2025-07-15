@@ -45,17 +45,17 @@ template DockerfileBaseAllApps_Python(IIPEcosphere config, FileArtifact target, 
                         } else if (genDependency(s) == 'PYTHON38') {
                             if (IsPythonInstalled == 0) {
                                 IsPythonInstalled = 1;
-                                pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+                                pythonPipInstalled = 'RUN python3.8 -m pip install -r requirements.txt';
                             }
                         } else if (genDependency(s) == 'PYTHON39') {
                             if (IsPythonInstalled == 0) {
                                 IsPythonInstalled = 1;
-                                pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+                                pythonPipInstalled = 'RUN python3.9 -m pip install -r requirements.txt';
                             }
                         }else if (genDependency(s) == 'PYTHON313') {
                             if (IsPythonInstalled == 0) {
                                 IsPythonInstalled = 1;
-                                pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+                                pythonPipInstalled = 'RUN python3.13 -m pip install -r requirements.txt';
                             }
                         } 
                     }
@@ -63,7 +63,7 @@ template DockerfileBaseAllApps_Python(IIPEcosphere config, FileArtifact target, 
             }
             
             if (IsPythonInstalled == 0) {
-                pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+                pythonPipInstalled = 'RUN python3.9 -m pip install -r requirements.txt';
             } 
             
             '# Install python dependencies'
@@ -92,7 +92,8 @@ template DockerfileBaseAllApps_Python(IIPEcosphere config, FileArtifact target, 
                     setOf(Dependency) deps = pyService.dependencies;
 				    
                     for (Dependency s : deps) {
-                        if (genDependency(s) == 'PYTHON2') {
+                    	String genDependency = genDependency(s);
+                        if (genDependency == 'PYTHON2') {
                             if (IsPythonInstalled == 0) {
                                 'FROM python:2.7.10'
                                 IsPythonInstalled = 1;
@@ -101,32 +102,32 @@ template DockerfileBaseAllApps_Python(IIPEcosphere config, FileArtifact target, 
                             for (String s: tmp) {
                                 '${s}'
                             }
-                        } else if (genDependency(s) == 'PYTHON38') {
+                        } else if (genDependency == 'PYTHON38') {
                             if (IsPythonInstalled == 0) {
-                                'FROM python:3.8.16-slim-buster'
+                                '${getPythonBaseImage(genDependency)}'
                                 'RUN apt-get update -y'
                                 IsPythonInstalled = 1;
-                                pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+                                pythonPipInstalled = 'RUN python3.8 -m pip install -r requirements.txt';
                             }
                             for (String s: tmp) {
                                     '${s}'
                             }
-                        } else if (genDependency(s) == 'PYTHON39') {
+                        } else if (genDependency == 'PYTHON39') {
                             if (IsPythonInstalled == 0) {
-                                'FROM python:3.9.21-slim'
+                                '${getPythonBaseImage(genDependency)}'
                                 'RUN apt-get update -y'
                                 IsPythonInstalled = 1;
-                                pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+                                pythonPipInstalled = 'RUN python3.9 -m pip install -r requirements.txt';
                             }
                             for (String s: tmp) {
                                 '${s}'
                             }
-                        } else if (genDependency(s) == 'PYTHON313') {
+                        } else if (genDependency == 'PYTHON313') {
                             if (IsPythonInstalled == 0) {
-                                'FROM python:3.13.2-slim'
+                                '${getPythonBaseImage(genDependency)}'
                                 'RUN apt-get update -y'
                                 IsPythonInstalled = 1;
-                                pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+                                pythonPipInstalled = 'RUN python3.13 -m pip install -r requirements.txt';
                             }
                             for (String s: tmp) {
                                 '${s}'
@@ -137,10 +138,10 @@ template DockerfileBaseAllApps_Python(IIPEcosphere config, FileArtifact target, 
             }
 
             if (IsPythonInstalled == 0) {
-                'FROM python:3.9.21-slim'
+                '${getPythonBaseImage("PYTHON39")}'
                 'RUN apt-get update -y'
                 IsPythonInstalled = 1;
-                pythonPipInstalled = 'RUN python3 -m pip install -r requirements.txt';
+                pythonPipInstalled = 'RUN python3.9 -m pip install -r requirements.txt';
                 for (String s: tmp) {
                     '${s}'
                 }
@@ -151,7 +152,9 @@ template DockerfileBaseAllApps_Python(IIPEcosphere config, FileArtifact target, 
             ''
             if (not(collectDependencies(elements)->selectByKind(SystemDependency)->select(d|d.key=='JAVA8').isEmpty())) {
                 '# Installed Java 8'
-                'RUN wget http://www.mirbsd.org/~tg/Debs/sources.txt/wtf-bookworm.sources && mkdir -p /etc/apt/sources.list.d && mv wtf-bookworm.sources /etc/apt/sources.list.d/ && apt update && apt install openjdk-8-jdk -y'
+                'RUN apt-get update && apt-get install -y --no-install-recommends temurin-8-jdk     && apt-get clean && rm -rf /var/lib/apt/lists/*'
+                'RUN apt-get update && apt-get install -y --no-install-recommends         ca-certificates wget gnupg     && wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | apt-key add -     && echo "deb https://packages.adoptium.net/artifactory/deb bullseye main" > /etc/apt/sources.list.d/temurin.list'
+                'RUN apt-get update -y && apt install wget -y && wget https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.deb && dpkg -i jdk-21_linux-x64_bin.deb'
             }
             ''
             //'${containerSettings(config, containerType, device)}'

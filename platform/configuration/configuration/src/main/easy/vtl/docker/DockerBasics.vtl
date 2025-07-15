@@ -227,5 +227,17 @@ template DockerBasics(Configuration config, FileArtifact target) {
             result.add('RUN ${c}');
         }
     }
-    
+
+    def String getPythonBaseImage(String pythonVersion) {
+        String pythonBaseImage = "";
+        if (pythonVersion == 'PYTHON38') {
+            pythonBaseImage = "FROM python@sha256:e191a71397fd61fbddb6712cd43ef9a2c17df0b5e7ba67607128554cd6bff267";
+        } else if (pythonVersion == 'PYTHON39') {
+            pythonBaseImage = "FROM python@sha256:5765e2feb8ceaf5b453ca1b298f8efbd7e42c133f4f166dda7396959b1a9cac8";
+        } else if (pythonVersion == 'PYTHON313') {
+            pythonBaseImage = "FROM python@sha256:631af3fee9d0b0a046855a62af745c1f94b75c5309be8802a0928cce3ac0f98d";
+        }
+        pythonBaseImage;
+    }
+
 }
