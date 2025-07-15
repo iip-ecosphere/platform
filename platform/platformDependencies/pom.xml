@@ -829,6 +829,7 @@
                                     </versionRange>
                                     <goals>
                                         <goal>unpack</goal>
+                                        <goal>unpack-plugins</goal>
                                     </goals>
                                 </pluginExecutionFilter>
                                 <action>
