@@ -225,7 +225,7 @@ public class ServiceStub implements Service {
         try {
             Object[] param = new Object[] {};
             return convertToEnumSafe(
-                JsonResultWrapper.fromJson(operations.get(NAME_PROP_STATE).getOperation(), param), null, 
+                JsonResultWrapper.fromJson(operations.get(NAME_OP_GET_STATE).getOperation(), param), null, 
                     ServiceState.class);
         } catch (ExecutionException e) {
             return null;

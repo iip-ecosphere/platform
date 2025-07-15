@@ -47,6 +47,7 @@ public class AasCreator {
     public static final String AAS_SUBMODEL_OPERATION_PASSIVATE = "passivate";
     public static final String AAS_SUBMODEL_OPERATION_ACTIVATE = "activate";
     public static final String AAS_SUBMODEL_OPERATION_SETSTATE = "setState";
+    public static final String AAS_SUBMODEL_OPERATION_GETSTATE = "getState";
     public static final String AAS_SUBMODEL_OPERATION_MIGRATE = "migrate";
     public static final String AAS_SUBMODEL_OPERATION_UPDATE = "update";
     public static final String AAS_SUBMODEL_OPERATION_SWITCH = "switchTo";
@@ -113,9 +114,9 @@ public class AasCreator {
         AasUtils.setValue(smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_DESCRIPTION).setType(Type.STRING),
             service.getDescription(), stub.getGetter(NAME_PROP_DESCRIPTION), InvocablesCreator.READ_ONLY)
             .build(auth);
-        //AasUtils.setValue(smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_STATE).setType(Type.STRING),
-        //    service.getState(), stub.getGetter(NAME_PROP_STATE), InvocablesCreator.READ_ONLY)
-        //    .build(auth); // not updated in BaSyx2, in services overridden on change        
+        smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_STATE) // for UI, written by serviceMgr 
+            .setValue(Type.STRING, service.getState())
+            .build(auth); 
         AasUtils.setValue(smBuilder.createPropertyBuilder(AAS_SUBMODEL_PROPERTY_KIND).setType(Type.STRING),
             service.getKind().toString(), stub.getGetter(NAME_PROP_KIND), InvocablesCreator.READ_ONLY)
             .build(auth);
@@ -123,11 +124,6 @@ public class AasCreator {
             service.isDeployable(), stub.getGetter(NAME_PROP_DEPLOYABLE), InvocablesCreator.READ_ONLY)
             .build(auth);
         
-        // more for testing dynamic state value across BaSyx
-        smBuilder.createOperationBuilder(AAS_SUBMODEL_PROPERTY_STATE)
-            .setInvocable(stub.getOperation(NAME_PROP_STATE))
-            .build(Type.STRING, auth);
-        // returns are always strings here through JsonResultWrapper
         smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_ACTIVATE)
             .setInvocable(stub.getOperation(NAME_OP_ACTIVATE))
             .addOutputVariable("result", Type.STRING)
@@ -141,6 +137,9 @@ public class AasCreator {
             .addInputVariable("state", Type.STRING)
             .addOutputVariable("result", Type.STRING)
             .build(auth);
+        smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_GETSTATE)
+            .setInvocable(stub.getOperation(NAME_OP_GET_STATE))
+            .build(Type.STRING, auth);
         smBuilder.createOperationBuilder(AAS_SUBMODEL_OPERATION_MIGRATE)
             .setInvocable(stub.getOperation(NAME_OP_MIGRATE))
             .addInputVariable("resourceId", Type.STRING)

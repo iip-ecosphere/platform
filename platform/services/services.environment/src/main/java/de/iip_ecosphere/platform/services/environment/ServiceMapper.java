@@ -47,13 +47,14 @@ public class ServiceMapper {
     public static final String NAME_OP_SWITCH = "switchTo";
     public static final String NAME_OP_RECONF = "reconfigure";
     public static final String NAME_OP_SET_STATE = "setState";
+    public static final String NAME_OP_GET_STATE = "getState";
     
     public static final String[] PROP_READONLY = {NAME_PROP_ID, NAME_PROP_NAME, NAME_PROP_DEPLOYABLE, 
-        NAME_PROP_TOPLEVEL, NAME_PROP_KIND, NAME_PROP_VERSION, NAME_PROP_DESCRIPTION}; 
+        NAME_PROP_TOPLEVEL, NAME_PROP_KIND, NAME_PROP_VERSION, NAME_PROP_DESCRIPTION, NAME_PROP_STATE}; 
     public static final String[] PROP_WRITEONLY = {}; 
     public static final String[] PROP_READWRITE = {}; 
-    public static final String[] OPERATIONS = {NAME_OP_ACTIVATE, NAME_PROP_STATE, NAME_OP_PASSIVATE, NAME_OP_MIGRATE, 
-        NAME_OP_UPDATE, NAME_OP_SWITCH, NAME_OP_RECONF, NAME_OP_SET_STATE}; 
+    public static final String[] OPERATIONS = {NAME_OP_ACTIVATE, NAME_OP_PASSIVATE, NAME_OP_MIGRATE, 
+        NAME_OP_UPDATE, NAME_OP_SWITCH, NAME_OP_RECONF, NAME_OP_SET_STATE, NAME_OP_GET_STATE}; 
     
     private ProtocolServerBuilder builder;
     
@@ -81,11 +82,8 @@ public class ServiceMapper {
                 () -> service.getVersion().toString(), null);
             builder.defineProperty(getQName(service, NAME_PROP_KIND), 
                 () -> service.getKind().toString(), null);
-            builder.defineOperation(getQName(service, NAME_PROP_STATE), 
-                new JsonResultWrapper(p -> {
-                    return service.getState().toString();
-                }
-            ));
+            builder.defineProperty(getQName(service, NAME_PROP_STATE), // just in case
+                () -> service.getState().toString(), null);
             builder.defineProperty(getQName(service, NAME_PROP_NAME), 
                 () -> service.getName(), null);
             builder.defineProperty(getQName(service, NAME_PROP_DEPLOYABLE), 
@@ -118,6 +116,11 @@ public class ServiceMapper {
                     return null;
                 }
             ));
+            builder.defineOperation(getQName(service, NAME_OP_GET_STATE), 
+                    new JsonResultWrapper(p -> {
+                        return service.getState().toString();
+                    }
+                ));
             builder.defineOperation(getQName(service, NAME_OP_SET_STATE), 
                 new JsonResultWrapper(p -> {
                     ServiceState state = ServiceState.valueOf(readString(p, 0, "")); // exception -> wrapper

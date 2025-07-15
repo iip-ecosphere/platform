@@ -62,7 +62,7 @@ public abstract class AbstractEnvironmentTest {
         assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_DESCRIPTION, 
             o -> checkString(o, expected.getDescription()));
         assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_VERSION, o -> checkVersion(o, expected.getVersion()));
-        assertOperation(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, 
+        assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_GETSTATE, 
             o -> checkStateString(o, expected.getState()), null);
         assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_KIND, o -> checkKindString(o, expected.getKind()));
         assertProperty(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_DEPLOYABLE, 
@@ -73,13 +73,13 @@ public abstract class AbstractEnvironmentTest {
             ServiceState.STARTING.name());
         assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_SETSTATE, null, null,
             ServiceState.RUNNING.name());
-        assertOperation(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, 
+        assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_GETSTATE, 
             o -> checkStateString(o, ServiceState.RUNNING), null);
         assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_PASSIVATE, null, null);
-        assertOperation(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, 
+        assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_GETSTATE, 
             o -> checkStateString(o, ServiceState.PASSIVATED), null);
         assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_ACTIVATE, null, null);
-        assertOperation(submodel, AasCreator.AAS_SUBMODEL_PROPERTY_STATE, 
+        assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_GETSTATE, 
             o -> checkStateString(o, ServiceState.RUNNING), null);
 
         assertOperation(submodel, AasCreator.AAS_SUBMODEL_OPERATION_MIGRATE, null, e -> true, "myResource");

@@ -22,6 +22,7 @@ NAME_OP_UPDATE = "update"
 NAME_OP_SWITCH = "switchTo"
 NAME_OP_RECONF = "reconfigure"
 NAME_OP_SET_STATE = "setState"
+NAME_OP_GET_STATE = "getState"
 
 def getQName(name, service):
     """Maps the given operation/property name for the given service to a qualified name.
@@ -67,7 +68,7 @@ def mapService(builder, service):
 
     def getStateIntl(params):
         return composeResult(lambda p: service.getState().name, params)
-    builder.defineOperation(getQName(NAME_PROP_STATE, service), getStateIntl)
+    builder.defineOperation(getQName(NAME_OP_GET_STATE, service), getStateIntl)
 
     def isDeployable():
         return str(service.isDeployable())
