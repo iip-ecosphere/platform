@@ -52,6 +52,9 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
 
     @Parameter(property = "unpack.relocate", required = false, defaultValue = "false")
     private boolean relocate;
+    
+    @Parameter(property = "unpack.relocateTarget", required = false, defaultValue = "jars")
+    private File relocateTarget;
 
     @Parameter( defaultValue = "${project.build.directory}", readonly = true )
     private File targetDirectory;
@@ -108,10 +111,9 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         setForceCleanup(true);
 
         FileSet cleanup = new FileSet();
-        cleanup.setDirectory(relocate ? "jars" : new File(targetDirectory, "oktoPlugins").toString());
+        cleanup.setDirectory((relocate ? relocateTarget : new File(targetDirectory, "oktoPlugins")).toString());
         setCleanup(cleanup);
 
-        File relocTarget = new File("jars");
         if (!relocate) {
             // figure out whether we are in development mode, i.e., in git workspace
             File skipIfExists = new File("../../support/support"); // building for arbitrary component
@@ -122,7 +124,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                 setSkipIfExists(skipIfExists);
             }
         } else {
-            relocTarget.mkdirs();
+            relocateTarget.mkdirs();
             setForce(true);
         }
 
@@ -139,7 +141,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                 item.setType("zip");
                 item.setClassifier("plugin");
                 item.setOverWrite(String.valueOf(true));
-                item.setOutputDirectory(relocate ? relocTarget : new File(targetDirectory, "oktoPlugins/" + name));
+                item.setOutputDirectory(relocate ? relocateTarget : new File(targetDirectory, "oktoPlugins/" + name));
                 getLog().info("Configuring plugin '" + name + "' -> " + item.getOutputDirectory());
                 item.setDestFileName(name + ".zip");
                 if (relocate) {

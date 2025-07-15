@@ -111,7 +111,7 @@ The delete goal allows to just delete files and directories. At it's core, it is
   </build>
   ```
 
-## unpack-plugin
+## unpack-plugins
 
 oktoflow plugins ship as zip files with contained classpath file(s) and jars in `target/jars`. This extension of the unpack goal eases the unpacking of plugins for tests and platform installation.
 
@@ -151,7 +151,7 @@ In the basic version, for testing, use
 
 for installation just add `<relocate>true</relocate>` to the `configuration`. The `plugins` are extended `artifactItems` which you may use instead. However, a `plugin` allows a more concise notation as we set up the `version` to the global `version` in `configuration`, the `type` to `zip`, the `classifier` to `plugin`, `overWrite` to `true` and `outputDirectory` to `${project.build.directory}/oktoPlugins`. If in a `plugin` the `groupId` is not given, we set it automatically to `de.iip-ecosphere.platform`. 
 
-Moreover, for installations, if `relocate` is enabled, the `outputDirectory` becomes `jars`, all unpacked jars are flattened into that directory and all classpath files are renamed based on the last part of the `artifactId`, stored into `plugins` and relocated to the `jar` folder.
+Moreover, for installations, if `relocate` is enabled, the `outputDirectory` becomes `jars`, all unpacked jars are flattened into that directory and all classpath files are renamed based on the last part of the `artifactId`, stored into `plugins` and relocated to the relication target folder (`relocateTarget`, user property `unpack.relocateTarget`, default `jars`).
 
 If we are not in `relocate` mode, the plugin is only enabled, if the relative directories `../../support/support` (for arbitrary platform component) or `../support` (for support component) do not exist, which is the case for builds outside a local git workspace, e.g., on CI.
 
