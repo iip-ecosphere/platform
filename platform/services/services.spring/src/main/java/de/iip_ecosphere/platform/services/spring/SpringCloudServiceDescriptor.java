@@ -350,6 +350,21 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
     public SpringCloudServiceDescriptor getEnsembleLeader() {
         return ensembleLeader;
     }
+
+    /**
+     * Registers the network ports for the underlying service using the {@link NetworkManager}. Does not register 
+     * network ports twice. Also allocates {@link #adminAddr} if not already done.
+     * 
+     * @return the spring managed server address
+     */
+    ManagedServerAddress registerNetworkPorts() {
+        NetworkManager mgr = NetworkManagerFactory.getInstance();
+        ManagedServerAddress springAddr = registerPort(mgr, "spring_" + getId());
+        if (null == adminAddr) {
+            adminAddr = registerPort(mgr, Starter.getServiceCommandNetworkMgrKey(getId()));
+        }
+        return springAddr;
+    }
     
     /**
      * Creates the deployment request for the Spring deployer.
@@ -378,9 +393,8 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
         Utils.addPropertyIfPositiveToMeBi(deployProps, AppDeployer.DISK_PROPERTY_KEY, service.getDisk(), null);
         Utils.addPropertyIfPositiveToInt(deployProps, AppDeployer.CPU_PROPERTY_KEY, service.getCpus(), "1");
 
-        ManagedServerAddress springAddr = registerPort(mgr, "spring_" + getId());
+        ManagedServerAddress springAddr = registerNetworkPorts();
         appProps.put("server.port", String.valueOf(springAddr.getPort())); // shall work, not another cmd arg
-        adminAddr = registerPort(mgr, Starter.getServiceCommandNetworkMgrKey(getId()));
         serviceProtocol = config.getServiceProtocol();
         List<String> cmdLine = collectCmdArguments(config, adminAddr.getPort(), serviceProtocol);
         for (Relation r : service.getRelations()) {

@@ -19,12 +19,12 @@ import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
-import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
+import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
@@ -114,6 +114,8 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_PROP_DEVICE_AAS = AasPartRegistry.NAME_PROP_DEVICE_AAS;
     public static final String NAME_PROP_IN_CLEANUP = "inCleanup";
     public static final String NAME_PROP_SUPPORTED_APPIDS = "supportedAppIds";
+    public static final String NAME_OP_SVC_GET_STATE = "getState";
+    public static final String NAME_OP_SVC_SET_STATE = "setState";
     public static final String NAME_OP_SERVICE_START = "startService";
     public static final String NAME_OP_SERVICE_START_TASK = "startServiceAsTask";
     public static final String NAME_OP_SERVICE_START_WITH_OPTS = "startServiceWithOptions";
@@ -126,8 +128,8 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_OP_SERVICE_RECONF = "reconfigureService";
     public static final String NAME_OP_SERVICE_STOP = "stopService";
     public static final String NAME_OP_SERVICE_STOP_TASK = "stopServiceAsTask";
-    public static final String NAME_OP_SERVICE_GET_STATE = "getServiceSate";
-    public static final String NAME_OP_SERVICE_SET_STATE = "setServiceSate";
+    public static final String NAME_OP_SERVICE_GET_STATE = "getServiceState";
+    public static final String NAME_OP_SERVICE_SET_STATE = "setServiceState";
     public static final String NAME_OP_ARTIFACT_ADD = "addArtifact";
     public static final String NAME_OP_ARTIFACT_ADD_TASK = "addArtifactAsTask";
     public static final String NAME_OP_ARTIFACT_REMOVE = "removeArtifact";
@@ -509,14 +511,23 @@ public class ServicesAas implements AasContributor {
             .setSemanticId(Eclass.IRDI_PROPERTY_SOFTWARE_NAME)
             .build();
         descriptorBuilder.createPropertyBuilder(NAME_PROP_STATE)
-            .setValue(Type.STRING, desc.getState().toString()) // to be overridden
+            .setValue(Type.STRING, desc.getState().toString()) // value to be overridden, just for UI
             .build();
-        // BaSyX 2, required for operation delegation by ServiceStub, map to operation in ServiceMapper
-        AasFactory f = AasFactory.getInstance();
-        InvocablesCreator iCreator = f.createInvocablesCreator(AasPartRegistry.getSetup());
-        descriptorBuilder.createOperationBuilder(NAME_PROP_STATE)
-            .setInvocable(iCreator.createInvocable(ServiceMapper.getQName(NAME_PROP_STATE, serviceId)))
-            .build(Type.STRING, AasPartRegistry.getSubmodelAuthentication());
+
+        // we just need the invokable; implemented via service mapper
+        InvocablesCreator iCreator = desc.getInvocablesCreator();
+        if (iCreator != null) { // contribute when it's there, i.e., network ports are allocated to the service
+            descriptorBuilder.createOperationBuilder(NAME_OP_SVC_SET_STATE)
+                .addInputVariable("state", Type.STRING)
+                .setInvocable(iCreator.createInvocable(ServiceMapper.getQName(
+                    ServiceMapper.NAME_OP_SET_STATE, serviceId)))
+                .build(AasPartRegistry.getSubmodelAuthentication());
+            descriptorBuilder.createOperationBuilder(NAME_OP_SVC_GET_STATE)
+                .setInvocable(iCreator.createInvocable(ServiceMapper.getQName(
+                    ServiceMapper.NAME_OP_GET_STATE, serviceId)))
+                .build(Type.STRING, AasPartRegistry.getSubmodelAuthentication());
+        }
+
         descriptorBuilder.createPropertyBuilder(NAME_PROP_KIND)
             .setValue(Type.STRING, desc.getKind().toString())
             .build();
@@ -805,15 +816,27 @@ public class ServicesAas implements AasContributor {
             String serviceId = fixId(desc.getId());
             SubmodelElementCollection elt = services.getSubmodelElementCollection(serviceId);
             if (null != elt) {
+                Operation op = elt.getOperation(NAME_OP_SVC_SET_STATE);
+                if (null != op) {
+                    try {
+                        op.invoke(act.toString());
+                    } catch (ExecutionException e) {
+                        getLogger().error("Cannot set state for service `{}`: {}", desc.getId(), e.getMessage());
+                    }
+                } else {
+                    getLogger().error("Service state change - cannot find operation {} for service `{}`", 
+                            NAME_OP_SVC_SET_STATE, desc.getId());
+                }
+                // old style, kept for UI, overwrite property value
                 Property prop = elt.getProperty(NAME_PROP_STATE);
                 if (null != prop) {
                     try {
                         prop.setValue(act.toString());
                     } catch (ExecutionException e) {
-                        getLogger().error("Cannot write state for service `{}`: {}", desc.getId(), e.getMessage());
+                        getLogger().warn("Cannot write state for service `{}`: {}", desc.getId(), e.getMessage());
                     }
                 } else {
-                    getLogger().error("Service state change - cannot find property {} for service `{}`", 
+                    getLogger().warn("Service state change - cannot find property {} for service `{}`", 
                         NAME_PROP_STATE, desc.getId());
                 }
             } else {

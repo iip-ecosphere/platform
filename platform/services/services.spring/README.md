@@ -160,8 +160,10 @@ The configuration structure is as shown below (the `executables` mapping is indi
 One of the service start commands can take a map of options. The Spring Cloud Service manager implements the following options:
 * `ensemble`: Change the ensemble/leader assignments at startup. Existing assignments from the artifact deployment descriptor can be overridden for top-level services. Unwanted assignments must be overridden too. The value of the option is a map in JSON format, i.e., `{"ens":"leader",...}` assigning the service with id `leader` as ensemble leader to the service with id `ens`. If leader cannot be resolved, e.g., an empty string, the leader assignment is cleared.
 
-## Hint
-Service startup on slow machines may fail due to Spring timeouts. Might be some deployer settings could help then.      
+## Hints
+Service startup on slow machines may fail due to Spring timeouts. Might be some deployer settings could help then.
+
+Testing depends on [the spring test service artifact](../tests/test.simpleStream.spring). If the service environment changes, it might be required **for debugging** to re-build the spring test service artifact manually (`mvn install`) and to copy/rename the resulting files to `target/jars`, a step that is usually done by the build process. If you need to have a look into the spring service execution logs, (temporarily) delay the shutdown of the services/app by sleeping for 30 minutes or so.         
       
 ## Missing
 * Handling of dependent services
