@@ -186,7 +186,8 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
      */
     private void relocate() throws MojoExecutionException, MojoFailureException {
         if (relocate) {
-            File tgtDir = new File("jars");
+            File tgtDir = relocateTarget;
+            File pluginDir = new File(relocateTarget, "../plugins");
             getLog().info("Flattening jars/target/jars and jars/target to jars");        
             try { // flatten
                 mergeFiles(new File(tgtDir, "target/jars"), tgtDir);
@@ -198,8 +199,8 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             FileUtils.deleteQuietly(new File(tgtDir, "target"));
             // move from jars/target and jars/target/jars to jars
             for (String cpFile : classpathFiles) {
-                File src = new File("jars/" + cpFile);
-                File tgt = new File("plugins/" + cpFile);
+                File src = new File(relocateTarget, cpFile);
+                File tgt = new File(pluginDir, cpFile);
                 tgt.mkdirs();
                 getLog().info("Rewriting classpath file " + src + " to " + tgt);
                 try {
