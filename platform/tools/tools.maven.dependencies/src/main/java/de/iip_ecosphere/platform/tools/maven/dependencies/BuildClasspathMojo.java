@@ -60,11 +60,20 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
     private boolean cleanup;
 
     @Parameter(required = false) 
+    private List<String> befores;
+    
+    @Parameter(required = false) 
     private List<String> prepends;
 
     @Parameter(required = false) 
     private List<String> appends;
+
+    @Parameter(required = false) 
+    private List<String> afters;
     
+    @Parameter( property = "mdep.lineSeparator", defaultValue = "\n" )
+    private String lineSeparator;
+
     @Parameter(required = false) 
     private boolean rollout;
     
@@ -166,6 +175,7 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
             setPrefix(TO_WIN.apply(initialPrefix));
             appends = copy(initialAppends, TO_WIN);
             prepends = copy(initialPrepends, TO_WIN);
+            lineSeparator = "\r\n";
             doExecuteImpl();
 
             outputFile = new File(initialOutputFile.toString() + "-linux");
@@ -176,6 +186,7 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
             setPrefix(TO_LINUX.apply(initialPrefix));
             appends = copy(initialAppends, TO_LINUX);
             prepends = copy(initialPrepends, TO_LINUX);
+            lineSeparator = "\n";
             doExecuteImpl();
         }
     }
@@ -196,14 +207,20 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
         super.doExecute();
         boolean hasPrepends = (prepends != null && !prepends.isEmpty());
         boolean hasAppends = (appends != null && !appends.isEmpty());
+        boolean hasBefores = (befores != null && !befores.isEmpty());
+        boolean hasAfters = (afters != null && !afters.isEmpty());
+        boolean hasAdditionalContents = hasPrepends || hasAppends || hasBefores || hasAfters;
         MavenProject project = getProject();
         String self = project.getGroupId().replace(".", "/") + "/" + project.getArtifactId() + "/" 
                + project.getVersion() + "/" + project.getArtifactId() + "-" + project.getVersion();
         String selfTest = self + "-tests.jar";
         self += ".jar";
-        if ((hasPrepends || hasAppends) && outputFile != null) {
+        if (hasAdditionalContents && outputFile != null) {
             try {
                 String content = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
+                if (hasBefores) {
+                    content = String.join(lineSeparator, befores) + lineSeparator +  content;
+                }
                 if (hasPrepends) {
                     String tmp = "";
                     for (String s : prepends) {
@@ -221,6 +238,9 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
                         tmp += pathSeparator + s;
                     }
                     content = content + tmp;
+                }
+                if (hasAfters) {
+                    content += lineSeparator + String.join(lineSeparator, afters);
                 }
                 FileUtils.write(outputFile, content, Charset.defaultCharset());
                 getLog().info("Appended/prepended to: " + outputFile);

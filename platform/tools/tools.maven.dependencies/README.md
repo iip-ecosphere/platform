@@ -60,6 +60,9 @@ The ``build-classpath`` goal is the same as in the original plugin and allows fo
 - `prepends` is a list of `prepend` string entries specifying complete classpath entries to be prepended to the `outputFile` concatenated by `pathSeparator`
 - `appends` is a list of `append` string entries specifying  complete classpath entries to be prepended to the `outputFile` concatenated by `pathSeparator`
 - `rollout` rolls out the given classpath setup to a similar file for Linux (postfix `-linux`) and a file for Windows (postfix `-win`) with operating system settings like file/path separator applied automatically
+- `befores` lines to be prepended before the classpath without modification, uses `lineSeparator` between given lines and classpath; e.g., use # to have comments before the classpath, see [the Java command documentation](https://docs.oracle.com/en/java/javase/17/docs/specs/man/java.html#java-command-line-argument-files)
+- `afters` lines to be appended after the classpath without modification, uses `lineSeparator` between given lines and classpath; e.g., use # to have comments before the classpath, see [the Java command documentation](https://docs.oracle.com/en/java/javase/17/docs/specs/man/java.html#java-command-line-argument-files)
+- `lineSeparator` (default the carriage return, user property `mdep.lineSeparator`) used as separator between `befores`, `afters` and the classpath 
 
 The expressions `${self}` or `${self-test}` can be used in prepends/appends to add the jar/test-jar artifact of the actual project.
 
