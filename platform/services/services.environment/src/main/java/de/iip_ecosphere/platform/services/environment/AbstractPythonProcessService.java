@@ -365,6 +365,7 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
                 if (null == conda) {
                     conda = new File("conda");
                 }
+                // search for run and -n <name>, the latter the envNameIndex
                 boolean foundRun = false;
                 int envNameIndex = -1;
                 for (int i = 0; i < args.size(); i++) {
@@ -380,8 +381,10 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
                         .getEnvironmentMapping(getLocationKey(), env));
 
                     args.add(envNameIndex + 1, "python"); // or pyExec?
+                    unbufferPos = envNameIndex + 2; // conda <cmd> -n path python -u
+                } else {
+                    unbufferPos = 1; // conda <cmd> -u; fallback
                 }
-                unbufferPos = 1; // conda <cmd> -u; conditional of foundRun?
             }
             if (unbuffer()) {
                 args.add(unbufferPos, "-u"); // do not buffer I/O, officially supported since Python 2.0
