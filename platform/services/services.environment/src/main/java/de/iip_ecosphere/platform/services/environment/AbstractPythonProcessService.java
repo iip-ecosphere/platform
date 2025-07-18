@@ -104,9 +104,6 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
         } else {
             pythonArgs.add(getPythonModule(null, yaml, null));
         }
-        if (unbuffer()) {
-            pythonArgs.add(0, "-u"); // do not buffer I/O, officially supported since Python 2.0
-        }
         if (null == home) { // shall not occur
             getLogger().warn("No home path given for service " + yaml.getId() + ". Falling back to temporary folder");
             home = FileUtils.createTmpFolder(FileUtils.sanitizeFileName(yaml.getId(), true));
@@ -361,6 +358,7 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
                 args.add(org.apache.commons.text.StringEscapeUtils.escapeJava(data)); // quote quotes -> JSON
             } 
             File pyExec = getPythonExecutable();
+            int unbufferPos = 0; // python -u 
             if ("conda".equals(pyExec.getName())) {
                 File conda = InstalledDependenciesSetup.getInstance().getLocation(
                         InstalledDependenciesSetup.KEY_PREFIX_CONDA);
@@ -383,6 +381,10 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
 
                     args.add(envNameIndex + 1, "python"); // or pyExec?
                 }
+                unbufferPos = 1; // conda <cmd> -u; conditional of foundRun?
+            }
+            if (unbuffer()) {
+                args.add(unbufferPos, "-u"); // do not buffer I/O, officially supported since Python 2.0
             }
             
             Process proc = AbstractProcessService.createProcess(pyExec, startExecutableByName(), home, args);
