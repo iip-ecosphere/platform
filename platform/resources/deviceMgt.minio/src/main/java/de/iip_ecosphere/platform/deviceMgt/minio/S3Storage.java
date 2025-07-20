@@ -28,9 +28,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.deviceMgt.storage.Storage;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A S3Storage grants access to the storage through s3. For this purpose it uses

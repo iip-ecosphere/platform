@@ -12,12 +12,11 @@
 
 package de.iip_ecosphere.platform.deviceMgt.s3mock;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.deviceMgt.DeviceMgtSetup;
 import de.iip_ecosphere.platform.deviceMgt.storage.StorageServerSetup;
 import de.iip_ecosphere.platform.deviceMgt.storage.StorageFactory;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import io.findify.s3mock.S3Mock;
 
 /**

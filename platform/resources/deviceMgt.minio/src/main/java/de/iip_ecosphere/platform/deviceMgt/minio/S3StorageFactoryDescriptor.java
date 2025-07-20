@@ -12,8 +12,6 @@
 
 package de.iip_ecosphere.platform.deviceMgt.minio;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.deviceMgt.DeviceMgtSetup;
 import de.iip_ecosphere.platform.deviceMgt.storage.PackageStorageSetup;
 import de.iip_ecosphere.platform.deviceMgt.storage.Storage;
@@ -21,6 +19,7 @@ import de.iip_ecosphere.platform.deviceMgt.storage.StorageFactoryDescriptor;
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import io.minio.MinioClient;
 
 /**

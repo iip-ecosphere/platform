@@ -32,7 +32,6 @@ import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.monitoring.MonitoringReceiver;
 import de.iip_ecosphere.platform.monitoring.prometheus.ConfigModifier.ScrapeEndpoint;
@@ -40,6 +39,7 @@ import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsPro
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import io.micrometer.core.instrument.Measurement;
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.config.MeterFilter;

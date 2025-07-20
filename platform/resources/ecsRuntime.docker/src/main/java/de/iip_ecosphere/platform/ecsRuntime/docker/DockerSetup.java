@@ -14,10 +14,9 @@ package de.iip_ecosphere.platform.ecsRuntime.docker;
 
 import java.io.IOException;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.ecsRuntime.EcsSetup;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Implements the docker specific configuration. For configuration prerequisites, see {@link EcsSetup}.

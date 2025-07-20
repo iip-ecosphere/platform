@@ -12,8 +12,6 @@
 
 package de.iip_ecosphere.platform.deviceMgt.s3mock;
 
-import org.slf4j.LoggerFactory;
-
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.AnonymousAWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -26,6 +24,7 @@ import de.iip_ecosphere.platform.deviceMgt.storage.StorageFactoryDescriptor;
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A S3StorageFactoryDescriptor is a service provider for
