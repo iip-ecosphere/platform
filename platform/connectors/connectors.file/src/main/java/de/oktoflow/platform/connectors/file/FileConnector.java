@@ -30,8 +30,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.text.StringTokenizer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.connectors.AbstractChannelConnector;
 import de.iip_ecosphere.platform.connectors.ChannelAdapterSelector;
@@ -45,6 +43,8 @@ import de.iip_ecosphere.platform.connectors.parser.InputParser;
 import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 /**

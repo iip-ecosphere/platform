@@ -24,9 +24,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.connectors.AbstractConnector;
 import de.iip_ecosphere.platform.connectors.AdapterSelector;
 import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
@@ -54,6 +51,8 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.types.common.Utils;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.plugins.Plugin;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
 import de.iip_ecosphere.platform.transport.serialization.QualifiedElement;

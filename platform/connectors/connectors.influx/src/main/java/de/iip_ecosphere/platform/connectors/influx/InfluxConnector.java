@@ -21,9 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
 import com.influxdb.client.QueryApi;
@@ -46,6 +43,8 @@ import de.iip_ecosphere.platform.connectors.types.RecordCompletePredicate;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Implements the generic INFLUX connector.

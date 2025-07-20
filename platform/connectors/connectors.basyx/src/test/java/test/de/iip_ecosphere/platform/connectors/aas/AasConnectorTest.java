@@ -20,8 +20,6 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
@@ -44,6 +42,8 @@ import de.iip_ecosphere.platform.support.iip_aas.AasContributor.Kind;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasBuildResult;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.connectors.aas.AasConnector;
