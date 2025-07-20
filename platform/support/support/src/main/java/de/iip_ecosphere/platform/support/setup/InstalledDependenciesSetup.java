@@ -20,9 +20,9 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang3.SystemUtils;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.resources.FolderResourceResolver;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 /**

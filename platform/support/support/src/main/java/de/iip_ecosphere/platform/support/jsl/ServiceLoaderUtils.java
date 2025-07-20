@@ -20,7 +20,7 @@ import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.stream.Stream;
 
-import org.slf4j.LoggerFactory;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Helper functions for Java Service Loading.

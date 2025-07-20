@@ -24,7 +24,8 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.LoggerFactory;
+
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Default plugin setup descriptor based based on loading from a project folder containing jars and the 
@@ -88,15 +89,39 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
      * @return the URLs, may be empty
      */
     public static URL[] loadClasspathSafe(File folder, boolean descriptorOnly) {
+        return loadClasspathFileSafe(findClasspathFile(folder, ""), folder, descriptorOnly);
+    }
+    
+    /**
+     * Loads a classpath file relative to the actual jars and returns the specified classpath entries as URLs. 
+     * Logs errors and  exceptions.
+     * 
+     * @param cpFile the classpath file
+     * @param descriptorOnly only the first/two entries, the full thing else
+     * @return the URLs, may be empty
+     */
+    public static URL[] loadClasspathFileSafe(File cpFile, boolean descriptorOnly) {
+        return loadClasspathFileSafe(cpFile, cpFile.getParentFile(), descriptorOnly);
+    }
+    
+    /**
+     * Loads a classpath file relative to the actual jars and returns the specified classpath entries as URLs. 
+     * Logs errors and  exceptions.
+     * 
+     * @param cpFile the classpath file
+     * @param base the base folder use to make relative classpath entries absolute
+     * @param descriptorOnly only the first/two entries, the full thing else
+     * @return the URLs, may be empty
+     */
+    private static URL[] loadClasspathFileSafe(File cpFile, File base, boolean descriptorOnly) {
         URL[] result = null;
-        File f = findClasspathFile(folder, "");
-        try (InputStream in = new FileInputStream(f)) {
-            LoggerFactory.getLogger(URLPluginSetupDescriptor.class).info("Loading classpath from '{}'", f);
+        try (InputStream in = new FileInputStream(cpFile)) {
+            LoggerFactory.getLogger(URLPluginSetupDescriptor.class).info("Loading classpath from '{}'", cpFile);
             List<File> entries = new ArrayList<File>();
             String contents = IOUtils.toString(in, Charset.defaultCharset());
             StringTokenizer tokenizer = new StringTokenizer(contents, ":;");
             while (tokenizer.hasMoreTokens()) {
-                entries.add(new File(folder, tokenizer.nextToken()));
+                entries.add(new File(base, tokenizer.nextToken()));
             }
             if (descriptorOnly) {
                 if (entries.size() > 1) {
@@ -113,7 +138,7 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
             result = toURLSafe(entries.toArray(new File[entries.size()]));
         } catch (IOException e) {
             LoggerFactory.getLogger(URLPluginSetupDescriptor.class).error(
-                "While classpath from '{}': {} Ignoring.", f, e.getMessage());
+                "While classpath from '{}': {} Ignoring.", cpFile, e.getMessage());
         }
         if (null == result) {
             result = new URL[0];

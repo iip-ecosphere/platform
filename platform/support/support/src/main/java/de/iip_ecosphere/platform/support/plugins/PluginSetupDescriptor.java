@@ -38,4 +38,13 @@ public interface PluginSetupDescriptor {
         return null;
     }
     
+    /**
+     * Prevents duplicates by classloader filtering. [testing]
+     * 
+     * @return {@code true} prevent (default), {@code false} allow all
+     */
+    public default boolean preventDuplicates() {
+        return true;
+    }
+    
 }

@@ -50,7 +50,12 @@ public class PluginManagerTest {
         public MyPluginSetupDescriptor() {
             super(toURLSafe(new File(JAR))); // built by Maven before testing
         }
-        
+
+        @Override
+        public boolean preventDuplicates() {
+            return false; // TESTING ONLY!!!
+        }
+
     }
     
     /**

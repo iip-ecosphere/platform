@@ -92,7 +92,7 @@ class ChildURLClassLoader extends URLClassLoader {
  * @author Stackoverflow
  * @author Holger Eichelberger, SSE
  */
-public class ChildFirstURLClassLoader extends ClassLoader {
+public class ChildFirstURLClassLoader extends ClassLoader implements IdentifyingClassloader {
     
     //https://stackoverflow.com/questions/5445511/how-do-i-create-a-parent-last-child-first-classloader
     // -in-java-or-how-to-overr
@@ -192,6 +192,11 @@ public class ChildFirstURLClassLoader extends ClassLoader {
             boolean enabled) {
         childClassLoader.setPackageAssertionStatus(packageName, enabled);
         super.setPackageAssertionStatus(packageName, enabled);
+    }
+    
+    @Override
+    public boolean amI(ClassLoader loader) {
+        return this == loader || childClassLoader == loader;
     }
     
 }

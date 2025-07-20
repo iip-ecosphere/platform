@@ -17,9 +17,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Default URL-based plugin setup descriptor. Typically, a specific descriptor inherits from this class and sets

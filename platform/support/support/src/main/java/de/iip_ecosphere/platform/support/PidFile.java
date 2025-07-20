@@ -10,7 +10,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
 import org.apache.commons.io.FileUtils;
-import org.slf4j.LoggerFactory;
+
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Process ID (PID) file abstraction that writes the current PID into a file and optionally

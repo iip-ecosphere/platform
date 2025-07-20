@@ -20,10 +20,9 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.StringTokenizer;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Manages plugins to separate overlapping classpaths and dependencies of alternatives and optionals.
@@ -192,7 +191,8 @@ public class PluginManager {
 
     /**
      * Registers the given plugin (setup) descriptor. Obtains the class loader
-     * of the descriptor and loads the known {@link PluginDescriptor plugin descriptors}.
+     * of the descriptor and loads the known {@link PluginDescriptor plugin descriptors}. Mandates that known
+     * {@link PluginDescriptor plugin descriptors} are loaded by the class loader(s) of {@code desc}.
      * 
      * @param desc the plugin setup descriptor
      * @param onlyNew if {@code true} considers only unknown/new plugins, if {@code false} consides all plugins and 
@@ -202,10 +202,36 @@ public class PluginManager {
     private static void registerPlugin(PluginSetupDescriptor desc, boolean onlyNew) {
         LoggerFactory.getLogger(PluginManager.class).info("Found plugin setup descriptor {}. Trying registration", 
             desc.getClass());
+        boolean allowAll = !desc.preventDuplicates();
         ClassLoader loader = PluginManager.class.getClassLoader();
+        ClassLoader descLoader = desc.createClassLoader(loader);
         ServiceLoaderUtils
-            .stream(ServiceLoader.load(PluginDescriptor.class, desc.createClassLoader(loader)))
+            .stream(ServiceLoader.load(PluginDescriptor.class, descLoader))
+            .filter(d -> allowAll || loadedBy(d, descLoader))
             .forEach(d -> registerPlugin(d, onlyNew, desc.getInstallDir()));
+    }
+    
+    /**
+     * Returns whether {@code obj} was loaded by {@code loader}.
+     * 
+     * @param obj the object to inspect
+     * @param loader the class loader to compare
+     * @return {@code true} if {@code obj} was loaded by {@code loader}, {@code false} else
+     */
+    private static boolean loadedBy(Object obj, ClassLoader loader) {
+        boolean found = false;
+        ClassLoader iter = obj.getClass().getClassLoader();
+        IdentifyingClassloader cfLoader = loader instanceof IdentifyingClassloader 
+            ? (IdentifyingClassloader) loader : null;
+        while (iter != null && !found) {
+            if (null != cfLoader) {
+                found = cfLoader.amI(iter);
+            } else {
+                found = iter == loader;
+            }
+            iter = iter.getParent();
+        }
+        return found;
     }
 
     /**
@@ -226,9 +252,12 @@ public class PluginManager {
         for (String id : ids) {
             Plugin<?> known = plugins.get(id);
             if (null != known) {
-                LoggerFactory.getLogger(PluginManager.class).warn(
-                    "Plugin id '{}' is already registered for {}. Ignoring descriptor {}.", 
-                    id, known.getClass(), desc.getClass());
+                if (descriptors.get(id) != desc) {
+                    LoggerFactory.getLogger(PluginManager.class).warn(
+                        "Plugin id '{}' is already registered for {}. Ignoring descriptor {}.", 
+                        id, known.getClass(), desc.getClass());
+                }
+                isKnown = true;
             }
         }
         if ((onlyNew && !isKnown) || !onlyNew) {

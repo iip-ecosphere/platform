@@ -15,7 +15,7 @@ package de.iip_ecosphere.platform.support;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.slf4j.LoggerFactory;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Implements a reusable server endpoint. 

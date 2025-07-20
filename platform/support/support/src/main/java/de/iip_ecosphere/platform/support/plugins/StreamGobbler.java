@@ -83,7 +83,7 @@ public class StreamGobbler extends Thread {
      * @param process the process to attach to
      * @param out the stream where the process output shall be written to
      * @param outConsumer the output stream consumer, may be <b>null</b> for none
-     * @param errr the stream where the process errors shall be written to
+     * @param err the stream where the process errors shall be written to
      * @param errConsumer the error stream consumer, may be <b>null</b> for none
      */
     public static void attach(Process process, PrintStream out, Consumer<String> outConsumer, PrintStream err, 

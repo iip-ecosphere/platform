@@ -22,11 +22,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Low-level YAML file support.

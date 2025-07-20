@@ -23,10 +23,10 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.function.Function;
 
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.OsUtils;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.resources.FolderResourceResolver;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 

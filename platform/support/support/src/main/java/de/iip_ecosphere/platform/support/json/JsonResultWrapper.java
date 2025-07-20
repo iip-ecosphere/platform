@@ -16,14 +16,13 @@ import java.io.Serializable;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.iip_ecosphere.platform.support.TaskRegistry;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Uniform JSON way to represent results of operations that may fail.

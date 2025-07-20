@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ServiceLoader;
 
-import org.slf4j.LoggerFactory;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Support for class loading also in FAT jars. Resource resolvers can be added directly or via JLS.

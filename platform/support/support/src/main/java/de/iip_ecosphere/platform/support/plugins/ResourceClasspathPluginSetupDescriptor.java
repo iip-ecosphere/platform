@@ -24,11 +24,11 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.resources.ResourceResolver;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Default resource-based plugin setup descriptor, reading the required URLs from a classpath file. Tries to resolve and
