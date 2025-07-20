@@ -56,8 +56,9 @@ import org.eclipse.milo.opcua.stack.core.types.structured.EnumDescription;
 import org.eclipse.milo.opcua.stack.core.types.structured.StructureDescription;
 import org.eclipse.milo.opcua.stack.core.util.Lazy;
 import org.eclipse.milo.opcua.stack.core.util.Namespaces;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.eclipse.milo.opcua.sdk.core.util.StreamUtil.opt2stream;
