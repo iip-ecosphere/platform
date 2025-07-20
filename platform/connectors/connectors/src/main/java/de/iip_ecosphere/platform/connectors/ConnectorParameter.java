@@ -21,7 +21,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.Schema;
@@ -31,6 +30,7 @@ import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.iip_aas.NameplateSetup;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.resources.ResourceResolver;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Defines the connection parameters for a {@link Connector}. Specific connectors shall document required parameter.

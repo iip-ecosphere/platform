@@ -16,9 +16,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.function.Supplier;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Creates a single connector instance or allows to dynamically choose among multiple connector

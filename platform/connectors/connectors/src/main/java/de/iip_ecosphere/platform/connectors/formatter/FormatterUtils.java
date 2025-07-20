@@ -15,9 +15,8 @@ package de.iip_ecosphere.platform.connectors.formatter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.ClassLoaderUtils;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Output formatter utility methods.

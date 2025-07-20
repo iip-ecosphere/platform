@@ -14,9 +14,8 @@ package de.iip_ecosphere.platform.connectors;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.CacheMode;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Defines a pluggable caching strategy. Caching strategies must have a public no-arg constructor. [testing, mocking]

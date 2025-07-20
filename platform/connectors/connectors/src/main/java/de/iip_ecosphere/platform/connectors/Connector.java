@@ -13,11 +13,10 @@ package de.iip_ecosphere.platform.connectors;
 
 import java.io.IOException;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.connectors.events.DataTimeDifferenceProvider;
 import de.iip_ecosphere.platform.connectors.events.EventHandlingConnector;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * The interface of a platform/machine connector. A connector shall define a {@link ConnectorDescriptor} as top-level 

@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.slf4j.LoggerFactory;
-
 import com.jsoniter.JsonIterator;
 import com.jsoniter.ValueType;
 import com.jsoniter.any.Any;
@@ -32,6 +30,7 @@ import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.transport.serialization.QualifiedElement;
 import de.iip_ecosphere.platform.transport.serialization.QualifiedElementFactory;
 import de.iip_ecosphere.platform.support.function.IOConsumer;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Implements the default input parser for JSON data. Name-based access shall be rather fast, however, 

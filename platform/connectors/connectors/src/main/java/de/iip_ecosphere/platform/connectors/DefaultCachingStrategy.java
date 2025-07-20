@@ -14,9 +14,8 @@ package de.iip_ecosphere.platform.connectors;
 
 import java.util.Map;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.CacheMode;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A default caching strategy.

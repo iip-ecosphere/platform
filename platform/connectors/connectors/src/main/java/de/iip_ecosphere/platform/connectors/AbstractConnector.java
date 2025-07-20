@@ -20,8 +20,6 @@ import java.util.TimerTask;
 
 import javax.net.ssl.SSLContext;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
 import de.iip_ecosphere.platform.connectors.events.DataTimeDifferenceProvider;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess.NotificationChangedListener;
@@ -31,6 +29,7 @@ import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.net.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Provides a reusable base of a {@link Connector} implementation using the

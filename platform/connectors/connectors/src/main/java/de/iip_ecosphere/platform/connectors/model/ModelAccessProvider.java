@@ -14,10 +14,9 @@ package de.iip_ecosphere.platform.connectors.model;
 
 import java.io.IOException;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Refines the {@link TypeTranslator} for the use with machine connectors.
