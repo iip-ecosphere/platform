@@ -17,9 +17,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ServiceLoader;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Defines the interface for resolution of semantic ids, IRDIs, IRIs ...

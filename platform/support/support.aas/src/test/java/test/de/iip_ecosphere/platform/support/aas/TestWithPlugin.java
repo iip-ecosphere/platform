@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.plugins.FolderClasspathPluginSetupDescriptor;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Plugin-based test, aiming at inheriting plugin loading.

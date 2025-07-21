@@ -16,7 +16,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -26,6 +25,7 @@ import org.yaml.snakeyaml.representer.Representer;
 
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A YAML-based identity file store. 

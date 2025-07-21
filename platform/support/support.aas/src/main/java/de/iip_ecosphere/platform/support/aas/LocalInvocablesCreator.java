@@ -18,11 +18,10 @@ import java.util.function.Supplier;
 
 import java.io.Serializable;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.aas.Invokable.GetterInvokable;
 import de.iip_ecosphere.platform.support.aas.Invokable.OperationInvokable;
 import de.iip_ecosphere.platform.support.aas.Invokable.SetterInvokable;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A local invocables creator for pure local calls. Functions are mapped to service functions 

@@ -14,7 +14,7 @@ package de.iip_ecosphere.platform.support.function;
 
 import java.io.IOException;
 
-import org.slf4j.LoggerFactory;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A simple (optional) function that may throw an {@link IOException}. {@link IndexOutOfBoundsException}

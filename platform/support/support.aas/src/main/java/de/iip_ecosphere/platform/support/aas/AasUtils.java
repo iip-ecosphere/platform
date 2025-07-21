@@ -23,14 +23,13 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.resources.ResourceResolver;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Helper functions for active AAS.

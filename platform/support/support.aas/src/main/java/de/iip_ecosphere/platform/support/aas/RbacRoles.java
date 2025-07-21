@@ -18,10 +18,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.DefaultRole;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 
 /**

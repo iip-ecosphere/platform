@@ -18,9 +18,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.function.IOSupplier;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A {@link InvocablesCreator} that resolves within a given AAS.

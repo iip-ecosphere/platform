@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import org.slf4j.LoggerFactory;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Aggregated methods for all known lifecycle descriptors. {@link LifecycleDescriptor} shall be declared via 

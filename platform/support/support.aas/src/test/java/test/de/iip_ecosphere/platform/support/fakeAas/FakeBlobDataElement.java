@@ -12,10 +12,9 @@
 
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.BlobDataElement;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A data element representing a file.

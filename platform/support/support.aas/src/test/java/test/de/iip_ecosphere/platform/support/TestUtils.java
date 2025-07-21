@@ -13,6 +13,8 @@
 package test.de.iip_ecosphere.platform.support;
 
 import de.iip_ecosphere.platform.support.NetUtils;
+import junit.framework.JUnit4TestAdapter;
+import junit.framework.TestSuite;
 
 /**
  * Some common test utilities. These functions shall not be part of production code!
@@ -30,5 +32,19 @@ public class TestUtils {
     public static boolean isSseCI() {
         return NetUtils.getOwnHostname().indexOf("jenkins") >= 0;
     }
+    
+    /**
+     * Creates a test suite.
+     * 
+     * @param tests the tests to execute
+     * @return the test suite
+     */
+    public static TestSuite suite(Class<?>... tests) {
+        TestSuite suite = new TestSuite();
+        for (Class<?> t : tests) {
+            suite.addTest(new JUnit4TestAdapter(t));
+        }
+        return suite;
+    }    
 
 }

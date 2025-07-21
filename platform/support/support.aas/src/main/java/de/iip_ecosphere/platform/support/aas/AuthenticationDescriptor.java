@@ -20,10 +20,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A descriptor that defines how platform authentication shall be applied to AAS. If no such

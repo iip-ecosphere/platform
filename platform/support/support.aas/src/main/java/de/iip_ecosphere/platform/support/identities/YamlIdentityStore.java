@@ -30,13 +30,12 @@ import java.util.List;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
 import de.iip_ecosphere.platform.support.identities.YamlIdentityFile.IdentityInformation;
 import de.iip_ecosphere.platform.support.net.SslUtils;
 import de.iip_ecosphere.platform.support.net.UriResolver;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Simple file-based identity store. Tries to load {@code identityStore-ipr.yml} (quietly), {@code identityStore.yml} 
