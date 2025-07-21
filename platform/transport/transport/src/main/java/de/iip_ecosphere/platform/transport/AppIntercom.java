@@ -16,10 +16,9 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Simple app intercom facility. Declare the intercom as attribute and call {@code #start()} in 

@@ -18,8 +18,6 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -33,6 +31,7 @@ import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.transport.serialization.GenericJsonToStringTranslator;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A simple, generic JSON status serializer. Additional enum constants must be registered here.

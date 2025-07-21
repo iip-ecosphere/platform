@@ -12,10 +12,9 @@ package de.iip_ecosphere.platform.transport;
 
 import java.util.Optional;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A factory for creating transport connector instances. This factory shall

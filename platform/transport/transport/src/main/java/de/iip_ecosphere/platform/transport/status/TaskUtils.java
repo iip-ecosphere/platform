@@ -14,12 +14,11 @@ package de.iip_ecosphere.platform.transport.status;
 
 import java.io.IOException;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.TaskRegistry;
 import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper.ExceptionFunction;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;

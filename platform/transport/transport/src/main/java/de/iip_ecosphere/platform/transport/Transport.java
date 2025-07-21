@@ -22,8 +22,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.function.IOConsumer;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
@@ -35,6 +33,7 @@ import de.iip_ecosphere.platform.transport.status.Alert;
 import de.iip_ecosphere.platform.transport.status.ComponentTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.status.TraceRecord;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Global and local transport support. At startup of the platform, sending messages and creating a connector

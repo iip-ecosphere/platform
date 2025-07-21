@@ -17,9 +17,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Base64;
 
 import org.apache.commons.text.StringEscapeUtils;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.ClassLoaderUtils;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Defines a set of type translators for primitive types.

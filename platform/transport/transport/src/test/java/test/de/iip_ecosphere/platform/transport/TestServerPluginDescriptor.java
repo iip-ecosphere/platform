@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang.SystemUtils;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -27,6 +26,7 @@ import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.plugins.DefaultPluginDescriptor;
 import de.iip_ecosphere.platform.support.plugins.FolderClasspathPluginSetupDescriptor;
 import de.iip_ecosphere.platform.support.plugins.StreamGobbler;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import test.de.iip_ecosphere.platform.transport.TestServerBuilder.InstanceCreator;
 
 /**

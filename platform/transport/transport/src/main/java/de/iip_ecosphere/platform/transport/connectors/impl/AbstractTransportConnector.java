@@ -20,11 +20,10 @@ import java.util.function.Supplier;
 
 import javax.net.ssl.SSLContext;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.net.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
