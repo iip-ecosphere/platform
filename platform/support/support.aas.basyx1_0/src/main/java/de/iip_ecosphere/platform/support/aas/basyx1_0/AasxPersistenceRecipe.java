@@ -32,8 +32,6 @@ import org.eclipse.basyx.components.aas.aasx.AASXPackageManager;
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.submodel.metamodel.api.parts.IConceptDescription;
 import org.eclipse.basyx.support.bundle.AASBundle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import de.iip_ecosphere.platform.support.ExtensionBasedFileFormat;
@@ -42,6 +40,8 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.basyx.AbstractAas;
 import de.iip_ecosphere.platform.support.aas.basyx.AbstractSubmodel;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Persistence recipe for AASX.

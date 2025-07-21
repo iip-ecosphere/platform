@@ -15,8 +15,6 @@ package de.iip_ecosphere.platform.support.metrics.plcnext;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 
-import org.slf4j.LoggerFactory;
-
 import Arp.Device.Interface.Services.Grpc.IDeviceStatusServiceGrpc;
 import Arp.Device.Interface.Services.Grpc.IDeviceStatusServiceOuterClass.IDeviceStatusServiceGetItemRequest;
 import Arp.Device.Interface.Services.Grpc.IDeviceStatusServiceGrpc.IDeviceStatusServiceBlockingStub;
@@ -26,6 +24,7 @@ import io.grpc.netty.NettyChannelBuilder;
 import io.netty.channel.epoll.EpollDomainSocketChannel;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.unix.DomainSocketAddress;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * System metrics implementation for Phoenix Contact/PLCnext.

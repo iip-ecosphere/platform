@@ -27,8 +27,6 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.ws.rs.ProcessingException;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.semanticId.DefaultSemanticIdResolutionResult;
@@ -40,6 +38,7 @@ import de.iip_ecosphere.platform.support.semanticId.eclass.handler.ApiException;
 import de.iip_ecosphere.platform.support.semanticId.eclass.model.ReadProperty;
 import de.iip_ecosphere.platform.support.semanticId.eclass.model.ReadUnit;
 import de.iip_ecosphere.platform.support.semanticId.eclass.model.TranslatableLabel;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Initial caching semantic id resolver for Eclass Ids.
