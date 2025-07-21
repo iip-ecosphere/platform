@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.ecsRuntime.EcsAas;
 import de.iip_ecosphere.platform.ecsRuntime.EcsCmdLineLifecycleDescriptor;
 import de.iip_ecosphere.platform.ecsRuntime.EcsLifecycleDescriptor;
@@ -31,6 +29,7 @@ import de.iip_ecosphere.platform.support.iip_aas.IipVersion;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.status.StatusMessageSerializer;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * This descriptor is responsible for creating the AAS of the platform.

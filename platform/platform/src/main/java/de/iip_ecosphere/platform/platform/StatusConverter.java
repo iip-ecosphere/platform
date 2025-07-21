@@ -3,8 +3,6 @@ package de.iip_ecosphere.platform.platform;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.services.environment.services.TransportToAasConverter;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.aas.Type;
@@ -17,6 +15,7 @@ import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.ComponentType;
 import de.iip_ecosphere.platform.transport.status.ComponentTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A status message to AAS-list converter.

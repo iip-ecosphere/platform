@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.ecsRuntime.EcsClient;
 import de.iip_ecosphere.platform.platform.cli.ArgsCommandProvider;
 import de.iip_ecosphere.platform.platform.cli.CommandProvider;
@@ -49,6 +47,7 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.status.StatusMessageSerializer;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A simple (optional interactive) command line client providing initial platform functionality through the various AAS.

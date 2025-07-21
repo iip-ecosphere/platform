@@ -23,7 +23,6 @@ import java.util.Base64;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.io.FileUtils;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.platform.ArtifactsManager.Artifact;
 import de.iip_ecosphere.platform.platform.ArtifactsManager.ArtifactKind;
@@ -51,6 +50,7 @@ import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.TaskUtils;
 import de.iip_ecosphere.platform.transport.status.TaskUtils.TaskCompletedPredicate;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * The platform AAS contributor, in particular for the available artifacts.

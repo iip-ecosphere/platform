@@ -14,8 +14,6 @@ package de.iip_ecosphere.platform.platform;
 
 import java.io.File;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.ecsRuntime.EcsLifecycleDescriptor;
 import de.iip_ecosphere.platform.services.ServicesLifecycleDescriptor;
 import de.iip_ecosphere.platform.services.environment.services.TransportConverterFactory;
@@ -33,6 +31,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.config.RuntimeSetup;
 import de.iip_ecosphere.platform.transport.Transport;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Defines the parts to be started directly by the platform code.

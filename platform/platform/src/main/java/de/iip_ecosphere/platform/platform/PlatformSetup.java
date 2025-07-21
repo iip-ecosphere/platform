@@ -15,11 +15,10 @@ package de.iip_ecosphere.platform.platform;
 import java.io.File;
 import java.io.IOException;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 import de.iip_ecosphere.platform.support.setup.EnableSetupMerge;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Platform setup from YAML.
