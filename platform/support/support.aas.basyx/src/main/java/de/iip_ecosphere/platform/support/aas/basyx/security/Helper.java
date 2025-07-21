@@ -21,7 +21,6 @@ import org.eclipse.basyx.extensions.shared.authorization.internal.RbacRuleSet;
 import org.eclipse.basyx.extensions.shared.authorization.internal.TargetInformation;
 import org.eclipse.basyx.vab.protocol.http.server.BaSyxContext;
 import org.eclipse.basyx.vab.protocol.http.server.JwtBearerTokenAuthenticationConfiguration;
-import org.slf4j.Logger;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.FilterChainProxy;
@@ -35,6 +34,7 @@ import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAasCom
 import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.ComponentSetup;
+import de.iip_ecosphere.platform.support.logging.Logger;
 
 /**
  * Server/security helper functions.

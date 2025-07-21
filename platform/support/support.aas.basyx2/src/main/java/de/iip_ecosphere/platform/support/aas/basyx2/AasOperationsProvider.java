@@ -19,7 +19,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import de.iip_ecosphere.platform.support.NetUtils;
@@ -30,6 +29,7 @@ import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
 import de.iip_ecosphere.platform.support.aas.basyx2.apps.asset.AssetSpringApp;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Implements a simple operations provider still following a simple status/operations/service structure. The idea is to 

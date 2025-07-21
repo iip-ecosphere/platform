@@ -19,11 +19,10 @@ import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.util.Optional;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.LifecycleHandler;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Generic IDs for different purposes. For now, the IDs are determined upon startup, but they may be also determined

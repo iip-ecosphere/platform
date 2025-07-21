@@ -17,12 +17,13 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.regex.Pattern;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.io.UrlResource;
+
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Application initializer additionally loading properties from BaSyX.

@@ -21,13 +21,12 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.semanticId.DefaultSemanticIdResolutionResult;
 import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolutionResult;
 import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolver;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A simple Yaml-based semantic catalog for testing/shipping with the platform.

@@ -25,7 +25,6 @@ import org.eclipse.digitaltwin.basyx.submodelrepository.SubmodelRepository;
 import org.eclipse.digitaltwin.basyx.submodelservice.InMemorySubmodelBackend;
 import org.eclipse.digitaltwin.basyx.submodelservice.SubmodelServiceFactory;
 import org.eclipse.digitaltwin.basyx.submodelservice.backend.CrudSubmodelServiceFactory;
-import org.slf4j.LoggerFactory;
 import org.eclipse.digitaltwin.basyx.submodelrepository.backend.CrudSubmodelRepositoryFactory;
 import org.eclipse.digitaltwin.basyx.submodelrepository.feature.authorization.AuthorizedSubmodelRepository;
 import org.eclipse.digitaltwin.basyx.submodelrepository.feature.operation.delegation.HTTPOperationDelegation;
@@ -59,6 +58,7 @@ import de.iip_ecosphere.platform.support.aas.basyx2.Tools;
 import de.iip_ecosphere.platform.support.aas.basyx2.apps.common.AssetServerKeyStoreDescriptor;
 import de.iip_ecosphere.platform.support.aas.basyx2.apps.security.RbacUtils;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Spring application for serving a submodel repository with spring. 

@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
-import org.slf4j.LoggerFactory;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A MAC-based device ID provider.

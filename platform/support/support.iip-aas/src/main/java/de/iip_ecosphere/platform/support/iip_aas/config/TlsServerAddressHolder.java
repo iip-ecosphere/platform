@@ -15,12 +15,11 @@ package de.iip_ecosphere.platform.support.iip_aas.config;
 import java.io.File;
 import java.io.IOException;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A proxy for {@link ServerAddress} with a protocol, as we do not want to have setters there.

@@ -24,8 +24,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import de.iip_ecosphere.platform.support.Endpoint;
@@ -60,6 +58,7 @@ import de.iip_ecosphere.platform.support.iip_aas.config.RuntimeSetupEndpointVali
 import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
 import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A registry for {@link AasContributor} instances to be loaded via the Java Service loader.

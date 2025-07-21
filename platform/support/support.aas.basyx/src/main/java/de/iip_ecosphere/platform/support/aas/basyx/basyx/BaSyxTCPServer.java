@@ -20,10 +20,8 @@ import java.nio.channels.SocketChannel;
 import org.eclipse.basyx.vab.modelprovider.api.IModelProvider;
 import org.eclipse.basyx.vab.service.api.BaSyxService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * BaSyx TCP server thread. Taken over from BaSyx to use the modified {@link VABBaSyxTCPInterface}.

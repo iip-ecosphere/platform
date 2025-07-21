@@ -25,7 +25,6 @@ import org.eclipse.digitaltwin.basyx.aasenvironment.IdShortPathBuilder;
 import org.eclipse.digitaltwin.basyx.client.internal.ApiException;
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 import org.eclipse.digitaltwin.basyx.submodelrepository.client.ConnectedSubmodelRepository;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.Submodel;
@@ -37,6 +36,7 @@ import de.iip_ecosphere.platform.support.aas.basyx2.BaSyxSubmodelElement.PathFun
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Wraps a BaSyx sub-model.

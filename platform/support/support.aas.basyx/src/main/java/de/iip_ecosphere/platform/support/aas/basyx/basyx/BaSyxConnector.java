@@ -9,8 +9,8 @@ import java.nio.channels.SocketChannel;
 import org.eclipse.basyx.vab.exception.provider.ProviderException;
 import org.eclipse.basyx.vab.protocol.api.IBaSyxConnector;
 import org.eclipse.basyx.vab.protocol.basyx.CoderTools;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * BaSyx connector class. Taken over from BaSyx to get rid of logging.

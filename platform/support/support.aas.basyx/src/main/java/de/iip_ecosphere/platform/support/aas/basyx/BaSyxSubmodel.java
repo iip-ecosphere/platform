@@ -20,7 +20,6 @@ import java.util.function.Consumer;
 
 import org.eclipse.basyx.submodel.metamodel.api.identifier.IIdentifier;
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.Submodel;
@@ -31,6 +30,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx.AbstractAas.BaSyxAbstractAasBuilder;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Wraps a BaSyx sub-model.

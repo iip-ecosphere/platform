@@ -21,10 +21,10 @@ import javax.net.ssl.TrustManagerFactory;
 
 import org.eclipse.basyx.vab.coder.json.connector.JSONConnector;
 import org.eclipse.basyx.vab.modelprovider.VABElementProxy;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 import de.iip_ecosphere.platform.support.net.SslUtils;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * implements an invocables creator for HTTPS-based VAB.

@@ -18,13 +18,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.function.Supplier;
 
-import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import de.iip_ecosphere.platform.support.PidFile;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Runtime information produced, stored, consumed by the platform.

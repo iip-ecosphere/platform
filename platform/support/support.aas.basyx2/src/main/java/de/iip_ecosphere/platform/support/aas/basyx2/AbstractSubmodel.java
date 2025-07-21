@@ -15,8 +15,6 @@ package de.iip_ecosphere.platform.support.aas.basyx2;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas;
@@ -36,6 +34,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
 import de.iip_ecosphere.platform.support.aas.basyx2.BaSyxElementTranslator.SubmodelElementsRegistrar;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Basic sub-model implementation.

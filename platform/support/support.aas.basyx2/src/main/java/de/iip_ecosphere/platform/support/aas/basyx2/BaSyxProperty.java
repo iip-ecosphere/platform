@@ -17,8 +17,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.DataTypeDefXsd;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
@@ -28,6 +26,8 @@ import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Wraps a BaSyx property.

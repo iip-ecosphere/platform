@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.eclipse.basyx.submodel.metamodel.api.ISubmodel;
 import org.eclipse.basyx.vab.exception.provider.ResourceNotFoundException;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.Builder;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -38,6 +37,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxElementTranslator.SubmodelElementsRegistrar;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Basic sub-model implementation.

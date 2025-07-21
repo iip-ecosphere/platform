@@ -18,13 +18,13 @@ import java.util.Map;
 import java.io.Serializable;
 
 import org.eclipse.basyx.vab.modelprovider.VABElementProxy;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Invokable;
 import de.iip_ecosphere.platform.support.aas.Invokable.GetterInvokable;
 import de.iip_ecosphere.platform.support.aas.Invokable.OperationInvokable;
 import de.iip_ecosphere.platform.support.aas.Invokable.SetterInvokable;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Implements an abstract invocables creator for the VAB following the naming conventions of 

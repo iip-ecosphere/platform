@@ -4,8 +4,8 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 
 import org.eclipse.basyx.vab.protocol.http.connector.HTTPConnector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * An HTTPS Connector class which can be used for creating an HTTPS Client. 

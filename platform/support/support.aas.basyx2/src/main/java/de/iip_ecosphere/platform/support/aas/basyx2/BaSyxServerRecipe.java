@@ -12,13 +12,12 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx2;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasServer;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.basyx2.BaSyxAbstractAasServer.ServerType;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Implements the server recipe for BaSyx.

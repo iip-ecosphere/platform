@@ -18,8 +18,6 @@ import java.util.TimerTask;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.Server;
@@ -30,6 +28,7 @@ import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasMode;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Implements the generic lifecycle descriptor for the service manager.

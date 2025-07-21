@@ -13,10 +13,10 @@
 package de.iip_ecosphere.platform.support.aas.basyx;
 
 import org.eclipse.basyx.submodel.metamodel.api.reference.IReference;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.BlobDataElement;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Wraps a BaSyx BLOB data element. Shall be created by respective builder methods.

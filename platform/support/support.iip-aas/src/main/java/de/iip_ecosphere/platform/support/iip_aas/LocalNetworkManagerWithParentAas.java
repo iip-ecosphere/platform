@@ -14,11 +14,10 @@ package de.iip_ecosphere.platform.support.iip_aas;
 
 import java.io.IOException;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A default network manager descriptor for JLS loading if a local network manager is needed, which delegates

@@ -22,7 +22,6 @@ import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultOperationVariable;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultProperty;
 import org.eclipse.digitaltwin.basyx.http.Aas4JHTTPSerializationExtension;
 import org.eclipse.digitaltwin.basyx.http.BaSyxHTTPConfiguration;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -48,6 +47,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.iip_ecosphere.platform.support.aas.basyx2.AasOperationsProvider;
 import de.iip_ecosphere.platform.support.aas.basyx2.apps.common.ExcludeBasyxTypeFilter;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Spring application representing asset operations. Operations must be registered in the operations provider 

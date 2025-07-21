@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -34,6 +33,7 @@ import de.iip_ecosphere.platform.support.aas.basyx2.apps.common.AssetServerKeySt
 import de.iip_ecosphere.platform.support.function.IORunnable;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Basic implementation of the the {@link AasServer}.
