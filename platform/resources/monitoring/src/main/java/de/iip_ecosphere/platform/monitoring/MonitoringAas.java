@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
@@ -40,6 +38,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.status.Alert;
 import de.iip_ecosphere.platform.transport.status.TraceRecord;
 import de.iip_ecosphere.platform.transport.streams.StreamNames;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Implements a generic service that maps {@link TraceRecord} to an (application) AAS.
