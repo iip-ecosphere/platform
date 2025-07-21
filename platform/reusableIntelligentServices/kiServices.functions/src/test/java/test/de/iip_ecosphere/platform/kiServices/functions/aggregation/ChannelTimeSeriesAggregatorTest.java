@@ -24,12 +24,12 @@ import java.util.NoSuchElementException;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.junit.Assert;
 import org.junit.Test;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.kiServices.functions.aggregation.ChannelTimeSeriesAggregator;
 import de.iip_ecosphere.platform.kiServices.functions.aggregation.MultiChannelTimeSeriesAggregator;
 import de.iip_ecosphere.platform.kiServices.functions.aggregation.MultiChannelTimeSeriesAggregator.*;
 import de.iip_ecosphere.platform.services.environment.IipStringStyle;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Tests {@link ChannelTimeSeriesAggregator} and {@link MultiChannelTimeSeriesAggregator}.

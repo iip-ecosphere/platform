@@ -22,7 +22,6 @@ import org.apache.commons.lang3.SystemUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Files;
 
@@ -39,6 +38,7 @@ import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.setup.InstalledDependenciesSetup;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Tests the RTSA local server. 

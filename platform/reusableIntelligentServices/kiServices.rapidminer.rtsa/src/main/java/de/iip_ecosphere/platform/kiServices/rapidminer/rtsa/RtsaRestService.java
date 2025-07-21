@@ -21,8 +21,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
 import de.iip_ecosphere.platform.support.setup.InstalledDependenciesSetup;
@@ -33,6 +31,7 @@ import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.environment.YamlProcess;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 import static de.iip_ecosphere.platform.support.FileUtils.*;
 
