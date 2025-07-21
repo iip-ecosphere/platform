@@ -31,7 +31,7 @@ public class YamlTest {
      */
     private static <T> T fromResource(IOFunction<InputStream, T> func) throws IOException {
         InputStream in = ResourceLoader.getResourceAsStream("nameplate.yml");
-        T result = func.apply(null);
+        T result = func.apply(in);
         in.close();
         return result;
     }
