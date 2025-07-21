@@ -12,6 +12,11 @@
      <version>0.7.1-SNAPSHOT</version>
      <relativePath/>
   </parent>
+  
+  <properties>
+    <maven.compiler.target>8</maven.compiler.target>
+    <maven.compiler.source>8</maven.compiler.source>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -33,6 +38,17 @@
 
   <build>
       <plugins>
+       <plugin>
+         <artifactId>maven-compiler-plugin</artifactId>
+         <version>${org.apache.maven.compiler.version}</version>
+           <configuration>
+             <!-- Must remain on Java 8 level, support level, rapidminer -->
+             <source>8</source>
+             <target>8</target>
+             <encoding>${java.encoding}</encoding>
+           </configuration>
+       </plugin>      
+      
          <plugin>
              <groupId>de.iip-ecosphere.platform</groupId>
              <artifactId>dependency-plugin</artifactId>

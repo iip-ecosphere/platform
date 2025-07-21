@@ -6,6 +6,11 @@
   <name>oktoflow snakeyaml plugin</name>
   <description>YAML plugin for snakeyaml.</description>
 
+  <properties>
+    <maven.compiler.target>8</maven.compiler.target>
+    <maven.compiler.source>8</maven.compiler.source>
+  </properties>
+
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependencies</artifactId>
@@ -40,6 +45,17 @@
 
   <build>
       <plugins>
+       <plugin>
+         <artifactId>maven-compiler-plugin</artifactId>
+         <version>${org.apache.maven.compiler.version}</version>
+           <configuration>
+             <!-- Must remain on Java 8 level, support level, rapidminer -->
+             <source>8</source>
+             <target>8</target>
+             <encoding>${java.encoding}</encoding>
+           </configuration>
+       </plugin>
+             
          <plugin>
              <groupId>de.iip-ecosphere.platform</groupId>
              <artifactId>dependency-plugin</artifactId>
