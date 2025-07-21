@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang.SystemUtils;
-import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import de.iip_ecosphere.platform.services.environment.YamlService;
@@ -33,6 +32,7 @@ import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.YamlProcess;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Integration of <a href="https://github.com/kiprotect/kodex">KIPROTECT KODEX</a> as a service.

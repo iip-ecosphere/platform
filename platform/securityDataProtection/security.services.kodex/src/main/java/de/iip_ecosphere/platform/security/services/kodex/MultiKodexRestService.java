@@ -13,12 +13,12 @@
 package de.iip_ecosphere.platform.security.services.kodex;
 
 import java.io.IOException;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.services.environment.AbstractDelegatingMultiService;
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.services.environment.GenericMultiTypeServiceImpl.OutTypeInfo;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Multi-type KODEX Rest service.
