@@ -25,7 +25,7 @@ public class YamlTest {
     /**
      * Applies {@code func} to a test resource and returns the result.
      * 
-     * @param fun the function to apply
+     * @param func the function to apply
      * @return the result from function
      * @throws IOException shall not occur
      */
