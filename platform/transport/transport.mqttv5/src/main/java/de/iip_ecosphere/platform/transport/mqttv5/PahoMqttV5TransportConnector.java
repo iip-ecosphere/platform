@@ -21,13 +21,13 @@ import org.eclipse.paho.mqttv5.client.persist.MemoryPersistence;
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.eclipse.paho.mqttv5.common.MqttMessage;
 import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.net.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.basics.AbstractMqttTransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A MQTT v5 connector based on Eclipse Paho. Requires {@link TransportParameter#getApplicationId()}.

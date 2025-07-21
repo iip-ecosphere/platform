@@ -13,8 +13,6 @@ package de.iip_ecosphere.platform.transport.spring;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
@@ -24,6 +22,8 @@ import org.springframework.util.MimeType;
 
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Generic Spring Cloud Stream message converter for {@link SerializerRegistry}. Register your (generated) serializers

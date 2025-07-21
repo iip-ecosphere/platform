@@ -17,8 +17,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
-import org.slf4j.LoggerFactory;
-
 import com.rabbitmq.client.AlreadyClosedException;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
@@ -32,6 +30,7 @@ import de.iip_ecosphere.platform.support.net.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Implements an AMQP transport connector based on RabbitMQ.
