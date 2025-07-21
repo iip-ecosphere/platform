@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.rabbitmq.client.AlreadyClosedException;
@@ -34,6 +32,8 @@ import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.AMQP.Queue;
 
 import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * An AMQP client for a single binder instance. Typically, different binders subscribe to different

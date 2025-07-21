@@ -26,12 +26,12 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
 import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A MQTT client for a single binder instance. Typically, different binders subscribe to different

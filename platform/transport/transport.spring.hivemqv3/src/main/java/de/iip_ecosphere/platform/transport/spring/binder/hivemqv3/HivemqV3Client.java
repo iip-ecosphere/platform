@@ -21,8 +21,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.hivemq.client.mqtt.MqttClient;
@@ -32,6 +30,8 @@ import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3ClientBuilder;
 
 import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConnector;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A HiveMq client for a single binder instance. Typically, different binders subscribe to different
