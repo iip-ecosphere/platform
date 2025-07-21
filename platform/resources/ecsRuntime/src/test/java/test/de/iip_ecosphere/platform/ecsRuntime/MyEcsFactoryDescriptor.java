@@ -14,11 +14,10 @@ package test.de.iip_ecosphere.platform.ecsRuntime;
 
 import java.io.IOException;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.ecsRuntime.EcsSetup;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactoryDescriptor;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A test service factory descriptor.

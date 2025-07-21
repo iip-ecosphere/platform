@@ -25,9 +25,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.net.UriResolver;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A basic re-usable implementation of the container manager. Implementations shall override at least 

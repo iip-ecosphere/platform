@@ -14,12 +14,12 @@ package de.iip_ecosphere.platform.ecsRuntime.ssh;
 
 import de.iip_ecosphere.platform.deviceMgt.Credentials;
 import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 import org.apache.commons.lang.SystemUtils;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.apache.sshd.server.shell.ProcessShellFactory;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;

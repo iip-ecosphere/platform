@@ -16,14 +16,13 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.streams.StreamNames;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 /**

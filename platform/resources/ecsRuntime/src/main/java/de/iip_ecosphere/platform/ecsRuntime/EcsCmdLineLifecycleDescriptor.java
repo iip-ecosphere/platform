@@ -14,9 +14,8 @@ package de.iip_ecosphere.platform.ecsRuntime;
 
 import java.util.concurrent.ExecutionException;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Handle onboarding/offboarding command line arguments.

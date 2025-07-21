@@ -14,7 +14,6 @@ package test.de.iip_ecosphere.platform.ecsRuntime.deviceAas;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Server;
@@ -24,6 +23,7 @@ import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.PersistenceType;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
 /**

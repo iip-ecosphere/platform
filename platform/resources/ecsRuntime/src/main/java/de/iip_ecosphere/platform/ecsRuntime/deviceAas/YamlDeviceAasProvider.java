@@ -23,13 +23,12 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.NameplateSetup;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Creates an AAS for this device, deploys it to the platform AAS server and returns the address of the AAS. This may

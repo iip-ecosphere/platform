@@ -19,11 +19,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Basic {@link ContainerDescriptor} implementation, e.g., including a representation of the {@link ServiceState} 
