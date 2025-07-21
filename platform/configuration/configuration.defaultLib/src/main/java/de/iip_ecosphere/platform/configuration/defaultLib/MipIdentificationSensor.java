@@ -17,9 +17,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimerTask;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.services.environment.DataIngestors;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import iip.datatypes.MipMqttInput;
 import iip.datatypes.MipMqttInputImpl;
 
