@@ -1,10 +1,10 @@
 package de.iip_ecosphere.platform.deviceMgt.ssh;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.net.Socket;
+
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Creates a connection between a remote and a client socket with the help
