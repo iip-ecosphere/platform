@@ -16,11 +16,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.iip_ecosphere.platform.support.plugins.Plugin;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
 /**
- * Creates loggers. By default, provides a fallback logger implementation.
+ * Creates loggers. By default, provides a fallback logger implementation. The format for parameterized log messages
+ * is that of SLF4J, i.e., {} in the message are substituted in the order of given arguments.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -48,14 +48,11 @@ public abstract class LoggerFactory {
      * Loads the logger factory plugin if present.
      */
     public static void considerPlugin() {
-        Plugin<ILoggerFactory> plugin = PluginManager.getPlugin(ILoggerFactory.class);
-        if (null != plugin) {
-            ILoggerFactory f = plugin.getInstance();
-            if (null != f) { // be vareful
-                factory = f;
-                loggers.clear(); // reset
-                System.out.println("Using logger factory " + factory.getClass().getName());
-            }
+        ILoggerFactory f = PluginManager.getPluginInstance(ILoggerFactory.class, LoggerFactoryDescriptor.class);
+        if (null != f) { // be careful
+            factory = f;
+            loggers.clear(); // reset
+            System.out.println("Using logger factory " + factory.getClass().getName());
         }
     }
 

@@ -37,7 +37,6 @@ import com.fasterxml.jackson.databind.module.SimpleAbstractTypeResolver;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
-import de.iip_ecosphere.platform.support.ServerAddress;
 
 /**
  * Some JSON utility methods, also reading/writing of specific types.
@@ -77,10 +76,10 @@ public class JsonUtils {
             
     };
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    //private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**
-     * Turns a {@link ServerAddress} into JSON.
+     * Turns an {@code object} to JSON.
      * 
      * @param obj the object (may be <b>null</b>), must have getters/setters for all attributes and a no-arg constructor
      *   no-arg constructor
@@ -91,8 +90,8 @@ public class JsonUtils {
         String result = "";
         if (null != obj) {
             try {
-                result = MAPPER.writeValueAsString(obj);
-            } catch (JsonProcessingException e) {
+                result = Json.toJsonDflt(obj);
+            } catch (IOException e) {
                 // handled by default value
             }
         } 
@@ -112,8 +111,8 @@ public class JsonUtils {
         R result = null;
         if (null != json) {
             try {
-                result = MAPPER.readValue(json.toString(), cls);
-            } catch (JsonProcessingException e) {
+                result = Json.fromJsonDflt(json.toString(), cls);
+            } catch (IOException e) {
                 //result = null;
             }
         }

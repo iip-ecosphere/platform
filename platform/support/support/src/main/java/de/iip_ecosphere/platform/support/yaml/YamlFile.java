@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.support.setup;
+package de.iip_ecosphere.platform.support.yaml;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,15 +22,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import org.yaml.snakeyaml.Yaml;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
- * Low-level YAML file support.
+ * Low-level YAML file support, specific functions for oktoflow.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -50,8 +48,7 @@ public class YamlFile {
      * @throws IOException if reading from {@code in} fails
      */
     public static Object read(InputStream in) throws IOException {
-        Yaml yaml = new Yaml();
-        return yaml.load(in);
+        return Yaml.getInstance().load(in);
     }
 
     /**

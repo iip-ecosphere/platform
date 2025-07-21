@@ -1,4 +1,5 @@
-/********************************************************************************
+/**
+ * ******************************************************************************
  * Copyright (c) {2025} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
@@ -9,19 +10,15 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package test.de.oktoflow.platform.logging.slf4j.simple;
+package de.iip_ecosphere.platform.support.json;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import de.iip_ecosphere.platform.support.plugins.PluginInstanceDescriptor;
 
 /**
- * Defines the tests to be executed.
+ * Creating the JSON instance via JSL.
  * 
  * @author Holger Eichelberger, SSE
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-    Slf4jLoggerTest.class,
-})
-public class AllTests {
+public interface JsonProviderDescriptor extends PluginInstanceDescriptor<Json> {
+    
 }

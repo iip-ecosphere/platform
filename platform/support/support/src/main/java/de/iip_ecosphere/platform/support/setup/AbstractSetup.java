@@ -18,15 +18,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.error.YAMLException;
-import org.yaml.snakeyaml.representer.Representer;
-
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.resources.MultiResourceResolver;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
+import de.iip_ecosphere.platform.support.yaml.Yaml;
+import de.iip_ecosphere.platform.support.yaml.YamlFile;
 
 /**
  * Basic class for a YAML-based component setup. Implementing classes must have a public no-arg constructor.
@@ -112,18 +108,6 @@ public abstract class AbstractSetup {
     }
     
     /**
-     * Creates a tolerant YAML object to read objects of type {@code cls}.
-     * 
-     * @param cls the type to read
-     * @return the yamp object
-     */
-    public static Yaml createYaml(Class<?> cls) {
-        Representer representer = new Representer(new DumperOptions());
-        representer.getPropertyUtils().setSkipMissingProperties(true);
-        return new Yaml(new Constructor(cls), representer);
-    }
-
-    /**
      * Reads a instance from {@code in}. Unknown properties are ignored.
      *
      * @param <C> the specific type of configuration to read
@@ -150,7 +134,7 @@ public abstract class AbstractSetup {
         C result = null;
         if (in != null) {
             try {
-                Iterator<Object> it = createYaml(cls).loadAll(in).iterator();
+                Iterator<Object> it = Yaml.getInstance().loadAll(in, cls);
                 if (it.hasNext()) {
                     Object o = it.next(); // ignore the other sub-documents here
                     if (cls.isInstance(o)) {
@@ -158,7 +142,7 @@ public abstract class AbstractSetup {
                     }
                 }
                 in.close();
-            } catch (YAMLException e) {
+            } catch (IOException e) {
                 in.close();
                 throw new IOException(e);
             }
@@ -182,12 +166,10 @@ public abstract class AbstractSetup {
             }
             if (hasAnnotation) {
                 try {
-                    Yaml yaml = new Yaml();
-                    @SuppressWarnings("unchecked")
-                    Map<String, Object> data = (Map<String, Object>) yaml.load(overwrite);
+                    Map<String, Object> data = Yaml.getInstance().loadMapping(overwrite);
                     result = YamlFile.overwrite(result, cls, data);
                     overwrite.close();
-                } catch (YAMLException | IOException e) {
+                } catch (IOException e) {
                     overwrite.close();
                     LoggerFactory.getLogger(AbstractSetup.class).error("Cannot overwrite setup: {} Ignoring.", 
                         e.getMessage());

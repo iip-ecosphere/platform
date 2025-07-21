@@ -14,6 +14,7 @@ package de.oktoflow.platform.support.logging.slf4j.simple;
 
 import de.iip_ecosphere.platform.support.logging.ILoggerFactory;
 import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactoryDescriptor;
 import de.iip_ecosphere.platform.support.plugins.SingletonPluginDescriptor;
 
 /**
@@ -21,7 +22,8 @@ import de.iip_ecosphere.platform.support.plugins.SingletonPluginDescriptor;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class Slf4jLoggerFactoryDescriptor extends SingletonPluginDescriptor<ILoggerFactory> {
+public class Slf4jLoggerFactoryDescriptor extends SingletonPluginDescriptor<ILoggerFactory> 
+    implements LoggerFactoryDescriptor {
 
     /**
      * oktoflow logger factory delegating to SLF4j.
@@ -42,6 +44,11 @@ public class Slf4jLoggerFactoryDescriptor extends SingletonPluginDescriptor<ILog
      */
     public Slf4jLoggerFactoryDescriptor() {
         super("log-slf4j-simple", null, ILoggerFactory.class, p -> new Slf4jLoggerFactory());
+    }
+
+    @Override
+    public ILoggerFactory create() {
+        return new Slf4jLoggerFactory();
     }
     
 }

@@ -180,9 +180,34 @@ public class FallbackLogger implements Logger {
     private boolean isEnabled(LogLevel level) {
         return level.isEnabled(this.level);
     }
+    
+    /**
+     * Emits the given message {@code msg} with no argument, possibly with the given throwable {@code th}.
+     * 
+     * @param level the target loglevel
+     * @param msg the message, logged is it is, prefixed with logger name, logger level and time
+     * @param th optional throwable to be logged, may be <b>null</b>
+     * @param out the target output stream
+     */
+    private void emit(LogLevel level, String msg, Throwable th, PrintStream out) {
+        out.print(DATEFORMAT.format(new Date()));
+        out.print(" [");
+        out.print(Thread.currentThread().getName());
+        out.print("] ");
+        out.print(level);
+        out.print(" ");
+        out.print(abbreviate(name));
+        out.print(" - ");
+        out.println(msg);
+        if (null != th) {
+            th.printStackTrace(out);
+        }
+    }
+    
 
     /**
-     * Logs the given message {@code msg} with no argument, possibly with the given throwable {@code th}.
+     * Logs the given message {@code msg} with no argument, possibly with the given throwable {@code th} if 
+     * {@code level} is enabled.
      * 
      * @param level the target loglevel
      * @param msg the message, logged is it is, prefixed with logger name, logger level and time
@@ -191,18 +216,7 @@ public class FallbackLogger implements Logger {
      */
     private void log(LogLevel level, String msg, Throwable th, PrintStream out) {
         if (isEnabled(level)) {
-            out.print(DATEFORMAT.format(new Date()));
-            out.print(" [");
-            out.print(Thread.currentThread().getName());
-            out.print("] ");
-            out.print(level);
-            out.print(" ");
-            out.print(abbreviate(name));
-            out.print(" - ");
-            out.println(msg);
-            if (null != th) {
-                th.printStackTrace(out);
-            }
+            emit(level, msg, th, out);
         }
     }
     
@@ -240,7 +254,7 @@ public class FallbackLogger implements Logger {
     }
 
     /**
-     * Logs with one argument.
+     * Logs with one argument if {@code level} is enabled.
      * 
      * @param level the target loglevel
      * @param format the logging format, placeholders as {@value #PLACEHOLDER}
@@ -248,12 +262,14 @@ public class FallbackLogger implements Logger {
      * @param arg the argument
      */
     private void logArgs(LogLevel level, String format, PrintStream out, Object arg) {
-        String msg = StringUtils.replaceOnce(format, PLACEHOLDER, toString(arg));
-        log(level, msg, null, out);
+        if (isEnabled(level)) {
+            String msg = StringUtils.replaceOnce(format, PLACEHOLDER, toString(arg));
+            log(level, msg, null, out);
+        }
     }
 
     /**
-     * Logs with two arguments.
+     * Logs with two arguments if {@code level} is enabled.
      * 
      * @param level the target loglevel
      * @param format the logging format, placeholders as {@value #PLACEHOLDER}
@@ -262,13 +278,15 @@ public class FallbackLogger implements Logger {
      * @param arg2 the second argument
      */
     private void logArgs(LogLevel level, String format, PrintStream out, Object arg1, Object arg2) {
-        String msg = StringUtils.replaceOnce(format, PLACEHOLDER, toString(arg1));
-        msg = StringUtils.replaceOnce(msg, PLACEHOLDER, toString(arg2));
-        log(level, msg, null, out);
+        if (isEnabled(level)) {
+            String msg = StringUtils.replaceOnce(format, PLACEHOLDER, toString(arg1));
+            msg = StringUtils.replaceOnce(msg, PLACEHOLDER, toString(arg2));
+            log(level, msg, null, out);
+        }
     }
 
     /**
-     * Logs with arbitrary arguments.
+     * Logs with arbitrary arguments if {@code level} is enabled.
      * 
      * @param level the target loglevel
      * @param format the logging format, placeholders as {@value #PLACEHOLDER}
@@ -276,11 +294,13 @@ public class FallbackLogger implements Logger {
      * @param args the arguments
      */
     private void logArgs(LogLevel level, String format, PrintStream out, Object[] args) {
-        String msg = format;
-        for (int a = 0; a < args.length; a++) {
-            msg = StringUtils.replaceOnce(msg, PLACEHOLDER, toString(args[a]));
+        if (isEnabled(level)) {
+            String msg = format;
+            for (int a = 0; a < args.length; a++) {
+                msg = StringUtils.replaceOnce(msg, PLACEHOLDER, toString(args[a]));
+            }
+            log(level, msg, null, out);
         }
-        log(level, msg, null, out);
     }
 
 }

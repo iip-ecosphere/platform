@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.StringTokenizer;
 
@@ -85,6 +86,29 @@ public class PluginManager {
      */
     public static <T> Plugin<T> getPlugin(Class<T> cls) {
         return getPlugin(cls, null);
+    }
+    
+    /**
+     * Returns an instance of a plugin, either via this plugin manager or via an optional JSL descriptor.
+     * 
+     * @param <T> the type of the plugin
+     * @param <I> the type of the JSL instance descriptor
+     * @param pluginCls the plugin class
+     * @param iCls the instance descriptor class, may be <b>null</b>
+     * @return the plugin instance, <b>null</b> if none was found/created
+     */
+    public static <T, I extends PluginInstanceDescriptor<T>> T getPluginInstance(Class<T> pluginCls, Class<I> iCls) {
+        T result = null;
+        Plugin<T> plugin = PluginManager.getPlugin(pluginCls);
+        if (null != plugin) {
+            result = plugin.getInstance();
+        } else if (iCls != null) {
+            Optional<I> svc = ServiceLoaderUtils.findFirst(iCls);
+            if (svc.isPresent()) {
+                result = svc.get().create();
+            }
+        }
+        return result;
     }
 
     /**

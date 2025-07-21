@@ -13,7 +13,8 @@
 package de.iip_ecosphere.platform.support.logging;
 
 /**
- * A logger. Basic interface taken over from SLF4j except for markers.
+ * A logger. Basic interface taken over from SLF4j except for markers. The format for parameterized log messages
+ * is that of SLF4J, i.e., {} in the message are substituted in the order of given arguments.
  * 
  * @author Holger Eichelberger, SSE
  * @author SLF4J

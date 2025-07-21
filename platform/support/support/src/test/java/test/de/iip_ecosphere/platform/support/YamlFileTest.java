@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.yaml.snakeyaml.Yaml;
 
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
-import de.iip_ecosphere.platform.support.setup.YamlFile;
+import de.iip_ecosphere.platform.support.yaml.YamlFile;
 
 /**
  * Tests {@link YamlFile}.

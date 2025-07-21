@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package test.de.oktoflow.platform.logging.slf4j.simple;
+package test.de.oktoflow.platform.support.logging.slf4j.simple;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;

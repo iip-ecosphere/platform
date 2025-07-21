@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>support.yaml-snakeyaml</artifactId>
+  <packaging>jar</packaging>
+  <name>oktoflow snakeyaml plugin</name>
+  <description>YAML plugin for snakeyaml.</description>
+
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependencies</artifactId>
+     <version>0.7.1-SNAPSHOT</version>
+     <relativePath/>
+  </parent>
+
+  <dependencies>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>support</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>1.27</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+      <plugins>
+         <plugin>
+             <groupId>de.iip-ecosphere.platform</groupId>
+             <artifactId>dependency-plugin</artifactId>
+             <version>${project.version}</version>
+             <executions>
+                 <execution>
+                     <id>copy-dependencies</id>
+                     <goals>
+                         <goal>copy-dependencies</goal>
+                     </goals>
+                     <phase>package</phase>
+                     <configuration>
+                         <prependGroupId>true</prependGroupId>
+                         <outputDirectory>target/jars</outputDirectory>
+                         <overWriteReleases>false</overWriteReleases>
+                         <overWriteSnapshots>true</overWriteSnapshots>
+                         <overWriteIfNewer>true</overWriteIfNewer>
+                         <includeScope>compile</includeScope>
+                         <excludeArtifactIds>support</excludeArtifactIds>
+                     </configuration>
+                 </execution>
+                 <execution>
+                     <id>build-classpath-plugin</id>
+                     <phase>prepare-package</phase>
+                     <goals>
+                         <goal>build-classpath</goal>
+                     </goals>
+                     <configuration>
+                         <outputFile>target/classes/classpath</outputFile>
+                         <prependGroupId>true</prependGroupId>
+                         <overWriteIfNewer>true</overWriteIfNewer>
+                         <localRepoProperty>target/jars</localRepoProperty>
+                         <prefix>target/jars</prefix>
+                         <fileSeparator>/</fileSeparator>
+                         <pathSeparator>:</pathSeparator>
+                         <includeScope>runtime</includeScope>
+                         <prepends>
+                             <prepend>target/${project.artifactId}-${project.version}.jar</prepend>
+                         </prepends>
+                         <excludeArtifactIds>support</excludeArtifactIds>
+                     </configuration>
+                 </execution>
+             </executions>
+         </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>${org.apache.maven.assembly.version}</version>
+            <executions>
+                <execution>
+                    <id>plugin</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                    <configuration>
+                        <descriptors>
+                            <descriptor>src/main/assembly/plugin.xml</descriptor>
+                        </descriptors>
+                        <attach>true</attach>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+      </plugins>
+  </build>
+
+</project>
