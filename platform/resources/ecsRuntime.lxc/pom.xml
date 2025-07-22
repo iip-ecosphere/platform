@@ -26,10 +26,17 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
+      <artifactId>support.log-slf4j-simple</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
       <scope>test</scope>
-    </dependency>    
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <artifactId>support.yaml-snakeyaml</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency>     
     <!-- JLxd API Client -->
     <dependency>
 	  <groupId>net.ssehub.easy.producer.external</groupId>
