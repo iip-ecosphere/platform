@@ -18,12 +18,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.function.Supplier;
 
-import org.yaml.snakeyaml.TypeDescription;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
-
 import de.iip_ecosphere.platform.support.PidFile;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
+import de.iip_ecosphere.platform.support.yaml.Yaml;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
@@ -124,12 +121,8 @@ public class RuntimeSetup extends AbstractSetup {
      * Stores this runtime setup to {@link #getFile()}.
      */
     public void store() {
-        Constructor constructor = new Constructor(RuntimeSetup.class);
-        TypeDescription configDescription = new TypeDescription(RuntimeSetup.class);
-        constructor.addTypeDescription(configDescription);
-        Yaml yaml = new Yaml(constructor);
         try (FileWriter writer = new FileWriter(getFile())) {
-            yaml.dump(this, writer);      
+            Yaml.getInstance().dump(this, RuntimeSetup.class, writer);
         } catch (IOException e) {
             LoggerFactory.getLogger(RuntimeSetup.class).warn("Cannot write platform runtime setup {}: {} "
                 + "Ephemeral AAS ports may not work.", getFile(), e.getMessage());

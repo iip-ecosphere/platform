@@ -34,13 +34,10 @@
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
+      <artifactId>support.log-slf4j-simple</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
       <scope>test</scope>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>

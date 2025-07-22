@@ -12,20 +12,15 @@
 
 package de.iip_ecosphere.platform.support.identities;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.error.YAMLException;
-import org.yaml.snakeyaml.representer.Representer;
-
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.yaml.Yaml;
 
 /**
  * A YAML-based identity file store. 
@@ -290,12 +285,9 @@ public class YamlIdentityFile {
             result = new YamlIdentityFile();
         } else {
             try {
-                Representer representer = new Representer(new DumperOptions());
-                representer.getPropertyUtils().setSkipMissingProperties(true);
-                Yaml yaml = new Yaml(new Constructor(YamlIdentityFile.class, new LoaderOptions()), representer);
-                result = yaml.load(in);
+                result = Yaml.getInstance().loadTolerantAs(in, YamlIdentityFile.class);
                 FileUtils.closeQuietly(in);
-            } catch (YAMLException e) {
+            } catch (IOException e) {
                 LoggerFactory.getLogger(YamlIdentityFile.class).warn(
                     "Cannot load input stream: {} Falling back to empty instance.", e.getMessage());
                 FileUtils.closeQuietly(in);
