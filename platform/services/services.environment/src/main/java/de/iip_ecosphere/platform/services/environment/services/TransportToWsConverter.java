@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.services.environment.Service;
 import de.iip_ecosphere.platform.services.environment.Starter;
@@ -32,6 +30,8 @@ import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.serialization.GenericJsonToStringTranslator;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Transport converter for websockets. Use {@link #createServer(ServerAddress)} to create a server.

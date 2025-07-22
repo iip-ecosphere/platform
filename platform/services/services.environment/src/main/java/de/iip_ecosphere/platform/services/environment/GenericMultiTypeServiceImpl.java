@@ -16,10 +16,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.services.environment.AbstractPythonProcessService.SyncDataIngestor;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Basic implementation classes for {@link GenericMultiTypeService}. Intended use is by delegation.

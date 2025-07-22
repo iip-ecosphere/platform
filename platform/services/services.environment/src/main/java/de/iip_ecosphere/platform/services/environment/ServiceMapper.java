@@ -16,12 +16,11 @@ import static de.iip_ecosphere.platform.support.aas.AasUtils.*;
 
 import java.util.Map;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.status.TraceRecord;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Template.

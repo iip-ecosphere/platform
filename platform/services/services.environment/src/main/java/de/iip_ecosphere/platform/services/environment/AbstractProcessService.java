@@ -30,11 +30,11 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.commons.lang.SystemUtils;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 import io.micrometer.core.instrument.Gauge;

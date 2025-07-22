@@ -14,9 +14,8 @@ package de.iip_ecosphere.platform.services.environment;
 
 import java.util.concurrent.ExecutionException;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Basic interface for a generic service that handles multiple any types of data. We use symbolic type names to 

@@ -14,7 +14,7 @@ package de.iip_ecosphere.platform.services.environment.switching;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.slf4j.LoggerFactory;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Code plugin to select a service from a given type. To be hooked into through configuration model and code generation.

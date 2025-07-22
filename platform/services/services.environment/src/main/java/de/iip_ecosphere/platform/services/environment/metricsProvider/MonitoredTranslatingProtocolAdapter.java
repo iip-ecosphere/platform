@@ -19,12 +19,11 @@ import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.connectors.types.ChannelTranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.ConnectorInputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import io.micrometer.core.instrument.Clock;
 
 /**

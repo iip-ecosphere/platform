@@ -17,10 +17,9 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Implements an abstract asynchronous process-based service which require a String-based communication with

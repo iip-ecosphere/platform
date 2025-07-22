@@ -24,13 +24,12 @@ import java.util.function.Consumer;
 import javax.json.Json;
 import javax.json.JsonObject;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.streams.StreamNames;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Implements the basis of a device heartbeat watcher.

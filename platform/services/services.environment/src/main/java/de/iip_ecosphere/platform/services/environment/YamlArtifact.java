@@ -17,9 +17,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Information about an artifact containing services. The artifact is to be deployed. We assume that the underlying

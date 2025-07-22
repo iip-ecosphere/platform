@@ -18,9 +18,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.function.Function;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.json.JsonUtils;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A simple, customizable data recorder for testing.

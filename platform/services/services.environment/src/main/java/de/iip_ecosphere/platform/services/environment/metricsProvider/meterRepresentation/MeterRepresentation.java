@@ -21,7 +21,7 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.stream.JsonParsingException;
 
-import org.slf4j.LoggerFactory;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 import io.micrometer.core.instrument.ImmutableTag;
 import io.micrometer.core.instrument.Measurement;

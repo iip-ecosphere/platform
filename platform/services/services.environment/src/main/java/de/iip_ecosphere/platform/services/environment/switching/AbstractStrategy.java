@@ -12,8 +12,8 @@
 
 package de.iip_ecosphere.platform.services.environment.switching;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Basic strategy implementation.
