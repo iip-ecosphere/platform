@@ -20,12 +20,12 @@ import java.util.function.Consumer;
 
 import javax.annotation.PreDestroy;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import de.iip_ecosphere.platform.services.environment.Service;
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.function.IOConsumer;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;

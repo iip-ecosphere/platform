@@ -22,7 +22,6 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -44,6 +43,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.transport.TransportFactory;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;

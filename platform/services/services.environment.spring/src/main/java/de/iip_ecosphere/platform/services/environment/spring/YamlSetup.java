@@ -17,11 +17,10 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.apache.commons.text.StringTokenizer;
-import org.slf4j.LoggerFactory;
-import org.yaml.snakeyaml.Yaml;
 
-import de.iip_ecosphere.platform.support.setup.AbstractSetup;
-import de.iip_ecosphere.platform.support.setup.YamlFile;
+import de.iip_ecosphere.platform.support.yaml.YamlFile;
+import de.iip_ecosphere.platform.support.yaml.Yaml;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
@@ -92,9 +91,8 @@ public class YamlSetup {
         TransportSetup result = null;
         if (null != in) {
             try {
-                Yaml yaml = new Yaml();
-                @SuppressWarnings("unchecked")
-                Map<String, Object> setup = (Map<String, Object>) yaml.load(in);
+                Yaml yaml = Yaml.getInstance();
+                Map<String, Object> setup = yaml.loadMapping(in);
                 substArgs(setup, args);
                 Map<String, Object> env = YamlFile.getMap(setup, 
                     "spring", "cloud", "stream", "binders", "properties", binder, "environment");
@@ -102,9 +100,7 @@ public class YamlSetup {
                     String binderEnvKey = env.keySet().iterator().next();
                     Map<String, Object> tmp = YamlFile.getMap(env, binderEnvKey);
                     String tmpYml = yaml.dump(tmp);
-                    result = AbstractSetup
-                        .createYaml(TransportSetup.class)
-                        .loadAs(tmpYml, TransportSetup.class);
+                    result = yaml.loadAs(tmpYml, TransportSetup.class);
                 } else {
                     LoggerFactory.getLogger(YamlSetup.class).warn(
                          "Cannot read transport setup '{}': Path/structure in Yaml not found", binder);

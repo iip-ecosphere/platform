@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -31,7 +30,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
-import org.yaml.snakeyaml.Yaml;
 
 import de.iip_ecosphere.platform.services.environment.Service;
 import de.iip_ecosphere.platform.services.environment.ServiceMapper;
@@ -42,8 +40,10 @@ import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
-import de.iip_ecosphere.platform.support.setup.YamlFile;
+import de.iip_ecosphere.platform.support.yaml.Yaml;
+import de.iip_ecosphere.platform.support.yaml.YamlFile;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
@@ -215,14 +215,18 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
         if (appId != null && appId.length() > 0) {
             appId = appId.replace(ServiceBase.APPLICATION_SEPARATOR, ""); // as before adding @, unsure
             List<String> res = CollectionUtils.toList(args);
-            Yaml yaml = new Yaml();
             Object data = new Object();
-            InputStream yamlIn = appYamlSupplier.get();
-            Iterator<Object> it = yaml.loadAll(yamlIn).iterator();
-            if (it.hasNext()) {
-                data = it.next(); // for now, ignore the other sub-documents here
+            try {
+                InputStream yamlIn = appYamlSupplier.get();
+                Iterator<Object> it = Yaml.getInstance().loadAll(yamlIn);
+                if (it.hasNext()) {
+                    data = it.next(); // for now, ignore the other sub-documents here
+                }
+                FileUtils.closeQuietly(yamlIn);
+            } catch (IOException e) {
+                LoggerFactory.getLogger(Starter.class).warn("Cannot read from application {} YAML: {}", appId, 
+                    e.getMessage());
             }
-            FileUtils.closeQuietly(yamlIn);
             LoggerFactory.getLogger(Starter.class).info("Augmenting stream bindings by appId {}", appId);
             final String bindingsPath = "spring.cloud.stream.bindings";
             final String[] bindingsFieldPath = bindingsPath.split("\\.");
