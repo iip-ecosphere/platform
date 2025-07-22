@@ -21,7 +21,7 @@ import de.iip_ecosphere.platform.services.environment.AbstractYamlArtifact;
 import de.iip_ecosphere.platform.services.spring.descriptor.Artifact;
 import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
-import de.iip_ecosphere.platform.support.setup.YamlFile;
+import de.iip_ecosphere.platform.support.yaml.YamlFile;
 
 /**
  * Information about an artifact containing services. The artifact is to be deployed. We assume that the underlying

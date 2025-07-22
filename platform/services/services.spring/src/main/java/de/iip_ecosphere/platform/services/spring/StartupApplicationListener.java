@@ -12,7 +12,8 @@
 
 package de.iip_ecosphere.platform.services.spring;
 
-import org.slf4j.LoggerFactory;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 import org.springframework.context.ApplicationListener;

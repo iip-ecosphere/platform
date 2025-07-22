@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.loader.JarLauncher;
 import org.springframework.boot.loader.archive.Archive;
 import org.springframework.boot.loader.archive.JarFileArchive;
@@ -49,6 +47,8 @@ import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Descriptor and artifact utility functions that may be used standalone.

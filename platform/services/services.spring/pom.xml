@@ -114,6 +114,24 @@
      <type>test-jar</type>
      <scope>test</scope>
     </dependency>
+    <dependency>
+      <artifactId>support.json-jackson</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency> 
+    <dependency>
+      <artifactId>support.yaml-snakeyaml</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency> 
+    <dependency>
+      <artifactId>support.log-slf4j-simple</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency>    
     <!-- Don't move it from here, interferes with Tomcat :/ -->
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>

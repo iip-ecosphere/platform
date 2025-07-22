@@ -29,8 +29,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.input.Tailer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 import org.springframework.cloud.deployer.spi.app.AppInstanceStatus;
 import org.springframework.cloud.deployer.spi.app.AppStatus;
@@ -66,6 +64,8 @@ import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.support.net.UriResolver;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 import static de.iip_ecosphere.platform.services.spring.SpringInstances.*;
 

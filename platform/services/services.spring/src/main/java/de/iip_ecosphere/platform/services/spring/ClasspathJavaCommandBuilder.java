@@ -29,8 +29,6 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.JavaVersion;
 import org.apache.commons.lang3.SystemUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 import org.springframework.cloud.deployer.spi.core.AppDeploymentRequest;
 import org.springframework.cloud.deployer.spi.local.AbstractLocalDeployerSupport;
@@ -41,6 +39,8 @@ import org.springframework.core.io.Resource;
 
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.ZipUtils;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A command builder that excepts classpath-based Spring service starting for ZIP service artifacts as well as JAR 

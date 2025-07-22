@@ -26,9 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.services.ServerWrapper;
 import de.iip_ecosphere.platform.services.ServiceManager;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
@@ -43,6 +40,8 @@ import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Manages server instances.

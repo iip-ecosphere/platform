@@ -26,11 +26,10 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.function.Consumer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.ZipUtils;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Resolves artifacts to classpaths or class loaders.
