@@ -14,7 +14,7 @@ package de.iip_ecosphere.platform.security.services.kodex;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang.SystemUtils;
-import org.yaml.snakeyaml.Yaml;
 
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.support.NetUtils;
@@ -33,6 +32,7 @@ import de.iip_ecosphere.platform.services.environment.YamlProcess;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.yaml.Yaml;
 
 /**
  * Integration of <a href="https://github.com/kiprotect/kodex">KIPROTECT KODEX</a> as a service.
@@ -141,8 +141,7 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
         if (null == bearerToken) {
             try {
                 InputStream inputStream = new FileInputStream(new File(home, "api.yml"));
-                Yaml yaml = new Yaml();
-                Map<String, Object> data = yaml.load(inputStream);
+                Map<String, Object> data = Yaml.getInstance().loadMapping(inputStream);
                 Object users = data.get("users"); 
                 String[] usersSplit = users.toString().split(",");
                 String accessToken = null;
@@ -157,7 +156,7 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
                     token = item;
                 }
                 bearerToken = "Bearer " + token;
-            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
                 LoggerFactory.getLogger(getClass()).error("Reading bearer " + e.getMessage(), e);
             }
         }
