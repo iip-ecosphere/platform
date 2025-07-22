@@ -21,12 +21,11 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.ServiceStub;
 import de.iip_ecosphere.platform.support.Version;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Abstract {@link ServiceDescriptor} implementation, e.g., including a representation of the {@link ServiceState} 

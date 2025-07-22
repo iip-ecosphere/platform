@@ -24,14 +24,13 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.ServiceStub;
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * A basic re-usable implementation of the service manager. Implementations shall override at least 
