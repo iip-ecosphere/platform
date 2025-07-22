@@ -53,13 +53,33 @@
       <artifactId>transport.spring.amqp</artifactId>
       <version>${project.version}</version>
     </dependency>  
-    
-<dependency>    
-    <groupId>org.glassfish</groupId>
-    <artifactId>jakarta.el</artifactId>
-    <optional>false</optional>
-</dependency>    
-    
+    <dependency>    
+        <groupId>org.glassfish</groupId>
+        <artifactId>jakarta.el</artifactId>
+        <optional>false</optional>
+    </dependency>    
+    <dependency> <!-- fix it here into for now -->
+      <artifactId>support.json-jackson</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+    </dependency> 
+    <dependency>  <!-- fix it here into for now -->
+      <artifactId>support.yaml-snakeyaml</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+    </dependency> 
+    <dependency>  <!-- fix it here into for now -->
+      <artifactId>support.log-slf4j-simple</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>support.aas</artifactId>
+      <version>${project.version}</version>
+      <classifier>tests</classifier>
+      <type>test-jar</type>
+    </dependency>  
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>transport</artifactId>
@@ -68,29 +88,12 @@
       <type>test-jar</type>
     </dependency>  
     <dependency>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <artifactId>test.amqp.qpid</artifactId>
-      <version>${project.version}</version>
-      <classifier>tests</classifier>
-      <type>test-jar</type>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.qpid</groupId>
-      <artifactId>qpid-broker</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
          <groupId>org.springframework.boot</groupId>
          <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
-    </dependency>
-    <dependency>
-     <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>support.aas.basyx</artifactId>
-     <version>${project.version}</version>
     </dependency>
   </dependencies>
   
@@ -281,6 +284,34 @@
 	          </execution>
 	        </executions>               
        </plugin>
+        <plugin>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>dependency-plugin</artifactId>
+            <version>${iip.version}</version>
+            <executions>
+                <execution>
+                    <id>okto plugins</id>
+                    <goals>
+                        <goal>unpack-plugins</goal>
+                    </goals>
+                    <phase>test-compile</phase>
+                    <configuration>
+                        <plugins>
+                            <plugin>
+                                <artifactId>support.aas.basyx2</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.aas.basyx</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>test.amqp.qpid</artifactId>
+                            </plugin>
+                        </plugins>
+                        <version>${iip.version}</version>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
     </plugins>
   </build>
 

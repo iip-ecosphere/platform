@@ -10,8 +10,8 @@ import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
-import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
 import test.de.iip_ecosphere.platform.transport.AbstractTestServer;
+import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 /**
  * Executes the streams in {@link Test} with as well as a broker. The broker is prescribed by the environment
@@ -51,6 +51,7 @@ public class TestWithBroker {
      * @param args command line arguments
      */
     public static void main(String[] args) {
+        TestWithQpid.loadPlugins();
         ServerAddress addr = new ServerAddress(Schema.IGNORE); // localhost, ephemeral
         List<String> aTmp = new ArrayList<String>();
         
@@ -66,7 +67,7 @@ public class TestWithBroker {
         // start broker
         extractBrokerConfig("hivemqv5cfg.zip", "./src/test/hiveMqv5Cfg"); // Maven turns file names to small caps
         extractBrokerConfig("qpidcfg.zip", "./src/test/qpidCfg"); // Maven turns file names to small caps
-        broker = new TestQpidServer(addr);
+        broker = TestWithQpid.fromPlugin(addr);
         broker.start();
         
         Test.main(args);
