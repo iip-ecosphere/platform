@@ -81,7 +81,7 @@ Some tests are executed in own JVMs to prevent conflicting dependencies with Mav
 
 ## Docker base images for Python (Using Digest)
 
-Sometimes, the base images used to create container images for the platform and applications gets updated (outside of the platform), which might cause errors during container image creation. For avoid that, we used the digest of the base images to always get the exact same image (Digest is a cryptographic hash, specifically a SHA256 hash, that uniquely identifies the contents of a container image).
+Sometimes, the base images used to create container images for the platform and applications gets updated (outside of the platform), which might cause errors during container image creation. To avoid that, we used the digest of the base images to always get the exact same image (Digest is a cryptographic hash, specifically a SHA256 hash, that uniquely identifies the contents of a container image).
 
 To get the digest for an image (e.g. `python:3.8.20-slim-bullseye`) use the command:
 ```

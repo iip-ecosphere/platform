@@ -95,8 +95,6 @@ public class AasIvmlMapperTest extends TestWithPlugin {
     
     /**
      * Sets up the tests.
-     * 
-     * @throws IOException if copying fails
      */
     @Before
     public void setup() {

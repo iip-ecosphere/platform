@@ -490,6 +490,11 @@
                              <prepends>
                                  <prepend>repo/${self}</prepend>
                              </prepends>
+                             <appends> <!-- test dependencies, declared in configuration.maven -->
+                                 <append>repo/de/iip-ecosphere/platform/support.json-jackson/${project.version}/support.json-jackson-${project.version}.jar</append>
+                                 <append>repo/de/iip-ecosphere/platform/support.yaml-snakeyaml/${project.version}/support.yaml-snakeyaml-${project.version}.jar</append>
+                                 <append>repo/de/iip-ecosphere/platform/support.log-slf4j-simple/${project.version}/support.log-slf4j-simple-${project.version}.jar</append>
+                             </appends>
                          </configuration>
                      </execution>
                      <execution>
@@ -511,17 +516,14 @@
                                  <prepend>repo/${self}</prepend>
                                  <prepend>repo/${self-test}</prepend>
                              </prepends>
+                             <appends> <!-- test dependencies, declared in configuration.maven -->
+                                 <append>repo/de/iip-ecosphere/platform/support.json-jackson/${project.version}/support.json-jackson-${project.version}.jar</append>
+                                 <append>repo/de/iip-ecosphere/platform/support.yaml-snakeyaml/${project.version}/support.yaml-snakeyaml-${project.version}.jar</append>
+                                 <append>repo/de/iip-ecosphere/platform/support.log-slf4j-simple/${project.version}/support.log-slf4j-simple-${project.version}.jar</append>
+                             </appends>
                          </configuration>
                      </execution>
-                 </executions>
-             </plugin>
-             
-            <plugin>
-                <groupId>de.iip-ecosphere.platform</groupId>
-                <artifactId>dependency-plugin</artifactId>
-                <version>${iip.version}</version>
-                <executions>
-                    <execution>
+                     <execution>
                         <id>okto plugins</id>
                         <goals>
                             <goal>unpack-plugins</goal>
