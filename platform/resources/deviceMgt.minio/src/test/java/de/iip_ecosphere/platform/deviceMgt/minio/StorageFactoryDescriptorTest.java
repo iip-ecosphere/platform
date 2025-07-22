@@ -18,6 +18,9 @@ import de.iip_ecosphere.platform.deviceMgt.storage.Storage;
 import de.iip_ecosphere.platform.deviceMgt.storage.StorageFactory;
 import de.iip_ecosphere.platform.deviceMgt.storage.StorageFactoryDescriptor;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+import de.iip_ecosphere.platform.support.yaml.Yaml;
+import de.oktoflow.platform.support.yaml.snakeyaml.SnakeYaml;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +47,8 @@ public class StorageFactoryDescriptorTest {
      */
     @Before
     public void setUp() {
+        Yaml.setInstance(new SnakeYaml()); // whyever, mocking?
+        
         configuration = new DeviceMgtSetup();
         PackageStorageSetup packageStorageSetup = new PackageStorageSetup();
         packageStorageSetup.setEndpoint("endpoint");
