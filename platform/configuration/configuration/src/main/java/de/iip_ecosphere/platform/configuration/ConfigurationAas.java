@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.configuration.ivml.AasIvmlMapper;
 import de.iip_ecosphere.platform.configuration.ivml.AasIvmlMapper.AasChange;
 import de.iip_ecosphere.platform.configuration.ivml.DefaultEdge;
@@ -43,6 +41,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper.OperationCompletedListener;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 

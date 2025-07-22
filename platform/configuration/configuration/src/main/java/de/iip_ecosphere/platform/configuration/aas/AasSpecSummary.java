@@ -22,11 +22,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-
-import de.iip_ecosphere.platform.configuration.FallbackLogger;
 import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.aas.IdentifierType;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 import static de.iip_ecosphere.platform.configuration.aas.ParsingUtils.*;
 
@@ -36,8 +35,6 @@ import static de.iip_ecosphere.platform.configuration.aas.ParsingUtils.*;
  * @author Holger Eichelberger, SSE
  */
 public class AasSpecSummary {
-    
-    private static Logger logger;
     
     private Version version;
     private String projectName;
@@ -385,8 +382,7 @@ public class AasSpecSummary {
      * @return the logger instance
      */
     private static Logger getLogger() {
-        logger = FallbackLogger.getLogger(logger, AasSpecSummary.class, ParsingUtils.getLoggingLevel());
-        return logger;
+        return LoggerFactory.getLogger(AasSpecSummary.class);
     }    
     
 }

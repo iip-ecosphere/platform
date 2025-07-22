@@ -22,12 +22,11 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-
-import de.iip_ecosphere.platform.configuration.FallbackLogger;
 import de.iip_ecosphere.platform.configuration.aas.AasImports.Import;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.Version;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 import static de.iip_ecosphere.platform.configuration.aas.ParsingUtils.*;
 
@@ -38,7 +37,6 @@ import static de.iip_ecosphere.platform.configuration.aas.ParsingUtils.*;
  */
 public class IvmlWriter {
 
-    private static Logger logger;
     private static final Pattern BASIC_IVML_NAME = Pattern.compile("^[\\w \\[\\]\\-\\Q$_\\E]+$");
     private PrintStream out = System.out;
     private String indent = "";
@@ -603,8 +601,7 @@ public class IvmlWriter {
      * @return the logger instance
      */
     private static Logger getLogger() {
-        logger = FallbackLogger.getLogger(logger, IvmlWriter.class, ParsingUtils.getLoggingLevel());
-        return logger;
+        return LoggerFactory.getLogger(IvmlWriter.class);
     }
 
 }

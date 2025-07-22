@@ -21,11 +21,10 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-
-import de.iip_ecosphere.platform.configuration.FallbackLogger;
 import de.iip_ecosphere.platform.support.aas.IdentifierType;
 import de.iip_ecosphere.platform.support.aas.SemanticIdRecognizer;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Utilities for text parsing.
@@ -41,30 +40,8 @@ class ParsingUtils {
     public static final String[] SEMANTICID_MARKER_WITH_PATH = {SEMANTICID_MARKER[0], SEMANTICID_MARKER[1], 
         "[IRDI PATH]", "[IRDI Path]"};
 
-    private static FallbackLogger.LoggingLevel loggingLevel = FallbackLogger.LoggingLevel.INFO;
-    private static Logger logger;
     private static final Pattern BRACKETS_WIITH_FOOTNOTE = Pattern.compile("^\\[([^\\]]+)\\]\\W*\\d*$");
     private static final Pattern ENUM_LITERAL_PATTERN = Pattern.compile("(and\\W+)?\\d+\\.\\W*\"([^\"]+)\"(\\.)?");
-
-    /**
-     * Returns the actual logging level for new loggers.
-     * 
-     * @return the logging level
-     */
-    static FallbackLogger.LoggingLevel getLoggingLevel() {
-        return loggingLevel;
-    }
-    
-    /**
-     * Changes the actual logging level for new loggers.
-     * 
-     * @param level the new level, ignored if <b>null</b>
-     */
-    static void setLoggingLevel(FallbackLogger.LoggingLevel level) {
-        if (null != level) {
-            loggingLevel = level;
-        }
-    }
     
     /**
      * Turns {@code name} into a valid Java/IVML identifier.
@@ -897,8 +874,7 @@ class ParsingUtils {
      * @return the logger
      */
     private static Logger getLogger() {
-        logger = FallbackLogger.getLogger(logger, RowProcessor.class, getLoggingLevel());
-        return logger;
+        return LoggerFactory.getLogger(RowProcessor.class);
     }
     
 }

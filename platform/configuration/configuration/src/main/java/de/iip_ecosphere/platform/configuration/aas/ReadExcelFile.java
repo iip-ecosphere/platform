@@ -29,9 +29,9 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.slf4j.Logger;
 
-import de.iip_ecosphere.platform.configuration.FallbackLogger;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Reads an IDTA spec with pages in excel sheets and contents/tables in formatted excel cells, as e.g., created by 
@@ -40,8 +40,6 @@ import de.iip_ecosphere.platform.configuration.FallbackLogger;
  * @author Holger Eichelberger, SSE
  */
 public class ReadExcelFile {
-
-    private static Logger logger;
 
     /**
      * Reads data from an excel file, e.g., created by smallpdf.com.
@@ -201,8 +199,7 @@ public class ReadExcelFile {
      * @return the logger instance
      */
     private static Logger getLogger() {
-        logger = FallbackLogger.getLogger(logger, ReadExcelFile.class, ParsingUtils.getLoggingLevel());
-        return logger;
+        return LoggerFactory.getLogger(ReadExcelFile.class);
     }
 
     /**

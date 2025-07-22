@@ -25,14 +25,13 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-
-import de.iip_ecosphere.platform.configuration.FallbackLogger;
 import de.iip_ecosphere.platform.configuration.aas.AasType.EntityType;
 import de.iip_ecosphere.platform.configuration.aas.ParsingUtils.AasEnumResultHandler;
 import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.aas.IdentifierType;
 import de.iip_ecosphere.platform.support.aas.SemanticIdRecognizer;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 import static de.iip_ecosphere.platform.configuration.aas.ParsingUtils.*;
 
@@ -54,8 +53,6 @@ class RowProcessor {
         = Pattern.compile("See [Ss]ection \\d+(\\.\\d+)*(.*)");
     private static Pattern extensionDesc
         = Pattern.compile(".* SMC (.*) in .* with (.*) elements.*");
-
-    private static Logger logger;
 
     private List<AasType> aasTypes = new ArrayList<>();
     private List<AasEnum> aasEnums = new ArrayList<>();
@@ -1376,8 +1373,7 @@ class RowProcessor {
      * @return the logger
      */
     private static Logger getLogger() {
-        logger = FallbackLogger.getLogger(logger, ParsingUtils.class, getLoggingLevel());
-        return logger;
+        return LoggerFactory.getLogger(ParsingUtils.class);
     }
 
 }

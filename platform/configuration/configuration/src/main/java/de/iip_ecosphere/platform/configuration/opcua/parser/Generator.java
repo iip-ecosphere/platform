@@ -19,9 +19,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.configuration.opcua.data.*;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Generates the IVML model.

@@ -15,9 +15,8 @@ package de.iip_ecosphere.platform.configuration.aas;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-
-import de.iip_ecosphere.platform.configuration.FallbackLogger;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Denotes potential {@link AasType} and {@link AasField} (meta) types.
@@ -43,7 +42,6 @@ enum AasSmeType {
     OPERATION(false),
     FILE(false);
     
-    private static Logger logger;
     private static final Map<String, AasSmeType> TYPE_TRANSLATION = new HashMap<>();
     private boolean isType; // IDTA 02026-1-0
     
@@ -145,8 +143,7 @@ enum AasSmeType {
      * @return the logger instance
      */
     private static Logger getLogger() {
-        logger = FallbackLogger.getLogger(logger, ReadExcelFile.class, ParsingUtils.getLoggingLevel());
-        return logger;
+        return LoggerFactory.getLogger(ReadExcelFile.class);
     }
     
 }

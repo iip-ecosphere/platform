@@ -15,9 +15,8 @@ package de.iip_ecosphere.platform.configuration.aas;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.slf4j.Logger;
-
-import de.iip_ecosphere.platform.configuration.FallbackLogger;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Represents a field in an {@link AasType}.
@@ -26,7 +25,6 @@ import de.iip_ecosphere.platform.configuration.FallbackLogger;
  */
 public class AasField extends AbstractAasElement {
 
-    private static Logger logger;
     private static final Set<String> BASIC_TYPES = new HashSet<>();
 
     private AasSmeType smeType;
@@ -432,8 +430,7 @@ public class AasField extends AbstractAasElement {
      * @return the logger instance
      */
     private static Logger getLogger() {
-        logger = FallbackLogger.getLogger(logger, AasField.class, ParsingUtils.getLoggingLevel());
-        return logger;
+        return LoggerFactory.getLogger(AasField.class);
     }    
 
 }

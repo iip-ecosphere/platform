@@ -1,3 +1,15 @@
+/**
+ * ******************************************************************************
+ * Copyright (c) {2024} The original author or authors
+ *
+ * All rights reserved. This program and the accompanying materials are made 
+ * available under the terms of the Eclipse Public License 2.0 which is available 
+ * at http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
+ ********************************************************************************/
+
 package de.iip_ecosphere.platform.configuration.aas;
 
 import java.io.File;
@@ -9,10 +21,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import de.iip_ecosphere.platform.configuration.FallbackLogger.LoggingLevel;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
 
+/**
+ * Specification comparator.
+ * 
+ * @author Holger Eichelberger, SSE
+ */
 public class SpecComparator {
 
     private static final Map<File, SpecPair> SPECS = new TreeMap<>((f1, f2) -> -f1.toString().compareTo(f2.toString()));
@@ -136,7 +152,6 @@ public class SpecComparator {
      * @param args the command line arguments, ignored
      */
     public static void main(String[] args) {
-        ParsingUtils.setLoggingLevel(LoggingLevel.ERROR);
         FileUtils.listFiles(new File("src/test/resources/idta"), 
             f -> f.isDirectory() || f.isFile(), f -> register(f));
 

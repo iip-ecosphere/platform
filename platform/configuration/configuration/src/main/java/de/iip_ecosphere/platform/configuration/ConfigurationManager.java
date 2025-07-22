@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.configuration.ConfigurationAas.IipGraphMapper;
 import de.iip_ecosphere.platform.configuration.ivml.AasIvmlMapper;
@@ -28,6 +26,8 @@ import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper.OperationCompletedListener;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
@@ -49,7 +49,6 @@ import net.ssehub.easy.varModel.model.ModelQueryException;
  */
 public class ConfigurationManager {
     
-    private static Logger logger;
     private static EasyExecutor executor;
     private static boolean initialized = false;
     private static BasicProgressObserver observer = new BasicProgressObserver();
@@ -409,10 +408,7 @@ public class ConfigurationManager {
      * @return the logger instance
      */
     private static Logger getLogger() {
-        logger = FallbackLogger.getLogger(logger, 
-            ConfigurationManager.class, 
-            FallbackLogger.LoggingLevel.WARN);
-        return logger;
+        return LoggerFactory.getLogger(ConfigurationManager.class);
     }
 
 }

@@ -42,6 +42,9 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         appendDependency(dep, "org.apache.logging.log4j", "log4j-api", "2.15.0"); // override due to CVE-2021-44228
         appendDependency(dep, "org.apache.logging.log4j", "log4j-core", "2.15.0"); // override due to CVE-2021-44228
         appendDependency(dep, iipGroup, "support", projectVersion);
+        appendDependency(dep, iipGroup, "support.yaml-snakeyaml", projectVersion); // preliminary -> plugin
+        appendDependency(dep, iipGroup, "support.json-jackson", projectVersion); // preliminary -> plugin
+        appendDependency(dep, iipGroup, "support.log-slf4j-simple", projectVersion); // preliminary -> plugin
         appendDependency(dep, iipGroup, "support.aas", projectVersion);
         appendDependency(dep, iipGroup, "transport", projectVersion);
         appendDependency(dep, iipGroup, "connectors", projectVersion);

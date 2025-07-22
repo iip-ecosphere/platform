@@ -15,9 +15,8 @@ package de.iip_ecosphere.platform.configuration;
 import java.io.File;
 import java.io.IOException;
 
-import org.slf4j.LoggerFactory;
-
 import de.iip_ecosphere.platform.deviceMgt.storage.PackageStorageSetup;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 
 /**

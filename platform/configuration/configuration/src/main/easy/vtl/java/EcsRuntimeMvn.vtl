@@ -18,6 +18,9 @@ template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target, String dir, 
 
         XmlElement dep = createDependencies(project);
         appendDependency(dep, iipGroup, "support", projectVersion);
+        appendDependency(dep, iipGroup, "support.yaml-snakeyaml", projectVersion); // preliminary -> plugin
+        appendDependency(dep, iipGroup, "support.json-jackson", projectVersion); // preliminary -> plugin
+        appendDependency(dep, iipGroup, "support.log-slf4j-simple", projectVersion); // preliminary -> plugin
         appendDependency(dep, iipGroup, "ecsRuntime", projectVersion);
         appendDependency(dep, iipGroup, containerManagerModule(config), projectVersion);
         appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);

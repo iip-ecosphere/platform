@@ -15,9 +15,9 @@ package de.iip_ecosphere.platform.configuration;
 import java.io.File;
 import java.io.IOException;
 
-import org.slf4j.Logger;
-
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.uni_hildesheim.sse.easy.loader.ManifestLoader;
 import de.uni_hildesheim.sse.easy.loader.framework.Log;
 import de.uni_hildesheim.sse.easy.loader.framework.Log.LoaderLogger;
@@ -34,7 +34,6 @@ import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
  */
 public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
 
-    private static Logger logger;
     private ManifestLoader loader;
     private boolean doLogging = true;
     private boolean doFilterLogs = false;
@@ -280,10 +279,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
      * @return the logger instance
      */
     private static Logger getLogger() {
-        logger = FallbackLogger.getLogger(logger, 
-            ConfigurationLifecycleDescriptor.class, 
-            FallbackLogger.LoggingLevel.WARN);
-        return logger;
+        return LoggerFactory.getLogger(ConfigurationLifecycleDescriptor.class);
     }
     
 }

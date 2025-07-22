@@ -33,7 +33,6 @@ import test.de.iip_ecosphere.platform.configuration.opcua.DomParserTest;
     IvmlContainerTests.class,
     //IvmlContainerLxcTests.class,  // -> examples to allow for platform/mangementUi build before
     StorageFactoryTest.class,
-    FallbackLoggerTest.class,
     IvmlApiTests.class,
     
     DataflowGraphFormatTest.class,

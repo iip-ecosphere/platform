@@ -32,7 +32,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -40,11 +39,12 @@ import org.xml.sax.SAXException;
 
 import static de.iip_ecosphere.platform.configuration.aas.ParsingUtils.*;
 
-import de.iip_ecosphere.platform.configuration.FallbackLogger;
 import de.iip_ecosphere.platform.configuration.aas.AasType.EntityType;
 import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.aas.IdentifierType;
 import de.iip_ecosphere.platform.support.aas.SemanticIdRecognizer;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Translates AASX IDTA spec files to IVML. Does not rely on AAS abstraction/Basyx as these AASX files cannot be read.
@@ -53,8 +53,6 @@ import de.iip_ecosphere.platform.support.aas.SemanticIdRecognizer;
  */
 public class ReadAasxFile {
     
-    private static Logger logger;
-
     /**
      * Returns the spec number of an AASX file from its file name.
      * 
@@ -1375,8 +1373,7 @@ public class ReadAasxFile {
      * @return the logger instance
      */
     private static Logger getLogger() {
-        logger = FallbackLogger.getLogger(logger, ReadAasxFile.class, ParsingUtils.getLoggingLevel());
-        return logger;
+        return LoggerFactory.getLogger(ReadAasxFile.class);
     }
     
     /**
