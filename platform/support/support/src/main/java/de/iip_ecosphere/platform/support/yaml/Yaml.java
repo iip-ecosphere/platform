@@ -21,7 +21,8 @@ import java.util.Map;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
 /**
- * Generic access to YAML.
+ * Generic access to YAML. Requires an implementing plugin of type {@link Yaml} or an active 
+ * {@link YamlProviderDescriptor}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -40,6 +41,17 @@ public abstract class Yaml {
      */
     public static Yaml getInstance() {
         return instance;
+    }
+    
+    /**
+     * Manually sets the instance. Shall not be needed, but may be required in some tests.
+     * 
+     * @param yaml the YAML instance
+     */
+    public static void setInstance(Yaml yaml) {
+        if (null != yaml) {
+            instance = yaml;
+        }
     }
     
     /**

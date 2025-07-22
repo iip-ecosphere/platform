@@ -17,7 +17,7 @@ import java.io.IOException;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
 /**
- * Json interface.
+ * Json interface. Requires an implementing plugin of type {@link Json} or an active {@link JsonProviderDescriptor}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -36,6 +36,17 @@ public abstract class Json {
      */
     public static Json createInstance() {
         return prototype.createInstanceImpl();
+    }
+    
+    /**
+     * Manually sets the instance. Shall not be needed, but may be required in some tests.
+     * 
+     * @param json the Json instance
+     */
+    public static void setPrototype(Json json) {
+        if (null != json) {
+            prototype = json;
+        }
     }
 
     /**
