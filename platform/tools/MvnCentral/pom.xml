@@ -78,11 +78,17 @@
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>    
+
     <dependency>
         <artifactId>support.aas.basyx</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>
+    <dependency>
+        <artifactId>support.aas.basyx.server</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
     <dependency>
         <artifactId>support.aas.basyx</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
@@ -102,22 +108,44 @@
         <version>${project.version}</version>
     </dependency>
     <dependency>
-        <artifactId>support.aas.basyx1_5</artifactId>
-        <groupId>de.iip-ecosphere.platform</groupId>
-        <version>${project.version}</version>
-    </dependency>
-    <dependency>
         <artifactId>support.aas.basyx1_0</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
         <classifier>plugin</classifier>
         <type>zip</type>
-    </dependency>
+    </dependency>    
     <dependency>
-        <artifactId>support.aas.basyx.server</artifactId>
+        <artifactId>support.aas.basyx1_5</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>support.aas.basyx1_5</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
     </dependency>    
+
+    <dependency>
+        <artifactId>support.aas.basyx2</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>support.aas.basyx2</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>core</classifier>
+    </dependency>
+    <dependency>
+        <artifactId>support.aas.basyx2</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>
+    
     <dependency>
         <artifactId>support.iip-aas</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
