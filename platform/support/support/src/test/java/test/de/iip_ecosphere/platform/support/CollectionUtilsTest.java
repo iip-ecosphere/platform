@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,6 +47,12 @@ public class CollectionUtilsTest {
         Assert.assertFalse(result.isEmpty());
         Assert.assertEquals(data.size(), result.size());
         Assert.assertEquals(data, result);
+        
+        List<Object> oResult = CollectionUtils.toList(new StringTokenizer("HERE, There", ", "));
+        Assert.assertNotNull(oResult);
+        Assert.assertFalse(oResult.isEmpty());
+        Assert.assertEquals(data.size(), oResult.size());
+        Assert.assertEquals(data, oResult);
     }
 
     /**
@@ -66,6 +73,14 @@ public class CollectionUtilsTest {
         Assert.assertEquals(data.size(), result.size());
         for (String s : data) {
             Assert.assertTrue(result.contains(s));
+        }
+
+        Set<Object> oResult = CollectionUtils.toSet(new StringTokenizer("HERE, There", ", "));
+        Assert.assertNotNull(oResult);
+        Assert.assertFalse(oResult.isEmpty());
+        Assert.assertEquals(data.size(), oResult.size());
+        for (String s : data) {
+            Assert.assertTrue(oResult.contains(s));
         }
         
         result = CollectionUtils.toSet("1", "2", "2");

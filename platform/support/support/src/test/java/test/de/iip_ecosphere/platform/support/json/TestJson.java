@@ -13,24 +13,21 @@
 package test.de.iip_ecosphere.platform.support.json;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationConfig;
-import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
-import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
-import com.fasterxml.jackson.databind.module.SimpleAbstractTypeResolver;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
-import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.json.IOIterator;
 import de.iip_ecosphere.platform.support.json.Json;
-import de.iip_ecosphere.platform.support.json.JsonUtils.MappingPropertyNamingStrategy;
-import de.iip_ecosphere.platform.support.json.JsonUtils.OptionalFieldsDeserializationProblemHandler;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
+import de.iip_ecosphere.platform.support.json.JsonUtils.JacksonEnumMapping;
 
 /**
  * Implements the JSON interface by Jackson.
@@ -38,38 +35,9 @@ import de.iip_ecosphere.platform.support.json.JsonUtils.OptionalFieldsDeserializ
  * @author Holger Eichelberger, SSE
  */
 public class TestJson extends de.iip_ecosphere.platform.support.json.Json {
-
-    /**
-     * A type resolver for "Impl" classes in "iip.".
-     */
-    public static final SimpleAbstractTypeResolver IIP_TYPE_RESOLVER = new SimpleAbstractTypeResolver() {
-        
-        private static final long serialVersionUID = -3746467806797935401L;
-        // no instance data here
-
-        @Override
-        public JavaType findTypeMapping(DeserializationConfig config, JavaType type) {
-            JavaType result = null;
-            // for generated IIP-Ecosphere data interfaces, we can try it with Impl classes
-            String className = type.getRawClass().getName();
-            if (type.isInterface() && className.startsWith("iip.")) {
-                String name = className + "Impl";
-                try {
-                    Class<?> cls = Class.forName(name);
-                    result = config.getTypeFactory().constructType(cls);
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (null == result) {
-                result = super.findTypeMapping(config, type);
-            }
-            return result;
-        }
-            
-    };    
     
     private ObjectMapper mapper = new ObjectMapper();
+    private ObjectWriter writer; 
     
     @Override
     public Json createInstanceImpl() {
@@ -81,7 +49,11 @@ public class TestJson extends de.iip_ecosphere.platform.support.json.Json {
         String result = "";
         if (null != obj) {
             try {
-                result = mapper.writeValueAsString(obj);
+                if (null != writer) {
+                    result = writer.writeValueAsString(obj);
+                } else {
+                    result = mapper.writeValueAsString(obj);
+                }
             } catch (JsonProcessingException e) {
                 throw new IOException(e);
             }
@@ -101,48 +73,109 @@ public class TestJson extends de.iip_ecosphere.platform.support.json.Json {
         }
         return result; 
     }
+
+    @Override
+    public <T> T readValue(String src, Class<T> cls) throws IOException {
+        try {
+            return mapper.readValue(src, cls);
+        } catch (JsonProcessingException e) {
+            throw new IOException(e);
+        }
+    }
     
     @Override
+    public <T> T readValue(byte[] src, Class<T> valueType) throws IOException {
+        try {
+            return mapper.readValue(src, valueType);
+        } catch (JsonProcessingException e) {
+            throw new IOException(e);
+        }
+    }
+    
+    @Override
+    public byte[] writeValueAsBytes(Object value) throws IOException {
+        try {
+            if (writer != null) {
+                return writer.writeValueAsBytes(value);
+            } else {
+                return mapper.writeValueAsBytes(value);
+            }
+        } catch (JsonProcessingException e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    public Json configureFor(Class<?> cls) {
+        mapper = JsonUtils.configureFor(mapper, cls);
+        return this;
+    }
+
+    @Override
     public Json handleIipDataClasses() {
-        SimpleModule iipModule = new SimpleModule();
-        iipModule.setAbstractTypes(IIP_TYPE_RESOLVER);
-        mapper.registerModule(iipModule);
+        mapper = JsonUtils.handleIipDataClasses(mapper);
         return this;
     }
     
     @Override
     public Json defineOptionals(Class<?> cls, String... fieldNames) {
-        mapper.addHandler(new OptionalFieldsDeserializationProblemHandler(cls, fieldNames));
+        mapper = JsonUtils.defineOptionals(mapper, cls, fieldNames);
         return this;
     }
 
     @Override
     public Json defineFields(String... fieldNames) {
-        Map<String, String> mapping = new HashMap<>();
-        for (String fn : fieldNames) {
-            String javaField = fn;
-            if (javaField.length() > 0) {
-                javaField = Character.toUpperCase(javaField.charAt(0)) + javaField.substring(1);
-            }
-            mapping.put(javaField, fn);
-        }
-        mapper.setPropertyNamingStrategy(new MappingPropertyNamingStrategy(mapping));
+        mapper = JsonUtils.defineFields(mapper, fieldNames);
         return this;
     }
     
     @Override
     public Json exceptFields(String... fieldNames) {
-        final Set<String> exclusions = CollectionUtils.addAll(new HashSet<String>(), fieldNames);
-        mapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
-
-            private static final long serialVersionUID = -6485293464445674590L;
-
-            @Override
-            public boolean hasIgnoreMarker(final AnnotatedMember member) {
-                return exclusions.contains(member.getName()) || super.hasIgnoreMarker(member);
-            }
-        });
+        mapper = JsonUtils.exceptFields(mapper, fieldNames);
         return this;
+    }
+    
+    @Override
+    public Json filterAllExceptFields(String... fieldNames) {
+        SimpleBeanPropertyFilter theFilter = SimpleBeanPropertyFilter
+            .serializeAllExcept(fieldNames);
+        SimpleFilterProvider filters = new SimpleFilterProvider()
+            .setDefaultFilter(theFilter);
+        writer = mapper.writer(filters);
+        return this;
+    }
+
+    @Override
+    public <T> T convertValue(Object value, Class<T> cls) throws IllegalArgumentException {
+        return mapper.convertValue(value, cls);
+    }
+
+    @Override
+    public Json failOnUnknownProperties(boolean fail) {
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        return this;
+    }
+
+    @Override
+    public <T> EnumMapping<T> createEnumMapping(Class<T> type, Map<String, T> mapping) {
+        return new JacksonEnumMapping<T>(type, mapping);
+    }
+    
+    @Override
+    public Json declareEnums(EnumMapping<?>... mappings) {
+        JsonUtils.declareEnums(mapper, mappings);
+        return this;
+    }
+    
+    @Override
+    public Json configureLazy(Set<Object> ignore) { 
+        JsonUtils.configureLazy(mapper, ignore);
+        return this;
+    }
+    
+    @Override
+    public <T> IOIterator<T> createIterator(InputStream stream, Class<T> cls) throws IOException {
+        return JsonUtils.createIterator(mapper, stream, cls);
     }
 
 }

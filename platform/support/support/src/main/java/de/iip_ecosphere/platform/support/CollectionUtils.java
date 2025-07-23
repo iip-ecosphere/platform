@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.support;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -117,6 +118,21 @@ public class CollectionUtils {
     }
 
     /**
+     * Turns the elements in the enumeration into a list.
+     * 
+     * @param <T> the element type
+     * @param en the enumeration
+     * @return the list with all elements in {@code en}
+     */
+    public static <T> List<T> toList(Enumeration<T> en) {
+        List<T> result = new ArrayList<T>();
+        while (en.hasMoreElements()) {
+            result.add(en.nextElement());
+        }
+        return result;
+    }
+
+    /**
      * Turns the elements in the iterable into a set.
      * 
      * @param <T> the element type
@@ -141,7 +157,22 @@ public class CollectionUtils {
         }
         return result;
     }
-    
+
+    /**
+     * Turns the elements in the enumeration into a set.
+     * 
+     * @param <T> the element type
+     * @param en the enumeration
+     * @return the set with all elements in {@code en}
+     */
+    public static <T> Set<T> toSet(Enumeration<T> en) {
+        Set<T> result = new HashSet<T>();
+        while (en.hasMoreElements()) {
+            result.add(en.nextElement());
+        }
+        return result;
+    }
+
     /**
      * Turns a collection into a string with configurable lead-in, separator and lead-out.
      * 
