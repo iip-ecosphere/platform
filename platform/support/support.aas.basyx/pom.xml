@@ -212,7 +212,7 @@
                  </execution>
                  <execution>
                      <id>build-classpath-plugin</id>
-                     <phase>prepare-package</phase>
+                     <phase>compile</phase> <!-- Eclipse autobuild -->
                      <goals>
                          <goal>build-classpath</goal>
                      </goals>

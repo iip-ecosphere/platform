@@ -107,6 +107,10 @@ public class JsonTest {
         s = json.toJson(data);
         data1 = json.fromJson(s, Data.class);
         assertData(data1, data);
+        
+        byte[] b = json.writeValueAsBytes(data);
+        data1 = json.readValue(b, Data.class);
+        assertData(data1, data);
     }
 
 }
