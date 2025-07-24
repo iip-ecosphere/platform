@@ -75,6 +75,7 @@ import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
+import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
@@ -139,6 +140,9 @@ public class AbstractTestServiceManager {
         setup.setHost("localhost");
         setup.setAuthenticationKey("amqp"); // -> identityStore.yml
         Transport.setTransportSetup(() -> setup);
+        NetworkManagerSetup nwmSetup = ServiceFactory.getNetworkManagerSetup();
+        nwmSetup.setNetmask("255.255.255.0"); // for testing, limit to localhost
+        NetworkManagerFactory.configure(nwmSetup);
         server.start();
         System.out.println("AMQP broker on port " + broker.getPort());
         
