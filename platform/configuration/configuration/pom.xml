@@ -29,10 +29,6 @@
   </repositories>
 
   <dependencies>
-    <dependency>
-      <groupId>org.yaml</groupId>
-      <artifactId>snakeyaml</artifactId>
-    </dependency>
     <dependency> <!-- required for xtext -->
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
