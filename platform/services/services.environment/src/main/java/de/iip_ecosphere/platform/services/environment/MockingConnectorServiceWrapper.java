@@ -29,11 +29,11 @@ import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
 import de.iip_ecosphere.platform.connectors.events.EventHandlingConnector;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
+import de.iip_ecosphere.platform.support.json.IOIterator;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.services.environment.DataMapper.BaseDataUnitFunctions;
-import de.iip_ecosphere.platform.services.environment.DataMapper.IOIterator;
 import de.iip_ecosphere.platform.services.environment.testing.DataRecorder;
 
 /**

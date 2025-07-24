@@ -18,13 +18,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,6 +30,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.json.IOIterator;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
@@ -440,33 +438,6 @@ public class DataMapper {
     }
 
     /**
-     * An iterator that can throw {@link IOException}.
-     * 
-     * @param <T> the type of element
-     * @author Holger Eichelberger, SSE
-     */
-    public interface IOIterator<T> {
-
-        /**
-         * Returns {@code true} if the iteration has more elements.
-         *
-         * @return {@code true} if the iteration has more elements
-         * @throws IOException if providing the next element caused an I/O problem
-         */
-        public boolean hasNext() throws IOException;
-
-        /**
-         * Returns the next element in the iteration.
-         *
-         * @return the next element in the iteration
-         * @throws NoSuchElementException if the iteration has no more elements
-         * @throws IOException if checking for the next element caused an I/O problem
-         */
-        public T next() throws IOException;
-        
-    }
-
-    /**
      * Maps the data in {@code stream} to instances of {@code cls}, one instance per line, returned in terms of an 
      * iterator. Ignores unknown attributes in {@code cls}.
      *  
@@ -498,29 +469,11 @@ public class DataMapper {
         ObjectMapper objectMapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, failOnUnknownProperties);
         JsonUtils.handleIipDataClasses(objectMapper);
-        
-        JsonFactory jf = new JsonFactory();
+
         if (null == stream) {
             LoggerFactory.getLogger(DataMapper.class).error("No stream found, is file/resource name correct?");
         }
-        JsonParser jp = jf.createParser(stream);
-        jp.setCodec(objectMapper);
-        jp.nextToken();
-        return new IOIterator<T>() {
-
-            @Override
-            public boolean hasNext() throws IOException {
-                return jp.hasCurrentToken();
-            }
-
-            @Override
-            public T next() throws IOException {
-                T data = jp.readValueAs(cls);
-                jp.nextToken();
-                return data;
-            }
-            
-        };
+        return JsonUtils.createIterator(objectMapper, stream, cls);
     }
 
 }
