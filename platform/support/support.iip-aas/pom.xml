@@ -74,11 +74,6 @@
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
     </dependency>     
-    <dependency>
-      <groupId>org.yaml</groupId>
-      <artifactId>snakeyaml</artifactId>
-      <scope>compile</scope>
-    </dependency>
   
     <dependency>
       <groupId>junit</groupId>
