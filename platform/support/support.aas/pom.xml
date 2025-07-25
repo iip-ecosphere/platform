@@ -18,11 +18,6 @@
      <artifactId>support</artifactId>
      <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.yaml</groupId>
-      <artifactId>snakeyaml</artifactId>
-      <scope>compile</scope>
-    </dependency>
   
     <dependency>
       <groupId>junit</groupId>
@@ -35,6 +30,12 @@
     </dependency>
     <dependency>
       <artifactId>support.log-slf4j-simple</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <artifactId>support.yaml-snakeyaml</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <scope>test</scope>
       <version>${project.version}</version>
