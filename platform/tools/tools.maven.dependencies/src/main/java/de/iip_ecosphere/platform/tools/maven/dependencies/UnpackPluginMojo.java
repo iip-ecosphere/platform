@@ -69,6 +69,9 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
     @Parameter(property = "unpack.relocateTarget", required = false, defaultValue = "jars")
     private File relocateTarget;
 
+    @Parameter(property = "unpack.resolveAndCopy", required = false, defaultValue = "true")
+    private boolean resolveAndCopy;
+
     @Parameter( defaultValue = "${project.build.directory}", readonly = true )
     private File targetDirectory;
 
@@ -439,7 +442,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                         Tokenizer tokenizer = new Tokenizer(line);
                         prefix = fixPrefix(prefix, tokenizer);
                         if (relocate) {
-                            processCpLineRelocation(mode, out, tokenizer, prefix);
+                            processCpLineRelocation(mode, out, tokenizer, prefix, relocateTarget);
                         } else {
                             processCpLineNoRelocation(cpFile, line, out, tokenizer);
                         }
@@ -463,8 +466,10 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
      * @param out the output stream for the rewritten classpath file
      * @param tokenizer the tokenizer
      * @param prefix the classpath token prefix
+     * @param jarFolder the folder where to copy the jars to
      */
-    private void processCpLineRelocation(String mode, PrintStream out, Tokenizer tokenizer, String prefix) {
+    private void processCpLineRelocation(String mode, PrintStream out, Tokenizer tokenizer, String prefix, 
+        File jarFolder) {
         while (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();
             if (tokenizer.win) {
@@ -476,7 +481,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             }
             if (null != mode && mode.equalsIgnoreCase("resolve")) {
                 token = stripPrefix(prefix, token);
-                token = resolve(token);
+                token = resolve(token, jarFolder);
             }
             out.print(token);
             if (tokenizer.hasMoreTokens()) {
@@ -575,12 +580,27 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
      * Tries to resolve the path.
      * 
      * @param path the given classpath path
+     * @param jarFolder the folder where to copy the jars to
      * @return {@code path} or the resolved path (in the local maven repo)
      */
-    private String resolve(String path) {
+    private String resolve(String path, File jarFolder) {
         String resolved = path;
         try {
-            resolved = resolve(parsePath(path));
+            DefaultArtifact artifact = parsePath(path);
+            File res = resolve(artifact);
+            if (resolveAndCopy) {
+                File tgt = new File(jarFolder, res.getName());
+                if (!res.exists()) {
+                    try {
+                        FileUtils.copyFile(res, tgt);
+                    } catch (IOException e) {
+                        getLog().error("Cannot copy resolved artifact '" + artifact + "' from '" + res + "' to '" 
+                            + tgt + "' - ignoring: " + e.getMessage());
+                    }
+                }
+            } else { // leave it where it is
+                resolved = res.getAbsolutePath();
+            }
         } catch (ArtifactResolutionException e) {
             getLog().warn("Cannot resolve to artifact, keeping path: " + path);
         }
@@ -610,7 +630,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
     private String resolve(Artifact artifact) {
         String result;
         try {
-            result = resolve(translate(artifact));
+            result = resolve(translate(artifact)).getAbsolutePath();
         } catch (ArtifactResolutionException e) {
             getLog().warn("Cannot resolve to artifact, ignoring: " + artifact);
             result = "";
@@ -625,12 +645,12 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
      * @return the resolved path
      * @throws ArtifactResolutionException if resolution fails
      */
-    private String resolve(DefaultArtifact artifact) throws ArtifactResolutionException {
+    private File resolve(DefaultArtifact artifact) throws ArtifactResolutionException {
         ArtifactRequest request = new ArtifactRequest();
         request.setArtifact(artifact);
         request.setRepositories(remoteRepositories);
         ArtifactResult result = repoSystem.resolveArtifact(repoSession, request);
-        return result.getArtifact().getFile().getAbsolutePath();
+        return result.getArtifact().getFile();
     }
 
 }
