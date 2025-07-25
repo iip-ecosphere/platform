@@ -159,7 +159,6 @@ public abstract class Json {
     /**
      * Configures this instance for IIP conventions.
      * 
-     * @param mapper the mapper to be configured
      * @return <b>this</b> for chaining
      */
     public abstract Json handleIipDataClasses();

@@ -90,7 +90,7 @@ public abstract class LoggerFactory {
     /**
      * Return a logger named corresponding to the class passed as parameter.
      * 
-     * @param clas the returned logger will be named after clazz
+     * @param cls the returned logger will be named after cls
      * @return the logger instance
      */
     public static Logger getLogger(Class<?> cls) {

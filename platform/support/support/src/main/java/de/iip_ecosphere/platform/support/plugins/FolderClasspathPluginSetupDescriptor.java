@@ -35,6 +35,9 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
  */
 public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescriptor {
 
+    public static final String KEY_SETUP_DESCRIPTOR = "# setupDescriptor: ";
+    public static final String KEY_PLUGIN_IDS = "# pluginIds: ";
+
     private File folder;
     private boolean descriptorOnly;
 
@@ -52,9 +55,10 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
      * 
      * @param folder the basis folder
      * @param descriptorOnly load the descriptor JARs only or the full thing
+     * @param appends further classpath files that shall be appended, e.g., logging, may be <b>null</b>
      */
-    public FolderClasspathPluginSetupDescriptor(File folder, boolean descriptorOnly) {
-        super(loadClasspathSafe(folder, descriptorOnly));
+    public FolderClasspathPluginSetupDescriptor(File folder, boolean descriptorOnly, File... appends) {
+        super(loadClasspathSafe(folder, descriptorOnly, appends));
         this.folder = folder;
         this.descriptorOnly = descriptorOnly;
     }
@@ -86,10 +90,11 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
      * 
      * @param folder the basis folder
      * @param descriptorOnly only the first/two entries, the full thing else
+     * @param appends further classpath files that shall be appended, e.g., logging, may be <b>null</b>
      * @return the URLs, may be empty
      */
-    public static URL[] loadClasspathSafe(File folder, boolean descriptorOnly) {
-        return loadClasspathFileSafe(findClasspathFile(folder, ""), folder, descriptorOnly);
+    public static URL[] loadClasspathSafe(File folder, boolean descriptorOnly, File... appends) {
+        return loadClasspathFileSafe(findClasspathFile(folder, ""), folder, descriptorOnly, appends);
     }
     
     /**
@@ -111,18 +116,28 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
      * @param cpFile the classpath file
      * @param base the base folder use to make relative classpath entries absolute
      * @param descriptorOnly only the first/two entries, the full thing else
+     * @param appends further classpath files that shall be appended, e.g., logging, may be <b>null</b>
      * @return the URLs, may be empty
      */
-    private static URL[] loadClasspathFileSafe(File cpFile, File base, boolean descriptorOnly) {
+    private static URL[] loadClasspathFileSafe(File cpFile, File base, boolean descriptorOnly, File... appends) {
         URL[] result = null;
         try (InputStream in = new FileInputStream(cpFile)) {
             LoggerFactory.getLogger(URLPluginSetupDescriptor.class).info("Loading classpath from '{}'", cpFile);
-            List<File> entries = new ArrayList<File>();
-            String contents = IOUtils.toString(in, Charset.defaultCharset());
-            StringTokenizer tokenizer = new StringTokenizer(contents, ":;");
-            while (tokenizer.hasMoreTokens()) {
-                entries.add(new File(base, tokenizer.nextToken()));
+            ClasspathFile cpf = readClasspathFile(in, base);
+            if (null != appends) {
+                for (File a: appends) {
+                    try (InputStream aIn = new FileInputStream(a)) {
+                        LoggerFactory.getLogger(URLPluginSetupDescriptor.class).info(
+                            "Appending classpath from '{}'", a);
+                        ClasspathFile aCpf = readClasspathFile(aIn, base);
+                        cpf.entries.addAll(aCpf.entries);
+                    } catch (IOException e) {
+                        LoggerFactory.getLogger(URLPluginSetupDescriptor.class).error(
+                            "While reading append classpath from '{}': {} Ignoring.", a, e.getMessage());
+                    }
+                }
             }
+            List<File> entries = new ArrayList<File>(cpf.entries);
             if (descriptorOnly) {
                 if (entries.size() > 1) {
                     List<File> tmp = new ArrayList<>();
@@ -138,10 +153,84 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
             result = toURLSafe(entries.toArray(new File[entries.size()]));
         } catch (IOException e) {
             LoggerFactory.getLogger(URLPluginSetupDescriptor.class).error(
-                "While classpath from '{}': {} Ignoring.", cpFile, e.getMessage());
+                "While reading classpath from '{}': {} Ignoring.", cpFile, e.getMessage());
         }
         if (null == result) {
             result = new URL[0];
+        }
+        return result;
+    }
+
+    /**
+     * Represents a classpath file and selected descriptive entries.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class ClasspathFile {
+        
+        private List<File> entries = new ArrayList<>();
+        private String setupDescriptor;
+        private List<String> pluginIds;
+        
+        /**
+         * The classpath entries.
+         * 
+         * @return the entries
+         */
+        public List<File> getEntries() {
+            return entries;
+        }
+        
+        /**
+         * The setup descriptor.
+         * 
+         * @return the setup descriptor as short or qualified name
+         */
+        public String getSetupDescriptor() {
+            return setupDescriptor;
+        }
+        
+        /**
+         * Returns the plugin ids.
+         * 
+         * @return the plugin ids, may be <b>null</b> for none
+         */
+        public List<String> pluginIds() {
+            return pluginIds;
+        }
+        
+    }
+    
+    /**
+     * Reads and parses a given classpath file.
+     * 
+     * @param in the input stream
+     * @param base the base folder use to make relative classpath entries absolute
+     * @return the classpath file description object
+     * @throws IOException if accessing the classpath file fails
+     */
+    public static ClasspathFile readClasspathFile(InputStream in, File base) throws IOException {
+        ClasspathFile result = new ClasspathFile();
+        List<String> contents = IOUtils.readLines(in, Charset.defaultCharset());
+        for (String line : contents) {
+            if (line.startsWith("#")) {
+                if (line.startsWith(KEY_SETUP_DESCRIPTOR)) {
+                    result.setupDescriptor = line.substring(KEY_SETUP_DESCRIPTOR.length()).trim();
+                }
+                if (line.startsWith(KEY_PLUGIN_IDS)) {
+                    result.pluginIds = new ArrayList<>();
+                    String tmp = line.substring(KEY_SETUP_DESCRIPTOR.length()).trim();
+                    StringTokenizer t = new StringTokenizer(tmp, ",");
+                    while (t.hasMoreTokens()) {
+                        result.pluginIds.add(t.nextToken().trim());
+                    }
+                }
+            } else {
+                StringTokenizer tokenizer = new StringTokenizer(line, ":;");
+                while (tokenizer.hasMoreTokens()) {
+                    result.entries.add(new File(base, tokenizer.nextToken()));
+                }
+            }
         }
         return result;
     }

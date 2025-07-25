@@ -441,7 +441,6 @@ public class JsonUtils {
      * @param obj the accessible object
      * @param ignores the properties to ignore
      * @param renames the property renamings (original name, new name)
-     * @return if the containing class shall be ignored
      */
     private static void handleAnnotations(String propName, AccessibleObject obj, Set<String> ignores, 
         Map<String, String> renames) {
