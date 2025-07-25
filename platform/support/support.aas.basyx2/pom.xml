@@ -313,20 +313,9 @@
                      <id>build-classpath-plugin</id>
                      <phase>compile</phase> <!-- Eclipse autobuild -->
                      <goals>
-                         <goal>build-classpath</goal>
+                         <goal>build-plugin-classpath</goal>
                      </goals>
                      <configuration>
-                         <outputFile>target/classes/classpath</outputFile>
-                         <prependGroupId>true</prependGroupId>
-                         <overWriteIfNewer>true</overWriteIfNewer>
-                         <localRepoProperty>target/jars</localRepoProperty>
-                         <prefix>target/jars</prefix>
-                         <fileSeparator>/</fileSeparator>
-                         <pathSeparator>:</pathSeparator>
-                         <includeScope>runtime</includeScope>
-                         <prepends>
-                             <prepend>target/${project.artifactId}-${project.version}.jar</prepend>
-                         </prepends>
                          <excludeArtifactIds>support.aas, support</excludeArtifactIds>
                      </configuration>
                  </execution>
