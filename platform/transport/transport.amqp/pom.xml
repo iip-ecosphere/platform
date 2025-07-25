@@ -42,7 +42,13 @@
        <type>test-jar</type>
        <scope>test</scope>
      </dependency>
-    <dependency>
+      <dependency>
+        <artifactId>support.yaml-snakeyaml</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <scope>test</scope>
+        <version>${project.version}</version>
+      </dependency>
+     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>transport</artifactId>
       <version>${project.version}</version>
