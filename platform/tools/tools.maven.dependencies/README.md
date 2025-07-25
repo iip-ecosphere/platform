@@ -66,6 +66,15 @@ The ``build-classpath`` goal is the same as in the original plugin and allows fo
 
 The expressions `${self}` or `${self-test}` can be used in prepends/appends to add the jar/test-jar artifact of the actual project.
 
+## build-plugin-classpath goal
+
+Specialized goal to build a plugin classpath file. Based on the refined ``build-classpath`` above, but ships with a pre-configuration for plugin classpaths. In more details, sets the output file to `${project.build.directory}/classes/classpath`, `prependGroupId` to `true`, `overWriteIfNewer` to `true`, `localRepoProperty` to `target/jars`, `prefix` to `target/jars`, `fileSeparator` to `/`, `pathSeparator` to `:`, and, if not set otherwise, `includeScope` to `runtime`. Further, prepends the own artifact by default and via `addTestArtifact` also the corresponding test artifact. Adds a set of befores as comments, including `prefix`, `unpackMode`, `setupDescriptor` and `pluginIds` (see below). 
+
+- `addTestArtifact` (default `false`, user property `mdep.addTestArtifact`) adds the test artifact based on the actual project
+- `unpackMode` (default `jars`, user property `mdep.unpackMode`) specifies how unpacking shall happen, i.e., whether jars are included in the plugin artifact (`jars`) or whether they shall be resolved (`resolve`)
+- `setupDescriptor` (default `FolderClasspath`, user property `mdep.setupDescriptor`) specifies the descriptor implementation that shall be announced to the plugin manager, may be a shortcut for platform supplied descriptors (`FolderClasspath`, `CurrentClassloader`, `ClasspathFile`, `PluginBased`) or a qualified classname assuming a non-arg constructor
+- `pluginIds` (default empty, user property `mdep.pluginIds`) specifies pluginIds for the `PluginBased` setup descriptor, may also be used with others whereby then the plugin is also announced by `PluginBased`
+
 ## diff-classpath goal
 
 The ``diff-classpath`` goal based on the original plugin and for diffing actual project dependencies against some container root dependencies, i.e., deliver the specific dependency tree.
@@ -138,9 +147,15 @@ In the basic version, for testing, use
                         <plugins>
                             <plugin>
                                 <name>support.aas.basyx2</name>
+                                <appends> <!-- complement the plugin, add the platform logging -->
+                                   <append>log-slf4j-simple</append>
+                                </appends>                                
                             </plugin>
                             <plugin>
                                 <name>support.aas.basyx</name>
+                                <appends> <!-- complement the plugin, add the platform logging -->
+                                   <append>log-slf4j-simple</append>
+                                </appends>
                             </plugin>
                         </plugins>
                         <version>${iip.version}</version>
@@ -152,7 +167,7 @@ In the basic version, for testing, use
   </build>
   ```
 
-for installation just add `<relocate>true</relocate>` to the `configuration`. The `plugins` are extended `artifactItems` which you may use instead. However, a `plugin` allows a more concise notation as we set up the `version` to the global `version` in `configuration`, the `type` to `zip`, the `classifier` to `plugin`, `overWrite` to `true` and `outputDirectory` to `${project.build.directory}/oktoPlugins`. If in a `plugin` the `groupId` is not given, we set it automatically to `de.iip-ecosphere.platform`. 
+for installation just add `<relocate>true</relocate>` to the `configuration`. The `plugins` are extended `ArtifactItems` which you may use instead. However, a `plugin` allows a more concise notation as we set up the `version` to the global `version` in `configuration`, the `type` to `zip`, the `classifier` to `plugin`, `overWrite` to `true` and `outputDirectory` to `${project.build.directory}/oktoPlugins`. If in a `plugin` the `groupId` is not given, we set it automatically to `de.iip-ecosphere.platform`. A plugin may have `appends`, simple names of previously unpacked plugins that shall be merged in given sequence in the classpath of the actual plugin, e.g., to include intentionally excluded plugins, such as logging, which is decided/merged into for platform services/applications by the platform instantiation. Takes into account the prefix path and the unpack mode written by the `build-plugin-classpath` plugin.
 
 Moreover, for installations, if `relocate` is enabled, the `outputDirectory` becomes `jars`, all unpacked jars are flattened into that directory and all classpath files are renamed based on the last part of the `artifactId`, stored into `plugins` and relocated to the relocation target folder (`relocateTarget`, user property `unpack.relocateTarget`, default `jars`); if specified, `plugins` becomes a sibling of the relocation target folder.
 

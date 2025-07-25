@@ -102,7 +102,25 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
         super.setPrefix(thePrefix);
         this.prefix = thePrefix;
     }
-    
+
+    /**
+     * Sets the prepends.
+     * 
+     * @param prepends the prepends
+     */
+    public void setPrepends(List<String> prepends) {
+        this.prepends = prepends;
+    }
+
+    /**
+     * Sets the befores.
+     * 
+     * @param befores the befores
+     */
+    public void setBefores(List<String> befores) {
+        this.befores = befores;
+    }
+
     /**
      * Returns the classpath contents as a collection of entries/tokens.
      * 
@@ -218,9 +236,6 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
         if (hasAdditionalContents && outputFile != null) {
             try {
                 String content = FileUtils.readFileToString(outputFile, Charset.defaultCharset());
-                if (hasBefores) {
-                    content = String.join(lineSeparator, befores) + lineSeparator +  content;
-                }
                 if (hasPrepends) {
                     String tmp = "";
                     for (String s : prepends) {
@@ -238,6 +253,9 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
                         tmp += pathSeparator + s;
                     }
                     content = content + tmp;
+                }
+                if (hasBefores) {
+                    content = String.join(lineSeparator, befores) + lineSeparator +  content;
                 }
                 if (hasAfters) {
                     content += lineSeparator + String.join(lineSeparator, afters);
