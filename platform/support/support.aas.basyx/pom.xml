@@ -136,7 +136,11 @@
       <artifactId>netty-codec-http</artifactId>
       <version>4.1.59.Final</version><!--$NO-MVN-MAN-VER$-->
     </dependency>
-    
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+    </dependency>  
+          
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -156,6 +160,12 @@
      <classifier>tests</classifier>
      <scope>test</scope>
     </dependency>
+    <dependency>
+      <artifactId>support.log-slf4j-simple</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency>    
     <dependency>
       <groupId>org.eclipse.basyx</groupId>
       <artifactId>basyx.sdk</artifactId>
