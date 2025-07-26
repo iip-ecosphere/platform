@@ -18,16 +18,10 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
-import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.transport.serialization.GenericJsonToStringTranslator;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
@@ -69,25 +63,7 @@ public class TraceRecordSerializer implements Serializer<TraceRecord> {
      * @return the object mapper
      */
     private static ObjectMapper createMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false); // may become empty through ignores
-        objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance,
-            ObjectMapper.DefaultTyping.NON_FINAL, 
-            JsonTypeInfo.As.WRAPPER_ARRAY);
-        if (!ignore.isEmpty()) {
-            objectMapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
-    
-                private static final long serialVersionUID = 7445592829151624983L;
-    
-                @Override
-                public boolean hasIgnoreMarker(final AnnotatedMember member) {
-                    return ignore.contains(member.getType().getRawClass()) || ignore.contains(member.getMember()) 
-                        || super.hasIgnoreMarker(member); 
-                }
-            });
-        }
-        return objectMapper;
+        return JsonUtils.configureLazy(new ObjectMapper(), ignore);
     }
 
     /**

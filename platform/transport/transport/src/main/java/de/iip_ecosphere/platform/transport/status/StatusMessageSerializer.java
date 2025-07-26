@@ -18,13 +18,10 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+
+import de.iip_ecosphere.platform.support.json.JsonUtils.EnumDeserializer;
 
 import de.iip_ecosphere.platform.transport.serialization.GenericJsonToStringTranslator;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
@@ -111,42 +108,6 @@ public class StatusMessageSerializer implements Serializer<StatusMessage> {
                 }
             }
         }
-    }
-
-    /**
-     * Generic enum deserializer.
-     * 
-     * @param <T> the type to deserialize
-     * @author Holger Eichelberger, SSE
-     */
-    public static class EnumDeserializer<T> extends StdDeserializer<T> {
-
-        private static final long serialVersionUID = -1654499344527076310L;
-        private Map<String, T> mapping;
-        
-        /**
-         * Creates a deserializer class.
-         * 
-         * @param mapping the mapping to use for deserialization
-         * @param cls the type of enums to deserialize
-         */
-        public EnumDeserializer(Map<String, T> mapping, Class<T> cls) {
-            super(cls);
-            this.mapping = mapping;
-        }
-        
-        @Override
-        public T deserialize(JsonParser jp, DeserializationContext ctxt)
-            throws IOException, JsonProcessingException {
-            T result = null;
-            JsonNode node = jp.getCodec().readTree(jp);
-            String name = node.asText();
-            if (null != name) {
-                result = mapping.get(name);
-            }
-            return result;
-        }
-        
     }
 
     @Override
