@@ -1,0 +1,61 @@
+import Basics;
+import JavaBasics;
+import ServiceBasics;
+import JavaServiceBaseImpl;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120)
+template JavaServiceImplStateMachine(Configuration config, JavaCodeArtifact target, String pkg, JavaService service) extends ServiceBasics {
+    
+    JavaCodeClass mainCls;
+    
+    // called via produceForInputTypes/produceForOutputTypes
+    def produceAsyncProcessorBody(IOType type) {
+        // @Monika: variant 1, only the block as java code, add block
+        String t = toTypeName(type);
+        JavaCodeMethod m = mainCls.addMethod("", "process" + t.firstToUpperCase());
+        m.addOverrideAnnotation();
+        m.addParameter(toQualifiedTypeName(t), "data");
+        JavaCodeBlock b = '// java code goes here, do whatever';
+        m.addAll(b);
+    }
+    
+    // called via produceForInputTypes/produceForOutputTypes
+    def produceSyncProcessorBody(IOType returnType, IOType dataType) {
+        // @Monika: variant 2, parse code into method block
+        String t = toTypeName(dataType);
+        JavaCodeMethod m = mainCls.addMethod(toQualifiedTypeName(returnType), "transform" + t.firstToUpperCase());
+        m.addOverrideAnnotation();
+        m.addParameter(toQualifiedTypeName(dataType), "data", "the data item to be processed");
+        m.parse('// java code goes here, do whatever');
+    }
+    
+    // called via produceForInputTypes/produceForOutputTypes
+    def produceProducerBody(IOType type) {
+        // @Monika: variant 3, full code on your side
+        String t = toTypeName(type);
+        mainCls.addMethod(new JavaCodeMethod('
+            @Override
+            public ${toQualifiedTypeName(type)} produce${t.firstToUpperCase()} {
+                // do whatever
+            }
+        '));
+        //mainCls.addMethod(toQualifiedTypeName(type), "produce" + t.firstToUpperCase());
+    }    
+
+    def main(Configuration config, JavaCodeArtifact target, String pkg, JavaService service) {
+        String clsName = asTypeName(service.name);
+        mainCls = codeCreateClass(target, pkg, clsName, "IIP-Ecosphere service with state machine for service \'${service.name}\'");
+        mainCls.addExtends("iip.impl.${clsName}Impl");
+
+        createFallbackConstructor(mainCls, false, false);
+        createFallbackConstructor(mainCls, true, false);
+        createYamlConstructor(mainCls, false, false);
+        createYamlConstructor(mainCls, true, false);
+        
+        produceForInputTypes(service);
+        produceForOutputTypes(service);
+    }
+    
+}

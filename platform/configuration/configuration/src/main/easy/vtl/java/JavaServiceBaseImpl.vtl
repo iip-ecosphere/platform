@@ -105,8 +105,8 @@ template JavaServiceBaseImpl(Configuration config, JavaCodeArtifact target, Serv
         produceAccessors(p, "double");
     }
 
-    def createFallbackConstructor(JavaCodeClass cls, boolean withId) {
-        mainCls.addConstructor('Fallback constructor setting most fields to "empty" default values.').(m|{
+    def createFallbackConstructor(JavaCodeClass cls, boolean withId, boolean withCode) {
+        cls.addConstructor('Fallback constructor setting most fields to "empty" default values.').(m|{
             m.setProtected();
             new JavaCodeMethodCall("super").(c|{
                 if (withId) {
@@ -115,12 +115,14 @@ template JavaServiceBaseImpl(Configuration config, JavaCodeArtifact target, Serv
                 c.addArgument(m.addParameter("de.iip_ecosphere.platform.services.environment.ServiceKind", "kind", "the service kind"));
                 m.add(c);
             });
-            m.addCall("registerParameterConfigurers");
+            if (withCode) {
+                m.addCall("registerParameterConfigurers");
+            }
         });
     }
     
-    def createYamlConstructor(JavaCodeClass cls, boolean withId) {
-        mainCls.addConstructor('Creates a service instance from YAML information.').(m|{
+    def createYamlConstructor(JavaCodeClass cls, boolean withId, boolean withCode) {
+        cls.addConstructor('Creates a service instance from YAML information.').(m|{
             m.setProtected();
             new JavaCodeMethodCall("super").(c|{
                 if (withId) {
@@ -132,7 +134,9 @@ template JavaServiceBaseImpl(Configuration config, JavaCodeArtifact target, Serv
                 }
                 m.add(c);
             });
-            m.addCall("registerParameterConfigurers");
+            if (withCode) {
+                m.addCall("registerParameterConfigurers");
+            }
         });
     }
     
@@ -152,10 +156,10 @@ template JavaServiceBaseImpl(Configuration config, JavaCodeArtifact target, Serv
         }
         mainCls.addAttribute("java.util.Map<String, de.iip_ecosphere.platform.services.environment.ParameterConfigurer<?>>", "paramConfigurers").addNew("java.util.HashMap<>");
 
-        createFallbackConstructor(mainCls, false);
-        createFallbackConstructor(mainCls, true);
-        createYamlConstructor(mainCls, false);
-        createYamlConstructor(mainCls, true);
+        createFallbackConstructor(mainCls, false, true);
+        createFallbackConstructor(mainCls, true, true);
+        createYamlConstructor(mainCls, false, true);
+        createYamlConstructor(mainCls, true, true);
         
         mainCls.addMethod("de.iip_ecosphere.platform.services.environment.ParameterConfigurer<?>", "getParameterConfigurer").(m|{
             m.param("String", "paramName");

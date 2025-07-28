@@ -1,0 +1,28 @@
+project ServiceStateMachines {
+
+   import MetaConcepts;
+   import Devices;
+   import DevicePart*;
+   import Resources;
+   import Transport;
+   import Nameplate;
+   
+   annotate BindingTime bindingTime = BindingTime::compile to .;
+   annotate Integer uiGroup = UiMandatoryGroup1 to .;
+   
+   compound State {
+       sequenceOf(String) onEntry; 
+       setOf(refTo(Transition)) transitions;       
+   }
+      
+   compound Transition {
+       String event;
+       String log; 
+       State target;
+   }
+   
+   compound StateMachine {
+       setOf(refTo(State)) states;
+   }
+   
+}

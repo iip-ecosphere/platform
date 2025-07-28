@@ -1,0 +1,6 @@
+ServiceStateMachines::State::onEntry = On entry action.
+ServiceStateMachines::State::transitions = State outgoing transitions.
+ServiceStateMachines::Transition::event = Transition firing event.
+ServiceStateMachines::Transition::log = Transition log.
+ServiceStateMachines::Transition::target = Transition target.
+ServiceStateMachines::StateMachine::states = The states of the state machine.

@@ -603,7 +603,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     
     // ------------------------------------------ generating apps: generating service-specific code artifacts -----------------------------------
     
-    // dispatch basis
+    @DispatchBasis
     generateServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, ServiceBase service) = {
         generateJavaServiceElements(appRoot, config, artifacts, no, service);
     }
@@ -619,11 +619,13 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         }
     }
     
+    @DispatchCase
     generateServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, CompleteService service) = {
         // do nothing, everything is here already generically in place
     }
     
     // Python (preliminary in here)
+    @DispatchCase
     generateServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, PythonService service) = {
         IIPEcosphere cfg = config;
         String clsName = asTypeName(no.name);
@@ -635,10 +637,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         }
     }
 
+    @DispatchCase
     generateServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, Connector conn) = {
         //generateJavaServiceElements(appRoot, config, artifacts, no, conn);
     }
 
+    @DispatchCase
     generateServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, ChannelConnector conn) = {
         //generateJavaServiceElements(appRoot, config, artifacts, no, conn);
         IIPEcosphere cfg = config;
@@ -2290,8 +2294,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     
     // ------------------------------------------ gen interfaces: service interfaces ---------------------------------------------------------
 
-    // dispatch basis
+    @DispatchBasis
     generateServiceInterfaces(Path appRoot, Configuration config, ServiceBase service) = {
+        generateJavaServiceInterfaces(appRoot, config, service);
+    }
+    
+    generateJavaServiceInterfaces(Path appRoot, Configuration config, ServiceBase service) = {
         String clsName = asTypeName(service.name);
         Path javaSrc = "${appRoot}/src/main/java";
         Path javaInterfacesSrc = "${javaSrc}/${toPath(javaInterfacesPackage)}";
@@ -2300,15 +2308,30 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("JavaServiceBaseImpl", config, "${javaServiceImplSrc}/${clsName}Impl.java", service=service, pkg=javaImplPackage);
     }
 
+    @DispatchCase
     generateServiceInterfaces(Path appRoot, Configuration config, Connector connector) = {
         // do nothing, connectors have different interfaces
     }
     
+    @DispatchCase
     generateServiceInterfaces(Path appRoot, Configuration config, CompleteService service) = {
         // do nothing, everything is here already generically in place
     }
     
+    @DispatchCase
+    generateServiceInterfaces(Path appRoot, Configuration config, JavaService service) = {
+        generateJavaServiceInterfaces(appRoot, config, service);
+        if (isDefined(service.stateMachine) and service.stateMachine <> null) {
+            String clsName = asTypeName(service.name);
+            Path javaSrc = "${appRoot}/src/main/java";
+            Path javaServiceImplSrc = "${javaSrc}/${toPath(javaImplPackage)}";
+            vilTemplateProcessor("JavaServiceImplStateMachine", config, "${javaServiceImplSrc}/${clsName}.java", 
+                pkg=javaImplPackage, service=service);
+        }
+    }
+    
     // Python (preliminary in here)
+    @DispatchCase
     generateServiceInterfaces(Path appRoot, Configuration config, PythonService service) = {
         String clsName = asTypeName(service.name);
         Path pySrc = "${appRoot}/src/main/python";
