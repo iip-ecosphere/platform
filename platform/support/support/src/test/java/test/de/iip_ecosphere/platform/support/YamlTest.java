@@ -42,6 +42,8 @@ public class YamlTest {
     @Test
     public void testYaml() throws IOException {
         Yaml yaml = Yaml.getInstance();
+        Yaml.setInstance(yaml);
+        
         Assert.assertNotNull(fromResource(in -> yaml.load(in)));
         Assert.assertNotNull(fromResource(in -> yaml.loadMapping(in)));
         Assert.assertNotNull(fromResource(in -> yaml.loadAs(in, Object.class)));

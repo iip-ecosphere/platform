@@ -2,6 +2,12 @@
 
 Basic functionality for the oktoflow platform in terms of:
   * Basic [support functions](support/README.md)
+  * [Logging plugin](support.log-slf4j-simple/README.md)
+  * [Yaml plugin](support.yaml-snakeyaml/README.md)
+  * [JSON plugin](support.json-jackson/README.md)
+  * [JSON plugin](support.rest-spark/README.md)
+  * [Websocket plugin](support.websocket-websocket/README.md)
+  * [ProcessInfo plugin](support.processInfo-oshi/README.md)
   * Asset Administration Shell (AAS) [abstraction](support.aas/README.md) with visitor, communication protocol support and useful recipes for deployment and I/O
   * [Default AAS client abstraction implementation](support.aas.basyx/README.md) for [Eclipse Basyx](https://www.eclipse.org/basyx/)
   * [Default AAS server abstraction implementation](support.aas.basyx.server/README.md) for [Eclipse Basyx](https://www.eclipse.org/basyx/)

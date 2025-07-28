@@ -45,6 +45,7 @@ import test.de.iip_ecosphere.platform.support.logging.LoggerFactoryTest;
     YamlTest.class,
     YamlFileTest.class,
     JsonTest.class,
+    RestTest.class,
     TaskRegistryTests.class,
     CollectorTest.class,
     PluginManagerTest.class,

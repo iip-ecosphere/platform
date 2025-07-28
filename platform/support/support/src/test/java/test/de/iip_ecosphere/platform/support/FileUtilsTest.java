@@ -16,7 +16,6 @@ import de.iip_ecosphere.platform.support.FileUtils;
  * @author Holger Eichelberger, SSE
  */
 public class FileUtilsTest {
-
     
     /**
      * Tests the temporary directory access.
@@ -70,7 +69,7 @@ public class FileUtilsTest {
             fileCount.incrementAndGet();
         });
         
-        Assert.assertEquals(16, fileCount.get());
+        Assert.assertEquals(19, fileCount.get());
         fileCount.set(0);
 
         FileUtils.listFiles(f, g -> !g.getName().equals("services"), g -> {
