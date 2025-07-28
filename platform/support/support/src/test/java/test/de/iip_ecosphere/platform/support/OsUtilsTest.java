@@ -57,4 +57,17 @@ public class OsUtilsTest {
         
         Assert.assertFalse(OsUtils.getBooleanPropertyOrEnv("iip.nonsense1", false));
     }
+    
+    /**
+     * Tests the Windows, Linux, Unix, Mac methods.
+     */
+    @Test
+    public void testOs() {
+        // just passed through, ok to call only
+        OsUtils.isWindows();
+        OsUtils.isLinux();
+        OsUtils.isUnix();
+        OsUtils.isMac();
+    }
+    
 }

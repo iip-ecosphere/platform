@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.support;
 
+import org.apache.commons.lang3.SystemUtils;
+
 /**
  * Access to static operating system level information.
  * 
@@ -109,6 +111,42 @@ public class OsUtils {
      */
     public static String getPropertyOrEnv(String key) {
         return getPropertyOrEnv(key, null);
+    }
+    
+    /**
+     * Returns whether we are running on windows.
+     * 
+     * @return {@code true} for windows, {@code false} else
+     */
+    public static boolean isWindows() {
+        return SystemUtils.IS_OS_WINDOWS;
+    }
+
+    /**
+     * Returns whether we are running on Linux.
+     * 
+     * @return {@code true} for Linux, {@code false} else
+     */
+    public static boolean isLinux() {
+        return SystemUtils.IS_OS_LINUX;
+    }
+
+    /**
+     * Returns whether we are running on Unix.
+     * 
+     * @return {@code true} for Unix, {@code false} else
+     */
+    public static boolean isUnix() {
+        return SystemUtils.IS_OS_UNIX;
+    }
+
+    /**
+     * Returns whether we are running on Mac.
+     * 
+     * @return {@code true} for Mac, {@code false} else
+     */
+    public static boolean isMac() {
+        return SystemUtils.IS_OS_MAC;
     }
 
 }

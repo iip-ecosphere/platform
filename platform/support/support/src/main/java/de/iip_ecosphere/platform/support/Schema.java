@@ -40,10 +40,15 @@ public enum Schema {
     SSL("ssl://", true),
     
     /**
-     * Non-encrypted websockets.
+     * Not-encrypted websockets.
      */
     WS("ws://", false),
-    
+
+    /**
+     * SSH.
+     */
+    SSH("ssh://", false),
+
     /**
      * Use whatever you like.
      */
