@@ -29,11 +29,6 @@
      <artifactId>deviceMgt</artifactId>
      <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.apache.sshd</groupId>
-      <artifactId>sshd-core</artifactId>
-      <version>2.7.0</version>
-    </dependency>
     <!-- NO dependency to de.iip-ecosphere.platform.services!! services.environment is ok for metrics -->
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
@@ -76,6 +71,12 @@
     </dependency> 
     <dependency>
       <artifactId>support.log-slf4j-simple</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <artifactId>support.ssh-sshd</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <scope>test</scope>
       <version>${project.version}</version>
