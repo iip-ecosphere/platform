@@ -29,7 +29,7 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Default plugin setup descriptor based based on loading from a project folder containing jars and the 
- * classpath in "classpath" or in "target/classes/classpath".
+ * classpath in "classpath", in "target/jars/classpath", or in "target/classes/classpath".
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -78,6 +78,9 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
     public static File findClasspathFile(File folder, String suffix) {
         suffix = suffix == null ? "" : suffix;
         File f = new File(folder, "classpath" + suffix); // unpacked
+        if (!f.exists()) {
+            f = new File(folder, "target/jars/classpath" + suffix); // development, in project
+        }
         if (!f.exists()) {
             f = new File(folder, "target/classes/classpath" + suffix); // development, in project
         }
