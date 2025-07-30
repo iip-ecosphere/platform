@@ -62,6 +62,7 @@ public class TestWithPlugin {
         private String folder;
         private String installFolder;
         private boolean descriptorOnly;
+        private String[] appends; 
 
         /**
          * Creates a new plugin location.
@@ -70,18 +71,21 @@ public class TestWithPlugin {
          * @param folder the plugin folder within the parent folder (in git workspace)
          * @param installFolder (in unpacked plugins)
          * @param descriptorOnly shall only be descriptor JARs loaded or the full classpath
+         * @param appends optional plugins to be appended
          */
-        private PluginLocation(String parent, String folder, String installFolder, boolean descriptorOnly) {
+        private PluginLocation(String parent, String folder, String installFolder, boolean descriptorOnly, 
+            String... appends) {
             this.parent = parent;
             this.folder = folder;
             this.installFolder = installFolder;
             this.descriptorOnly = descriptorOnly;
+            this.appends = appends;
         }
     }
     
     static {
-        addPluginLocation("support", "support.aas.basyx2", "basyx2", false);
-        addPluginLocation("support", "support.aas.basyx", "basyx", false);
+        addPluginLocation("support", "support.aas.basyx2", "basyx2", false, "log-slf4j-simple");
+        addPluginLocation("support", "support.aas.basyx", "basyx", false, "log-slf4j-simple");
     }
 
     /**
@@ -91,13 +95,35 @@ public class TestWithPlugin {
      * @param folder the plugin folder within the parent folder (in git workspace)
      * @param installFolder (in unpacked plugins)
      * @param descriptorOnly shall only be descriptor JARs loaded or the full classpath
+     * @param appends optional plugins to be appended
      */
-    public static void addPluginLocation(String parent, String folder, String installFolder, boolean descriptorOnly) {
-        locations.add(new PluginLocation(parent, folder, installFolder, descriptorOnly));
+    public static void addPluginLocation(String parent, String folder, String installFolder, boolean descriptorOnly, 
+        String... appends) {
+        locations.add(new PluginLocation(parent, folder, installFolder, descriptorOnly, appends));
         LoggerFactory.getLogger(TestWithPlugin.class).info("Added plugin location for {} (descriptor only: {})", 
             folder, descriptorOnly);
     }
 
+    /**
+     * Collects the appended plugins.
+     * 
+     * @param base the base folder for relocation
+     * @param appends the appended plugins
+     * @return the appended plugins, may be <b>null</b>
+     */
+    private static File[] collectAppends(File base, String[] appends) {
+        File[] result;
+        if (null == appends || appends.length == 0) {
+            result = null;
+        } else {
+            result = new File[appends.length];
+            for (int a = 0; a < appends.length; a++) {
+                result[a] = new File(base, appends[a]);
+            }
+        }
+        return result;
+    }
+    
     /**
      * Loads plugins statically.
      */
@@ -115,15 +141,18 @@ public class TestWithPlugin {
                 }
                 if (folder.isDirectory()) { // in local git repo
                     LoggerFactory.getLogger(TestWithPlugin.class).info("Loading plugin from {} (development)", folder);
-                    PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(folder, loc.descriptorOnly));
+                    File[] appends = collectAppends(folder.getParentFile(), loc.appends);
+                    PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(folder, loc.descriptorOnly, 
+                        appends));
                     found = true;
                 } else { // local, unpacked
                     folder = new File(installDir);
                     if (folder.isDirectory()) {
+                        File[] appends = collectAppends(folder.getParentFile(), loc.appends);
                         LoggerFactory.getLogger(TestWithPlugin.class).info("Loading plugin from {} "
                             + "(test deployment)", installDir);
                         PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(
-                            new File(installDir + "/" + loc.installFolder), loc.descriptorOnly));
+                            new File(installDir + "/" + loc.installFolder), loc.descriptorOnly, appends));
                         found = true;
                     }
                 }
