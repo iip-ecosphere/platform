@@ -27,7 +27,17 @@ public class DefaultPluginDescriptor<T> implements PluginDescriptor<T> {
     private String id;
     private List<String> ids;
     private Class<T> pluginClass;
-    private Function<Plugin<T>, T> pluginSupplier;
+    private PluginSupplier<T> pluginSupplier;
+
+    /**
+     * Declares the plugin supplier type.
+     * 
+     * @param <T> plugin type
+     * @author Holger Eichelberger, SSE
+     */
+    public interface PluginSupplier<T> extends Function<Plugin<T>, T> {
+        
+    }
     
     /**
      * Creates a descriptor instance.
@@ -36,15 +46,48 @@ public class DefaultPluginDescriptor<T> implements PluginDescriptor<T> {
      * @param ids optional secondary ids, may be <b>null</b> or empty
      * @param pluginClass the instance class
      * @param pluginSupplier the creator supplier
+     * @see #initId(String)
+     * @see #initIds(String[])
+     * @see #initPluginSupplier(Function)
      */
     public DefaultPluginDescriptor(String id, List<String> ids, Class<T> pluginClass, 
-        Function<Plugin<T>, T> pluginSupplier) {
-        this.id = id;
-        this.ids = ids;
+        PluginSupplier<T> pluginSupplier) {
+        this.id = initId(id);
+        this.ids = initIds(ids);
         this.pluginClass = pluginClass;
-        this.pluginSupplier = pluginSupplier;
+        this.pluginSupplier = initPluginSupplier(pluginSupplier);
     }
     
+    /**
+     * Returns the plugin supplier upon creation.
+     * 
+     * @param pluginSupplier the supplied supplier
+     * @return {@code pluginSupplier}
+     */
+    protected PluginSupplier<T> initPluginSupplier(PluginSupplier<T> pluginSupplier) {
+        return pluginSupplier;
+    }
+
+    /**
+     * Returns the plugin id upon creation.
+     * 
+     * @param id the supplied plugin id
+     * @return {@code id}
+     */
+    protected String initId(String id) {
+        return id;
+    }
+
+    /**
+     * Returns the additional plugin ids upon creation.
+     * 
+     * @param ids the supplied plugin ids
+     * @return {@code ids}
+     */
+    protected List<String> initIds(List<String> ids) {
+        return ids;
+    }
+
     @Override
     public String getId() {
         return id;
@@ -66,7 +109,7 @@ public class DefaultPluginDescriptor<T> implements PluginDescriptor<T> {
      * @return the plugin instance
      */
     protected Plugin<T> createPlugin(String id, List<String> ids, Class<T> pluginClass, 
-        Function<Plugin<T>, T> pluginSupplier, File installDir) {
+        PluginSupplier<T> pluginSupplier, File installDir) {
         return new Plugin<T>(id, ids, pluginClass, pluginSupplier, installDir);
     }
 

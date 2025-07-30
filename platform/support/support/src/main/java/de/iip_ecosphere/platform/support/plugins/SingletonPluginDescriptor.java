@@ -14,7 +14,6 @@ package de.iip_ecosphere.platform.support.plugins;
 
 import java.io.File;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * Singleton plugin descriptor implementation, creates {@link SingletonPlugin} instances.
@@ -33,13 +32,13 @@ public class SingletonPluginDescriptor<T> extends DefaultPluginDescriptor<T> {
      * @param pluginSupplier the creator supplier
      */
     public SingletonPluginDescriptor(String id, List<String> ids, Class<T> pluginClass, 
-        Function<Plugin<T>, T> pluginSupplier) {
+        PluginSupplier<T> pluginSupplier) {
         super(id, ids, pluginClass, pluginSupplier);
     }
     
     @Override
     protected Plugin<T> createPlugin(String id, List<String> ids, Class<T> pluginClass, 
-        Function<Plugin<T>, T> pluginSupplier, File installDir) {
+        PluginSupplier<T> pluginSupplier, File installDir) {
         return new SingletonPlugin<T>(id, ids, pluginClass, pluginSupplier, installDir);
     }
 
