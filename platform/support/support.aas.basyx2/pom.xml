@@ -295,29 +295,24 @@
              <executions>
                  <execution>
                      <id>copy-dependencies</id>
-                     <goals>
-                         <goal>copy-dependencies</goal>
-                     </goals>
                      <phase>package</phase>
-                     <configuration>
-                         <prependGroupId>true</prependGroupId>
-                         <outputDirectory>target/jars</outputDirectory>
-                         <overWriteReleases>false</overWriteReleases>
-                         <overWriteSnapshots>true</overWriteSnapshots>
-                         <overWriteIfNewer>true</overWriteIfNewer>
-                         <includeScope>runtime</includeScope>
-                         <excludeArtifactIds>support.aas, support</excludeArtifactIds>
-                     </configuration>
+                     <goals>
+                         <goal>copy-plugin-dependencies</goal>
+                     </goals>
                  </execution>
                  <execution>
                      <id>build-classpath-plugin</id>
-                     <phase>compile</phase> <!-- Eclipse autobuild -->
+                     <phase>prepare-package</phase> <!-- Eclipse autobuild -->
                      <goals>
                          <goal>build-plugin-classpath</goal>
                      </goals>
-                     <configuration>
-                         <excludeArtifactIds>support.aas, support</excludeArtifactIds>
-                     </configuration>
+                 </execution>
+                 <execution>
+                     <id>assemble</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>assemble-plugin</goal>
+                     </goals>
                  </execution>
              </executions>
          </plugin>
@@ -334,7 +329,6 @@
                     </goals>
                     <configuration>
                         <descriptors>
-                            <descriptor>src/main/assembly/plugin.xml</descriptor>
                             <descriptor>src/main/assembly/core.xml</descriptor>
                         </descriptors>
                         <attach>true</attach>

@@ -63,52 +63,27 @@
              <executions>
                  <execution>
                      <id>copy-dependencies</id>
-                     <goals>
-                         <goal>copy-dependencies</goal>
-                     </goals>
                      <phase>package</phase>
-                     <configuration>
-                         <prependGroupId>true</prependGroupId>
-                         <outputDirectory>target/jars</outputDirectory>
-                         <overWriteReleases>false</overWriteReleases>
-                         <overWriteSnapshots>true</overWriteSnapshots>
-                         <overWriteIfNewer>true</overWriteIfNewer>
-                         <includeScope>compile</includeScope>
-                         <excludeArtifactIds>support</excludeArtifactIds>
-                     </configuration>
+                     <goals>
+                         <goal>copy-plugin-dependencies</goal>
+                     </goals>
                  </execution>
                  <execution>
                      <id>build-classpath-plugin</id>
-                     <phase>compile</phase> <!-- Eclipse autobuild -->
+                     <phase>package</phase>
                      <goals>
                          <goal>build-plugin-classpath</goal>
                      </goals>
-                     <configuration>
-                         <excludeArtifactIds>support</excludeArtifactIds>
-                     </configuration>
+                 </execution>
+                 <execution>
+                     <id>assemble</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>assemble-plugin</goal>
+                     </goals>
                  </execution>
              </executions>
          </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <version>${org.apache.maven.assembly.version}</version>
-            <executions>
-                <execution>
-                    <id>plugin</id>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>single</goal>
-                    </goals>
-                    <configuration>
-                        <descriptors>
-                            <descriptor>src/main/assembly/plugin.xml</descriptor>
-                        </descriptors>
-                        <attach>true</attach>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
       </plugins>
   </build>
 
