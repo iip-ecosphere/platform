@@ -125,6 +125,11 @@
        <version>3.2.0</version>
     </dependency>
     <dependency>
+       <groupId>org.apache.maven.plugins</groupId>
+       <artifactId>maven-assembly-plugin</artifactId>
+       <version>3.0.0</version>
+    </dependency>
+    <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>maven-python</artifactId>
       <version>${project.version}</version>

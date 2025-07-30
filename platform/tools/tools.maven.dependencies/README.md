@@ -2,6 +2,8 @@
 
 We use the `maven-dependency-plugin` for various tasks, e.g., to unpack Python code or the configuration model.  However, we do not limit ourselves to the target directory which may be cleaned up with `mvn clean` and other cleaning procedures do not work. So we decided to add a cleanup specification to `unpack` goal of maven-dependency-plugin provided by this package. Similarly, we need to add further non-classpath files to `build-classpath` when creating classpath files for platform instances. For convenience, we include further goals such as `delete` or `copy` of the original plugin we use them frequently in conjunction with `unpack`. Basic properties of the underlying maven dependendency plugin can be applied although not explicitly discussed here.
 
+# generic goals
+
 ## unpack goal
 
 The extended `unpack` goal behaves like the original goal offering all configuration options, but in addition the `cleanup` option. Unpacking only happens if the output directory given in the respective artifact item does not exist, it only contains files listed in `initiallyAllowed` or if `force` is specified, usually via command line.
@@ -52,11 +54,11 @@ The extended unpack goal supports the following additional configuration setting
   
 ## copy-dependencies goal
 
-The ``copy-dependencies`` goal is the same as in the original plugin and included here just for convenience.
+The `copy-dependencies` goal is the same as in the original plugin and included here just for convenience.
 
 ## build-classpath goal
 
-The ``build-classpath`` goal is the same as in the original plugin and allows for adding further entries at the beginning or ending of a classpath file.
+The `build-classpath` goal is the same as in the original plugin and allows for adding further entries at the beginning or ending of a classpath file.
 - `prepends` is a list of `prepend` string entries specifying complete classpath entries to be prepended to the `outputFile` concatenated by `pathSeparator`
 - `appends` is a list of `append` string entries specifying  complete classpath entries to be prepended to the `outputFile` concatenated by `pathSeparator`
 - `rollout` rolls out the given classpath setup to a similar file for Linux (postfix `-linux`) and a file for Windows (postfix `-win`) with operating system settings like file/path separator applied automatically
@@ -65,15 +67,6 @@ The ``build-classpath`` goal is the same as in the original plugin and allows fo
 - `lineSeparator` (default the carriage return, user property `mdep.lineSeparator`) used as separator between `befores`, `afters` and the classpath 
 
 The expressions `${self}` or `${self-test}` can be used in prepends/appends to add the jar/test-jar artifact of the actual project.
-
-## build-plugin-classpath goal
-
-Specialized goal to build a plugin classpath file. Based on the refined ``build-classpath`` above, but ships with a pre-configuration for plugin classpaths. In more details, sets the output file to `${project.build.directory}/classes/classpath`, `prependGroupId` to `true`, `overWriteIfNewer` to `true`, `localRepoProperty` to `target/jars`, `prefix` to `target/jars`, `fileSeparator` to `/`, `pathSeparator` to `:`, and, if not set otherwise, `includeScope` to `runtime`. Further, prepends the own artifact by default and via `addTestArtifact` also the corresponding test artifact. Adds a set of befores as comments, including `prefix`, `unpackMode`, `setupDescriptor` and `pluginIds` (see below). 
-
-- `addTestArtifact` (default `false`, user property `mdep.addTestArtifact`) adds the test artifact based on the actual project
-- `unpackMode` (default `jars`, user property `mdep.unpackMode`) specifies how unpacking shall happen, i.e., whether jars are included in the plugin artifact (`jars`) or whether they shall be resolved (`resolve`)
-- `setupDescriptor` (default `FolderClasspath`, user property `mdep.setupDescriptor`) specifies the descriptor implementation that shall be announced to the plugin manager, may be a shortcut for platform supplied descriptors (`FolderClasspath`, `CurrentClassloader`, `ClasspathFile`, `PluginBased`, `Process`) or a qualified classname assuming a non-arg constructor
-- `pluginIds` (default empty, user property `mdep.pluginIds`) specifies pluginIds for the `PluginBased` setup descriptor, may also be used with others whereby then the plugin is also announced by `PluginBased`
 
 ## diff-classpath goal
 
@@ -122,6 +115,71 @@ The delete goal allows to just delete files and directories. At it's core, it is
      </plugins>
   </build>
   ```
+
+
+# plugin goals
+
+Creating an oktoflow plugin requires three resource goals, all configured with the specific default settings described below:
+
+  ```xml
+         <plugin>
+             <groupId>de.iip-ecosphere.platform</groupId>
+             <artifactId>dependency-plugin</artifactId>
+             <version>${project.version}</version>
+             <executions>
+                 <execution>
+                     <id>copy-dependencies</id>
+                     <goals>
+                         <goal>copy-dependencies</goal>
+                     </goals>
+                     <phase>package</phase>
+                 </execution>
+                 <execution>
+                     <id>build-classpath-plugin</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>build-plugin-classpath</goal>
+                     </goals>
+                 </execution>
+                 <execution>
+                     <id>assemble</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>assemble-plugin</goal>
+                     </goals>
+                 </execution>                 
+             </executions>
+         </plugin>
+  ```
+
+Each execution may be configured independently. Some configuration settings shall be consistent and may go into an overarching, execution-independent configuration, e.g. ``excludeArtifactIds``, ``unpackMode`` or ``addTestArtifact``.
+
+## build-plugin-classpath goal
+
+Specialized goal to build a plugin classpath file. Based on the refined ``build-classpath`` above, but ships with a pre-configuration for plugin classpaths. In more details, sets the output file to `${project.build.directory}/jars/classpath`, `prependGroupId` to `true`, `overWriteIfNewer` to `true`, `localRepoProperty` to `${project.build.directory}/jars`, `prefix` to `${project.build.directory}/jars`, `fileSeparator` to `/`, `pathSeparator` to `:`, and, if not set otherwise, `includeScope` to `runtime` (with `addTestArtifact` set to `test`). Further, prepends the own artifact by default and via `addTestArtifact` also the corresponding test artifact. Adds a set of befores as comments, including `prefix`, `unpackMode`, `setupDescriptor` and `pluginIds` (see below). 
+
+- `addTestArtifact` (default `false`, user property `mdep.addTestArtifact`) adds the test artifact based on the actual project
+- `unpackMode` (default `jars`, user property `mdep.unpackMode`) specifies how unpacking shall happen, i.e., whether jars are included in the plugin artifact (`jars`) or whether they shall be resolved (`resolve`)
+- `setupDescriptor` (default `FolderClasspath`, user property `mdep.setupDescriptor`) specifies the descriptor implementation that shall be announced to the plugin manager, may be a shortcut for platform supplied descriptors (`FolderClasspath`, `CurrentClassloader`, `ClasspathFile`, `PluginBased`, `Process`), a qualified classname assuming a non-arg constructor, or empty for no loading through the class loader (rather than appending during unpack).
+- `pluginIds` (default empty, user property `mdep.pluginIds`) specifies pluginIds for the `PluginBased` setup descriptor, may also be used with others whereby then the plugin is also announced by `PluginBased`
+
+The inherited setting ``excludeArtifactIds`` shall be configured in a way that prerequiste platform layers are excluded. Usually, the plugin detects and determins the respective artifact ids automatically.
+
+## copy-plugin-dependencies goal
+
+The `copy-plugin-dependencies` goal extends the ``copy-dependencies`` by pre-configuring it to prepend the group id, to set the output directory to ``${project.build.directory}/jars`` (can be overwritten), by disabling overriding of releases, by enabling overriding of snapshots and if newer, and by setting the include scope to `runtime` if not set (with `addTestArtifact` set to `test`). 
+
+The inherited setting ``excludeArtifactIds`` shall be configured in a way that prerequiste platform layers are excluded. Usually, the plugin detects and determins the respective artifact ids automatically.
+
+## assemble-plugin
+
+Creates a plugin-zip with classpath files from default directories (either ``${project.build.directory}/jars`` or ``${project.build.directory}/classes``) as well as the plugin jars and it's dependencies from jars (depending on `unpackMode`).
+
+- `unpackMode` (default `jars`, user property `mdep.unpackMode`) specifies how unpacking shall happen, i.e., whether jars are included in the plugin artifact (`jars`) or whether they shall be resolved (`resolve`)
+- `addTestArtifact` (default `false`, user property `mdep.addTestArtifact`) adds the test artifact based on the actual project
+- `furtherFiles` allowing to handle further files in usual Maven manner. Currently only the sub-structure `excludes/exclude` is considered to expliclitly exclude JARs from ``${project.build.directory}/jars`` that shall not be packaged/assembled.
+
+Unfortunately, reusing the Maven assembly plugin for this purpose was not possible due to technical (injection) issues.
 
 ## unpack-plugins
 
@@ -173,6 +231,6 @@ Moreover, for installations, if `relocate` is enabled, the `outputDirectory` bec
 
 If we are not in `relocate` mode, the plugin is only enabled, if the relative directories `../../support/support` (for arbitrary platform component) or `../support` (for support component) do not exist, which is the case for builds outside a local git workspace, e.g., on CI.
 
-## Missing
+# Missing
 
 Java-based tests as we do not understand how to correctly set up the testing harness. Testing is done here via ANT and, thus, not subject to coverage analysis.

@@ -20,9 +20,11 @@ import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
@@ -499,6 +501,10 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
      * @param tokenizer the tokenizer
      */
     private void processCpLineNoRelocation(String name, String line, PrintStream out, Tokenizer tokenizer) {
+        Set<String> knownTokens = new HashSet<>();
+        while (tokenizer.hasMoreTokens()) {
+            knownTokens.add(tokenizer.nextToken()); 
+        }
         out.print(line);
         int pos = name.indexOf("/");
         if (pos > 0) { // differentiating directory, if not-relocating
@@ -507,8 +513,11 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         List<String> plAppends = pluginAppends.get(name);
         if (null != plAppends) {
             for (String cp: plAppends) {
-                out.print(tokenizer.sep);
-                out.print(cp);
+                if (!knownTokens.contains(cp)) {
+                    out.print(tokenizer.sep);
+                    out.print(cp);
+                    knownTokens.add(cp);
+                }
             }
         }        
     }

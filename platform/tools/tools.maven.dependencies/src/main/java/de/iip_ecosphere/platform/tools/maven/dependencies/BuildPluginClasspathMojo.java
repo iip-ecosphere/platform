@@ -29,7 +29,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  * @author Holger Eichelberger, SSE
  */
 @Mojo( name = "build-plugin-classpath", requiresDependencyResolution = ResolutionScope.TEST, 
-    defaultPhase = LifecyclePhase.COMPILE, threadSafe = true )
+    defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true )
 public class BuildPluginClasspathMojo extends BuildClasspathMojo {
 
     public static final String KEY_PREFIX = "# prefix: ";
@@ -41,7 +41,7 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
     private boolean addTestArtifact;
 
     @Parameter( property = "mdep.unpackMode", defaultValue = "jars" )
-    private boolean unpackMode;
+    private String unpackMode;
 
     @Parameter( property = "mdep.setupDescriptor", defaultValue = "FolderClasspath" )
     private String setupDescriptor;
@@ -96,7 +96,8 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
     @Override
     protected void doExecute() throws MojoExecutionException {
         final String prefix = "target/jars";
-        setOutputFile(new File(targetDirectory, "classes/classpath"));
+        excludeArtifactIds = Layers.getExcludeArtifactIds(getProject().getArtifactId(), excludeArtifactIds, getLog());
+        setOutputFile(new File(targetDirectory, "jars/classpath"));
         setPrependGroupId(true);
         overWriteIfNewer = true;
         setLocalRepoProperty(prefix);
@@ -104,7 +105,11 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
         setFileSeparator("/");
         setPathSeparator(":");
         if (null == includeScope || includeScope.length() == 0) { // if not defined, default it
-            includeScope = "runtime";
+            if (addTestArtifact) {
+                includeScope = "test";
+            } else {
+                includeScope = "runtime";
+            }
         }
         List<String> prepends = new ArrayList<>();
         prepends.add(composeMyArtifact("", "jar"));
