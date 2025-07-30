@@ -36,13 +36,15 @@ public class TestUtils {
     /**
      * Creates a test suite.
      * 
-     * @param tests the tests to execute
+     * @param tests the tests to execute (may be <b>null</b> for an empty tests suite)
      * @return the test suite
      */
     public static TestSuite suite(Class<?>... tests) {
         TestSuite suite = new TestSuite();
-        for (Class<?> t : tests) {
-            suite.addTest(new JUnit4TestAdapter(t));
+        if (null != tests) {
+            for (Class<?> t : tests) {
+                suite.addTest(new JUnit4TestAdapter(t));
+            }
         }
         return suite;
     }    
