@@ -19,6 +19,8 @@ package de.iip_ecosphere.platform.support.metrics;
  */
 public interface SystemMetricsDescriptor {
 
+    public static final String PLUGIN_ID = "systemMetrics";
+    
     /**
      * Creates the actual system metrics instance.
      * 

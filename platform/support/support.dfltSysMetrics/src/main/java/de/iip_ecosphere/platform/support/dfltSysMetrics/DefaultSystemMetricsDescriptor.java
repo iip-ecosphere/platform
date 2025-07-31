@@ -12,15 +12,15 @@
 
 package de.iip_ecosphere.platform.support.dfltSysMetrics;
 
+import de.iip_ecosphere.platform.support.metrics.AbstractSystemMetricsPluginDescriptor;
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
-import de.iip_ecosphere.platform.support.metrics.SystemMetricsDescriptor;
 
 /**
  * The default JSL system metrics descriptor.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class DefaultSystemMetricsDescriptor implements SystemMetricsDescriptor {
+public class DefaultSystemMetricsDescriptor extends AbstractSystemMetricsPluginDescriptor {
 
     @Override
     public SystemMetrics createInstance() {

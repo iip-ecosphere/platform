@@ -14,15 +14,15 @@ package de.iip_ecosphere.platform.support.metrics.plcnext;
 
 import java.io.File;
 
+import de.iip_ecosphere.platform.support.metrics.AbstractSystemMetricsPluginDescriptor;
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
-import de.iip_ecosphere.platform.support.metrics.SystemMetricsDescriptor;
 
 /**
  * The default JSL system metrics descriptor.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class PlcNextSystemMetricsDescriptor implements SystemMetricsDescriptor {
+public class PlcNextSystemMetricsDescriptor extends AbstractSystemMetricsPluginDescriptor {
 
     @Override
     public SystemMetrics createInstance() {

@@ -27,6 +27,7 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
  */
 public abstract class SemanticIdResolver {
 
+    public static final String PLUGIN_ID_PREFIX = "semanticId-";
     public static final String GERMAN = Locale.GERMAN.getLanguage();
     public static final String ENGLISH = Locale.ENGLISH.getLanguage();
     

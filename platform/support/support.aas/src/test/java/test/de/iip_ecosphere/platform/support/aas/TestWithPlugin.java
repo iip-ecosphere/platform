@@ -12,29 +12,17 @@
 
 package test.de.iip_ecosphere.platform.support.aas;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Before;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.plugins.FolderClasspathPluginSetupDescriptor;
-import de.iip_ecosphere.platform.support.plugins.PluginManager;
-import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
- * Plugin-based test, aiming at inheriting plugin loading.
+ * Plugin-based test wit default setup for AAS.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class TestWithPlugin {
+public class TestWithPlugin extends test.de.iip_ecosphere.platform.support.TestWithPlugin {
 
-    public static final String PROP_AAS_PLUGIN = "okto.test.aas.pluginId";
-    
-    private static boolean loaded = false;
-    private static List<PluginLocation> locations = new ArrayList<>();
-    private static String installDir = "target/oktoPlugins";
     private static String aasPluginId = "aas.basyx-2.0"; // shall become the default id then
     
     /**
@@ -50,120 +38,14 @@ public class TestWithPlugin {
         }
         return old;
     }
-
-    /**
-     * Represents a plugin location.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class PluginLocation {
-        
-        private String parent;
-        private String folder;
-        private String installFolder;
-        private boolean descriptorOnly;
-        private String[] appends; 
-
-        /**
-         * Creates a new plugin location.
-         * 
-         * @param parent the parent folder (in git workspace)
-         * @param folder the plugin folder within the parent folder (in git workspace)
-         * @param installFolder (in unpacked plugins)
-         * @param descriptorOnly shall only be descriptor JARs loaded or the full classpath
-         * @param appends optional plugins to be appended
-         */
-        private PluginLocation(String parent, String folder, String installFolder, boolean descriptorOnly, 
-            String... appends) {
-            this.parent = parent;
-            this.folder = folder;
-            this.installFolder = installFolder;
-            this.descriptorOnly = descriptorOnly;
-            this.appends = appends;
-        }
-    }
     
     static {
         addPluginLocation("support", "support.aas.basyx2", "basyx2", false, "log-slf4j-simple");
         addPluginLocation("support", "support.aas.basyx", "basyx", false, "log-slf4j-simple");
-    }
-
-    /**
-     * Adds a new plugin location.
-     * 
-     * @param parent the parent folder (in git workspace)
-     * @param folder the plugin folder within the parent folder (in git workspace)
-     * @param installFolder (in unpacked plugins)
-     * @param descriptorOnly shall only be descriptor JARs loaded or the full classpath
-     * @param appends optional plugins to be appended
-     */
-    public static void addPluginLocation(String parent, String folder, String installFolder, boolean descriptorOnly, 
-        String... appends) {
-        locations.add(new PluginLocation(parent, folder, installFolder, descriptorOnly, appends));
-        LoggerFactory.getLogger(TestWithPlugin.class).info("Added plugin location for {} (descriptor only: {})", 
-            folder, descriptorOnly);
-    }
-
-    /**
-     * Collects the appended plugins.
-     * 
-     * @param base the base folder for relocation
-     * @param appends the appended plugins
-     * @return the appended plugins, may be <b>null</b>
-     */
-    private static File[] collectAppends(File base, String[] appends) {
-        File[] result;
-        if (null == appends || appends.length == 0) {
-            result = null;
-        } else {
-            result = new File[appends.length];
-            for (int a = 0; a < appends.length; a++) {
-                result[a] = new File(base, appends[a]);
-            }
-        }
-        return result;
-    }
-    
-    /**
-     * Loads plugins statically.
-     */
-    public static void loadPlugins() {
-        if (!loaded) {
-            loaded = true;
-            boolean found = false;
-            for (PluginLocation loc : locations) {
-                File folder = new File("..", loc.folder); // for platform parts in "support"
-                if (!folder.isDirectory()) { // just in case
-                    folder = new File("../" + loc.parent, loc.folder); 
-                }
-                if (!folder.isDirectory()) { // usual nesting of platform part in different folder
-                    folder = new File("../../" + loc.parent, loc.folder); 
-                }
-                if (folder.isDirectory()) { // in local git repo
-                    LoggerFactory.getLogger(TestWithPlugin.class).info("Loading plugin from {} (development)", folder);
-                    File[] appends = collectAppends(folder.getParentFile(), loc.appends);
-                    PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(folder, loc.descriptorOnly, 
-                        appends));
-                    found = true;
-                } else { // local, unpacked
-                    folder = new File(installDir);
-                    if (folder.isDirectory()) {
-                        File[] appends = collectAppends(folder.getParentFile(), loc.appends);
-                        LoggerFactory.getLogger(TestWithPlugin.class).info("Loading plugin from {} "
-                            + "(test deployment)", installDir);
-                        PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(
-                            new File(installDir + "/" + loc.installFolder), loc.descriptorOnly, appends));
-                        found = true;
-                    }
-                }
-                if (!found) {
-                    LoggerFactory.getLogger(TestWithPlugin.class).info("No plugins found for {}. "
-                        + "Test may fail.", loc.folder);
-                }
-            }
+        addRunAfterLoading(() -> {
             // TODO default from AASFactory
             AasFactory.setPluginId(System.getProperty("okto.test.aas.pluginId", aasPluginId)); 
-        }
+        });
     }
     
     /**
@@ -171,7 +53,7 @@ public class TestWithPlugin {
      */
     @Before
     public void setup() {
-        loadPlugins();
+        super.setup();
     }
 
 }

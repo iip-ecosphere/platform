@@ -18,8 +18,8 @@ import java.nio.charset.Charset;
 
 import org.apache.commons.io.FileUtils;
 
+import de.iip_ecosphere.platform.support.metrics.AbstractSystemMetricsPluginDescriptor;
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
-import de.iip_ecosphere.platform.support.metrics.SystemMetricsDescriptor;
 
 /**
  * The default JSL system metrics descriptor. Enables the metrics if {@code /etc/os-release} or
@@ -27,7 +27,7 @@ import de.iip_ecosphere.platform.support.metrics.SystemMetricsDescriptor;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class BitmotecSystemMetricsDescriptor implements SystemMetricsDescriptor {
+public class BitmotecSystemMetricsDescriptor extends AbstractSystemMetricsPluginDescriptor {
 
     @Override
     public SystemMetrics createInstance() {

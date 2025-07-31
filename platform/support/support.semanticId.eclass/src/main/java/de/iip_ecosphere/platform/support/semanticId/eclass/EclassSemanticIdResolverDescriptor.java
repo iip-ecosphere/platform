@@ -12,19 +12,24 @@
 
 package de.iip_ecosphere.platform.support.semanticId.eclass;
 
+import de.iip_ecosphere.platform.support.semanticId.AbstractSemanticIdResolverPluginDescriptor;
 import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolver;
-import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolverDescriptor;
 
 /**
  * JSL descriptor for {@link EclassSemanticIdResolver}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class EclassSemanticIdResolverDescriptor implements SemanticIdResolverDescriptor {
+public class EclassSemanticIdResolverDescriptor extends AbstractSemanticIdResolverPluginDescriptor {
 
     @Override
     public SemanticIdResolver createResolver() {
         return new EclassSemanticIdResolver();
+    }
+
+    @Override
+    protected String initId(String id) {
+        return "semanticId-eclass";
     }
 
 }
