@@ -88,7 +88,7 @@ public class ConnectorTest {
         }
         Assert.assertNotNull("Descriptor " + cls.getName() + " not auto-registered in ConnectorRegistry", found);
         Assert.assertTrue(found.getName().length() > 0);
-        Assert.assertNotNull(found.getType());
+        Assert.assertNotNull(found.getConnectorType());
     }
     
     /**

@@ -56,7 +56,7 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
         }
 
         @Override
-        public Class<?> getType() {
+        public Class<?> getConnectorType() {
             return MyModelConnector.class;
         }
         

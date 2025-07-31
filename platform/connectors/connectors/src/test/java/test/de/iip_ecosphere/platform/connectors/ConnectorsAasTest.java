@@ -72,7 +72,7 @@ public class ConnectorsAasTest extends TestWithPlugin {
         }
 
         @Override
-        public Class<?> getType() {
+        public Class<?> getConnectorType() {
             return Connector1.class;
         }
         
@@ -154,7 +154,7 @@ public class ConnectorsAasTest extends TestWithPlugin {
         }
 
         @Override
-        public Class<?> getType() {
+        public Class<?> getConnectorType() {
             return Connector2.class;
         }
         
@@ -449,7 +449,8 @@ public class ConnectorsAasTest extends TestWithPlugin {
         while (iter.hasNext()) {
             ConnectorDescriptor desc = iter.next();
             if (Connector1Descriptor.class == desc.getClass() || Connector2Descriptor.class == desc.getClass()) {
-                SubmodelElementCollection sec = cdsm.getSubmodelElementCollection(ClassUtility.getName(desc.getType()));
+                SubmodelElementCollection sec = cdsm.getSubmodelElementCollection(
+                    ClassUtility.getName(desc.getConnectorType()));
                 Assert.assertNotNull(sec);
                 try {
                     Assert.assertEquals(desc.getName(), sec.getProperty(ConnectorsAas.NAME_DESC_VAR_NAME).getValue());

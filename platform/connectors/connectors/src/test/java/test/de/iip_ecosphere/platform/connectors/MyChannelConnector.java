@@ -40,7 +40,7 @@ public class MyChannelConnector<CO, CI> extends AbstractChannelConnector<byte[],
         }
 
         @Override
-        public Class<?> getType() {
+        public Class<?> getConnectorType() {
             return MyModelConnector.class;
         }
         

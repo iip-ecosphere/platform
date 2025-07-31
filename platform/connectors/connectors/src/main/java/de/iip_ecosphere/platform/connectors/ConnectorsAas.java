@@ -103,7 +103,7 @@ public class ConnectorsAas implements AasContributor {
                 ConnectorDescriptor desc = iter.next();
                 Class<?> cls = desc.getClass();
                 SubmodelElementCollectionBuilder secB = ismB.createSubmodelElementCollectionBuilder(
-                    ClassUtility.getName(desc.getType()));
+                    ClassUtility.getName(desc.getConnectorType()));
                 secB.createPropertyBuilder(NAME_DESC_VAR_NAME)
                     .setValue(Type.STRING, desc.getName())
                     .build();

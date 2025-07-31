@@ -14,8 +14,8 @@ package de.iip_ecosphere.platform.connectors;
 
 /**
  * Describes a connector without instantiating it. Required to use the Java services mechanism to
- * silently register connector classes with the {@link ConnectorRegistry}. Per connector type ({@link #getType()})
- * there shall be only a single descriptor (instance)!
+ * silently register connector classes with the {@link ConnectorRegistry}. Per connector type 
+ * ({@link #getConnectorType()}) there shall be only a single descriptor (instance)!
  */
 public interface ConnectorDescriptor {
 
@@ -31,6 +31,6 @@ public interface ConnectorDescriptor {
      * 
      * @return the type
      */
-    public Class<?> getType();
+    public Class<?> getConnectorType();
     
 }
