@@ -1,7 +1,7 @@
-# Transport layer of the IIP-Ecosphere platform: Spring connector/binder for HiveMq MQTT v5
+# Transport layer of the oktoflow platform: Spring connector/binder for HiveMq MQTT v5
 
 This component provides a MQTT v5 transport implementation for the communication from/to a device. A binder/connector 
-extends the Spring Cloud Stream framework by the specific protocol.
+extends the Spring Cloud Stream framework by the specific protocol. As this component is loaded into Spring, it is a partial oktoflow plugin that shall be added to/merged into a spring plugin, thus, it has no plugin descriptor.
 
 The implementation is initial and could be optimized. The following configuration options are supported:
  * `mqtt.host`: Host name of the MQTT broker
