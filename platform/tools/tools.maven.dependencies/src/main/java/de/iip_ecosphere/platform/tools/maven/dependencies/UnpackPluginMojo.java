@@ -67,7 +67,10 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
 
     @Parameter(property = "unpack.relocate", required = false, defaultValue = "false")
     private boolean relocate;
-    
+
+    @Parameter(property = "unpack.always", required = false, defaultValue = "false")
+    private boolean always;
+
     @Parameter(property = "unpack.relocateTarget", required = false, defaultValue = "jars")
     private File relocateTarget;
 
@@ -182,13 +185,15 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         setCleanup(cleanup);
 
         if (!relocate) {
-            // figure out whether we are in development mode, i.e., in git workspace
-            File skipIfExists = new File("../../support/support"); // building for arbitrary component
-            if (!skipIfExists.exists()) {
-                skipIfExists = new File("../support"); // building for a support component
-            }
-            if (skipIfExists.exists()) {
-                setSkipIfExists(skipIfExists);
+            if (!always) {
+                // figure out whether we are in development mode, i.e., in git workspace
+                File skipIfExists = new File("../../support/support"); // building for arbitrary component
+                if (!skipIfExists.exists()) {
+                    skipIfExists = new File("../support"); // building for a support component
+                }
+                if (skipIfExists.exists()) {
+                    setSkipIfExists(skipIfExists);
+                }
             }
         } else {
             relocateTarget.mkdirs();
@@ -219,7 +224,13 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         
         super.doExecute();
         
-        handleAppends();
+        if (skipIfExists() == null || !skipIfExists().exists()) {
+            handleAppends();
+        } else {
+            if (plugins.stream().anyMatch(p -> p.hasAppends())) {
+                getLog().info("Running in shortcut local test mode, cannot handle appends");
+            }
+        }
         relocate();
     }
     
@@ -249,7 +260,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
      */
     private void handleAppends() {
         for (PluginItem pl : plugins) {
-            if (pl.appends != null && !pl.appends.isEmpty()) {
+            if (pl.hasAppends()) {
                 List<String> result = new ArrayList<>();
                 for (String name: pl.appends) {
                     File cpFile = getCpFile(name);

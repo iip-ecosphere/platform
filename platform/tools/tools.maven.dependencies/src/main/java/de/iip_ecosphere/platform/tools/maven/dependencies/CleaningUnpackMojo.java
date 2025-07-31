@@ -208,6 +208,15 @@ public class CleaningUnpackMojo extends UnpackMojo {
     }
     
     /**
+     * Returns the file/folder determining whether we can skip the execution if it exists.
+     * 
+     * @return the file/folder
+     */
+    public File skipIfExists() {
+        return skipIfExists;
+    }
+    
+    /**
      * Sets whether the cleanup shall be logged.
      * 
      * @param logCleanup log the cleanup or not
