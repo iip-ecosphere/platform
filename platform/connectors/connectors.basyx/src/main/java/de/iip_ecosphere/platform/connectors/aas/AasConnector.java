@@ -112,7 +112,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         }
 
         @Override
-        public Class<?> getType() {
+        public Class<?> getConnectorType() {
             return AasConnector.class;
         }
         

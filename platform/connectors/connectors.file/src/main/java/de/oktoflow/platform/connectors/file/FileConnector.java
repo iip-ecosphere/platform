@@ -98,7 +98,7 @@ public class FileConnector<CO, CI> extends AbstractChannelConnector<byte[], byte
         }
 
         @Override
-        public Class<?> getType() {
+        public Class<?> getConnectorType() {
             return FileConnector.class;
         }
         

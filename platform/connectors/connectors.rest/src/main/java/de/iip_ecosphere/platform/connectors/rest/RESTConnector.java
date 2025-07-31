@@ -56,7 +56,7 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
         }
 
         @Override
-        public Class<?> getType() {
+        public Class<?> getConnectorType() {
             return RESTConnector.class;
         }
 

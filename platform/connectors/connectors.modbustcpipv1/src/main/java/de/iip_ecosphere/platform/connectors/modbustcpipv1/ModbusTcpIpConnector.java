@@ -85,7 +85,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
         }
 
         @Override
-        public Class<?> getType() {
+        public Class<?> getConnectorType() {
             return ModbusTcpIpConnector.class;
         }
 

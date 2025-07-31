@@ -68,7 +68,7 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[]
         }
 
         @Override
-        public Class<?> getType() {
+        public Class<?> getConnectorType() {
             return PahoMqttv3Connector.class;
         }
         

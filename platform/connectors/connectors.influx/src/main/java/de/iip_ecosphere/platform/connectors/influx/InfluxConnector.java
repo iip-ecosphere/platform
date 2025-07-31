@@ -83,7 +83,7 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
         }
 
         @Override
-        public Class<?> getType() {
+        public Class<?> getConnectorType() {
             return InfluxConnector.class;
         }
 

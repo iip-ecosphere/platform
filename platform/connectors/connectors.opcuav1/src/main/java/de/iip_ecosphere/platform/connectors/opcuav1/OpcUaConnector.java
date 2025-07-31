@@ -188,7 +188,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         }
 
         @Override
-        public Class<?> getType() {
+        public Class<?> getConnectorType() {
             return OpcUaConnector.class;
         }
         
