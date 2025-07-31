@@ -81,17 +81,41 @@ public class ResourceLoader {
         ServiceLoader<ResourceResolver> loader = ServiceLoader.load(ResourceResolver.class);
         loader.forEach(r -> registerResourceResolver(r));
     }
-    
+
     /**
      * Registers a resources resolver.
      * 
      * @param resolver the resolver to be registered, ignored if <b>null</b>
      */
     public static void registerResourceResolver(ResourceResolver resolver) {
+        registerResourceResolver(resolver, false);
+    }
+
+    /**
+     * Registers a resources resolver.
+     * 
+     * @param resolver the resolver to be registered, ignored if <b>null</b>
+     * @param prepend add the resolver to the front (handle with care)
+     */
+    public static void registerResourceResolver(ResourceResolver resolver, boolean prepend) {
         if (null != resolver) {
-            resolvers.add(resolver);
+            if (prepend) {
+                resolvers.add(0, resolver);
+            } else {
+                resolvers.add(resolver);
+            }
             LoggerFactory.getLogger(ResourceLoader.class).info("Registered resource resolver {}", resolver.getName());
         }
+    }
+    
+    /**
+     * Returns whether the specific resolver is known.
+     * 
+     * @param resolver the resolver to look for
+     * @return {@code true} for known, {@code false} else
+     */
+    public static boolean knowsResourceResolver(ResourceResolver resolver) {
+        return resolvers.contains(resolver);
     }
 
     /**
