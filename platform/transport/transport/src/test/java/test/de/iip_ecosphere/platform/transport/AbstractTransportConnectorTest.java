@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.transport.TransportFactory;
 import de.iip_ecosphere.platform.transport.connectors.AbstractReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
@@ -165,6 +166,10 @@ public class AbstractTransportConnectorTest {
      */
     @Test
     public void testApplyAuthenticationKey() {
+        boolean known = ResourceLoader.knowsResourceResolver(ResourceLoader.MAVEN_RESOLVER);
+        if (!known) {
+            ResourceLoader.registerResourceResolver(ResourceLoader.MAVEN_RESOLVER, true);
+        }
         Assert.assertTrue(AbstractTransportConnector.applyAuthenticationKey("amqp", (u, p, e) -> {
             Assert.assertNotNull(u);
             Assert.assertTrue(u.length() > 0);
@@ -191,6 +196,9 @@ public class AbstractTransportConnectorTest {
             Assert.fail("shall not be called"); 
             return false;
         }, () -> false));
+        if (!known) {
+            ResourceLoader.unregisterResourceResolver(ResourceLoader.MAVEN_RESOLVER);
+        }
     }
     
 }

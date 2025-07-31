@@ -46,13 +46,6 @@
     </dependency>
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>support</artifactId>
-     <version>${project.version}</version>
-     <type>test-jar</type>
-     <scope>test</scope>
-    </dependency>
-    <dependency>
-     <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>support.aas</artifactId>
      <version>${project.version}</version>
      <type>test-jar</type>
@@ -76,6 +69,13 @@
       <scope>test</scope>
       <version>${project.version}</version>
     </dependency>    
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>support</artifactId>
+     <version>${project.version}</version>
+     <type>test-jar</type>
+     <scope>test</scope>
+    </dependency>
   </dependencies>
   
   <build>
