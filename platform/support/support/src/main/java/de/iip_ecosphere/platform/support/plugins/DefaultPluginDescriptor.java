@@ -47,8 +47,8 @@ public class DefaultPluginDescriptor<T> implements PluginDescriptor<T> {
      * @param pluginClass the instance class
      * @param pluginSupplier the creator supplier
      * @see #initId(String)
-     * @see #initIds(String[])
-     * @see #initPluginSupplier(Function)
+     * @see #initIds(List)
+     * @see #initPluginSupplier(PluginSupplier)
      */
     public DefaultPluginDescriptor(String id, List<String> ids, Class<T> pluginClass, 
         PluginSupplier<T> pluginSupplier) {
