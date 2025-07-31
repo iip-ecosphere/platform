@@ -37,8 +37,10 @@ public class Layers {
                 result = "support";
             } else if (artifactId.startsWith("transport.")) {
                 result = "support, support.aas, support.iip-aas";
+            } else if (artifactId.startsWith("connectors.")) {
+                result = "support, support.aas, support.iip-aas, transport";
             } else if (artifactId.startsWith("services.")) {
-                result = "support, support.aas, support.iip-aas, services.environment";
+                result = "support, support.aas, support.iip-aas, transport, services.environment";
             } // further cases
         }
         if (log != null && result != null && result.length() > 0) {
