@@ -35,6 +35,8 @@ public class Layers {
                 result = "support, support.aas";
             } else if (artifactId.startsWith("support.")) {
                 result = "support";
+            } else if (artifactId.startsWith("transport.")) {
+                result = "support, support.aas, support.iip-aas";
             } else if (artifactId.startsWith("services.")) {
                 result = "support, support.aas, support.iip-aas, services.environment";
             } // further cases
