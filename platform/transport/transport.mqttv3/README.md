@@ -1,7 +1,6 @@
-# Transport layer of the IIP-Ecosphere platform: Transport plugin MQTT v3
+# Transport layer of the oktoflow platform: Transport plugin MQTT v3
 
-This component provides a MQTT v3 transport plugin for the IIP-Ecosphere platform transport layer. It can be used
-standalone and in tests. Also the tests can be used as further basis for MQTT v5 based protocols. This connector takes
+This component provides a MQTT v3 transport plugin for the oktoflow platform transport layer. It can be loaded as plugin or used as JSL component (direct dependency, e.g. for testing). Also the tests can be used as further basis for MQTT v5 based protocols. This connector takes
 over the specified QoS from the connector parameters.
 
 This implementation ships with [MQTT](https://mqtt.org/) v3 client as default transport connectors based on 
@@ -10,7 +9,7 @@ This implementation ships with [MQTT](https://mqtt.org/) v3 client as default tr
 For the moment, the regression tests exercise the transport connectors with simple JSON and [Google protobuf](https://developers.google.com/protocol-buffers) serialization against [HiveMQ](https://www.hivemq.com) as MQTT broker 
 supporting MQTT v3 and v5. Dependencies to the json-simple library, Google protobuf and HiveQM are used for testing 
 only and not required for platform execution. Serializers and data classes are reused from the basic transport 
-component. For TLS testing, we use the keystore from the IIP-Ecosphere moquette testing package.
+component. For TLS testing, we use the keystore from the oktoflow moquette testing package.
 
 **Missing**
 - Validation/fixing topic names w.r.t. MQTT specification

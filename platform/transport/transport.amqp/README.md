@@ -1,6 +1,6 @@
-# IIP-Ecosphere transport extension for AMQP (based on RabbitMQ)
+# oktoflow transport extension for AMQP (based on RabbitMQ)
 
-Extends the transport layer in terms of the AMQP protocol. This extension is optional. 
+Extends the transport layer in terms of the AMQP protocol. This extension is optional. It can be loaded as plugin or used as JSL component (direct dependency, e.g. for testing).
 This implementation ships with an [AMQP 1.0](https://www.amqp.org/) client as  transport connectors based on 
 [RabbitMQ](https://www.rabbitmq.com/). This connector does not consider the specified (MQTT) QoS from the connector parameters rather than it sets the AMQP basic QoS settings to unlimited queues.
 

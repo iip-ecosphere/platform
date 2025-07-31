@@ -1,7 +1,6 @@
-# Transport layer of the IIP-Ecosphere platform: Transport plugin MQTT v5
+# Transport layer of the oktoflow platform: Transport plugin MQTT v5
 
-This component provides a MQTT v5 transport plugin for the IIP-Ecosphere platform transport layer. It can be used
-standalone and in tests. Also the tests can be used as further basis for MQTT v5 based protocols. This connector takes
+This component provides a MQTT v5 transport plugin for the oktoflow platform transport layer. It can be loaded as plugin or used as JSL component (direct dependency, e.g. for testing). Also the tests can be used as further basis for MQTT v5 based protocols. This connector takes
 over the specified QoS from the connector parameters.
 
 This implementation ships with [MQTT](https://mqtt.org/) v5 client as default transport connectors based on 
