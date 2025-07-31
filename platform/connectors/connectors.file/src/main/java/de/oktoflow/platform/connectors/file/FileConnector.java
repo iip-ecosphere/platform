@@ -26,14 +26,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.text.StringTokenizer;
 
 import de.iip_ecosphere.platform.connectors.AbstractChannelConnector;
+import de.iip_ecosphere.platform.connectors.AbstractPluginChannelConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ChannelAdapterSelector;
-import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
+import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.MachineConnectorSupportedQueries;
@@ -90,7 +92,7 @@ public class FileConnector<CO, CI> extends AbstractChannelConnector<byte[], byte
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class Descriptor implements ConnectorDescriptor {
+    public static class Descriptor extends AbstractPluginChannelConnectorDescriptor<byte[], byte[]> {
 
         @Override
         public String getName() {
@@ -100,6 +102,19 @@ public class FileConnector<CO, CI> extends AbstractChannelConnector<byte[], byte
         @Override
         public Class<?> getConnectorType() {
             return FileConnector.class;
+        }
+
+        @Override
+        protected String initId(String id) {
+            return PLUGIN_ID_PREFIX + "file";
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected <O, I, CO, CI, S extends ChannelAdapterSelector<byte[], byte[], CO, CI>, 
+            A extends ChannelProtocolAdapter<byte[], byte[], CO, CI>> Connector<byte[], byte[], CO, CI> 
+            createConnectorImpl(S selector, Supplier<ConnectorParameter> params, A... adapter) {
+            return new FileConnector<CO, CI>(selector, adapter);
         }
         
     }

@@ -170,4 +170,18 @@ public interface Connector <O, I, CO, CI> extends EventHandlingConnector {
     public default void setDataTimeDifferenceProvider(DataTimeDifferenceProvider<CO> provider) {
     }
 
+    /**
+     * Sets an instance identification for {@link ConnectorExtensionDescriptor connector extensions}.
+     * 
+     * @param identification the identification
+     */
+    public void setInstanceIdentification(String identification);
+    
+    /**
+     * Returns the instance identification for {@link ConnectorExtensionDescriptor connector extensions}.
+     * 
+     * @return the identification, set before by {@link #setInstanceIdentification(String)}
+     */
+    public String getInstanceIdentification();
+
 }

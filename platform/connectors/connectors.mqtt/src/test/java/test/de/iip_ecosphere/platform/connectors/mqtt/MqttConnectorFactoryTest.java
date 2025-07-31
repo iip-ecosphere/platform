@@ -24,6 +24,7 @@ import de.iip_ecosphere.platform.connectors.mqttv3.PahoMqttv3Connector;
 import de.iip_ecosphere.platform.connectors.mqttv5.PahoMqttv5Connector;
 import de.iip_ecosphere.platform.support.Version;
 import test.de.iip_ecosphere.platform.connectors.ConnectorFactoryTest;
+import test.de.iip_ecosphere.platform.support.TestWithPlugin;
 import de.iip_ecosphere.platform.support.iip_aas.NameplateSetup.Service;
 
 /**
@@ -31,7 +32,12 @@ import de.iip_ecosphere.platform.support.iip_aas.NameplateSetup.Service;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class MqttConnectorFactoryTest {
+public class MqttConnectorFactoryTest extends TestWithPlugin {
+    
+    static {
+        addPluginLocation("connectors", "connectors.mqttv3", "mqttv3", false);
+        addPluginLocation("support", "connectors.mqttv5", "mqttv5", false);
+    }
     
     /**
      * Tests {@link MqttConnectorFactory}.

@@ -16,10 +16,12 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.connectors.AbstractConnector;
+import de.iip_ecosphere.platform.connectors.AbstractPluginConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.AdapterSelector;
-import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
+import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
@@ -134,7 +136,7 @@ public class AdsConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class Descriptor implements ConnectorDescriptor {
+    public static class Descriptor extends AbstractPluginConnectorDescriptor<Object, Object> {
 
         @Override
         public String getName() {
@@ -144,6 +146,19 @@ public class AdsConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         @Override
         public Class<?> getConnectorType() {
             return AdsConnector.class;
+        }
+        
+        @Override
+        protected String initId(String id) {
+            return PLUGIN_ID_PREFIX + "influx";
+        }        
+        
+        @SuppressWarnings("unchecked")
+        @Override
+        protected <O, I, CO, CI, S extends AdapterSelector <Object, Object, CO, CI>, 
+            A extends ProtocolAdapter<Object, Object, CO, CI>> Connector<Object, Object, CO, CI> 
+            createConnectorImpl(S selector, Supplier<ConnectorParameter> params, A... adapter) {
+            return new AdsConnector<CO, CI>(selector, adapter);
         }
         
     }

@@ -36,6 +36,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.sdk.client.api.config.OpcUaClientConfigBuilder;
@@ -87,8 +88,9 @@ import org.eclipse.milo.opcua.stack.core.types.structured.X509IdentityToken;
 import org.eclipse.milo.opcua.stack.core.util.EndpointUtil;
 
 import de.iip_ecosphere.platform.connectors.AbstractConnector;
+import de.iip_ecosphere.platform.connectors.AbstractPluginConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.AdapterSelector;
-import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
+import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
@@ -180,7 +182,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class Descriptor implements ConnectorDescriptor {
+    public static class Descriptor extends AbstractPluginConnectorDescriptor<DataItem, Object> {
 
         @Override
         public String getName() {
@@ -190,6 +192,19 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         @Override
         public Class<?> getConnectorType() {
             return OpcUaConnector.class;
+        }
+
+        @Override
+        protected String initId(String id) {
+            return PLUGIN_ID_PREFIX + "opcua-v1";
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected <O, I, CO, CI, S extends AdapterSelector<DataItem, Object, CO, CI>, 
+            A extends ProtocolAdapter<DataItem, Object, CO, CI>> Connector<DataItem, Object, CO, CI> 
+            createConnectorImpl(S selector, Supplier<ConnectorParameter> params, A... adapter) {
+            return new OpcUaConnector<CO, CI>(selector, adapter);
         }
         
     }

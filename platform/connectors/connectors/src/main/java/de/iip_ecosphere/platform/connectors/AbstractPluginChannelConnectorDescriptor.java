@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.connectors;
 
 import java.util.function.Supplier;
 
+import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.support.plugins.SingletonPluginDescriptor;
 
@@ -26,13 +27,13 @@ import de.iip_ecosphere.platform.support.plugins.SingletonPluginDescriptor;
  * 
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractPluginConnectorDescriptor<TO, TI> extends SingletonPluginDescriptor<ConnectorDescriptor> 
-    implements ConnectorDescriptor {
+public abstract class AbstractPluginChannelConnectorDescriptor<TO, TI> 
+    extends SingletonPluginDescriptor<ConnectorDescriptor> implements ConnectorDescriptor {
 
     /**
      * Creates a descriptor instance. Concrete implementations must redefine the plugin id.
      */
-    public AbstractPluginConnectorDescriptor() {
+    public AbstractPluginChannelConnectorDescriptor() {
         super("connector", null, ConnectorDescriptor.class, null);
     }
     
@@ -47,17 +48,18 @@ public abstract class AbstractPluginConnectorDescriptor<TO, TI> extends Singleto
     
     @Override
     @SuppressWarnings("unchecked")
-    public <O, I, CO, CI, S extends AdapterSelector <O, I, CO, CI>, A extends ProtocolAdapter<O, I, CO, CI>> 
+    public <O, I, CO, CI, S extends AdapterSelector<O, I, CO, CI>, A extends ProtocolAdapter<O, I, CO, CI>> 
         Connector<O, I, CO, CI> createConnector(S selector, Supplier<ConnectorParameter> params, A... adapter) {
-        return (Connector<O, I, CO, CI>) createConnectorImpl((AdapterSelector<TO, TI, CO, CI>) selector, 
-            params, (ProtocolAdapter<TO, TI, CO, CI>[]) adapter);
+        return (Connector<O, I, CO, CI>) createConnectorImpl((ChannelAdapterSelector<TO, TI, CO, CI>) selector, 
+            params, (ChannelProtocolAdapter<TO, TI, CO, CI>[]) adapter);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <O, I, CO, CI, A extends ProtocolAdapter<O, I, CO, CI>> 
         Connector<O, I, CO, CI> createConnector(Supplier<ConnectorParameter> params, A... adapter) {
-        return (Connector<O, I, CO, CI>) createConnectorImpl(params, (ProtocolAdapter<TO, TI, CO, CI>[]) adapter);
+        return (Connector<O, I, CO, CI>) createConnectorImpl(params, 
+            (ChannelProtocolAdapter<TO, TI, CO, CI>[]) adapter);
     }
 
     /**
@@ -73,9 +75,9 @@ public abstract class AbstractPluginConnectorDescriptor<TO, TI> extends Singleto
      * @return the created connector
      */
     @SuppressWarnings("unchecked")
-    protected <O, I, CO, CI, A extends ProtocolAdapter<TO, TI, CO, CI>> 
+    protected <O, I, CO, CI, A extends ChannelProtocolAdapter<TO, TI, CO, CI>> 
         Connector<TO, TI, CO, CI> createConnectorImpl(Supplier<ConnectorParameter> params, A... adapter) {
-        return createConnectorImpl(null, adapter);
+        return createConnectorImpl(null, params, adapter);
     }
 
     /**
@@ -93,8 +95,8 @@ public abstract class AbstractPluginConnectorDescriptor<TO, TI> extends Singleto
      * @return the created connector
      */
     @SuppressWarnings("unchecked")
-    protected abstract <O, I, CO, CI, S extends AdapterSelector <TO, TI, CO, CI>, 
-        A extends ProtocolAdapter<TO, TI, CO, CI>> 
+    protected abstract <O, I, CO, CI, S extends ChannelAdapterSelector<TO, TI, CO, CI>, 
+        A extends ChannelProtocolAdapter<TO, TI, CO, CI>> 
         Connector<TO, TI, CO, CI> createConnectorImpl(S selector, Supplier<ConnectorParameter> params, A... adapter);
         
 }

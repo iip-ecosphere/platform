@@ -1,7 +1,7 @@
-# Connectors Component MODBUS/TCP extension in the Transport Layer of the oktoflow platform
+# Connectors Component REST extension in the Transport Layer of the oktoflow platform
 
-MODBUS/TCP machine connector for bi-directional access to devices and machines and already installed platforms based on [Jamod](https://jamod.sourceforge.net/). We run the testswithout AAS factory installed in order to simplify 
-the test. If required, additionally also an AAS server according to the ``AasPartRegistry`` must be initiated.
+Generic REST machine connector for bi-directional access to devices and machines and already installed platforms. 
+Using services shall utilize the ConnectorExtensionDescriptor to declare the (generated) Spring response classes 
+the connector shall work with.
 
-The tests are based on the MODBUS data model below:
-![ModbusDataModel](ModbusDataModel.jpg)
+We run the tests without AAS factory installed in order to simplify the test. If required, additionally also an AAS server according to the ``AasPartRegistry`` must be initiated.

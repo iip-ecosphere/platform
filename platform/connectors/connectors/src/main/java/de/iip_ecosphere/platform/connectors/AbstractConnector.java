@@ -61,6 +61,7 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
     private CachingStrategy cachingStrategy;
     private Map<String, Object> storage;
     private DataTimeDifferenceProvider<CO> dataTimeDifferenceProvider;
+    private String instanceIdentification;
 
     /**
      * Creates an instance and installs the protocol adapter(s) with a default
@@ -564,6 +565,16 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
     @Override
     public void setDataTimeDifference(int difference) {
         notifyDataTimeDifference(difference);
+    }
+
+    @Override
+    public void setInstanceIdentification(String identification) {
+        this.instanceIdentification = identification;
+    }
+    
+    @Override
+    public String getInstanceIdentification() {
+        return this.instanceIdentification;
     }
     
     @Override

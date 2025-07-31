@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 import java.util.Set;
 
 import org.springframework.http.HttpEntity;
@@ -14,8 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import de.iip_ecosphere.platform.connectors.AbstractConnector;
+import de.iip_ecosphere.platform.connectors.AbstractPluginConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.AdapterSelector;
-import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
+import de.iip_ecosphere.platform.connectors.Connector;
+import de.iip_ecosphere.platform.connectors.ConnectorExtensionDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
@@ -37,7 +40,7 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
  */
 @MachineConnector(hasModel = true, supportsModelStructs = false, supportsEvents = false, specificSettings = {
     "Endpoints", "RequestType" })
-public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, CO, CI> {
+public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, CO, CI> {
 
     public static final String NAME = "REST";
     private static final Logger LOGGER = LoggerFactory.getLogger(RESTConnector.class);
@@ -48,7 +51,7 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
     /**
      * The descriptor of this connector (see META-INF/services).
      */
-    public static class Descriptor implements ConnectorDescriptor {
+    public static class Descriptor extends AbstractPluginConnectorDescriptor<RESTItem, Object> {
 
         @Override
         public String getName() {
@@ -58,6 +61,19 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
         @Override
         public Class<?> getConnectorType() {
             return RESTConnector.class;
+        }
+
+        @Override
+        protected String initId(String id) {
+            return PLUGIN_ID_PREFIX + "rest";
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected <O, I, CO, CI, S extends AdapterSelector<RESTItem, Object, CO, CI>, 
+            A extends ProtocolAdapter<RESTItem, Object, CO, CI>> Connector<RESTItem, Object, CO, CI> 
+            createConnectorImpl(S selector, Supplier<ConnectorParameter> params, A... adapter) {
+            return new RESTConnector<CO, CI>(selector, adapter); 
         }
 
     }
@@ -251,11 +267,13 @@ public abstract class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, 
     }
 
     /**
-     * Returns an Array containig the specific RESTServerResponse classes.
+     * Returns an Array containing the specific RESTServerResponse classes.
      * 
-     * @return Array containig the specific RESTServerResponse classes.
+     * @return Array containing the specific RESTServerResponse classes.
      */
-    protected abstract Class<?>[] getResponseClasses();
+    protected Class<?>[] getResponseClasses() {
+        return ConnectorExtensionDescriptor.getExtension(this, Class[].class, () -> new Class[0]);
+    }
 
     /**
      * Implements the model access for REST.

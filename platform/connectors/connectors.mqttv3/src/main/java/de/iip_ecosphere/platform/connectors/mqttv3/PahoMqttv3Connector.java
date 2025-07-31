@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.connectors.mqttv3;
 
 import java.io.IOException;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,8 +27,9 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import de.iip_ecosphere.platform.connectors.AbstractChannelConnector;
+import de.iip_ecosphere.platform.connectors.AbstractPluginChannelConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ChannelAdapterSelector;
-import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
+import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
@@ -60,7 +62,7 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[]
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class Descriptor implements ConnectorDescriptor {
+    public static class Descriptor extends AbstractPluginChannelConnectorDescriptor<byte[], byte[]> {
 
         @Override
         public String getName() {
@@ -70,6 +72,19 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[]
         @Override
         public Class<?> getConnectorType() {
             return PahoMqttv3Connector.class;
+        }
+
+        @Override
+        protected String initId(String id) {
+            return PLUGIN_ID_PREFIX + "mqtt-v3";
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected <O, I, CO, CI, S extends ChannelAdapterSelector<byte[], byte[], CO, CI>, 
+            A extends ChannelProtocolAdapter<byte[], byte[], CO, CI>> Connector<byte[], byte[], CO, CI> 
+            createConnectorImpl(S selector, Supplier<ConnectorParameter> params, A... adapter) {
+            return new PahoMqttv3Connector<CO, CI>(selector, adapter);
         }
         
     }

@@ -17,11 +17,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.connectors.AbstractConnector;
+import de.iip_ecosphere.platform.connectors.AbstractPluginConnectorDescriptor;
+import de.iip_ecosphere.platform.connectors.AdapterSelector;
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
@@ -64,7 +67,7 @@ public class ConnectorsAasTest extends TestWithPlugin {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class Connector1Descriptor implements ConnectorDescriptor {
+    public static class Connector1Descriptor extends AbstractPluginConnectorDescriptor<Object, Object> {
 
         @Override
         public String getName() {
@@ -75,7 +78,20 @@ public class ConnectorsAasTest extends TestWithPlugin {
         public Class<?> getConnectorType() {
             return Connector1.class;
         }
-        
+
+        @Override
+        protected String initId(String id) {
+            return PLUGIN_TEST_ID_PREFIX + "conn1";
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected <O, I, CO, CI, S extends AdapterSelector<Object, Object, CO, CI>, 
+            A extends ProtocolAdapter<Object, Object, CO, CI>> Connector<Object, Object, CO, CI> createConnectorImpl(
+            S selector, Supplier<ConnectorParameter> params, A... adapter) {
+            return new Connector1<CO, CI>(adapter);
+        }
+
     }
 
     /**
@@ -95,7 +111,8 @@ public class ConnectorsAasTest extends TestWithPlugin {
          * 
          * @param adapter the protocol adapter
          */
-        protected Connector1(ProtocolAdapter<Object, Object, CO, CI> adapter) {
+        @SafeVarargs
+        protected Connector1(ProtocolAdapter<Object, Object, CO, CI>... adapter) {
             super(adapter);
         }
 
@@ -146,7 +163,7 @@ public class ConnectorsAasTest extends TestWithPlugin {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class Connector2Descriptor implements ConnectorDescriptor {
+    public static class Connector2Descriptor extends AbstractPluginConnectorDescriptor<byte[], byte[]> {
 
         @Override
         public String getName() {
@@ -156,6 +173,19 @@ public class ConnectorsAasTest extends TestWithPlugin {
         @Override
         public Class<?> getConnectorType() {
             return Connector2.class;
+        }
+
+        @Override
+        protected String initId(String id) {
+            return PLUGIN_TEST_ID_PREFIX + "conn2";
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected <O, I, CO, CI, S extends AdapterSelector<byte[], byte[], CO, CI>, 
+            A extends ProtocolAdapter<byte[], byte[], CO, CI>> Connector<byte[], byte[], CO, CI> createConnectorImpl(
+                S selector, Supplier<ConnectorParameter> params, A... adapter) {
+            return new Connector2<CO, CI>(adapter);
         }
         
     }
@@ -174,7 +204,8 @@ public class ConnectorsAasTest extends TestWithPlugin {
          * 
          * @param adapter the protocol adapter
          */
-        protected Connector2(ProtocolAdapter<byte[], byte[], CO, CI> adapter) {
+        @SafeVarargs
+        protected Connector2(ProtocolAdapter<byte[], byte[], CO, CI>... adapter) {
             super(adapter);
         }
 

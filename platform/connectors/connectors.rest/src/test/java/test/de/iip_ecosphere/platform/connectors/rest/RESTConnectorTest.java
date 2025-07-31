@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
+import de.iip_ecosphere.platform.connectors.ConnectorExtensionDescriptor.DefaultConnectorExtension;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.connectors.rest.RESTConnector;
@@ -29,6 +30,8 @@ import test.de.iip_ecosphere.platform.connectors.ConnectorTest;
 
 public class RESTConnectorTest {
 
+    private static final String CONN_SET_ID = "set";
+    private static final String CONN_SINGLE_ID = "single";
     private static final Logger LOGGER = LoggerFactory.getLogger(RESTConnectorTest.class);
     private static TestServer testServer;
 
@@ -84,8 +87,9 @@ public class RESTConnectorTest {
 
         ActiveAasBase.setNotificationMode(NotificationMode.NONE);
 
-        RESTConnector<MachineOutputSingle, MachineInputSingle> connector = new SpecificRESTConnectorSingle(
+        RESTConnector<MachineOutputSingle, MachineInputSingle> connector = new RESTConnector<>(
                 getProtocolAdapterSingle());
+        connector.setInstanceIdentification(CONN_SINGLE_ID);
 
         try {
             connector.connect(getConnectorParameter("single"));
@@ -146,8 +150,9 @@ public class RESTConnectorTest {
 
         ActiveAasBase.setNotificationMode(NotificationMode.NONE);
 
-        RESTConnector<MachineOutputSingle, MachineInputSingle> connector = new SpecificRESTConnectorSingle(
+        RESTConnector<MachineOutputSingle, MachineInputSingle> connector = new RESTConnector<>(
                 getProtocolAdapterSingle());
+        connector.setInstanceIdentification(CONN_SINGLE_ID);
 
         try {
             connector.connect(getConnectorParameter("singleWP"));
@@ -200,6 +205,39 @@ public class RESTConnectorTest {
             e.printStackTrace();
         }
     }
+    
+    
+    /**
+     * Connector extension providing the response classes.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class SetTestConnectorExtension extends DefaultConnectorExtension<Class<?>[]> {
+
+        /**
+         * Creates an instance. [JSL]
+         */
+        public SetTestConnectorExtension() {
+            super(CONN_SET_ID, () -> new Class[]{TestServerResponseSetRestType.class});
+        }
+        
+    }
+
+    /**
+     * Connector extension providing the response classes.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class SingleTestConnectorExtension extends DefaultConnectorExtension<Class<?>[]> {
+
+        /**
+         * Creates an instance. [JSL]
+         */
+        public SingleTestConnectorExtension() {
+            super(CONN_SINGLE_ID, () -> new Class[]{TestServerResponsSingleRestType.class});
+        }
+        
+    }
 
     /**
      * Test with RequestType = Set.
@@ -210,7 +248,8 @@ public class RESTConnectorTest {
         ActiveAasBase.setNotificationMode(NotificationMode.NONE);
 
         RESTConnector<MachineOutputSet, MachineInputSet> connector = 
-                new SpecificRESTConnectorSet(getProtocolAdapterSet());
+                new RESTConnector<>(getProtocolAdapterSet());
+        connector.setInstanceIdentification(CONN_SET_ID);
 
         try {
             connector.connect(getConnectorParameter("set"));
@@ -258,7 +297,8 @@ public class RESTConnectorTest {
         ActiveAasBase.setNotificationMode(NotificationMode.NONE);
 
         RESTConnector<MachineOutputSet, MachineInputSet> connector = 
-                new SpecificRESTConnectorSet(getProtocolAdapterSet());
+                new RESTConnector<>(getProtocolAdapterSet());
+        connector.setInstanceIdentification(CONN_SET_ID);
 
         try {
             connector.connect(getConnectorParameter("setWP"));
@@ -328,11 +368,11 @@ public class RESTConnectorTest {
     }
 
     /**
-     * Creates and returns a ReceptionCallbac<MachineOutputSingle> for the
+     * Creates and returns a ReceptionCallback&lt;MachineOutputSingle&gt; for the
      * Connector.
      * 
-     * @param restRef AtomicReference<MachineOutputSingle> to set received data
-     * @return ReceptionCallback<MachineOutputSingle> callback
+     * @param restRef AtomicReference&lt;MachineOutputSingle&gt; to set received data
+     * @return ReceptionCallback&lt;MachineOutputSingle&gt; callback
      */
     private ReceptionCallback<MachineOutputSingle> createCallbackSingle(AtomicReference<MachineOutputSingle> restRef,
             AtomicInteger count) {
@@ -355,10 +395,10 @@ public class RESTConnectorTest {
     }
 
     /**
-     * Creates and returns a ReceptionCallbac<MachineOutputSet> for the Connector.
+     * Creates and returns a ReceptionCallback&lt;MachineOutputSet&gt; for the Connector.
      * 
-     * @param restRef AtomicReference<MachineOutputSet> to set received data
-     * @return ReceptionCallback<MachineOutputSet> callback
+     * @param restRef AtomicReference&lt;MachineOutputSet&gt; to set received data
+     * @return ReceptionCallback&lt;MachineOutputSet&gt; callback
      */
     private ReceptionCallback<MachineOutputSet> createCallbackSet(AtomicReference<MachineOutputSet> restRef,
             AtomicInteger count) {
@@ -381,8 +421,7 @@ public class RESTConnectorTest {
     }
 
     /**
-     * Returns the connector descriptor for
-     * {@link #createConnector(ProtocolAdapter)}.
+     * Returns the connector descriptor.
      * 
      * @return the connector descriptor
      */

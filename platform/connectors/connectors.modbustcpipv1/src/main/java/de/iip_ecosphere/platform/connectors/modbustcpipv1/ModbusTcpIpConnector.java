@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 import com.ghgande.j2mod.modbus.ModbusException;
 import com.ghgande.j2mod.modbus.ModbusIOException;
@@ -36,8 +37,9 @@ import com.ghgande.j2mod.modbus.procimg.Register;
 import com.ghgande.j2mod.modbus.procimg.SimpleRegister;
 
 import de.iip_ecosphere.platform.connectors.AbstractConnector;
+import de.iip_ecosphere.platform.connectors.AbstractPluginConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.AdapterSelector;
-import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
+import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
@@ -77,7 +79,7 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
     /**
      * The descriptor of this connector (see META-INF/services).
      */
-    public static class Descriptor implements ConnectorDescriptor {
+    public static class Descriptor extends AbstractPluginConnectorDescriptor<ModbusItem, Object> {
 
         @Override
         public String getName() {
@@ -87,6 +89,19 @@ public class ModbusTcpIpConnector<CO, CI> extends AbstractConnector<ModbusItem, 
         @Override
         public Class<?> getConnectorType() {
             return ModbusTcpIpConnector.class;
+        }
+
+        @Override
+        protected String initId(String id) {
+            return PLUGIN_ID_PREFIX + "modbusTcp";
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected <O, I, CO, CI, S extends AdapterSelector<ModbusItem, Object, CO, CI>, 
+            A extends ProtocolAdapter<ModbusItem, Object, CO, CI>> Connector<ModbusItem, Object, CO, CI> 
+            createConnectorImpl(S selector, Supplier<ConnectorParameter> params, A... adapter) {
+            return new ModbusTcpIpConnector<CO, CI>(selector, adapter);
         }
 
     }

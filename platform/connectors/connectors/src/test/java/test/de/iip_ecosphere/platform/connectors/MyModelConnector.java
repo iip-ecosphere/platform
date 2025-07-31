@@ -17,9 +17,12 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.connectors.AbstractConnector;
-import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
+import de.iip_ecosphere.platform.connectors.AbstractPluginConnectorDescriptor;
+import de.iip_ecosphere.platform.connectors.AdapterSelector;
+import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
@@ -48,7 +51,7 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class Descriptor implements ConnectorDescriptor {
+    public static class Descriptor extends AbstractPluginConnectorDescriptor<Object, Object> {
 
         @Override
         public String getName() {
@@ -58,6 +61,19 @@ public class MyModelConnector<CO, CI> extends AbstractConnector<Object, Object, 
         @Override
         public Class<?> getConnectorType() {
             return MyModelConnector.class;
+        }
+
+        @Override
+        protected String initId(String id) {
+            return PLUGIN_TEST_ID_PREFIX + "myModelConnector";
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected <O, I, CO, CI, S extends AdapterSelector<Object, Object, CO, CI>, 
+            A extends ProtocolAdapter<Object, Object, CO, CI>> Connector<Object, Object, CO, CI> createConnectorImpl(
+            S selector, Supplier<ConnectorParameter> params, A... adapter) {
+            return new MyModelConnector<CO, CI>(adapter);
         }
         
     };

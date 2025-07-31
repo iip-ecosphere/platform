@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
@@ -29,10 +30,11 @@ import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
 
 import de.iip_ecosphere.platform.connectors.AdapterSelector;
-import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
+import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.MachineConnectorSupportedQueries;
+import de.iip_ecosphere.platform.connectors.AbstractPluginConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.AbstractThreadedConnector;
 import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
 import de.iip_ecosphere.platform.connectors.events.SimpleTimeseriesQuery;
@@ -75,7 +77,7 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
     /**
      * The descriptor of this connector (see META-INF/services).
      */
-    public static class Descriptor implements ConnectorDescriptor {
+    public static class Descriptor extends AbstractPluginConnectorDescriptor<Object, Object> {
 
         @Override
         public String getName() {
@@ -86,6 +88,19 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
         public Class<?> getConnectorType() {
             return InfluxConnector.class;
         }
+        
+        @SuppressWarnings("unchecked")
+        @Override
+        protected <O, I, CO, CI, S extends AdapterSelector <Object, Object, CO, CI>, 
+            A extends ProtocolAdapter<Object, Object, CO, CI>> Connector<Object, Object, CO, CI> 
+            createConnectorImpl(S selector, Supplier<ConnectorParameter> params, A... adapter) {
+            return new InfluxConnector<CO, CI>(selector, adapter);
+        }
+        
+        @Override
+        protected String initId(String id) {
+            return PLUGIN_ID_PREFIX + "influx-v2";
+        }        
 
     }
 

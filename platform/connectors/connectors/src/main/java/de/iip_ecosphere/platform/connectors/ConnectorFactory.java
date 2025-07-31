@@ -18,6 +18,8 @@ import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.plugins.Plugin;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
 /**
  * Creates a single connector instance or allows to dynamically choose among multiple connector
@@ -115,5 +117,57 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
         
         return result;
     }
+
+    /**
+     * Creates a connector instance from a plugin of type {@link ConnectorDescriptor}, 
+     * see also {@link AbstractPluginConnectorDescriptor}.
+     * 
+     * @param <O> the output type from the underlying machine/platform
+     * @param <I> the input type to the underlying machine/platform
+     * @param <CO> the output type of the connector
+     * @param <CI> the input type of the connector
+     * @param <A> the adapter type
+     * @param pluginId the plugin id 
+     * @param params the connector parameters supplier
+     * @param adapter the protocol adapters to create the connector for
+     * @return the connector instance or <b>null</b> if none can be created
+     */
+    @SuppressWarnings("unchecked")
+    public static <O, I, CO, CI, A extends ProtocolAdapter<O, I, CO, CI>> 
+        Connector<O, I, CO, CI> createConnectorByPlugin(String pluginId, Supplier<ConnectorParameter> params, 
+        A... adapter) {
+        return createConnectorByPlugin(pluginId, params, null, adapter);
+    }    
+
+    /**
+     * Creates a connector instance from a plugin of type {@link ConnectorDescriptor}, 
+     * see also {@link AbstractPluginConnectorDescriptor}.
+     * 
+     * @param <O> the output type from the underlying machine/platform
+     * @param <I> the input type to the underlying machine/platform
+     * @param <CO> the output type of the connector
+     * @param <CI> the input type of the connector
+     * @param <S> the selector type
+     * @param <A> the adapter type
+     * @param pluginId the plugin id 
+     * @param params the connector parameters supplier
+     * @param selector the adapter selector, may be <b>null</b> for none
+     * @param adapter the protocol adapters to create the connector for
+     * @return the connector instance or <b>null</b> if none can be created
+     */
+    @SuppressWarnings("unchecked")
+    public static <O, I, CO, CI, S extends AdapterSelector <O, I, CO, CI>, A extends ProtocolAdapter<O, I, CO, CI>> 
+        Connector<O, I, CO, CI> createConnectorByPlugin(String pluginId, Supplier<ConnectorParameter> params, 
+        S selector, A... adapter) {
+        Connector<O, I, CO, CI> result = null;
+        Plugin<ConnectorDescriptor> plugin = PluginManager.getPlugin(pluginId, ConnectorDescriptor.class);
+        if (null == plugin) {
+            LoggerFactory.getLogger(ConnectorFactory.class).error("Cannot create connector, there is no plugin for "
+                    + "plugin id '{}' registered", pluginId);
+        } else {
+            result = plugin.getInstance().createConnector(selector, params, adapter);
+        }
+        return result;
+    }    
     
 }

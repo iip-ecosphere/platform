@@ -76,9 +76,9 @@ public class RESTEndpoint {
     }
 
     /**
-     * Setter for simpleValueToWrite.
+     * Setter for asSingleValue.
      * 
-     * @param simpleValueToWrite to set
+     * @param asSingleValue to set
      */
     public void setAsSingleValue(boolean asSingleValue) {
         this.asSingleValue = asSingleValue;

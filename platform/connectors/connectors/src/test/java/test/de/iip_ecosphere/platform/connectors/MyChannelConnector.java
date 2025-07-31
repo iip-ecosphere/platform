@@ -3,9 +3,12 @@ package test.de.iip_ecosphere.platform.connectors;
 import java.io.IOException;
 import java.util.Deque;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.connectors.AbstractChannelConnector;
-import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
+import de.iip_ecosphere.platform.connectors.AbstractPluginChannelConnectorDescriptor;
+import de.iip_ecosphere.platform.connectors.ChannelAdapterSelector;
+import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
@@ -32,7 +35,7 @@ public class MyChannelConnector<CO, CI> extends AbstractChannelConnector<byte[],
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class Descriptor implements ConnectorDescriptor {
+    public static class Descriptor extends AbstractPluginChannelConnectorDescriptor<byte[], byte[]> {
 
         @Override
         public String getName() {
@@ -43,6 +46,19 @@ public class MyChannelConnector<CO, CI> extends AbstractChannelConnector<byte[],
         public Class<?> getConnectorType() {
             return MyModelConnector.class;
         }
+
+        @Override
+        protected String initId(String id) {
+            return PLUGIN_TEST_ID_PREFIX + "myChannelConnector";
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected <O, I, CO, CI, S extends ChannelAdapterSelector<byte[], byte[], CO, CI>, 
+            A extends ChannelProtocolAdapter<byte[], byte[], CO, CI>> Connector<byte[], byte[], CO, CI> 
+            createConnectorImpl(S selector, Supplier<ConnectorParameter> params, A... adapter) {
+            return new MyChannelConnector<CO, CI>(adapter);
+        }
         
     }
     
@@ -51,7 +67,8 @@ public class MyChannelConnector<CO, CI> extends AbstractChannelConnector<byte[],
      * 
      * @param adapter the protocol adapter
      */
-    public MyChannelConnector(ChannelProtocolAdapter<byte[], byte[], CO, CI> adapter) {
+    @SafeVarargs
+    public MyChannelConnector(ChannelProtocolAdapter<byte[], byte[], CO, CI>... adapter) {
         super(adapter);
     }
 

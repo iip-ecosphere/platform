@@ -13,10 +13,9 @@
 package de.iip_ecosphere.platform.connectors.mqtt;
 
 import de.iip_ecosphere.platform.connectors.Connector;
+import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorFactory;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
-import de.iip_ecosphere.platform.connectors.mqttv3.PahoMqttv3Connector;
-import de.iip_ecosphere.platform.connectors.mqttv5.PahoMqttv5Connector;
 import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
 
 /**
@@ -35,9 +34,11 @@ public class MqttConnectorFactory<CO, CI> implements ConnectorFactory<byte[], by
         ChannelProtocolAdapter<byte[], byte[], CO, CI>... adapter) {
         Connector<byte[], byte[], CO, CI> result;
         if (ConnectorFactory.hasVersion(params) && params.getService().getVersion().getSegment(0) == 5) {
-            result = new PahoMqttv5Connector<CO, CI>(adapter);
+            result = ConnectorFactory.createConnectorByPlugin(ConnectorDescriptor.PLUGIN_ID_PREFIX + "mqtt-v5", 
+                () -> params, adapter);
         } else {
-            result = new PahoMqttv3Connector<CO, CI>(adapter);
+            result = ConnectorFactory.createConnectorByPlugin(ConnectorDescriptor.PLUGIN_ID_PREFIX + "mqtt-v3", 
+                () -> params, adapter);
         }
         return result;
     }

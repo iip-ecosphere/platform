@@ -47,7 +47,7 @@ public class TestServerController {
     /**
      * Returns a TestServerResponseSet for given paths.
      * 
-     * @param path to TestServerResponseSet
+     * @param paths to TestServerResponseSet
      * @return TestServerResponseSet at path
      */
     @GetMapping("/set")
@@ -324,7 +324,7 @@ public class TestServerController {
      * Put Endpoint to set a new Value for stringValue. 
      * 
      * @param value to set for stringValue
-     * @return ResponseEntity<String> containing 
+     * @return ResponseEntity&lt;String&gt; containing 
      */
     @PutMapping("/string")
     public ResponseEntity<String> updateStringValue(@RequestParam("value") String value) {
