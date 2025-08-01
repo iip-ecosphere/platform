@@ -35,12 +35,11 @@ import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsPro
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.processInfo.ProcessInfoFactory;
+import de.iip_ecosphere.platform.support.processInfo.ProcessInfoFactory.ProcessInfo;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 import io.micrometer.core.instrument.Gauge;
-import oshi.SystemInfo;
-import oshi.software.os.OSProcess;
-import oshi.software.os.OperatingSystem;
 
 /**
  * Implements an abstract asynchronous process-based service for a single pair of input-output types. A created 
@@ -62,7 +61,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunna
     private YamlService serviceSpec;
     private PrintWriter serviceIn;
     private Process proc;
-    private OSProcess osProcess;
+    private ProcessInfo osProcess;
 
     /**
      * Creates an instance of the service with the required type translators.
@@ -557,12 +556,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunna
      */
     private void attachProcessInformation() {
         if (null == osProcess) {
-            long procId = getProcessId(proc);
-            if (procId > 0) {
-                SystemInfo si = new SystemInfo();
-                OperatingSystem os = si.getOperatingSystem();
-                osProcess = os.getProcess((int) procId);
-            }
+            osProcess = ProcessInfoFactory.getInstance().create(proc);
         }
     }
     

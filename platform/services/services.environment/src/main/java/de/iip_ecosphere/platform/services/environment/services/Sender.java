@@ -25,7 +25,7 @@ public interface Sender<T> {
     /**
      * Initiates a connection. This method does not block.
      */
-    public void connect();
+    public void connect() throws IOException;
     
     /**
      * Blocks until connected or failed to do so.
@@ -33,7 +33,7 @@ public interface Sender<T> {
      * @return returns whether it succeeded or not.
      * @throws InterruptedException thrown when blocking thread gets interrupted
      */
-    public boolean connectBlocking() throws InterruptedException;
+    public boolean connectBlocking() throws IOException;
 
     /**
      * Is the state open.
@@ -65,9 +65,9 @@ public interface Sender<T> {
     /**
      * Closes the sender but blocks until closing is done or failed to do so.
      *
-     * @throws InterruptedException thrown when the blocking thread gets interrupted
+     * @throws IOException when the closing fails
      */
-    public void closeBlocking() throws InterruptedException;
+    public void closeBlocking() throws IOException;
 
     /**
      * Returns the URI that this sender is connected to.

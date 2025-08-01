@@ -17,16 +17,12 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
-
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.exceptions.WebsocketNotConnectedException;
-import org.java_websocket.handshake.ServerHandshake;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.iip_ecosphere.platform.services.environment.GenericMultiTypeServiceImpl.OutTypeInfo;
+import de.iip_ecosphere.platform.services.environment.services.WsAdapter;
 import de.iip_ecosphere.platform.support.PythonUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
@@ -50,9 +46,8 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
 
     private int instancePort;
     private long averageResponseTime = 0;
-    private WebSocket socket;
+    private PyWebSocket socket;
     private String networkPortKey;
-    private String lastError; // new instance of WebSocket per try
 
     /**
      * Creates an instance from a service id and a YAML artifact.
@@ -114,7 +109,7 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
         try {
             getLogger().info("Connecting to {}", uri);
             while (null == socket) { 
-                WebSocket tmp = new WebSocket(new URI(uri)); // instance not reusable
+                PyWebSocket tmp = new PyWebSocket(new URI(uri)); // instance not reusable
                 if (tmp.connectBlocking()) { // blocking may fail
                     getLogger().info("Connected to {}", uri);
                     socket = tmp;
@@ -123,7 +118,7 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
                     TimeUtils.sleep(250);
                 }
             }
-        } catch (URISyntaxException | InterruptedException e) {
+        } catch (URISyntaxException e) {
             getLogger().error("Connecting to {}: {}", uri, e.getMessage());
         } 
     }
@@ -144,7 +139,7 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
             try {
                 InData tmp = new InData(type, data);
                 socket.send(JsonUtils.toJson(tmp));
-            } catch (WebsocketNotConnectedException e) {
+            } catch (IOException e) {
                 // in shutdown?
                 if (getState() != ServiceState.STOPPING && getState() != ServiceState.STOPPED) {
                     throw new ExecutionException(e);
@@ -172,7 +167,7 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
      * 
      * @author Holger Eichelberger, SSE
      */
-    private class WebSocket extends WebSocketClient {
+    private class PyWebSocket extends WsAdapter {
 
         private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -181,26 +176,12 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
          * 
          * @param serverUri the server URI
          */
-        public WebSocket(URI serverUri) {
-            super(serverUri);
-        }
-
-        /**
-         * Creates a web socket for the given server URI.
-         * 
-         * @param serverUri the server URI
-         * @param httpHeaders the headers to use
-         */
-        public WebSocket(URI serverUri, Map<String, String> httpHeaders) {
-            super(serverUri, httpHeaders);
+        public PyWebSocket(URI serverUri) {
+            super(serverUri, getLogger());
         }
 
         @Override
-        public void onOpen(ServerHandshake handshakedata) {
-        }
-
-        @Override
-        public void onMessage(String message) {
+        protected void onMessage(String message) {
             try {
                 OutData data = objectMapper.readValue(message, OutData.class);
                 OutTypeInfo<?> info = getOutTypeInfo(data.getType());
@@ -208,22 +189,6 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
                 averageResponseTime = data.getTime();
             } catch (IOException e) {
                 getLogger().error("While ingesting result data: {}", e.getMessage());
-            }
-        }
-
-        @Override
-        public void onClose(int code, String reason, boolean remote) {
-            if (remote) {
-                getLogger().info("Connection closed by remote peer, code: {} reason: {}", code, reason);
-            }
-        }
-
-        @Override
-        public void onError(Exception ex) {
-            String msg = ex.getMessage();
-            if (null == lastError || !lastError.equals(msg)) {
-                lastError = msg;
-                getLogger().error("While running Python: {}", ex.getMessage());
             }
         }
 

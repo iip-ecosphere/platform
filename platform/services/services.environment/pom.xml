@@ -76,18 +76,6 @@
       <version>1.1.1</version>
     </dependency>
     <dependency>
-        <groupId>com.github.oshi</groupId>
-        <artifactId>oshi-core</artifactId>
-        <version>6.1.6</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.java-websocket</groupId>
-      <artifactId>Java-WebSocket</artifactId>
-      <version>1.5.3</version>
-    </dependency> 
-
-    <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>connectors</artifactId>
      <version>${project.version}</version>
@@ -139,17 +127,29 @@
       <version>${project.version}</version>
     </dependency>     
     <dependency>
+      <artifactId>support.rest-spark</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency>     
+    <dependency>
+      <artifactId>support.websocket-websocket</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency>     
+    <dependency>
+      <artifactId>support.processInfo-OSHI</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency>     
+    <dependency>
       <artifactId>support.log-slf4j-simple</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <scope>test</scope>
       <version>${project.version}</version>
     </dependency>  
-    <dependency> <!-- May cause jetty http request factory conflicts with spring -->
-        <groupId>com.sparkjava</groupId>
-        <artifactId>spark-core</artifactId>
-        <version>2.9.3</version>
-        <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

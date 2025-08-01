@@ -15,8 +15,6 @@ package de.iip_ecosphere.platform.services.environment.services;
 import java.io.IOException;
 import java.util.Set;
 
-import org.java_websocket.exceptions.WebsocketNotConnectedException;
-
 import de.iip_ecosphere.platform.services.environment.Service;
 import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.support.Endpoint;
@@ -137,7 +135,7 @@ public class TransportToWsConverter<T> extends TransportConverter<T> {
             if (null != sender) {
                 try {
                     sender.connectBlocking();
-                } catch (InterruptedException e) {
+                } catch (IOException e) {
                     getLogger().error("Connection attempt interrupted: {}", e.getMessage());
                 }
             }
@@ -160,11 +158,11 @@ public class TransportToWsConverter<T> extends TransportConverter<T> {
                 sender.send(data);
                 notConnectedError = false;
             } catch (IOException e) {
-                getLogger().error("Cannot write data: {}", e.getMessage());
-            } catch (WebsocketNotConnectedException e) {
                 if (!notConnectedError) {
                     getLogger().error("Cannot write data, not connected: {}", e.getMessage());
                     notConnectedError = true;
+                } else {
+                    getLogger().error("Cannot write data: {}", e.getMessage());
                 }
             }
         }

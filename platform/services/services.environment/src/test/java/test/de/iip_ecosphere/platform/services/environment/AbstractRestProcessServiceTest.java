@@ -12,11 +12,6 @@
 
 package test.de.iip_ecosphere.platform.services.environment;
 
-import static spark.Spark.delete;
-import static spark.Spark.get;
-import static spark.Spark.post;
-import static spark.Spark.put;
-
 import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
@@ -34,10 +29,11 @@ import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.Version;
+import de.iip_ecosphere.platform.support.rest.Rest;
+import de.iip_ecosphere.platform.support.rest.Rest.RestServer;
+import de.iip_ecosphere.platform.support.rest.Rest.Route;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
-import spark.Route;
-import spark.Spark;
 
 /**
  * Tests {@link AbstractRestProcessService}.
@@ -148,19 +144,20 @@ public class AbstractRestProcessServiceTest {
     @Test
     public void testRestProcess() throws ExecutionException {
         Route route = (req, res) -> { 
-            String request = lines(req.body()).collect(Collectors.joining("\n"));
-            res.body(request);
-            res.status(200);
-            return res.body();
+            String request = lines(req.getBody()).collect(Collectors.joining("\n"));
+            res.setBody(request);
+            res.setStatus(200);
+            return res.getBody();
         };
 
         port = NetUtils.getEphemeralPort();
-        Spark.port(port);
-        post(PATH, route);
-        get(PATH, route);
-        put(PATH, route);
-        delete(PATH, route);
-        Spark.awaitInitialization();
+        Rest rest = Rest.getInstance();
+        RestServer server = rest.createServer(port);
+        server.definePost(PATH, route);
+        server.defineGet(PATH, route);
+        server.definePut(PATH, route);
+        server.defineDelete(PATH, route);
+        server.start();
 
         AtomicInteger rcv = new AtomicInteger();
         ReceptionCallback<String> callback = new ReceptionCallback<String>() {
@@ -193,8 +190,7 @@ public class AbstractRestProcessServiceTest {
         TimeUtils.sleep(1000);
         Assert.assertTrue(rcv.get() > 0);
         service.setState(ServiceState.STOPPING);
-        Spark.stop();
-        Spark.awaitStop();
+        server.stop(true);
     }
     
 }
