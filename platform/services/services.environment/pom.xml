@@ -139,7 +139,7 @@
       <version>${project.version}</version>
     </dependency>     
     <dependency>
-      <artifactId>support.processInfo-OSHI</artifactId>
+      <artifactId>support.processInfo-oshi</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <scope>test</scope>
       <version>${project.version}</version>
