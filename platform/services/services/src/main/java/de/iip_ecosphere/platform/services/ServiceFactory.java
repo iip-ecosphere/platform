@@ -190,4 +190,22 @@ public class ServiceFactory {
         netwMgrSetup = instance;
     }
 
+    /**
+     * Returns a test represented as it's class for execution in jUnit. This is required if a test running a service 
+     * manager and other components like AAS as plugins shall get execute a test independently. Delegates the
+     * work to {@link ServiceFactoryDescriptor}. [testing]
+     * 
+     * @param index a 0-based index of the test/suite to return; usually test and implementing service manager are in 
+     *    close relationship and know the valid indexes
+     * @return the test classes or <b>null</b> if there is none for the given index
+     */
+    public static Class<?>[] getTests(int index) {
+        Class<?>[] result = null;
+        init();
+        if (null != desc) {
+            result = desc.getTests(index);
+        }
+        return result;
+    }
+
 }

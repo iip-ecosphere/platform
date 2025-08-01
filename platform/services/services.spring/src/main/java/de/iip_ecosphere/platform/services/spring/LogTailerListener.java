@@ -48,7 +48,7 @@ class LogTailerListener extends TailerListenerAdapter implements Closeable {
             String.class);
         try {
             sender.connectBlocking();
-        } catch (InterruptedException e) {
+        } catch (IOException e) {
         }
     }
     
@@ -77,7 +77,7 @@ class LogTailerListener extends TailerListenerAdapter implements Closeable {
             sender.close();
         }
         if (null != tailer) {
-            tailer.stop();
+            tailer.close();
         }
     }
     

@@ -1,5 +1,6 @@
-/********************************************************************************
- * Copyright (c) {2021} The original author or authors
+/**
+ * ******************************************************************************
+ * Copyright (c) {2025} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
  * available under the terms of the Eclipse Public License 2.0 which is available 
@@ -8,24 +9,22 @@
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
+
 package test.de.iip_ecosphere.platform.services;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
 
 /**
- * Defines the tests to be executed.
+ * For testing test provisioning.
  * 
  * @author Holger Eichelberger, SSE
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-    AbstractServiceDescriptorTest.class,
-    ServiceManagerTest.class,
-    ServicesAasTest.class,
-    ServerWrapperTest.class,
-    TestProviderTest.class
-})
-public class AllTests {
+@ExcludeFirst // give priority to real JSL descriptors
+public class TestProviderDescriptor implements de.iip_ecosphere.platform.services.TestProviderDescriptor {
+
+    @Override
+    public Class<?>[] getTests(int index) {
+        return index >= 0 && index < 2 ? new Class<?>[] {Object.class} : null;
+    }
 
 }

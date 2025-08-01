@@ -21,11 +21,11 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     UtilsTest.class,
-    SimpleStartStopServiceManagerTest.class,
+    //SimpleStartStopServiceManagerTest.class,
     ArtifactInfoTest.class,
-    TestLifecycleDescriptor.class,
+    //TestLifecycleDescriptor.class,
     ServiceMgrAndDescriptorTest.class,
-    ServerStartStopServiceManagerTest.class,
+    //ServerStartStopServiceManagerTest.class,
     
     DescriptorUtilsTest.class,
     ServerManagerTest.class

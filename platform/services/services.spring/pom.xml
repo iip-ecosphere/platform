@@ -184,6 +184,38 @@
         </configuration>
       </plugin>
       
+         <plugin>
+             <groupId>de.iip-ecosphere.platform</groupId>
+             <artifactId>dependency-plugin</artifactId>
+             <version>${project.version}</version>
+             <executions>
+                 <execution>
+                     <id>copy-dependencies</id>
+                     <goals>
+                         <goal>copy-plugin-dependencies</goal>
+                     </goals>
+                     <phase>package</phase>
+                 </execution>
+                 <execution>
+                     <id>build-classpath-plugin</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>build-plugin-classpath</goal>
+                     </goals>
+                 </execution>
+                 <execution>
+                     <id>assemble</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>assemble-plugin</goal>
+                     </goals>
+                 </execution>
+             </executions>
+             <configuration>
+                 <addTestArtifact>true</addTestArtifact>
+             </configuration>             
+         </plugin>
+      
     </plugins>
   </build>
 
