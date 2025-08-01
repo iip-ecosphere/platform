@@ -52,14 +52,27 @@ public interface ConnectorExtensionDescriptor {
      * Returns a connector extension.
      * 
      * @param <T> the type of the extension
-     * @param connector the connector requesting the extension
+     * @param connector the connector requesting the extension, supplying the id through 
+     *     {@link Connector#getInstanceIdentification()}
      * @param cls the requested extension type
      * @param dflt the default value if none was found
      * @return {@code dflt} or the extension value
      */
     public static <T> T getExtension(Connector<?, ?, ?, ?> connector, Class<T> cls, Supplier<T> dflt) {
+        return getExtension(connector.getInstanceIdentification(), cls, dflt);
+    }
+    
+    /**
+     * Returns a connector extension.
+     * 
+     * @param <T> the type of the extension
+     * @param is the connector instance identification to be matched by the related extension
+     * @param cls the requested extension type
+     * @param dflt the default value if none was found
+     * @return {@code dflt} or the extension value
+     */
+    public static <T> T getExtension(String id, Class<T> cls, Supplier<T> dflt) {
         T result;
-        String id = connector.getInstanceIdentification();
         ServiceLoader<ConnectorExtensionDescriptor> loader = ServiceLoader.load(ConnectorExtensionDescriptor.class);
         Optional<ConnectorExtensionDescriptor> desc = ServiceLoaderUtils.stream(loader)
             .filter(d -> d.handlesConnectorForExtension(id))
@@ -73,7 +86,6 @@ public interface ConnectorExtensionDescriptor {
         }
         return result;
     }
-
 
     /**
      * Generic simple implementation of {@link #getConnectorExtension(Class, Supplier)}.
@@ -90,7 +102,7 @@ public interface ConnectorExtensionDescriptor {
         T result;
         V v = val.get();
         if (cls == v.getClass()) {
-            result = cls.cast(val);
+            result = cls.cast(v);
         } else {
             result = dflt.get();
         }
@@ -100,7 +112,7 @@ public interface ConnectorExtensionDescriptor {
     /**
      * A default implementation of {@link ConnectorExtensionDescriptor} checking for identifier equality and providing
      * the extension value through {@link ConnectorExtensionDescriptor#getConnectorExtensionValue(
-     * Class, Class, Supplier, Supplier)}. To become a concrete descriptor, must be extended and no-arg constructor 
+     * Class, Supplier, Supplier)}. To become a concrete descriptor, must be extended and no-arg constructor 
      * must supply the constructor arguments.
      * 
      * @param <V> the value type

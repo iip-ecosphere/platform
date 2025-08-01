@@ -35,7 +35,8 @@ import org.junit.runners.Suite;
     FormatCacheTest.class,
     ModelAccessProviderTest.class,
     AbstractThreadedConnectorTest.class,
-    AbstractTypeMappingModelAccessTest.class
+    AbstractTypeMappingModelAccessTest.class,
+    ConnectorExtensionDescriptorTest.class
 })
 public class AllTests {
 }
