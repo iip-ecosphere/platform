@@ -140,7 +140,7 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
                         ClasspathFile aCpf = readClasspathFile(aIn, base);
                         cpf.entries.addAll(aCpf.entries);
                     } catch (IOException e) {
-                        LoggerFactory.getLogger(URLPluginSetupDescriptor.class).error(
+                        LoggerFactory.getLogger(URLPluginSetupDescriptor.class).warn(
                             "While reading append classpath from '{}': {} Ignoring.", a, e.getMessage());
                     }
                 }
