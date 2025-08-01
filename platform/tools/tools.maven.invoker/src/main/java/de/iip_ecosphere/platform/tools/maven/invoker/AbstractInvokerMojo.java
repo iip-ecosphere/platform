@@ -166,7 +166,10 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
     
     @Parameter(property = "easy.docker.skip")
     private String easyDockerSkip;
-    
+
+    @Parameter(property = "configuration.tracingLevel")
+    private String configTracingLevel;
+
     /**
      * A specific <code>fileSet</code> rule to select files and directories.
      */
@@ -275,6 +278,7 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
         setAsProperty(sysProperties, "maven.build.cache.enabled", mavenBuildCacheEnabled);
         setAsProperty(sysProperties, "easy.docker.failOnError", easyDockerFailOnError);
         setAsProperty(sysProperties, "easy.docker.skip", easyDockerSkip);
+        setAsProperty(sysProperties, "configuration.tracingLevel", configTracingLevel);
         value = (disablePython || disableBuild);
         sysProperties.put("python-compile.skip", String.valueOf(value));
         sysProperties.put("python-test.skip", String.valueOf(value));
