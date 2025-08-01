@@ -206,6 +206,7 @@ If there is already a repositories section, please add the contents for the Ã¢â‚
   * Application: Change the version in the Maven POM of your platform, run `mvn -U install -Dunpack.force=true` in the main folder of the application.
   * Example: Update the code via git and then run `mvn -U install -Dunpack.force=true` in the main folder of the example.
 
+
 ## There is a strange warning about illegal access operations. Is this problematic or dangerous?
 
 *Symptom:* When starting platform services, there is output like (*XXX*, *YYY*, *ZZZ* substituted accordingly) like
@@ -222,6 +223,7 @@ Is this problematic or dangerous?
 
 *Solution:* This message shall have disappeared after the migration to JDK 17 (see [#106](https://github.com/iip-ecosphere/platform/issues/106) and our [migration story](MigrationStory.md)), but may re-occur with JDK 21.
 
+
 ## When I work with more than one own example, builds are failing
 
 *Symptom:* There are more than two (own) all-in-one examples that seem to be conflicting during build.
@@ -235,6 +237,7 @@ Is this problematic or dangerous?
 
 After changing the values, run `mvn install` on all affected all-in-one examples.
 
+
 ## My Python service is not loading its (model) files
 
 *Symptom:* There is a Python service that shall load a model/data file. As Python services are packed by the build process and unpacked in a different (temporary) folder, combined there with Python files from platform and code generation, there might be some confusion where data files are located. In any case, local/absolute paths are discouraged.
@@ -245,11 +248,20 @@ After changing the values, run `mvn install` on all affected all-in-one examples
   * Relative paths to Python services start after `src/main/python`, i.e., if your file is `src/main/python/services/myFile.pkl` your service shall use `services/myFile.pkl` as local path.
   * Check `src/main/assembly/python.yml` whether in addition to `**/*.py` also your model extensions are listed, e.g., `<include>**/*.pkl</include>`. Then run the build process of your application, to be on the safe side with `-U`.
 
+
 ## My Python service does not emit anything when I call print or printf
 
 *Symptom:* You do not see any or delayed Python output when you call print or printf in the application log.
 
-*Reason:* By default, Python buffers the standard output streams. If a service is running longer, full buffers are emitted, potentially a bit delayed. For integrations based on the command line streams, delays may cause effects on downstream services. Moreover, as we operate in this case on standard input/output, we redirect standard output to standard error streams.
+*Reason:* By default, Python buffers the standard output streams. If a service is running longer, full buffers are emitted, eventually a bit delayed. For integrations based on the command line streams, delays may cause effects on downstream services. Moreover, as we operate in this case on standard input/output, we redirect standard output to standard error streams.
 
 *Solution:* On regular Python calls of oktoflow (service integration, Python function calls) we now apply the Python argument -u, which disables standard stream buffering. Non-commandline stream integrations, e.g. webservices, log to usual streams, i.e., print to sysout.
 
+
+## I try to run tests locally but I do get strange NullPointerExceptions
+
+*Symptom:* You run some tests with Maven or IDE and run into NullPointerExceptions.
+
+*Reason:* Must not be a bug, could be an issue of trying to load plugins locally (if a github workspace is detected) to avoid packing-unpacking. We try to improve the build process here.
+
+*Solution:* Force building the missing plugins first, in particular those in services, such as for logging, websockets, rest, json, yaml.
