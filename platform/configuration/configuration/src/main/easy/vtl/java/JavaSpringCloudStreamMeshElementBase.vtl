@@ -489,16 +489,16 @@ block;
         '()->service.getInPath("${getPath(conn.inInterface)}"), ()->service.getOutPath("${getPath(conn.outInterface)}")';
     }
     
-    @DispatchBasis
+    /* @DispatchBasis
     def String getConnectorCls(Connector conn) {
         conn.class;
     }
 
     @DispatchCase
-    def String getConnectorCls(RestConnector conn) {
+    def String getConnectorCls(GeneratedConnector conn) {
         String typeName = asTypeName(conn.name);
         typeName + "Impl";
-    }
+    }*/
     
     def initialService(MeshElement elt, Connector conn, setOf(String) serviceVars, JavaCodeMethod m) {
         String connGen = getConnectorGenerics(conn, true);
@@ -510,6 +510,7 @@ block;
         init.arg("() -> param");
         init.addCallArgument("createConnectorAdapter").arg(genCreateConnectorAdapterSuppliers(conn));
         m.var("de.iip_ecosphere.platform.connectors.Connector" + connGen, "conn").initializer(init);
+        m.call("conn.setInstanceIdentification").stringArg(conn.name);
         m.call("conn.enablePolling").arg(false); // independent of notifications, disable as @Autowired may not be
         getYamlServiceFragment("serviceData", clsName, conn.id, m);
         init = new JavaCodeConstructorCall(wrapperCls(conn) + connGen).arg("serviceData").arg("conn").arg("() -> param");

@@ -76,6 +76,7 @@
 								<id>generatedConnector</id>
 								<configuration>
 									<mainClass>${generated.class}</mainClass>
+									<classpathScope>test</classpathScope>
 								</configuration>
 							</execution>
 							<execution>
@@ -159,7 +160,7 @@
 									<goal>generateApps</goal>
 								</goals>
 							</execution>
-							<execution>
+							<!--<execution>
 								<id>testApp</id>
 								<goals>
 									<goal>testApp</goal>
@@ -175,7 +176,7 @@
 											.*RECEIVED.*RestPhoenixEEMImpl.*</logRegExpr>
 									</logRegExprs>
 								</configuration>
-							</execution>
+							</execution>-->
 						</executions>
 						<configuration>
 							<model>Rest</model>

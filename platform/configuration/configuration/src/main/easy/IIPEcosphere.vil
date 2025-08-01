@@ -15,6 +15,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     setOf(String) usedServiceTypes = {};
     Integer currentStep = -1;
     Integer maxSteps = 0;
+    mapOf(String, sequenceOf(String)) appJsl = {};
     
     main(Project source, Configuration config, Project target) = {
         platformInstantiation = true;
@@ -233,6 +234,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         addArtifacts(ser.artifacts, ser.artifact, bins, noDeps);                        
                     }
                 };
+                // processes the appJSL entries to individual files
+                for (String k: appJsl.getKeys()) {
+                  vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/${k}", descriptors=appJsl.get(k));
+                }
                 sequenceOf(String) pluginDescriptors = {};
                 for (Plugin plugin: plugins->sortedBy(p|p.id)) {
                     sequenceOf(String) tmp = plugin.artifact.split(":");
@@ -2112,7 +2117,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         collectRestTypes(conn.inInterface.type, types, usedTypes);
         collectRestTypes(conn.outInterface.type, outTypes, usedTypes);
         types = types.including(outTypes);
-        vilTemplateProcessor("JavaConnectorRestImpl", config, "${javaNodesSrc}/${typeName}Impl.java", conn=conn, pkg=javaNodesPackage, usedRestTypes=usedTypes);
+        vilTemplateProcessor("JavaConnectorRestImpl", config, "${javaNodesSrc}/${typeName}Extension.java", conn=conn, pkg=javaNodesPackage, usedRestTypes=usedTypes);
+        addAppJsl("de.iip_ecosphere.platform.connectors.ConnectorExtensionDescriptor", "${javaNodesPackage}.${typeName}Extension");
         for (RecordType t: types) {
             typeName = toTypeName(t);
             vilTemplateProcessor("JavaConnectorRestType", config, "${javaNodesSrc}/${typeName}RestType.java", type=t, pkg=javaNodesPackage);
@@ -2120,6 +2126,24 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         Path resourcesSrc = "${appRoot}/src/main/resources";
         String connectorName = toIdentifier(conn.name);
         vilTemplateProcessor("ConnectorResource", config, "${resourcesSrc}/${connectorName}.server", conn=conn);
+    }
+    
+    /**
+     * Collects information on the JSL files for the application. One file may contain multiple implementations.
+     * 
+     * @param descriptor qualified class name of the descriptor / file name
+     * @param impl qualified class name of the implementation to load
+     */
+    addAppJsl(String descriptor, String impl) = {
+        sequenceOf(String) impls;
+        if (!appJsl.containsKey(descriptor)) {
+            sequenceOf(String) implsTmp = {};
+            impls = implsTmp;
+            appJsl.add(descriptor, impls);
+        } else {
+            impls = appJsl.get(descriptor);
+        }
+        impls.add(impl);
     }
     
     @DispatchBasis

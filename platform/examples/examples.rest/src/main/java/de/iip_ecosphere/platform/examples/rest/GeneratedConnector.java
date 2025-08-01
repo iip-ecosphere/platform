@@ -25,10 +25,7 @@ import iip.datatypes.RestPhoenixEEMResponseTariffNumberImpl;
 import iip.datatypes.RestPhoenixRwEEMMixed;
 import iip.datatypes.RestPhoenixRwEEMMixedImpl;
 import iip.nodes.MyRestConnEEMMixedExample;
-import iip.nodes.MyRestConnEEMMixedExampleImpl;
 import test.de.iip_ecosphere.platform.examples.rest.TestServerEEM;
-
-
 
 
 public class GeneratedConnector {
@@ -142,8 +139,9 @@ public class GeneratedConnector {
         TranslatingProtocolAdapter<RESTItem, Object, RestPhoenixEEMMixed, RestPhoenixRwEEMMixed> adapter = 
                 MyRestConnEEMMixedExample.createConnectorAdapter();
         
-        RESTConnector<RestPhoenixEEMMixed, RestPhoenixRwEEMMixed> conn = 
-                new MyRestConnEEMMixedExampleImpl(adapter);
+        RESTConnector<RestPhoenixEEMMixed, RestPhoenixRwEEMMixed> conn = new RESTConnector<>(adapter);
+        // see iip.nodes.MyRestConnEEMMixedExampleExtension.java
+        conn.setInstanceIdentification("myRestConnEEMMixed example"); 
         conn.connect(adjustConnectorParameter(MyRestConnEEMMixedExample.createConnectorParameter()));
         conn.setReceptionCallback(callback);
         return conn;
