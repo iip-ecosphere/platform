@@ -76,15 +76,20 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
      * @return the classpath file
      */
     public static File findClasspathFile(File folder, String suffix) {
+        File result;
         suffix = suffix == null ? "" : suffix;
-        File f = new File(folder, "classpath" + suffix); // unpacked
-        if (!f.exists()) {
-            f = new File(folder, "target/jars/classpath" + suffix); // development, in project
+        if (folder.isFile()) {
+            result = folder; // unpacked, relocated
+        } else {
+            result = new File(folder, "classpath" + suffix); // unpacked
+            if (!result.exists()) {
+                result = new File(folder, "target/jars/classpath" + suffix); // development, in project
+            }
+            if (!result.exists()) {
+                result = new File(folder, "target/classes/classpath" + suffix); // development, in project
+            }
         }
-        if (!f.exists()) {
-            f = new File(folder, "target/classes/classpath" + suffix); // development, in project
-        }
-        return f;
+        return result;
     }
 
     /**

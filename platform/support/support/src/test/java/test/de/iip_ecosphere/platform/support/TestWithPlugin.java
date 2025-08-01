@@ -35,6 +35,7 @@ public class TestWithPlugin {
     private static List<PluginLocation> locations = new ArrayList<>();
     private static String installDir = "target/oktoPlugins";
     private static List<Runnable> runAfterLoading = new ArrayList<>();
+    private static boolean enableLocalPlugins = true;
 
     /**
      * Represents a plugin location.
@@ -105,6 +106,24 @@ public class TestWithPlugin {
     }
     
     /**
+     * Whether local plugins shall be enabled.
+     * 
+     * @param enable enable or disable (default is enabled)
+     */
+    public static void enableLocalPlugins(boolean enable) {
+        enableLocalPlugins = enable;
+    }
+    
+    /**
+     * Sets the folder where the plugins are installed.
+     * 
+     * @param dir the folder
+     */
+    public static void setInstallDir(String dir) {
+        installDir = dir;
+    }
+    
+    /**
      * Loads plugins statically.
      */
     public static void loadPlugins() {
@@ -119,7 +138,7 @@ public class TestWithPlugin {
                 if (!folder.isDirectory()) { // usual nesting of platform part in different folder
                     folder = new File("../../" + loc.parent, loc.folder); 
                 }
-                if (folder.isDirectory()) { // in local git repo
+                if (enableLocalPlugins && folder.isDirectory()) { // in local git repo
                     LoggerFactory.getLogger(TestWithPlugin.class).info("Loading plugin from {} (development)", folder);
                     File[] appends = collectAppends(folder.getParentFile(), loc.appends);
                     PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(folder, loc.descriptorOnly, 
