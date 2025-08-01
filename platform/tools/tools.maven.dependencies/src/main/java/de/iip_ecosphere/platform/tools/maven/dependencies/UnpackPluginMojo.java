@@ -38,6 +38,7 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.plugins.dependency.fromConfiguration.ArtifactItem;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.codehaus.plexus.components.io.filemappers.FileMapper;
@@ -54,7 +55,8 @@ import org.eclipse.aether.resolution.ArtifactResult;
  * 
  * @author Holger Eichelberger, SSE
  */
-@Mojo(name = "unpack-plugins", defaultPhase = LifecyclePhase.TEST_COMPILE, requiresProject = false, threadSafe = true)
+@Mojo(name = "unpack-plugins", defaultPhase = LifecyclePhase.TEST_COMPILE, requiresProject = false, threadSafe = true, 
+    requiresDependencyResolution = ResolutionScope.RUNTIME, requiresDependencyCollection = ResolutionScope.RUNTIME)
 public class UnpackPluginMojo extends CleaningUnpackMojo {
 
     private static final String NAME_CLASSPATH_FILE = "classpath";
@@ -109,7 +111,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
          * @return the name
          */
         private String getName() {
-            return lastPart(getArtifactId(), ".");
+            return lastArtifactIdPart(getArtifactId());
         }
         
         /**
@@ -165,11 +167,22 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         }
         
     }
-    
+
     /**
      * Returns the part after the last ".".
      * 
      * @param name the name to strip
+     * @return the last part or {@code name}
+     */
+    private static String lastArtifactIdPart(String name) {
+        return lastPart(name, ".");
+    }
+    
+    /**
+     * Returns the part after the last {@code separator}.
+     * 
+     * @param name the name to strip
+     * @param separator the separator
      * @return the last part or {@code name}
      */
     private static String lastPart(String name, String separator) {
@@ -221,7 +234,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             }
             setArtifactItems(artifactItems);
         }
-        
+
         super.doExecute();
         
         if (skipIfExists() == null || !skipIfExists().exists()) {
@@ -263,7 +276,8 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             if (pl.hasAppends()) {
                 List<String> result = new ArrayList<>();
                 for (String name: pl.appends) {
-                    File cpFile = getCpFile(name);
+                    String shortName = lastArtifactIdPart(name);
+                    File cpFile = getCpFile(shortName);
                     try (FileInputStream fis = new FileInputStream(cpFile)) {
                         List<String> contents = IOUtils.readLines(fis, Charset.defaultCharset());
                         String prefix = null;
