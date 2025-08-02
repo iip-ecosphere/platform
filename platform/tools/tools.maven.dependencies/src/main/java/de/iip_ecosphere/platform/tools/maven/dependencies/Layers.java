@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.tools.maven.dependencies;
 
+import java.util.Arrays;
+
 import org.apache.maven.plugin.logging.Log;
 
 /**
@@ -21,6 +23,21 @@ import org.apache.maven.plugin.logging.Log;
  */
 public class Layers {
 
+    private static final String[] LAYERS = {
+        "support", 
+        "support.aas", 
+        "support.iip-aas", 
+        "transport", 
+        "connectors",
+        "services.environment", 
+        "services", 
+        "deviceMgt",
+        "ecsRuntime",
+        "monitoring",
+        "configuration",
+        "platform"
+    };
+    
     /**
      * Determines the exclude artifact ids.
      * 
@@ -31,17 +48,26 @@ public class Layers {
     public static String getExcludeArtifactIds(String artifactId, String excludeIds, Log log) {
         String result = excludeIds;
         if (null == result || result.length() == 0) {
-            if (artifactId.startsWith("support.aas.")) {
+            int last = 0;
+            for (int l = 0; l < LAYERS.length; l++) {
+                if (artifactId.startsWith(LAYERS[l] + ".")) {
+                    last = l;
+                }
+            }
+            result = String.join(", ", Arrays.copyOfRange(LAYERS, 0, last + 1));
+/*            if (artifactId.startsWith("support.aas.")) {
                 result = "support, support.aas";
             } else if (artifactId.startsWith("support.")) {
                 result = "support";
             } else if (artifactId.startsWith("transport.")) {
-                result = "support, support.aas, support.iip-aas";
-            } else if (artifactId.startsWith("connectors.")) {
                 result = "support, support.aas, support.iip-aas, transport";
+            } else if (artifactId.startsWith("connectors.")) {
+                result = "support, support.aas, support.iip-aas, transport, connectors";
             } else if (artifactId.startsWith("services.")) {
-                result = "support, support.aas, support.iip-aas, transport, services.environment";
-            } // further cases
+                result = "support, support.aas, support.iip-aas, transport, services.environment, services";
+            } else if (artifactId.startsWith("deviceMgt.")) {
+                result = "support, support.aas, support.iip-aas, transport, services.environment, services, deviceMgt";
+            } // further cases*/
         }
         if (log != null && result != null && result.length() > 0) {
             log.info("Using excludeArtifactIds: " + result);

@@ -32,6 +32,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -40,6 +42,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.plugins.dependency.fromConfiguration.ArtifactItem;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.codehaus.plexus.components.io.filemappers.FileMapper;
 import org.eclipse.aether.RepositorySystem;
@@ -84,12 +88,18 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
 
     private List<String> classpathFiles = new ArrayList<>();
     
+    @Parameter( defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true )
+    private List<ArtifactRepository> remoteArtifactRepositories;
+
     @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
     private List<RemoteRepository> remoteRepositories;
 
     @Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
     private RepositorySystemSession repoSession;
-    
+
+    @Parameter( defaultValue = "${session}", readonly = true, required = true )
+    private MavenSession session;
+
     @Component
     private RepositorySystem repoSystem;
     
@@ -104,15 +114,6 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         
         @Parameter(required = false) 
         private List<String> appends;
-        
-        /**
-         * Returns the name of the plugin item.
-         * 
-         * @return the name
-         */
-        private String getName() {
-            return lastArtifactIdPart(getArtifactId());
-        }
         
         /**
          * Returns whether this item has appends.
@@ -167,28 +168,6 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         }
         
     }
-
-    /**
-     * Returns the part after the last ".".
-     * 
-     * @param name the name to strip
-     * @return the last part or {@code name}
-     */
-    private static String lastArtifactIdPart(String name) {
-        return lastPart(name, ".");
-    }
-    
-    /**
-     * Returns the part after the last {@code separator}.
-     * 
-     * @param name the name to strip
-     * @param separator the separator
-     * @return the last part or {@code name}
-     */
-    private static String lastPart(String name, String separator) {
-        int pos = name.lastIndexOf(separator);
-        return pos > 0 ? name.substring(pos + separator.length()) : name;
-    }
     
     @Override
     public void doExecute() throws MojoExecutionException, MojoFailureException {
@@ -217,19 +196,19 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             List<ArtifactItem> artifactItems = new ArrayList<>();
             for (PluginItem pl : plugins) {
                 ArtifactItem item = new ArtifactItem();
-                String name = pl.getName();
+                String artId = pl.getArtifactId();
                 if (StringUtils.isBlank(pl.getGroupId())) {
                     item.setGroupId("de.iip-ecosphere.platform");
                 }
-                item.setArtifactId(pl.getArtifactId());
+                item.setArtifactId(artId);
                 item.setVersion(StringUtils.isBlank(version) ? pl.getVersion() : version);
                 item.setType("zip");
                 item.setClassifier("plugin");
                 item.setOverWrite(String.valueOf(true));
-                item.setOutputDirectory(getOutputDir(name));
-                getLog().info("Configuring plugin '" + name + "' -> " + item.getOutputDirectory());
-                item.setDestFileName(name + ".zip");
-                item.setFileMappers(new FileMapper[] {new RelocatingFileMapper(name, pl.hasAppends())});
+                item.setOutputDirectory(getOutputDir(artId));
+                getLog().info("Configuring plugin '" + artId + "' -> " + item.getOutputDirectory());
+                item.setDestFileName(artId + ".zip");
+                item.setFileMappers(new FileMapper[] {new RelocatingFileMapper(artId, pl.hasAppends())});
                 artifactItems.add(item);
             }
             setArtifactItems(artifactItems);
@@ -276,8 +255,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             if (pl.hasAppends()) {
                 List<String> result = new ArrayList<>();
                 for (String name: pl.appends) {
-                    String shortName = lastArtifactIdPart(name);
-                    File cpFile = getCpFile(shortName);
+                    File cpFile = getCpFile(name);
                     try (FileInputStream fis = new FileInputStream(cpFile)) {
                         List<String> contents = IOUtils.readLines(fis, Charset.defaultCharset());
                         String prefix = null;
@@ -298,7 +276,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                         getLog().error("Cannot locate append plugin '" + name + "' - ignoring: " + e.getMessage());
                     }
                 }
-                pluginAppends.put(pl.getName(), result);
+                pluginAppends.put(pl.getArtifactId(), result);
             }
         }
     }
@@ -685,6 +663,15 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         request.setRepositories(remoteRepositories);
         ArtifactResult result = repoSystem.resolveArtifact(repoSession, request);
         return result.getArtifact().getFile();
+    }
+
+    @Override
+    public ProjectBuildingRequest newResolveArtifactProjectBuildingRequest() {
+        // no artifact resolution so far
+        ProjectBuildingRequest buildingRequest =
+            new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
+        buildingRequest.setRemoteRepositories(remoteArtifactRepositories);
+        return buildingRequest;
     }
 
 }
