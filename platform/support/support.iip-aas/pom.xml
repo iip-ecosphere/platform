@@ -45,13 +45,13 @@
                             <plugin>
                                 <artifactId>support.aas.basyx2</artifactId>
                                 <appends> <!-- complement the plugin, add the platform logging -->
-                                   <append>log-slf4j-simple</append>
+                                   <append>support.log-slf4j-simple</append>
                                 </appends>
                             </plugin>
                             <plugin>
                                 <artifactId>support.aas.basyx</artifactId>
                                 <appends> <!-- complement the plugin, add the platform logging -->
-                                   <append>log-slf4j-simple</append>
+                                   <append>support.log-slf4j-simple</append>
                                 </appends>
                             </plugin>
                         </plugins>
