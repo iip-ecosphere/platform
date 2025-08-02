@@ -11,9 +11,8 @@
  ********************************************************************************/
 package de.iip_ecosphere.platform.ecsRuntime.docker;
 
-import org.apache.commons.lang.SystemUtils;
-
 import de.iip_ecosphere.platform.ecsRuntime.EcsSetup.AbstractManagerSetup;
+import de.iip_ecosphere.platform.support.OsUtils;
 
 /**
  * Implements the docker specific configuration.
@@ -24,7 +23,7 @@ import de.iip_ecosphere.platform.ecsRuntime.EcsSetup.AbstractManagerSetup;
 public class Docker extends AbstractManagerSetup {
 
     // http://localhost:2375 does not seem to work although discussed as solution
-    private String dockerHost = SystemUtils.IS_OS_WINDOWS 
+    private String dockerHost = OsUtils.isWindows()
         ? "unix:///var/run/docker.sock" : "unix:///var/run/docker.sock";
     private String dockerImageYamlFilename = "image-info.yml";
     private boolean deleteWhenUndeployed = false;
