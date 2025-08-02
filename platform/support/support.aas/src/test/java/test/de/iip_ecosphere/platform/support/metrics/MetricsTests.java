@@ -14,6 +14,7 @@ package test.de.iip_ecosphere.platform.support.metrics;
 
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.metrics.DefaultSystemMetrics;
 import de.iip_ecosphere.platform.support.metrics.DefaultSystemMetricsDescriptor;
 import de.iip_ecosphere.platform.support.metrics.LinuxSystemMetricsUtils;
@@ -21,7 +22,6 @@ import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
 
 import java.io.File;
 
-import org.apache.commons.lang.SystemUtils;
 import org.junit.Assert;
 
 /**
@@ -66,7 +66,7 @@ public class MetricsTests {
         Assert.assertTrue(LinuxSystemMetricsUtils.getSysTemp(tempFile) < 100); // 27...
         
         String[] args;
-        if (SystemUtils.IS_OS_WINDOWS) {
+        if (OsUtils.isWindows()) {
             args = new String[] {"cmd.exe", "/c", "dir"}; 
         } else {
             args = new String[] {"ls"}; 
