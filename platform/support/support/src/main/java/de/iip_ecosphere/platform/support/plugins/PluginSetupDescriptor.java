@@ -13,6 +13,10 @@
 package de.iip_ecosphere.platform.support.plugins;
 
 import java.io.File;
+import java.util.ServiceLoader;
+import java.util.stream.Stream;
+
+import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 
 /**
  * A descriptor to describe the presence of a plugin. Used for setting up the {@link PluginManager}.
@@ -45,6 +49,17 @@ public interface PluginSetupDescriptor {
      */
     public default boolean preventDuplicates() {
         return true;
+    }
+    
+    /**
+     * Returns the plugin descriptors represented by this setup descriptor.
+     * 
+     * @param loader the class loader to use, preferably the result of {@link #createClassLoader(ClassLoader)}
+     * @return the plugin descriptors
+     */
+    @SuppressWarnings("rawtypes")
+    public default Stream<PluginDescriptor> getPluginDescriptors(ClassLoader loader) {
+        return ServiceLoaderUtils.stream(ServiceLoader.load(PluginDescriptor.class, loader));
     }
     
 }

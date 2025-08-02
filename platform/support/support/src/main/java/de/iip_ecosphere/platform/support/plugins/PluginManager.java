@@ -229,8 +229,7 @@ public class PluginManager {
         boolean allowAll = !desc.preventDuplicates();
         ClassLoader loader = PluginManager.class.getClassLoader();
         ClassLoader descLoader = desc.createClassLoader(loader);
-        ServiceLoaderUtils
-            .stream(ServiceLoader.load(PluginDescriptor.class, descLoader))
+        desc.getPluginDescriptors(descLoader)
             .filter(d -> allowAll || loadedBy(d, descLoader))
             .forEach(d -> registerPlugin(d, onlyNew, desc.getInstallDir()));
     }

@@ -179,5 +179,25 @@ public class CollectionUtilsTest {
         Assert.assertEquals("1 2", CollectionUtils.toStringSpaceSeparated(list));
         Assert.assertEquals("[1, 2]", CollectionUtils.toString(list, "[", "]", ", "));
     }
+    
+    /**
+     * Tests {@link CollectionUtils#reverse(Object[])}.
+     */
+    @Test
+    public void testReverse() {
+        CollectionUtils.reverse(null);
+
+        String[] data = new String[0];
+        CollectionUtils.reverse(data);
+        Assert.assertArrayEquals(new String[] {}, data);
+        
+        data = new String[] {"a"};
+        CollectionUtils.reverse(data);
+        Assert.assertArrayEquals(new String[] {"a"}, data);
+
+        data = new String[] {"a", "b"};
+        CollectionUtils.reverse(data);
+        Assert.assertArrayEquals(new String[] {"b", "a"}, data);
+    }
 
 }

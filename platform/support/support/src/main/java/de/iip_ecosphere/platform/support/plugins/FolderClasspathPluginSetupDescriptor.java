@@ -22,9 +22,12 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 
+import de.iip_ecosphere.platform.support.ZipUtils;
+import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
@@ -59,7 +62,7 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
      */
     public FolderClasspathPluginSetupDescriptor(File folder, boolean descriptorOnly, File... appends) {
         super(loadClasspathSafe(folder, descriptorOnly, appends));
-        this.folder = folder;
+        this.folder = adjustBase(folder);
         this.descriptorOnly = descriptorOnly;
     }
 
@@ -93,6 +96,23 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
     }
 
     /**
+     * Adjusts the base directory.
+     * 
+     * @param folder the folder to be used as base directory
+     * @return the base directory
+     */
+    public static File adjustBase(File folder) {
+        File result = folder;
+        if (result.isFile()) {
+            result = result.getParentFile();
+            if ("plugins".equals(result.getName())) { // unpack convention, or - if there is no jar?
+                result = result.getParentFile();
+            }
+        }
+        return result;
+    }
+
+    /**
      * Loads a resource in classpath format and returns the specified classpath entries as URLs. Logs errors and 
      * exceptions.
      * 
@@ -100,9 +120,11 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
      * @param descriptorOnly only the first/two entries, the full thing else
      * @param appends further classpath files that shall be appended, e.g., logging, may be <b>null</b>
      * @return the URLs, may be empty
+     * @see #loadClasspathFileSafe(File, boolean)
+     * @see #adjustBase(File)
      */
     public static URL[] loadClasspathSafe(File folder, boolean descriptorOnly, File... appends) {
-        return loadClasspathFileSafe(findClasspathFile(folder, ""), folder, descriptorOnly, appends);
+        return loadClasspathFileSafe(findClasspathFile(folder, ""), adjustBase(folder), descriptorOnly, appends);
     }
     
     /**
@@ -130,18 +152,16 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
     private static URL[] loadClasspathFileSafe(File cpFile, File base, boolean descriptorOnly, File... appends) {
         URL[] result = null;
         try (InputStream in = new FileInputStream(cpFile)) {
-            LoggerFactory.getLogger(URLPluginSetupDescriptor.class).info("Loading classpath from '{}'", cpFile);
+            getLogger().info("Loading classpath from '{}'", cpFile);
             ClasspathFile cpf = readClasspathFile(in, base);
             if (null != appends) {
                 for (File a: appends) {
                     try (InputStream aIn = new FileInputStream(a)) {
-                        LoggerFactory.getLogger(URLPluginSetupDescriptor.class).info(
-                            "Appending classpath from '{}'", a);
+                        getLogger().info("Appending classpath from '{}'", a);
                         ClasspathFile aCpf = readClasspathFile(aIn, base);
                         cpf.entries.addAll(aCpf.entries);
                     } catch (IOException e) {
-                        LoggerFactory.getLogger(URLPluginSetupDescriptor.class).warn(
-                            "While reading append classpath from '{}': {} Ignoring.", a, e.getMessage());
+                        getLogger().warn("While reading append classpath from '{}': {} Ignoring.", a, e.getMessage());
                     }
                 }
             }
@@ -160,8 +180,7 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
             }
             result = toURLSafe(entries.toArray(new File[entries.size()]));
         } catch (IOException e) {
-            LoggerFactory.getLogger(URLPluginSetupDescriptor.class).error(
-                "While reading classpath from '{}': {} Ignoring.", cpFile, e.getMessage());
+            getLogger().error("While reading classpath from '{}': {} Ignoring.", cpFile, e.getMessage());
         }
         if (null == result) {
             result = new URL[0];
@@ -260,6 +279,85 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
     @Override
     protected ClassLoader createClassLoader(URL[] urls, ClassLoader parent) {
         return descriptorOnly ? new URLClassLoader(urls, parent) : super.createClassLoader(urls, parent);
+    }
+
+    @Override
+    @SuppressWarnings("rawtypes")
+    public Stream<PluginDescriptor> getPluginDescriptors(ClassLoader loader) {
+        return getPluginDescriptors(getURLs(), loader);
+    }
+    
+    /**
+     * Returns the plugin descriptors represented by this setup descriptor. We just look into the first (main) or 
+     * second (optional test) jar to speed up and focus the search for descriptors.
+     * 
+     * @param urls the classpath URLs
+     * @param loader the class loader to use, preferably the result of {@link #createClassLoader(ClassLoader)}
+     * @return the plugin descriptors
+     * @see #getPluginDescriptors(URL[], ClassLoader)
+     */
+    @SuppressWarnings("rawtypes")
+    public static Stream<PluginDescriptor> getPluginDescriptors(URL[] urls, ClassLoader loader) {
+        List<PluginDescriptor> result = new ArrayList<>();
+        String first = null;
+        for (URL u: urls) {
+            String name = stripExtension(u.getFile());
+            if (first == null) {
+                first = name;
+                loadDescriptors(u, loader, result);
+            } else {
+                if (name.startsWith(first)) { // xxx-tests
+                    loadDescriptors(u, loader, result);
+                }
+                break;
+            }
+        }
+        return result.stream();
+    }
+
+    /**
+     * Loads the plugin descriptors from {@code url}.
+     * 
+     * @param url the URL to load the descriptors from
+     * @param loader the class loader to use, preferably the result of {@link #createClassLoader(ClassLoader)}
+     * @param result modified with added plugin descriptor instances as side effect
+     */
+    @SuppressWarnings("rawtypes")
+    private static void loadDescriptors(URL url, ClassLoader loader, List<PluginDescriptor> result) {
+        try {
+            InputStream in = ZipUtils.findFile(url.openStream(), "META-INF/services/" 
+                + PluginDescriptor.class.getName());
+            if (in != null) {
+                List<String> lines = IOUtils.readLines(in, Charset.defaultCharset());
+                for (String l : lines) {
+                    try {
+                        Class<?> cls = loader.loadClass(l);
+                        if (PluginDescriptor.class.isAssignableFrom(cls)) {
+                            result.add(PluginDescriptor.class.cast(cls.newInstance()));
+                        } else {
+                            getLogger().warn("Loading plugin descriptor for {}: {} not of type PluginDescriptor. "
+                                + "Ignoring", url, l);
+                        }
+                    } catch (ClassNotFoundException | IllegalAccessException | InstantiationException 
+                        | ExceptionInInitializerError | SecurityException e) {
+                        getLogger().warn("Loading plugin descriptor for {}: {} {}. Ignoring", 
+                            url, e.getClass().getSimpleName(), e.getMessage());
+                    }
+                }
+                in.close();
+            }
+        } catch (IOException e) {
+            getLogger().warn("Loading plugin descriptor for {}: {}. Ignoring", url, e.getMessage());
+        }
+    }
+    
+    /**
+     * Returns the logger for this class.
+     * 
+     * @return the logger
+     */
+    private static Logger getLogger() {
+        return LoggerFactory.getLogger(FolderClasspathPluginSetupDescriptor.class);
     }
 
 }

@@ -126,4 +126,13 @@ public class URLPluginSetupDescriptor implements PluginSetupDescriptor {
         return new ChildFirstURLClassLoader(urls, parent);
     }
 
+    /**
+     * Returns the URLs.
+     * 
+     * @return the URLs
+     */
+    protected URL[] getURLs() {
+        return urls;
+    }
+
 }

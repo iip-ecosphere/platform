@@ -33,7 +33,7 @@ public class OsUtils {
      * @return the operating system name
      */
     public static final String getOsName() {
-        // preliminary, may use org.apache.commons.lang.SystemUtils
+        // preliminary, may use org.apache.commons.lang3.SystemUtils
         return System.getProperty("os.name", "");
     }
     
@@ -43,7 +43,7 @@ public class OsUtils {
      * @return the operating system architecture.
      */
     public static final String getOsArch() {
-        // preliminary, may use org.apache.commons.lang.SystemUtils
+        // preliminary, may use org.apache.commons.lang3.SystemUtils
         return System.getProperty("os.arch", "");
     }
     

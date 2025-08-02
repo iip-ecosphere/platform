@@ -34,7 +34,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.validator.routines.InetAddressValidator;
 
 /**
@@ -212,7 +211,7 @@ public class NetUtils {
         boolean inContainer = false;
         String tmp = OsUtils.getPropertyOrEnv(PROP_INCONTAINER);
         if (null == tmp) {
-            if (SystemUtils.IS_OS_WINDOWS) {
+            if (OsUtils.isWindows()) {
                 // unsafe fallback
                 try {
                     Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();

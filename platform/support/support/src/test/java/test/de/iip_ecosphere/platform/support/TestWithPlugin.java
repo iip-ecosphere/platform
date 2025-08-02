@@ -150,8 +150,12 @@ public class TestWithPlugin {
                         File[] appends = collectAppends(folder.getParentFile(), loc.appends);
                         LoggerFactory.getLogger(TestWithPlugin.class).info("Loading plugin from {} "
                             + "(test deployment)", installDir);
+                        File cpFile = new File(installDir + "/" + loc.folder);
+                        if (!cpFile.exists()) { // initial style, transition
+                            cpFile = new File(installDir + "/" + loc.installFolder);
+                        }
                         PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(
-                            new File(installDir + "/" + loc.installFolder), loc.descriptorOnly, appends));
+                            cpFile, loc.descriptorOnly, appends));
                         found = true;
                     }
                 }

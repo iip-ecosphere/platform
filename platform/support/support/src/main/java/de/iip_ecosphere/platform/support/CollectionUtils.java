@@ -20,6 +20,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 /**
  * Some useful additional collection methods.
  * 
@@ -203,6 +205,16 @@ public class CollectionUtils {
      */
     public static String toStringSpaceSeparated(Collection<?> collection) {
         return toString(collection, "", "", " ");
+    }
+    
+    /**
+     * Reverses the order of the given array. There is no special handling for multi-dimensional arrays. This method 
+     * does nothing for a <b>null</b> input array.
+     *
+     * @param array  the array to reverse, may be <b>null</b>
+     */
+    public static void reverse(final Object[] array) {
+        ArrayUtils.reverse(array);
     }
     
 }

@@ -23,7 +23,6 @@ import java.util.function.Predicate;
 
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.apache.commons.lang.SystemUtils;
 
 /**
  * Basic file functionality.
@@ -261,7 +260,7 @@ public class FileUtils {
     public static File getSystemRoot() {
         // https://stackoverflow.com/questions/4362786/getting-the-default-root-directory-in-java
         File result;
-        if (SystemUtils.IS_OS_WINDOWS) {
+        if (OsUtils.isWindows()) {
             String sysDrive = System.getenv("SystemDrive");
             if (null == sysDrive) {
                 sysDrive = "C:";
