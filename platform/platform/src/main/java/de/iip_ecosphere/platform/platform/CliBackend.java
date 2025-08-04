@@ -32,8 +32,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang.ArrayUtils;
-
 import de.iip_ecosphere.platform.deviceMgt.DeviceRemoteManagementOperations;
 import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsClient;
@@ -50,6 +48,7 @@ import de.iip_ecosphere.platform.platform.cli.ServiceDeploymentPlan.ServiceResou
 import de.iip_ecosphere.platform.platform.cli.ServicesClientFactory;
 import de.iip_ecosphere.platform.services.ServicesClient;
 import de.iip_ecosphere.platform.platform.cli.PrintVisitor.PrintType;
+import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.TaskRegistry;
 import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.aas.Submodel;
@@ -699,7 +698,7 @@ class CliBackend {
                 ServicesClient client = getServicesFactory().create(a.getResourceSubstituted(), p.getAppId());
                 serviceClients.put(a.getResourceSubstituted(), client);
                 String[] services = a.getServicesAsArray(p.getAppId(), appInstanceId);
-                ArrayUtils.reverse(services);
+                CollectionUtils.reverse(services);
                 println("Stopping services " + Arrays.toString(services) + " on " + a.getResource());
                 int running = 0;
                 for (int i = 0; i < services.length; i++) {
