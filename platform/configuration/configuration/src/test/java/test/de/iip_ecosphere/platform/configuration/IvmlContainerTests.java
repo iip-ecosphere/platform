@@ -16,10 +16,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.commons.lang.SystemUtils;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.configuration.PlatformInstantiatorExecutor;
+import de.iip_ecosphere.platform.support.OsUtils;
 
 /**
  * Tests the creation of containers via IVML models.
@@ -40,7 +40,7 @@ public class IvmlContainerTests extends AbstractIvmlTests {
         // mvn: stdout now in target/surefire-reports/<qualifiedClassName>-output.txt
         String dockerFailProp;
         String dockerFailPropValue;
-        if (SystemUtils.IS_OS_WINDOWS) { // windows: usually no docker, just skip with fixed return ID
+        if (OsUtils.isWindows()) { // windows: usually no docker, just skip with fixed return ID
             dockerFailProp = "easy.docker.skip";
             dockerFailPropValue = "a12cb01";
         } else { // CI fail sometimes due to unknown docker issue??
