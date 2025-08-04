@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.SystemUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -27,6 +26,7 @@ import de.iip_ecosphere.platform.connectors.types.ChannelTranslatingProtocolAdap
 import de.iip_ecosphere.platform.connectors.types.ConnectorInputTypeAdapter;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeAdapter;
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
@@ -64,7 +64,7 @@ public class JSerialCommConnectorTest {
     private void createParameters() throws IOException {
         String appPortDescriptor = "COM1";
         String machinePortDescriptor = "COM2";
-        if (!SystemUtils.IS_OS_WINDOWS) {
+        if (!OsUtils.isWindows()) {
             // https://stackoverflow.com/questions/52187/virtual-serial-port-for-linux
             appPortDescriptor = "/tmp/ttyV0";
             machinePortDescriptor = "/tmp/ttyV1";
