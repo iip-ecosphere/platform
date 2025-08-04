@@ -192,4 +192,9 @@ public class MonitoringReceiverTest extends AbstractMonitoringReceiverTest {
         mrl.getInstance().doAsserts();
     }
 
+    @Override
+    protected int getSleepTime() {
+        return 8000;
+    }
+
 }
