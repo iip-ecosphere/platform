@@ -42,6 +42,12 @@
       <artifactId>json-simple</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <artifactId>support.processInfo-oshi</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
   
   <build>
