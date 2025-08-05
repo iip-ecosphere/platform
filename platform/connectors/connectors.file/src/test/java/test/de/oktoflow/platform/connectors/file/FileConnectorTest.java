@@ -31,13 +31,13 @@ import de.iip_ecosphere.platform.connectors.types.ChannelTranslatingProtocolAdap
 import de.iip_ecosphere.platform.connectors.types.ConnectorInputTypeAdapter;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeAdapter;
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 import de.oktoflow.platform.connectors.file.FileConnector;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 
 import test.de.iip_ecosphere.platform.connectors.AbstractSerializingConnectorTest;
