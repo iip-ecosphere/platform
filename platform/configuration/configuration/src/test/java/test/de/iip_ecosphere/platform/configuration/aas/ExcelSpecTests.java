@@ -16,10 +16,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.configuration.aas.ReadExcelFile;
+import de.iip_ecosphere.platform.support.FileUtils;
+
 import org.junit.Assert;
 
 /**

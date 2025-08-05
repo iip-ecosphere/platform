@@ -29,9 +29,8 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-
+import de.iip_ecosphere.platform.support.IOUtils;
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.JavaUtils;
 import de.iip_ecosphere.platform.support.plugins.StreamGobbler;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator.InstantiationConfigurer;
@@ -241,7 +240,7 @@ public class PlatformInstantiatorExecutor {
                 localRepo = new File(tmp);
             }
             try {
-                String cpElementString = IOUtils.toString(cpIn, StandardCharsets.UTF_8.name());
+                String cpElementString = IOUtils.toString(cpIn, StandardCharsets.UTF_8);
                 StringTokenizer cpElements = new StringTokenizer(cpElementString, ":");
                 result = new ArrayList<>();
                 while (cpElements.hasMoreTokens()) {

@@ -123,16 +123,16 @@ public class AasIvmlMapperTest extends TestWithPlugin {
      */
     private static void setupIvmlFiles() throws IOException {
         if (null != ivmlFolder) {
-            org.apache.commons.io.FileUtils.deleteDirectory(ivmlFolder);
+            FileUtils.deleteDirectory(ivmlFolder);
         }
         ivmlFolder = FileUtils.createTmpFolder("config.config").getCanonicalFile();
         
         String srcCfg = (origIvmlMeta.toString() + "/cfg/").replace('/', File.separatorChar);
-        org.apache.commons.io.FileUtils.copyDirectory(origIvmlMeta, new File(ivmlFolder, "meta"), 
+        FileUtils.copyDirectory(origIvmlMeta, new File(ivmlFolder, "meta"), 
             f -> !f.toString().startsWith(srcCfg));
-        org.apache.commons.io.FileUtils.copyDirectory(origIvmlConfig == null ? origBase : origIvmlConfig, 
+        FileUtils.copyDirectory(origIvmlConfig == null ? origBase : origIvmlConfig, 
             ivmlFolder, f -> f.getName().endsWith(".ivml") || f.getName().endsWith(".text"));
-        org.apache.commons.io.FileUtils.copyDirectory(new File("src/test/easy/simpleMesh"), ivmlFolder);
+        FileUtils.copyDirectory(new File("src/test/easy/simpleMesh"), ivmlFolder);
         copy("src/test/easy/common", "CommonSetup.ivml", "CommonSetupNoMonUi.ivml");
     }
     
@@ -145,8 +145,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
      */
     private static void copy(String baseFolder, String... fileNames) throws IOException {
         for (String n : fileNames) {
-            org.apache.commons.io.FileUtils.copyFile(new File(baseFolder, n), 
-                new File(ivmlFolder, n));
+            FileUtils.copyFile(new File(baseFolder, n), new File(ivmlFolder, n));
         }
     }
     
@@ -635,7 +634,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
             file = file + ".ivml";
         }
         try {
-            String contents = org.apache.commons.io.FileUtils.readFileToString(resolveIvmlFile(file), 
+            String contents = FileUtils.readFileToString(resolveIvmlFile(file), 
                 Charset.defaultCharset());
             for (String e : expected) {
                 boolean found = contents.contains(e);

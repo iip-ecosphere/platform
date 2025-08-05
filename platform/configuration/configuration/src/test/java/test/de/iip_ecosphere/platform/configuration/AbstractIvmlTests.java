@@ -24,7 +24,6 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 
 import de.iip_ecosphere.platform.configuration.ConfigurationLifecycleDescriptor;
@@ -34,6 +33,7 @@ import de.iip_ecosphere.platform.configuration.EasySetup;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator.InstantiationConfigurer;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.ZipUtils;

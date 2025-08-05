@@ -1,5 +1,6 @@
 project Connectors {
 
+    import DataOperations;
     import OpcUaDataTypes;
     import AASDataTypes;
     import Transport;
@@ -101,109 +102,6 @@ project Connectors {
     @DispatchCase
     def Boolean providerOk(JavaDataTimeDiffProvider provider, Connector conn) = 
         provider <> null implies conn.input->exists(t|t.type == provider.type);
-    
-    // -------------------------------------- Data Operations -------------------------------
-    
-    // Post-parser mapping operations forming a simplified expression tree structure with 
-    // record-field leaf nodes
-    
-    abstract compound ConnectorOperation { // internal for constraints
-    }
-    
-    abstract compound AssignmentOperation refines ConnectorOperation { // top level operation in connector 
-    }
-    
-    def setOf(ConnectorOperation) collectOperations(setOf(ConnectorOperation) ops) = 
-        ops->collect(o|collectOperations(o)).flatten();
-    
-    @dispatchBasis
-    def sequenceOf(ConnectorOperation) collectOperations(ConnectorOperation op) = {};
-    
-    compound ModelCallOperation refines AssignmentOperation {
-        refTo(Field) field; // may be given to indicate that the call shall replace the translation of field
-        NonEmptyString name;
-        sequenceOf(DataOperation) arguments; // EASy-bug
-    }
-    
-    compound FieldAssignmentOperation refines AssignmentOperation {
-        refTo(Field) field;
-        DataOperation operation;
-    }
-
-    @dispatchCase
-    def sequenceOf(ConnectorOperation) collectOperations(FieldAssignmentOperation op) = {op.operation};
-    
-    // transfers both, value and field, potentially to different target fields (optimization)
-    compound TransferAssignmentOperation refines AssignmentOperation {
-        refTo(Field) field;
-        refTo(Field) valueField;
-        refTo(Field) nameField;
-    }
-    
-    abstract compound DataOperation refines ConnectorOperation {
-    }
-    
-    compound DataFieldAccess refines DataOperation {
-        refTo(Field) field;
-    }
-
-    abstract compound ConstantDataOperation refines DataOperation {
-    }
-
-    compound IntegerConstantDataOperation refines ConstantDataOperation {
-        Integer value;
-    }
-
-    compound StringConstantDataOperation refines ConstantDataOperation {
-        String value;
-    }
-
-    compound BooleanConstantDataOperation refines ConstantDataOperation {
-        Boolean value;
-    }
-
-    compound RealConstantDataOperation refines ConstantDataOperation {
-        Real value;
-    }
-
-    // obtains the actual output channel -> channel connectors    
-    compound OutChannelDataOperation refines DataOperation {
-        // -> Type String
-    }
-
-    compound ParenthesisDataOperation refines DataOperation {
-        DataOperation operation;
-    }
-
-    @dispatchCase
-    def sequenceOf(ConnectorOperation) collectOperations(ParenthesisDataOperation op) = {op.operation};
-    
-    compound FieldNameDataOperation refines DataOperation {
-        refTo(Field) field;
-    }
-    
-    abstract compound DataTranslationOperation refines DataOperation {
-        sequenceOf(DataOperation) arguments;
-    }
-
-    @dispatchCase
-    def sequenceOf(ConnectorOperation) collectOperations(DataTranslationOperation op) = op.arguments;
-    
-    compound AddDataTranslationOperation refines DataTranslationOperation {
-        // TODO constraint: args only real, integer fields/constants
-    }
-
-    compound SubtractDataTranslationOperation refines DataTranslationOperation {
-        // TODO constraint: args only real, integer fields/constants
-    }
-
-    compound MuliplyDataTranslationOperation refines DataTranslationOperation {
-        // TODO constraint: args only real, integer fields/constants
-    }
-
-    compound DivideDataTranslationOperation refines DataTranslationOperation {
-        // TODO constraint: args only real, integer fields/constants
-    }
 
     // ------------------------ event handler  ---------------------------
     

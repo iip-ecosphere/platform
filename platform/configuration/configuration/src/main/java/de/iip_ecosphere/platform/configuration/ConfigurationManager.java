@@ -15,11 +15,10 @@ package de.iip_ecosphere.platform.configuration;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.commons.io.FileUtils;
-
 import de.iip_ecosphere.platform.configuration.ConfigurationAas.IipGraphMapper;
 import de.iip_ecosphere.platform.configuration.ivml.AasIvmlMapper;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlUtils;
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.TaskRegistry;
 import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
