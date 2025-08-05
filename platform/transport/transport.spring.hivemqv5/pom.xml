@@ -134,6 +134,9 @@
                      <goals>
                          <goal>build-plugin-classpath</goal>
                      </goals>
+                     <configuration>
+                         <setupDescriptor>None</setupDescriptor>
+                     </configuration>
                  </execution>
                  <execution>
                      <id>assemble</id>
