@@ -9,8 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-import org.apache.commons.io.FileUtils;
-
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**

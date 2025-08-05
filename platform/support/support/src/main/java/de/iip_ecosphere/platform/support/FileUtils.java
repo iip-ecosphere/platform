@@ -14,7 +14,11 @@ package de.iip_ecosphere.platform.support;
 
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Iterator;
@@ -25,7 +29,7 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 
 /**
- * Basic file functionality.
+ * Basic file functionality, partly warpping/in style of {@code org.apache.commons.io.FileUtils}. 
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -80,6 +84,17 @@ public class FileUtils {
     }
     
     /**
+     * Deletes a file or directory. For a directory, delete it and all subdirectories.
+     *
+     * @param file file or directory to delete
+     * @throws FileNotFoundException if the file was not found
+     * @throws IOException           in case deletion is unsuccessful
+     */
+    public static void forceDelete(final File file) throws IOException {
+        org.apache.commons.io.FileUtils.forceDelete(file);
+    }
+    
+    /**
      * Deletes a file or directory on JVM exit, not throwing an exception. If file is a directory, delete it and all 
      * sub-directories. [convenience]
      *
@@ -111,6 +126,25 @@ public class FileUtils {
     public static File getTempDirectory() {
         return org.apache.commons.io.FileUtils.getTempDirectory();
     }
+    
+    /**
+     * Returns a {@link File} representing the user's home directory.
+     *
+     * @return the user's home directory.
+     */
+    public static File getUserDirectory() {
+        return org.apache.commons.io.FileUtils.getUserDirectory();
+    }
+
+    /**
+     * Returns the path to the user's home directory.
+     *
+     * @return the path to the user's home directory.
+     */
+    public static String getUserDirectoryPath() {
+        return org.apache.commons.io.FileUtils.getUserDirectoryPath();
+    }
+    
 
     /**
      * Closes a closable quietly.
@@ -270,6 +304,237 @@ public class FileUtils {
             result = new File("/");
         }
         return result;
+    }
+
+    /**
+     * Writes a CharSequence with platform default charset to a file creating the file if it does not exist.
+     *
+     * @param file     the file to write
+     * @param data     the content to write to the file
+     * @throws IOException in case of an I/O error
+     * @since 2.3
+     */
+    public static void write(final File file, final CharSequence data) throws IOException {
+        write(file, data, Charset.defaultCharset());
+    }
+
+    /**
+     * Writes a CharSequence to a file creating the file if it does not exist.
+     *
+     * @param file     the file to write
+     * @param data     the content to write to the file
+     * @param charset the requested charset, <b>null</b> means platform default
+     * @throws IOException in case of an I/O error
+     */
+    public static void write(final File file, final CharSequence data, final Charset charset) throws IOException {
+        org.apache.commons.io.FileUtils.write(file, data, charset);
+    }
+
+    /**
+     * Reads the contents of a file into a String with platform default charset. The {@code file} is always closed.
+     *
+     * @param file     the file to read
+     * @return the file contents
+     * @throws IOException if an I/O error occurs, including when the file does not exist, is a directory rather than a
+     *         regular file, or for some other reason why the file cannot be opened for reading.
+     */
+    public static String readFileToString(final File file) throws IOException {
+        return org.apache.commons.io.FileUtils.readFileToString(file, Charset.defaultCharset());
+    }
+
+    /**
+     * Reads the contents of a file into a String. The {@code file} is always closed.
+     *
+     * @param file     the file to read
+     * @param charset the requested charset, <b>null</b> means platform default
+     * @return the file contents
+     * @throws IOException if an I/O error occurs, including when the file does not exist, is a directory rather than a
+     *         regular file, or for some other reason why the file cannot be opened for reading.
+     */
+    public static String readFileToString(final File file, final Charset charset) throws IOException {
+        return org.apache.commons.io.FileUtils.readFileToString(file, charset);
+    }
+
+    /**
+     * Deletes a directory recursively.
+     *
+     * @param directory directory to delete
+     * @throws IOException              in case deletion is unsuccessful
+     * @throws IllegalArgumentException if {@code directory} is not a directory
+     */
+    public static void deleteDirectory(final File directory) throws IOException {
+        org.apache.commons.io.FileUtils.deleteDirectory(directory);
+    }
+
+    /**
+     * Copies a filtered directory to a new location preserving the file dates.
+     * This method copies the contents of the specified source directory to within the specified destination directory.
+     * The destination directory is created if it does not exist. If the destination directory does exist, then this
+     * method merges the source with the destination, with the source taking precedence.
+     *
+     * @param srcDir an existing directory to copy
+     * @param destDir the new directory
+     * @param filter the filter to apply, null means copy all directories and files should be the same as the original
+     * @throws IllegalArgumentException if {@code srcDir} exists but is not a directory, or
+     *     the source and the destination directory are the same
+     * @throws FileNotFoundException if the source does not exist
+     * @throws IOException if an error occurs, the destination is not writable, or setting the last-modified time 
+     *  didn't succeed
+     */
+    public static void copyDirectory(final File srcDir, final File destDir, final FileFilter filter)
+        throws IOException {
+        org.apache.commons.io.FileUtils.copyDirectory(srcDir, destDir, filter);
+    }    
+
+    /**
+     * Copies a filtered directory to a new location.
+     * This method copies the contents of the specified source directory to within the specified destination directory.
+     * The destination directory is created if it does not exist. If the destination directory does exist, then this
+     * method merges the source with the destination, with the source taking precedence.
+     *
+     * @param srcDir an existing directory to copy
+     * @param destDir the new directory
+     * @param filter the filter to apply, null means copy all directories and files
+     * @param preserveFileDate true if the file date of the copy should be the same as the original
+     * @throws IllegalArgumentException if {@code srcDir} exists but is not a directory,
+     *     the source and the destination directory are the same, or the destination is not writable
+     * @throws FileNotFoundException if the source does not exist
+     * @throws IOException if an error occurs or setting the last-modified time didn't succeed
+     */
+    public static void copyDirectory(final File srcDir, final File destDir, final FileFilter filter, 
+        final boolean preserveFileDate) throws IOException {
+        org.apache.commons.io.FileUtils.copyDirectory(srcDir, destDir, filter, preserveFileDate);
+    }
+    
+    /**
+     * Copies a whole directory to a new location, preserving the file dates.
+     * This method copies the specified directory and all its child directories and files to the specified destination.
+     * The destination is the new location and name of the directory. That is, copying /home/bar to /tmp/bang
+     * copies the contents of /home/bar into /tmp/bang. It does not create /tmp/bang/bar.
+     * The destination directory is created if it does not exist. If the destination directory does exist, then this
+     * method merges the source with the destination, with the source taking precedence.
+     *
+     * @param srcDir an existing directory to copy
+     * @param destDir the new directory
+     * @throws IllegalArgumentException if {@code srcDir} exists but is not a directory,
+     *     the source and the destination directory are the same
+     * @throws FileNotFoundException if the source does not exist.
+     * @throws IOException if an error occurs, the destination is not writable, or setting the last-modified time 
+     * didn't succeed
+     */
+    public static void copyDirectory(final File srcDir, final File destDir) throws IOException {
+        org.apache.commons.io.FileUtils.copyDirectory(srcDir, destDir);
+    }
+    
+    /**
+     * Copies a file to a new location preserving the file date.
+     * This method copies the contents of the specified source file to the specified destination file. The directory
+     * holding the destination file is created if it does not exist. If the destination file exists, then this method
+     * overwrites it. A symbolic link is resolved before copying so the new file is not a link.
+     *
+     * @param srcFile an existing file to copy
+     * @param destFile the new file
+     * @throws IOException if source or destination is invalid, if an error occurs or setting the last-modified time 
+     * didn't succeed, if the output file length is not the same as the input file length after the copy completes
+     */
+    public static void copyFile(final File srcFile, final File destFile) throws IOException {
+        org.apache.commons.io.FileUtils.copyDirectory(srcFile, destFile);
+    }
+    
+    /**
+     * Writes a String with platform default charset to a file creating the file if it does not exist.
+     * The parent directories of the file will be created if they do not exist.
+     *
+     * @param file     the file to write
+     * @param data     the content to write to the file
+     * @throws IOException                          in case of an I/O error
+     * @throws java.io.UnsupportedEncodingException if the encoding is not supported by the VM
+     */
+    public static void writeStringToFile(final File file, final String data) throws IOException {
+        org.apache.commons.io.FileUtils.writeStringToFile(file, data, Charset.defaultCharset());
+    }    
+    
+    /**
+     * Writes a String to a file creating the file if it does not exist.
+     * The parent directories of the file will be created if they do not exist.
+     *
+     * @param file     the file to write
+     * @param data     the content to write to the file
+     * @param charset the charset to use, <b>null</b> means platform default
+     * @throws IOException                          in case of an I/O error
+     * @throws java.io.UnsupportedEncodingException if the encoding is not supported by the VM
+     */
+    public static void writeStringToFile(final File file, final String data, final Charset charset) throws IOException {
+        org.apache.commons.io.FileUtils.writeStringToFile(file, data, charset);
+    }
+
+    /**
+     * Reads the contents of a file into a byte array.
+     * The {@code file} is always closed.
+     *
+     * @param file the file to read
+     * @return the file contents
+     * @throws IOException if an I/O error occurs, including when the file does not exist, is a directory rather than a
+     *         regular file, or for some other reason why the file cannot be opened for reading.
+     */
+    public static byte[] readFileToByteArray(final File file) throws IOException {
+        return org.apache.commons.io.FileUtils.readFileToByteArray(file);
+    }
+    
+    /**
+     * Writes a byte array to a file creating the file if it does not exist.
+     * The parent directories of the file will be created if they do not exist.
+     *
+     * @param file the file to write to
+     * @param data the content to write to the file
+     * @throws IOException in case of an I/O error
+     */
+    public static void writeByteArrayToFile(final File file, final byte[] data) throws IOException {
+        org.apache.commons.io.FileUtils.writeByteArrayToFile(file, data);
+    }
+    
+    /**
+     * Writes a byte array to a file creating the file if it does not exist.
+     *
+     * @param file   the file to write to
+     * @param data   the content to write to the file
+     * @param append if {@code true}, then bytes will be added to the
+     *               end of the file rather than overwriting
+     * @throws IOException in case of an I/O error
+     */
+    public static void writeByteArrayToFile(final File file, final byte[] data, final boolean append) 
+        throws IOException {
+        org.apache.commons.io.FileUtils.writeByteArrayToFile(file, data, append);
+    }
+
+    /**
+     * Copies bytes from an {@link InputStream} {@code source} to a file
+     * {@code destination}. The directories up to {@code destination}
+     * will be created if they don't already exist. {@code destination}
+     * will be overwritten if it already exists.
+     *
+     * @param source      the {@link InputStream} to copy bytes from, must not be, will be closed
+     * @param destination the non-directory {@link File} to write bytes to (possibly overwriting)
+     * @throws IOException if {@code destination} is a directory, if {@code destination} cannot be written, if 
+     *     {@code destination} needs creating but can't be, if an IO error occurs during copying
+     */
+    public static void copyInputStreamToFile(final InputStream source, final File destination) throws IOException {
+        org.apache.commons.io.FileUtils.copyInputStreamToFile(source, destination);
+    }
+
+    /**
+     * Tests whether the contents of two files are equal.
+     * This method checks to see if the two files are different lengths or if they point to the same file, before
+     * resorting to byte-by-byte comparison of the contents.
+     *
+     * @param file1 the first file
+     * @param file2 the second file
+     * @return {@code true} if the content of the files are equal or they both don't exist, {@code false} otherwise
+     * @throws IllegalArgumentException when an input is not a file.
+     * @throws IOException If an I/O error occurs.
+     */
+    public static boolean contentEquals(final File file1, final File file2) throws IOException {
+        return org.apache.commons.io.FileUtils.contentEquals(file1, file2);
     }
 
 }

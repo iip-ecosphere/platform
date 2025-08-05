@@ -16,10 +16,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.collector.Collector;
 import de.iip_ecosphere.platform.support.collector.Collector.Field;

@@ -15,9 +15,9 @@ package test.de.iip_ecosphere.platform.support;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.PidFile;
 import org.junit.Assert;
 

@@ -97,11 +97,11 @@ public class FileUtilsTest {
     @Test
     public void testBase64() throws IOException {
         File src = new File("src/test/resources/Logo.jpg");
-        File tgt = new File(org.apache.commons.io.FileUtils.getTempDirectory(), "base64.tst");
+        File tgt = new File(FileUtils.getTempDirectory(), "base64.tst");
         tgt.delete();
         String enc = FileUtils.fileToBase64(src);
         FileUtils.base64ToFile(enc, tgt);
-        Assert.assertTrue(org.apache.commons.io.FileUtils.contentEquals(src, tgt));
+        Assert.assertTrue(FileUtils.contentEquals(src, tgt));
         tgt.delete();
     }
     
