@@ -438,7 +438,7 @@ public class FileUtils {
      * didn't succeed, if the output file length is not the same as the input file length after the copy completes
      */
     public static void copyFile(final File srcFile, final File destFile) throws IOException {
-        org.apache.commons.io.FileUtils.copyDirectory(srcFile, destFile);
+        org.apache.commons.io.FileUtils.copyFile(srcFile, destFile);
     }
     
     /**
