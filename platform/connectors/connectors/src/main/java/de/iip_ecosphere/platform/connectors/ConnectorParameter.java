@@ -20,9 +20,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import org.apache.commons.io.IOUtils;
-
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.IOUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
@@ -354,7 +353,7 @@ public class ConnectorParameter {
             ResourceResolver... resolver) throws IOException {
             InputStream res = ResourceLoader.getResourceAsStream(resource, resolver);
             if (null != res) {
-                String contents = IOUtils.toString(res, StandardCharsets.UTF_8.name());
+                String contents = IOUtils.toString(res, StandardCharsets.UTF_8);
                 instance.specificSettings.put(key, contents);
                 FileUtils.closeQuietly(res);
             }
