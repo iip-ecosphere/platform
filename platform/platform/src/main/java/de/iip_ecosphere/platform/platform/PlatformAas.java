@@ -22,13 +22,12 @@ import java.nio.file.StandardCopyOption;
 import java.util.Base64;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.commons.io.FileUtils;
-
 import de.iip_ecosphere.platform.platform.ArtifactsManager.Artifact;
 import de.iip_ecosphere.platform.platform.ArtifactsManager.ArtifactKind;
 import de.iip_ecosphere.platform.services.ServiceManager;
 import de.iip_ecosphere.platform.services.environment.services.TransportConverter;
 import de.iip_ecosphere.platform.services.environment.services.TransportConverterFactory;
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.TaskRegistry;
 import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.aas.Aas;

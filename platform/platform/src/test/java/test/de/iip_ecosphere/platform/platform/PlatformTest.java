@@ -22,6 +22,7 @@ import de.iip_ecosphere.platform.platform.ArtifactsManager.ArtifactKind;
 import de.iip_ecosphere.platform.platform.PersistentAasSetup;
 import de.iip_ecosphere.platform.platform.PlatformSetup;
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.LifecycleHandler;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
@@ -39,7 +40,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
 
