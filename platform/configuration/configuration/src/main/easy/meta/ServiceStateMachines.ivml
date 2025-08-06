@@ -11,17 +11,24 @@ project ServiceStateMachines {
    annotate Integer uiGroup = UiMandatoryGroup1 to .;
    
    compound State {
+       String id;
        sequenceOf(String) onEntry; 
        setOf(refTo(Transition)) transitions;       
    }
+   
+   compound Event {
+       String id;
+   }
       
    compound Transition {
-       String event;
+       String id;
+       refTo(Event) event;
        String log; 
-       State target;
+       refTo(State) target;
    }
    
    compound StateMachine {
+       String id;
        setOf(refTo(State)) states;
    }
    
