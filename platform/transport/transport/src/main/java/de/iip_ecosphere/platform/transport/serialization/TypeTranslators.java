@@ -16,9 +16,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Base64;
 
-import org.apache.commons.text.StringEscapeUtils;
-
 import de.iip_ecosphere.platform.support.ClassLoaderUtils;
+import de.iip_ecosphere.platform.support.StringUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
@@ -52,12 +51,12 @@ public class TypeTranslators {
 
         @Override
         public String from(String data) throws IOException {
-            return StringEscapeUtils.escapeJson(data);
+            return StringUtils.escapeJson(data);
         }
 
         @Override
         public String to(String source) throws IOException {
-            return StringEscapeUtils.unescapeJson(source);
+            return StringUtils.unescapeJson(source);
         }
         
     };
