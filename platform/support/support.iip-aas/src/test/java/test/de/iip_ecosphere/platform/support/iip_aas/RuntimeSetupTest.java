@@ -14,9 +14,9 @@ package test.de.iip_ecosphere.platform.support.iip_aas;
 
 import java.io.File;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.iip_aas.config.RuntimeSetup;
 import org.junit.Assert;
 

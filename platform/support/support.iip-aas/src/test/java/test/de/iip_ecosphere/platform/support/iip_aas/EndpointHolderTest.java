@@ -14,10 +14,10 @@ package test.de.iip_ecosphere.platform.support.iip_aas;
 
 import java.io.File;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.iip_aas.config.BasicEndpointValidator;
 import de.iip_ecosphere.platform.support.iip_aas.config.EndpointHolder;
