@@ -14,11 +14,10 @@ package de.iip_ecosphere.platform.support.metrics;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.function.Function;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.IOUtils;
 
 /**
  * Collection of helper functions to read out measurements from the Linux file system, e.g., from {@code /sys}.
@@ -60,7 +59,7 @@ public class LinuxSystemMetricsUtils {
                     if (f.isDirectory()) {
                         File typeFile = new File(f, "type");
                         try {
-                            String type = FileUtils.readFileToString(typeFile, Charset.defaultCharset());
+                            String type = FileUtils.readFileToString(typeFile);
                             if (type.startsWith(typePrefix)) {
                                 result = new File(f, "temp");
                                 break;
@@ -85,7 +84,7 @@ public class LinuxSystemMetricsUtils {
         float result = SystemMetrics.INVALID_CELSIUS_TEMPERATURE;
         if (null != file) {
             try {
-                String tmp = FileUtils.readFileToString(file, Charset.defaultCharset()).trim();
+                String tmp = FileUtils.readFileToString(file).trim();
                 result = (float) (Integer.parseInt(tmp) / 1000.0);
             } catch (IOException | NumberFormatException e) {
             } 
@@ -104,7 +103,7 @@ public class LinuxSystemMetricsUtils {
         String result = dflt;
         try {
             Process p = new ProcessBuilder(call).start();
-            result = IOUtils.toString(p.getInputStream(), Charset.defaultCharset());
+            result = IOUtils.toString(p.getInputStream());
         } catch (IOException e) {
         }
         return result;

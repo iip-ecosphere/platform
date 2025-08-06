@@ -14,6 +14,7 @@ package test.de.iip_ecosphere.platform.support.net;
 
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -32,7 +33,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Optional;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 
 /**

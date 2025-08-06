@@ -32,10 +32,9 @@ import java.util.concurrent.ExecutionException;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.IOUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.AssetInformation;

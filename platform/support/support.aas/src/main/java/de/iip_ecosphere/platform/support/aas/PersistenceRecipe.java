@@ -17,9 +17,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
-
 import de.iip_ecosphere.platform.support.FileFormat;
+import de.iip_ecosphere.platform.support.FileUtils;
 
 /**
  * A receipe to read/write AAS from/to files.

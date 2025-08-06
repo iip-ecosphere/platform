@@ -15,10 +15,10 @@ package test.de.iip_ecosphere.platform.support;
 import java.io.File;
 import java.util.ServiceLoader;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.LifecycleHandler;
 import de.iip_ecosphere.platform.support.PidLifecycleDescriptor;

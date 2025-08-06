@@ -275,7 +275,7 @@ public class AasUtils {
                 FileUtils.deleteOnExit(f);
                 InputStream is = resolver.resolve(image);
                 if (null != is) {
-                    org.apache.commons.io.FileUtils.copyInputStreamToFile(is, f); // closes is
+                    FileUtils.copyInputStreamToFile(is, f); // closes is
                     String contents = FileUtils.fileToBase64(f);
                     String mimeType = Files.probeContentType(f.toPath());
                     handler.handle(fName, contents, mimeType);
