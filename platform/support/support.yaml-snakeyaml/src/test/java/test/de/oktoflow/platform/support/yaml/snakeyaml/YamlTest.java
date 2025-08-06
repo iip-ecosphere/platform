@@ -1,16 +1,14 @@
 package test.de.oktoflow.platform.support.yaml.snakeyaml;
 
-
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.util.function.Function;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.function.IOFunction;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.IOUtils;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.yaml.Yaml;
 import de.oktoflow.platform.support.yaml.snakeyaml.SnakeYaml;
@@ -21,7 +19,28 @@ import de.oktoflow.platform.support.yaml.snakeyaml.SnakeYaml;
  * @author Holger Eichelberger, SSE
  */
 public class YamlTest {
-
+    
+    /**
+     * Like {@link Function} but throws {@link IOException}.
+     *
+     * @param <P> the type of the input to the operations.
+     * @param <R> the return type of the operations.
+     * @since 2.7
+     */
+    @FunctionalInterface
+    public interface IOFunction<P, R> {
+        
+        /**
+         * Applies this function to the given argument.
+         *
+         * @param t the function argument
+         * @return the function result
+         * @throws IOException if an I/O error occurs.
+         */
+        public R apply(final P param) throws IOException;
+        
+    }
+    
     /**
      * Applies {@code func} to a test resource and returns the result.
      * 
@@ -50,7 +69,7 @@ public class YamlTest {
         Assert.assertNotNull(fromResource(in -> yaml.loadMapping(in)));
         Assert.assertNotNull(fromResource(in -> yaml.loadAs(in, Object.class)));
         Assert.assertNotNull(fromResource(in -> yaml.loadTolerantAs(in, Object.class)));
-        String s = fromResource(in -> IOUtils.toString(in, Charset.defaultCharset()));
+        String s = fromResource(in -> IOUtils.toString(in));
         Assert.assertNotNull(yaml.loadAs(s, Object.class));
 
         Assert.assertNotNull(yaml.dump(new Object()));

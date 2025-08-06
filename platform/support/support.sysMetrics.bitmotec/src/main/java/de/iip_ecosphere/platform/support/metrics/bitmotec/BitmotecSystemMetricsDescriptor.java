@@ -16,8 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import org.apache.commons.io.FileUtils;
-
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.metrics.AbstractSystemMetricsPluginDescriptor;
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
 
