@@ -22,10 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.commons.lang.SystemUtils;
-
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.services.environment.AbstractRestProcessService;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.YamlProcess;
@@ -178,7 +177,7 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
     @Override
     protected int getWaitTimeBeforeDestroy() {
         // preliminary, Andreas will try to fix this; Win vs. Other -> experimental
-        return SystemUtils.IS_OS_WINDOWS ? WAITING_TIME_WIN : WAITING_TIME_OTHER; 
+        return OsUtils.isWindows() ? WAITING_TIME_WIN : WAITING_TIME_OTHER; 
     }
     
     @Override
