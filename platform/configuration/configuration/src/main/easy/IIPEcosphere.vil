@@ -319,7 +319,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 vilTemplateProcessor("TemplatesEclipseGitignore", config, "${appRoot}/.gitignore", appName=appName);
                 vilTemplateProcessor("TemplatesEasyProducer", config, "${appRoot}/.EASyProducer", appName=appName);
                 // currently no separate templates
-                vilTemplateProcessor("TemplatesVsCodeEnvProject", config, "${appRoot}/.env");
+                Path vsCodeSettings = "${appRoot}/.vscode";
+                vsCodeSettings.mkdir();
+                vilTemplateProcessor("TemplatesVsCodeEnvProject", config, "${vsCodeSettings}/settings.json");
 
                 setOf(AssemblyInfo) assemblies = {}; 
                 mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};

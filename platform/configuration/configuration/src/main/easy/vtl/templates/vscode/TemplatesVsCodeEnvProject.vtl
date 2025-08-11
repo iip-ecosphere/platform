@@ -4,7 +4,9 @@ template TemplatesVsCodeEnvProject(IIPEcosphere config, FileArtifact target) {
 	
     def main(IIPEcosphere config, FileArtifact target) {
         String sep = target.getPathSeparator();
-        'PYTHONPATH=\\${PYTHONPATH}${sep}./target/pyEnv/iip${sep}./target/pySrc'
+        '{
+             "python.pythonPath": "\\${PYTHONPATH}${sep}\\${workspaceRoot}/target/pyEnv/iip${sep}\\${workspaceRoot}/target/pySrc"
+        }'
     }
 	
 }
