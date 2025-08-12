@@ -293,6 +293,11 @@ public abstract class AbstractBaSyxAasFactory extends AasFactory {
     public boolean supportsSamePorts() {
         return true;
     }
+    
+    @Override
+    public boolean supportsUrlPaths() {
+        return true;
+    }
 
     @Override
     public String getMetaModelVersion() {
