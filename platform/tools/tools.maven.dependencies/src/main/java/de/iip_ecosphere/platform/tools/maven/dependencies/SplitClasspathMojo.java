@@ -19,10 +19,17 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.AbstractMojo;
@@ -43,7 +50,10 @@ public class SplitClasspathMojo extends AbstractMojo {
 
     @Parameter( property = "mdep.archiveFile", defaultValue = "", required = true )
     private List<File> archiveFiles;
-    
+
+    @Parameter( property = "mdep.skip", defaultValue = "false", required = false )
+    private boolean skip;
+
     @Parameter( required = false )
     private List<String> mainPatterns;
 
@@ -66,16 +76,48 @@ public class SplitClasspathMojo extends AbstractMojo {
     
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if (mainPatterns == null) {
-            mainPatterns = new ArrayList<>();
+        if (!skip) {
+            if (mainPatterns == null) {
+                mainPatterns = new ArrayList<>();
+            }
+            if (mainPatterns.isEmpty()) {
+                Collections.addAll(mainPatterns, "transport-", "support-", "support.aas-", "support.iip-aas-", 
+                    "connectors-", "services.environment-", "services.spring.loader-");
+                // preliminary, to become plugins
+                Collections.addAll(mainPatterns, "commons-io", "commons-lang3", "jackson-", "micrometer-core");
+            }
+            for (File f: archiveFiles) {
+                processFile(f);
+            }
+        } else {
+            getLog().info("Skipping.");
         }
-        if (mainPatterns.isEmpty()) {
-            Collections.addAll(mainPatterns, "transport-", "support-", "support.aas-", "support.iip-aas-", 
-                "connectors-", "services.environment-");
+    }
+
+    /**
+     * Returns whether (parts of) {@code file} are compressed/deflated. Keep stored/deflated, in particular for 
+     * Spring boot app jars, which are either exploded or stored.
+     * 
+     * @param file the file to check
+     * @return {@code true} for compression, {@code false} else
+     */
+    private boolean isCompressed(File file) {
+        boolean compressed = false;
+        try {
+            JarFile jf = new JarFile(file);
+            Enumeration<JarEntry> enm = jf.entries();
+            while (enm.hasMoreElements()) {
+                JarEntry ent = enm.nextElement();
+                if (ent.getName().endsWith(".jar")) { // classes are compressed
+                    compressed = ent.getMethod() == ZipEntry.DEFLATED;
+                    break;
+                }
+            }
+            jf.close();
+        } catch (IOException e) {
+            getLog().warn("While checking Jar file: " + e.getMessage() + " Assuming no compression.");
         }
-        for (File f: archiveFiles) {
-            processFile(f);
-        }
+        return compressed;
     }
 
     /**
@@ -85,7 +127,10 @@ public class SplitClasspathMojo extends AbstractMojo {
      * @throws MojoExecutionException if processing fails
      */
     private void processFile(File file) throws MojoExecutionException {
-        try (FileSystem fs = FileSystems.newFileSystem(file.toPath())) {
+        boolean compressed = isCompressed(file);
+        getLog().info("Using compression: " + compressed);
+        try (FileSystem fs = FileSystems.newFileSystem(file.toPath(), 
+            Map.of("compressionMethod", compressed ? "DEFLATED" : "STORED"))) {
             Path mainPath;
             Path appPath = null;
             StringBuilder main = new StringBuilder();
@@ -134,6 +179,7 @@ public class SplitClasspathMojo extends AbstractMojo {
                 if (Files.exists(mainPath)) {
                     getLog().info("Processing " + file + " as spring app JAR archive");
                     appPath = fs.getPath("/BOOT-INF/classpath-app.idx");
+                    Files.createDirectory(fs.getPath("/BOOT-INF/lib2"));
                     List<String> lines = IOUtils.readLines(Files.newInputStream(mainPath), Charset.defaultCharset());
                     for (String line: lines) {
                         StringBuilder target;
@@ -141,10 +187,12 @@ public class SplitClasspathMojo extends AbstractMojo {
                             target = main;
                         } else {
                             target = app;
+                            line = processSpringLine(fs, line);
                         }
                         target.append(line);
                         target.append("\n");
                     }
+                    postProcessSpringJar(fs);
                 }
             }
             if (null != appPath) {
@@ -155,5 +203,88 @@ public class SplitClasspathMojo extends AbstractMojo {
             throw new MojoExecutionException(e.getMessage());
         }
     }
+    
+    /**
+     * Processes a spring index line. May move files in the archive.
+     * 
+     * @param fs the filesystem to operate on
+     * @param line the line to process
+     * @return the potentially modified line
+     * @throws IOException if moving files fails
+     */
+    private String processSpringLine(FileSystem fs, String line) throws IOException {
+        if (line.startsWith("- \"") && line.endsWith("\"")) {
+            String src = line.substring(3, line.length() - 1);
+            String tgt = src.replace("BOOT-INF/lib/", "BOOT-INF/lib2/");
+            Path srcPath = fs.getPath(src);
+            Path tgtPath = fs.getPath(tgt);
+            Files.move(srcPath, tgtPath, StandardCopyOption.REPLACE_EXISTING);
+            line = "- \"" + tgt + "\"";
+        }
+        return line;
+    }
 
+    /**
+     * Post-processes a spring jar, by moving those files that are not mentioned in an index file.
+     * 
+     * @param fs the filesystem to operate on
+     * @throws IOException if moving files fails
+     */
+    private void postProcessSpringJar(FileSystem fs) throws IOException {
+        Path srcPath = fs.getPath("BOOT-INF/classes/");
+        Path tgtPath = fs.getPath("BOOT-INF/classes2/");
+        moveAll(srcPath, tgtPath, true);
+    }
+    
+    /**
+     * Moves all files and folders from a source directory to a destination directory.
+     *
+     * @param sourcePath The path to the source directory
+     * @param destPath   The path to the destination directory
+     * @param keepSourcePath keep {@code sourcePath} itself if {@code true}, else remove also {@code sourcePath}
+     * @throws IOException If an I/O error occurs during the move operation
+     */
+    public void moveAll(Path sourcePath, Path destPath, boolean keepSourcePath) throws IOException {
+        if (!Files.exists(destPath)) {
+            Files.createDirectories(destPath);
+        }
+        Files.walk(sourcePath)
+            .forEach(source -> {
+                try {
+                    Path destination = destPath.resolve(sourcePath.relativize(source));
+                    Path destParent = destination;
+                    if (Files.isRegularFile(source)) {
+                        destParent = destination.getParent();
+                    }
+                    if (Files.notExists(destParent)) {
+                        Files.createDirectories(destParent);
+                    }
+                    if (Files.isRegularFile(source)) {
+                        Files.move(source, destination, StandardCopyOption.REPLACE_EXISTING);
+                    }
+                } catch (IOException e) {
+                    getLog().error("In Jar: Failed to move " + source + ": " 
+                        + e.getClass().getSimpleName() + " " + e.getMessage());
+                }
+            });
+            
+        // 4. Optionally, delete the now empty source directory after the move
+        try {
+            Files.walk(sourcePath)
+                .sorted(Comparator.reverseOrder()) // files (leftover?) before their parent directories
+                .forEach(path -> {
+                    try {
+                        if (!keepSourcePath || (keepSourcePath && !path.equals(sourcePath))) {
+                            Files.delete(path);
+                        }
+                    } catch (IOException e) {
+                        getLog().error("In Jar: Failed to delete " + ": " 
+                            + e.getClass().getSimpleName() + " " + e.getMessage());
+                    }
+                });
+        } catch (IOException e) {
+            getLog().error("In Jar: Failed to delete source directory: " + e.getMessage());
+        }
+    }
+    
 }
