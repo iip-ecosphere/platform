@@ -65,6 +65,8 @@ public abstract class AasFactory {
      * The plugin ID of the default AAS implementation.
      */
     public static final String DEFAULT_PLUGIN_ID = "aas" + PluginManager.POSTFIX_ID_DEFAULT;
+    
+    public static final String PROPERTY_PLUGIN_ID = "okto.aasFactoryId";
 
     /**
      * Factory descriptor for Java Service Loader.
@@ -296,6 +298,15 @@ public abstract class AasFactory {
             pluginId = id;
             instance = DUMMY; // reset for getInstance()
         }
+    }
+    
+    /**
+     * Returns the plugin id used to load the AAS implementation. By default, {@link #DEFAULT_PLUGIN_ID}.
+     * 
+     * @return the id
+     */
+    public static String getPluginId() {
+        return pluginId;
     }
     
     /**
@@ -585,6 +596,15 @@ public abstract class AasFactory {
      * @return {@code true} if supported, {@code false}
      */
     public boolean supportsSamePorts() {
+        return false;
+    }
+    
+    /**
+     * Returns whether the implementation allows for dedicated server URL paths.
+     * 
+     * @return {@code true} of server URL paths are considered and taken up, {@code false} if paths are ignored 
+     */
+    public boolean supportsUrlPaths() {
         return false;
     }
 
