@@ -45,5 +45,35 @@ public class StringUtilsTest {
 
         Assert.assertEquals("\t", StringUtils.unescapeJava(StringUtils.escapeJava("\t")));
     }
+    
+    /**
+     * Tests {@link StringUtils#defaultIfBlank(CharSequence, CharSequence)} and 
+     * {@link StringUtils#defaultIfEmpty(CharSequence, CharSequence)}.
+     */
+    @Test
+    public void testDefaults() {
+        Assert.assertEquals("a", StringUtils.defaultIfBlank(null, "a"));
+        Assert.assertEquals("a", StringUtils.defaultIfBlank("", "a"));
+        Assert.assertEquals("a", StringUtils.defaultIfBlank("   ", "a"));
+
+        Assert.assertEquals("a", StringUtils.defaultIfEmpty(null, "a"));
+        Assert.assertEquals("a", StringUtils.defaultIfEmpty("", "a"));
+        Assert.assertEquals("   ", StringUtils.defaultIfEmpty("   ", "a"));
+    }
+
+    /**
+     * Tests {@link StringUtils#isBlank(CharSequence)} and 
+     * {@link StringUtils#isEmpty(CharSequence)}.
+     */
+    @Test
+    public void testIsEmptyBlank() {
+        Assert.assertTrue(StringUtils.isBlank(null));
+        Assert.assertTrue(StringUtils.isBlank(""));
+        Assert.assertTrue(StringUtils.isBlank("   "));
+
+        Assert.assertTrue(StringUtils.isEmpty(null));
+        Assert.assertTrue(StringUtils.isEmpty(""));
+        Assert.assertFalse(StringUtils.isEmpty("   "));
+    }
 
 }

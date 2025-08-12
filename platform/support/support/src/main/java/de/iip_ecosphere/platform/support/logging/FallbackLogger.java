@@ -16,7 +16,7 @@ import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.commons.lang3.StringUtils;
+// no external dependencies here!
 
 /**
  * A fallback logger to sysout/syserr.
@@ -263,7 +263,7 @@ public class FallbackLogger implements Logger {
      */
     private void logArgs(LogLevel level, String format, PrintStream out, Object arg) {
         if (isEnabled(level)) {
-            String msg = StringUtils.replaceOnce(format, PLACEHOLDER, toString(arg));
+            String msg = replaceOnce(format, PLACEHOLDER, toString(arg));
             log(level, msg, null, out);
         }
     }
@@ -279,8 +279,8 @@ public class FallbackLogger implements Logger {
      */
     private void logArgs(LogLevel level, String format, PrintStream out, Object arg1, Object arg2) {
         if (isEnabled(level)) {
-            String msg = StringUtils.replaceOnce(format, PLACEHOLDER, toString(arg1));
-            msg = StringUtils.replaceOnce(msg, PLACEHOLDER, toString(arg2));
+            String msg = replaceOnce(format, PLACEHOLDER, toString(arg1));
+            msg = replaceOnce(msg, PLACEHOLDER, toString(arg2));
             log(level, msg, null, out);
         }
     }
@@ -297,10 +297,27 @@ public class FallbackLogger implements Logger {
         if (isEnabled(level)) {
             String msg = format;
             for (int a = 0; a < args.length; a++) {
-                msg = StringUtils.replaceOnce(msg, PLACEHOLDER, toString(args[a]));
+                msg = replaceOnce(msg, PLACEHOLDER, toString(args[a]));
             }
             log(level, msg, null, out);
         }
+    }
+
+    /**
+     * Replaces {@code searchString} once in {@code text} by {@code replacement}.
+     * 
+     * @param text the text to search for and to replace within
+     * @param searchString the string to search for
+     * @param replacement the replacement string
+     * @return {@code text} with the first occurrence of {@code searchString} replaced
+     */
+    private static String replaceOnce(final String text, final String searchString, final String replacement) {
+        String result = text;
+        int pos = text.indexOf(searchString);
+        if (pos > 0) {
+            result = text.substring(0, pos) + replacement + text.substring(pos + searchString.length());
+        }
+        return result;
     }
 
 }

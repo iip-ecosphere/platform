@@ -63,5 +63,53 @@ public class StringUtils {
     public static final String unescapeJson(final String input) {
         return StringEscapeUtils.unescapeJson(input);
     }
+    
+    /**
+     * Returns either the passed in CharSequence, or if the CharSequence is
+     * whitespace, empty ({@code ""}) or <b>null</b>, the value of {@code defaultStr}.
+     *
+     * @param <T> the specific kind of CharSequence
+     * @param str the CharSequence to check, may be <b>null</b>
+     * @param defaultStr  the default CharSequence to return
+     *  if the input is whitespace, empty ({@code ""}) or <b>null</b>
+     * @return the passed in CharSequence, or the default
+     */
+    public static <T extends CharSequence> T defaultIfBlank(final T str, final T defaultStr) {
+        return org.apache.commons.lang3.StringUtils.defaultIfBlank(str, defaultStr);
+    }
+
+    /**
+     * Returns either the passed in CharSequence, or if the CharSequence is
+     * empty or <b>null</b>, the value of {@code defaultStr}.
+     *
+     * @param <T> the specific kind of CharSequence
+     * @param str  the CharSequence to check, may be null
+     * @param defaultStr  the default CharSequence to return
+     *  if the input is empty ({@code ""}) or <b>null</b>
+     * @return the passed in CharSequence, or the default
+     */
+    public static <T extends CharSequence> T defaultIfEmpty(final T str, final T defaultStr) {
+        return org.apache.commons.lang3.StringUtils.defaultIfEmpty(str, defaultStr);
+    }
+
+    /**
+     * Checks if a CharSequence is empty ({@code ""}), <b>null</b> or whitespace only.
+     *
+     * @param cs  the CharSequence to check, may be <b>null</b>
+     * @return {@code true} if the CharSequence is <b>null</b>, empty or whitespace only
+     */
+    public static boolean isBlank(final CharSequence cs) {
+        return org.apache.commons.lang3.StringUtils.isBlank(cs);
+    }
+
+    /**
+     * Checks if a CharSequence is empty ({@code ""}) or <b>null</b>.
+     *
+     * @param cs  the CharSequence to check, may be <b>null</b>
+     * @return {@code true} if the CharSequence is empty or <b>null</b>
+     */
+    public static boolean isEmpty(final CharSequence cs) {
+        return org.apache.commons.lang3.StringUtils.isEmpty(cs);
+    }
 
 }

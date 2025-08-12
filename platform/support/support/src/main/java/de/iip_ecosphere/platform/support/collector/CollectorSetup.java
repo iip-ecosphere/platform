@@ -12,8 +12,7 @@
 
 package de.iip_ecosphere.platform.support.collector;
 
-import org.apache.commons.io.FileUtils;
-
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 
 /**
