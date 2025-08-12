@@ -15,7 +15,7 @@ export class Interceptor implements HttpInterceptor {
   private setupHeaders(headers: HttpHeaders) : HttpHeaders {
     const user = inject(UserService);
     headers = headers
-      .set('Access-Control-Allow-Origin', '*')
+      //.set('Access-Control-Allow-Origin', '*') // fails since mid 2025 on browsers, requires specific server policy
       .set('Content-Type', 'application/json');
     return user.injectTo(headers);
   }

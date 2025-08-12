@@ -19,20 +19,21 @@ During the upgrade to Angular 19, some components did not complain for incompati
 Handled now through `mvn compile`. On the first try, we recommend running the following two steps manually
   - `npm install` 
   - `ng build` 
-  - `ng test` 
 
 ## Setting up the Management UI
 
 An installed management UI contains a setup JSON file in `assets/config/config.json`, which is created/modified during platform instantiation based on the UI configuration in the configuration model. Currently, an example looks as follows
 
     {
-        "ip": "http://192.168.0.199:9001",
+        "ip": "http://127.0.0.1:9001",
         "urn": "urn%3A%3A%3AAAS%3A%3A%3AiipEcosphere%23",
         "metaModelVersion": "v2",
         "requireAuthentication" : false, 
     }
     
-whereby the `ip` denotes the IP/base URL platform AAS repository server and the the `urn` denotes the URN of the platform AAS. An AAS metamodel v2 setup shell also include `metaModelVersion` with value `"v2"` as well as a value for `requireAuthentication` (which enables or disables login/logout). Further setup values are `httpTimeout` in milliseconds (default `1000`). For AAS metamodel v3 setup, `metaModelVersion` state value `"v2"` and also give `smIP`, the IP/base URL platform submodel repository server. Further considered values are `enableDebug`, `enableInfo`, `enableLog`, `enableWarn` for different logging levels or `inTest` which may indicate that the current execution is part of testing.
+whereby the `ip` denotes the IP/base URL platform AAS repository server and the the `urn` denotes the URN of the platform AAS. An AAS metamodel v2 setup shell also include `metaModelVersion` with value `"v2"` as well as a value for `requireAuthentication` (which enables or disables login/logout). Further setup values are `httpTimeout` in milliseconds (default `1000`). For AAS metamodel v3 setup, `metaModelVersion` state value `"v2"` and also give `smIP`, the IP/base URL platform submodel repository server. Further considered values are `enableDebug`, `enableInfo`, `enableLog`, `enableWarn` for different logging levels or `inTest` which may indicate that the current execution is part of testing. 
+
+Do **not modify** this file manually.
 
 ## Running the test suite
 
