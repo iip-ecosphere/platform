@@ -57,6 +57,10 @@ public class TestQpidServer extends AbstractTestServer {
             systemLauncher = new SystemLauncher();
             Map<String, Object> attributes = new HashMap<String, Object>();
             File f = new File(getConfigDir("./src/test"), "config.json");
+            if (!f.exists()) {
+                f = new File(new File(getConfigDir("./src/test"), "qpidCfg"), "config.json");
+            }
+            System.out.println("Qpid: Using configuration directory: " + f);            
             URL initialConfig = f.toURI().toURL();
             // assume "tls" folder where initialConfig is (even after unpacking). If there is none, config shall
             // not refer to keystore, i.e., setting the (custom) system property does not matter here
