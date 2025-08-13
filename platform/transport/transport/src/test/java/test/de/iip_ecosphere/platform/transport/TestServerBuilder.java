@@ -62,7 +62,7 @@ public class TestServerBuilder implements Builder<AbstractTestServer> {
     }
     
     /**
-     * Creates the server instance.
+     * Sets the server address.
      * 
      * @param addr the server address (schema ignored)
      */

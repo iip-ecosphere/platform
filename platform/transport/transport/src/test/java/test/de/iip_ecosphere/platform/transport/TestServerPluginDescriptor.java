@@ -87,7 +87,7 @@ public class TestServerPluginDescriptor extends DefaultPluginDescriptor<TestServ
         private ServerAddress address;
         private File installDir;
         private ProcessUpSupplier checker;
-        private int upTimeout = 6000; // for laptop on battery
+        private int upTimeout = 10000; // for laptop on battery
         
         /**
          * Creates the server instance.
@@ -137,6 +137,7 @@ public class TestServerPluginDescriptor extends DefaultPluginDescriptor<TestServ
                 args.add(String.valueOf(address.getPort()));
                 args.add(new File("").getAbsolutePath()); // shall be user.dir
                 ProcessBuilder b = new ProcessBuilder(args);
+                instDir = FolderClasspathPluginSetupDescriptor.adjustBase(instDir); // may be CP file
                 b.directory(instDir.getAbsoluteFile());
                 LoggerFactory.getLogger(getClass()).info("Spawning process for plugin {} with arguments {} "
                     + "in directory {}", id, String.join(" ", args), instDir);
