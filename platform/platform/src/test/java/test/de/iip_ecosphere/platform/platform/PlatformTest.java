@@ -26,6 +26,7 @@ import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.LifecycleHandler;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
@@ -60,12 +61,12 @@ public class PlatformTest extends TestWithQpid {
         Assert.assertEquals(8080, cfg.getAas().getServer().getPort());
         Assert.assertEquals(Schema.HTTPS, cfg.getAas().getServer().getSchema());
         Assert.assertEquals("127.0.0.1", cfg.getAas().getServer().getHost());
-        Assert.assertEquals("aas", cfg.getAas().getServer().getPath());
+        Assert.assertEquals(aasUrlPath("aas"), cfg.getAas().getServer().getPath());
 
         Assert.assertEquals(8081, cfg.getAas().getRegistry().getPort());
         Assert.assertEquals(Schema.HTTPS, cfg.getAas().getRegistry().getSchema());
         Assert.assertEquals("127.0.0.1", cfg.getAas().getRegistry().getHost());
-        Assert.assertEquals("registry", cfg.getAas().getRegistry().getPath());
+        Assert.assertEquals(aasUrlPath("registry"), cfg.getAas().getRegistry().getPath());
 
         Assert.assertEquals(8082, cfg.getAas().getImplementation().getPort());
         Assert.assertEquals(Schema.TCP, cfg.getAas().getImplementation().getSchema());
@@ -80,6 +81,19 @@ public class PlatformTest extends TestWithQpid {
         
         //HTTPS not fully setup with certificates, cannot start LifecycleHandler here
     }
+    
+
+    /**
+
+
+     * Returns an adjusted (expected) URL path.
+     * 
+     * @param withPath the path if the AAS implementation supports URL paths
+     * @return {@code withPath} if the AAS implementation supports URL paths, else empty
+     */
+    private static String aasUrlPath(String withPath) {
+        return AasFactory.getInstance().supportsUrlPaths() ? withPath : "";
+    }    
     
     /**
      * Tests the platform aAS via the lifecycle descriptors.
