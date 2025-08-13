@@ -16,6 +16,7 @@ public class EndpointHolder extends TlsServerAddressHolder {
 
     private String path = "";
     private String idStorePrefix = null;
+    private boolean ignorePath = false;
     private transient EndpointValidator validator = new BasicEndpointValidator();
     
     /**
@@ -48,13 +49,15 @@ public class EndpointHolder extends TlsServerAddressHolder {
     }
     
     /**
-     * Creates an instance by copying data from a given instance. Does not copy the {@link #validator}.
+     * Creates an instance by copying data from a given instance. Does not copy the {@link #validator}. Takes over
+     * whether paths shall be ignored.
      * 
      * @param holder the holder to copy from
      */
     public EndpointHolder(EndpointHolder holder) {
         super(holder);
         path = holder.path;
+        ignorePath = holder.ignorePath;
     }
     
     /**
@@ -74,7 +77,18 @@ public class EndpointHolder extends TlsServerAddressHolder {
      * @return the endpoint name/path
      */
     public String getPath() {
-        return validator.validatePath(path, this);
+        return ignorePath ? "" : validator.validatePath(path, this);
+    }
+    
+    /**
+     * Allows ignoring the specified path, then always returning an empty path.
+     * 
+     * @param ignorePath whether the path shall be ignored
+     * @return <b>this</b> for chaining
+     */
+    public EndpointHolder ignorePath(boolean ignorePath) {
+        this.ignorePath = ignorePath;
+        return this;
     }
 
     /**

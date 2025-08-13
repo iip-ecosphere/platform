@@ -181,17 +181,17 @@ public class AasPartRegistry {
      */
     public static class AasSetup implements SetupSpec {
 
-        private EndpointHolder server = new EndpointHolder(AasPartRegistry.DEFAULT_SCHEMA, 
+        private EndpointHolder server = createAasEndpointHolder(AasPartRegistry.DEFAULT_SCHEMA, 
             DEFAULT_HOST, DEFAULT_PORT, DEFAULT_AAS_ENDPOINT);
 
-        private EndpointHolder smServer = new EndpointHolder(AasPartRegistry.DEFAULT_SCHEMA, 
-                DEFAULT_HOST, DEFAULT_SM_PORT, DEFAULT_AAS_ENDPOINT);
+        private EndpointHolder smServer = createAasEndpointHolder(AasPartRegistry.DEFAULT_SCHEMA, 
+            DEFAULT_HOST, DEFAULT_SM_PORT, DEFAULT_AAS_ENDPOINT);
         
-        private EndpointHolder registry = new EndpointHolder(DEFAULT_SCHEMA, DEFAULT_HOST, 
+        private EndpointHolder registry = createAasEndpointHolder(DEFAULT_SCHEMA, DEFAULT_HOST, 
             DEFAULT_REGISTRY_PORT, DEFAULT_REGISTRY_ENDPOINT);
 
-        private EndpointHolder smRegistry = new EndpointHolder(DEFAULT_SCHEMA, DEFAULT_HOST, 
-                DEFAULT_SM_REGISTRY_PORT, DEFAULT_REGISTRY_ENDPOINT);
+        private EndpointHolder smRegistry = createAasEndpointHolder(DEFAULT_SCHEMA, DEFAULT_HOST, 
+            DEFAULT_SM_REGISTRY_PORT, DEFAULT_REGISTRY_ENDPOINT);
 
         private ProtocolAddressHolder implementation = new ProtocolAddressHolder(Schema.IGNORE, 
             DEFAULT_HOST, DEFAULT_PROTOCOL_PORT, DEFAULT_PROTOCOL);
@@ -199,7 +199,7 @@ public class AasPartRegistry {
         private String serverHost = NO_SPECIFIC_SERVER_HOST; // -> use what is stated in server/registry
         
         private AasMode mode = AasMode.REMOTE_DEPLOY;
-        private String accessControlAllowOrigin = DeploymentRecipe.ANY_CORS_ORIGIN;
+        private String accessControlAllowOrigin;
         private int aasStartupTimeout = 120000;
         private String pluginId; // default of AasFactory
         private Map<AasComponent, ComponentSetup> setups = new HashMap<>();
@@ -334,7 +334,7 @@ public class AasPartRegistry {
          * @param aas the AAS server information
          */
         public void setServer(EndpointHolder aas) {
-            this.server = new EndpointHolder(aas);
+            this.server = createAasEndpointHolder(aas);
             this.server.setValidator(RuntimeSetupEndpointValidator.create(r -> r.getAasServer()));
         }
 
@@ -344,7 +344,7 @@ public class AasPartRegistry {
          * @param aas the submodel server information
          */
         public void setSubmodelServer(EndpointHolder aas) {
-            this.smServer = new EndpointHolder(aas);
+            this.smServer = createAasEndpointHolder(aas);
             this.smServer.setValidator(
                 RuntimeSetupEndpointValidator.create(r -> r.getSubmodelServer(), false)); // false -> v1 optional
         }
@@ -449,7 +449,7 @@ public class AasPartRegistry {
          * @param registry the registry information
          */
         public void setRegistry(EndpointHolder registry) {
-            this.registry = new EndpointHolder(registry);
+            this.registry = createAasEndpointHolder(registry);
             this.registry.setValidator(RuntimeSetupEndpointValidator.create(r -> r.getAasRegistry()));
         }
         
@@ -459,7 +459,7 @@ public class AasPartRegistry {
          * @param registry the registry information
          */
         public void setSubmodelRegistry(EndpointHolder registry) {
-            this.smRegistry = new EndpointHolder(registry);
+            this.smRegistry = createAasEndpointHolder(registry);
             this.smRegistry.setValidator(
                 RuntimeSetupEndpointValidator.create(r -> r.getSubmodelRegistry(), false)); // false -> v1 optional
         }        
@@ -650,6 +650,38 @@ public class AasPartRegistry {
             return setups.get(component);
         }
 
+    }
+    
+    /**
+     * Returns whether AAS URL paths shall be ignored.
+     * 
+     * @return {@code true} for ignoring, {@code false} for considering
+     * @see AasFactory#supportsUrlPaths()
+     */
+    private static boolean ignoreAasUrlPaths() {
+        return !AasFactory.getInstance().supportsUrlPaths();
+    }
+    
+    /**
+     * Creates an instance. Dependent on the AAS factory, may disable URL paths. [factory]
+     * 
+     * @param schema the schema
+     * @param host the host name
+     * @param port the port
+     * @param path the path denoting the endpoint
+     */
+    private static EndpointHolder createAasEndpointHolder(Schema schema, String host, int port, String path) {
+        return new EndpointHolder(schema, host, port, path).ignorePath(ignoreAasUrlPaths());
+    }
+
+    /**
+     * Creates an AAS endpoint holder. Dependent on the AAS factory, may disable URL paths. [factory]
+     * 
+     * @param holder the holder to take the information from
+     * @see #ignoreAasUrlPaths()
+     */
+    private static EndpointHolder createAasEndpointHolder(EndpointHolder holder) {
+        return new EndpointHolder(holder).ignorePath(ignoreAasUrlPaths());
     }
 
     /**
