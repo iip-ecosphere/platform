@@ -331,13 +331,13 @@ public class AasPartRegistryTest extends TestWithPlugin {
         Assert.assertEquals(Schema.HTTP, setup.getServer().getSchema());
         Assert.assertEquals("here.de", setup.getServer().getHost());
         Assert.assertEquals(9994, setup.getServer().getPort());
-        Assert.assertEquals("aas", setup.getServer().getPath());
+        Assert.assertEquals(aasUrlPath("aas"), setup.getServer().getPath());
         Assert.assertEquals(9994, setup.getServer().getServerAddress().getPort()); 
         
         Assert.assertEquals(Schema.HTTP, setup.getRegistry().getSchema());
         Assert.assertEquals("me.de", setup.getRegistry().getHost());
         Assert.assertEquals(9995, setup.getRegistry().getPort());
-        Assert.assertEquals("registry", setup.getRegistry().getPath());
+        Assert.assertEquals(aasUrlPath("registry"), setup.getRegistry().getPath());
         Assert.assertEquals(9995, setup.getRegistry().getServerAddress().getPort()); 
         
         Assert.assertEquals(Schema.TCP, setup.getImplementation().getSchema());
@@ -345,6 +345,16 @@ public class AasPartRegistryTest extends TestWithPlugin {
         Assert.assertEquals(10220, setup.getImplementation().getPort());
         Assert.assertEquals("VAB", setup.getImplementation().getProtocol());
         Assert.assertEquals(10220, setup.getImplementation().getServerAddress().getPort()); 
+    }
+
+    /**
+     * Returns an adjusted (expected) URL path.
+     * 
+     * @param withPath the path if the AAS implementation supports URL paths
+     * @return {@code withPath} if the AAS implementation supports URL paths, else empty
+     */
+    private static String aasUrlPath(String withPath) {
+        return AasFactory.getInstance().supportsUrlPaths() ? withPath : "";
     }
 
     /**
