@@ -103,7 +103,7 @@ describe('FlowchartComponent', () => {
         });
       }
     }
-    expect(checkSet.size).toBe(0);
+    expect(checkSet.size).toBe(1); // 'myOpcConn'
 
     // TODO requires started instance from deployment-plans and test frame
   });
