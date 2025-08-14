@@ -51,6 +51,7 @@ describe('FlowchartComponent', () => {
     let expectedServiceNames = new Set<string>();
     expectedServiceNames.add('SimpleSource');
     expectedServiceNames.add('SimpleReceiver');
+    expectedServiceNames.add('myOpcConn'); // it's just there for testing
 
     let checkSet = new Set<string>(expectedServiceNames);
     let servicePanel = compiled.querySelector('div[class="outer-container"]') as HTMLElement;
