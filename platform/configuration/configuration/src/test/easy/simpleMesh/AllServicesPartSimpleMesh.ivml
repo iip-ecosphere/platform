@@ -53,6 +53,44 @@ project AllServicesPartSimpleMesh {
       class = "java.lang.Object", // placeholder, will not work -> Server interface
       cmdArg = "--port=${port}"
     };
+    
+    // unused in app, shall only be in the Configuration AAS
+    OpcUaV1Connector myOpcUaConn = {
+        id = "myOpcConn",
+        name = "myOpcConn example",
+        description = "",
+        ver = "0.1.0",
+        port = 1234, // default localhost
+        
+        input = {{type=refBy(rec1)}},
+        output = {{type=refBy(rec1)}},
+        inInterface = {type=refBy(rec1), path="/opc/machIn/"}, 
+        outInterface = {type=refBy(rec1), path="/opc/machOut/"},
+        traceRcv = TraceKind::TRACE,
+        traceSent = TraceKind::TRACE,
+        security = {
+            keyAlias = "device",
+            keystoreKey = "myOpc:keystore",
+            authenticationKey = "myOpc:auth",
+            hostNameVerification = false   
+        },
+        operations = {
+          FieldAssignmentOperation{field=refBy(rec1.fields[0]), 
+            operation=AddDataTranslationOperation{
+                arguments={
+                    DataFieldAccess{field=refBy(rec1.fields[0])},
+                    IntegerConstantDataOperation{value=100}
+                }
+            }
+          }, ModelCallOperation {
+               name="myOp",
+               arguments={
+                   DataFieldAccess{field=refBy(rec1.fields[1])},
+                   IntegerConstantDataOperation{value=110}
+               }
+          }
+        }
+    };    
    
     freeze {
         .;
