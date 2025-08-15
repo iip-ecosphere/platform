@@ -6,6 +6,7 @@ project ServiceStateMachines {
    import Resources;
    import Transport;
    import Nameplate;
+   import DataOperations;
    
    annotate BindingTime bindingTime = BindingTime::compile to .;
    annotate Integer uiGroup = UiMandatoryGroup1 to .;
@@ -17,7 +18,7 @@ project ServiceStateMachines {
    }
    
    compound Event {
-       String id;
+       DataFieldAccess field;
    }
       
    compound Transition {
@@ -30,6 +31,7 @@ project ServiceStateMachines {
    compound StateMachine {
        String id;
        setOf(refTo(State)) states;
+       refTo(RecordType) input;
    }
    
 }
