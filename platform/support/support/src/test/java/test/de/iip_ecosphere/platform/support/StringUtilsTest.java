@@ -15,6 +15,7 @@ package test.de.iip_ecosphere.platform.support;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.StringUtils;
+
 import org.junit.Assert;
 
 /**
@@ -74,6 +75,35 @@ public class StringUtilsTest {
         Assert.assertTrue(StringUtils.isEmpty(null));
         Assert.assertTrue(StringUtils.isEmpty(""));
         Assert.assertFalse(StringUtils.isEmpty("   "));
+    }
+
+    /**
+     * Just som data to be emitted.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class TestData {
+        @SuppressWarnings("unused")
+        private int iVal;
+        private String sVal;
+    }
+
+    /**
+     * Tests {@link StringUtils#toString(Object)} and 
+     * {@link StringUtils#toStringShortStyle(Object)}.
+     */
+    public void testToString() {
+        TestData t = new TestData();
+        t.iVal = 10;
+        t.sVal = "abc";
+        String res = StringUtils.toStringShortStyle(t);
+        Assert.assertTrue(res.length() > t.sVal.length()); // chosen so that prefix fits in
+        res = StringUtils.toString(t);
+        Assert.assertTrue(res.length() > 0);
+       
+        t.sVal = "aaaabbbbaaaabbbbaaaabbbbaaaabbbbkkskghwnajvkjejbajkbe5u ajdgkjekjbngkjnak";
+        res = StringUtils.toStringShortStyle(t);
+        Assert.assertTrue(res.length() < t.sVal.length()); // chosen so that prefix fits in
     }
 
 }

@@ -26,6 +26,13 @@ public class OsUtils {
      */
     private OsUtils() {
     }
+
+    /**
+     * Returns the {@code user.home} System Property. User's home directory.
+     */
+    public static final String getUserHome() {
+        return SystemUtils.USER_HOME;
+    }
     
     /**
      * Returns the operating system name.
@@ -147,6 +154,15 @@ public class OsUtils {
      */
     public static boolean isMac() {
         return SystemUtils.IS_OS_MAC;
+    }
+    
+    /**
+     * Returns whether we are running on Java 1.8.
+     * 
+     * @return {@code true} for Java 1.8, {@code false} else
+     */
+    public static boolean isJava1_8() {
+        return SystemUtils.IS_JAVA_1_8;
     }
 
 }

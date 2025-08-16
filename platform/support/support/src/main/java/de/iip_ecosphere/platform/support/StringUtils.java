@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.support;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.commons.text.StringEscapeUtils;
 
 /**
@@ -20,6 +22,11 @@ import org.apache.commons.text.StringEscapeUtils;
  * @author Holger Eichelberger, SSE
  */
 public class StringUtils {
+    
+    /**
+     * Short prefix style with limited string output.
+     */
+    static final ToStringStyle SHORT_STRING_STYLE = new ShortStringToStringStyle(); 
     
     /**
      * Escapes the characters in a {@code String} using Java String rules.
@@ -103,6 +110,30 @@ public class StringUtils {
     }
 
     /**
+     * Checks if a CharSequence is not empty (""), not null and not whitespace only.
+     *
+     * @param cs  the CharSequence to check, may be null
+     * @return {@code true} if the CharSequence is
+     *  not empty and not null and not whitespace only
+     */
+    public static boolean isNotBlank(final CharSequence cs) {
+        return org.apache.commons.lang3.StringUtils.isNotBlank(cs);
+    }
+    
+    /**
+     * Replaces a String with another String inside a larger String, once.
+     *
+     * @param text  text to search and replace in, may be null
+     * @param searchString  the String to search for, may be null
+     * @param replacement  the String to replace with, may be null
+     * @return the text with any replacements processed,
+     *  <b>null</b> if null String input
+     */
+    public static String replaceOnce(final String text, final String searchString, final String replacement) {
+        return org.apache.commons.lang3.StringUtils.replaceOnce(text, searchString, replacement);
+    }
+
+    /**
      * Checks if a CharSequence is empty ({@code ""}) or <b>null</b>.
      *
      * @param cs  the CharSequence to check, may be <b>null</b>
@@ -110,6 +141,94 @@ public class StringUtils {
      */
     public static boolean isEmpty(final CharSequence cs) {
         return org.apache.commons.lang3.StringUtils.isEmpty(cs);
+    }
+    
+    /**
+     * Turns an object to an readable string, usually using reflection. Uses some default
+     * style.
+     * 
+     * @param obj the object
+     * @return the string representation
+     */
+    public static String toString(Object obj) {
+        return ReflectionToStringBuilder.toString(obj);
+    }
+    
+    /**
+     * Short prefix style with limited string output.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static final class ShortStringToStringStyle extends ToStringStyle {
+        
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * <p>Constructor.</p>
+         *
+         * <p>Use the static constant rather than instantiating.</p>
+         */
+        ShortStringToStringStyle() {
+            super();
+            this.setUseShortClassName(true);
+            this.setUseIdentityHashCode(false);
+        }
+        
+        @Override
+        public void append(StringBuffer buffer, String fieldName, Object value, Boolean fullDetail) {
+            if (value instanceof String) { // in particular base64 images
+                String sVal = (String) value;
+                if (sVal.length() > 20) {
+                    value = sVal.substring(0, 20) + "...";
+                }
+            }
+            super.append(buffer, fieldName, value, fullDetail);
+        }
+
+        /**
+         * <p>Ensure singleton after serialization.</p>
+         * @return the singleton
+         */
+        private Object readResolve() {
+            return SHORT_STRING_STYLE;
+        }
+        
+    }
+
+    /**
+     * Turns an object to an readable string, usually using reflection. Uses oktoflow short style.
+     * 
+     * @param obj the object
+     * @return the string representation
+     */
+    public static String toStringShortStyle(Object obj) {
+        return ReflectionToStringBuilder.toString(obj, SHORT_STRING_STYLE);
+    }
+    
+    /**
+     * Removes a substring only if it is at the beginning of a source string,
+     * otherwise returns the source string.
+
+     * @param str  the source String to search, may be null
+     * @param remove  the String to search for and remove, may be null
+     * @return the substring with the string removed if found,
+     *  <b>null</b> if <b>null</b> String input
+     */
+    public static String removeStart(String str, String remove) {
+        return org.apache.commons.lang3.StringUtils.removeStart(str, remove);
+    }
+    
+    /**
+     * Removes a substring only if it is at the end of a source string,
+     * otherwise returns the source string.
+     *
+     * @param str  the source String to search, may be null
+     * @param remove  the String to search for and remove, may be null
+     * @return the substring with the string removed if found,
+     *  <b>null</b> if <b>null</b> String input
+     */
+    public static String removeEnd(String str, String remove) {
+        return org.apache.commons.lang3.StringUtils.removeEnd(null, null);
     }
 
 }
