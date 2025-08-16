@@ -566,7 +566,7 @@ template JavaBasics(Configuration config, FileArtifact target) {
     }
     
     def JavaCodeMethodCall addLoggerCall(JavaCodeBlockInterface block, String call, String msg, String cls="getClass()") {
-        block.addCall("org.slf4j.LoggerFactory.getLogger", JavaCodeImportScope.CLASS)
+        block.addCall("de.iip_ecosphere.platform.support.logging.LoggerFactory.getLogger", JavaCodeImportScope.CLASS)
             .addArgument(cls)
             .addCall(call)
                 .addStringArgument(msg);
@@ -585,9 +585,8 @@ template JavaBasics(Configuration config, FileArtifact target) {
     }
     
     def addReflectiveToString(JavaCodeClass c) {
-        c.addImport("org.apache.commons.lang3.builder.ReflectionToStringBuilder");
-        c.addImport("de.iip_ecosphere.platform.services.environment.IipStringStyle");
-        c.addToString().addReturn("ReflectionToStringBuilder.toString(this, IipStringStyle.SHORT_STRING_STYLE)");
+        c.addImport("de.iip_ecosphere.platform.support.StringUtils");
+        c.addToString().addReturn("StringUtils.toStringShortStyle(this)");
     }
 
 }

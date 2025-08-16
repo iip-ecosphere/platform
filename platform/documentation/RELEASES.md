@@ -28,7 +28,7 @@ New features:
 
 Changes:
 * As part of cleaning up dependencies in the core components of oktoflow:
-  * Turning Java objects generically into text is now done via `de.iip_ecosphere.platform.support.StringUtils.toString(object)` for a default format and `de.iip_ecosphere.platform.support.StringUtils.toStringShortStyle(object)` for the short format. The latter replaces the approach with `org.apache.commons.lang3.builder.ReflectionToStringBuilder.toString(object, IipStringStyle.SHORT_STRING_STYLE)` using `de.iip_ecosphere.platform.services.environment.IipStringStyle` as formatting. `de.iip_ecosphere.platform.services.environment.IipStringStyle` was internalized into `de.iip_ecosphere.platform.support.StringUtils` and, thus, can be/was removed from `services.environment`.
+  * Turning Java objects generically into text is now done via `de.iip_ecosphere.platform.support.StringUtils.toString(object)` for a default format and `de.iip_ecosphere.platform.support.StringUtils.toStringShortStyle(object)` for the short format. The latter replaces the approach with `org.apache.commons.lang3.builder.ReflectionToStringBuilder.toString(object, IipStringStyle.SHORT_STRING_STYLE)` using `de.iip_ecosphere.platform.services.environment.IipStringStyle` as formatting. `de.iip_ecosphere.platform.services.environment.IipStringStyle` was internalized into `de.iip_ecosphere.platform.support.StringUtils` and, thus, can be/was removed from `services.environment`. Please re-build your applications.
 
 ### Version 0.7.0 (2024/07/11, no maven central release):
 
