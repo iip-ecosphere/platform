@@ -228,7 +228,7 @@ public class StringUtils {
      *  <b>null</b> if <b>null</b> String input
      */
     public static String removeEnd(String str, String remove) {
-        return org.apache.commons.lang3.StringUtils.removeEnd(null, null);
+        return org.apache.commons.lang3.StringUtils.removeEnd(str, remove);
     }
 
 }

@@ -105,5 +105,14 @@ public class StringUtilsTest {
         res = StringUtils.toStringShortStyle(t);
         Assert.assertTrue(res.length() < t.sVal.length()); // chosen so that prefix fits in
     }
+    
+    /**
+     * Tests {@link StringUtils#removeStart(String, String)} and 
+     * {@link StringUtils#removeEnd(String, String)}.
+     */
+    public void testRemove() {
+        Assert.assertEquals("This", StringUtils.removeEnd("ThisEnd", "End"));
+        Assert.assertEquals("End", StringUtils.removeStart("ThisEnd", "This"));
+    }
 
 }
