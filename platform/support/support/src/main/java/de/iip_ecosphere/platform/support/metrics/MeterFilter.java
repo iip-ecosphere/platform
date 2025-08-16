@@ -26,7 +26,7 @@ public interface MeterFilter {
     /**
      * Accepts a meter id for filtering.
      * 
-     * @param id Id with {@link MeterFilter#map} transformations applied.
+     * @param id Id with transformations applied
      * @return after all transformations, should a real meter be registered for this id, or should it be no-op'd.
      */
     public MeterFilterReply accept(Meter.Id id);

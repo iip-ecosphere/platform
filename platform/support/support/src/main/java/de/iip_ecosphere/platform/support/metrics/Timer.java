@@ -69,7 +69,7 @@ public interface Timer extends Meter {
      * Executes the Supplier {@code supplier} and records the time taken.
      *
      * @param supplier   Function to execute and measure the execution time.
-     * @param <T> The return type of the {@link supplier}.
+     * @param <T> The return type of the {@code supplier}.
      * @return The return value of {@code supplier}.
      */
     public <T> T record(Supplier<T> supplier);

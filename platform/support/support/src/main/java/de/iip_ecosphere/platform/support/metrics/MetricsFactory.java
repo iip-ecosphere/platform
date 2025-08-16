@@ -125,7 +125,7 @@ public abstract class MetricsFactory {
      * reference to this function.
      *
      * @param name the gauge's name
-     * @param fupplier a function that yields a double value for the gauge
+     * @param supplier a function that yields a double value for the gauge
      * @return the gauge builder
      */
     public abstract GaugeBuilder<Supplier<Number>> createGauge(String name, Supplier<Number> supplier);
@@ -235,9 +235,7 @@ public abstract class MetricsFactory {
     /**
      * Starts building a gauge by returning a gauge builder.
      * 
-     * @param <T> the type of object
      * @param name the name of the gauge
-     * @param obj the object providing the value
      * @param supplier a value supplier turning {@code obj} into a gauge value
      * @return the gauge builder
      */

@@ -70,7 +70,7 @@ public interface MeterRegistry {
      * the same {@link Id} returned when registering a meter - which will have {@link MeterFilter}s applied to it.
      * May affect multiple meters as tags not specified here.
      *
-     * @param meter The name of the meter to remove
+     * @param name the name of the meter to remove
      * @return The removed meter (may not be the same instance as registered before), or <b>null</b> if the provided 
      *     meter is not currently registered.
      */
@@ -81,7 +81,7 @@ public interface MeterRegistry {
      * {@link MeterFilter}s will not be applied to it. You can use the {@link Id} of the {@link Meter} returned
      * when registering a meter, since that will have {@link MeterFilter}s already applied to it.
      *
-     * @param mappedId The id of the meter to remove
+     * @param id The id of the meter to remove
      * @return The removed meter, or null if no meter matched the provided id
      */
     public Meter remove(Id id);
