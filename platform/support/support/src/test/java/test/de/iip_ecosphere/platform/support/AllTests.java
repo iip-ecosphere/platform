@@ -49,6 +49,7 @@ import test.de.iip_ecosphere.platform.support.logging.LoggerFactoryTest;
     JsonTest.class,
     RestTest.class,
     MetricsTest.class,
+    BytecodeTest.class,
     ProcessInfoTest.class,
     WebsocketTest.class,
     SshTest.class,
