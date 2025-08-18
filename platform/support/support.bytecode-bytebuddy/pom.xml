@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>support.bytecode-bytebuddy</artifactId>
+  <packaging>jar</packaging>
+  <name>oktoflow class/bytecode plugin</name>
+  <description>Class/bytecode plugin through bytebuddy.</description>
+
+  <properties>
+    <maven.compiler.target>8</maven.compiler.target>
+    <maven.compiler.source>8</maven.compiler.source>
+  </properties>
+
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependencies</artifactId>
+     <version>0.7.1-SNAPSHOT</version>
+     <relativePath/>
+  </parent>
+
+  <dependencies>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>support</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy</artifactId>
+	  <version>1.10.20</version>
+    </dependency>   
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <artifactId>support.log-slf4j-simple</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>support</artifactId>
+     <version>${project.version}</version>
+     <type>test-jar</type>
+     <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+      <plugins>
+       <plugin>
+         <artifactId>maven-compiler-plugin</artifactId>
+         <version>${org.apache.maven.compiler.version}</version>
+           <configuration>
+             <!-- Must remain on Java 8 level, support level, rapidminer -->
+             <source>8</source>
+             <target>8</target>
+             <encoding>${java.encoding}</encoding>
+           </configuration>
+       </plugin>
+             
+         <plugin>
+             <groupId>de.iip-ecosphere.platform</groupId>
+             <artifactId>dependency-plugin</artifactId>
+             <version>${project.version}</version>
+             <executions>
+                 <execution>
+                     <id>copy-dependencies</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>copy-plugin-dependencies</goal>
+                     </goals>
+                 </execution>
+                 <execution>
+                     <id>build-classpath-plugin</id>
+                     <phase>compile</phase> <!-- Eclipse autobuild -->
+                     <goals>
+                         <goal>build-plugin-classpath</goal>
+                     </goals>
+                 </execution>
+                 <execution>
+                     <id>assemble</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>assemble-plugin</goal>
+                     </goals>
+                 </execution>
+             </executions>
+         </plugin>
+      </plugins>
+  </build>
+
+</project>
