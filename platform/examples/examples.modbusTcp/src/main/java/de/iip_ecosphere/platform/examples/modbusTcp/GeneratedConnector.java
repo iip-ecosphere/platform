@@ -26,12 +26,12 @@ import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
+import de.iip_ecosphere.platform.support.metrics.Clock;
+import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import iip.datatypes.ModbusPhoenixEEM;
 import iip.datatypes.ModbusPhoenixRwEEM;
 import iip.nodes.MyModbusConnExample;
-import io.micrometer.core.instrument.Clock;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 /**
  * Runs the generated connector.
@@ -44,7 +44,7 @@ public class GeneratedConnector {
     
     private static final boolean USE_FREE_PORT = true;
     private static final int MAX = 100;
-    private static MetricsProvider metrics = new MetricsProvider(new SimpleMeterRegistry());
+    private static MetricsProvider metrics = new MetricsProvider(MetricsFactory.getInstance().createRegistry());
     private static ModbusServer server;
     private static int serverPort = -1;
     
