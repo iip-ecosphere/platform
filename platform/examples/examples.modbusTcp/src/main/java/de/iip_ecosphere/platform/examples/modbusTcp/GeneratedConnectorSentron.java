@@ -55,10 +55,8 @@ public class GeneratedConnectorSentron {
      * @throws IOException in case that the server cannot be accessed
      */
     public static void main(String[] args) throws IOException {
-        
         //test(false);
         performanceTest(true);
-
     }
     
     /**

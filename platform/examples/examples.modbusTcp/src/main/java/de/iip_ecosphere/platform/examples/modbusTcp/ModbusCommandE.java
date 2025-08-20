@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.examples.modbusTcp;
 
+import de.iip_ecosphere.platform.support.StringUtils;
+
 /**
  * Some Modbus machine command for testing.
  * 
@@ -143,7 +145,7 @@ public class ModbusCommandE {
 
     @Override
     public String toString() {
-        return org.apache.commons.lang3.builder.ReflectionToStringBuilder.toString(this, 
-            de.iip_ecosphere.platform.services.environment.IipStringStyle.SHORT_STRING_STYLE);
+        return StringUtils.toStringShortStyle(this);
     }
+
 }

@@ -124,7 +124,6 @@ public class GeneratedConnector {
      * @throws IOException if the connector fails (preliminary)
      */
     public static void performanceTest(boolean startServer) throws IOException {
-        
         clock = metrics.getClock();
         File log = new File("totalRequestTimeGeneratedConnector.txt");
         logger = new LogRunnable(log);

@@ -170,7 +170,6 @@ public class ManualConnector {
      * @throws IOException if the connector fails (preliminary)
      */
     public static void performanceTest(boolean startServer) throws IOException {
-        
         clock = metrics.getClock();
         File log = new File("totalRequestTimeManualConnector.txt");
         logger = new LogRunnable(log);
