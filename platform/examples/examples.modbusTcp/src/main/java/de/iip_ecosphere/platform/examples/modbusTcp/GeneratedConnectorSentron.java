@@ -23,12 +23,12 @@ import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsPro
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
-import de.iip_ecosphere.platform.support.metrics.Clock;
-import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import iip.datatypes.ModbusSiemensRwSentron;
 import iip.datatypes.ModbusSiemensSentron;
 import iip.nodes.MyModbusSentronConnExample;
+import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 /**
  * Runs the generated Sentron connector.
@@ -41,7 +41,7 @@ public class GeneratedConnectorSentron {
     public static final String TOTAL_REQUEST_TIME = "totalRequestTime";
     
     private static final int MAX = 100;
-    private static MetricsProvider metrics = new MetricsProvider(MetricsFactory.getInstance().createRegistry());
+    private static MetricsProvider metrics = new MetricsProvider(new SimpleMeterRegistry());
     private static ModbusServer server;
     
     private static Clock clock;
