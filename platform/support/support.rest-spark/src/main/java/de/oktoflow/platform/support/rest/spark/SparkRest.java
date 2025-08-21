@@ -13,7 +13,7 @@
 package de.oktoflow.platform.support.rest.spark;
 
 import de.iip_ecosphere.platform.support.Server;
-import spark.Spark;
+import spark.Service;
 
 /**
  * Implements the Rest interface by Spark.
@@ -89,13 +89,15 @@ public class SparkRest extends de.iip_ecosphere.platform.support.rest.Rest {
      */
     private static class SparkRestServer implements RestServer {
 
+        private Service service;
+        
         /**
          * Creates an instance.
          * 
          * @param port the port to use
          */
         private SparkRestServer(int port) {
-            Spark.port(port);
+            service = Service.ignite().port(port);
         }
 
         /**
@@ -110,34 +112,34 @@ public class SparkRest extends de.iip_ecosphere.platform.support.rest.Rest {
 
         @Override
         public void definePost(String path, Route route) {
-            Spark.post(path, createRoute(route));
+            service.post(path, createRoute(route));
         }
 
         @Override
         public void defineGet(String path, Route route) {
-            Spark.get(path, createRoute(route));
+            service.get(path, createRoute(route));
         }
 
         @Override
         public void definePut(String path, Route route) {
-            Spark.put(path, createRoute(route));
+            service.put(path, createRoute(route));
         }
 
         @Override
         public void defineDelete(String path, Route route) {
-            Spark.delete(path, createRoute(route));
+            service.delete(path, createRoute(route));
         }
 
         @Override
         public Server start() {
-            Spark.awaitInitialization();
+            service.awaitInitialization();
             return this;
         }
 
         @Override
         public void stop(boolean dispose) {
-            Spark.stop();
-            Spark.awaitStop();
+            service.stop();
+            service.awaitStop();
         }
         
     }
