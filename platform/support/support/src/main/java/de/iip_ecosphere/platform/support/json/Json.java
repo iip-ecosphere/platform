@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.support.json;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.Map;
 import java.util.Set;
 
@@ -272,5 +274,69 @@ public abstract class Json {
      * @throws IOException if accessing the stream fails
      */
     public abstract <T> IOIterator<T> createIterator(InputStream stream, Class<T> cls) throws IOException;
+
+    /**
+     * Creates a JSON object for individual access from {@code string}.
+     * 
+     * @param string the string
+     * @return the JSON object
+     * @throws IOException if the object cannot be read/constructed
+     * @see #createObject(Reader)
+     */
+    public static JsonObject createObject(String string) throws IOException {
+        return createObject(new StringReader(string));
+    }
+
+    /**
+     * Creates a JSON object for individual access from {@code reader}.
+     * 
+     * @param reader the reader
+     * @return the JSON object
+     * @throws IOException if the object cannot be read/constructed
+     */
+    public static JsonObject createObject(Reader reader) throws IOException {
+        return prototype.createObjectImpl(reader);
+    }
+
+    /**
+     * Creates a JSON object for individual access from {@code reader}.
+     * 
+     * @param reader the reader
+     * @return the JSON object
+     * @throws IOException if the object cannot be read/constructed
+     */
+    public abstract JsonObject createObjectImpl(Reader reader) throws IOException;
+
+    /**
+     * Creates a JSON object builder.
+     * 
+     * @return the JSON object builder
+     */
+    public static JsonObjectBuilder createObjectBuilder() {
+        return prototype.createObjectBuilderImpl();
+    }
+    
+    /**
+     * Creates a JSON object builder.
+     * 
+     * @return the JSON object builder
+     */
+    public abstract JsonObjectBuilder createObjectBuilderImpl();
+
+    /**
+     * Creates a JSON array builder.
+     * 
+     * @return the JSON array builder
+     */
+    public static JsonArrayBuilder createArrayBuilder() {
+        return prototype.createArrayBuilderImpl();
+    }
+    
+    /**
+     * Creates a JSON array builder.
+     * 
+     * @return the JSON array builder
+     */
+    public abstract JsonArrayBuilder createArrayBuilderImpl();
 
 }

@@ -44,7 +44,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-    </dependency>     
+    </dependency>
     <dependency>
 	  <groupId>de.iip-ecosphere.platform</groupId>
 	  <artifactId>maven-python</artifactId>
@@ -81,6 +81,11 @@
         <version>2.9.3</version>
         <scope>test</scope>
     </dependency>
+     <dependency>
+      <groupId>org.glassfish</groupId>
+      <artifactId>javax.json</artifactId>
+        <scope>test</scope>
+    </dependency>    
   </dependencies>
   
   <build>

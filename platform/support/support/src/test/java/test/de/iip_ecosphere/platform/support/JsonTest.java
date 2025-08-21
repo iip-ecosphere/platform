@@ -18,6 +18,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.json.Json;
+import de.iip_ecosphere.platform.support.json.JsonArray;
+import de.iip_ecosphere.platform.support.json.JsonNumber;
+import de.iip_ecosphere.platform.support.json.JsonObject;
+import de.iip_ecosphere.platform.support.json.JsonString;
 
 /**
  * Tests {@link Json}.
@@ -109,6 +113,57 @@ public class JsonTest {
         byte[] b = json.writeValueAsBytes(data);
         data1 = json.readValue(b, Data.class);
         assertData(data1, data);
+    }
+    
+    /**
+     * Tests basic {@link JsonObject} functions.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testJsonObject() throws IOException {
+        JsonObject jobj = Json.createObjectBuilder()
+            .add("intVal", 1)
+            .add("strVal", "abc")
+            .add("boolVal", true)
+            .add("dblVal", 2.0)
+            .add("arr", Json.createArrayBuilder()
+                .add(1)
+                .add("str")
+                .add(true)
+                .add(Json.createArrayBuilder()) // as array builder
+                .build()) // as array value
+            .build();
+        String json = jobj.toString();
+        
+        JsonObject obj = Json.createObject(json);
+        Assert.assertNotNull(obj);
+
+        JsonNumber n1 = obj.getJsonNumber("intVal");
+        Assert.assertNotNull(n1);
+        Assert.assertEquals(1, n1.intValue());
+
+        JsonNumber n2 = obj.getJsonNumber("dblVal");
+        Assert.assertNotNull(n2);
+        Assert.assertEquals(2.0, n2.intValue(), 0.01);
+
+        JsonString s1 = obj.getJsonString("strVal");
+        Assert.assertNotNull(s1);
+        Assert.assertEquals("abc", s1.getString());
+
+        Assert.assertEquals(1, obj.getInt("intVal"));
+        Assert.assertEquals("abc", obj.getString("strVal"));
+        Assert.assertEquals(true, obj.getBoolean("boolVal"));
+        
+        JsonArray a1 = obj.getJsonArray("arr");
+        Assert.assertEquals(4, a1.size());
+        Assert.assertNotNull(a1);
+        Assert.assertEquals("str", a1.getString(1));
+        Assert.assertEquals(1, a1.getInt(0));
+        Assert.assertEquals(true, a1.getBoolean(2));
+        JsonArray a2 = a1.getJsonArray(3);
+        Assert.assertNotNull(a2);
+        Assert.assertEquals(0, a2.size());
     }
 
 }
