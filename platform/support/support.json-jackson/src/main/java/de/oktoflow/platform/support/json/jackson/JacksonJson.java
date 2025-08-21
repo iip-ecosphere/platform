@@ -14,6 +14,7 @@ package de.oktoflow.platform.support.json.jackson;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,6 +27,9 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 import de.iip_ecosphere.platform.support.json.IOIterator;
 import de.iip_ecosphere.platform.support.json.Json;
+import de.iip_ecosphere.platform.support.json.JsonArrayBuilder;
+import de.iip_ecosphere.platform.support.json.JsonObject;
+import de.iip_ecosphere.platform.support.json.JsonObjectBuilder;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.support.json.JsonUtils.JacksonEnumMapping;
 
@@ -178,4 +182,18 @@ public class JacksonJson extends de.iip_ecosphere.platform.support.json.Json {
         return JsonUtils.createIterator(mapper, stream, cls);
     }
 
+    @Override
+    public JsonObject createObjectImpl(Reader reader) throws IOException {
+        return JerseyJsonObject.createObject(reader);
+    }
+
+    @Override
+    public JsonObjectBuilder createObjectBuilderImpl() {
+        return JerseyJsonObject.createObjectBuilder();
+    }
+
+    @Override
+    public JsonArrayBuilder createArrayBuilderImpl() {
+        return JerseyJsonObject.createArrayBuilder();
+    }
 }
