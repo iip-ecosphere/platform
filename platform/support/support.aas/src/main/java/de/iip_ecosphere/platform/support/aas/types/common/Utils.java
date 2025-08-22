@@ -34,8 +34,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.apache.commons.lang3.StringUtils;
-
+import de.iip_ecosphere.platform.support.StringUtils;
 import de.iip_ecosphere.platform.support.aas.BlobDataElement;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.ElementsAccess;

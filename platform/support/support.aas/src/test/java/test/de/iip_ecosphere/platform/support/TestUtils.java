@@ -42,6 +42,9 @@ public class TestUtils {
     public static TestSuite suite(Class<?>... tests) {
         TestSuite suite = new TestSuite();
         if (null != tests) {
+            if (tests.length > 0) {
+                Thread.currentThread().setContextClassLoader(tests[0].getClassLoader());
+            }
             for (Class<?> t : tests) {
                 suite.addTest(new JUnit4TestAdapter(t));
             }
