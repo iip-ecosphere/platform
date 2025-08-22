@@ -31,6 +31,7 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
         appendDependency(dep, iipGroup, "support.rest-spark", projectVersion); // preliminary -> plugin
         appendDependency(dep, iipGroup, "support.processInfo-oshi", projectVersion); // preliminary -> plugin
         appendDependency(dep, iipGroup, "support.bytecode-bytebuddy", projectVersion); // preliminary -> plugin
+        appendDependency(dep, iipGroup, "support.http-apache", projectVersion); // preliminary -> plugin
         XmlElement d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
         if (monitoring) {
             // conflicts on Linux with Tomcat
