@@ -48,7 +48,7 @@ class SubmodelRegistryUtils {
         if (null != desc) {
             List<Endpoint> eps = desc.getEndpoints();
             if (!eps.isEmpty()) {
-                result = eps.getFirst();
+                result = eps.get(0);
             }
         }
         return result;

@@ -143,7 +143,7 @@ public abstract class BaSyxSubmodelElement implements SubmodelElement {
             path = new ArrayList<>();
         }
         if (null != element) {
-            path.addFirst(element);
+            path.add(0, element);
         }
         return path;
     }
