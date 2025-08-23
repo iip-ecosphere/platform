@@ -176,5 +176,15 @@ public abstract class Rest {
     public RestServer createServer(ServerAddress addr) {
         return createServer(addr.getPort());
     }
+    
+    /**
+     * Creates a web/REST target to call operations on, a kind of REST client.
+     * 
+     * @param uri web resource URI. May contain template parameters. Must not be <b>null</b>.
+     * @return the rest target instance
+     * @throws IllegalArgumentException in case the supplied string is not a valid URI template
+     * @throws NullPointerException in case the supplied argument is <b>null</b>.
+     */
+    public abstract RestTarget createTarget(String uri);
 
 }

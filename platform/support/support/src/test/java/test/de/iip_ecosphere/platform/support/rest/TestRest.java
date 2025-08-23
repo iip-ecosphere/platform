@@ -13,6 +13,7 @@
 package test.de.iip_ecosphere.platform.support.rest;
 
 import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.rest.RestTarget;
 
 /**
  * Implements an empty Rest interface for simple testing.
@@ -66,6 +67,11 @@ public class TestRest extends de.iip_ecosphere.platform.support.rest.Rest {
     @Override
     public RestServer createServer(int port) {
         return new TestServer(port);
+    }
+
+    @Override
+    public RestTarget createTarget(String uri) {
+        return null;
     }
 
 }
