@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 import de.iip_ecosphere.platform.connectors.formatter.OutputFormatter.OutputConverter;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.serialization.QualifiedElement;
 
 /**
@@ -95,7 +96,7 @@ public class ConverterToString implements OutputConverter<String> {
 
     @Override
     public String fromDate(Date data, String format) throws IOException {
-        return FormatCache.format(data, format);
+        return TimeUtils.format(data, format);
     }
 
     @Override

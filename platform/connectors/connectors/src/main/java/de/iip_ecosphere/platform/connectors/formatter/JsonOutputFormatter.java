@@ -24,6 +24,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.function.IOConsumer;
 import de.iip_ecosphere.platform.transport.serialization.QualifiedElement;
 
@@ -157,7 +158,7 @@ public class JsonOutputFormatter implements OutputFormatter<IOConsumer<JsonGener
         @Override
         public IOConsumer<JsonGenerator> fromDate(Date data, String format) throws IOException {
             return g -> {
-                g.writeString(FormatCache.format(data, format));
+                g.writeString(TimeUtils.format(data, format));
             };
         }
 

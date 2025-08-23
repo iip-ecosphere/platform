@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
-import de.iip_ecosphere.platform.connectors.formatter.FormatCache;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.function.IOConsumer;
 import de.iip_ecosphere.platform.transport.serialization.IipEnum;
 import de.iip_ecosphere.platform.transport.serialization.QualifiedElement;
@@ -326,24 +326,24 @@ public interface InputParser<T> {
          * Converts parsed data returned by {@link ParseResult} to a date representation.
          * 
          * @param data the obtained data
-         * @param format the target date format (see {@link FormatCache})
+         * @param format the target date format (see {@link TimeUtils})
          * @return the converted date
          * @throws IOException if conversion fails
          */
         public default Date toDate(T data, String format) throws IOException {
-            return FormatCache.parse(data, format);
+            return TimeUtils.parse(data, format);
         }
         
         /**
          * Converts parsed data returned by {@link ParseResult} to a date representation.
          * 
          * @param data the obtained data
-         * @param format the target date format (see {@link FormatCache})
+         * @param format the target date format (see {@link TimeUtils})
          * @return the converted date
          * @throws IOException if conversion fails
          */
         public default LocalDateTime toLocalDateTime(T data, String format) throws IOException {
-            return FormatCache.toLocalDateTime(toDate(data, format));
+            return TimeUtils.toLocalDateTime(toDate(data, format));
         }
 
         /**

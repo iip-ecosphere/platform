@@ -22,6 +22,7 @@ import java.util.List;
 
 import de.iip_ecosphere.platform.connectors.parser.InputParser;
 import de.iip_ecosphere.platform.connectors.parser.InputParser.InputConverter;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.serialization.IipEnum;
 import de.iip_ecosphere.platform.transport.serialization.QualifiedElement;
 
@@ -200,7 +201,7 @@ public interface OutputFormatter<T> {
          * @throws IOException if conversion fails
          */
         public default T fromLocalDateTime(LocalDateTime data, String format) throws IOException {
-            return fromDate(FormatCache.toDate(data), format);
+            return fromDate(TimeUtils.toDate(data), format);
         }
 
         /**
