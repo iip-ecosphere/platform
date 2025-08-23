@@ -94,7 +94,6 @@ import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
-import de.iip_ecosphere.platform.connectors.formatter.FormatCache;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelInputConverter;
@@ -102,6 +101,7 @@ import de.iip_ecosphere.platform.connectors.model.ModelOutputConverter;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
@@ -167,7 +167,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
     private ConnectorParameter params;
     
     static { // preliminary
-        FormatCache.registerConverter(new FormatCache.AbstractDateConverter<DateTime>(DateTime.class) {
+        TimeUtils.registerConverter(new TimeUtils.AbstractDateConverter<DateTime>(DateTime.class) {
 
             @Override
             public Date toDate(DateTime data) {
@@ -621,7 +621,7 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
         
         @Override
         public Object fromLocalDateTime(LocalDateTime data, String format) throws IOException {
-            return new DateTime((Date) fromDate(FormatCache.toDate(data), format));
+            return new DateTime((Date) fromDate(TimeUtils.toDate(data), format));
         }
 
         @Override
