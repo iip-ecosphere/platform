@@ -4,7 +4,7 @@
   <artifactId>support.rest-spark</artifactId>
   <packaging>jar</packaging>
   <name>oktoflow rest plugin</name>
-  <description>REST plugin through spark.</description>
+  <description>REST plugin through spark and Glassfish/Jersey.</description>
 
   <properties>
     <maven.compiler.target>8</maven.compiler.target>
@@ -29,6 +29,14 @@
         <artifactId>spark-core</artifactId>
         <version>2.9.3</version>
     </dependency>
+     <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-client</artifactId>
+     </dependency>
+<dependency>
+    <groupId>org.glassfish.jersey.inject</groupId>
+    <artifactId>jersey-hk2</artifactId>
+</dependency>     
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

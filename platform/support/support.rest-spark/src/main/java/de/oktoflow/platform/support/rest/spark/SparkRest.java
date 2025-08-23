@@ -13,6 +13,7 @@
 package de.oktoflow.platform.support.rest.spark;
 
 import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.rest.RestTarget;
 import spark.Service;
 
 /**
@@ -147,6 +148,11 @@ public class SparkRest extends de.iip_ecosphere.platform.support.rest.Rest {
     @Override
     public RestServer createServer(int port) {
         return new SparkRestServer(port);
+    }
+
+    @Override
+    public RestTarget createTarget(String uri) {
+        return new JerseyWebTarget(uri);
     }
 
 }

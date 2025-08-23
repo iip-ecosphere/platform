@@ -10,6 +10,7 @@ import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.rest.Rest;
 import de.iip_ecosphere.platform.support.rest.Rest.RestServer;
 import de.iip_ecosphere.platform.support.rest.Rest.Route;
+import de.iip_ecosphere.platform.support.rest.RestTarget;
 import de.oktoflow.platform.support.rest.spark.SparkRest;
 
 /**
@@ -29,8 +30,9 @@ public class RestTest {
         Rest rest = Rest.getInstance();
         Assert.assertTrue(rest instanceof SparkRest);
         
+        final String json = "{\"received\":true}";
         Route route = (req, res) -> { 
-            res.setBody("received");
+            res.setBody(json);
             res.setStatus(200);
             return res.getBody();
         };
@@ -44,6 +46,26 @@ public class RestTest {
         server.defineDelete(path, route);
         server.start();
         TimeUtils.sleep(500);
+        
+        RestTarget t = rest.createTarget("http://localhost:" + port + "/");
+        String result = t.createRequest()
+            .addPath("test")
+            .addPath("route")
+            .addQueryParam("param", "a", "b")
+            .requestJson()
+            .getAsString();
+        Assert.assertEquals(json, result);
+        t.createRequest()
+            .addPath("test")
+            .addPath("route")
+            .requestJson()
+            .put("{\"request\":\"abc\"");
+        t.createRequest()
+            .addPath("test")
+            .addPath("route")
+            .requestJson()
+            .delete();
+        
         server.stop(true);
     }
 
