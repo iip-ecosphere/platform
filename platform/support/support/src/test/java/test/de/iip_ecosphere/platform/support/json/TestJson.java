@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import de.iip_ecosphere.platform.support.json.IOIterator;
 import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.json.JsonArrayBuilder;
+import de.iip_ecosphere.platform.support.json.JsonIterator;
 import de.iip_ecosphere.platform.support.json.JsonObject;
 import de.iip_ecosphere.platform.support.json.JsonObjectBuilder;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
@@ -183,18 +184,28 @@ public class TestJson extends de.iip_ecosphere.platform.support.json.Json {
     }
 
     @Override
-    public JsonObject createObjectImpl(Reader reader) throws IOException {
+    protected JsonObject createObjectImpl(Reader reader) throws IOException {
         return TestJsonObject.createObject(reader);
     }
 
     @Override
-    public JsonObjectBuilder createObjectBuilderImpl() {
+    protected JsonObjectBuilder createObjectBuilderImpl() {
         return TestJsonObject.createObjectBuilder();
     }
 
     @Override
-    public JsonArrayBuilder createArrayBuilderImpl() {
+    protected JsonArrayBuilder createArrayBuilderImpl() {
         return TestJsonObject.createArrayBuilder();
+    }
+
+    @Override
+    protected JsonIterator parseImpl(String text) {
+        return null;
+    }
+
+    @Override
+    protected JsonIterator parseImpl(byte[] data) {
+        return null;
     }
 
 }

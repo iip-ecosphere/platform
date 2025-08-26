@@ -165,5 +165,17 @@ public class JsonTest {
         Assert.assertNotNull(a2);
         Assert.assertEquals(0, a2.size());
     }
+    
+    /**
+     * Tests {@link JsoniterAny}.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testJsonIter() throws IOException {
+        // not implemented here
+        Json.parse(new byte[0]);
+        Json.parse("");
+    }
 
 }
