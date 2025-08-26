@@ -13,16 +13,22 @@
 package test.de.oktoflow.platform.support.json.jackson;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.json.JsonArray;
+import de.iip_ecosphere.platform.support.json.JsonIterator;
+import de.iip_ecosphere.platform.support.json.JsonIterator.EntryIterator;
+import de.iip_ecosphere.platform.support.json.JsonIterator.ValueType;
 import de.iip_ecosphere.platform.support.json.JsonNumber;
 import de.iip_ecosphere.platform.support.json.JsonObject;
 import de.iip_ecosphere.platform.support.json.JsonString;
 import de.oktoflow.platform.support.json.jackson.JacksonJson;
+import de.oktoflow.platform.support.json.jackson.JsoniterAny;
 
 /**
  * Tests {@link Json}.
@@ -166,6 +172,78 @@ public class JsonTest {
         JsonArray a2 = a1.getJsonArray(3);
         Assert.assertNotNull(a2);
         Assert.assertEquals(0, a2.size());
+    }
+
+    /**
+     * Tests {@link JsoniterAny}.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testJsonIter() throws IOException {
+        JsonObject jobj = Json.createObjectBuilder()
+            .add("intVal", 1)
+            .add("strVal", "abc")
+            .add("boolVal", true)
+            .add("dblVal", 2.0)
+            .add("arr", Json.createArrayBuilder()
+                .add(1)
+                .add("str")
+                .add(true)
+                .add(Json.createArrayBuilder()) // as array builder
+                .build()) // as array value
+            .build();
+        String json = jobj.toString();
+        
+        JsonIterator iter = Json.parse(json);
+        Assert.assertNotNull(iter.getAnyKey());
+        Assert.assertEquals(ValueType.OBJECT, iter.valueType());
+        Assert.assertEquals(5, iter.size());
+        Assert.assertTrue(iter.containsKey("strVal"));
+        Assert.assertFalse(iter.containsKey("xyz"));
+        JsonIterator tmp = iter.get("intVal"); 
+        Assert.assertNotNull(tmp);
+        Assert.assertNull(tmp.getAnyKey());
+        Assert.assertEquals(ValueType.NUMBER, tmp.valueType());
+        Assert.assertEquals(1, tmp.toIntValue());
+        tmp = iter.get("strVal"); 
+        Assert.assertNotNull(tmp);
+        Assert.assertEquals(ValueType.STRING, tmp.valueType());
+        Assert.assertEquals("abc", tmp.toStringValue());
+        tmp = iter.get("boolVal"); 
+        Assert.assertNotNull(tmp);
+        Assert.assertEquals(ValueType.BOOLEAN, tmp.valueType());
+        Assert.assertEquals(true, tmp.toBooleanValue());
+        tmp = iter.get("dblVal"); 
+        Assert.assertNotNull(tmp);
+        Assert.assertEquals(ValueType.NUMBER, tmp.valueType());
+        Assert.assertEquals(2.0, tmp.toDoubleValue(), 0.01);
+        Assert.assertEquals(2.0, tmp.toFloatValue(), 0.01);
+        tmp = iter.get("arr"); 
+        Assert.assertNotNull(tmp);
+        Assert.assertEquals(ValueType.ARRAY, tmp.valueType());
+        JsonIterator arrTmp = tmp.get(0);
+        Assert.assertNotNull(arrTmp);
+        Assert.assertEquals(ValueType.NUMBER, arrTmp.valueType());
+
+        iter = Json.parse(json);
+        EntryIterator eIter = iter.entries();
+        Map<String, JsonIterator> entries = new HashMap<>();
+        while (eIter.next()) {
+            entries.put(eIter.key(), eIter.value());
+        }
+        Assert.assertEquals(5, entries.size());
+        Assert.assertTrue(entries.containsKey("arr"));
+        
+        byte[] data = json.getBytes();
+        iter = Json.parse(data);
+        tmp = iter.get("arr"); 
+        Assert.assertNotNull(tmp);
+        byte[] tmpData = iter.slice(data, tmp);
+        Assert.assertNotNull(tmpData);
+        Assert.assertTrue(tmpData.length < data.length);
+        String tmpStr = new String(tmpData);
+        Assert.assertTrue(tmpStr.startsWith("[") && tmpStr.endsWith("]"));
     }
 
 }

@@ -24,10 +24,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.jsoniter.any.Any;
 
 import de.iip_ecosphere.platform.support.json.IOIterator;
 import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.json.JsonArrayBuilder;
+import de.iip_ecosphere.platform.support.json.JsonIterator;
 import de.iip_ecosphere.platform.support.json.JsonObject;
 import de.iip_ecosphere.platform.support.json.JsonObjectBuilder;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
@@ -183,17 +185,35 @@ public class JacksonJson extends de.iip_ecosphere.platform.support.json.Json {
     }
 
     @Override
-    public JsonObject createObjectImpl(Reader reader) throws IOException {
+    protected JsonObject createObjectImpl(Reader reader) throws IOException {
         return JerseyJsonObject.createObject(reader);
     }
 
     @Override
-    public JsonObjectBuilder createObjectBuilderImpl() {
+    protected JsonObjectBuilder createObjectBuilderImpl() {
         return JerseyJsonObject.createObjectBuilder();
     }
 
     @Override
-    public JsonArrayBuilder createArrayBuilderImpl() {
+    protected JsonArrayBuilder createArrayBuilderImpl() {
         return JerseyJsonObject.createArrayBuilder();
     }
+    
+    @Override
+    protected JsonIterator parseImpl(String text) {
+        return new JsoniterAny(com.jsoniter.JsonIterator.deserialize(text));
+    }
+    
+    @Override
+    protected JsonIterator parseImpl(byte[] data) {
+        Any tmp;
+        // ensure (lazy) iterator :( // LazyIterator#parse ??
+        if (data[0] == ((byte) '[')) {
+            tmp = Any.lazyArray(data, 0, data.length);
+        } else {
+            tmp = Any.lazyObject(data, 0, data.length - 1);    
+        }
+        return new JsoniterAny(tmp);
+    }
+    
 }

@@ -42,6 +42,10 @@
       <groupId>org.glassfish</groupId>
       <artifactId>javax.json</artifactId>
     </dependency>    
+    <dependency> <!-- preliminary, move to plugin -->
+     <groupId>com.jsoniter</groupId>
+     <artifactId>jsoniter</artifactId>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
