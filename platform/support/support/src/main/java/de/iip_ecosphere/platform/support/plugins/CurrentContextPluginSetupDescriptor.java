@@ -13,20 +13,21 @@
 package de.iip_ecosphere.platform.support.plugins;
 
 /**
- * A default plugin setup descriptor taking the actual/parent classloader as actual one.
- * This descriptor is intended for plugins that do not need to load further classes or, in turn,
- * use the plugin mechanism for implementation.
+ * A default plugin setup descriptor taking the actual thread's context class loader or as fallback the specified 
+ * parent classloader as actual one. This descriptor is intended for plugins that do not need to load further classes 
+ * or, in turn, use the plugin mechanism for implementation.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class CurrentClassloaderPluginSetupDescriptor implements PluginSetupDescriptor {
+public class CurrentContextPluginSetupDescriptor implements PluginSetupDescriptor {
 
-    public static final CurrentClassloaderPluginSetupDescriptor INSTANCE 
-        = new CurrentClassloaderPluginSetupDescriptor();
-
+    public static final CurrentContextPluginSetupDescriptor INSTANCE 
+        = new CurrentContextPluginSetupDescriptor();
+    
     @Override
     public ClassLoader createClassLoader(ClassLoader parent) {
-        return parent;
+        ClassLoader result = Thread.currentThread().getContextClassLoader();
+        return null == result ? parent : result;
     }
 
 }

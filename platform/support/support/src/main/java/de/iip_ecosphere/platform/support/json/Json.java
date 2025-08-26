@@ -305,7 +305,7 @@ public abstract class Json {
      * @return the JSON object
      * @throws IOException if the object cannot be read/constructed
      */
-    public abstract JsonObject createObjectImpl(Reader reader) throws IOException;
+    protected abstract JsonObject createObjectImpl(Reader reader) throws IOException;
 
     /**
      * Creates a JSON object builder.
@@ -321,7 +321,7 @@ public abstract class Json {
      * 
      * @return the JSON object builder
      */
-    public abstract JsonObjectBuilder createObjectBuilderImpl();
+    protected abstract JsonObjectBuilder createObjectBuilderImpl();
 
     /**
      * Creates a JSON array builder.
@@ -337,6 +337,42 @@ public abstract class Json {
      * 
      * @return the JSON array builder
      */
-    public abstract JsonArrayBuilder createArrayBuilderImpl();
+    protected abstract JsonArrayBuilder createArrayBuilderImpl();
+
+    /**
+     * Parses text into an interatively parsable structure.
+     * 
+     * @param text the JSON text to parse
+     * @return the iterator, may indicate invalid data
+     */
+    protected abstract JsonIterator parseImpl(String text);
+
+    /**
+     * Parses data into an interatively parsable structure.
+     * 
+     * @param data the JSON data to parse
+     * @return the iterator, may indicate invalid data
+     */
+    protected abstract JsonIterator parseImpl(byte[] data);
+
+    /**
+     * Parses text into an interatively parsable structure.
+     * 
+     * @param text the JSON text to parse
+     * @return the iterator, may indicate invalid data
+     */
+    public static JsonIterator parse(String text) {
+        return prototype.parseImpl(text);
+    }
+
+    /**
+     * Parses data into an interatively parsable structure.
+     * 
+     * @param data the JSON data to parse
+     * @return the iterator, may indicate invalid data
+     */
+    public static JsonIterator parse(byte[] data) {
+        return prototype.parseImpl(data);
+    }
 
 }
