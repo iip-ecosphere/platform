@@ -13,24 +13,20 @@
 package de.iip_ecosphere.platform.connectors.parser;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.jsoniter.JsonIterator;
-import com.jsoniter.ValueType;
-import com.jsoniter.any.Any;
-import com.jsoniter.any.Any.EntryIterator;
-import com.jsoniter.spi.JsonException;
+import de.iip_ecosphere.platform.support.json.Json;
+import de.iip_ecosphere.platform.support.json.JsonIterator;
+import de.iip_ecosphere.platform.support.json.JsonIterator.EntryIterator;
+import de.iip_ecosphere.platform.support.json.JsonIterator.ValueType;
 
-import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.transport.serialization.QualifiedElement;
 import de.iip_ecosphere.platform.transport.serialization.QualifiedElementFactory;
 import de.iip_ecosphere.platform.support.function.IOConsumer;
-import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Implements the default input parser for JSON data. Name-based access shall be rather fast, however, 
@@ -41,36 +37,9 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
  * @author Holger Eichelberger, SSE
  */
 @MachineParser
-public final class JsonInputParser implements InputParser<Any> {
+public final class JsonInputParser implements InputParser<JsonIterator> {
     
     private static final JsonInputConverter CONVERTER = new JsonInputConverter();
-
-    private static final Class<?> LAZY_ANY_CLS;
-    private static final Field LAZY_ANY_HEAD_FIELD;
-    private static final Field LAZY_ANY_TAIL_FIELD;
-    
-    static {
-        Class<?> cls = JsonInputConverter.class; // a class that is not instance of LazyAny
-        Field hf = null;
-        Field tf = null;
-        try {
-            cls = Class.forName("com.jsoniter.any.LazyAny");
-            hf = cls.getDeclaredField("head");
-            hf.setAccessible(true);
-            tf = cls.getDeclaredField("tail");
-            tf.setAccessible(true);
-        } catch (ClassNotFoundException | NoSuchFieldException e) {
-            LoggerFactory.getLogger(JsonInputParser.class).error("Cannot find LazyAny class or its fields: " 
-                + e.getMessage() + " Disabling JSON stepIn-slicing.");
-        }
-        if (tf == null) {
-            cls = JsonInputConverter.class; // a class that is not instance of LazyAny
-            tf = null;
-        }
-        LAZY_ANY_CLS = cls;
-        LAZY_ANY_HEAD_FIELD = hf;
-        LAZY_ANY_TAIL_FIELD = tf;
-    }
     
     /**
      * Emulates a one-element entry "iterator".
@@ -80,7 +49,7 @@ public final class JsonInputParser implements InputParser<Any> {
     private static final class OneElementEntryIterator implements EntryIterator {
 
         private String key;
-        private Any value;
+        private JsonIterator value;
         
         /**
          * Creates the instance.
@@ -88,7 +57,7 @@ public final class JsonInputParser implements InputParser<Any> {
          * @param key the key of the only element
          * @param value the value of the only element
          */
-        private OneElementEntryIterator(String key, Any value) {
+        private OneElementEntryIterator(String key, JsonIterator value) {
             this.key = key;
             this.value = value;
         }
@@ -104,7 +73,7 @@ public final class JsonInputParser implements InputParser<Any> {
         }
 
         @Override
-        public Any value() {
+        public JsonIterator value() {
             return value;
         }
         
@@ -115,9 +84,9 @@ public final class JsonInputParser implements InputParser<Any> {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static final class JsonParseResult implements ParseResult<Any> {
+    public static final class JsonParseResult implements ParseResult<JsonIterator> {
 
-        private Any any;
+        private JsonIterator any;
         private byte[] data;
         private JsonParseResult parent;
 
@@ -127,7 +96,7 @@ public final class JsonInputParser implements InputParser<Any> {
          * @param data the data to parse/deserialize
          */
         private JsonParseResult(byte[] data) {
-            this(data, JsonIterator.deserialize(data), null);
+            this(data, Json.parse(data), null);
         }
 
         /**
@@ -137,7 +106,7 @@ public final class JsonInputParser implements InputParser<Any> {
          * @param any the jsoniter object representing the context
          * @param parent the parent parse result to jump back to in {@link #stepOut()}.
          */
-        private JsonParseResult(byte[] data, Any any, JsonParseResult parent) {
+        private JsonParseResult(byte[] data, JsonIterator any, JsonParseResult parent) {
             this.any = any;
             this.data = data;
             this.parent = parent;
@@ -149,10 +118,10 @@ public final class JsonInputParser implements InputParser<Any> {
         }
 
         @Override
-        public String getFieldName(IOConsumer<Any> valueCons, int... indexes) throws IOException {
+        public String getFieldName(IOConsumer<JsonIterator> valueCons, int... indexes) throws IOException {
             String result = "";
             if (any.size() == 1 && indexes.length == 1) {
-                result = any.asMap().keySet().iterator().next().toString(); // :(
+                result = any.getAnyKey();
                 if (null != valueCons) {
                     valueCons.accept(any.get(result));
                 }
@@ -178,7 +147,7 @@ public final class JsonInputParser implements InputParser<Any> {
         private EntryIterator findBy(int[] indexes) {
             EntryIterator result = null;
             if (indexes.length > 0) {
-                Any tmp = dataToAny();
+                JsonIterator tmp = Json.parse(data);
                 for (int i = 0; i < indexes.length; i++) {
                     int pos = indexes[i];
                     if (tmp.valueType() == ValueType.ARRAY) {
@@ -207,25 +176,9 @@ public final class JsonInputParser implements InputParser<Any> {
          * @param tmp the any to be considered
          * @return {@code tmp} or deserialized any
          */
-        private Any deserializeIfString(Any tmp) {
+        private JsonIterator deserializeIfString(JsonIterator tmp) {
             if (tmp.valueType() == ValueType.STRING) { // index assumes an object, try to parse
-                tmp = JsonIterator.deserialize(tmp.toString());
-            }
-            return tmp;
-        }
-        
-        /**
-         * Turns {@link #data} to any considering its "type".
-         * 
-         * @return any from {@link #data}
-         */
-        private Any dataToAny() {
-            Any tmp;
-            // ensure (lazy) iterator :( // LazyIterator#parse ??
-            if (data[0] == ((byte) '[')) {
-                tmp = Any.lazyArray(data, 0, data.length);
-            } else {
-                tmp = Any.lazyObject(data, 0, data.length - 1);    
+                tmp = Json.parse(tmp.toString());
             }
             return tmp;
         }
@@ -238,7 +191,7 @@ public final class JsonInputParser implements InputParser<Any> {
          */
         private EntryIterator findBy(int index) {
             EntryIterator result = null;
-            Any tmp = dataToAny();
+            JsonIterator tmp = Json.parse(data);
             if (tmp.valueType() == ValueType.ARRAY) {
                 result = new OneElementEntryIterator("", tmp.get(index));
             } else {
@@ -254,8 +207,8 @@ public final class JsonInputParser implements InputParser<Any> {
         }
 
         @Override
-        public Any getData(String name, int... indexes) throws IOException {
-            Any result = get(name, indexes);
+        public JsonIterator getData(String name, int... indexes) throws IOException {
+            JsonIterator result = get(name, indexes);
             if (result != null) {
                 return result;
             } else {
@@ -272,14 +225,14 @@ public final class JsonInputParser implements InputParser<Any> {
          *     {@link #getDataCount()}
          * @return the JSON object, may be <b>null</b> for not found
          */
-        private Any get(String name, int... indexes) {
-            Any result = null;
-            Any obj = any;
+        private JsonIterator get(String name, int... indexes) {
+            JsonIterator result = null;
+            JsonIterator obj = any;
             int start = 0;
             int end = 0;
             do {
                 if (obj.valueType() == ValueType.STRING) { // index assumes an object, try to parse
-                    obj = JsonIterator.deserialize(obj.toString());
+                    obj = Json.parse(obj.toString());
                 }
                 end = name.indexOf(SEPARATOR, start);
                 if (end > 0) {
@@ -305,8 +258,8 @@ public final class JsonInputParser implements InputParser<Any> {
         }
         
         @Override
-        public void getData(IOConsumer<Any> ifPresent, String name, int... indexes) throws IOException {
-            Any result = get(name, indexes);
+        public void getData(IOConsumer<JsonIterator> ifPresent, String name, int... indexes) throws IOException {
+            JsonIterator result = get(name, indexes);
             if (null != result) {
                 ifPresent.accept(result);
             }
@@ -321,9 +274,9 @@ public final class JsonInputParser implements InputParser<Any> {
          *     {@link #getDataCount()}
          * @return the JSON object, may be <b>null</b> for not found
          */
-        private Any getLocal(String name, int[] indexes) {
-            Any result = null;
-            if (any.keys().contains(name)) { // seems to be faster than direct access
+        private JsonIterator getLocal(String name, int[] indexes) {
+            JsonIterator result = null;
+            if (any.containsKey(name)) { // seems to be faster than direct access
                 result = any.get(name);    
             } else {
                 if (indexes.length > 0) {
@@ -337,8 +290,8 @@ public final class JsonInputParser implements InputParser<Any> {
         }
 
         @Override
-        public Any getLocalData(String name, int... indexes) throws IOException {
-            Any result = getLocal(name, indexes);
+        public JsonIterator getLocalData(String name, int... indexes) throws IOException {
+            JsonIterator result = getLocal(name, indexes);
             if (null == result) {
                 throw new IOException("No entry found for " + name + " / " + Arrays.toString(indexes));
             }
@@ -346,8 +299,8 @@ public final class JsonInputParser implements InputParser<Any> {
         }
 
         @Override
-        public void getLocalData(IOConsumer<Any> ifPresent, String name, int... indexes) throws IOException {
-            Any result = getLocal(name, indexes);
+        public void getLocalData(IOConsumer<JsonIterator> ifPresent, String name, int... indexes) throws IOException {
+            JsonIterator result = getLocal(name, indexes);
             if (null != result) {
                 ifPresent.accept(result);
             }
@@ -355,8 +308,7 @@ public final class JsonInputParser implements InputParser<Any> {
 
         @Override
         public JsonParseResult stepInto(String name, int index) throws IOException {
-            Any nested = any.get(name);
-            boolean deserialized = false;
+            JsonIterator nested = any.get(name);
             if (nested.valueType() == ValueType.INVALID) { // fallback
                 EntryIterator it = findBy(index);
                 if (null != it) {
@@ -366,26 +318,7 @@ public final class JsonInputParser implements InputParser<Any> {
                 }
             }
             if (nested.valueType() != ValueType.INVALID) { // fallback
-                if (nested.valueType() == ValueType.STRING) { // step into assumes an object, try to parse
-                    nested = JsonIterator.deserialize(nested.toString());
-                    deserialized = true;
-                }
-                byte[] topData = getTopData();
-                byte[] actData = topData; // jsoniter parsing happens on the same array
-                if (LAZY_ANY_CLS.isInstance(nested)) { // LazyIterator#parse -> JsonIterator may help but not available
-                    try { // no direct access but we need the correct slice of the underlying input data for indexes
-                        int head = (int) LAZY_ANY_HEAD_FIELD.get(nested);
-                        int tail = (int) LAZY_ANY_TAIL_FIELD.get(nested);
-                        actData = new byte[tail - head]; // exclude tail
-                        System.arraycopy(topData, head, actData, 0, actData.length);
-                        if (deserialized) {
-                            String tmp = JsonUtils.unescape(new String(actData));
-                            actData = tmp.getBytes();
-                        }
-                    } catch (IllegalAccessException e) {
-                        throw new IOException("Cannot determine head/tail to slice input data: " + e.getMessage());
-                    }
-                }
+                byte[] actData = any.slice(getTopData(), nested);
                 return new JsonParseResult(actData, nested, this);
             } else {
                 throw new IOException("Cannot determine element for " + name + " index: " + index);
@@ -421,123 +354,91 @@ public final class JsonInputParser implements InputParser<Any> {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static final class JsonInputConverter implements InputConverter<Any> {
+    public static final class JsonInputConverter implements InputConverter<JsonIterator> {
 
         @Override
-        public int toInteger(Any data) throws IOException {
-            try {
-                return data.toInt();
-            } catch (JsonException e) { // wrong format, we cannot read that
-                throw new IOException(e);
-            }
+        public int toInteger(JsonIterator data) throws IOException {
+            return data.toIntValue();
         }
 
         @Override
-        public byte toByte(Any data) throws IOException {
-            try {
-                return (byte) data.toInt();
-            } catch (JsonException e) { // wrong format, we cannot read that
-                throw new IOException(e);
-            }
+        public byte toByte(JsonIterator data) throws IOException {
+            return (byte) data.toIntValue();
         }
 
         @Override
-        public long toLong(Any data) throws IOException {
-            try {
-                return data.toLong();
-            } catch (JsonException e) { // wrong format, we cannot read that
-                throw new IOException(e);
-            }
+        public long toLong(JsonIterator data) throws IOException {
+            return data.toLongValue();
         }
 
         @Override
-        public short toShort(Any data) throws IOException {
-            try {
-                return (short) data.toInt();
-            } catch (JsonException e) { // wrong format, we cannot read that
-                throw new IOException(e);
-            }
+        public short toShort(JsonIterator data) throws IOException {
+            return (short) data.toIntValue();
         }
 
         @Override
-        public String toString(Any data) throws IOException {
-            try {
-                return data.toString();
-            } catch (JsonException e) { // wrong format, we cannot read that
-                throw new IOException(e);
-            }
+        public String toString(JsonIterator data) throws IOException {
+            return data.toStringValue();
         }
 
         @Override
-        public double toDouble(Any data) throws IOException {
-            try {
-                return data.toDouble();
-            } catch (JsonException e) { // wrong format, we cannot read that
-                throw new IOException(e);
-            }
+        public double toDouble(JsonIterator data) throws IOException {
+            return data.toDoubleValue();
         }
 
         @Override
-        public float toFloat(Any data) throws IOException {
-            try {
-                return data.toFloat();
-            } catch (JsonException e) { // wrong format, we cannot read that
-                throw new IOException(e);
-            }
+        public float toFloat(JsonIterator data) throws IOException {
+            return data.toFloatValue();
         }
 
         @Override
-        public boolean toBoolean(Any data) throws IOException {
-            try {
-                return data.toBoolean();
-            } catch (JsonException e) { // wrong format, we cannot read that
-                throw new IOException(e);
-            }
+        public boolean toBoolean(JsonIterator data) throws IOException {
+            return data.toBooleanValue();
         }
 
         @Override
-        public int[] toIntegerArray(Any data) throws IOException {
+        public int[] toIntegerArray(JsonIterator data) throws IOException {
             int[] dta = new int[data.size()];
             for (int j = 0; j < dta.length; j++) {
-                dta[j] = data.get(j).toInt();
+                dta[j] = data.get(j).toIntValue();
             }
             return dta; // exception?
         }
         
         @Override
-        public String[] toStringArray(Any data) throws IOException {
+        public String[] toStringArray(JsonIterator data) throws IOException {
             String[] dta = new String[data.size()];
             for (int j = 0; j < dta.length; j++) {
-                dta[j] = data.get(j).toString();
+                dta[j] = data.get(j).toStringValue();
             }
-            return dta; // exception?
+            return dta;
         }        
 
         @Override
-        public double[] toDoubleArray(Any data) throws IOException {
+        public double[] toDoubleArray(JsonIterator data) throws IOException {
             double[] dta = new double[data.size()]; 
             for (int j = 0; j < dta.length; j++) {
-                dta[j] = Double.parseDouble(data.get(j).toString());
+                dta[j] = Double.parseDouble(data.get(j).toStringValue());
             }
-            return dta; // exception?
+            return dta;
         }
 
         @Override
-        public byte[] toByteArray(Any data) throws IOException {
+        public byte[] toByteArray(JsonIterator data) throws IOException {
             byte[] dta = new byte[data.size()];
             for (int j = 0; j < dta.length; j++) {
-                dta[j] = (byte) data.get(j).toInt();
+                dta[j] = (byte) data.get(j).toIntValue();
             }
-            return dta; // exception?
+            return dta;
         }
         
         @Override
-        public Object toObject(Any data) throws IOException {
+        public Object toObject(JsonIterator data) throws IOException {
             return null; // preliminary
         }
 
         @Override
-        public <E> List<E> toList(Any data, Class<E> eltCls) throws IOException {
+        public <E> List<E> toList(JsonIterator data, Class<E> eltCls) throws IOException {
             List<E> result = new ArrayList<>(data.size());
             for (int i = 0; i < data.size(); i++) {
                 Object obj = data.get(i);
@@ -554,7 +455,7 @@ public final class JsonInputParser implements InputParser<Any> {
         }
 
         @Override
-        public <E> List<QualifiedElement<E>> toElementList(Any data, Class<E> eltCls) throws IOException {
+        public <E> List<QualifiedElement<E>> toElementList(JsonIterator data, Class<E> eltCls) throws IOException {
             List<QualifiedElement<E>> result = new ArrayList<>(data.size());
             for (int i = 0; i < data.size(); i++) {
                 Object obj = data.get(i);
@@ -573,21 +474,13 @@ public final class JsonInputParser implements InputParser<Any> {
         }
 
         @Override
-        public BigInteger toBigInteger(Any data) throws IOException {
-            try {
-                return data.toBigInteger();
-            } catch (JsonException e) { // wrong format, we cannot read that
-                throw new IOException(e);
-            }
+        public BigInteger toBigInteger(JsonIterator data) throws IOException {
+            return data.toBigIntegerValue();
         }
 
         @Override
-        public BigDecimal toBigDecimal(Any data) throws IOException {
-            try {
-                return data.toBigDecimal();
-            } catch (JsonException e) { // wrong format, we cannot read that
-                throw new IOException(e);
-            }
+        public BigDecimal toBigDecimal(JsonIterator data) throws IOException {
+            return data.toBigDecimalValue();
         }
 
     }
