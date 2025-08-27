@@ -169,6 +169,11 @@ public class JsoniterAny implements JsonIterator {
     }
 
     @Override
+    public String toString() {
+        return any.toString();
+    }
+
+    @Override
     public String toStringValue() throws IOException {
         try {
             return any.toString();
