@@ -15,10 +15,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.google.protobuf</groupId>
-      <artifactId>protobuf-java</artifactId>
-    </dependency>
-    <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>support.aas</artifactId>
      <version>${project.version}</version>
@@ -27,10 +23,6 @@
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>support.iip-aas</artifactId>
      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-text</artifactId>
     </dependency>
   
     <dependency>
@@ -42,6 +34,11 @@
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
