@@ -7,12 +7,15 @@ template PythonReqPlatform(IIPEcosphere config, FileArtifact target, Text text) 
 	// reading from requirements.txt is not bad but assumes usage of install package
 	// better to have them in a list in the model similar to #143
     def main(IIPEcosphere config, FileArtifact target, Text text) {
-        'pyyaml
-        pyflakes
-        websockets
-        pyzbar
-        opencv-python
-        numpy
-        Pillow'
+
+        setOf(Dependency) pythonDeps = config.platformPython.dependencies -> selectByType(PythonDependency);
+        for (PythonDependency d : pythonDeps) {
+            if (d.version == "") {
+                '${d.name}'
+            } else {
+                '${d.name} == ${d.version}'
+            }
+        }
     }	
+
 }
