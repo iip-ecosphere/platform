@@ -17,14 +17,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-
+import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.IOUtils;
 import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.resources.ResourceResolver;
@@ -84,7 +82,7 @@ public class ResourceClasspathPluginSetupDescriptor extends URLPluginSetupDescri
         if (null != in) {
             try {
                 List<File> entries = new ArrayList<File>();
-                String contents = IOUtils.toString(in, Charset.defaultCharset());
+                String contents = IOUtils.toString(in);
                 StringTokenizer tokenizer = new StringTokenizer(contents, ":;");
                 while (tokenizer.hasMoreTokens()) {
                     String tok = tokenizer.nextToken();

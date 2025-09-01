@@ -41,7 +41,7 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
     public static final String KEY_SETUP_DESCRIPTOR = "# setupDescriptor: ";
     public static final String KEY_PLUGIN_IDS = "# pluginIds: ";
 
-    private File folder;
+    private File installDir;
     private boolean descriptorOnly;
 
     /**
@@ -62,13 +62,13 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
      */
     public FolderClasspathPluginSetupDescriptor(File folder, boolean descriptorOnly, File... appends) {
         super(loadClasspathSafe(folder, descriptorOnly, appends));
-        this.folder = adjustBase(folder);
+        this.installDir = folder;
         this.descriptorOnly = descriptorOnly;
     }
 
     @Override
     public File getInstallDir() {
-        return folder;
+        return installDir;
     }
     
     /**
@@ -82,7 +82,7 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
         File result;
         suffix = suffix == null ? "" : suffix;
         if (folder.isFile()) {
-            result = folder; // unpacked, relocated
+            result = new File(folder + suffix); // unpacked, relocated
         } else {
             result = new File(folder, "classpath" + suffix); // unpacked
             if (!result.exists()) {
@@ -94,12 +94,12 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
         }
         return result;
     }
-
+    
     /**
      * Adjusts the base directory.
      * 
      * @param folder the folder to be used as base directory
-     * @return the base directory
+     * @return the adjusted base directory
      */
     public static File adjustBase(File folder) {
         File result = folder;
@@ -152,7 +152,7 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
     private static URL[] loadClasspathFileSafe(File cpFile, File base, boolean descriptorOnly, File... appends) {
         URL[] result = null;
         try (InputStream in = new FileInputStream(cpFile)) {
-            getLogger().info("Loading classpath from '{}'", cpFile);
+            getLogger().info("Loading classpath from '{}' (descriptorOnly: {})", cpFile, descriptorOnly);
             ClasspathFile cpf = readClasspathFile(in, base);
             if (null != appends) {
                 for (File a: appends) {
@@ -338,8 +338,8 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
                             getLogger().warn("Loading plugin descriptor for {}: {} not of type PluginDescriptor. "
                                 + "Ignoring", url, l);
                         }
-                    } catch (ClassNotFoundException | IllegalAccessException | InstantiationException 
-                        | ExceptionInInitializerError | SecurityException e) {
+                    } catch (NoClassDefFoundError | ClassNotFoundException | IllegalAccessException 
+                        | InstantiationException | ExceptionInInitializerError | SecurityException e) {
                         getLogger().warn("Loading plugin descriptor for {}: {} {}. Ignoring", 
                             url, e.getClass().getSimpleName(), e.getMessage());
                     }

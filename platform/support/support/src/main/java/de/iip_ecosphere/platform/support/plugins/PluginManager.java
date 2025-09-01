@@ -13,14 +13,20 @@
 package de.iip_ecosphere.platform.support.plugins;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.StringTokenizer;
+import java.util.function.Supplier;
 
+import de.iip_ecosphere.platform.support.IOUtils;
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
@@ -39,6 +45,22 @@ public class PluginManager {
      * Postfix of plugin id to indicate a default plugin that is also returned if no plugin id matches.
      */
     public static final String POSTFIX_ID_DEFAULT = "-default";
+
+    /**
+     * Prefix identification key for classpath meta-information on the setup descriptor.
+     */
+    public static final String KEY_SETUP_DESCRIPTOR = "# setupDescriptor: ";
+
+    /**
+     * Prefix identification key for sequence number meta-information on the setup descriptor.
+     */
+    public static final String KEY_SEQUENCE_NR = "# sequenceNr: ";
+
+    /**
+     * Prefix identification key for classpath meta-information on the optional plugin ids.
+     */
+    public static final String KEY_PLUGIN_IDS = "# pluginIds: ";
+    
     public static final String FILE_PLUGINS_PROPERTY = "okto.plugins";
     private static Map<String, Plugin<?>> plugins = new HashMap<>();
     private static Map<Class<?>, List<Plugin<?>>> pluginsByType = new HashMap<>();
@@ -158,6 +180,8 @@ public class PluginManager {
     
     static {
         loadPlugins(false);
+        // default ones by platform core components afterwards so that specific ones can take precedence
+        registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE);
     }
     
     /**
@@ -224,7 +248,7 @@ public class PluginManager {
      * @see #registerPlugin(PluginDescriptor, boolean, File)
      */
     private static void registerPlugin(PluginSetupDescriptor desc, boolean onlyNew) {
-        LoggerFactory.getLogger(PluginManager.class).info("Found plugin setup descriptor {}. Trying registration", 
+        LoggerFactory.getLogger(PluginManager.class).info("Found plugin setup descriptor {}. Trying registration...", 
             desc.getClass());
         boolean allowAll = !desc.preventDuplicates();
         ClassLoader loader = PluginManager.class.getClassLoader();
@@ -329,6 +353,321 @@ public class PluginManager {
                 result = desc.getClass().getClassLoader();
             }
         }
+        return result;
+    }
+
+    /**
+     * Loads all plugins in {@code folder}, either in individual folders per plugin or merged into on jar folder with 
+     * individual classpath files.
+     * 
+     * @param folder the parent folder of the plugins folder or of the classpaths (jars in parent folder)
+     * @param local additional local plugin setup descriptors to be considered before the file-based ones
+     */
+    public static void loadAllFrom(File folder, PluginSetupDescriptor... local) {
+        loadAllFrom(folder, null, local);
+    }
+
+    /**
+     * Loads all plugins in {@code folder}, either in individual folders per plugin or merged into on jar folder with 
+     * individual classpath files.
+     * 
+     * @param folder the parent folder of the plugins folder or of the classpaths (jars in parent folder)
+     * @param filter optional filter removing those plugins that shall not be loaded, e.g., as covered by 
+     *     {@code local}; may be <b>null</b> for none
+     * @param local additional local plugin setup descriptors to be considered before the file-based ones
+     */
+    public static void loadAllFrom(File folder, PluginFilter filter, PluginSetupDescriptor... local) {
+        File[] files = folder.listFiles();
+        for (File f : files) {
+            File cpFile;
+            if (f.isDirectory()) { // test unpacking with contained jars
+                cpFile = new File(f, "classpath"); // by convention
+            } else { // resolved, relocated
+                cpFile = f;
+            }
+            if (!cpFile.exists()) {
+                LoggerFactory.getLogger(PluginManager.class).warn("No plugin classpath file {}. Ignoring.", cpFile);
+            } else {
+                loadPluginFrom(cpFile, files.length, filter, local);
+            }
+        }
+    }
+    
+    /**
+     * Extracts the suffix after removing the prefix.
+     * 
+     * @param prefix the prefix to look for, may be <b>null</b>
+     * @param line the line to extract the suffix from
+     * @param dflt the default value if there is no prefix, usually {@code line}
+     * @return {@code line} or the line without the prefix
+     */
+    private static String extractSuffix(String prefix, String line, String dflt) {
+        String result = dflt;
+        if (null != prefix && line.startsWith(prefix)) {
+            result = line.substring(prefix.length()).trim();
+        }
+        return result;
+    }
+    
+    /**
+     * Collects information about a plugin.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class PluginInfo {
+
+        private int sequenceNr;
+        private File file;
+        private Supplier<PluginSetupDescriptor> supplier = null;
+        private List<String> pluginIds;
+        
+        /**
+         * Creates an instance for local setup descriptors.
+         * 
+         * @param supplier the supplier to create the descriptor
+         */
+        private PluginInfo(Supplier<PluginSetupDescriptor> supplier) {
+            this(null, supplier, Integer.MIN_VALUE, null);
+        }
+        
+        /**
+         * Creates an instance.
+         * 
+         * @param file the file path to the plugin
+         * @param supplier the setup descriptor supplier
+         * @param sequenceNr the indicative plugin loading sequence number
+         * @param pluginIds the dependent plugin ids to be considered, may be <b>null</b>
+         */
+        private PluginInfo(File file, Supplier<PluginSetupDescriptor> supplier, int sequenceNr, 
+            List<String> pluginIds) {
+            this.file = file;
+            this.supplier = supplier;
+            this.sequenceNr = sequenceNr;
+            this.pluginIds = pluginIds;
+        }
+
+        /**
+         * Returns the name of the plugin.
+         * 
+         * @return the name
+         */
+        public String getName() {
+            return null == file ? "" : file.getName();
+        }
+        
+        /**
+         * Returns the initial loading sequence number.
+         * 
+         * @return the initial sequence number
+         */
+        public int getSequenceNr() {
+            return sequenceNr;
+        }
+        
+        /**
+         * Returns whether this plugin has dependent plugin ids.
+         * 
+         * @return {@code true} for dependent plugin ids, {@code false} else
+         */
+        public boolean hasPluginIds() {
+            return pluginIds != null && pluginIds.size() > 0;
+        }
+        
+    }
+
+    /**
+     * Allows to filter out plugins that shall not be loaded. Local plugins will not be subject to filtering.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface PluginFilter {
+        
+        /**
+         * Returns whether {@code info} shall be loaded/registered.
+         * 
+         * @param info the info to be considered
+         * @return {@code true} for load/register, {@code false} else
+         */
+        public boolean accept(PluginInfo info);
+        
+    }
+
+    /**
+     * Creates a {@link PluginInfo} and adds it to the set of plugins to load.
+     * 
+     * @param toLoad the list of plugins to load
+     * @param cpFile the classpath file defining the plugin
+     * @param sequenceNr the indicative sequence number to load the plugin
+     * @param supplier the supplier to create the setup descriptor
+     */
+    private static void addToLoad(List<PluginInfo> toLoad, File cpFile, int sequenceNr, 
+        Supplier<PluginSetupDescriptor> supplier) {
+        addToLoad(toLoad, cpFile, sequenceNr, supplier, null);
+    }
+
+    /**
+     * Creates a {@link PluginInfo} and adds it to the set of plugins to load.
+     * 
+     * @param toLoad the list of plugins to load
+     * @param cpFile the classpath file defining the plugin
+     * @param sequenceNr the indicative sequence number to load the plugin
+     * @param supplier the supplier to create the setup descriptor
+     * @param pluginIds the dependent plugin ids to be considered, may be <b>null</b>
+     */
+    private static void addToLoad(List<PluginInfo> toLoad, File cpFile, int sequenceNr, 
+        Supplier<PluginSetupDescriptor> supplier, List<String> pluginIds) {
+        if (null != supplier) {
+            toLoad.add(new PluginInfo(cpFile, supplier, sequenceNr, pluginIds));
+        }
+    }
+    
+    /**
+     * Parses the plugin sequence number.
+     * 
+     * @param cpFile the plugin being processed (for logging)
+     * @param text the text representing the sequence number, may be <b>null</b>
+     * @param dflt the default sequence number to use in case of parsing problems
+     * @return the sequence number
+     */
+    private static int parseSequenceNr(File cpFile, String text, int dflt) {
+        int result = dflt;
+        if (null != text) {
+            try {
+                result = Integer.parseInt(text);
+            } catch (NumberFormatException e) {
+                LoggerFactory.getLogger(PluginManager.class).warn("Sequence number of plugin {} is not a "
+                    + "number ({}). Using {}.", cpFile, e.getMessage(), dflt);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Loads the plugin specified by its classpath file and its jar file folder based on metadata in the classpath file.
+     * 
+     * @param cpFile the classpath file
+     * @param filter optional filter removing those plugins that shall not be loaded, e.g., as covered by 
+     *     {@code local}; may be <b>null</b> for none
+     * @param local additional local plugin setup descriptors to be considered before the file-based ones
+     */
+    private static void loadPluginFrom(File cpFile, int maxFiles, PluginFilter filter, PluginSetupDescriptor... local) {
+        List<PluginInfo> toLoad = new ArrayList<>();
+        int seqNr = maxFiles + 1; // give explicitly specified ones precedence
+        try (FileInputStream fis = new FileInputStream(cpFile)) {
+            List<String> lines = IOUtils.readLines(fis, Charset.defaultCharset());
+            String setupDescriptor = null;
+            String pluginIds = null;
+            String sequenceNr = null;
+            for (String line: lines) {
+                setupDescriptor = extractSuffix(KEY_SETUP_DESCRIPTOR, line, setupDescriptor);
+                pluginIds = extractSuffix(KEY_PLUGIN_IDS, line, pluginIds);
+                sequenceNr = extractSuffix(KEY_SEQUENCE_NR, line, sequenceNr);
+            }
+            setupDescriptor = setupDescriptor == null ? "FolderClasspath" : setupDescriptor;
+            setupDescriptor = setupDescriptor.toLowerCase();
+            pluginIds = pluginIds == null ? "" : pluginIds;
+            int pSeqNr = parseSequenceNr(cpFile, sequenceNr, seqNr);
+
+            switch (setupDescriptor) {
+            case "folderclasspath":
+                addToLoad(toLoad, cpFile, pSeqNr, () -> new FolderClasspathPluginSetupDescriptor(cpFile));
+                break;
+            case "currentcontext":
+                addToLoad(toLoad, cpFile, pSeqNr, () -> CurrentContextPluginSetupDescriptor.INSTANCE);
+                break;
+            case "currentclassloader":
+                addToLoad(toLoad, cpFile, pSeqNr, () -> CurrentClassloaderPluginSetupDescriptor.INSTANCE);
+                break;
+            case "pluginbased":
+                StringTokenizer plIds = new StringTokenizer(pluginIds, ",");
+                List<String> ids = new ArrayList<>();
+                while (plIds.hasMoreTokens()) {
+                    ids.add(plIds.nextToken().trim());
+                }
+                String plId = ids.size() > 0 ? ids.get(0) : "";
+                addToLoad(toLoad, cpFile, pSeqNr, () -> new PluginBasedSetupDescriptor(plId), ids);
+                break;
+            case "process":
+                addToLoad(toLoad, cpFile, pSeqNr, () -> new FolderClasspathPluginSetupDescriptor(cpFile, true));
+                break;
+            case "":
+            case "none":
+                // do not load!
+                break;
+            default:
+                try {
+                    Class<?> cls = Class.forName(setupDescriptor);
+                    Object inst = cls.newInstance();
+                    if (inst instanceof PluginSetupDescriptor) {
+                        addToLoad(toLoad, cpFile, pSeqNr, () -> (PluginSetupDescriptor) inst);
+                    } else {
+                        LoggerFactory.getLogger(PluginManager.class).warn("Plugin setup descriptor for "
+                            + "plugin {} is not instanceof PluginSetupDescriptor. Ignoring. Reason: {}", cpFile);
+                    }
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                    LoggerFactory.getLogger(PluginManager.class).warn("Cannot determine plugin setup descriptor for "
+                        + "plugin classpath file {}. Ignoring. Reason: {}", cpFile, e.getMessage());
+                }
+                break;
+            }
+            seqNr++;
+        } catch (IOException e) {
+            LoggerFactory.getLogger(PluginManager.class).warn("Cannot load plugin classpath file {}. "
+                + "Ignoring. Reason: {}", cpFile, e.getMessage());
+        }
+        // filter out those that shall not be loaded
+        if (null != filter) {
+            toLoad.removeIf(i -> !filter.accept(i));
+        }
+        sortPlugins(toLoad);
+        // add those that shall be loaded anyway
+        for (PluginSetupDescriptor l: local) {
+            toLoad.add(0, new PluginInfo(() -> l));
+        }
+        // and register/load all remaining
+        for (PluginInfo info : toLoad) {
+            registerPlugin(info.supplier.get());
+        }
+    }
+    
+    /**
+     * Sorts the plugins, basically according to their initial sequence number and then, if given, after the last 
+     * specified dependent plugin (or if not matching at the end).
+     * 
+     * @param infos the plugin informations to sort
+     */
+    private static List<PluginInfo> sortPlugins(List<PluginInfo> infos) {
+        Collections.sort(infos, (i1, i2) -> Integer.compare(i1.getSequenceNr(), i2.getSequenceNr()));
+        List<PluginInfo> result = new ArrayList<>();
+        List<PluginInfo> secondary = new ArrayList<>();
+        for (PluginInfo info : infos) {
+            if (info.hasPluginIds()) {
+                secondary.add(info);
+            } else {
+                result.add(info);
+            }
+        }
+        int beforeSize = -1; // permit one round
+        while (!secondary.isEmpty() && beforeSize != secondary.size()) {
+            int tmpBeforeSize = secondary.size();
+            for (int s = secondary.size() - 1; s >= 0; s--) {
+                PluginInfo info = secondary.get(s);
+                List<String> infoPluginIds = info.pluginIds;
+                int foundCount = 1;
+                int insertPos = -1;
+                for (int r = 0; r < result.size() && foundCount < infoPluginIds.size(); r++) {
+                    if (infoPluginIds.contains(result.get(r).getName())) {
+                        foundCount++;
+                        insertPos = r;
+                    }
+                }
+                if (foundCount == infoPluginIds.size()) {
+                    result.add(insertPos, secondary.remove(s));
+                }
+            }
+            beforeSize = tmpBeforeSize;
+        }
+        result.addAll(secondary);
         return result;
     }
 
