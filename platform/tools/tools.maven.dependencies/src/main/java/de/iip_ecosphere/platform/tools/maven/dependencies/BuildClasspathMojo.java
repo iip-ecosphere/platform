@@ -120,6 +120,15 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
     public void setBefores(List<String> befores) {
         this.befores = befores;
     }
+    
+    /**
+     * Returns the befores.
+     * 
+     * @return the befores, may be <b>null</b>
+     */
+    public List<String> getBefores() {
+        return this.befores;
+    }
 
     /**
      * Returns the classpath contents as a collection of entries/tokens.
@@ -194,6 +203,7 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
             appends = copy(initialAppends, TO_WIN);
             prepends = copy(initialPrepends, TO_WIN);
             lineSeparator = "\r\n";
+            adjustTo(TO_WIN);
             doExecuteImpl();
 
             outputFile = new File(initialOutputFile.toString() + "-linux");
@@ -204,9 +214,18 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
             setPrefix(TO_LINUX.apply(initialPrefix));
             appends = copy(initialAppends, TO_LINUX);
             prepends = copy(initialPrepends, TO_LINUX);
+            adjustTo(TO_LINUX);
             lineSeparator = "\n";
             doExecuteImpl();
         }
+    }
+
+    /**
+     * Adjusts the setup.
+     * 
+     * @param func the adjustment function
+     */
+    public void adjustTo(Function<String, String> func) {
     }
     
     /**

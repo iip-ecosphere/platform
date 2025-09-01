@@ -38,18 +38,22 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
     @Parameter( defaultValue = "${project.build.directory}", readonly = true )
     private File targetDirectory;
 
+    @Parameter( required = false )
+    private boolean asTest;
+
     @Override
     protected void doExecute() throws MojoExecutionException {
-        excludeArtifactIds = Layers.getExcludeArtifactIds(getProject().getArtifactId(), excludeArtifactIds, getLog());
+        excludeArtifactIds = Layers.getExcludeArtifactIds(getProject().getArtifactId(), excludeArtifactIds, 
+            asTest, getLog());
         setPrependGroupId(true);
         if (outputDirectory == null || outputDirectory.getName().equals("")) {
-            setOutputDirectory(new File(targetDirectory, "jars"));
+            setOutputDirectory(new File(targetDirectory, "jars" + (asTest ? "-test" : "")));
         }
         overWriteReleases = false;
         overWriteSnapshots = true;
         overWriteIfNewer = true;
         if (null == includeScope || includeScope.length() == 0) { // if not defined, default it
-            if (addTestArtifact) {
+            if (addTestArtifact || asTest) {
                 includeScope = "test";
             } else {
                 includeScope = "runtime";

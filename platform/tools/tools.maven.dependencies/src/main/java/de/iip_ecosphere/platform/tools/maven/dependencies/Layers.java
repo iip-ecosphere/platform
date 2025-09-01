@@ -45,7 +45,7 @@ public class Layers {
      * @param excludeIds the given excludeArtifactids
      * @return {@code excludeIds} or the known exclude ids
      */
-    public static String getExcludeArtifactIds(String artifactId, String excludeIds, Log log) {
+    public static String getExcludeArtifactIds(String artifactId, String excludeIds, boolean asTest, Log log) {
         String result = excludeIds;
         if (null == result || result.length() == 0) {
             int last = -1; // e.g. test has no excludes
@@ -72,6 +72,16 @@ public class Layers {
                 result2 = "support, support.aas, support.iip-aas, transport, services.environment, services, deviceMgt";
             } // further cases
             log.info("CP " + result2);*/
+        }
+        if (asTest) {
+            if (result == null) {
+                result = "";
+            }
+            if (result.length() > 0) {
+                result += ", ";
+            }
+            result += "junit, junit-jupiter-api, junit-jupiter-engine, junit-jupiter-params, junit-platform-commons, "
+                + "junit-platform-engine";
         }
         if (log != null && result != null && result.length() > 0) {
             log.info("Using excludeArtifactIds: " + result);

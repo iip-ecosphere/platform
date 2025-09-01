@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -36,7 +37,10 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
     public static final String KEY_UNPACK_MODE = "# unpackMode: ";
     public static final String KEY_SETUP_DESCRIPTOR = "# setupDescriptor: ";
     public static final String KEY_PLUGIN_IDS = "# pluginIds: ";
-    
+    public static final String KEY_SEQUENCE_NR = "# sequenceNr: ";
+
+    private final String prefix = "target/jars";
+   
     @Parameter( property = "mdep.addTestArtifact", defaultValue = "false" )
     private boolean addTestArtifact;
 
@@ -48,6 +52,9 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
 
     @Parameter( property = "mdep.pluginIds", defaultValue = "" )
     private List<String> pluginIds;
+    
+    @Parameter( required = false )
+    private boolean asTest;
 
     @Parameter( defaultValue = "${project.build.directory}", readonly = true )
     private File targetDirectory;
@@ -92,12 +99,12 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
         return getRelTargetDirectory() + "/" + getProject().getArtifactId() + "-" + getProject().getVersion() 
             + classifier + extension;
     }
-    
+
     @Override
     protected void doExecute() throws MojoExecutionException {
-        final String prefix = "target/jars";
-        excludeArtifactIds = Layers.getExcludeArtifactIds(getProject().getArtifactId(), excludeArtifactIds, getLog());
-        setOutputFile(new File(targetDirectory, "jars/classpath"));
+        excludeArtifactIds = Layers.getExcludeArtifactIds(getProject().getArtifactId(), excludeArtifactIds, 
+            asTest, getLog());
+        setOutputFile(new File(targetDirectory, "jars" + (asTest ? "-test" : "") + "/classpath"));
         setPrependGroupId(true);
         overWriteIfNewer = true;
         setLocalRepoProperty(prefix);
@@ -105,7 +112,7 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
         setFileSeparator("/");
         setPathSeparator(":");
         if (null == includeScope || includeScope.length() == 0) { // if not defined, default it
-            if (addTestArtifact) {
+            if (addTestArtifact || asTest) {
                 includeScope = "test";
             } else {
                 includeScope = "runtime";
@@ -113,19 +120,33 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
         }
         List<String> prepends = new ArrayList<>();
         prepends.add(composeMyArtifact("", "jar"));
-        if (addTestArtifact) {
+        if (addTestArtifact || asTest) {
             prepends.add(composeMyArtifact("tests", "jar")); // default Maven classifier
         }
         setPrepends(prepends);
+        composeBefores(null);
+        super.doExecute();
+    }
+    
+    @Override
+    public void adjustTo(Function<String, String> func) {
+        composeBefores(func);
+    }
+
+    /**
+     * Composes and sets the befores.
+     * 
+     * @param func a path adjustment function, may be <b>null</b>
+     */
+    private void composeBefores(Function<String, String> func) {
         List<String> befores = new ArrayList<>();
-        befores.add(KEY_PREFIX + prefix);
+        befores.add(KEY_PREFIX + (null != func ? func.apply(prefix) : prefix));
         befores.add(KEY_UNPACK_MODE + unpackMode);
         befores.add(KEY_SETUP_DESCRIPTOR + setupDescriptor);
         if (pluginIds != null && pluginIds.size() > 0) {
             befores.add(KEY_PLUGIN_IDS + String.join(", ", pluginIds));
         }
         setBefores(befores);
-        super.doExecute();
     }
         
 }

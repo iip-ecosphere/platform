@@ -84,7 +84,7 @@ public class SplitClasspathMojo extends AbstractMojo {
                 Collections.addAll(mainPatterns, "transport-", "support-", "support.aas-", "support.iip-aas-", 
                     "connectors-", "services.environment-", "services.spring.loader-");
                 // preliminary, to become plugins
-                Collections.addAll(mainPatterns, "commons-io", "commons-lang3", "jackson-", "micrometer-core");
+                Collections.addAll(mainPatterns, "commons-io", "commons-lang3", "jackson-", "joda-", "jsoniter");
             }
             for (File f: archiveFiles) {
                 processFile(f);

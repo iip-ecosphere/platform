@@ -21,6 +21,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -114,6 +115,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         
         @Parameter(required = false) 
         private List<String> appends;
+        private boolean asTest;
         
         /**
          * Returns whether this item has appends.
@@ -123,7 +125,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         private boolean hasAppends() {
             return null != appends && !appends.isEmpty();
         }
-        
+
     }
     
     /**
@@ -171,9 +173,10 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
     
     @Override
     public void doExecute() throws MojoExecutionException, MojoFailureException {
+        File targetDir = relocate ? relocateTarget : new File(targetDirectory, "oktoPlugins");
         setForceCleanup(true);
         FileSet cleanup = new FileSet();
-        cleanup.setDirectory((relocate ? relocateTarget : new File(targetDirectory, "oktoPlugins")).toString());
+        cleanup.setDirectory(targetDir.toString());
         setCleanup(cleanup);
 
         if (!relocate) {
@@ -203,7 +206,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                 item.setArtifactId(artId);
                 item.setVersion(StringUtils.isBlank(version) ? pl.getVersion() : version);
                 item.setType("zip");
-                item.setClassifier("plugin");
+                item.setClassifier("plugin" + (pl.asTest ? "-test" : ""));
                 item.setOverWrite(String.valueOf(true));
                 item.setOutputDirectory(getOutputDir(artId));
                 getLog().info("Configuring plugin '" + artId + "' -> " + item.getOutputDirectory());
@@ -267,7 +270,9 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                                 prefix = fixPrefix(prefix, tokenizer);
                                 while (tokenizer.hasMoreTokens()) {
                                     String token = tokenizer.nextToken();
-                                    token = "../" + name + "/" + token; // relative path for other plugins
+                                    if (!relocate) {
+                                        token = "../" + name + "/" + token; // relative path for other plugins
+                                    }
                                     result.add(token);
                                 }
                             }
@@ -334,7 +339,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
          */
         private Tokenizer(String line) {
             tokenizer = new StringTokenizer(line, sep);
-            if (tokenizer.countTokens() < 1) {
+            if (tokenizer.countTokens() <= 1) {
                 sep = ";";
                 tokenizer = new StringTokenizer(line, sep);
                 win = true;
@@ -412,6 +417,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             // cleanup
             FileUtils.deleteQuietly(new File(tgtDir, "target"));
         } 
+        int seqNr = 1;
         for (String cpFile : classpathFiles) {
             File src;
             File tgt;
@@ -436,6 +442,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                 List<String> contents = IOUtils.readLines(fis, Charset.defaultCharset());
                 fis.close();
                 PrintStream out = new PrintStream(new FileOutputStream(tgt));
+                out.println(BuildPluginClasspathMojo.KEY_SEQUENCE_NR + seqNr);
                 String prefix = null;
                 String mode = null;
                 for (String line : contents) {
@@ -447,7 +454,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                         Tokenizer tokenizer = new Tokenizer(line);
                         prefix = fixPrefix(prefix, tokenizer);
                         if (relocate) {
-                            processCpLineRelocation(mode, out, tokenizer, prefix, relocateTarget);
+                            processCpLineRelocation(cpFile, mode, out, tokenizer, prefix, relocateTarget);
                         } else {
                             processCpLineNoRelocation(cpFile, line, out, tokenizer);
                         }
@@ -461,22 +468,40 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             } catch (IOException e) {
                 throw new MojoFailureException("Cannot postprocess " + src + ": " + e.getMessage());
             }
+            seqNr++;
         }
     }
+    
+    // checkstyle: stop parameter number check
     
     /**
      * Processes a classpath line while plugin relocation. 
      * 
+     * @param name the name of the plugin
      * @param mode the unpack mode, may be <b>null</b>
      * @param out the output stream for the rewritten classpath file
      * @param tokenizer the tokenizer
      * @param prefix the classpath token prefix
      * @param jarFolder the folder where to copy the jars to
      */
-    private void processCpLineRelocation(String mode, PrintStream out, Tokenizer tokenizer, String prefix, 
+    private void processCpLineRelocation(String name, String mode, PrintStream out, Tokenizer tokenizer, String prefix, 
         File jarFolder) {
+        List<String> tokens = new ArrayList<>();
         while (tokenizer.hasMoreTokens()) {
-            String token = tokenizer.nextToken();
+            tokens.add(tokenizer.nextToken());
+        }
+        Set<String> knownTokens = new HashSet<>(tokens);
+        List<String> plAppends = pluginAppends.get(name);
+        if (null != plAppends) {
+            for (String cp: plAppends) {
+                if (!knownTokens.contains(cp)) {
+                    tokens.add(cp);
+                }
+            }            
+        }
+        Iterator<String> tokenIter = tokens.iterator();
+        while (tokenIter.hasNext()) {
+            String token = tokenIter.next();
             if (tokenizer.win) {
                 token = token.replace("target\\jars\\", "jars\\");
                 token = token.replace("target\\", "jars\\");
@@ -489,11 +514,13 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                 token = resolve(token, jarFolder);
             }
             out.print(token);
-            if (tokenizer.hasMoreTokens()) {
+            if (tokenIter.hasNext()) {
                 out.print(tokenizer.sep);
             }
-        }        
+        }
     }
+    
+    // checkstyle: resume parameter number check
     
     /**
      * Processes a classpath line without plugin relocation. 

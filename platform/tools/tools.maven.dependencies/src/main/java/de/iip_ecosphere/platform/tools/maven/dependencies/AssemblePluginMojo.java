@@ -51,6 +51,9 @@ public class AssemblePluginMojo extends AbstractMojo {
   
     @Parameter( property = "mdep.unpackMode", defaultValue = "jars" )
     private String unpackMode;
+    
+    @Parameter( required = false )
+    private boolean asTest;
 
     @Parameter( defaultValue = "${project}", readonly = true, required = true )
     private MavenProject project;
@@ -67,10 +70,9 @@ public class AssemblePluginMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         String namePrefix = project.getArtifactId() + "-" + project.getVersion();
-        File outputFile = new File(targetDirectory, namePrefix + "-plugin.zip");
-        File jarsDir = new File(targetDirectory, "jars");
+        File outputFile = new File(targetDirectory, namePrefix + "-plugin" + (asTest ? "-test" : "") + ".zip");
+        File jarsDir = new File(targetDirectory, "jars" + (asTest ? "-test" : ""));
         getLog().info("Building " + outputFile);
-        
         FileUtils.deleteQuietly(outputFile);
         try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outputFile))) {
             if (!addClasspathFiles(out, jarsDir)) { 
@@ -78,7 +80,7 @@ public class AssemblePluginMojo extends AbstractMojo {
                 addClasspathFiles(out, new File(targetDirectory, "classes"));
             }
             addFile(out, new File(targetDirectory, namePrefix + ".jar"), "target/");
-            if (addTestArtifact) {
+            if (addTestArtifact || asTest) {
                 addFile(out, new File(targetDirectory, namePrefix + "-tests.jar"), "target/");
             }
             Set<File> excluded = new HashSet<>();
@@ -97,7 +99,7 @@ public class AssemblePluginMojo extends AbstractMojo {
         } catch (IOException e) {
             getLog().error("While packaging '" + outputFile + "': " + e.getMessage());
         }
-        projectHelper.attachArtifact(project, "zip", "plugin", outputFile);
+        projectHelper.attachArtifact(project, "zip", "plugin" + (asTest ? "-test" : ""), outputFile);
     }
 
     /**
