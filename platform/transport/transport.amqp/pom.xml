@@ -74,6 +74,11 @@
       <artifactId>json-simple</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <scope>test</scope>
+    </dependency>      
   </dependencies>
 
   <build>
