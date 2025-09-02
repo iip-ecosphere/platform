@@ -29,10 +29,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.apache.commons.lang.SystemUtils;
-
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.processInfo.ProcessInfoFactory;
@@ -233,7 +232,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunna
         // https://stackoverflow.com/questions/47160990/how-to-determine-32-bit-os-or-64-bit-os-from-java-application
         String os = "";
         String arch = null;
-        if (SystemUtils.IS_OS_WINDOWS) {
+        if (OsUtils.isWindows()) {
             os = "win";
             String winArch = System.getenv("PROCESSOR_ARCHITECTURE");
             String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
@@ -244,7 +243,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunna
             os = "linux";
         }
         if (null == arch) {
-            if (SystemUtils.OS_ARCH.endsWith("64")) {
+            if (OsUtils.getOsArch().endsWith("64")) {
                 arch = "64";
             } else {
                 arch = "32";
@@ -263,7 +262,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunna
      */
     public static String getExecutableSuffix() {
         String result = "";
-        if (SystemUtils.IS_OS_WINDOWS) {
+        if (OsUtils.isWindows()) {
             result = ".exe";
         }
         return result;
