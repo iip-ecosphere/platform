@@ -8,7 +8,9 @@ template DockerfilePlatform(IIPEcosphere config, FileArtifact target) {
 	
     def main(IIPEcosphere config, FileArtifact target) {
 
-        '${getPythonBaseImage(config.platformPython.key)}'
+        SystemDependency platformPythonVersion = getPlatformPythonValueSafe(config);
+        
+        '${getPythonBaseImage(platformPythonVersion.key)}'
         ''
         'RUN apt-get update -y && apt install wget -y && wget https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.deb && dpkg -i jdk-21_linux-x64_bin.deb'
 

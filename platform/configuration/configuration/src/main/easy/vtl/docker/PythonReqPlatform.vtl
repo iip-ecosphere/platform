@@ -1,4 +1,5 @@
 import Basics;
+import DockerBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
@@ -8,7 +9,8 @@ template PythonReqPlatform(IIPEcosphere config, FileArtifact target, Text text) 
 	// better to have them in a list in the model similar to #143
     def main(IIPEcosphere config, FileArtifact target, Text text) {
 
-        setOf(Dependency) pythonDeps = config.platformPython.dependencies -> selectByType(PythonDependency);
+        SystemDependency platformPythonVersion = getPlatformPythonValueSafe(config);
+        setOf(Dependency) pythonDeps = platformPythonVersion.dependencies -> selectByType(PythonDependency);
         for (PythonDependency d : pythonDeps) {
             if (d.version == "") {
                 '${d.name}'

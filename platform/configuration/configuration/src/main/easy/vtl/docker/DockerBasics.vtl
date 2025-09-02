@@ -240,4 +240,13 @@ template DockerBasics(Configuration config, FileArtifact target) {
         pythonBaseImage;
     }
 
+    def SystemDependency getPlatformPythonValueSafe(IIPEcosphere cfg) {
+        SystemDependency res;
+        if (isDefined(cfg.platformPython) and cfg.platformPython <> null) {
+            res = cfg.platformPython;
+        } else {
+            res = cfg.platformPythonDflt;
+        }
+        res;
+    }
 }
