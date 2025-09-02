@@ -110,7 +110,9 @@ public class ResourceLoader {
         });
         
         ServiceLoader<ResourceResolver> loader = ServiceLoaderUtils.load(ResourceResolver.class);
-        loader.forEach(r -> registerResourceResolver(r));
+        if (null != loader) { // whyever in tests, might be through mocking
+            loader.forEach(r -> registerResourceResolver(r));
+        }
     }
 
     /**
