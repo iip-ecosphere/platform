@@ -203,7 +203,6 @@ project ContainerCreation {
         managementUi;
         artifactsFolder;
         artifactsUriPrefix;
-        platformPython;
         containerGeneration;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);

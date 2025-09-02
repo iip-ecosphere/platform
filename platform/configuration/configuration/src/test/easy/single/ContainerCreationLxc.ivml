@@ -233,7 +233,6 @@ project ContainerCreationLxc {
         managementUi;
         artifactsFolder;
         artifactsUriPrefix;
-        platformPython;
         containerGeneration;
         platformContainerGeneration;
         .; // every variable declared in this project
