@@ -19,6 +19,7 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.json.JsonArray;
+import de.iip_ecosphere.platform.support.json.JsonIterator;
 import de.iip_ecosphere.platform.support.json.JsonNumber;
 import de.iip_ecosphere.platform.support.json.JsonObject;
 import de.iip_ecosphere.platform.support.json.JsonString;
@@ -167,7 +168,7 @@ public class JsonTest {
     }
     
     /**
-     * Tests {@link JsoniterAny}.
+     * Tests {@link JsonIterator}.
      * 
      * @throws IOException shall not occur
      */

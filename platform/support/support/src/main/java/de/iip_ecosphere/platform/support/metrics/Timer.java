@@ -48,6 +48,35 @@ public interface Timer extends Meter {
         public long stop(Timer timer);
     
     }
+
+    /**
+     * Default implementation of {@link Sample} based on micrometer.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public class DefaultSample implements Sample {
+
+        private final long startTime;
+        private final Clock clock;
+
+        /**
+         * Creates an instance.
+         * 
+         * @param clock the clock when the sample starts
+         */
+        DefaultSample(Clock clock) {
+            this.clock = clock;
+            this.startTime = clock.monotonicTime();
+        }
+
+        @Override
+        public long stop(Timer timer) {
+            long durationNs = clock.monotonicTime() - startTime;
+            timer.record(durationNs, TimeUnit.NANOSECONDS);
+            return durationNs;
+        }
+        
+    }
     
     /**
      * Executes the runnable {@code func} and records the time taken.

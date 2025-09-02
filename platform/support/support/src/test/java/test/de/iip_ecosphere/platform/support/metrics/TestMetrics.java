@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
 
+import de.iip_ecosphere.platform.support.metrics.Clock;
 import de.iip_ecosphere.platform.support.metrics.Counter.CounterBuilder;
 import de.iip_ecosphere.platform.support.metrics.Gauge.GaugeBuilder;
 import de.iip_ecosphere.platform.support.metrics.Measurement;
@@ -26,7 +27,6 @@ import de.iip_ecosphere.platform.support.metrics.MeterRegistry;
 import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
 import de.iip_ecosphere.platform.support.metrics.Statistic;
 import de.iip_ecosphere.platform.support.metrics.Tag;
-import de.iip_ecosphere.platform.support.metrics.Timer.Sample;
 import de.iip_ecosphere.platform.support.metrics.Timer.TimerBuilder;
 
 /**
@@ -92,12 +92,12 @@ public class TestMetrics extends MetricsFactory {
     }
 
     @Override
-    public Sample createTimerStart() {
+    public Measurement createMeasurement(Supplier<Double> valueFunction, Statistic statistic) {
         return null;
     }
 
     @Override
-    public Measurement createMeasurement(Supplier<Double> valueFunction, Statistic statistic) {
+    public Clock getSystemClock() {
         return null;
     }
 

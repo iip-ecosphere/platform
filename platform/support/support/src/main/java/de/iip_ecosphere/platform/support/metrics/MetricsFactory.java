@@ -20,6 +20,7 @@ import de.iip_ecosphere.platform.support.metrics.Counter.CounterBuilder;
 import de.iip_ecosphere.platform.support.metrics.Gauge.GaugeBuilder;
 import de.iip_ecosphere.platform.support.metrics.Meter.Id;
 import de.iip_ecosphere.platform.support.metrics.Timer.Sample;
+import de.iip_ecosphere.platform.support.metrics.Timer.DefaultSample;
 import de.iip_ecosphere.platform.support.metrics.Timer.TimerBuilder;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
@@ -188,7 +189,16 @@ public abstract class MetricsFactory {
      * 
      * @return the timer sample
      */
-    public abstract Sample createTimerStart();
+    public Sample createTimerStart() {
+        return new DefaultSample(getSystemClock());
+    }
+
+    /**
+     * Returns the system clock (representation).
+     * 
+     * @return the system clock
+     */
+    public abstract Clock getSystemClock();
     
     /**
      * Creates a measurement.
