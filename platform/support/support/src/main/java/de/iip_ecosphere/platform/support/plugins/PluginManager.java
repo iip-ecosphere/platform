@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.ServiceLoader;
 import java.util.StringTokenizer;
 import java.util.function.Supplier;
 
@@ -65,7 +64,7 @@ public class PluginManager {
     private static Map<String, Plugin<?>> plugins = new HashMap<>();
     private static Map<Class<?>, List<Plugin<?>>> pluginsByType = new HashMap<>();
     private static Map<String, PluginDescriptor<?>> descriptors = new HashMap<>();
-    
+
     /**
      * Returns a specific plugin.
      * 
@@ -208,7 +207,7 @@ public class PluginManager {
      */
     private static void loadPlugins(boolean onlyNew) {
         ServiceLoaderUtils
-            .stream(ServiceLoader.load(PluginSetupDescriptor.class))
+            .stream(ServiceLoaderUtils.load(PluginSetupDescriptor.class))
             .forEach(d -> registerPlugin(d, onlyNew));
 
         String plugins = OsUtils.getPropertyOrEnv(FILE_PLUGINS_PROPERTY, "");
@@ -246,12 +245,13 @@ public class PluginManager {
      * @param onlyNew if {@code true} considers only unknown/new plugins, if {@code false} consides all plugins and 
      *   issues warnings
      * @see #registerPlugin(PluginDescriptor, boolean, File)
+     * @see PluginSetup#getClassLoader()
      */
     private static void registerPlugin(PluginSetupDescriptor desc, boolean onlyNew) {
         LoggerFactory.getLogger(PluginManager.class).info("Found plugin setup descriptor {}. Trying registration...", 
             desc.getClass());
         boolean allowAll = !desc.preventDuplicates();
-        ClassLoader loader = PluginManager.class.getClassLoader();
+        ClassLoader loader = PluginSetup.getClassLoader();
         ClassLoader descLoader = desc.createClassLoader(loader);
         desc.getPluginDescriptors(descLoader)
             .filter(d -> allowAll || loadedBy(d, descLoader))
@@ -282,6 +282,15 @@ public class PluginManager {
     }
 
     /**
+     * Registers the given plugin descriptor as a new plugin without installation directory.
+     * 
+     * @param desc the descriptor to register
+     */
+    public static void registerPlugin(PluginDescriptor<?> desc) {
+        registerPlugin(desc, true, null);
+    }
+
+    /**
      * Registers the given plugin descriptor. May warn if a {@link PluginDescriptor#getId() plugin id}
      * is already registered and ignores then {@code desc}.
      * 
@@ -290,7 +299,7 @@ public class PluginManager {
      *   issues warnings
      * @param installDir the installation directory, may be <b>null</b>
      */
-    private static void registerPlugin(PluginDescriptor<?> desc, boolean onlyNew, File installDir) {
+    public static void registerPlugin(PluginDescriptor<?> desc, boolean onlyNew, File installDir) {
         Plugin<?> plugin = desc.createPlugin(installDir);
         Class<?> pluginClass = plugin.getInstanceClass();
         List<String> ids = plugin.getAllIds();

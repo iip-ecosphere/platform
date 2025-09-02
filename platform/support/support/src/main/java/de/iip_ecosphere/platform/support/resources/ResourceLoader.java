@@ -16,15 +16,23 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.function.Predicate;
 
+import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.plugins.PluginSetup;
 
 /**
- * Support for class loading also in FAT jars. Resource resolvers can be added directly or via JLS.
+ * Support for class loading also in FAT jars. Resource resolvers can be added directly or via JLS. Resource
+ * filtering is currently only supported on the implicit classpath resource resolver.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -63,6 +71,7 @@ public class ResourceLoader {
     };
     
     private static List<ResourceResolver> resolvers = new ArrayList<>();
+    private static List<Predicate<URI>> filters = null;
     
     static {
         registerResourceResolver(new ResourceResolver() {
@@ -74,11 +83,33 @@ public class ResourceLoader {
 
             @Override
             public InputStream resolve(ClassLoader loader, String resource) {
-                return loader.getResourceAsStream(resource);                
+                InputStream result = null;
+                if (hasFilters()) {
+                    try {
+                        Enumeration<URL> res = loader.getResources(resource);
+                        while (res.hasMoreElements()) {
+                            URL u = res.nextElement();
+                            try {
+                                if (matchesFilter(u.toURI())) {
+                                    result = u.openStream();
+                                }
+                            } catch (URISyntaxException e) {
+                                LoggerFactory.getLogger(this).warn("Cannot filter resource URL {}: {}", u, 
+                                    e.getMessage());
+                            }
+                        }
+                    } catch (IOException e) {
+                        LoggerFactory.getLogger(this).warn("Cannot enumerate resources for {}: {}", resource, 
+                            e.getMessage());
+                    }
+                } else {
+                    result = loader.getResourceAsStream(resource);
+                }
+                return result;                
             }
         });
         
-        ServiceLoader<ResourceResolver> loader = ServiceLoader.load(ResourceResolver.class);
+        ServiceLoader<ResourceResolver> loader = ServiceLoaderUtils.load(ResourceResolver.class);
         loader.forEach(r -> registerResourceResolver(r));
     }
 
@@ -126,7 +157,8 @@ public class ResourceLoader {
     public static void unregisterResourceResolver(ResourceResolver resolver) {
         if (null != resolver) {
             resolvers.remove(resolver);
-            LoggerFactory.getLogger(ResourceLoader.class).info("Unregistered resource resolver {}", resolver.getName());
+            LoggerFactory.getLogger(PluginSetup.getClassLoader()).info("Unregistered resource resolver {}", 
+                resolver.getName());
         }
     }
 
@@ -138,7 +170,7 @@ public class ResourceLoader {
      * @return the resource as input stream, may be <b>null</b> if the resource was not found
      */
     public static InputStream getResourceAsStream(String name, ResourceResolver... optional) {
-        return getResourceAsStream(ResourceLoader.class, name, optional);
+        return getResourceAsStream(PluginSetup.getClassLoader(), name, optional);
     }
     
     /**
@@ -223,6 +255,47 @@ public class ResourceLoader {
             text = "/" + text;
         }
         return text;
+    }
+    
+    /**
+     * Adds a URL-based resource filter. If filters are added, only resources that are accepted by the filter
+     * are returned (if supported by the {@link ResourceResolver}. [testing]
+     * 
+     * @param filter the filter to add, ignored if <b>null</b>
+     */
+    public static void addFilter(Predicate<URI> filter) {
+        if (null != filter) {
+            if (null == filters) {
+                filters = new ArrayList<>();
+            }
+            filters.add(filter);
+        }
+    }
+    
+    /**
+     * Returns whether resource filters have been defined. [testing]
+     * 
+     * @return {@code true} for resource filters, {@code false} else
+     */
+    public static boolean hasFilters() {
+        return null != filters && !filters.isEmpty();
+    }
+    
+    /**
+     * Returns if any filter matches the given {@code uri}. [testing]
+     * 
+     * @param uri the URI to test
+     * @return {@code true} if at least one filter matches the given {@code uri}, {@code false} else. Consider 
+     *     {@link #hasFilters()} to identify whether {@code false} is significant.
+     */
+    public static boolean matchesFilter(URI uri) {
+        boolean matches = false;
+        if (null != filters) {
+            for (int f = 0; !matches && f < filters.size(); f++) {
+                matches = filters.get(f).test(uri);
+            }
+        }
+        return matches;
     }
 
 }

@@ -21,6 +21,7 @@ import java.util.ServiceLoader;
 import java.util.stream.Stream;
 
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.plugins.PluginSetup;
 
 /**
  * Helper functions for Java Service Loading.
@@ -108,14 +109,14 @@ public class ServiceLoaderUtils {
     }
     
     /**
-     * Creates a service loader for the given {@code cls} using the class loader of {@code cls}.
+     * Creates a service loader for the given {@code cls} using {@link PluginSetup#getClassLoader()} as class loader.
      * 
      * @param <D> the descriptor type
      * @param cls the class of the descriptor type
      * @return the service loader
      */
     public static <D> ServiceLoader<D> load(Class<D> cls) { 
-        return ServiceLoader.load(cls, cls.getClassLoader());
+        return ServiceLoader.load(cls, PluginSetup.getClassLoader());
     }
     
 }

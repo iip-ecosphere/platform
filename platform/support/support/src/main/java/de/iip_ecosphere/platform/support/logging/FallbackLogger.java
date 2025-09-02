@@ -14,7 +14,11 @@ package de.iip_ecosphere.platform.support.logging;
 
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 // no external dependencies here!
 
@@ -27,9 +31,20 @@ public class FallbackLogger implements Logger {
 
     private static final SimpleDateFormat DATEFORMAT = new SimpleDateFormat("HH:mm:ss");
     private static final String PLACEHOLDER = "{}";
+    private static Map<Class<?>, Function<Object, Object>> stringConverter = new HashMap<>();
     
     private String name;
     private LogLevel level;
+    
+    static {
+        stringConverter.put(int[].class, o -> Arrays.toString((int[]) o));
+        stringConverter.put(long[].class, o -> Arrays.toString((long[]) o));
+        stringConverter.put(byte[].class, o -> Arrays.toString((byte[]) o));
+        stringConverter.put(char[].class, o -> Arrays.toString((char[]) o));
+        stringConverter.put(float[].class, o -> Arrays.toString((float[]) o));
+        stringConverter.put(double[].class, o -> Arrays.toString((double[]) o));
+        stringConverter.put(boolean[].class, o -> Arrays.toString((double[]) o));
+    }
     
     /**
      * Creates an instance.
@@ -250,6 +265,14 @@ public class FallbackLogger implements Logger {
      * @return the string value
      */
     private String toString(Object arg) {
+        if (arg instanceof Object[]) {
+            arg = Arrays.toString((Object[]) arg);
+        } else if (arg != null) {
+            Function<Object, Object> conv = stringConverter.get(arg.getClass());
+            if (null != conv) {
+                arg = conv.apply(arg);
+            }
+        }
         return null == arg ? "null" : arg.toString();
     }
 
