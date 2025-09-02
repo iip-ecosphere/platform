@@ -31,6 +31,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -56,6 +57,9 @@ public class SplitClasspathMojo extends AbstractMojo {
 
     @Parameter( required = false )
     private List<String> mainPatterns;
+    
+    @Parameter( required = false )
+    private List<String> deleteFiles;
 
     /**
      * Returns whether the given name/line contains on of the main file patterns.
@@ -89,6 +93,7 @@ public class SplitClasspathMojo extends AbstractMojo {
             for (File f: archiveFiles) {
                 processFile(f);
             }
+            cleanup();
         } else {
             getLog().info("Skipping.");
         }
@@ -201,6 +206,19 @@ public class SplitClasspathMojo extends AbstractMojo {
             }
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage());
+        }
+    }
+    
+    /**
+     * Cleans up left-over files.
+     */
+    private void cleanup() {
+        // left-overs of zip filesystem provider at least on Windows
+        File[] main = new File("").listFiles(f -> f.getName().startsWith("zipfstmp") && f.getName().endsWith(".tmp"));
+        if (null != main) {
+            for (File f: main) {
+                FileUtils.deleteQuietly(f);
+            }
         }
     }
     
