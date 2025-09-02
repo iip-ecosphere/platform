@@ -34,6 +34,7 @@ import de.iip_ecosphere.platform.services.environment.GenericMultiTypeServiceImp
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.PythonUtils;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.StringUtils;
 import de.iip_ecosphere.platform.support.setup.InstalledDependenciesSetup;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
@@ -353,7 +354,7 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
             }
             if (null != data) {
                 args.add("--data");
-                args.add(org.apache.commons.text.StringEscapeUtils.escapeJava(data)); // quote quotes -> JSON
+                args.add(StringUtils.escapeJava(data)); // quote quotes -> JSON
             } 
             File pyExec = getPythonExecutable();
             int unbufferPos = 0; // python -u 

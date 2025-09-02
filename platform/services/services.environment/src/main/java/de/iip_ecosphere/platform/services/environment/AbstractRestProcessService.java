@@ -20,17 +20,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.HttpClientConnectionManager;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.util.EntityUtils;
-
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.http.Http;
+import de.iip_ecosphere.platform.support.http.HttpClient;
+import de.iip_ecosphere.platform.support.http.HttpPost;
+import de.iip_ecosphere.platform.support.http.HttpResponse;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
@@ -49,7 +44,7 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
     
     private HttpURLConnection connection;
     private ExecutorService executor = Executors.newFixedThreadPool(5);
-    private CloseableHttpClient client;
+    private HttpClient client;
 
     /**
      * Creates an instance of the service with the required type translators.
@@ -115,8 +110,7 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
      * Sets up the connection manager and creates a new httpClient based on a connection pool.
      */
     protected void setupConnectionManager() {
-        HttpClientConnectionManager poolingConnectionManager = new PoolingHttpClientConnectionManager();
-        client = HttpClients.custom().setConnectionManager(poolingConnectionManager).build();
+        client = Http.getInstance().createPooledClient();
     }
     
     /**
@@ -173,17 +167,16 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
         executor.execute(new Runnable() {
             public void run() {
                 try {
-                    HttpPost post = new HttpPost(getApiPath());
                     String bearer = getBearerToken();
                     String input = toSendString(data, inTypeName);
-                    StringEntity entity = new StringEntity(input);
-                    post.setEntity(entity);
-                    post.setHeader("Accept", "application/json");
-                    post.setHeader("Content-type", "application/json");
-                    post.setHeader("Authorization", bearer);
+                    HttpPost post = Http.getInstance().createPost(getApiPath())
+                        .setEntity(input)
+                        .setHeader("Accept", "application/json")
+                        .setHeader("Content-type", "application/json")
+                        .setHeader("Authorization", bearer);
                     if (client != null) {
-                        CloseableHttpResponse response = client.execute(post);
-                        String output = EntityUtils.toString(response.getEntity());
+                        HttpResponse response = client.execute(post);
+                        String output = response.getEntityAsString();
                         handleReception(output);
                     } else {
                         LoggerFactory.getLogger(getClass()).info("Connection not yet open. Cannot process data.");

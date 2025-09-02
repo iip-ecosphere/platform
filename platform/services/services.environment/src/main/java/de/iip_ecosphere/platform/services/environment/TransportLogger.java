@@ -23,9 +23,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.StringUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.IipVersion;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
@@ -144,7 +143,7 @@ public class TransportLogger {
      * @return the formatted string
      */
     protected static String toString(Object obj) {
-        return ReflectionToStringBuilder.toString(obj, IipStringStyle.SHORT_STRING_STYLE);
+        return StringUtils.toStringShortStyle(obj);
     }
     
     /**

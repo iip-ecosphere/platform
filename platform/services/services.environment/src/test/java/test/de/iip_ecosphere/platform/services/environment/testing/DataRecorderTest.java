@@ -14,13 +14,13 @@ package test.de.iip_ecosphere.platform.services.environment.testing;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.function.Function;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.environment.testing.DataRecorder;
+import de.iip_ecosphere.platform.support.FileUtils;
 
 /**
  * Tests {@link DataRecorder}.
@@ -99,7 +99,7 @@ public class DataRecorderTest {
         
         if (null != file) {
             try {
-                String contents = org.apache.commons.io.FileUtils.readFileToString(file, Charset.defaultCharset());
+                String contents = FileUtils.readFileToString(file);
                 contents = contents.replace("\n", "*").replace("\r", ""); // unify win/linux EOL
                 Assert.assertEquals(text + "*" + "channel: " + text + "*" + text + "*" + text + "*", contents);
             } catch (IOException e) {

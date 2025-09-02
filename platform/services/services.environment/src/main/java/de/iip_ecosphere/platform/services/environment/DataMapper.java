@@ -30,13 +30,12 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.bytecode.Bytecode;
 import de.iip_ecosphere.platform.support.json.IOIterator;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
-import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.description.annotation.AnnotationDescription;
 
 /**
  * Maps data from a stream to input instances for a service. This class is intended as a basis for testing (here 
@@ -102,18 +101,17 @@ public class DataMapper {
      * @return the created class
      */
     public static <T> Class<? extends T> createBaseDataUnitClass(Class<T> cls) {
-        AnnotationDescription jsonFilter = AnnotationDescription.Latent.Builder.ofType(JsonFilter.class)
-            .define("value", "iipFilter").build();
-        Class<? extends T> result = new ByteBuddy()
-            .subclass(cls)
-            .name("iip.mock." + cls.getSimpleName() + "Mock")
+        Class<? extends T> result = Bytecode.getInstance().createClassBuilder(
+            "iip.mock." + cls.getSimpleName() + "Mock", cls, MockingConnectorServiceWrapper.class.getClassLoader())
             .implement(BaseDataUnitFunctions.class)
-            .annotateType(jsonFilter)
+            .annotate(JsonFilter.class)
+                .define("value", "iipFilter")
+                .build()
             .defineProperty("$period", Integer.TYPE)
+                .build()
             .defineProperty("$repeats", Integer.TYPE)
-            .make()
-            .load(MockingConnectorServiceWrapper.class.getClassLoader())
-            .getLoaded();
+                .build()
+            .build();
         
         // and we need an ad-hoch serializer that represents the new type and behaves as the existing type
         final Serializer<T> ser = SerializerRegistry.getSerializer(cls);

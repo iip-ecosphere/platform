@@ -23,6 +23,7 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.services.environment.DataMapper;
 import de.iip_ecosphere.platform.services.environment.DataMapper.BaseDataUnitFunctions;
 import de.iip_ecosphere.platform.services.environment.DataMapper.MappingConsumer;
+import de.iip_ecosphere.platform.support.StringUtils;
 
 import org.junit.Assert;
 
@@ -64,8 +65,7 @@ public class DataMapperTest {
 
         @Override
         public String toString() {
-            return org.apache.commons.lang3.builder.ReflectionToStringBuilder.toString(this, 
-                de.iip_ecosphere.platform.services.environment.IipStringStyle.SHORT_STRING_STYLE);
+            return StringUtils.toStringShortStyle(this);
         }
 
     }
@@ -118,8 +118,7 @@ public class DataMapperTest {
 
         @Override
         public String toString() {
-            return org.apache.commons.lang3.builder.ReflectionToStringBuilder.toString(this, 
-                de.iip_ecosphere.platform.services.environment.IipStringStyle.SHORT_STRING_STYLE);
+            return StringUtils.toStringShortStyle(this);
         }
 
     }
@@ -173,8 +172,7 @@ public class DataMapperTest {
         
         @Override
         public String toString() {
-            return org.apache.commons.lang3.builder.ReflectionToStringBuilder.toString(this, 
-                de.iip_ecosphere.platform.services.environment.IipStringStyle.SHORT_STRING_STYLE);
+            return StringUtils.toStringShortStyle(this);
         }
         
     }

@@ -130,8 +130,6 @@ public abstract class WsAdapter {
     
     /**
      * Connects the socket.
-     * 
-     * @throws IOException if connection fails
      */
     public void connect() {
         if (null != socket) {

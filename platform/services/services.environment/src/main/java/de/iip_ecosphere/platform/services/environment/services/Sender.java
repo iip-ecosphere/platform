@@ -31,7 +31,7 @@ public interface Sender<T> {
      * Blocks until connected or failed to do so.
      *
      * @return returns whether it succeeded or not.
-     * @throws InterruptedException thrown when blocking thread gets interrupted
+     * @throws IOException thrown when connection fails, particularly when the blocking thread gets interrupted
      */
     public boolean connectBlocking() throws IOException;
 

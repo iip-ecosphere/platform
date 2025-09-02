@@ -17,8 +17,10 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 /**
  * Specific styles for {@link org.apache.commons.lang3.builder.ReflectionToStringBuilder}.
  * 
+ * @deprecated use {@link de.iip_ecosphere.platform.support.StringUtils#toStringShortStyle(Object)} instead
  * @author Holger Eichelberger, SSE
  */
+@Deprecated
 public class IipStringStyle {
     
     /**

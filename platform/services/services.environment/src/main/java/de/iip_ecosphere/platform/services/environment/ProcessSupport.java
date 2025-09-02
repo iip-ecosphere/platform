@@ -275,8 +275,7 @@ public class ProcessSupport {
             if (null != res) {
                 cmdResult.accept(res.toString());
             } else if (resultFile != null) {
-                cmdResult.accept(org.apache.commons.io.FileUtils.readFileToString(
-                    new File(resultFile), StandardCharsets.UTF_8));
+                cmdResult.accept(FileUtils.readFileToString(new File(resultFile), StandardCharsets.UTF_8));
             }
         } catch (InterruptedException e) {
             LoggerFactory.getLogger(ProcessSupport.class).error(
