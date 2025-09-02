@@ -4,7 +4,7 @@
   <artifactId>services.environment</artifactId>
   <packaging>jar</packaging>
   <name>Multi-language service environment</name>
-  <description>Multi-language service environment for the IIP-Ecosphere platform to generate services upon.</description>
+  <description>Multi-language service environment for the oktoflow platform to generate services upon.</description>
 
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
@@ -18,19 +18,6 @@
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-exec</artifactId>
-        <version>1.3</version>
-    </dependency>      
-    <dependency>
-      <groupId>net.bytebuddy</groupId>
-      <artifactId>byte-buddy</artifactId>
-    </dependency>   
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>support.aas</artifactId>
@@ -75,6 +62,7 @@
       <artifactId>com.springsource.org.apache.commons.logging</artifactId>
       <version>1.1.1</version>
     </dependency>
+
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>connectors</artifactId>
@@ -150,6 +138,24 @@
       <scope>test</scope>
       <version>${project.version}</version>
     </dependency>  
+    <dependency>
+      <artifactId>support.metrics-micrometer</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency>  
+    <dependency>
+      <artifactId>support.bytecode-bytebuddy</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>    
+    <dependency>
+      <artifactId>support.http-apache</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>    
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
