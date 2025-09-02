@@ -14,10 +14,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-    </dependency>
-    <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>services.environment</artifactId>
       <version>${project.version}</version>
@@ -67,6 +63,12 @@
     </dependency> 
     <dependency>
       <artifactId>support.processInfo-oshi</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+      <artifactId>support.http-apache</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <scope>test</scope>
       <version>${project.version}</version>
