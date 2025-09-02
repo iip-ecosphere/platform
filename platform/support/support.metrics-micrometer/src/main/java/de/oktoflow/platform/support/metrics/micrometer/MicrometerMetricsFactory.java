@@ -28,9 +28,8 @@ import de.iip_ecosphere.platform.support.metrics.MeterRegistry;
 import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
 import de.iip_ecosphere.platform.support.metrics.Statistic;
 import de.iip_ecosphere.platform.support.metrics.Tag;
-import de.iip_ecosphere.platform.support.metrics.Timer;
-import de.iip_ecosphere.platform.support.metrics.Timer.Sample;
 import de.iip_ecosphere.platform.support.metrics.Timer.TimerBuilder;
+import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.ImmutableTag;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -41,6 +40,8 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
  * @author Holger Eichelberger, SSE
  */
 public class MicrometerMetricsFactory extends MetricsFactory {
+    
+    private static final de.iip_ecosphere.platform.support.metrics.Clock SYSTEM = new MicrometerClock(Clock.SYSTEM);
 
     @Override
     public MeterRegistry createRegistry(Object registry, boolean warn) {
@@ -67,17 +68,8 @@ public class MicrometerMetricsFactory extends MetricsFactory {
     }
 
     @Override
-    public Sample createTimerStart() {
-        return new Sample() {
-            
-            private io.micrometer.core.instrument.Timer.Sample sample = io.micrometer.core.instrument.Timer.start();
-            
-            @Override
-            public long stop(Timer timer) {
-                return sample.stop(((MicrometerTimer) timer).getMeter());
-            }
-            
-        };
+    public de.iip_ecosphere.platform.support.metrics.Clock getSystemClock() {
+        return SYSTEM;
     }
 
     @Override

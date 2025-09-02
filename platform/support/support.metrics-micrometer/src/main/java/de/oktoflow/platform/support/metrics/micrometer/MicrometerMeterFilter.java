@@ -13,6 +13,7 @@
 package de.oktoflow.platform.support.metrics.micrometer;
 
 import de.iip_ecosphere.platform.support.metrics.Meter;
+import de.oktoflow.platform.support.metrics.micrometer.AbstractMeter.MicrometerId;
 import io.micrometer.core.instrument.config.MeterFilter;
 
 /**
@@ -44,7 +45,12 @@ class MicrometerMeterFilter implements de.iip_ecosphere.platform.support.metrics
 
     @Override
     public MeterFilterReply accept(Meter.Id id) {
-        return MeterFilterReply.NEUTRAL;
+        MeterFilterReply result = MeterFilterReply.NEUTRAL;
+        if (id instanceof MicrometerId) {
+            io.micrometer.core.instrument.config.MeterFilterReply reply = filter.accept(((MicrometerId) id).getId());
+            result = MicrometerUtils.value(MeterFilterReply.class, reply, MeterFilterReply.NEUTRAL);
+        }
+        return result;
     }
 
     @Override

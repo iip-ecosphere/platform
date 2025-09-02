@@ -34,11 +34,24 @@ import de.iip_ecosphere.platform.support.metrics.MeterFilter.MeterFilterReply;
 public class MicrometerUtils {
 
     /**
+     * Turns an emum value into an enum value considering {@code dflt}.
+     * 
+     * @param <T> the enum type
+     * @param cls the enum class
+     * @param value the value (may be <b>null</b>)
+     * @param dflt the default value if {@code value} cannot be converted/found
+     * @return the value
+     */
+    public static <T extends Enum<T>> T value(Class<T> cls, Enum<?> value, T dflt) {
+        return value(cls, value == null ? null : value.name(), dflt);
+    }
+
+    /**
      * Turns a string into an enum value considering {@code dflt}.
      * 
      * @param <T> the enum type
      * @param cls the enum class
-     * @param value the value as string
+     * @param value the value as string (may be <b>null</b>)
      * @param dflt the default value if {@code value} cannot be converted/found
      * @return the value
      */

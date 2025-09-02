@@ -279,7 +279,9 @@ public class MicrometerTest {
         }));
         Assert.assertNull(MicrometerUtils.createMeter(null, (i, t, m) -> null));
         
-        Assert.assertEquals(Statistic.VALUE, MicrometerUtils.value(Statistic.class, null, Statistic.VALUE));
+        Assert.assertEquals(Statistic.VALUE, MicrometerUtils.value(Statistic.class, 
+            io.micrometer.core.instrument.Statistic.VALUE , Statistic.UNKNOWN));
+        Assert.assertEquals(Statistic.VALUE, MicrometerUtils.value(Statistic.class, (String) null, Statistic.VALUE));
         Assert.assertEquals(Statistic.VALUE, MicrometerUtils.value(Statistic.class, "1xyz", Statistic.VALUE));
         
         Assert.assertNull(MicrometerUtils.filterValue((MeterFilter) null));
