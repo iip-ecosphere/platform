@@ -23,8 +23,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.google.common.io.Files;
-
 import de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.MultiRtsaRestService;
 import de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.RtsaRestService;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
@@ -162,7 +160,7 @@ public class RtsaRestServiceTest {
             }
             File depl = new File("target/fake/myRtsaexample-0.1.0.zip");
             try {
-                Files.copy(depl, new File(new File(zipT, "deployments"), depl.getName()));
+                FileUtils.copyFile(depl, new File(new File(zipT, "deployments"), depl.getName()));
             } catch (IOException e) {
                 LoggerFactory.getLogger(RtsaRestServiceTest.class).error("Cannot copy {}: {}", depl, e.getMessage());
             }
