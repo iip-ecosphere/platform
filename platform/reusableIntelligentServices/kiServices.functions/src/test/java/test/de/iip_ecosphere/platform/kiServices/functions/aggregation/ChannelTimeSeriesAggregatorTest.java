@@ -21,14 +21,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.kiServices.functions.aggregation.ChannelTimeSeriesAggregator;
 import de.iip_ecosphere.platform.kiServices.functions.aggregation.MultiChannelTimeSeriesAggregator;
 import de.iip_ecosphere.platform.kiServices.functions.aggregation.MultiChannelTimeSeriesAggregator.*;
-import de.iip_ecosphere.platform.services.environment.IipStringStyle;
+import de.iip_ecosphere.platform.support.StringUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
@@ -51,7 +50,7 @@ public class ChannelTimeSeriesAggregatorTest {
 
         @Override
         public String toString() {
-            return ReflectionToStringBuilder.toString(this, IipStringStyle.SHORT_STRING_STYLE);
+            return StringUtils.toStringShortStyle(this);
         }
 
     }
@@ -67,7 +66,7 @@ public class ChannelTimeSeriesAggregatorTest {
         
         @Override
         public String toString() {
-            return ReflectionToStringBuilder.toString(this, IipStringStyle.SHORT_STRING_STYLE);
+            return StringUtils.toStringShortStyle(this);
         }
 
     }
@@ -86,7 +85,7 @@ public class ChannelTimeSeriesAggregatorTest {
         
         @Override
         public String toString() {
-            return ReflectionToStringBuilder.toString(this, IipStringStyle.SHORT_STRING_STYLE);
+            return StringUtils.toStringShortStyle(this);
         }
 
     }
@@ -114,7 +113,7 @@ public class ChannelTimeSeriesAggregatorTest {
 
         @Override
         public String toString() {
-            return ReflectionToStringBuilder.toString(this, IipStringStyle.SHORT_STRING_STYLE);
+            return StringUtils.toStringShortStyle(this);
         }
 
     }
@@ -131,7 +130,7 @@ public class ChannelTimeSeriesAggregatorTest {
 
         @Override
         public String toString() {
-            return ReflectionToStringBuilder.toString(this, IipStringStyle.SHORT_STRING_STYLE);
+            return StringUtils.toStringShortStyle(this);
         }
 
     }

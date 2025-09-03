@@ -18,14 +18,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.commons.io.FileUtils;
-
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 
 import de.iip_ecosphere.platform.services.environment.ProcessSupport;
 import de.iip_ecosphere.platform.services.environment.ProcessSupport.ScriptOwner;
+import de.iip_ecosphere.platform.support.FileUtils;
 
 /**
  * Offers the functionality of reading in qr codes.
@@ -35,7 +34,7 @@ import de.iip_ecosphere.platform.services.environment.ProcessSupport.ScriptOwner
 public class QRCodeScanner {
     //Shall set the result folder appropriate for each operating system.
     static {
-        resultScript = de.iip_ecosphere.platform.support.FileUtils.getTempDirectoryPath() + "/qr.res";
+        resultScript = FileUtils.getTempDirectoryPath() + "/qr.res";
     }
     
     private static String resultScript;
