@@ -1,0 +1,211 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------< de.iip-ecosphere.platform:services.spring.loader >----------
+[INFO] Building Services (Spring) Apploader 0.7.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- os:1.6.2:detect (default) @ services.spring.loader ---
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: windows
+[INFO] os.detected.arch: x86_64
+[INFO] os.detected.version: 10.0
+[INFO] os.detected.version.major: 10
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: windows-x86_64
+[INFO] 
+[INFO] --- jacoco:0.8.12:prepare-agent (default) @ services.spring.loader ---
+[INFO] argLine set to -javaagent:C:\\Users\\eichelberger\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.12\\org.jacoco.agent-0.8.12-runtime.jar=destfile=W:\\IIP-workspace24\\services.spring.loader\\target\\jacoco.exec
+[INFO] 
+[INFO] --- protobuf:0.6.1:compile (default) @ services.spring.loader ---
+[INFO] W:\IIP-workspace24\services.spring.loader\src\main\proto does not exist. Review the configuration or consider disabling the plugin.
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ services.spring.loader ---
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.7.0:compile (default-compile) @ services.spring.loader ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- python:0.7.1-SNAPSHOT:compile-python (py-compile) @ services.spring.loader ---
+[INFO] Using Python python
+[INFO] Using hash file W:\IIP-workspace24\services.spring.loader\target\python-compile.fpf
+[INFO] Wrote hash file W:\IIP-workspace24\services.spring.loader\target\python-compile.fpf
+[INFO] 
+[INFO] --- protobuf:0.6.1:test-compile (default) @ services.spring.loader ---
+[INFO] W:\IIP-workspace24\services.spring.loader\src\test\proto does not exist. Review the configuration or consider disabling the plugin.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ services.spring.loader ---
+[INFO] Copying 4 resources from src\test\resources to target\test-classes
+[INFO] 
+[INFO] --- compiler:3.7.0:testCompile (default-testCompile) @ services.spring.loader ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- surefire:3.0.0-M3:test (default-test) @ services.spring.loader ---
+[INFO] 
+[INFO] --- jacoco:0.8.12:report (report) @ services.spring.loader ---
+[INFO] Loading execution data file W:\IIP-workspace24\services.spring.loader\target\jacoco.exec
+[INFO] Analyzed bundle 'Services (Spring) Apploader' with 4 classes
+[INFO] 
+[INFO] --- python:0.7.1-SNAPSHOT:test-python (py-test) @ services.spring.loader ---
+[INFO] Using Python: python
+[INFO] Using PYTHONPATH=, PRJ_HOME=W:\IIP-workspace24\services.spring.loader
+[INFO] 
+[INFO] --- jar:3.2.0:jar (default-jar) @ services.spring.loader ---
+[INFO] 
+[INFO] --- javadoc:3.2.0:jar (default-cli) @ services.spring.loader ---
+[INFO] Configuration changed, re-generating javadoc.
+[ERROR] MavenReportException: Error while generating Javadoc: 
+Exit code: 1 - Loading source files for package de.iip_ecosphere.platform.services.spring.loader...
+Constructing Javadoc information...
+Building index for all the packages and classes...
+Standard Doclet version 21.0.2+13-58
+Building tree for all the packages and classes...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\AppStarter.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\AppStarter.AccessibleLauncher.html...
+W:\IIP-workspace24\services.spring.loader\src\main\java\de\iip_ecosphere\platform\services\spring\loader\AppStarter.java:256: error: unexpected content
+         * @see {@link #postProcessClassPathArchives(List)}
+                                                          ^
+W:\IIP-workspace24\services.spring.loader\src\main\java\de\iip_ecosphere\platform\services\spring\loader\AppStarter.java:301: error: unexpected content
+         * @see {@link #createClassLoader(URL[])}
+                                                ^
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\AppStarter.ClassPathIndexFile.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\AppStarter.MyLCL.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\package-summary.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\package-tree.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\constant-values.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\class-use\AppStarter.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\class-use\AppStarter.ClassPathIndexFile.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\class-use\AppStarter.MyLCL.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\class-use\AppStarter.AccessibleLauncher.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\package-use.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\overview-tree.html...
+Building index for all classes...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\allclasses-index.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\allpackages-index.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\index-all.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\search.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\index.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\help-doc.html...
+2 errors
+
+Command line was: cmd.exe /X /C "C:\localUserFiles\eichelberger\Java\jdk-21.0.2\bin\javadoc.exe @options @packages"
+
+Refer to the generated Javadoc files in 'W:\IIP-workspace24\services.spring.loader\target\apidocs' dir.
+
+org.apache.maven.reporting.MavenReportException: 
+Exit code: 1 - Loading source files for package de.iip_ecosphere.platform.services.spring.loader...
+Constructing Javadoc information...
+Building index for all the packages and classes...
+Standard Doclet version 21.0.2+13-58
+Building tree for all the packages and classes...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\AppStarter.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\AppStarter.AccessibleLauncher.html...
+W:\IIP-workspace24\services.spring.loader\src\main\java\de\iip_ecosphere\platform\services\spring\loader\AppStarter.java:256: error: unexpected content
+         * @see {@link #postProcessClassPathArchives(List)}
+                                                          ^
+W:\IIP-workspace24\services.spring.loader\src\main\java\de\iip_ecosphere\platform\services\spring\loader\AppStarter.java:301: error: unexpected content
+         * @see {@link #createClassLoader(URL[])}
+                                                ^
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\AppStarter.ClassPathIndexFile.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\AppStarter.MyLCL.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\package-summary.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\package-tree.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\constant-values.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\class-use\AppStarter.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\class-use\AppStarter.ClassPathIndexFile.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\class-use\AppStarter.MyLCL.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\class-use\AppStarter.AccessibleLauncher.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\de\iip_ecosphere\platform\services\spring\loader\package-use.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\overview-tree.html...
+Building index for all classes...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\allclasses-index.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\allpackages-index.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\index-all.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\search.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\index.html...
+Generating W:\IIP-workspace24\services.spring.loader\target\apidocs\help-doc.html...
+2 errors
+
+Command line was: cmd.exe /X /C "C:\localUserFiles\eichelberger\Java\jdk-21.0.2\bin\javadoc.exe @options @packages"
+
+Refer to the generated Javadoc files in 'W:\IIP-workspace24\services.spring.loader\target\apidocs' dir.
+
+    at org.apache.maven.plugins.javadoc.AbstractJavadocMojo.doExecuteJavadocCommandLine (AbstractJavadocMojo.java:5861)
+    at org.apache.maven.plugins.javadoc.AbstractJavadocMojo.executeJavadocCommandLine (AbstractJavadocMojo.java:5737)
+    at org.apache.maven.plugins.javadoc.AbstractJavadocMojo.executeReport (AbstractJavadocMojo.java:2176)
+    at org.apache.maven.plugins.javadoc.JavadocJar.doExecute (JavadocJar.java:199)
+    at org.apache.maven.plugins.javadoc.AbstractJavadocMojo.execute (AbstractJavadocMojo.java:1935)
+    at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo (DefaultBuildPluginManager.java:126)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2 (MojoExecutor.java:328)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute (MojoExecutor.java:316)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.execute (MojoExecutor.java:212)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.execute (MojoExecutor.java:174)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.access$000 (MojoExecutor.java:75)
+    at org.apache.maven.lifecycle.internal.MojoExecutor$1.run (MojoExecutor.java:162)
+    at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute (DefaultMojosExecutionStrategy.java:39)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.execute (MojoExecutor.java:159)
+    at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject (LifecycleModuleBuilder.java:105)
+    at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject (LifecycleModuleBuilder.java:73)
+    at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build (SingleThreadedBuilder.java:53)
+    at org.apache.maven.lifecycle.internal.LifecycleStarter.execute (LifecycleStarter.java:118)
+    at org.apache.maven.DefaultMaven.doExecute (DefaultMaven.java:261)
+    at org.apache.maven.DefaultMaven.doExecute (DefaultMaven.java:173)
+    at org.apache.maven.DefaultMaven.execute (DefaultMaven.java:101)
+    at org.apache.maven.cli.MavenCli.execute (MavenCli.java:904)
+    at org.apache.maven.cli.MavenCli.doMain (MavenCli.java:281)
+    at org.apache.maven.cli.MavenCli.main (MavenCli.java:204)
+    at jdk.internal.reflect.DirectMethodHandleAccessor.invoke (DirectMethodHandleAccessor.java:103)
+    at java.lang.reflect.Method.invoke (Method.java:580)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced (Launcher.java:255)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.launch (Launcher.java:201)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode (Launcher.java:361)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.main (Launcher.java:314)
+[INFO] Building jar: W:\IIP-workspace24\services.spring.loader\target\services.spring.loader-0.7.1-SNAPSHOT-javadoc.jar
+[INFO] 
+[INFO] --- javadoc:3.2.0:test-jar (default-cli) @ services.spring.loader ---
+[INFO] Building jar: W:\IIP-workspace24\services.spring.loader\target\services.spring.loader-0.7.1-SNAPSHOT-test-javadoc.jar
+[INFO] 
+[INFO] --- jar:3.2.0:test-jar (default) @ services.spring.loader ---
+[INFO] 
+[INFO] --- source:3.2.0:jar-no-fork (attach-sources) @ services.spring.loader ---
+[INFO] 
+[INFO] >>> source:3.2.0:test-jar (attach-sources) > generate-sources @ services.spring.loader >>>
+[INFO] 
+[INFO] --- os:1.6.2:detect (default) @ services.spring.loader ---
+[INFO] ------------------------------------------------------------------------
+[INFO] Detecting the operating system and CPU architecture
+[INFO] ------------------------------------------------------------------------
+[INFO] os.detected.name: windows
+[INFO] os.detected.arch: x86_64
+[INFO] os.detected.version: 10.0
+[INFO] os.detected.version.major: 10
+[INFO] os.detected.version.minor: 0
+[INFO] os.detected.classifier: windows-x86_64
+[INFO] 
+[INFO] --- jacoco:0.8.12:prepare-agent (default) @ services.spring.loader ---
+[INFO] argLine set to -javaagent:C:\\Users\\eichelberger\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.12\\org.jacoco.agent-0.8.12-runtime.jar=destfile=W:\\IIP-workspace24\\services.spring.loader\\target\\jacoco.exec
+[INFO] 
+[INFO] --- protobuf:0.6.1:compile (default) @ services.spring.loader ---
+[INFO] W:\IIP-workspace24\services.spring.loader\src\main\proto does not exist. Review the configuration or consider disabling the plugin.
+[INFO] 
+[INFO] <<< source:3.2.0:test-jar (attach-sources) < generate-sources @ services.spring.loader <<<
+[INFO] 
+[INFO] 
+[INFO] --- source:3.2.0:test-jar (attach-sources) @ services.spring.loader ---
+[INFO] 
+[INFO] --- install:3.1.1:install (default-install) @ services.spring.loader ---
+[INFO] Installing W:\IIP-workspace24\services.spring.loader\pom.xml to C:\Users\eichelberger\.m2\repository\de\iip-ecosphere\platform\services.spring.loader\0.7.1-SNAPSHOT\services.spring.loader-0.7.1-SNAPSHOT.pom
+[INFO] Installing W:\IIP-workspace24\services.spring.loader\target\services.spring.loader-0.7.1-SNAPSHOT.jar to C:\Users\eichelberger\.m2\repository\de\iip-ecosphere\platform\services.spring.loader\0.7.1-SNAPSHOT\services.spring.loader-0.7.1-SNAPSHOT.jar
+[INFO] Installing W:\IIP-workspace24\services.spring.loader\target\services.spring.loader-0.7.1-SNAPSHOT-javadoc.jar to C:\Users\eichelberger\.m2\repository\de\iip-ecosphere\platform\services.spring.loader\0.7.1-SNAPSHOT\services.spring.loader-0.7.1-SNAPSHOT-javadoc.jar
+[INFO] Installing W:\IIP-workspace24\services.spring.loader\target\services.spring.loader-0.7.1-SNAPSHOT-test-javadoc.jar to C:\Users\eichelberger\.m2\repository\de\iip-ecosphere\platform\services.spring.loader\0.7.1-SNAPSHOT\services.spring.loader-0.7.1-SNAPSHOT-test-javadoc.jar
+[INFO] Installing W:\IIP-workspace24\services.spring.loader\target\services.spring.loader-0.7.1-SNAPSHOT-tests.jar to C:\Users\eichelberger\.m2\repository\de\iip-ecosphere\platform\services.spring.loader\0.7.1-SNAPSHOT\services.spring.loader-0.7.1-SNAPSHOT-tests.jar
+[INFO] Installing W:\IIP-workspace24\services.spring.loader\target\services.spring.loader-0.7.1-SNAPSHOT-sources.jar to C:\Users\eichelberger\.m2\repository\de\iip-ecosphere\platform\services.spring.loader\0.7.1-SNAPSHOT\services.spring.loader-0.7.1-SNAPSHOT-sources.jar
+[INFO] Installing W:\IIP-workspace24\services.spring.loader\target\services.spring.loader-0.7.1-SNAPSHOT-test-sources.jar to C:\Users\eichelberger\.m2\repository\de\iip-ecosphere\platform\services.spring.loader\0.7.1-SNAPSHOT\services.spring.loader-0.7.1-SNAPSHOT-test-sources.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  36.256 s
+[INFO] Finished at: 2025-08-12T10:06:45+02:00
+[INFO] ------------------------------------------------------------------------
