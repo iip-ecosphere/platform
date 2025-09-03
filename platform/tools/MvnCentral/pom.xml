@@ -74,9 +74,136 @@
         <version>${project.version}</version>
     </dependency>    
     <dependency>
+        <artifactId>support.yaml-snakeyaml</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>support.yaml-snakeyaml</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>
+    <dependency>
+        <artifactId>support.websocket-websocket</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+        <artifactId>support.websocket-websocket</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>    
+    <dependency>
+        <artifactId>support.ssh-sshd</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+        <artifactId>support.ssh-sshd</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>    
+    <dependency>
+        <artifactId>support.rest-spark</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+        <artifactId>support.rest-spark</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>    
+    <dependency>
+        <artifactId>support.processInfo-OSHI</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+        <artifactId>support.processInfo-OSHI</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>    
+    <dependency>
+        <artifactId>support.metrics-micrometer</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+        <artifactId>support.metrics-micrometer</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>    
+    <dependency>
+        <artifactId>support.log-slf4j-simple</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+        <artifactId>support.log-slf4j-simple</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>    
+    <dependency>
+        <artifactId>support.json-jackson</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+        <artifactId>support.json-jackson</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>    
+    <dependency>
+        <artifactId>support.http-apache</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+        <artifactId>support.http-apache</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>    
+    <dependency>
+        <artifactId>support.bytecode-bytebuddy</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+        <artifactId>support.bytecode-bytebuddy</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>    
+    <dependency>
         <artifactId>support.dfltSysMetrics</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+        <artifactId>support.dfltSysMetrics</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
     </dependency>    
 
     <dependency>
@@ -126,7 +253,6 @@
         <classifier>plugin</classifier>
         <type>zip</type>
     </dependency>    
-
     <dependency>
         <artifactId>support.aas.basyx2</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
@@ -144,7 +270,7 @@
         <version>${project.version}</version>
         <classifier>plugin</classifier>
         <type>zip</type>
-    </dependency>
+    </dependency>    
     
     <dependency>
         <artifactId>support.iip-aas</artifactId>
@@ -157,14 +283,35 @@
         <version>${project.version}</version>
     </dependency>  
     <dependency>
+        <artifactId>support.semanticId.eclass</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>  
+    <dependency>
         <artifactId>support.metrics.plcNext</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>  
     <dependency>
+        <artifactId>support.metrics.plcNext</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>  
+    <dependency>
         <artifactId>support.metrics.bitmotec</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+        <artifactId>support.metrics.bitmotec</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
     </dependency>    
         
     <dependency>
@@ -178,14 +325,35 @@
         <version>${project.version}</version>
     </dependency>    
     <dependency>
+        <artifactId>transport.amqp</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>    
+    <dependency>
         <artifactId>transport.mqttv3</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>    
     <dependency>
+        <artifactId>transport.mqttv3</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>    
+    <dependency>
         <artifactId>transport.mqttv5</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>transport.mqttv5</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
     </dependency>
 
     <dependency>
@@ -230,9 +398,23 @@
         <version>${project.version}</version>
     </dependency>
     <dependency>
+        <artifactId>connectors.opcuav1</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>
+    <dependency>
         <artifactId>connectors.modbustcpipv1</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>connectors.modbustcpipv1</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
     </dependency>
     <dependency>
         <artifactId>connectors.rest</artifactId>
@@ -240,9 +422,23 @@
         <version>${project.version}</version>
     </dependency>
     <dependency>
+        <artifactId>connectors.rest</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>
+    <dependency>
         <artifactId>connectors.mqttv5</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>connectors.mqttv5</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
     </dependency>
     <dependency>
         <artifactId>connectors.mqttv3</artifactId>
@@ -250,9 +446,23 @@
         <version>${project.version}</version>
     </dependency>
     <dependency>
+        <artifactId>connectors.mqttv3</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>
+    <dependency>
         <artifactId>connectors.mqtt</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>connectors.mqtt</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
     </dependency>
     <dependency>
         <artifactId>connectors.aas</artifactId>
@@ -260,9 +470,23 @@
         <version>${project.version}</version>
     </dependency>
     <dependency>
+        <artifactId>connectors.aas</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>
+    <dependency>
         <artifactId>connectors.ads</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>connectors.ads</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
     </dependency>
     <dependency>
         <artifactId>connectors.serial</artifactId>
@@ -270,9 +494,35 @@
         <version>${project.version}</version>
     </dependency>
     <dependency>
+        <artifactId>connectors.serial</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>
+    <dependency>
         <artifactId>connectors.file</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>connectors.file</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>
+    <dependency>
+        <artifactId>connectors.influx</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>connectors.influx</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
     </dependency>
     
     <dependency>
@@ -287,7 +537,12 @@
         <classifier>python</classifier>
         <type>zip</type>
     </dependency>
-    
+
+    <dependency>
+        <artifactId>services.spring.loader</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
     <dependency>
         <artifactId>services.environment.spring</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>

@@ -15,6 +15,16 @@
      <module>platformDependencies</module>
      <module>support/support</module>
      <module>support/libs.ads</module>
+     <module>support.yaml-snakeyaml</module>
+     <module>support.websocket-websocket</module>
+     <module>support.ssh-sshd</module>
+     <module>support.rest-spark</module>
+     <module>support.processInfo-OSHI</module>
+     <module>support.metrics-micrometer</module>
+     <module>support.log-slf4j-simple</module>
+     <module>support.json-jackson</module>
+     <module>support.http-apache</module>
+     <module>support.bytecode-bytebuddy</module>
      <!-- maven plugins -->
      <module>tools/tools.maven.python</module>
      <module>tools/tools.maven.invoker</module>
@@ -29,6 +39,7 @@
      <module>support/support.aas.basyx.server</module>
      <module>support/support.aas.basyx1_0</module>
      <module>support/support.aas.basyx1_5</module>
+     <module>support/support.aas.basyx2</module>
      <module>support/support.iip-aas</module>
      <module>support/support.dfltSysMetrics</module>
      <module>support/support.sysMetrics.plcnext</module>
@@ -60,6 +71,7 @@
      <module>connectors/connectors.file</module>
      <!-- services layer -->
      <module>services/services.environment</module>
+     <module>services/services.spring.loader</module>
      <module>services/services.environment.spring</module>
      <module>services/services</module>
      <module>tests/test.simpleStream.spring</module>
