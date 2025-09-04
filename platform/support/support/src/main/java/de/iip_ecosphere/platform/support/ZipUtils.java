@@ -12,14 +12,18 @@
 
 package de.iip_ecosphere.platform.support;
 
+import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Enumeration;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 /**
@@ -55,6 +59,7 @@ public class ZipUtils {
      * @param pred the predicate to identify the file
      * @return the input stream to {@code name} (must be closed explicitly) or <b>null</b> for none
      * @throws IOException if something I/O related fails
+     * @see #findFile(File, Predicate)
      */
     public static InputStream findFile(InputStream in, Predicate<ZipEntry> pred) throws IOException {
         InputStream found = null;
@@ -76,7 +81,76 @@ public class ZipUtils {
         }
         return found;
     }
+    
+    /**
+     * Finds a file within the ZIP/JAR file given by {@code file}. Same as {@link #findFile(InputStream, Predicate)},
+     * but may work on ZIP files that have been processed as stream or Zip file system, i.e., in case of the bug that 
+     * only deflated entries can have ext descriptors.
+     * 
+     * @param file the ZIP/JAR file
+     * @param pred the predicate to identify the file
+     * @return the input stream to {@code name} (must be closed explicitly) or <b>null</b> for none
+     * @throws IOException if something I/O related fails
+     */
+    public static InputStream findFile(File file, Predicate<ZipEntry> pred) throws IOException {
+        // https://stackoverflow.com/questions/47208272/android-zipinputstream-only-deflated-entries-can-have-
+        // ext-descriptor
+        InputStream found = null;
+        ZipFile zf = new ZipFile(file);
+        Enumeration<? extends ZipEntry> entries =  zf.entries();
+        while (entries.hasMoreElements()) {
+            ZipEntry zipEntry = entries.nextElement();
+            if (pred.test(zipEntry)) {
+                found = new ClosingInputStream(zf.getInputStream(zipEntry), zf);
+                break;
+            }
+        }
+        // do not close zf here, happens in ClosingInputStream
+        return found;
+    }
+    
+    /**
+     * Finds a file within the ZIP/JAR file given by {@code file}. Same as {@link #findFile(InputStream, Predicate)},
+     * but may work on ZIP files that have been processed as stream or Zip file system, i.e., in case of the bug that 
+     * only deflated entries can have ext descriptors.
+     * 
+     * @param file the ZIP/JAR file
+     * @param name the name of the file within {@code in} to be returned
+     * @return the input stream to {@code name} (must be closed explicitly) or <b>null</b> for none
+     * @throws IOException if something I/O related fails
+     */
+    public static InputStream findFile(File file, String name) throws IOException {
+        return findFile(file, z -> z.getName().equals(name));
+    }    
 
+    /**
+     * A delegating input stream that closes a given closable after closing this stream. Typically, the closeable
+     * is some parent stream.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class ClosingInputStream extends DelegatingInputStream {
+
+        private Closeable closeable;
+        
+        /**
+         * Creates an instance.
+         * 0
+         * @param delegate the instance to delegate the operations to
+         * @param closeable the closable to close after this stream
+         */
+        public ClosingInputStream(InputStream delegate, Closeable closeable) {
+            super(delegate);
+            this.closeable = closeable;
+        }
+        
+        @Override
+        public void close() throws IOException {
+            super.close();
+            closeable.close();
+        }
+        
+    }
     
     /**
      * Finds a file within the ZIP/JAR file given by {@code in}. Closes {@code in}.

@@ -388,16 +388,20 @@ public class PluginManager {
     public static void loadAllFrom(File folder, PluginFilter filter, PluginSetupDescriptor... local) {
         File[] files = folder.listFiles();
         for (File f : files) {
-            File cpFile;
+            File cpFile = null;
             if (f.isDirectory()) { // test unpacking with contained jars
                 cpFile = new File(f, "classpath"); // by convention
             } else { // resolved, relocated
-                cpFile = f;
+                if (!f.getName().endsWith("-win") && !f.getName().endsWith("-linux")) {
+                    cpFile = f;
+                }
             }
-            if (!cpFile.exists()) {
-                LoggerFactory.getLogger(PluginManager.class).warn("No plugin classpath file {}. Ignoring.", cpFile);
-            } else {
-                loadPluginFrom(cpFile, files.length, filter, local);
+            if (null != cpFile) {
+                if (!cpFile.exists()) {
+                    LoggerFactory.getLogger(PluginManager.class).warn("No plugin classpath file {}. Ignoring.", cpFile);
+                } else {
+                    loadPluginFrom(cpFile, files.length, filter, local);
+                }
             }
         }
     }

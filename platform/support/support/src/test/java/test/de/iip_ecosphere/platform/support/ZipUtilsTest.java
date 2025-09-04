@@ -125,6 +125,25 @@ public class ZipUtilsTest {
 
         FileUtils.deleteQuietly(f);
     }
+
+    /**
+     * Tests {@link ZipUtils#findFile(File, String)}.
+     * 
+     * @throws IOException if reading/writing fails
+     */
+    @Test
+    public void findFile() throws IOException {
+        File f = new File("src/test/resources/test.zip");
+        Assert.assertTrue(f.exists());
+        InputStream fileStream = ZipUtils.findFile(f, "folder2/text21.txt");
+        Assert.assertNotNull(fileStream);
+        String test = IOUtils.toString(fileStream, StandardCharsets.UTF_8.name());
+        fileStream.close();
+        Assert.assertEquals("text21.txt", test);
+
+        fileStream = ZipUtils.findFile(f, "folder2/text23.txt");
+        Assert.assertNull(fileStream);
+    }
     
     /**
      * Tests {@link ZipUtils#listFiles(InputStream, java.util.function.Predicate, java.util.function.Consumer)}.
