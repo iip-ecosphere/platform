@@ -19,7 +19,6 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Ignore;
@@ -29,6 +28,7 @@ import au.com.jcloud.lxd.model.Container;
 import au.com.jcloud.lxd.service.ILxdService;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
 import de.iip_ecosphere.platform.ecsRuntime.lxc.LxcContainerManager;
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 
@@ -55,8 +55,8 @@ public class LxcContainerManagerTest {
         // Some assumptions made for Jenkins to run test successfully
         // To activate test again either assume false or set
         // "!SystemUtils.IS_OS_WINDOWS"
-        Assume.assumeFalse(SystemUtils.IS_OS_WINDOWS);
-        Assume.assumeTrue(!SystemUtils.USER_HOME.startsWith("/home/"));
+        Assume.assumeFalse(OsUtils.isWindows());
+        Assume.assumeTrue(!OsUtils.getUserHome().startsWith("/home/"));
 
         String userHome = System.getProperty("user.home");
         System.setProperty("snap_cert", userHome + File.separator + "snap/lxd/common/config/client.crt");
