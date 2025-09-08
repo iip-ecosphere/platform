@@ -32,6 +32,7 @@ import de.iip_ecosphere.platform.configuration.EasyLogLevel;
 import de.iip_ecosphere.platform.configuration.EasySetup;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator.InstantiationConfigurer;
+import de.iip_ecosphere.platform.configuration.ivml.IvmlUtils;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
@@ -266,12 +267,13 @@ public abstract class AbstractIvmlTests {
         
         @Override
         protected void validateReasoningResult(ReasoningResult res) throws ExecutionException {
+            boolean hasConflict = IvmlUtils.analyzeReasoningResult(res, isEmitReasonerWarnings(), true);
             if (exit) {
-                if (res.hasConflict()) {
+                if (hasConflict) {
                     System.exit(-2);
                 }
             } else {
-                Assert.assertFalse(res.hasConflict());
+                Assert.assertFalse(hasConflict);
             }
         }
         

@@ -34,6 +34,20 @@ project KodexMesh {
             }
         }
     };
+
+    RecordType rec1refined = {
+        name = "KRec13Refined",
+        refining = refBy(rec1),
+        fields = {
+            Field {
+                name = "intField2",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "stringField2",
+                type = refBy(StringType)
+            }
+        }
+    };
     
     // ------------ individual, reusable services ------------------
         

@@ -211,6 +211,15 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
         }
         method.addAnnotation("com.fasterxml.jackson.annotation.JsonIgnore"); // unconditional -> service integrations
     }
+
+    // added v2->v3
+    def getExt(RecordType type, String add, String pkg) {
+        if (isDefined(type.refining) and type.refining <> null) {
+            pkg + "." + asTypeName(type.refining.name) + add;  
+        } else {
+            "";
+        }
+    }
     
     def main(Configuration config, JavaCodeArtifact target, RecordType type, String pkg, Boolean interface, Boolean sharedInterfaces, Boolean impl) {
         IIPEcosphere cfg = config;
@@ -239,6 +248,7 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
             interface = false;
             emitJavadoc = true;
         }
+        String ext = getExt(type, add, pkg);
 
         JavaCodeClass mainCls = codeCreateClass(target, pkg, clsName + add, '${comment} of the application data type ${clsName}');
         if (typeNeedsAasElement(type)) {
@@ -246,6 +256,7 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
         }
         mainCls.addAnnotation("de.iip_ecosphere.platform.support.iip_aas.ConfiguredName").addStringArgument(type.name);
         mainCls.addInterface(implements);
+        mainCls.addExtends(ext);
         mainCls.asInterface(interface);
 
         for (Field f: type.fields) {
@@ -264,6 +275,9 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
 
             JavaCodeMethod cons = mainCls.addConstructor("Copy constructor.");
             cons.addParameter(clsName, "from", "the instance to copy the values from");
+            if (ext <> "") {
+                cons.addSuperCall().arg("from");
+            }
 
             JavaCodeMethod hash = mainCls.addHashCode();
             hash.addVariable("int", "hc", "0");

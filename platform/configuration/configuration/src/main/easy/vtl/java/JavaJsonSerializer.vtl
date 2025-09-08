@@ -24,7 +24,8 @@ template JavaJsonSerializer(IIPEcosphere config, JavaCodeArtifact target, Record
     }
     
     def defineJacksonOptionals(RecordType type, String objectMapperVar, String typeName, JavaCodeBlock block) {
-        sequenceOf(String) fieldNames = type.fields->select(f|f.optional)->collect(f|f.name);
+        sequenceOf(Field) fields = collectFields(type);
+        sequenceOf(String) fieldNames = fields->select(f|f.optional)->collect(f|f.name);
         if (fieldNames.size() > 0) {
             JavaCodeMethodCall call = block.addCall("de.iip_ecosphere.platform.support.json.JsonUtils.defineOptionals", JavaCodeImportScope.CLASS)
                 .addArgument(objectMapperVar)

@@ -18,6 +18,15 @@ template JavaSerializerBase(IIPEcosphere config, JavaCodeArtifact target, Record
         "X";
     }
 
+    // added v2->v3
+    def sequenceOf(Field) collectFields(RecordType type) {
+        sequenceOf(Field) result = type.fields;
+        if (isDefined(type.refining) and type.refining <> null) {
+            result = result.append(collectFields(type.refining)).flatten();
+        }
+        result;
+    }
+
     def genCls(IIPEcosphere config, JavaCodeArtifact target, RecordType type, String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl) {
         String clsName = asTypeName(type.name);
         String typeName = clsName;

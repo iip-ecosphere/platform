@@ -19,12 +19,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import de.iip_ecosphere.platform.configuration.ivml.IvmlUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
 import net.ssehub.easy.instantiation.core.model.common.ITraceFilter;
 import net.ssehub.easy.instantiation.core.model.common.NoTraceFilter;
 import net.ssehub.easy.instantiation.core.model.common.TopLevelExecutionTraceFilter;
 import net.ssehub.easy.instantiation.core.model.execution.TracerFactory;
-import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 import net.ssehub.easy.varModel.confModel.Configuration;
 
@@ -57,6 +57,7 @@ public class PlatformInstantiator {
         private File metaModelFolder;
         private String startRuleName = "mainCli";
         private Map<String, String> properties = new HashMap<>();
+        private boolean emitReasonerWarnings = false;
         
         /**
          * Creates a configurer instance.
@@ -179,6 +180,25 @@ public class PlatformInstantiator {
             }
                 
             return args.toArray(new String[args.size()]); 
+        }
+
+        /**
+         * Returns whether reasoning warnings shall be emitted.
+         * 
+         * @return {@code true} for warnings, {@code false} else
+         */
+        protected boolean isEmitReasonerWarnings() {
+            return emitReasonerWarnings;
+        }
+        
+        /**
+         * Enables emitting reasoner warnings.
+         * 
+         * @return <b>this</b> (builder style)
+         */
+        public InstantiationConfigurer emitReasonerWarnings() {
+            emitReasonerWarnings = true;
+            return this;
         }
         
         /**
@@ -305,7 +325,7 @@ public class PlatformInstantiator {
          * @throws ExecutionException if reasoning fails
          */
         protected void validateReasoningResult(ReasoningResult res) throws ExecutionException {
-            if (res.hasConflict()) {
+            if (IvmlUtils.analyzeReasoningResult(res, isEmitReasonerWarnings(), true)) {
                 System.exit(-1);
             }
         }
@@ -342,7 +362,7 @@ public class PlatformInstantiator {
         }
         
     }
-
+    
     /**
      * An instantiation configurer that does not clean the output folder.
      * 
@@ -396,7 +416,6 @@ public class PlatformInstantiator {
         if (null == rRes) {
             throw new ExecutionException("No valid IVML model loaded/found.", null);
         }
-        EasyExecutor.printReasoningMessages(rRes);
         configurer.validateReasoningResult(rRes);
         ConfigurationManager.setupContainerProperties();
         try {

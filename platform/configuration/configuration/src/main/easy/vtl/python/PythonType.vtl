@@ -123,6 +123,16 @@ template PythonType(Configuration config, PythonCodeArtifact target, RecordType 
         addDatatypeImport(asTypeName(type.name), false, art);
     }
 
+    // added v2->v3
+    def getBase(RecordType type, String add, PythonCodeArtifact target) {
+        String result = "";
+        if (isDefined(type.refining) and type.refining <> null) {
+            result = asTypeName(type.refining.name) + add;  
+            addDatatypeImport(result, false, target);
+        }
+        result;
+    }
+
     def main(Configuration config, PythonCodeArtifact target, RecordType type, Boolean interface, Boolean sharedInterfaces) {
         String clsName = asTypeName(type.name);
         String add = "";
@@ -135,7 +145,7 @@ template PythonType(Configuration config, PythonCodeArtifact target, RecordType 
             } else {
                 add = "Impl";
                 comment = "Implementation";
-                ext = "(${clsName})";
+                ext = clsName;
                 addDatatypeImport(clsName, false, target);
             }
         } else {
@@ -146,8 +156,10 @@ template PythonType(Configuration config, PythonCodeArtifact target, RecordType 
         genTypeImports(type, target);
     	target.addImport("datetime", "datetime");
     	target.addImport("decimal", "Decimal");
-
-    	PythonCodeClass c = addPythonClass(target, "${clsName}${add}${ext}", '${comment} of the application data type ${clsName}.');
+        String base = getBase(type, add, target);
+    	PythonCodeClass c = addPythonClass(target, "${clsName}${add}", '${comment} of the application data type ${clsName}.');
+    	c.addBase(ext);
+    	c.addBase(base);
 		attributes(type, c);
 		getters(type, c);
 		setters(type, c);

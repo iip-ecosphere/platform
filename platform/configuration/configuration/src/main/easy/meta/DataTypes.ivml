@@ -44,6 +44,7 @@ project DataTypes {
     abstract compound DataType {
         NonEmptyString name;
         Constraint isNameOk = isNameOk(self);
+        String semanticId = "";
     }
     
     @DispatchBasis
@@ -52,6 +53,7 @@ project DataTypes {
     
     compound AliasType refines DataType {
         refTo(DataType) represents;
+        String semanticId = represents.semanticId;
     }
     
     // allow for unique selection on UI, not necessarily needed for code generation
@@ -110,14 +112,33 @@ project DataTypes {
         name = "FloatListType",
         type = refBy(FloatType)
     };
+
+    def sequenceOf(Field) collectFields(RecordType type) = 
+        if (type.refining == null) then
+            {}
+        else
+            type.fields.including(collectFields(type.refining))
+        endif;
     
+    def Boolean fieldsOk(RecordType type) = 
+        let sequenceOf(Field) fld = collectFields(type) in
+           fld.size() == fld.asSet().size();
+           
+    def setOf(RecordType) createRecordTypeSet(RecordType type) = 
+        let setOf(RecordType) r = {} in
+            r.including(type);
+ 
     compound RecordType refines CDataProperty, DataType {
         Fields fields;
+        refTo(RecordType) refining = null;
         Constraint fieldNamesUnique = fields->select(f|isRelevant(f))->isUnique(l|l.name);
+        Constraint cycleFree = createRecordTypeSet(self)->isAcyclic(RecordType t|t.refining) and fieldsOk(self);
     }
     
     const Integer CACHE_ALWAYS = -1;
     const Integer CACHE_NONE = 0;
+    
+    enum Display { TimeSeries, Gauge };
     
     compound Field {
         assign(bindingTime = BindingTime::specify) to { // may require staged freezing
@@ -127,7 +148,9 @@ project DataTypes {
             Boolean optional = false;
             Boolean readOnly = false;
             Boolean nullable = false;
-            String semanticId = "";
+            String semanticId = type.semanticId;
+            String displayName = "";
+            Display display = null;
         }
         Integer cachingTime = CACHE_ALWAYS;
         Constraint isNameOk = isNameOk(self);

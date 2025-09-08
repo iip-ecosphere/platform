@@ -205,7 +205,8 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      * @throws ExecutionException the exception if reasoning failed
      */
     protected void throwIfFails(ReasoningResult res, boolean reloadIfFail) throws ExecutionException {
-        if (res.hasConflict()) {
+        boolean hasConflict = IvmlUtils.analyzeReasoningResult(res, false, false);
+        if (hasConflict) {
             if (reloadIfFail) {
                 reloadConfiguration();
             }
@@ -511,7 +512,8 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
             }
         }
         ReasoningResult result = ReasonerFrontend.getInstance().propagate(cfg.getConfiguration(), null, null);
-        if (result.hasConflict()) {
+        boolean hasConflict = IvmlUtils.analyzeReasoningResult(result, false, false);
+        if (hasConflict) {
             history.rollback();
             throwIfFails(result, false);
             /*String text = "";
@@ -713,7 +715,8 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
         reloadConfiguration();
         ReasoningResult res = validateAndPropagate();
         String msg = "";
-        if (res.hasConflict()) {
+        boolean hasConflict = IvmlUtils.analyzeReasoningResult(res, false, false);
+        if (hasConflict) {
             for (CopiedFile c : copies.values()) {
                 try {
                     c.restore();
