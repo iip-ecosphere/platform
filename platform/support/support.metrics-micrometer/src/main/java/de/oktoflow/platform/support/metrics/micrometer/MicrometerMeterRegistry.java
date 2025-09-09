@@ -94,7 +94,8 @@ class MicrometerMeterRegistry implements MeterRegistry, MeterRegistry.Config {
             result = new MicrometerTimer((io.micrometer.core.instrument.Timer) meter);
         } else if (applies(filter, Counter.class) && meter instanceof io.micrometer.core.instrument.Counter) {
             result = new MicrometerCounter((io.micrometer.core.instrument.Counter) meter);
-        } else { // incomplete, e.g., FunctionCounter missing
+        // incomplete, e.g., FunctionCounter missing
+        } else if (applies(filter, Meter.class) && meter != null) { // final else
             result = new GenericMeterWrapper(meter);
         }
         return filter.cast(result);
