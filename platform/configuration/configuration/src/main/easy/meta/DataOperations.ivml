@@ -106,6 +106,35 @@ project DataOperations {
     compound DivideDataTranslationOperation refines DataTranslationOperation {
         // TODO constraint: args only real, integer fields/constants
     }
-
-
+    
+    // --- propositional logic ------------
+    
+    
+    abstract compound Condition refines DataOperation {
+        
+    }
+    
+    enum ComparisonOperator {EQUALS, NOT_EQUALS, GREATER, GREATER_OR_EQUAL, LESS};
+    
+    compound BooleanCondition refines Condition {
+        DataFieldAccess field;
+    }
+    
+    
+    compound BinaryCondition refines Condition {
+        DataOperation leftOperand;
+        DataOperation rightOperand;
+    }
+    
+    
+    
+    compound EqualsCondition refines BinaryCondition {
+        
+    }
+    
+    @dispatchBasis
+    def String produceCondition(BinaryCondition cond) = {};
+    
+    @dispatchCase
+    def String produceCondition(EqualsCondition cond) = "tutaj jest wynik";
 }

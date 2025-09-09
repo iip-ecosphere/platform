@@ -26,6 +26,8 @@ project ServiceStateMachines {
        refTo(Event) event;
        String log; 
        refTo(State) target;
+       Condition condition;
+       
    }
    
    compound StateMachine {
