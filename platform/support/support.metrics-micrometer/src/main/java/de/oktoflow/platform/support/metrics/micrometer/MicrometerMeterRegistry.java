@@ -94,8 +94,28 @@ class MicrometerMeterRegistry implements MeterRegistry, MeterRegistry.Config {
             result = new MicrometerTimer((io.micrometer.core.instrument.Timer) meter);
         } else if (applies(filter, Counter.class) && meter instanceof io.micrometer.core.instrument.Counter) {
             result = new MicrometerCounter((io.micrometer.core.instrument.Counter) meter);
+        } else { // incomplete, e.g., FunctionCounter missing
+            result = new GenericMeterWrapper(meter);
         }
         return filter.cast(result);
+    }
+    
+    /**
+     * Just wraps a not further supported meter so that it is not lost.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class GenericMeterWrapper extends AbstractMeter<io.micrometer.core.instrument.Meter> {
+
+        /**
+         * Creates an instance.
+         * 
+         * @param meter the meter to wrap
+         */
+        protected GenericMeterWrapper(io.micrometer.core.instrument.Meter meter) {
+            super(meter);
+        }
+        
     }
     
     /**
