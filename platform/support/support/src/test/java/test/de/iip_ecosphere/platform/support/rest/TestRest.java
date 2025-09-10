@@ -54,6 +54,32 @@ public class TestRest extends de.iip_ecosphere.platform.support.rest.Rest {
         }
 
         @Override
+        public void defineBefore(Filter filter) {
+        }
+
+        @Override
+        public void defineBefore(String path, Filter filter) {
+        }
+
+        @Override
+        public void halt(int status, String body) {
+        }
+
+        @Override
+        public boolean supportsPathVariables() {
+            return false;
+        }
+
+        @Override
+        public String toPathVariable(String name) {
+            return name;
+        }
+
+        @Override
+        public void secure(String keystoreFile, String keystorePassword, String certAlias) {
+        }
+
+        @Override
         public Server start() {
             return this;
         }
@@ -61,7 +87,7 @@ public class TestRest extends de.iip_ecosphere.platform.support.rest.Rest {
         @Override
         public void stop(boolean dispose) {
         }
-        
+
     }
     
     @Override

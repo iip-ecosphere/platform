@@ -37,9 +37,10 @@ public class ServiceLoaderUtils {
      * @param <D> the descriptor type
      * @param descriptorClass the descriptor class
      * @return the found descriptor, may be an empty optional instance
+     * @see #load(Class)
      */
     public static <D> Optional<D> filterExcluded(Class<D> descriptorClass) {
-        ServiceLoader<D> loader = ServiceLoader.load(descriptorClass);
+        ServiceLoader<D> loader = load(descriptorClass);
         // in test settings, the fake descriptor may also be there - filter it out
         Optional<D> first = stream(loader)
             .filter(d -> !hasExcludeFirst(d))
@@ -56,9 +57,10 @@ public class ServiceLoaderUtils {
      * @param <D> the descriptor type
      * @param descriptorClass the descriptor class
      * @return the first service provider
+     * @see #load(Class)
      */
     public static <D> Optional<D> findFirst(Class<D> descriptorClass) {
-        return findFirst(ServiceLoader.load(descriptorClass));
+        return findFirst(load(descriptorClass));
     }
 
     /**

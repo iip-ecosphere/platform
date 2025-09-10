@@ -36,6 +36,11 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
  * id. Additionally, considers comma/semicolon separated paths in env/system property 
  * {@value #FILE_PLUGINS_PROPERTY} to be loaded as unpacked plugins.
  * 
+ * The {@link PluginManager} does not load plugins automatically as the first point in time to address
+ * the {@link PluginManager} may be too early, see {@link PluginSetup}. Call {@link #loadPlugins()}, 
+ * {@link #loadAllFrom(File, PluginSetupDescriptor...)}
+ * {@link #loadAllFrom(File, PluginFilter, PluginSetupDescriptor...)} explicitly.
+ * 
  * @author Holger Eichelberger, SSE
  */
 public class PluginManager {
@@ -175,12 +180,6 @@ public class PluginManager {
      */
     public static Iterable<Plugin<?>> plugins() {
         return plugins.values();
-    }
-    
-    static {
-        loadPlugins(false);
-        // default ones by platform core components afterwards so that specific ones can take precedence
-        registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE);
     }
     
     /**

@@ -130,4 +130,9 @@ public class ChildFirstClassLoader extends ClassLoader implements IdentifyingCla
         return this == loader || childClassLoader == loader;
     }
     
+    @Override
+    public String toString() {
+        return super.toString() + " with child " + childClassLoader;
+    }
+    
 }

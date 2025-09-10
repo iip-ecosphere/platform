@@ -143,6 +143,7 @@ public class PluginManagerTest {
      */
     @Test
     public void testPluginManager() {
+        PluginManager.loadPlugins();
         Assert.assertNull(PluginManager.getPlugin("whatever"));
         final String id = "test-plugin";
         Plugin<?> plugin = PluginManager.getPlugin(id); // must not reference class directly!

@@ -21,12 +21,34 @@ package de.iip_ecosphere.platform.support.plugins;
  */
 public class CurrentClassloaderPluginSetupDescriptor implements PluginSetupDescriptor {
 
+    /**
+     * Instance for the current class loader provided by the plugin manager. This is 
+     * {@link PluginSetup#getClassLoader()}.
+     */
     public static final CurrentClassloaderPluginSetupDescriptor INSTANCE 
         = new CurrentClassloaderPluginSetupDescriptor();
 
+    private ClassLoader loader;
+
+    /**
+     * Creates a default instance using {@link PluginSetup#getClassLoader()}.
+     */
+    public CurrentClassloaderPluginSetupDescriptor() {
+        this(null);
+    }
+    
+    /**
+     * Creates an instance for a specific class loader.
+     * 
+     * @param loader the class loader to use, may be <b>null</b> then {@link PluginSetup#getClassLoader()} is used
+     */
+    public CurrentClassloaderPluginSetupDescriptor(ClassLoader loader) {
+        this.loader = loader;
+    }
+
     @Override
     public ClassLoader createClassLoader(ClassLoader parent) {
-        return parent;
+        return null == loader ? parent : loader;
     }
 
 }
