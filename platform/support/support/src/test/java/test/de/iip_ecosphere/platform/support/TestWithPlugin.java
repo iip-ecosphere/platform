@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.junit.Before;
 
+import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
 import de.iip_ecosphere.platform.support.plugins.FolderClasspathPluginSetupDescriptor;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
@@ -128,6 +129,7 @@ public class TestWithPlugin {
      */
     public static void loadPlugins() {
         if (!loaded) {
+            PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE);
             loaded = true;
             boolean found = false;
             for (PluginLocation loc : locations) {
