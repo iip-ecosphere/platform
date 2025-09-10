@@ -46,6 +46,21 @@ public class SparkRest extends de.iip_ecosphere.platform.support.rest.Rest {
             return request.body();
         }
 
+        @Override
+        public String getParam(String name) {
+            return request.params(name);
+        }
+
+        @Override
+        public String getContentType() {
+            return request.contentType();
+        }
+
+        @Override
+        public String getQueryString() {
+            return request.queryString();
+        }
+
     }
 
     /**
@@ -80,6 +95,11 @@ public class SparkRest extends de.iip_ecosphere.platform.support.rest.Rest {
         public void setStatus(int status) {
             response.status(status);
         }
+
+        @Override
+        public void setType(String type) {
+            response.type(type);
+        }
         
     }
 
@@ -111,8 +131,19 @@ public class SparkRest extends de.iip_ecosphere.platform.support.rest.Rest {
             return (req, res) -> route.handle(new SparkRequest(req), new SparkResponse(res));
         }
 
+        /**
+         * Wraps an interface filter to a spark filter.
+         * 
+         * @param filter the interface filter
+         * @return the spark filter
+         */
+        private spark.Filter createFilter(Filter filter) {
+            return (req, res) -> filter.handle(new SparkRequest(req), new SparkResponse(res));
+        }
+
         @Override
         public void definePost(String path, Route route) {
+System.out.println("POST " + path);            
             service.post(path, createRoute(route));
         }
 
@@ -130,6 +161,21 @@ public class SparkRest extends de.iip_ecosphere.platform.support.rest.Rest {
         public void defineDelete(String path, Route route) {
             service.delete(path, createRoute(route));
         }
+        
+        @Override
+        public void defineBefore(Filter filter) {
+            service.before(createFilter(filter));
+        }
+
+        @Override
+        public void defineBefore(String path, Filter filter) {
+            service.before(path, createFilter(filter));
+        }
+
+        @Override
+        public void halt(int status, String body) {
+            service.halt(status, body);
+        }
 
         @Override
         public Server start() {
@@ -141,6 +187,21 @@ public class SparkRest extends de.iip_ecosphere.platform.support.rest.Rest {
         public void stop(boolean dispose) {
             service.stop();
             service.awaitStop();
+        }
+
+        @Override
+        public boolean supportsPathVariables() {
+            return true;
+        }
+
+        @Override
+        public String toPathVariable(String name) {
+            return ":" + name;
+        }
+        
+        @Override
+        public void secure(String keystoreFile, String keystorePassword, String certAlias) {
+            service = service.secure(keystoreFile, keystorePassword, certAlias, null, null);
         }
         
     }
