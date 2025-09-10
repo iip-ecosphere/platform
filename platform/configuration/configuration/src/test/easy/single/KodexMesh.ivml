@@ -110,7 +110,115 @@ project KodexMesh {
         input = {{type=refBy(rec2)}}
     };
 
-    // ------------ application and service nets ------------------
+    Service myStateService = JavaService {
+        id = "StateService",
+        name = "StateService",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.NoImpl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::SINK_SERVICE,
+        input = {{type=refBy(TurnstilePlcOutput)}, {type=refBy(rec2)}},
+        stateMachine = refBy(Turnstile)
+    };
+
+    // --------- state machine ---------------------------------
+
+    RecordType TurnstilePlcOutput = {
+        name = "TurnstilePlcOutput",
+        fields = {
+            Field {
+                name = "insertCoin",
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "push",
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "money",
+                type = refBy(DoubleType),
+                cachingTime = CACHE_NONE
+            }, Field {
+                name = "ready",
+                type = refBy(BooleanType),
+                cachingTime = CACHE_NONE
+            }
+        }
+    };
+    
+    Event insertCoin = {
+        field = DataFieldAccess{field=refBy(TurnstilePlcOutput.fields[0])}
+    };
+    
+    Event push = {
+        field = DataFieldAccess{field=refBy(TurnstilePlcOutput.fields[1])},
+    };
+    
+    State unlocked = {
+        id = "unlocked",
+        transitions = {refBy(unlockedInsertCoin), refBy(unlockedPush)},
+        onEntry = {"unlockedAction"}
+    };
+    
+    State locked = {
+        id = "locked",
+        onEntry ={"lockedAction"},
+        transitions = {refBy(lockedInsertCoin), refBy(lockedPush)}
+    };
+    
+    Transition lockedInsertCoin = {
+        id = "lockedInsertCoin",
+        event = refBy(insertCoin),
+        log = "inserting a coin in locked state -> unlocking the tile",
+        target = refBy(unlocked),
+        condition = BooleanCondition {
+            field = DataFieldAccess{field=refBy(TurnstilePlcOutput.fields[0])}
+        } 
+    };
+    
+    Transition lockedPush = {
+        id = "lockedPush",
+        event = refBy(push),
+        log = "Pushing in locked state  -> no change",
+        target = locked,
+        condition = BooleanCondition {
+            field = DataFieldAccess{field=refBy(TurnstilePlcOutput.fields[1])}
+        } 
+    };
+    
+    Transition unlockedInsertCoin = {
+        id = "unlockedInsertCoin",
+        event = refBy(insertCoin),
+        target = refBy(unlocked),
+        log = "Inserting a coin in unlocked state -> no change",
+        /*condition = BooleanCondition {
+            field = DataFieldAccess{field=refBy(TurnstilePlcOutput.fields[2])}
+        }*/
+        condition = EqualsCondition { // 3 = 3
+            leftOperand = DataFieldAccess{field=refBy(TurnstilePlcOutput.fields[2])},
+            rightOperand = IntegerConstantDataOperation{value=3} 
+        }
+    };
+    
+    Transition unlockedPush = {
+        id = "unlockedPush",
+        event = refBy(push),
+        target= refBy(locked),
+        log = "Pushing in unlocked state -> push successful",
+        condition = BooleanCondition {
+            field = DataFieldAccess{field=refBy(TurnstilePlcOutput.fields[3])}
+        } 
+    };
+    
+    StateMachine Turnstile = {
+        id = "Turnstile",
+        states = {refBy(locked), refBy(unlocked)},
+        input = refBy(TurnstilePlcOutput)
+    };
+
+    // ------------ application and service meshes ------------------
     
     Application myApp = {
         id = "KodexMeshApp",
