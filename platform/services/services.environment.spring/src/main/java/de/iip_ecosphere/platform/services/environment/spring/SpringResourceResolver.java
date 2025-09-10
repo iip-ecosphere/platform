@@ -30,7 +30,11 @@ public class SpringResourceResolver implements ResourceResolver {
     
     @Override
     public InputStream resolve(ClassLoader loader, String resource) {
-        return loader.getResourceAsStream("BOOT-INF/classes/" + resource);
+        InputStream result = loader.getResourceAsStream("BOOT-INF/classes/" + resource);
+        if (null == result) {
+            result = loader.getResourceAsStream("BOOT-INF/classes-app/" + resource);
+        }
+        return result;
     }
 
 }

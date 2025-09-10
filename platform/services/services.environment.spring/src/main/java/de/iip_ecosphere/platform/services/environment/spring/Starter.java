@@ -44,6 +44,8 @@ import de.iip_ecosphere.platform.support.yaml.Yaml;
 import de.iip_ecosphere.platform.support.yaml.YamlFile;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
@@ -266,6 +268,7 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
             ctx = app.run(a);
         });
         registerPlugin("springBroker", new TestSpringBroker());
+        PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE); // "local" plugins
         ResourceLoader.registerResourceResolver(new SpringResourceResolver()); // ensure spring resolution
         final String[] tmpArgs = args;
         setLocalTransportSetupSupplier(setup -> {
