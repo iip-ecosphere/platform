@@ -20,6 +20,8 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.connectors.parser.JsonInputParser;
 import de.iip_ecosphere.platform.connectors.parser.JsonInputParser.JsonInputConverter;
 import de.iip_ecosphere.platform.connectors.parser.JsonInputParser.JsonParseResult;
+import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
 /**
  * Tests {@link JsonInputParser}.
@@ -27,6 +29,10 @@ import de.iip_ecosphere.platform.connectors.parser.JsonInputParser.JsonParseResu
  * @author Holger Eichelberger, SSE
  */
 public class JsonInputParserTest {
+    
+    static {
+        PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE);
+    }
     
     /**
      * Some object-based test data.

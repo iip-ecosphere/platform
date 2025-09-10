@@ -24,6 +24,8 @@ import de.iip_ecosphere.platform.connectors.formatter.JsonOutputFormatter.JsonOu
 import de.iip_ecosphere.platform.connectors.parser.JsonInputParser;
 import de.iip_ecosphere.platform.connectors.parser.JsonInputParser.JsonInputConverter;
 import de.iip_ecosphere.platform.connectors.parser.JsonInputParser.JsonParseResult;
+import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
 /**
  * Tests {@link JsonOutputFormatter}.
@@ -31,6 +33,10 @@ import de.iip_ecosphere.platform.connectors.parser.JsonInputParser.JsonParseResu
  * @author Holger Eichelberger, SSE
  */
 public class JsonOutputFormatterTest {
+    
+    static {
+        PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE);
+    }
     
     /**
      * Tests the output formatter.
