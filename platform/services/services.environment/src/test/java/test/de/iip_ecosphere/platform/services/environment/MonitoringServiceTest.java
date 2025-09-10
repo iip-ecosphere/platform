@@ -21,6 +21,10 @@ import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.UpdatingMonitoringService;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+//import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
+import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -30,6 +34,10 @@ import org.junit.Test;
  * @author Holger Eichelberger, SSE
  */
 public class MonitoringServiceTest {
+    
+    static {
+        PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE);
+    }
     
     /**
      * Test service.
@@ -99,6 +107,7 @@ public class MonitoringServiceTest {
         MonitoringService.setUp(null, null);
         
         MetricsProvider prov = new MetricsProvider(new SimpleMeterRegistry());
+        //MetricsProvider prov = new MetricsProvider(MetricsFactory.getInstance().createRegistry());
         MonitoringService.setUp(null, prov);
         
         MyService service = new MyService();

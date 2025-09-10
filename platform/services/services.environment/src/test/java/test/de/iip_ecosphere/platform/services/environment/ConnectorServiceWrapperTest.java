@@ -24,6 +24,8 @@ import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
+import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import test.de.iip_ecosphere.platform.connectors.IdentityInputTranslator;
 import test.de.iip_ecosphere.platform.connectors.IdentityOutputTranslator;
@@ -43,6 +45,10 @@ import org.junit.Assert;
  */
 public class ConnectorServiceWrapperTest {
 
+    static {
+        PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE);
+    }
+    
     /**
      * Tests the {@link ConnectorServiceWrapper}.
      * 

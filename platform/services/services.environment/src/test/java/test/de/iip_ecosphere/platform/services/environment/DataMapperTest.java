@@ -24,6 +24,8 @@ import de.iip_ecosphere.platform.services.environment.DataMapper;
 import de.iip_ecosphere.platform.services.environment.DataMapper.BaseDataUnitFunctions;
 import de.iip_ecosphere.platform.services.environment.DataMapper.MappingConsumer;
 import de.iip_ecosphere.platform.support.StringUtils;
+import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
 import org.junit.Assert;
 
@@ -36,6 +38,10 @@ public class DataMapperTest {
 
     private static int count = 0;
 
+    static {
+        PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE);
+    }
+    
     /**
      * Some input data for a service. [testing]
      * 
