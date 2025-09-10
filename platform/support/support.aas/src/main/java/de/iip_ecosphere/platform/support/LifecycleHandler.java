@@ -25,6 +25,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
 /**
  * Aggregated methods for all known lifecycle descriptors. {@link LifecycleDescriptor} shall be declared via 
@@ -111,6 +113,7 @@ public class LifecycleHandler {
      * @param args the command line arguments to be considered during startup
      */
     public static void startup(String[] args) {
+        PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE); // preliminary
         cmdArgs = args.clone();
         AtomicReference<String> pidFile = new AtomicReference<>();
         
