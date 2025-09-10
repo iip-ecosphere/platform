@@ -30,8 +30,10 @@ import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -95,7 +97,7 @@ public class AppStarter {
          */
         static final EntryFilter NESTED_ARCHIVE_ENTRY_FILTER = (entry) -> {
             if (entry.isDirectory()) {
-                return entry.getName().equals("BOOT-INF/classes2/");
+                return entry.getName().equals("BOOT-INF/classes-app/");
             }
             return entry.getName().startsWith("BOOT-INF/lib2/");
         };        
@@ -362,6 +364,7 @@ public class AppStarter {
     static class ChildLaunchedURLClassLoader extends LaunchedURLClassLoader implements ChildClassLoader {
         
         private FindClassClassLoader realParent;
+        private Map<String, Class<?>> classes = new HashMap<>();
 
         /**
          * Creates an instance with delegation to the real parent class loader.
@@ -416,9 +419,24 @@ public class AppStarter {
             return result;
         }
         
-
         @Override
         public Class<?> findClass(String name) throws ClassNotFoundException {
+            Class<?> result = classes.get(name);
+            if (null == result) { // linkage error else, due to inconsistent response (?)
+                result = findClassIntern(name);
+                classes.put(name, result);
+            }
+            return result;
+        }
+        
+        /**
+         * Finds a class (no caching).
+         * 
+         * @param name the qualified class name
+         * @return the class object
+         * @throws ClassNotFoundException if the class cannot be found
+         */
+        public Class<?> findClassIntern(String name) throws ClassNotFoundException {
             boolean isJava = name.startsWith("java.") || name.startsWith("javax."); // java is java
             try {
                 if (isJava) {
@@ -631,7 +649,7 @@ public class AppStarter {
         ClassLoader loader = AppStarter.class.getClassLoader();
         System.out.println("oktoflow Spring application loader, main class loader " + loader);        
         // adjust class loader
-        if (loader instanceof LaunchedURLClassLoader) { // spring packaged
+        if (loader.getClass().getName().equals(LaunchedURLClassLoader.class.getName())) { // spring packaged
             loader = new AccessibleLauncher().createStackedLoader(loader); // implies child first
         } else {
             InputStream cp = ResourceLoader.getResourceAsStream(loader, APP_CLASSPATH);
