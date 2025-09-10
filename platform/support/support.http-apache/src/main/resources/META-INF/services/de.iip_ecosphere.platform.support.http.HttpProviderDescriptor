@@ -1,1 +1,1 @@
-de.oktoflow.platform.support.rest.spark.SparkRestPluginDescriptor
+de.oktoflow.platform.support.http.apache.ApacheHttpRestPluginDescriptor
