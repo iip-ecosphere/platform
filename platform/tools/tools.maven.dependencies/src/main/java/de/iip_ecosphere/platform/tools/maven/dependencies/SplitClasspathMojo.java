@@ -250,7 +250,7 @@ public class SplitClasspathMojo extends AbstractMojo {
      */
     private void postProcessSpringJar(FileSystem fs) throws IOException {
         Path srcPath = fs.getPath("BOOT-INF/classes/");
-        Path tgtPath = fs.getPath("BOOT-INF/classes2/");
+        Path tgtPath = fs.getPath("BOOT-INF/classes-app/");
         moveAll(srcPath, tgtPath, true);
     }
     
