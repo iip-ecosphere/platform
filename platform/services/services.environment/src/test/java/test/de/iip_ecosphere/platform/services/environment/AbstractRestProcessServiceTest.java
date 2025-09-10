@@ -29,6 +29,8 @@ import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.Version;
+import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 import de.iip_ecosphere.platform.support.rest.Rest;
 import de.iip_ecosphere.platform.support.rest.Rest.RestServer;
 import de.iip_ecosphere.platform.support.rest.Rest.Route;
@@ -42,6 +44,10 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  */
 public class AbstractRestProcessServiceTest {
 
+    static {
+        PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE);
+    }
+    
     private static final String PATH = "/services/repeater";
     private static final String TEST_REST = "{\"field\":\"abc\"}";
     private int port;
