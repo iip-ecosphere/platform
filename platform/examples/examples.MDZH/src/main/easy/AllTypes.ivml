@@ -140,7 +140,10 @@ project AllTypes {
                 mappedName = "Messages_0_Payload_TotalActivePower_Value",
                 description = "PowerConsumption",
                 type = refBy(Modbus_float32), // keep for now
-                cachingTime = CACHE_NONE
+                cachingTime = CACHE_NONE,
+                displayName = "Power Consumption",
+                display = Display::TimeSeries,
+                semanticId = "0173-1#05-AAA187#005"
             }        
         }
     };
