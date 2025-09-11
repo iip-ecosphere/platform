@@ -14,7 +14,9 @@ package de.iip_ecosphere.platform.support.aas.basyx;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -416,6 +418,42 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
     @Override
     public Function<Object[], Object> getServiceFunction(String name) {
         return getOperation(getServicePath(), name);
+    }
+    
+    @Override
+    public Set<String> getOperations(boolean qualified) {
+        Set<String> result = new HashSet<>();
+        for (String category: operations.keySet()) {
+            addOperations(category, qualified, result);
+        }
+        return result;
+    }
+
+    @Override
+    public Set<String> getOperations(String category, boolean qualified) {
+        return addOperations(category, qualified, new HashSet<>());
+    }
+
+    /**
+     * Adds all operations known for {@code category} to {@code result}.
+     * 
+     * @param category the category
+     * @param qualified add qualified or unqualified names
+     * @param result the result set to modify
+     * @return {@code result}
+     */
+    private Set<String> addOperations(String category, boolean qualified, Set<String> result) {
+        Map<String, Entry> cat = operations.get(category);
+        if (null != cat) {
+            String prefix = qualified ? PREFIX_OPERATIONS + category + SEPARATOR : "";
+            cat.keySet().forEach(k -> result.add(prefix + k));
+        }
+        return result;
+    }
+
+    @Override
+    public Set<String> getServiceOperations(boolean qualified) {
+        return getOperations(getServicePath(), qualified);
     }
 
     @Override

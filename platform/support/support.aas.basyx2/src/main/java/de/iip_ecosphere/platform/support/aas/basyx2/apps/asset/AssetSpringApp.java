@@ -160,7 +160,7 @@ public class AssetSpringApp implements WebMvcConfigurer {
      * @param func the function, may be <b>null</b>
      * @return the function execution result
      */
-    private ResponseEntity<OperationVariable[]> invokeOperation(String opName, OperationVariable[] requestData, 
+    static ResponseEntity<OperationVariable[]> invokeOperation(String opName, OperationVariable[] requestData, 
         Function<Object[], Object> func) {
         HttpStatus responseStatus;
         OperationVariable[] result = null;

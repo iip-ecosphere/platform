@@ -29,6 +29,7 @@ import de.iip_ecosphere.platform.support.aas.basyx2.BaSyxAasFactory;
 import de.iip_ecosphere.platform.support.aas.basyx2.BaSyxLocalServer;
 import de.iip_ecosphere.platform.support.aas.Type;
 import test.de.iip_ecosphere.platform.support.aas.AasTest;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
 /**
  * Tests the AAS abstraction implementation for BaSyx.
@@ -46,6 +47,12 @@ public class BaSyxTest extends AasTest {
     @Override
     protected Endpoint createDependentEndpoint(ServerAddress address, String endpoint) {
         return new Endpoint(address.getSchema(), endpoint); // turn to emphemeral, v3 requires 4 servers
+    }
+
+    @Override
+    protected void setupPlugins() {
+        TestWithPlugin.addPluginLocation("support", "support.rest-spark", "rest-spark", false);
+        TestWithPlugin.loadPlugins();
     }
     
     /**
