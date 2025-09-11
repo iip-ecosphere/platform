@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -96,6 +97,33 @@ public interface OperationsProvider {
      * @see #defineServiceFunction(String, Function)
      */
     public Function<Object[], Object> getServiceFunction(String name);
+    
+    /**
+     * Returns all known operation names.
+     * 
+     * @param qualified if {@code true} qualified names (operation/<i>category</i>/<i>name</i>) or if {@code false} 
+     *     just names
+     * @return the operation names
+     */
+    public Set<String> getOperations(boolean qualified);
+
+    /**
+     * Returns all known operation names for a given {@code category}.
+     * 
+     * @param qualified if {@code true} qualified names (operation/<i>category</i>/<i>name</i>) or if {@code false} 
+     *     just names
+     * @return the operation names
+     */
+    public Set<String> getOperations(String category, boolean qualified);
+
+    /**
+     * Returns all known service operation names.
+     * 
+     * @param qualified if {@code true} qualified names (operation/<i>category</i>/<i>name</i>) or if {@code false} 
+     *     just names
+     * @return the operation names
+     */
+    public Set<String> getServiceOperations(boolean qualified);
     
     /**
      * Defines a service function (in a pre-defined category).

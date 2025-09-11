@@ -144,6 +144,16 @@ public interface ProtocolServerBuilder extends Builder<Server> {
     public ProtocolServerBuilder defineProperty(String name, Supplier<Object> get, Consumer<Object> set);
     
     /**
+     * Indicates that the protocol server shall run in a Tomcat environment, e.g., the server to be built 
+     * must not change {@link java.net.URL#setURLStreamHandlerFactory(java.net.URLStreamHandlerFactory)}.
+     * 
+     * @return <b>this</b>
+     */
+    public default ProtocolServerBuilder forTomcat() {
+        return this;
+    }
+    
+    /**
      * Sets an interceptor for all returns, primarily intended for testing/mocking to circumvent implementations that
      * do not support direct mocking. Shall not be used for regular purposes. May be ignored by the implementation.
      * 

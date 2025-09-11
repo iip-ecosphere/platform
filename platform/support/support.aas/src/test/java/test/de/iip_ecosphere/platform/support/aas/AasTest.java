@@ -118,6 +118,7 @@ public class AasTest {
     private static final String URN_AAS = "urn:::AAS:::testMachines#";
     
     private static final LangString DESCRIPTION = new LangString("en", "A description");
+    private static boolean forTomcatFlag = false;
     
     static {
         QNAME_VAR_LOTSIZE = NAME_SUBMODEL + "/" + NAME_VAR_LOTSIZE;
@@ -127,7 +128,7 @@ public class AasTest {
         QNAME_OP_RECONFIGURE = NAME_SUBMODEL + "/" + NAME_OP_RECONFIGURE;
         QNAME_OP_STOPMACHINE = NAME_SUBMODEL + "/" + NAME_OP_STOPMACHINE;
     }
-    
+
     /**
      * Creates the operations server for the given machine instance and for the operations in 
      * {@link #createAasOperationsElements(SubmodelElementContainerBuilder, SetupSpec, TestMachine, 
@@ -138,12 +139,32 @@ public class AasTest {
      * @return the protocol server
      */
     public static Server createOperationsServer(SetupSpec spec, TestMachine machine) {
+        return createOperationsServer(spec, machine, false);
+    }
+    
+    /**
+     * Creates the operations server for the given machine instance and for the operations in 
+     * {@link #createAasOperationsElements(SubmodelElementContainerBuilder, SetupSpec, TestMachine, 
+     * AuthenticationDescriptor)}.
+     * 
+     * @param spec the setup specification
+     * @param machine the machine
+     * @param testForTomcat enables/disables alternating tests with {@link ProtocolServerBuilder#forTomcat()}
+     * @return the protocol server
+     */
+    public static Server createOperationsServer(SetupSpec spec, TestMachine machine, boolean testForTomcat) {
         AasFactory instance = AasFactory.getInstance();
         AasFactory.setPluginId("unknown"); // forth and back that it has been called once
         AasFactory.setPluginId(AasFactory.DEFAULT_PLUGIN_ID);
         AasFactory.setInstance(instance);
         AasFactory factory = AasFactory.getInstance();
         ProtocolServerBuilder builder = factory.createProtocolServerBuilder(spec);
+        if (testForTomcat) {
+            if (forTomcatFlag) {
+                builder.forTomcat();        
+            }
+            forTomcatFlag = !forTomcatFlag;
+        }
         builder.defineProperty(NAME_VAR_LOTSIZE, () -> {
             return machine.getLotSize(); 
         }, (param) -> {
@@ -342,10 +363,12 @@ public class AasTest {
      * @throws UnknownHostException shall not occur if the test works
      * @throws ExecutionException shall not occur if the test works
      * @throws IOException shall not occur if the test works
+     * @see #setupPlugins()
      */
     protected void testVabQuery(String protocol, String serverProtocol, AuthenticationDescriptor authDesc) 
         throws SocketException, UnknownHostException, ExecutionException, IOException {
 
+        setupPlugins();
         TestMachine machine = new TestMachine();
 
         AasFactory factory = AasFactory.getInstance();
@@ -360,7 +383,7 @@ public class AasTest {
         spec.setAssetServerKeystore(getKeyStoreDescriptor(protocol));
         spec.setAssetServerAuthentication(authDesc);
         Aas aas = createAas(machine, spec, authDesc);
-        Server ccServer = createOperationsServer(spec, machine);
+        Server ccServer = createOperationsServer(spec, machine, true);
         ccServer.start(); // required here by basyx-0.1.0-SNAPSHOT
         ProtocolServerBuilder builder = AasFactory.getInstance().createProtocolServerBuilder(spec);
         Assert.assertTrue(builder.isAvailable(VAB_SERVER.getHost(), 5000));
@@ -385,6 +408,12 @@ public class AasTest {
      */
     protected Endpoint createDependentEndpoint(ServerAddress address, String endpoint) {
         return new Endpoint(address, endpoint);
+    }
+
+    /**
+     * Sets up required plugins.
+     */
+    protected void setupPlugins() {
     }
     
     /**

@@ -13,7 +13,9 @@
 package de.iip_ecosphere.platform.support.aas;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -88,5 +90,38 @@ public class SimpleOperationsProvider implements OperationsProvider {
     public void setInterceptor(Interceptor interceptor) {
         this.interceptor = interceptor;
     }
+    
+    @Override
+    public Set<String> getOperations(boolean qualified) {
+        return getOperations(null, qualified);
+    }
+
+    @Override
+    public Set<String> getOperations(String category, boolean qualified) {
+        Set<String> result = new HashSet<>();
+        if (category != null && !category.endsWith("_")) {
+            category += "_";
+        }
+        for (String name: funcs.keySet()) {
+            if (null == category || name.startsWith(category) || name.startsWith(OP_PREFIX + category)) {
+                if (!qualified) {
+                    int pos = name.indexOf("_");
+                    if (pos > 0 && name.startsWith(OP_PREFIX)) {
+                        pos = name.indexOf("_", pos + 1);
+                    }
+                    if (pos > 0) {
+                        name = name.substring(pos + 1);
+                    }
+                }
+                result.add(name);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Set<String> getServiceOperations(boolean qualified) {
+        return getOperations(SERVICE_PREFIX, qualified);
+    }    
 
 }
