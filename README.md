@@ -12,6 +12,7 @@ For installation and first steps, see [install guide](platform/documentation/INS
 
 ## News
 
+* ReGaP: Influx/Grafana based dashboarding for oktoflow apps, in integration with [Bitmotec](https://www.bitmotec.com/)
 * For easing git checkouts: examples.hm22 and examples.emo23 have been moved to an own repository
 * Upcoming support for Asset Administration Shells metamodel v3 through BaSyx2
 * Support for Python 3.13 and virtual environments
