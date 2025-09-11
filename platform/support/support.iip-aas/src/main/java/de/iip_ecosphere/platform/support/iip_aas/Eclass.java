@@ -213,5 +213,20 @@ public class Eclass {
      * Use {@link #IRDI_PROPERTY_SOFTWARE_VERSION} instead.
      */
     public static final String IRDI_ASPECT_SW_VERSION = "0173-1#02-AAS383#001";
+
+    /**
+     * Unit of current in Ampere.
+     */
+    public static final String IRDI_UNIT_AMPERE = "0173-1#05-AAA220#005";
     
+    /**
+     * Unit of current in kilo Ampere.
+     */
+    public static final String IRDI_UNIT_KILO_AMPERE = "0173-1#05-AAA280#005";
+
+    /**
+     * Unit of current in milli Ampere.
+     */
+    public static final String IRDI_UNIT_MILLI_AMPERE = "0173-1#05-AAA187#005";
+
 }

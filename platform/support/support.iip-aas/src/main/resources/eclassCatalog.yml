@@ -515,3 +515,40 @@ definitions:
         name: network protocol
         structuredName: network protocol
         description: Information about the protocol of the network
+  - semanticId: 0173-1#05-AAA280#005
+    version: 5
+    revision: 5
+    naming:
+      de:
+        name: kA
+        structuredName: kA
+        description: 1 000-faches der SI-Basiseinheit Ampere
+      en:
+        name: kA
+        structuredName: kA
+        description: 1 000 times the SI base unit ampere
+  - semanticId: 0173-1#05-AAA220#005
+    version: 5
+    revision: 5
+    naming:
+      de:
+        name: A
+        structuredName: A
+        description: Stärke eines konstanten elektrischen Stromes, der, durch zwei parallele, geradlinige, unendlich lange und im Vakuum im Abstand von einem Meter voneinander angeordnete Leiter von vernachlässigbar kleinem, kreisförmigem Querschnitt fließend, zwischen diesen Leitern je einem Meter Leiterlänge die Kraft 2·10⁻⁷ Newton hervorrufen würde
+      en:
+        name: A
+        structuredName: A
+        description: Strength of a constant electric current which, flowing through two parallel, straight, infinitely long conductors of negligible circular cross-section arranged one meter apart in a vacuum, would produce a force of 2 10⁻⁷ Newton between these conductors for each meter of conductor length
+  - semanticId: 0173-1#05-AAA187#005        
+    version: 5
+    revision: 5
+    naming:
+      de:
+        name: mA
+        structuredName: mA
+        description: 0,001-faches der SI-Basiseinheit Ampere
+      en:
+        name: mA
+        structuredName: mA
+        description: 0,001 times the SI base unit ampere
+  
