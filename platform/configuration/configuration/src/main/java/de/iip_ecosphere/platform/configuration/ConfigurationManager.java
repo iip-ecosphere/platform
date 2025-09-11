@@ -15,9 +15,9 @@ package de.iip_ecosphere.platform.configuration;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-import de.iip_ecosphere.platform.configuration.ConfigurationAas.IipGraphMapper;
 import de.iip_ecosphere.platform.configuration.ivml.AasIvmlMapper;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlUtils;
+import de.iip_ecosphere.platform.configuration.serviceMesh.ServiceMeshGraphMapper;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.TaskRegistry;
 import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
@@ -215,7 +215,7 @@ public class ConfigurationManager {
             }
             if (null == aasIvmlMapper) {
                 aasIvmlMapper = new AasIvmlMapper(() -> ConfigurationManager.getVilConfiguration(), 
-                     new IipGraphMapper(), null);
+                     new ServiceMeshGraphMapper(), null);
                 aasIvmlMapper.addGraphFormat(new DrawflowGraphFormat());
             }
             initialized = true;

@@ -24,6 +24,7 @@ import de.iip_ecosphere.platform.configuration.DrawflowGraphFormat;
 import de.iip_ecosphere.platform.configuration.EasySetup;
 import de.iip_ecosphere.platform.configuration.ivml.AasIvmlMapper;
 import de.iip_ecosphere.platform.configuration.ivml.GraphFormat;
+import de.iip_ecosphere.platform.configuration.serviceMesh.ServiceMeshGraphMapper;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Server;
@@ -83,7 +84,7 @@ public class TestAasIvmlModel {
 
             Configuration cfg = ConfigurationManager.getVilConfiguration();
             GraphFormat format = new DrawflowGraphFormat();
-            AasIvmlMapper mapper = new AasIvmlMapper(() -> cfg, new ConfigurationAas.IipGraphMapper(), null); 
+            AasIvmlMapper mapper = new AasIvmlMapper(() -> cfg, new ServiceMeshGraphMapper(), null); 
             mapper.addGraphFormat(format);
             ConfigurationManager.setAasIvmlMapper(mapper);        
             

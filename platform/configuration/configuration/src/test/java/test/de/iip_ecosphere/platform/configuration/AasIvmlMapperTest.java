@@ -46,6 +46,7 @@ import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphEdge;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphNode;
+import de.iip_ecosphere.platform.configuration.serviceMesh.ServiceMeshGraphMapper;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlUtils;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.Endpoint;
@@ -360,7 +361,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         Configuration cfg = ConfigurationManager.getVilConfiguration();
         Assert.assertNotNull("No configuration available", cfg);
         // TODO no listeners for now
-        return new MyAasIvmlMapper(() -> cfg, new ConfigurationAas.IipGraphMapper(), adapt); 
+        return new MyAasIvmlMapper(() -> cfg, new ServiceMeshGraphMapper(), adapt); 
     }
     
     /**
