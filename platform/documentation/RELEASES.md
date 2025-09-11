@@ -6,7 +6,7 @@ In progress:
 * [#164](https://github.com/iip-ecosphere/platform/issues/164): UI design revision
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 * [#170](https://github.com/iip-ecosphere/platform/issues/170): Integrate BaSyx2
-* [#165](https://github.com/iip-ecosphere/platform/issues/170): Upgrade automated container building
+* [#165](https://github.com/iip-ecosphere/platform/issues/170): Upgrade automated container building/Python
 * [#122](https://github.com/iip-ecosphere/platform/issues/122): Transparent encryption, RBAC on AAS (incl. UI authentication)
 
 Improvements:
@@ -18,10 +18,13 @@ Improvements:
 * Revision of code generation to Java/Python/JSON/YAML artifacts provided by EASy-Producer
 * [#167](https://github.com/iip-ecosphere/platform/issues/167): Generated Windows/Linux script line endings.
 * [#166](https://github.com/iip-ecosphere/platform/issues/166): Upgrade Angular for UI.
-* [#173](https://github.com/iip-ecosphere/platform/issues/173): Fix Python version selection for Python services.
 * [#171](https://github.com/iip-ecosphere/platform/issues/171): Migrate build-jk.xml to maven deployment (where possible).
-* [#174](https://github.com/iip-ecosphere/platform/issues/174): Move examples.hm22 and examples.emo23 to own repository
+* [#173](https://github.com/iip-ecosphere/platform/issues/173): Fix Python version selection for Python services.
+* [#174](https://github.com/iip-ecosphere/platform/issues/174): Moved examples.hm22 and examples.emo23 to own repository
 * [#175](https://github.com/iip-ecosphere/platform/issues/175): Revise Python tests, please check/adjust your Python tests according to the generated Python test templates.
+* [#176](https://github.com/iip-ecosphere/platform/issues/176): Archived/nailed-down basis containers for container generation.
+* [#177](https://github.com/iip-ecosphere/platform/issues/177): Local Python venvs in installation scripts.
+* [#178](https://github.com/iip-ecosphere/platform/issues/178): Python console output.
 
 New features:
 * [#169](https://github.com/iip-ecosphere/platform/issues/169): File-based connector for CSV, JSON (ReGaP)
