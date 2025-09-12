@@ -11,7 +11,7 @@ Application configurations are specified in terms of the [Integrated Variability
 Briefly summarized, an IVML file used for app configuration looks as follows:
 
 ```
-project Name {
+project <Name> {
 
    // imports
 
