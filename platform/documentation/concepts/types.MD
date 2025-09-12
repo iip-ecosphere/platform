@@ -92,7 +92,9 @@ In turn, `Field` instances may be equipped with more information as summarized b
 | readOnly | Read-only data is not written back to data sources represented by a connector. If possible, no setter methods/functions will be generated for read-only fields. | False |
 | nullable | May the data contain **null** as a value. If true, potentially additional code must be generated to handle this case, which may impact performance. | False |
 | cachingTime | Time in milliseconds a connector may cache the data without reading it again from the underlying data source. Negative values indicate that the field shall be always be cached. Pre-defined constants are CACHE_NONE (0 ms) and CACHE_ALWAYS (-1 ms). However, the current default value may be changed in the future, as in our demonstrators/applications usually dynamic data is represented and CACHE_NONE must be specified explicitly, e.g., for OPC UA connectors. | \-1 |
-| semanticId | Optional semantic identifier (preferred ECLASS or AAS) characterizing the type, if not given, taken over from `type` if stated there. |  -  |
+| semanticId | Optional semantic identifier (preferred ECLASS or AAS) characterizing the type, if not given, taken over from `type` if stated there. |  _type.semanticId_  |
+| displayName | Optional display name for values represented by this field, e.g., on a dashboard. | "" |
+| display | Optional setting on how to display the field on a dashboard (`TimeSeries`, `Gauge`) | - |
 
 Background:
 - Type and record names are used for naming generated classes or attributes/fields as well as related methods/functions within the classes. Thereby, given names are adjusted to the respective programming language conventions, e.g., Java or Python. However, within data formats, e.g., JSON, we keep the original names as specified in the model.
@@ -103,7 +105,14 @@ Alias types consitute an own type that is essentially based on an existing type 
 
 ```
 AliasType AmpereType refines AliasType {
+    name = "Ampere",
     represents = refTo(DoubleType),
     semanticId = "0173-1#05-AAA220#005"
 }
 ```
+
+| Field | Description | Default |
+| --- | --- | --- |
+| name | The unique name of the type | |
+| represents | Reference to the type variable that shall be aliased | |
+| semanticId | Optional semantic id detailing the type | _represents.semanticId_ | |
