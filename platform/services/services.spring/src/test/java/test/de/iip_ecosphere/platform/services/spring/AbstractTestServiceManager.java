@@ -133,6 +133,7 @@ public class AbstractTestServiceManager extends AbstractTest {
      * @param broker the broker address
      */
     public static void init(ServerAddress broker) {
+        TestWithQpid.loadPlugins();
         server = TestWithQpid.fromPlugin(broker); // prescribes protocol for artifacts
         // spring is too late, AbstractSetup does not load it even with modified constructor...
         TransportSetup setup = ServiceFactory.getTransport();
