@@ -45,8 +45,6 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
-import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
-import de.iip_ecosphere.platform.support.plugins.PluginManager;
 import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
@@ -64,10 +62,6 @@ import test.de.iip_ecosphere.platform.transport.TestWithQpid;
  */
 public class PythonProcessServiceTest extends TestWithQpid {
 
-    static {
-        PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE);
-    }    
-    
     private String stringParam = null;
     
     /**

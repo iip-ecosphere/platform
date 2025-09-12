@@ -15,14 +15,14 @@ package de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepr
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-
-import io.micrometer.core.instrument.Gauge;
-import io.micrometer.core.instrument.Measurement;
-import io.micrometer.core.instrument.Statistic;
+import de.iip_ecosphere.platform.support.json.Json;
+import de.iip_ecosphere.platform.support.json.JsonArray;
+import de.iip_ecosphere.platform.support.json.JsonObject;
+import de.iip_ecosphere.platform.support.json.JsonObjectBuilder;
+import de.iip_ecosphere.platform.support.metrics.Gauge;
+import de.iip_ecosphere.platform.support.metrics.Measurement;
+import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
+import de.iip_ecosphere.platform.support.metrics.Statistic;
 
 /**
  * This class aims to provide a prototypical implementation of the Gauge
@@ -91,7 +91,7 @@ public class GaugeRepresentation extends MeterRepresentation implements Gauge {
         value = jo.getJsonNumber("value").doubleValue();
 
         measurements = new ArrayList<Measurement>();
-        measurements.add(new Measurement(() -> value(), Statistic.VALUE));
+        measurements.add(MetricsFactory.buildMeasurement(() -> value(), Statistic.VALUE));
     }
 
     /**
@@ -106,7 +106,7 @@ public class GaugeRepresentation extends MeterRepresentation implements Gauge {
         value = 0;
 
         measurements = new ArrayList<Measurement>();
-        measurements.add(new Measurement(() -> value, Statistic.VALUE));
+        measurements.add(MetricsFactory.buildMeasurement(() -> value, Statistic.VALUE));
     }
     
     /**

@@ -2,16 +2,11 @@ package test.de.iip_ecosphere.platform.services.environment.metricsProvider;
 
 import static org.junit.Assert.*;
 
-import java.io.StringReader;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,19 +17,19 @@ import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsPro
 import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.MeterRepresentation;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.json.Json;
+import de.iip_ecosphere.platform.support.json.JsonObject;
+import de.iip_ecosphere.platform.support.metrics.Counter;
+import de.iip_ecosphere.platform.support.metrics.Gauge;
+import de.iip_ecosphere.platform.support.metrics.Measurement;
+import de.iip_ecosphere.platform.support.metrics.Meter;
+import de.iip_ecosphere.platform.support.metrics.MeterFilter;
+import de.iip_ecosphere.platform.support.metrics.MeterRegistry;
+import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
+import de.iip_ecosphere.platform.support.metrics.Statistic;
+import de.iip_ecosphere.platform.support.metrics.Timer;
 import test.de.iip_ecosphere.platform.services.environment.metricsProvider.utils.TestUtils;
 import static test.de.iip_ecosphere.platform.services.environment.metricsProvider.utils.TestUtils.assertThrows;
-
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.Gauge;
-import io.micrometer.core.instrument.Measurement;
-import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Statistic;
-import io.micrometer.core.instrument.Timer;
-import io.micrometer.core.instrument.config.MeterFilter;
-import io.micrometer.core.instrument.search.RequiredSearch;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 /**
  * Tests {@link MetricsProvider}.
@@ -67,20 +62,20 @@ public class MetricsProviderTest {
      */
     @Before
     public void setUpMetricsProvider() {
-        provider = createProvider(new SimpleMeterRegistry());
+        provider = createProvider(MetricsFactory.getInstance().createRegistry());
     }
 
     /**
-     * Tests {@link MetricsProvider#MetricsProvider(io.micrometer.core.instrument.MeterRegistry)}.
+     * Tests {@link MetricsProvider#MetricsProvider(MeterRegistry)}.
      */
     @Test
     public void testInitOk() {
-        MetricsProvider mProvider = createProvider(new SimpleMeterRegistry());
+        MetricsProvider mProvider = createProvider(MetricsFactory.getInstance().createRegistry());
         assertNotNull(mProvider);
     }
 
     /**
-     * Tests {@link MetricsProvider#MetricsProvider(io.micrometer.core.instrument.MeterRegistry)}.
+     * Tests {@link MetricsProvider#MetricsProvider(MeterRegistry)}.
      */
     @Test
     public void testInitNull() {
@@ -327,30 +322,31 @@ public class MetricsProviderTest {
     
     /**
      * Tests serializing/deserializing.
+     * 
+     * @throws IOException shall not occur
      */
     @Test
-    public void testJson() {
+    public void testJson() throws IOException {
         double gValue = 10;
-        Counter counter = Counter
-            .builder("service.sent").baseUnit("tuple/s")
+        Counter counter = MetricsFactory.buildCounter("service.sent").baseUnit("tuple/s")
             .description("Tuples sent out by a service")
             .tags("service", "SimpleReceiver", "application", "SimpleMeshApp", "device", "dev0")
             .register(provider.getRegistry());
-        Counter.builder("service.received")
+        MetricsFactory.buildCounter("service.received")
             .baseUnit("tuple/s")
             .description("Tuples received by a service")
             .tags("service", "SimpleReceiver", "application", "SimpleMeshApp", "device", "dev0")
             .register(provider.getRegistry());
-        Counter.builder("system.online")
+        MetricsFactory.buildCounter("system.online")
             .baseUnit("ms")
             .description("Time the system is online")
             .tags("service", "SimpleReceiver", "application", "SimpleMeshApp", "device", "dev2")
             .register(provider.getRegistry());
-        Timer timer = Timer.builder("system.time")
+        Timer timer = MetricsFactory.buildTimer("system.time")
             .description("Time the system is opeating")
             .tags("service", "SimpleReceiver", "application", "SimpleMeshApp", "device", "dev2")
             .register(provider.getRegistry());
-        Gauge gauge = Gauge.builder("system.value", () -> gValue)
+        Gauge gauge = MetricsFactory.buildGauge("system.value", () -> gValue)
             .description("Some value")
             .tags("service", "SimpleReceiver", "application", "SimpleMeshApp", "device", "dev2")
             .register(provider.getRegistry());
@@ -361,15 +357,16 @@ public class MetricsProviderTest {
         MetricsProvider.recordNsTime(timer, () -> 400, () -> { }); // and some 400 ns
         
         String json = provider.toJson("id0", false,
-            MeterFilter.acceptNameStartsWith("service.sent"),
-            MeterFilter.denyNameStartsWith("services.received"));
+            MetricsFactory.acceptNameStartsWith("service.sent"),
+            MetricsFactory.denyNameStartsWith("services.received"));
         assertMeters(json, provider.getRegistry());
-        JsonObject obj = Json.createReader(new StringReader(json)).readObject();
+        JsonObject obj = Json.createObject(json);
         String id = obj.getString("id");
         assertEquals("id0", id);
         if (null != id) {
-            for (Map.Entry<String, JsonValue> e : obj.getJsonObject("meters").entrySet()) {
-                Meter meter = MeterRepresentation.parseMeter(e.getValue().toString(), "device:dev1");
+            JsonObject meters = obj.getJsonObject("meters");
+            for (String key: meters.keys()) {
+                Meter meter = MeterRepresentation.parseMeter(meters.getValue(key).toString(), "device:dev1");
                 assertNotNull(meter);
                 if (meter.getId().getName().equals(counter.getId().getName())) {
                     meter.getId().getBaseUnit().equals("tuple/s");
@@ -415,19 +412,21 @@ public class MetricsProviderTest {
      * 
      * @param json the JSON representation
      * @param registry the registry to check against
+     * @throws IOException shall not occur
      */
-    private void assertMeters(String json, MeterRegistry registry) {
-        JsonObject obj = Json.createReader(new StringReader(json)).readObject();
+    private void assertMeters(String json, MeterRegistry registry) throws IOException {
+        JsonObject obj = Json.createObject(json);
         String id = obj.getString("id");
         Assert.assertNotNull(id);
         Assert.assertTrue(id.length() > 0);
-        for (Map.Entry<String, JsonValue> e : obj.getJsonObject("meters").entrySet()) {
-            Meter meter = MeterRepresentation.parseMeter(e.getValue().toString(), "device:abcd");
-            RequiredSearch s = registry.get(meter.getId().getName());
-            Assert.assertNotNull(s.meter());
-            Assert.assertTrue(meter.getId().getType() == s.meter().getId().getType());
+        JsonObject meters = obj.getJsonObject("meters");
+        for (String key : meters.keys()) {
+            Meter meter = MeterRepresentation.parseMeter(meters.getValue(key).toString(), "device:abcd");
+            Meter s = registry.getMeter(meter.getName());
+            Assert.assertNotNull(s);
+            Assert.assertTrue(meter.getId().getType() == s.getId().getType());
             List<Measurement> mMeasure = CollectionUtils.toList(meter.measure().iterator());
-            List<Measurement> sMeasure = CollectionUtils.toList(s.meter().measure().iterator());
+            List<Measurement> sMeasure = CollectionUtils.toList(s.measure().iterator());
             Assert.assertEquals(mMeasure.size(), sMeasure.size());
             for (int i = 0; i < mMeasure.size(); i++) {
                 Measurement mM = mMeasure.get(i);
@@ -454,7 +453,7 @@ public class MetricsProviderTest {
      */
     @Test
     public void testAppend() {
-        MeterFilter add = MeterFilter.deny();
+        MeterFilter add = MetricsFactory.deny();
         MeterFilter[] t = MetricsProvider.append(MetricsProvider.DEFAULT_METER_FILTERS, add);
         assertTrue(t.length == MetricsProvider.DEFAULT_METER_FILTERS.length + 1);
         for (int i = 0; i < t.length; i++) {

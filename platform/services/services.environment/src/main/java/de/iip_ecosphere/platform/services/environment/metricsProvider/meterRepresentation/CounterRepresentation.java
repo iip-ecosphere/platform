@@ -15,14 +15,14 @@ package de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepr
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.Measurement;
-import io.micrometer.core.instrument.Statistic;
+import de.iip_ecosphere.platform.support.json.Json;
+import de.iip_ecosphere.platform.support.json.JsonArray;
+import de.iip_ecosphere.platform.support.json.JsonObject;
+import de.iip_ecosphere.platform.support.json.JsonObjectBuilder;
+import de.iip_ecosphere.platform.support.metrics.Counter;
+import de.iip_ecosphere.platform.support.metrics.Measurement;
+import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
+import de.iip_ecosphere.platform.support.metrics.Statistic;
 
 /**
  * This class aims to provide a prototypical implementation of the Counter
@@ -95,7 +95,7 @@ public class CounterRepresentation extends MeterRepresentation implements Counte
         update = 0.0;
 
         measurements = new ArrayList<Measurement>();
-        measurements.add(new Measurement(() -> count(), Statistic.COUNT));
+        measurements.add(MetricsFactory.buildMeasurement(() -> count(), Statistic.COUNT));
     }
 
     /**
@@ -111,7 +111,7 @@ public class CounterRepresentation extends MeterRepresentation implements Counte
         update = 0;
 
         measurements = new ArrayList<Measurement>();
-        measurements.add(new Measurement(() -> count, Statistic.COUNT));
+        measurements.add(MetricsFactory.buildMeasurement(() -> count, Statistic.COUNT));
     }
     
     /**

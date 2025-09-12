@@ -18,16 +18,15 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-
-import io.micrometer.core.instrument.Measurement;
-import io.micrometer.core.instrument.Statistic;
-import io.micrometer.core.instrument.Timer;
-import io.micrometer.core.instrument.distribution.HistogramSnapshot;
+import de.iip_ecosphere.platform.support.json.Json;
+import de.iip_ecosphere.platform.support.json.JsonArray;
+import de.iip_ecosphere.platform.support.json.JsonArrayBuilder;
+import de.iip_ecosphere.platform.support.json.JsonObject;
+import de.iip_ecosphere.platform.support.json.JsonObjectBuilder;
+import de.iip_ecosphere.platform.support.metrics.Measurement;
+import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
+import de.iip_ecosphere.platform.support.metrics.Statistic;
+import de.iip_ecosphere.platform.support.metrics.Timer;
 
 /**
  * This class aims to provide a prototypical implementation of the Timer
@@ -135,7 +134,7 @@ public class TimerRepresentation extends MeterRepresentation implements Timer {
                     throw new IllegalArgumentException("This object does not map a valid Timer!");
                 }
                 count = jo.getJsonNumber("value").longValue();
-                measurements.add(new Measurement(() -> (double) count, Statistic.COUNT));
+                measurements.add(MetricsFactory.buildMeasurement(() -> (double) count, Statistic.COUNT));
                 cFlag = true;
                 break;
             case TOTAL_TIME:
@@ -144,7 +143,7 @@ public class TimerRepresentation extends MeterRepresentation implements Timer {
                 }
                 aux = jo.getJsonNumber("value").doubleValue();
                 totalTime = (long) (aux * conv);
-                measurements.add(new Measurement(() -> totalTime(baseTimeUnit), Statistic.TOTAL_TIME));
+                measurements.add(MetricsFactory.buildMeasurement(() -> totalTime(baseTimeUnit), Statistic.TOTAL_TIME));
                 ttFlag = true;
                 break;
             case MAX:
@@ -153,7 +152,7 @@ public class TimerRepresentation extends MeterRepresentation implements Timer {
                 }
                 aux = jo.getJsonNumber("value").doubleValue();
                 maxTime = (long) (aux * conv);
-                measurements.add(new Measurement(() -> max(baseTimeUnit), Statistic.MAX));
+                measurements.add(MetricsFactory.buildMeasurement(() -> max(baseTimeUnit), Statistic.MAX));
                 mtFlag = true;
                 break;
             default:
@@ -181,9 +180,9 @@ public class TimerRepresentation extends MeterRepresentation implements Timer {
         updates = new ArrayList<Long>();
 
         measurements = new ArrayList<Measurement>();
-        measurements.add(new Measurement(() -> (double) count, Statistic.COUNT));
-        measurements.add(new Measurement(() -> (double) totalTime, Statistic.TOTAL_TIME));
-        measurements.add(new Measurement(() -> (double) maxTime, Statistic.MAX));
+        measurements.add(MetricsFactory.buildMeasurement(() -> (double) count, Statistic.COUNT));
+        measurements.add(MetricsFactory.buildMeasurement(() -> (double) totalTime, Statistic.TOTAL_TIME));
+        measurements.add(MetricsFactory.buildMeasurement(() -> (double) maxTime, Statistic.MAX));
     }
     
     /**
@@ -214,11 +213,6 @@ public class TimerRepresentation extends MeterRepresentation implements Timer {
     }
 
     @Override
-    public HistogramSnapshot takeSnapshot() {
-        return new HistogramSnapshot(count, totalTime, maxTime, null, null, null);
-    }
-
-    @Override
     public void record(long amount, TimeUnit unit) {
         long aux = amount * unit.toNanos(1);
 
@@ -234,7 +228,7 @@ public class TimerRepresentation extends MeterRepresentation implements Timer {
     @Override
     public <T> T record(Supplier<T> supplier) {
         T supply;
-        Sample timer = Timer.start();
+        Sample timer = MetricsFactory.getInstance().createTimerStart();
         supply = supplier.get();
         timer.stop(this);
 
@@ -244,7 +238,7 @@ public class TimerRepresentation extends MeterRepresentation implements Timer {
     @Override
     public <T> T recordCallable(Callable<T> callable) throws Exception {
         T supply;
-        Sample timer = Timer.start();
+        Sample timer = MetricsFactory.getInstance().createTimerStart();
         supply = callable.call();
         timer.stop(this);
 
@@ -253,7 +247,7 @@ public class TimerRepresentation extends MeterRepresentation implements Timer {
 
     @Override
     public void record(Runnable runnable) {
-        Sample timer = Timer.start();
+        Sample timer = MetricsFactory.getInstance().createTimerStart();
         runnable.run();
         timer.stop(this);
     }
@@ -316,6 +310,11 @@ public class TimerRepresentation extends MeterRepresentation implements Timer {
         job.add("recordings", jab.build());
 
         return job.build();
+    }
+
+    @Override
+    public double mean(TimeUnit unit) {
+        return count > 0 ? totalTime(unit) / count : 0;
     }
 
 }

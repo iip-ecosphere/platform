@@ -12,16 +12,15 @@
 
 package de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas;
 
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 
 import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.CounterRepresentation;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.GaugeRepresentation;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.TimerRepresentation;
+import de.iip_ecosphere.platform.support.rest.Rest;
+import de.iip_ecosphere.platform.support.rest.RestTarget;
+import de.iip_ecosphere.platform.support.rest.RestTarget.Invocation;
+import de.iip_ecosphere.platform.support.rest.RestTarget.Request;
 
 /**
  * Class that implements a REST client to retrieve the Meters from the Metrics
@@ -89,7 +88,7 @@ public class MetricsExtractorRestClient {
     private static final String ACTION_MINOR = "action:end of minor GC";
 
     /* Web Target */
-    private WebTarget webTarget;
+    private RestTarget webTarget;
 
     /**
      * Initializes a new Metrics Extractor REST Client.<br>
@@ -110,7 +109,7 @@ public class MetricsExtractorRestClient {
             throw new IllegalArgumentException("Port cannot be a negative number!");
         }
         String uri = PROTOCOL + hostAddr + ":" + portNo;
-        webTarget = ClientBuilder.newClient().target(uri);
+        webTarget = Rest.getInstance().createTarget(uri);
     }
 
     /**
@@ -124,11 +123,11 @@ public class MetricsExtractorRestClient {
      * @return response body of the GET request
      */
     private String sendGetRequest(String endpoint, String resource, String... tags) {
-        WebTarget request = webTarget.path(endpoint).path(resource).queryParam("tag", (Object[]) tags);
-        Invocation.Builder invocationBuilder = request.request(MediaType.APPLICATION_JSON);
+        Request request = webTarget.createRequest().addPath(endpoint).addPath(resource).addQueryParam("tag", tags);
+        Invocation invocation = request.requestJson();
         try {
-            return invocationBuilder.get().readEntity(String.class);
-        } catch (ProcessingException e) {
+            return invocation.getAsString();
+        } catch (IOException e) {
             // That resource was not found, so null is returned
             return null;
         }
@@ -145,10 +144,10 @@ public class MetricsExtractorRestClient {
      *                                  server
      */
     private void sendPutRequest(String endpoint, String body) {
-        Invocation.Builder invocationBuilder = webTarget.path(endpoint).request(MediaType.APPLICATION_JSON);
+        Invocation invocationBuilder = webTarget.createRequest().addPath(endpoint).requestJson();
         try {
-            invocationBuilder.put(Entity.json(body));
-        } catch (ProcessingException e) {
+            invocationBuilder.put(body);
+        } catch (IOException e) {
             throw new IllegalArgumentException("Error code from the server:  " + e.getMessage());
         }
     }
@@ -165,11 +164,10 @@ public class MetricsExtractorRestClient {
      *                               the server
      */
     private void sendDeleteRequest(String endpoint, String resource) {
-        Invocation.Builder invocationBuilder = webTarget.path(endpoint).path(resource).request(
-            MediaType.APPLICATION_JSON);
+        Invocation invocation = webTarget.createRequest().addPath(endpoint).addPath(resource).requestJson();
         try {
-            invocationBuilder.delete();
-        } catch (ProcessingException e) {
+            invocation.delete();
+        } catch (IOException e) {
             throw new IllegalStateException("Error code from the server:  " + e.getMessage());
         }
     }

@@ -19,21 +19,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.TimerRepresentation;
+import de.iip_ecosphere.platform.support.json.JsonArray;
+import de.iip_ecosphere.platform.support.json.JsonObject;
+import de.iip_ecosphere.platform.support.metrics.Measurement;
+import de.iip_ecosphere.platform.support.metrics.Meter;
+import de.iip_ecosphere.platform.support.metrics.Meter.Id;
+import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
+import de.iip_ecosphere.platform.support.metrics.Tag;
+import de.iip_ecosphere.platform.support.metrics.Timer;
 import test.de.iip_ecosphere.platform.services.environment.metricsProvider.utils.TestUtils;
 import static test.de.iip_ecosphere.platform.services.environment.metricsProvider.utils.TestUtils.assertThrows;
-import io.micrometer.core.instrument.ImmutableTag;
-import io.micrometer.core.instrument.Measurement;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Tags;
-import io.micrometer.core.instrument.Timer;
-import io.micrometer.core.instrument.Meter.Id;
-import io.micrometer.core.instrument.Meter.Type;
 
 /**
  * Tests {@link TimerRepresentation}.
@@ -73,8 +71,8 @@ public class TimerRepresentationTest {
     public void testInitOkNoTags() throws IOException {
         JsonObject obj = TestUtils.readJsonFromResources(FOLDER, JSON_VALID);
         List<Tag> tagList = new ArrayList<Tag>();
-        Id id = new Id(obj.getString("name"), Tags.of(tagList), obj.getString("baseUnit"), obj.getString("description"),
-                Type.TIMER);
+        Id id = MetricsFactory.buildId(obj.getString("name"), tagList, obj.getString("baseUnit"), 
+            obj.getString("description"), Meter.Type.TIMER);
 
         Timer timer = TimerRepresentation.parseTimer(obj);
         assertNotNull(timer);
@@ -94,10 +92,10 @@ public class TimerRepresentationTest {
     public void testInitOkWithTags() throws IOException {
         JsonObject obj = TestUtils.readJsonFromResources(FOLDER, JSON_VALID);
         List<Tag> tagList = new ArrayList<Tag>();
-        tagList.add(new ImmutableTag("key1", "value1"));
-        tagList.add(new ImmutableTag("key2", "value2"));
-        Id id = new Id(obj.getString("name"), Tags.of(tagList), obj.getString("baseUnit"), obj.getString("description"),
-                Type.TIMER);
+        tagList.add(MetricsFactory.buildImmutableTag("key1", "value1"));
+        tagList.add(MetricsFactory.buildImmutableTag("key2", "value2"));
+        Id id = MetricsFactory.buildId(obj.getString("name"), tagList, obj.getString("baseUnit"), 
+            obj.getString("description"), Meter.Type.TIMER);
 
         Timer timer = TimerRepresentation.parseTimer(obj, "key1:value1", "key2:value2");
         assertNotNull(timer);
@@ -190,19 +188,6 @@ public class TimerRepresentationTest {
         JsonObject obj = TestUtils.readJsonFromResources(FOLDER, JSON_INVALID_TWO_MAX);
 
         assertThrows(IllegalArgumentException.class, () -> TimerRepresentation.parseTimer(obj));
-    }
-
-    /**
-     * Tests {@link TimerRepresentation#takeSnapshot()}.
-     * 
-     * @throws IOException shall not occur when test is passed
-     */
-    @Test
-    public void testTakeSnapshot() throws IOException {
-        JsonObject obj = TestUtils.readJsonFromResources(FOLDER, JSON_VALID);
-        Timer timer = TimerRepresentation.parseTimer(obj);
-
-        assertNotNull(timer.takeSnapshot());
     }
 
     /**
@@ -441,7 +426,7 @@ public class TimerRepresentationTest {
     public void testNameInitOk() {
         String name = "name";
         List<Tag> tagList = new ArrayList<Tag>();
-        Id id = new Id(name, Tags.of(tagList), null, null, Type.TIMER);
+        Id id = MetricsFactory.buildId(name, tagList, null, null, Meter.Type.TIMER);
 
         Timer timer = TimerRepresentation.createNewTimer(name);
         assertNotNull(timer);

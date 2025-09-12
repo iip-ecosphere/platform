@@ -14,6 +14,7 @@ package test.de.iip_ecosphere.platform.services.environment.metricsProvider;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
@@ -23,11 +24,12 @@ import de.iip_ecosphere.platform.connectors.types.ConnectorInputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MonitoredTranslatingProtocolAdapter;
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
-import io.micrometer.core.instrument.Timer;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import de.iip_ecosphere.platform.support.metrics.MeterRegistry;
+import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
+import de.iip_ecosphere.platform.support.metrics.Timer;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 
 /**
@@ -140,7 +142,7 @@ public class MonitoredTranslatingProtocolAdapterTest {
      * @param log the expected log file, may be <b>null</b> for none
      */
     private static void testAdapter(File log) {
-        SimpleMeterRegistry reg = new SimpleMeterRegistry();
+        MeterRegistry reg = MetricsFactory.getInstance().createRegistry();
         MetricsProvider metrics = new MetricsProvider(reg);
         MonitoredTranslatingProtocolAdapter<String, String, ConnectorData, ConnectorData> adapter 
             = new MonitoredTranslatingProtocolAdapter<>(new ConnectorOutTranslator(), 
@@ -154,12 +156,12 @@ public class MonitoredTranslatingProtocolAdapterTest {
             }
         }
         
-        Timer iTimer = reg.get(MonitoredTranslatingProtocolAdapter.ADAPT_INPUT_TIME).timer();
+        Timer iTimer = reg.getTimer(MonitoredTranslatingProtocolAdapter.ADAPT_INPUT_TIME);
         double tmp = iTimer.mean(TimeUnit.MILLISECONDS);
         Assert.assertTrue(tmp + " not in range", 140 <= tmp && tmp <= 500);
         Assert.assertEquals(max, iTimer.count());
 
-        Timer oTimer = reg.get(MonitoredTranslatingProtocolAdapter.ADAPT_OUTPUT_TIME).timer();
+        Timer oTimer = reg.getTimer(MonitoredTranslatingProtocolAdapter.ADAPT_OUTPUT_TIME);
         tmp = oTimer.mean(TimeUnit.MILLISECONDS);
         Assert.assertTrue(tmp + " not in range", 90 <= tmp && tmp <= 550);
         Assert.assertEquals(max, oTimer.count());
@@ -169,7 +171,7 @@ public class MonitoredTranslatingProtocolAdapterTest {
             Assert.assertTrue(log.length() > 0);
             try {   
                 System.out.println("LOG:");    
-                System.out.println(FileUtils.readFileToString(log, "UTF-8"));
+                System.out.println(FileUtils.readFileToString(log, StandardCharsets.UTF_8));
             } catch (IOException t) {
                 t.printStackTrace();
             }

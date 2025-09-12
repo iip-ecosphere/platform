@@ -18,21 +18,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.json.JsonObject;
-
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.CounterRepresentation;
+import de.iip_ecosphere.platform.support.json.JsonObject;
+import de.iip_ecosphere.platform.support.metrics.Counter;
+import de.iip_ecosphere.platform.support.metrics.Measurement;
+import de.iip_ecosphere.platform.support.metrics.Meter;
+import de.iip_ecosphere.platform.support.metrics.Meter.Id;
+import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
+import de.iip_ecosphere.platform.support.metrics.Statistic;
+import de.iip_ecosphere.platform.support.metrics.Tag;
 import test.de.iip_ecosphere.platform.services.environment.metricsProvider.utils.TestUtils;
 import static test.de.iip_ecosphere.platform.services.environment.metricsProvider.utils.TestUtils.assertThrows;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Tags;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.ImmutableTag;
-import io.micrometer.core.instrument.Measurement;
-import io.micrometer.core.instrument.Meter.Id;
-import io.micrometer.core.instrument.Meter.Type;
-import io.micrometer.core.instrument.Statistic;
 
 /**
  * Tests {@link CounterRepresentation}.
@@ -58,14 +56,14 @@ public class CounterRepresentationTest {
     public void testInitOkNoTags() throws IOException {
         JsonObject obj = TestUtils.readJsonFromResources(FOLDER, JSON_VALID);
         List<Tag> tagList = new ArrayList<Tag>();
-        Id id = new Id(obj.getString("name"), Tags.of(tagList), obj.getString("baseUnit"), obj.getString("description"),
-                Type.COUNTER);
+        Id id = MetricsFactory.buildId(obj.getString("name"), tagList, obj.getString("baseUnit"), 
+            obj.getString("description"), Meter.Type.COUNTER);
 
         Counter counter = CounterRepresentation.parseCounter(obj);
         assertNotNull(counter);
         assertEquals(id, counter.getId());
-        assertEquals(obj.getJsonArray("measurements").get(0).asJsonObject().getJsonNumber("value").doubleValue(),
-                counter.count(), 0.0);
+        assertEquals(obj.getJsonArray("measurements").getJsonObject(0).getJsonNumber("value").doubleValue(),
+            counter.count(), 0.0);
     }
 
     /**
@@ -77,16 +75,16 @@ public class CounterRepresentationTest {
     public void testInitOkWithTags() throws IOException {
         JsonObject obj = TestUtils.readJsonFromResources(FOLDER, JSON_VALID);
         List<Tag> tagList = new ArrayList<Tag>();
-        tagList.add(new ImmutableTag("key1", "value1"));
-        tagList.add(new ImmutableTag("key2", "value2"));
-        Id id = new Id(obj.getString("name"), Tags.of(tagList), obj.getString("baseUnit"), obj.getString("description"),
-                Type.COUNTER);
+        tagList.add(MetricsFactory.buildImmutableTag("key1", "value1"));
+        tagList.add(MetricsFactory.buildImmutableTag("key2", "value2"));
+        Id id = MetricsFactory.buildId(obj.getString("name"), tagList, obj.getString("baseUnit"), 
+            obj.getString("description"), Meter.Type.COUNTER);
 
         Counter counter = CounterRepresentation.parseCounter(obj, "key1:value1", "key2:value2");
         assertNotNull(counter);
         assertEquals(id, counter.getId());
-        assertEquals(obj.getJsonArray("measurements").get(0).asJsonObject().getJsonNumber("value").doubleValue(),
-                counter.count(), 0.0);
+        assertEquals(obj.getJsonArray("measurements").getJsonObject(0).getJsonNumber("value").doubleValue(),
+            counter.count(), 0.0);
     }
 
     /**
@@ -122,7 +120,7 @@ public class CounterRepresentationTest {
     public void testIncrementByOne() throws IOException {
         double increment = 1.0;
         JsonObject obj = TestUtils.readJsonFromResources(FOLDER, JSON_VALID);
-        double original = obj.getJsonArray("measurements").get(0).asJsonObject().getJsonNumber("value").doubleValue();
+        double original = obj.getJsonArray("measurements").getJsonObject(0).getJsonNumber("value").doubleValue();
 
         Counter counter = CounterRepresentation.parseCounter(obj);
         assertEquals(original, counter.count(), 0.0);
@@ -138,7 +136,7 @@ public class CounterRepresentationTest {
     @Test
     public void testIncrementByZero() throws IOException {
         JsonObject obj = TestUtils.readJsonFromResources(FOLDER, JSON_VALID);
-        double original = obj.getJsonArray("measurements").get(0).asJsonObject().getJsonNumber("value").doubleValue();
+        double original = obj.getJsonArray("measurements").getJsonObject(0).getJsonNumber("value").doubleValue();
 
         Counter counter = CounterRepresentation.parseCounter(obj);
         assertEquals(original, counter.count(), 0.0);
@@ -201,7 +199,7 @@ public class CounterRepresentationTest {
     public void testNameInitOk() {
         String name = "name";
         List<Tag> tagList = new ArrayList<Tag>();
-        Id id = new Id(name, Tags.of(tagList), null, null, Type.COUNTER);
+        Id id = MetricsFactory.buildId(name, tagList, null, null, Meter.Type.COUNTER);
 
         Counter counter = CounterRepresentation.createNewCounter(name);
         assertNotNull(counter);

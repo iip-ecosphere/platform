@@ -13,7 +13,6 @@
 package de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,14 +20,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.streams.StreamNames;
+import de.iip_ecosphere.platform.support.json.Json;
+import de.iip_ecosphere.platform.support.json.JsonObject;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
@@ -54,8 +52,12 @@ public class HeartbeatWatcher {
     
             @Override
             public void received(String data) {
-                JsonObject obj = Json.createReader(new StringReader(data)).readObject();
-                notifyRecordReceived(obj.getString("id"));
+                try {
+                    JsonObject obj = Json.createObject(data);
+                    notifyRecordReceived(obj.getString("id"));
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(this).warn("While receiving data: {}", e.getMessage());
+                }
             }
 
             @Override

@@ -19,8 +19,7 @@ import java.io.PrintStream;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import org.apache.commons.io.FileUtils;
-
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 
 /**

@@ -12,23 +12,19 @@
 
 package de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation;
 
-import java.io.StringReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.stream.JsonParsingException;
-
+import de.iip_ecosphere.platform.support.json.Json;
+import de.iip_ecosphere.platform.support.json.JsonArray;
+import de.iip_ecosphere.platform.support.json.JsonObject;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
-
-import io.micrometer.core.instrument.ImmutableTag;
-import io.micrometer.core.instrument.Measurement;
-import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.Statistic;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Tags;
+import de.iip_ecosphere.platform.support.metrics.Measurement;
+import de.iip_ecosphere.platform.support.metrics.Meter;
+import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
+import de.iip_ecosphere.platform.support.metrics.Statistic;
+import de.iip_ecosphere.platform.support.metrics.Tag;
 
 /**
  * This class aims to provide a prototypical implementation of the Meter
@@ -114,7 +110,7 @@ public abstract class MeterRepresentation implements Meter {
             String baseUnit = object.isNull("baseUnit") ? null : object.getString("baseUnit");
             String description = object.isNull("description") ? null : object.getString("description");
 
-            id = new Id(object.getString("name"), extractTagsMap(tags), baseUnit, description, type);
+            id = MetricsFactory.buildId(object.getString("name"), extractTagsMap(tags), baseUnit, description, type);
         } catch (NullPointerException | ClassCastException ex) {
             throw new IllegalArgumentException(NON_VALID_JSON, ex);
         }
@@ -136,7 +132,7 @@ public abstract class MeterRepresentation implements Meter {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Name cannot be null or null");
         }
-        id = new Id(name, Tags.of(new ArrayList<Tag>()), null, null, type);
+        id = MetricsFactory.buildId(name, new ArrayList<Tag>(), null, null, type);
     }
 
     /**
@@ -149,14 +145,14 @@ public abstract class MeterRepresentation implements Meter {
      * @param tags tags that the meter has
      * @return Tags representation of the set of tags
      */
-    private static Tags extractTagsMap(String... tags) {
+    private static List<Tag> extractTagsMap(String... tags) {
         List<Tag> tagList = new ArrayList<Tag>();
         String[] aux;
         try {
             for (String tag : tags) {
                 aux = tag.split(":");
                 if (aux.length == 2 && aux[0].length() > 0 && aux[1].length() > 0) {
-                    tagList.add(new ImmutableTag(aux[0], aux[1]));
+                    tagList.add(MetricsFactory.buildImmutableTag(aux[0], aux[1]));
                 } else {
                     LoggerFactory.getLogger(MeterRepresentation.class).warn(
                         "'{}' does not parse to a vaild meter tag. Ignoring.", tag);
@@ -166,7 +162,7 @@ public abstract class MeterRepresentation implements Meter {
             throw new IllegalArgumentException(NON_VALID_JSON, aiobe);
         }
 
-        return Tags.of(tagList);
+        return tagList;
 
     }
 
@@ -196,8 +192,8 @@ public abstract class MeterRepresentation implements Meter {
      */
     public static Meter parseMeter(String json, String... tags) {
         try {
-            return parseMeter(Json.createReader(new StringReader(json)).readObject(), tags);
-        } catch (JsonParsingException e) {
+            return parseMeter(Json.createObject(json), tags);
+        } catch (IOException e) {
             LoggerFactory.getLogger(MeterRepresentation.class).info("Cannot parse meter JSON '{}' : {}", 
                 json, e.getMessage());
             return null;
@@ -214,8 +210,8 @@ public abstract class MeterRepresentation implements Meter {
      */
     public static Meter parseMeterQuiet(String json, String... tags) {
         try {
-            return parseMeter(Json.createReader(new StringReader(json)).readObject(), tags);
-        } catch (JsonParsingException e) {
+            return parseMeter(Json.createObject(json), tags);
+        } catch (IOException e) {
             return null;
         }
     }
@@ -266,6 +262,12 @@ public abstract class MeterRepresentation implements Meter {
             result = GaugeRepresentation.parseGauge(object, tags);
         }
         return result;
+    }
+    
+
+    @Override
+    public String getName() {
+        return id.getName();
     }
 
 }

@@ -18,21 +18,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.json.JsonObject;
-
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.GaugeRepresentation;
+import de.iip_ecosphere.platform.support.json.JsonObject;
+import de.iip_ecosphere.platform.support.metrics.Gauge;
+import de.iip_ecosphere.platform.support.metrics.Measurement;
+import de.iip_ecosphere.platform.support.metrics.Meter;
+import de.iip_ecosphere.platform.support.metrics.Meter.Id;
+import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
+import de.iip_ecosphere.platform.support.metrics.Statistic;
+import de.iip_ecosphere.platform.support.metrics.Tag;
 import test.de.iip_ecosphere.platform.services.environment.metricsProvider.utils.TestUtils;
 import static test.de.iip_ecosphere.platform.services.environment.metricsProvider.utils.TestUtils.assertThrows;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Tags;
-import io.micrometer.core.instrument.Gauge;
-import io.micrometer.core.instrument.ImmutableTag;
-import io.micrometer.core.instrument.Measurement;
-import io.micrometer.core.instrument.Statistic;
-import io.micrometer.core.instrument.Meter.Id;
-import io.micrometer.core.instrument.Meter.Type;
 
 /**
  * Tests {@link GaugeRepresentation}.
@@ -57,10 +55,10 @@ public class GaugeRepresentationTest {
     @Test
     public void testInitOkNoTags() throws IOException {
         JsonObject obj = TestUtils.readJsonFromResources(FOLDER, JSON_VALID);
-        double original = obj.getJsonArray("measurements").get(0).asJsonObject().getJsonNumber("value").doubleValue();
+        double original = obj.getJsonArray("measurements").getJsonObject(0).getJsonNumber("value").doubleValue();
         List<Tag> tagList = new ArrayList<Tag>();
-        Id id = new Id(obj.getString("name"), Tags.of(tagList), obj.getString("baseUnit"), obj.getString("description"),
-                Type.GAUGE);
+        Id id = MetricsFactory.buildId(obj.getString("name"), tagList, obj.getString("baseUnit"), 
+            obj.getString("description"), Meter.Type.GAUGE);
 
         Gauge gauge = GaugeRepresentation.parseGauge(obj);
         assertNotNull(gauge);
@@ -76,12 +74,12 @@ public class GaugeRepresentationTest {
     @Test
     public void testInitOkWithTags() throws IOException {
         JsonObject obj = TestUtils.readJsonFromResources(FOLDER, JSON_VALID);
-        double original = obj.getJsonArray("measurements").get(0).asJsonObject().getJsonNumber("value").doubleValue();
+        double original = obj.getJsonArray("measurements").getJsonObject(0).getJsonNumber("value").doubleValue();
         List<Tag> tagList = new ArrayList<Tag>();
-        tagList.add(new ImmutableTag("key1", "value1"));
-        tagList.add(new ImmutableTag("key2", "value2"));
-        Id id = new Id(obj.getString("name"), Tags.of(tagList), obj.getString("baseUnit"), obj.getString("description"),
-                Type.GAUGE);
+        tagList.add(MetricsFactory.buildImmutableTag("key1", "value1"));
+        tagList.add(MetricsFactory.buildImmutableTag("key2", "value2"));
+        Id id = MetricsFactory.buildId(obj.getString("name"), tagList, obj.getString("baseUnit"), 
+            obj.getString("description"), Meter.Type.GAUGE);
 
         Gauge gauge = GaugeRepresentation.parseGauge(obj, "key1:value1", "key2:value2");
         assertNotNull(gauge);
@@ -154,7 +152,7 @@ public class GaugeRepresentationTest {
     public void testNameInitOk() {
         String name = "name";
         List<Tag> tagList = new ArrayList<Tag>();
-        Id id = new Id(name, Tags.of(tagList), null, null, Type.GAUGE);
+        Id id = MetricsFactory.buildId(name, tagList, null, null, Meter.Type.GAUGE);
 
         Gauge gauge = GaugeRepresentation.createNewGauge(name);
         assertNotNull(gauge);

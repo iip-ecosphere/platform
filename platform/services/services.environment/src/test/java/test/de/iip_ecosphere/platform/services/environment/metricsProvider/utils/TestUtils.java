@@ -6,13 +6,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringReader;
 import java.net.URL;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.json.Json;
+import de.iip_ecosphere.platform.support.json.JsonObject;
+
 import org.junit.Assert;
 
 /**
@@ -59,7 +58,7 @@ public class TestUtils {
             sb.append(br.readLine());
         }
         br.close();
-        return Json.createReader(new StringReader(sb.toString())).readObject();
+        return Json.createObject(sb.toString());
     }
 
     /**

@@ -24,27 +24,25 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-import com.google.common.util.concurrent.AtomicDouble;
-
-import io.micrometer.core.instrument.Clock;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.Gauge;
-import io.micrometer.core.instrument.Measurement;
-import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.Meter.Id;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Timer;
-import io.micrometer.core.instrument.config.MeterFilter;
-import io.micrometer.core.instrument.config.MeterFilterReply;
-import io.micrometer.core.instrument.search.MeterNotFoundException;
-
 import com.sun.management.OperatingSystemMXBean;
 
 import de.iip_ecosphere.platform.services.environment.UpdatingMonitoringService;
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
+import de.iip_ecosphere.platform.support.AtomicDouble;
+import de.iip_ecosphere.platform.support.metrics.Clock;
+import de.iip_ecosphere.platform.support.metrics.Counter;
+import de.iip_ecosphere.platform.support.metrics.Gauge;
+import de.iip_ecosphere.platform.support.metrics.Measurement;
+import de.iip_ecosphere.platform.support.metrics.Meter;
+import de.iip_ecosphere.platform.support.metrics.Meter.Id;
+import de.iip_ecosphere.platform.support.metrics.MeterFilter;
+import de.iip_ecosphere.platform.support.metrics.MeterFilter.MeterFilterReply;
+import de.iip_ecosphere.platform.support.metrics.MeterRegistry;
+import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
 import de.iip_ecosphere.platform.support.metrics.SystemMetricsFactory;
+import de.iip_ecosphere.platform.support.metrics.Tag;
+import de.iip_ecosphere.platform.support.metrics.Timer;
 
 /**
  * This class represents an interface to manage the Micrometer-API meters.<br>
@@ -70,10 +68,10 @@ public class MetricsProvider {
 
     public static final List<Tag> EMPTY_TAGS = Collections.unmodifiableList(new ArrayList<Tag>());
     public static final MeterFilter[] DEFAULT_METER_FILTERS = {
-        MeterFilter.denyNameStartsWith("jvm."),
-        MeterFilter.denyNameStartsWith("spring."),
-        MeterFilter.denyNameStartsWith("logback."),
-        MeterFilter.denyNameStartsWith("tomcat.")
+        MetricsFactory.denyNameStartsWith("jvm."),
+        MetricsFactory.denyNameStartsWith("spring."),
+        MetricsFactory.denyNameStartsWith("logback."),
+        MetricsFactory.denyNameStartsWith("tomcat.")
     };
     
     public static final String TAG_SERVICE_SERVICE = "service";
@@ -112,7 +110,7 @@ public class MetricsProvider {
     protected static final String NULL_ARG = " has a null value. This argument cannot be null!";
 
     // Tools
-    private final MeterRegistry registry;
+    private MeterRegistry registry;
     private final OperatingSystemMXBean osmxb;
 
     // Flag required for correct initialization of system metrics
@@ -146,6 +144,17 @@ public class MetricsProvider {
     private float deviceCpuTemperature;
     private float deviceCaseTemperature;
 
+    /**
+     * Create a new Metrics Provider Instance with default registry.
+     * 
+     * @throws IllegalArgumentException if the registry is null
+     * @see MetricsFactory#createRegistry()
+     * @see #MetricsProvider(MeterRegistry)
+     */
+    public MetricsProvider() {
+        this(MetricsFactory.getInstance().createRegistry());
+    }
+    
     /**
      * Create a new Metrics Provider Instance.<br>
      * The Metrics Provider will have a map of metrics that can be operated by the
@@ -222,7 +231,7 @@ public class MetricsProvider {
         registerDiskMetrics();
         registerDeviceMetrics();
         if (monitorNonNative) {
-            Gauge.builder(SYS_MEM_USAGE, () -> sysMemUsage)
+            MetricsFactory.buildGauge(SYS_MEM_USAGE, () -> sysMemUsage)
                 .description("Current percentage of physical memory in use")
                 .baseUnit("percent")
                 .register(registry);
@@ -235,15 +244,15 @@ public class MetricsProvider {
      */
     public void registerMemoryMetrics() {
         if (monitorNonNative) {
-            Gauge.builder(SYS_MEM_TOTAL, () -> sysMemTotal)
+            MetricsFactory.buildGauge(SYS_MEM_TOTAL, () -> sysMemTotal)
                 .description("Total Physical memory of the system")
                 .baseUnit(memoryBaseUnit.stringValue())
                 .register(registry);
-            Gauge.builder(SYS_MEM_FREE, () -> sysMemFree)
+            MetricsFactory.buildGauge(SYS_MEM_FREE, () -> sysMemFree)
                 .description("Free Physical memory of the system")
                 .baseUnit(memoryBaseUnit.stringValue())
                 .register(registry);
-            Gauge.builder(SYS_MEM_USED, () -> sysMemUsed)
+            MetricsFactory.buildGauge(SYS_MEM_USED, () -> sysMemUsed)
                 .description("Physical memory currently in use")
                 .baseUnit(memoryBaseUnit.stringValue())
                 .register(registry);
@@ -256,19 +265,19 @@ public class MetricsProvider {
      */
     public void registerDiskMetrics() {
         if (monitorNonNative) {
-            Gauge.builder(SYS_DISK_TOTAL, () -> sysDiskTotal)
+            MetricsFactory.buildGauge(SYS_DISK_TOTAL, () -> sysDiskTotal)
                 .description("Total disk capacity of the system")
                 .baseUnit(diskBaseUnit.stringValue())
                 .register(registry);
-            Gauge.builder(SYS_DISK_FREE, () -> sysDiskFree)
+            MetricsFactory.buildGauge(SYS_DISK_FREE, () -> sysDiskFree)
                 .description("Total free disk capacity of the system")
                 .baseUnit(diskBaseUnit.stringValue())
                 .register(registry);
-            Gauge.builder(SYS_DISK_USABLE, () -> sysDiskUsable)
+            MetricsFactory.buildGauge(SYS_DISK_USABLE, () -> sysDiskUsable)
                 .description("Total usable disk capacity of the system")
                 .baseUnit(diskBaseUnit.stringValue())
                 .register(registry);
-            Gauge.builder(SYS_DISK_USED, () -> sysDiskUsed)
+            MetricsFactory.buildGauge(SYS_DISK_USED, () -> sysDiskUsed)
                 .description("Current total disk capacity currently in use or unavailable")
                 .baseUnit(diskBaseUnit.stringValue())
                 .register(registry);
@@ -281,11 +290,11 @@ public class MetricsProvider {
      */
     public void registerDeviceMetrics() {
         if (monitorNonNative) {
-            Gauge.builder(DEVICE_CPU_TEMPERATURE, () -> deviceCpuTemperature)
+            MetricsFactory.buildGauge(DEVICE_CPU_TEMPERATURE, () -> deviceCpuTemperature)
                 .description("The CPU temperature of the device.")
                 .baseUnit("degrees celsius")
                 .register(registry);
-            Gauge.builder(DEVICE_CASE_TEMPERATURE, () -> deviceCaseTemperature)
+            MetricsFactory.buildGauge(DEVICE_CASE_TEMPERATURE, () -> deviceCaseTemperature)
                 .description("The case temperature (if available)")
                 .baseUnit("degrees celsius")
                 .register(registry);
@@ -300,11 +309,11 @@ public class MetricsProvider {
      */
     public void removeDeviceMetrics() {
         if (monitorNonNative) {
-            registry.remove(registry.get(DEVICE_CPU_TEMPERATURE).meter());
-            registry.remove(registry.get(DEVICE_CASE_TEMPERATURE).meter());
-            registry.remove(registry.get(DEVICE_TPU_CORES).meter());
-            registry.remove(registry.get(DEVICE_GPU_CORES).meter());
-            registry.remove(registry.get(DEVICE_CPU_CORES).meter());
+            registry.remove(DEVICE_CPU_TEMPERATURE);
+            registry.remove(DEVICE_CASE_TEMPERATURE);
+            registry.remove(DEVICE_TPU_CORES);
+            registry.remove(DEVICE_GPU_CORES);
+            registry.remove(DEVICE_CPU_CORES);
         }
     }
 
@@ -316,9 +325,9 @@ public class MetricsProvider {
      */
     public void removeMemoryMetrics() {
         if (monitorNonNative) {
-            registry.remove(registry.get(SYS_MEM_TOTAL).meter());
-            registry.remove(registry.get(SYS_MEM_FREE).meter());
-            registry.remove(registry.get(SYS_MEM_USED).meter());
+            registry.remove(SYS_MEM_TOTAL);
+            registry.remove(SYS_MEM_FREE);
+            registry.remove(SYS_MEM_USED);
         }
     }
 
@@ -330,10 +339,10 @@ public class MetricsProvider {
      */
     public void removeDiskMetrics() {
         if (monitorNonNative) {
-            registry.remove(registry.get(SYS_DISK_TOTAL).meter());
-            registry.remove(registry.get(SYS_DISK_FREE).meter());
-            registry.remove(registry.get(SYS_DISK_USABLE).meter());
-            registry.remove(registry.get(SYS_DISK_USED).meter());
+            registry.remove(SYS_DISK_TOTAL);
+            registry.remove(SYS_DISK_FREE);
+            registry.remove(SYS_DISK_USABLE);
+            registry.remove(SYS_DISK_USED);
         }
     }
 
@@ -400,7 +409,7 @@ public class MetricsProvider {
             throw new IllegalArgumentException(gaugeId + ID_NOT_FOUND_ERRMSG);
         }
         gauges.remove(gaugeId);
-        registry.remove(registry.get(gaugeId).meter());
+        registry.remove(gaugeId);
     }
 
     /**
@@ -429,9 +438,10 @@ public class MetricsProvider {
      *         gauge with the requested identifier
      */
     public double getRegisteredGaugeValue(String gaugeId) {
-        try { // before default ones are registered, the registry request may lead to exception
-            return registry.get(gaugeId).gauge().value();
-        } catch (MeterNotFoundException e) {
+        Gauge g = registry.getGauge(gaugeId);
+        if (null != g) { // before default ones are registered, the registry request may lead to exception
+            return g.value();
+        } else {
             return getGaugeValue(gaugeId);
         }
     }
@@ -549,7 +559,7 @@ public class MetricsProvider {
         }
 
         counters.remove(counterId);
-        registry.remove(registry.get(counterId).meter());
+        registry.remove(counterId);
     }
 
     /**
@@ -578,9 +588,10 @@ public class MetricsProvider {
      *         counter with the requested identifier
      */
     public double getRegisteredCounterValue(String counterId) {
-        try { // before default ones are registered, the registry request may lead to exception
-            return registry.get(counterId).counter().count();
-        } catch (MeterNotFoundException e) {
+        Counter c = registry.getCounter(counterId);
+        if (null != c) { // before default ones are registered, the registry request may lead to exception
+            return c.count();
+        } else {
             return getCounterValue(counterId);
         }
     }
@@ -611,7 +622,7 @@ public class MetricsProvider {
         }
 
         timers.remove(timerId);
-        registry.remove(registry.get(timerId).meter());
+        registry.remove(timerId);
     }
 
     /**
@@ -737,9 +748,10 @@ public class MetricsProvider {
      *         timer with the requested identifier
      */
     public long getRegisteredTimerCount(String timerId) {
-        try { // before default ones are registered, the registry request may lead to exception
-            return registry.get(timerId).timer().count();
-        } catch (MeterNotFoundException e) {
+        Timer t = registry.getTimer(timerId);
+        if (null != t) { // before default ones are registered, the registry request may lead to exception
+            return t.count();
+        } else {
             return getTimerCount(timerId);
         }
     }
@@ -788,8 +800,8 @@ public class MetricsProvider {
             init = false;
         }
 
-        sysMemTotal = osmxb.getTotalPhysicalMemorySize() / memoryBaseUnit.byteValue();
-        sysMemFree = osmxb.getFreePhysicalMemorySize() / memoryBaseUnit.byteValue();
+        sysMemTotal = osmxb.getTotalMemorySize() / memoryBaseUnit.byteValue();
+        sysMemFree = osmxb.getFreeMemorySize() / memoryBaseUnit.byteValue();
         sysMemUsed = sysMemTotal - sysMemFree;
         sysMemUsage = sysMemUsed / sysMemTotal;
 
@@ -870,11 +882,11 @@ public class MetricsProvider {
      * @throws IllegalArgumentException if no meter is found with that name
      */
     public String getMeter(String name, Iterable<Tag> tags) {
-        try {
-            Meter meter = registry.get(name).tags(tags).meter();
+        Meter meter = registry.getMeter(name, tags);
+        if (null != meter) {
             return jsonParser(meter);
-        } catch (MeterNotFoundException mnfe) {
-            throw new IllegalArgumentException(mnfe.getMessage());
+        } else {
+            throw new IllegalArgumentException("Meter " + meter + " not found.");
         }
     }
     
@@ -898,7 +910,7 @@ public class MetricsProvider {
             if (!first) {
                 sb.append(",");
             }
-            sb.append("\"" + meter.getId().getName() + "\":");
+            sb.append("\"" + meter.getName() + "\":");
             sb.append(jsonParser(meter));
             first = false;
         }
@@ -972,7 +984,7 @@ public class MetricsProvider {
      * @return {@code true} for apply, {@code false} else
      */
     public static boolean include(String id, MeterFilter... filters) {
-        return include(new Meter.Id(id, null, null, null, null), filters);
+        return include(MetricsFactory.buildId(id, null, null, null, null), filters);
     }
     
     /**
@@ -1006,7 +1018,6 @@ public class MetricsProvider {
         }
     }
 
-
     /**
      * Retrieves a custom gauge as a JSON object.<br>
      * The requested gauge is located within the map and parsed as a JsonObject to
@@ -1020,7 +1031,7 @@ public class MetricsProvider {
         if (!gauges.containsKey(name)) {
             throw new IllegalArgumentException(name + ID_NOT_FOUND_ERRMSG);
         } else {
-            return jsonParser(registry.get(name).gauge());
+            return jsonParser(registry.getGauge(name));
         }
     }
 
@@ -1037,7 +1048,7 @@ public class MetricsProvider {
         if (!counters.containsKey(name)) {
             throw new IllegalArgumentException(name + ID_NOT_FOUND_ERRMSG);
         } else {
-            return jsonParser(registry.get(name).counter());
+            return jsonParser(registry.getCounter(name));
         }
     }
 
@@ -1054,14 +1065,13 @@ public class MetricsProvider {
         if (!timers.containsKey(name)) {
             throw new IllegalArgumentException(name + ID_NOT_FOUND_ERRMSG);
         } else {
-            return jsonParser(registry.get(name).timer());
+            return jsonParser(registry.getTimer(name));
         }
     }
 
     /**
      * Parses a meter into a JsonObject to be sent via HTTP.<br>
-     * Due to the current limitations with inserting the actual
-     * {@link javax.json.Json} libraries inside this component, this method acts
+     * Due to the current limitations with the Json libraries inside this component, this method acts
      * like a crude substitute that creates a String that can later be parsed into a
      * valid JsonObject.<br>
      * In order to maintain a certain uniformity, the resulting JSON object mimics
@@ -1088,7 +1098,7 @@ public class MetricsProvider {
 
         for (Measurement m : meter.measure()) {
             sb.append("{");
-            sb.append("\"statistic\":\"").append(m.getStatistic().toString()).append("\",");
+            sb.append("\"statistic\":\"").append(m.getStatisticAsString()).append("\",");
             sb.append("\"value\":").append(String.format(Locale.ROOT, "%f", m.getValue()));
             sb.append("},");
         }
@@ -1281,7 +1291,7 @@ public class MetricsProvider {
             description =  "Tuples sent out by a service";
             name = SERVICE_TUPLES_SENT;
         }
-        return Counter.builder(name)
+        return MetricsFactory.buildCounter(name)
             .baseUnit("tuple/s")
             .description(description)
             .tags(TAG_SERVICE_SERVICE, serviceName, 
@@ -1305,7 +1315,7 @@ public class MetricsProvider {
      */
     public Timer createServiceProcessingTimer(String serviceName, String serviceId, String appId, 
         String appInstanceId) {
-        return io.micrometer.core.instrument.Timer.builder(SERVICE_TIME_PROCESSED)
+        return MetricsFactory.buildTimer(SERVICE_TIME_PROCESSED)
             .description("Main processing time of a service")
             .tags(TAG_SERVICE_SERVICE, serviceName, 
                 TAG_SERVICE_APPLICATION, appId, 

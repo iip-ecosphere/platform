@@ -18,19 +18,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.json.JsonObject;
-
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.GaugeRepresentation;
+import de.iip_ecosphere.platform.support.json.JsonObject;
+import de.iip_ecosphere.platform.support.metrics.Meter;
+import de.iip_ecosphere.platform.support.metrics.Meter.Id;
+import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
+import de.iip_ecosphere.platform.support.metrics.Tag;
 import test.de.iip_ecosphere.platform.services.environment.metricsProvider.utils.TestUtils;
 import static test.de.iip_ecosphere.platform.services.environment.metricsProvider.utils.TestUtils.assertThrows;
-import io.micrometer.core.instrument.ImmutableTag;
-import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.Meter.Id;
-import io.micrometer.core.instrument.Meter.Type;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Tags;
 
 /**
  * Tests meter representation via {@link GaugeRepresentation}.
@@ -61,8 +58,8 @@ public class MeterRepresentationTest {
     public void testInitOkNoTags() throws IOException {
         JsonObject obj = TestUtils.readJsonFromResources(FOLDER, JSON_VALID);
         List<Tag> tagList = new ArrayList<Tag>();
-        Id id = new Id(obj.getString("name"), Tags.of(tagList), obj.getString("baseUnit"), obj.getString("description"),
-                Type.GAUGE);
+        Id id = MetricsFactory.buildId(obj.getString("name"), tagList, obj.getString("baseUnit"), 
+            obj.getString("description"), Meter.Type.GAUGE);
 
         Meter meter = GaugeRepresentation.parseGauge(obj);
         assertNotNull(meter);
@@ -78,11 +75,10 @@ public class MeterRepresentationTest {
     public void testInitOkWithTags() throws IOException {
         JsonObject obj = TestUtils.readJsonFromResources(FOLDER, JSON_VALID);
         List<Tag> tagList = new ArrayList<Tag>();
-        tagList.add(new ImmutableTag("key1", "value1"));
-        tagList.add(new ImmutableTag("key2", "value2"));
-        Tags tags = Tags.of(tagList);
-        Id id = new Id(obj.getString("name"), tags, obj.getString("baseUnit"), obj.getString("description"),
-                Type.GAUGE);
+        tagList.add(MetricsFactory.buildImmutableTag("key1", "value1"));
+        tagList.add(MetricsFactory.buildImmutableTag("key2", "value2"));
+        Id id = MetricsFactory.buildId(obj.getString("name"), tagList, obj.getString("baseUnit"), 
+            obj.getString("description"), Meter.Type.GAUGE);
 
         Meter meter = GaugeRepresentation.parseGauge(obj, "key1:value1", "key2:value2");
         assertNotNull(meter);
@@ -98,7 +94,8 @@ public class MeterRepresentationTest {
     public void testInitOkNoTagsNoBaseUnitValue() throws IOException {
         JsonObject obj = TestUtils.readJsonFromResources(FOLDER, JSON_VALID_NO_BASE_UNIT);
         List<Tag> tagList = new ArrayList<Tag>();
-        Id id = new Id(obj.getString("name"), Tags.of(tagList), null, obj.getString("description"), Type.OTHER);
+        Id id = MetricsFactory.buildId(obj.getString("name"), tagList, null, obj.getString("description"), 
+            Meter.Type.OTHER);
 
         Meter meter = GaugeRepresentation.parseGauge(obj);
         assertNotNull(meter);
@@ -114,7 +111,8 @@ public class MeterRepresentationTest {
     public void testInitOkNoTagsNoDescriptionValue() throws IOException {
         JsonObject obj = TestUtils.readJsonFromResources(FOLDER, JSON_VALID_NO_DESCRIPTION);
         List<Tag> tagList = new ArrayList<Tag>();
-        Id id = new Id(obj.getString("name"), Tags.of(tagList), obj.getString("baseUnit"), null, Type.OTHER);
+        Id id = MetricsFactory.buildId(obj.getString("name"), tagList, obj.getString("baseUnit"), 
+            null, Meter.Type.OTHER);
 
         Meter meter = GaugeRepresentation.parseGauge(obj);
         assertNotNull(meter);
@@ -220,7 +218,7 @@ public class MeterRepresentationTest {
     public void testNameInitOk() {
         String name = "name";
         List<Tag> tagList = new ArrayList<Tag>();
-        Id id = new Id(name, Tags.of(tagList), null, null, Type.GAUGE);
+        Id id = MetricsFactory.buildId(name, tagList, null, null, Meter.Type.GAUGE);
 
         Meter meter = GaugeRepresentation.createNewGauge(name);
         assertNotNull(meter);

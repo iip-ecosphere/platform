@@ -27,6 +27,11 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.Irdi;
+import de.iip_ecosphere.platform.support.json.Json;
+import de.iip_ecosphere.platform.support.json.JsonArray;
+import de.iip_ecosphere.platform.support.json.JsonNumber;
+import de.iip_ecosphere.platform.support.json.JsonObject;
+import de.iip_ecosphere.platform.support.json.JsonValue;
 import de.iip_ecosphere.platform.transport.TransportFactory;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
@@ -36,19 +41,11 @@ import static de.iip_ecosphere.platform.services.environment.metricsProvider.met
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.StringReader;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonNumber;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
-import javax.json.stream.JsonParsingException;
 
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
@@ -231,7 +228,7 @@ public class MetricsAasConstructor {
         
         /**
          * Returns the element access instances to be processed further during 
-         * {@link MetricsAasConstructor#pushToAas(ElementsAccess, java.util.Map.Entry, Map, PushMeterPredicate)}.
+         * {@link MetricsAasConstructor#pushToAas(ElementsAccess, String, JsonValue, Map, PushMeterPredicate)}.
          * 
          * @param parent the parent access to derive the elements from
          * @param deviceId the device id as passed in from the monitoring data
@@ -289,20 +286,24 @@ public class MetricsAasConstructor {
         }
         if (null != monSubModel) {
             mPredicate = null == mPredicate ? PREDICATE_ALWAYS_TRUE : mPredicate;
-            JsonObject obj = Json.createReader(new StringReader(json)).readObject();
-            String id = obj.getString("id");
-            if (null != id) {
-                List<ElementsAccess> coll = cSupplier.get(monSubModel, id);
-                if (null != coll) {
-                    JsonObject meters = obj.getJsonObject("meters");    
-                    if (null != meters) {
-                        for (ElementsAccess c : coll) {
-                            for (Map.Entry<String, JsonValue> ent : meters.entrySet()) {
-                                pushToAas(c, ent, monMapping, mPredicate);
+            try {
+                JsonObject obj = Json.createObject(json);
+                String id = obj.getString("id");
+                if (null != id) {
+                    List<ElementsAccess> coll = cSupplier.get(monSubModel, id);
+                    if (null != coll) {
+                        JsonObject meters = obj.getJsonObject("meters");    
+                        if (null != meters) {
+                            for (ElementsAccess c : coll) {
+                                for (String k: meters.keys()) {
+                                    pushToAas(c, k, meters.getValue(k), monMapping, mPredicate);
+                                }
                             }
                         }
                     }
                 }
+            } catch (IOException e) {
+                LoggerFactory.getLogger(MetricsAasConstructor.class).warn("Cannot parse meter: {}", e.getMessage());
             }
         }
     }
@@ -313,16 +314,16 @@ public class MetricsAasConstructor {
      * Pushes a JSON metrics entry to {@code coll}.
      * 
      * @param coll the collection to push to
-     * @param ent the metrics entry containing metrics name and measurement
+     * @param key the name of the metric
+     * @param json the measurement of the metric
      * @param monMapping the meter-shortId mapping to use
      * @param mPredicate optional predicate to identify whether pushing a value shall happen, may be <b>null</b> 
      *     then {@link #PREDICATE_ALWAYS_TRUE} is used
      */
-    private static void pushToAas(ElementsAccess coll, Map.Entry<String, JsonValue> ent, 
+    private static void pushToAas(ElementsAccess coll, String key, JsonValue json, 
         Map<String, String> monMapping, PushMeterPredicate mPredicate) {
-        String idShort = monMapping.get(ent.getKey());
+        String idShort = monMapping.get(key);
         if (null != idShort) {
-            JsonValue json = ent.getValue();
             if (mPredicate.test(coll, json)) {
                 AasUtils.setPropertyValueSafe(coll, idShort, getMeasurement(json.toString())); // implicit conversion
             }
@@ -347,7 +348,7 @@ public class MetricsAasConstructor {
         @Override
         public void received(String data) {
             try {
-                JsonObject obj = Json.createReader(new StringReader(data)).readObject();
+                JsonObject obj = Json.createObject(data);
                 String id = obj.getString("id");
                 if (null != id) {
                     JsonObjectHolder holder = holders.get(id);
@@ -355,7 +356,7 @@ public class MetricsAasConstructor {
                         holder.obj = obj;
                     }
                 }
-            } catch (JsonParsingException e) {
+            } catch (IOException e) {
                 LoggerFactory.getLogger(MetricsAasConstructor.class).error("Cannot parse JSON: " 
                     + e.getMessage() + " " + data);
             }
@@ -413,16 +414,21 @@ public class MetricsAasConstructor {
     private static Object getMeasurement(String json) {
         Object result = null;
         if (null != json && json.length() > 0) {
-            JsonObject obj = Json.createReader(new StringReader(json)).readObject();
-            JsonArray meas = obj.getJsonArray("measurements");
-            if (null != meas && meas.size() > 0) {
-                JsonObject measurement = meas.getJsonObject(0);
-                if (null != measurement) {
-                    JsonNumber num = measurement.getJsonNumber("value");
-                    if (null != num) {
-                        result = num.doubleValue();
+            try {
+                JsonObject obj = Json.createObject(json);
+                JsonArray meas = obj.getJsonArray("measurements");
+                if (null != meas && meas.size() > 0) {
+                    JsonObject measurement = meas.getJsonObject(0);
+                    if (null != measurement) {
+                        JsonNumber num = measurement.getJsonNumber("value");
+                        if (null != num) {
+                            result = num.doubleValue();
+                        }
                     }
                 }
+            } catch (IOException e) {
+                LoggerFactory.getLogger(MetricsAasConstructor.class).warn("Cannot parse measurement: {}", 
+                    e.getMessage());
             }
         }
         return result;

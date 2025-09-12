@@ -34,11 +34,11 @@ import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
 import de.iip_ecosphere.platform.support.processInfo.ProcessInfoFactory;
 import de.iip_ecosphere.platform.support.processInfo.ProcessInfoFactory.ProcessInfo;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
-import io.micrometer.core.instrument.Gauge;
 
 /**
  * Implements an abstract asynchronous process-based service for a single pair of input-output types. A created 
@@ -604,7 +604,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunna
      */
     public void attachMetricsProvider(MetricsProvider provider) {
         if (null != provider) { // standalone
-            Gauge.builder("service." + getId() + ".process.memory.used", 
+            MetricsFactory.buildGauge("service." + getId() + ".process.memory.used", 
                  () -> null == osProcess ? 0 : osProcess.getVirtualSize())
                     .description("Used memory of the attached process")
                     .baseUnit(provider.getMemoryBaseUnit().stringValue()).register(provider.getRegistry());
