@@ -67,9 +67,13 @@ In addition, a `ChannelConnector` offers the following fields:
 
 While `JsonFormatter`/`JsonParser` do not require further information, `TextLineFormatter`/`TextLineParser` must be configured with a `separator`, e.g., "," for CSV, "\t" for TSV etc.
 
+## OPC UA connector
+
+The OPC UA  connector is a model connector with no further fields.
+
 ## AAS connector
 
-The Asset Administration Shell (AAS) connector supports the following fields:
+The Asset Administration Shell (AAS) connector is a model connector that supports the following additional fields:
 
 | Field | Description | Default |
 | --- | --- | --- |
@@ -79,6 +83,10 @@ The Asset Administration Shell (AAS) connector supports the following fields:
 
 Background: 
 - The connector was primarily realized for AAS metamodel v2. Through a more recent oktoflow AAS plugin, also metamodel v3 is supported. However, in the future, we may have to distinguish between AAS and sumbodel host/port.
+
+## ADS connector
+
+The ADS connector is a model connector for Beckhoff ADS with no further fields.
 
 ## Serial connector
 
@@ -152,3 +160,17 @@ The `FileConnector` makes that in local files available or writes to local files
 The field `readFiles` may contain a single file name, a folder nome or multiple file names (generically as Java regular expressions) determining the files to be read. Files are read from the file system or as app resources. If multiple files are configured, their names are sorted lexicographically to determine the reading sequence. The field `writeFiles` may contain a file or folder in the file system to write incoming data to (if not specified, incoming data will be ignored). Data points read from the `readFiles` may be ingested with a fixed sampling frequency in polling mode or a simulated time in non-polling mode, either as fixed time between subsequent data points (`dataTimediff`) or through a `ConnectorInputHandler` or a `DataTimeDiffProvider` in generated connector integrations based on the last intested data point.
 
 To ease the application, pre-defined `FileConnector` types are `JsonFileConnector`, `CSVFileConnector` and `TSVFileConnector`, each with no further fields.
+
+## MQTTv3 connector
+
+The `MQTTv3` connector is a channel connector with no further fields. Formatters and parsers can be applied as described for the `FileConnector`. 
+
+The `MipMqttV3Connector` is an example of a pre-configured connector with fixed input/output types. The connector is part of oktoflow's default library.
+
+## MQTTv5 connector
+
+The `MQTTv5` connector is a channel connector with no further fields. Formatters and parsers can be applied as described for the `FileConnector`.
+
+## MQTT connector
+
+The `MQTT` connector is a channel connector which selects dynamically between `MQTTv3` and `MQTTv5` connector. The MQTT connector has no further fields. Formatters and parsers can be applied as described for the `FileConnector`.
