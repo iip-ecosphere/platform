@@ -239,6 +239,28 @@
                      </configuration>
                  </execution>
 
+                <execution>
+                    <id>okto plugins</id>
+                    <goals>
+                        <goal>unpack-plugins</goal>
+                    </goals>
+                    <phase>test-compile</phase>
+                    <configuration>
+                        <plugins>
+                            <plugin>
+                                <artifactId>support.aas.basyx2</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.aas.basyx</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>test.amqp.qpid</artifactId>
+                            </plugin>
+                        </plugins>
+                        <version>${iip.version}</version>
+                    </configuration>
+                </execution>
+
              </executions>
          </plugin>
       
