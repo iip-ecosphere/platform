@@ -27,7 +27,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -54,6 +53,7 @@ import de.iip_ecosphere.platform.services.spring.SpringCloudServiceSetup;
 import de.iip_ecosphere.platform.services.spring.SpringInstances;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
@@ -72,6 +72,8 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
+import de.iip_ecosphere.platform.support.metrics.Gauge;
+import de.iip_ecosphere.platform.support.metrics.Meter;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
@@ -79,9 +81,7 @@ import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
-import io.micrometer.core.instrument.Gauge;
-import io.micrometer.core.instrument.Meter;
-import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
+import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 /**
  * Abstract, common test for service manager/service execution tests.
@@ -133,7 +133,7 @@ public class AbstractTestServiceManager {
      * @param broker the broker address
      */
     public static void init(ServerAddress broker) {
-        server = new TestQpidServer(broker); // prescribes protocol for artifacts
+        server = TestWithQpid.fromPlugin(broker); // prescribes protocol for artifacts
         // spring is too late, AbstractSetup does not load it even with modified constructor...
         TransportSetup setup = ServiceFactory.getTransport();
         setup.setPort(broker.getPort());
