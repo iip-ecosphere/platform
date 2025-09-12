@@ -24,7 +24,6 @@ import java.util.function.Supplier;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -40,10 +39,12 @@ import de.iip_ecosphere.platform.services.environment.YamlService;
 
 import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
+import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.metrics.Counter;
+import de.iip_ecosphere.platform.support.metrics.Timer;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
 import de.iip_ecosphere.platform.transport.Transport;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.Timer;
 
 /**
  * Defines the test stream to be processed. We assume that a broker is running.
@@ -139,9 +140,7 @@ public class Test extends Starter {
                     metrics.recordWithTimer(REST_TIMER_ID, 0, TimeUnit.MILLISECONDS);
                     first = false;
                 } else if (config.getIngestCount() > 0 && ingestCount > config.getIngestCount()) {
-                    if (null != getContext()) {
-                        getContext().close();
-                    }
+                    stop();
                     System.exit(0);
                 }
                 if (config.getIngestCount() > 0) {
@@ -152,6 +151,15 @@ public class Test extends Starter {
                 return String.valueOf(num);
             });
         };
+    }
+
+    /**
+     * Stops the application.
+     */
+    public static void stop() {
+        if (null != getContext()) {
+            getContext().close();
+        }        
     }
     
     /**
@@ -256,6 +264,7 @@ public class Test extends Starter {
      * @param args command line arguments
      */
     public static void main(String[] args) {
+        ResourceLoader.addFilter(u -> !u.toString().endsWith("-tests.jar!/identityStore.yml")); // exclude test JARs
         fileName = CmdLine.getArg(args, "test.log", FileUtils.getTempDirectoryPath() + "/test.simpleStream.spring.log");
         FileUtils.deleteQuietly(new File(fileName));
         Starter.main(Test.class, args);
