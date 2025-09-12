@@ -45,10 +45,6 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-loader</artifactId>
     </dependency>
-	<dependency>
-	    <groupId>net.bytebuddy</groupId>
-	    <artifactId>byte-buddy</artifactId>
-	</dependency>
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>support.aas</artifactId>
@@ -86,16 +82,10 @@
       <scope>test</scope>
     </dependency>    
     <dependency>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <artifactId>test.amqp.qpid</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.qpid</groupId>
-      <artifactId>qpid-broker</artifactId>
-      <scope>test</scope>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>support.aas</artifactId>
+     <version>${project.version}</version>
+     <scope>test</scope>
     </dependency>
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
@@ -127,6 +117,12 @@
       <groupId>de.iip-ecosphere.platform</groupId>
       <scope>test</scope>
       <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+      <artifactId>support.bytecode-bytebuddy</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>    
     <!-- Don't move it from here, interferes with Tomcat :/ -->
     <dependency>
@@ -210,10 +206,39 @@
                          <goal>assemble-plugin</goal>
                      </goals>
                  </execution>
+
+                 <execution>
+                     <id>copy-dependencies-test</id>
+                     <goals>
+                         <goal>copy-plugin-dependencies</goal>
+                     </goals>
+                     <phase>package</phase>
+                     <configuration>
+                       <asTest>true</asTest>
+                     </configuration>
+                 </execution>
+                 <execution>
+                     <id>build-classpath-plugin-test</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>build-plugin-classpath</goal>
+                     </goals>
+                     <configuration>
+                       <asTest>true</asTest>
+                     </configuration>
+                 </execution>
+                 <execution>
+                     <id>assemble-test</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>assemble-plugin</goal>
+                     </goals>
+                     <configuration>
+                       <asTest>true</asTest>
+                     </configuration>
+                 </execution>
+
              </executions>
-             <configuration>
-                 <addTestArtifact>true</addTestArtifact>
-             </configuration>             
          </plugin>
       
     </plugins>
