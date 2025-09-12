@@ -18,9 +18,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PreDestroy;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +25,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import io.micrometer.core.instrument.MeterRegistry;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.CapacityBaseUnit;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstants;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
@@ -43,7 +39,11 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
+import de.iip_ecosphere.platform.support.json.JsonArray;
+import de.iip_ecosphere.platform.support.json.JsonObject;
+import de.iip_ecosphere.platform.support.json.JsonValue;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
 import de.iip_ecosphere.platform.transport.TransportFactory;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
@@ -186,15 +186,54 @@ public class MetricsProvider extends de.iip_ecosphere.platform.services.environm
      * client via the appropriate methods, allowing the user to add new custom
      * metrics when needed and manipulate them in a uniform manner. <br>
      * This constructor should be called automatically by the Spring boot framework
+     * as fallback if no {@link io.micrometer.core.instrument.MeterRegistry} is available.
+     * 
+     * @throws IllegalArgumentException if the registry is null
+     */
+    public MetricsProvider() {
+        this(MetricsFactory.getInstance().createRegistry());
+        LoggerFactory.getLogger(this).info("Using default metrics factory");
+    }
+    
+    /**
+     * Create a new Metrics Provider Instance.<br>
+     * The Metrics Provider will have a map of metrics that can be operated by the
+     * client via the appropriate methods, allowing the user to add new custom
+     * metrics when needed and manipulate them in a uniform manner. <br>
+     * This constructor should be called automatically by the Spring boot framework
      * and accessed by an autowired attribute as a result.
      * 
      * @param registry where new Meters are registered. Injected by the Spring Boot
      *                 Application
      * @throws IllegalArgumentException if the registry is null
      */
-    public MetricsProvider(MeterRegistry registry) {
-     // with lambda, non-native monitoring data will be grabbed from Transport
+    @Autowired
+    public MetricsProvider(io.micrometer.core.instrument.MeterRegistry registry) {
+        // with lambda, non-native monitoring data will be grabbed from Transport
+        this(MetricsFactory.getInstance().createRegistry(registry)); 
+        LoggerFactory.getLogger(this).info("Using Spring metrics factory");
+    }
+    
+    /**
+     * Create a new Metrics Provider Instance. Avoid interference with autowiring.
+     * 
+     * @param registry where new Meters are registered. Injected by the Spring Boot
+     *                 Application
+     * @throws IllegalArgumentException if the registry is null
+     */
+    protected MetricsProvider(de.iip_ecosphere.platform.support.metrics.MeterRegistry registry) {
         super(registry, !MetricsAasConstructor.LAMBDA_SETTERS_SUPPORTED); 
+    }
+    
+    /**
+     * Create a new Metrics Provider Instance.
+     * 
+     * @param registry where new Meters are registered. Injected by the Spring Boot
+     *                 Application
+     * @throws IllegalArgumentException if the registry is null
+     */
+    public static MetricsProvider of(de.iip_ecosphere.platform.support.metrics.MeterRegistry registry) {
+        return new MetricsProvider(registry);
     }
     
     /**

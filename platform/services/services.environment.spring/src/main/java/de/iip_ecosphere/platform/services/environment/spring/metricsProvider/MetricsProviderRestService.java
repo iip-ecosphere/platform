@@ -30,8 +30,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.iip_ecosphere.platform.services.environment.metricsProvider.CapacityBaseUnit;
-import io.micrometer.core.instrument.ImmutableTag;
-import io.micrometer.core.instrument.Tag;
+import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
+import de.iip_ecosphere.platform.support.metrics.Tag;
 
 /**
  * This class provides a RESTful Service to access the {@link MetricsProvider}
@@ -283,7 +283,7 @@ public class MetricsProviderRestService {
         String[] splt;
         for (String tag : params.get("tag")) {
             splt = tag.split(":");
-            tags.add(new ImmutableTag(splt[0], splt[1]));
+            tags.add(MetricsFactory.buildImmutableTag(splt[0], splt[1]));
         }
 
         return getMeter(name, tags);

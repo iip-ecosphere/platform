@@ -25,7 +25,8 @@ import test.de.iip_ecosphere.platform.services.environment.spring.metricsProvide
     MetricsProviderTest.class,
     StarterTests.class,
     SpringAsyncServiceBaseTests.class,
-    YamlSetupTest.class
+    YamlSetupTest.class,
+    test.de.oktoflow.platform.support.metrics.micrometer.AllTests.class
 })
 public class AllTests {
 }

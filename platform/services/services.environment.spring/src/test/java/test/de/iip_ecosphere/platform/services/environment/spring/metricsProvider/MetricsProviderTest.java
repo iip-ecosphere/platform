@@ -4,8 +4,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
-
-import io.micrometer.core.instrument.MeterRegistry;
+import de.iip_ecosphere.platform.support.metrics.MeterRegistry;
 
 /**
  * Tests {@link MetricsProvider}.
@@ -17,7 +16,7 @@ public class MetricsProviderTest extends
 
     @Override
     protected MetricsProvider createProvider(MeterRegistry registry) {
-        return new MetricsProvider(registry);
+        return MetricsProvider.of(registry);
     }
     
     /**
