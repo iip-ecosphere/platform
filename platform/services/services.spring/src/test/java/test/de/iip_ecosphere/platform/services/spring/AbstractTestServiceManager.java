@@ -78,6 +78,8 @@ import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
+import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
@@ -90,6 +92,10 @@ import test.de.iip_ecosphere.platform.transport.TestWithQpid;
  */
 public class AbstractTestServiceManager {
 
+    static {
+        PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE);
+    }
+    
     /**
      * A predicate testing whether the value of a JSON gauge is positive.
      */
