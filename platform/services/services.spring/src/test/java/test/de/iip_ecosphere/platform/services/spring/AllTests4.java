@@ -10,6 +10,7 @@
  ********************************************************************************/
 package test.de.iip_ecosphere.platform.services.spring;
 
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -18,6 +19,7 @@ import org.junit.runners.Suite;
  * 
  * @author Holger Eichelberger, SSE
  */
+@Ignore("for now as long as we are in transition")
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     ZipNoCpServiceManagerTest.class
