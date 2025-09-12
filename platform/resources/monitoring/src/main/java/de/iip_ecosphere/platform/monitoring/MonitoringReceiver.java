@@ -13,15 +13,9 @@
 package de.iip_ecosphere.platform.monitoring;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
-import javax.json.stream.JsonParsingException;
 
 import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.MeterRepresentation;
 import de.iip_ecosphere.platform.transport.Transport;
@@ -31,8 +25,10 @@ import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.ComponentTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.streams.StreamNames;
-import io.micrometer.core.instrument.Meter;
+import de.iip_ecosphere.platform.support.json.Json;
+import de.iip_ecosphere.platform.support.json.JsonObject;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.metrics.Meter;
 
 /**
  * Observes IIP-Ecosphere standard transport channels and prepares the information for feeding it into
@@ -67,13 +63,13 @@ public abstract class MonitoringReceiver {
         public void received(String data) {
             try {
                 try {
-                    JsonObject obj = Json.createReader(new StringReader(data)).readObject();
+                    JsonObject obj = Json.createObject(data);
                     String id = obj.getString("id");
                     notifyMeterReception(stream, id, obj);
                     if (null != id) {
                         obtainExporter(id).addMeters(id, obj.getJsonObject("meters"));
                     }
-                } catch (JsonParsingException e) {
+                } catch (IOException e) {
                     LoggerFactory.getLogger(MonitoringReceiver.class).error("Cannot parse JSON: " 
                         + e.getMessage() + " " + data);
                 }
@@ -224,8 +220,8 @@ public abstract class MonitoringReceiver {
          * @param mtrs the meters
          */
         protected void addMeters(String deviceId, JsonObject mtrs) {
-            for (Map.Entry<String, JsonValue> e : mtrs.entrySet()) {
-                Meter meter = MeterRepresentation.parseMeter(e.getValue().toString(), 
+            for (String k : mtrs.keys()) {
+                Meter meter = MeterRepresentation.parseMeter(mtrs.getValue(k).toString(), 
                     "device:" + deviceId); // we are a bridge, let's add the deviceId
                 if (null != meter) {
                     addMeter(meter);

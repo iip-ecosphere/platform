@@ -17,8 +17,6 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import javax.json.JsonObject;
-
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,10 +30,10 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+import de.iip_ecosphere.platform.support.json.JsonObject;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.streams.StreamNames;
-import io.micrometer.core.instrument.Meter;
 import test.de.iip_ecosphere.platform.monitoring.AbstractMonitoringReceiverTest;
 import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
@@ -80,7 +78,7 @@ public class PrometheusLifecycleDescriptorTest extends AbstractMonitoringReceive
         }
 
         @Override
-        protected void notifyMeterAdded(Meter meter) {
+        protected void notifyMeterAdded(de.iip_ecosphere.platform.support.metrics.Meter meter) {
             super.notifyMeterAdded(meter);
             if (meter != null) {
                 meterCount++;

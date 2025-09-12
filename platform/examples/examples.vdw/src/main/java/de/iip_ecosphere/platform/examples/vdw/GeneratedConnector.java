@@ -21,11 +21,11 @@ import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsPro
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
+import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import iip.datatypes.OpcIn;
 import iip.datatypes.OpcOut;
 import iip.nodes.MyOpcConnExample;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 /**
  * Runs the generated connector.
@@ -34,7 +34,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
  */
 public class GeneratedConnector {
 
-    private static MetricsProvider metrics = new MetricsProvider(new SimpleMeterRegistry());
+    private static MetricsProvider metrics = new MetricsProvider();
 
     /**
      * Runs the generated connector. Currently not integrated with test as the VDW OPC server must be online 

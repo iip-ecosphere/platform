@@ -91,6 +91,17 @@
       <artifactId>simple-logger</artifactId>
       <version>1.7.0</version>
     </dependency>
+    <dependency>
+      <artifactId>support.metrics-micrometer</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>io.micrometer</groupId>
+          <artifactId>micrometer-core</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>    
     
 	<dependency>
       <groupId>junit</groupId>
@@ -168,6 +179,25 @@
       <scope>test</scope>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <artifactId>support.metrics-micrometer</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+      <type>test-jar</type>
+      <exclusions>
+        <exclusion>
+          <groupId>io.micrometer</groupId>
+          <artifactId>micrometer-core</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>    
+    <dependency>
+      <artifactId>support.http-apache</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>    
 
    </dependencies>
    

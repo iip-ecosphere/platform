@@ -23,7 +23,7 @@ import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.streams.StreamNames;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
 
 /**
  * Does OS/JVM level monitoring. [public for testing]
@@ -33,7 +33,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 public class Monitor {
     
     public static final String TRANSPORT_METRICS_CHANNEL = StreamNames.RESOURCE_METRICS;
-    private static MetricsProvider provider = new MetricsProvider(new SimpleMeterRegistry());
+    private static MetricsProvider provider = new MetricsProvider(MetricsFactory.getInstance().createRegistry());
     private static Timer timer = new Timer();
     private static boolean update = false;
 

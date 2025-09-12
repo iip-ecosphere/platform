@@ -22,7 +22,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    PrometheusLifecycleDescriptorTest.class
+    PrometheusLifecycleDescriptorTest.class,
+    test.de.oktoflow.platform.support.metrics.micrometer.AllTests.class
 })
 public class AllTests {
 }

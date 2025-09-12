@@ -15,8 +15,6 @@ package test.de.iip_ecosphere.platform.monitoring;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.json.JsonObject;
-
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -27,10 +25,11 @@ import de.iip_ecosphere.platform.monitoring.MonitoringSetup;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
+import de.iip_ecosphere.platform.support.json.JsonObject;
+import de.iip_ecosphere.platform.support.metrics.Meter;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.streams.StreamNames;
-import io.micrometer.core.instrument.Meter;
 import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 /**

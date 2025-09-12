@@ -62,7 +62,7 @@ public class EcsLifecycleDescriptor extends AbstractAasLifecycleDescriptor imple
                 continueWaiting = false;
                 LOGGER.error(e.getMessage());
             }
-        } 
+        }
     }
     
     @Override
@@ -73,7 +73,7 @@ public class EcsLifecycleDescriptor extends AbstractAasLifecycleDescriptor imple
         boolean autoOnOff = setup.getAutoOnOffboarding();
         if (registered) {
             try {
-                DeviceManagement.removeDevice(autoOnOff ? true : false);
+                DeviceManagement.removeDevice(autoOnOff);
             } catch (ExecutionException e) {
                 if (!autoOnOff) { // graceful if auto
                     LOGGER.error(e.getMessage());

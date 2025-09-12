@@ -53,9 +53,9 @@ import de.iip_ecosphere.platform.support.aas.ServerRecipe.PersistenceType;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
+import de.iip_ecosphere.platform.support.metrics.Gauge;
+import de.iip_ecosphere.platform.support.metrics.Meter;
 import de.iip_ecosphere.platform.transport.Transport;
-import io.micrometer.core.instrument.Gauge;
-import io.micrometer.core.instrument.Meter;
 import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
@@ -228,7 +228,8 @@ public class EcsAasTest extends TestWithQpid {
             Predicate<Object> pred = ent.getValue();
             if (null != pred) {
                 Object val = prop.getValue();
-                Assert.assertTrue(pred.test(val));
+                Assert.assertTrue(prop.getIdShort() + " " + prop.getValue() + " does not meet condition", 
+                    pred.test(val));
             }
         }
     }

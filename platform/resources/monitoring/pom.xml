@@ -94,6 +94,12 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <artifactId>support.metrics-micrometer</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>    
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>

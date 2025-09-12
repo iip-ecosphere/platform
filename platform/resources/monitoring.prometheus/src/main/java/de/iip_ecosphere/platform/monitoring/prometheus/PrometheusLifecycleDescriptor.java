@@ -27,11 +27,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.function.Supplier;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.HttpClients;
-
 import de.iip_ecosphere.platform.monitoring.prometheus.ConfigModifier.ScrapeEndpoint;
 import de.iip_ecosphere.platform.monitoring.prometheus.PrometheusMonitoringSetup.PrometheusSetup;
 import de.iip_ecosphere.platform.services.environment.AbstractProcessService;
@@ -41,6 +36,10 @@ import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.ZipUtils;
+import de.iip_ecosphere.platform.support.http.Http;
+import de.iip_ecosphere.platform.support.http.HttpClient;
+import de.iip_ecosphere.platform.support.http.HttpPost;
+import de.iip_ecosphere.platform.support.http.HttpResponse;
 import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
@@ -178,13 +177,14 @@ public class PrometheusLifecycleDescriptor implements LifecycleDescriptor {
             
             writer.close();
             if (notify) {
-                HttpClient httpclient = HttpClients.createDefault();
-                HttpPost httppost = new HttpPost(setup.getServer().getServerAddress().toServerUri() 
+                Http http = Http.getInstance();
+                HttpClient httpclient = http.createClient();
+                HttpPost httppost = http.createPost(setup.getServer().getServerAddress().toServerUri() 
                     + "/-/reload");
                 HttpResponse response = httpclient.execute(httppost);
-                int code = response.getStatusLine().getStatusCode();
+                int code = response.getStatusCode();
                 if (code >= 400) {
-                    String phrase = response.getStatusLine().getReasonPhrase();
+                    String phrase = response.getReasonPhrase();
                     LoggerFactory.getLogger(PrometheusLifecycleDescriptor.class)
                         .info("Cannot update configuration. HTTP response: {} {}", code, phrase);
                 }

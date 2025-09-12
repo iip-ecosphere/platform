@@ -10,11 +10,11 @@ import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepre
 import de.iip_ecosphere.platform.support.aas.BasicAasVisitor;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.metrics.Gauge;
+import de.iip_ecosphere.platform.support.metrics.Meter;
 import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolutionResult;
 import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolver;
 import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolutionResult.Naming;
-import io.micrometer.core.instrument.Gauge;
-import io.micrometer.core.instrument.Meter;
 
 /**
  * A visitor for printing a structured list of sub-model elements collections and their properties.

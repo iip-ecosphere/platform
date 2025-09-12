@@ -40,6 +40,7 @@ import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.oktoflow.platform.support.metrics.micrometer.MicrometerUtils;
 import io.micrometer.core.instrument.Measurement;
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.config.MeterFilter;
@@ -60,8 +61,9 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
 
     public static final String DEFAULT_METRICS_SERVLET_NAME = "metrics";
     public static final String DEFAULT_METRICS_ENDPOINT = "/" + DEFAULT_METRICS_SERVLET_NAME;
-    private static final MeterFilter[] METER_FILTERS = MetricsProvider.append(
-        MetricsProvider.DEFAULT_METER_FILTERS, MeterFilter.denyNameStartsWith("alertmonitor."));
+    private static final MeterFilter[] METER_FILTERS = MicrometerUtils.append(
+        MicrometerUtils.filterValue(MetricsProvider.DEFAULT_METER_FILTERS), 
+        MeterFilter.denyNameStartsWith("alertmonitor."));
     
     private Tomcat server;
     private Context context;
@@ -160,7 +162,7 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
                 Set<String> included = parse(req);
                 TextFormat.write004(writer, AmMetrics.registry.filteredMetricFamilySamples(
                     id -> included.contains(id) // below: names in scrape format, filter potentially with "."
-                        || MetricsProvider.include(id.replaceAll("_", "."), METER_FILTERS)));
+                        || MicrometerUtils.include(id.replaceAll("_", "."), METER_FILTERS)));
                 writer.flush();
             } finally {
                 writer.close();
@@ -219,7 +221,7 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
         MyPrometheusMeterRegistry() {
             super(PrometheusConfig.DEFAULT);
             // usual stuff added automatically in a spring environment
-            MetricsProvider.apply(this, MetricsProvider.DEFAULT_METER_FILTERS);
+            MicrometerUtils.apply(this, MicrometerUtils.filterValue(MetricsProvider.DEFAULT_METER_FILTERS));
         }
         
         /**
@@ -343,7 +345,8 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
 
         private MyPrometheusMeterRegistry registry = new MyPrometheusMeterRegistry();
         private ScrapeEndpoint entry;
-        private RegistryServlet servlet = new RegistryServlet(registry);        
+        private RegistryServlet servlet = new RegistryServlet(registry);  
+        
         /**
          * Creates an exporter.
          * 
@@ -373,11 +376,11 @@ public class IipEcospherePrometheusExporter extends MonitoringReceiver {
         // checkstyle: stop exception type check
         
         @Override
-        protected void addMeter(Meter meter)  {
+        protected void addMeter(de.iip_ecosphere.platform.support.metrics.Meter meter)  {
             if (null != meter) {
                 try {
-                    registry.remove(meter.getId());
-                    registry.createMeter(meter.getId(), meter.getId().getType(), meter.measure());
+                    registry.remove(MicrometerUtils.idValue(meter.getId()));
+                    MicrometerUtils.createMeter(meter, (id, type, measure) -> registry.createMeter(id, type, measure));
                 } catch (Throwable t) {
                     LoggerFactory.getLogger(getClass()).error("Cannot add meter ({}, {}, {}): {}", meter.getId(), 
                         meter.getId().getType(), meter.measure(), t.getMessage());
