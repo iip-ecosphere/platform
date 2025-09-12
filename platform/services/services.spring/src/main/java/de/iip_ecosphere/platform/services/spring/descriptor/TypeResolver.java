@@ -19,9 +19,8 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 
-import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.description.modifier.Visibility;
-import net.bytebuddy.dynamic.DynamicType;
+import de.iip_ecosphere.platform.support.bytecode.Bytecode;
+import de.iip_ecosphere.platform.support.bytecode.Bytecode.ClassBuilder;
 
 /**
  * Resolves declared types to dynamic Java classes (just attributes). 
@@ -125,17 +124,13 @@ public class TypeResolver {
             }
         }
         if (resolvable) {
-            DynamicType.Builder<?> typeBuilder = new ByteBuddy()
-                .subclass(Object.class)
-                .name(type.getName());
+            ClassBuilder<Object> typeBuilder = Bytecode.getInstance().createClassBuilder(type.getName(), Object.class, 
+                null == loader ? getClass().getClassLoader() : loader);
             for (Field f : type.getFields()) {
-                typeBuilder = typeBuilder.defineField(f.getName(), resolve(f.getType()), Visibility.PUBLIC);
+                typeBuilder.definePublicField(f.getName(), resolve(f.getType()))
+                    .build();
             }
-            DynamicType.Unloaded<?> unloadedType = typeBuilder.make();
-            // for loading the first class, use the loader of this class
-            // for following classes, use Buddy's loader of the first class so that they can find each other
-            Class<?> cls = unloadedType.load(null == loader ? getClass().getClassLoader() : loader)
-                .getLoaded();
+            Class<?> cls = typeBuilder.build();
             if (null == loader) {
                 loader = cls.getClassLoader();
             }
