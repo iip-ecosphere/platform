@@ -49,7 +49,7 @@ import de.iip_ecosphere.platform.support.setup.CmdLine;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ServiceMgrAndDescriptorTest {
+public class ServiceMgrAndDescriptorTest extends AbstractTest {
     
     /**
      * A mocking service manager for a given service artifact. Only selected functions are implemented!

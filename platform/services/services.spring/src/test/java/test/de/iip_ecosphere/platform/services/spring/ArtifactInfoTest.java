@@ -39,7 +39,7 @@ import de.iip_ecosphere.platform.services.spring.yaml.YamlService;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ArtifactInfoTest {
+public class ArtifactInfoTest extends AbstractTest {
 
     /**
      * Tests the YAML reader.
