@@ -610,7 +610,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
         throws ExecutionException {
         try {
             Constraint c = new Constraint(createExpression(null, varDecl.getName() + "=" + valueEx, prj), prj);
-            prj.add(c);
+            prj.addBeforeFreeze(c); // the usual position
             return c;
         } catch (CSTSemanticException e) {
             throw new ExecutionException(e.getMessage(), null);
