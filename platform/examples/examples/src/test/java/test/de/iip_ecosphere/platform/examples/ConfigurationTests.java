@@ -17,28 +17,29 @@ import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
-import org.apache.qpid.server.util.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.examples.SpringStartup;
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.collector.Collector;
 import test.de.iip_ecosphere.platform.configuration.AbstractIvmlTests;
-import test.de.iip_ecosphere.platform.test.amqp.qpid.TestQpidServer;
+import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 /**
  * Executes tests on runnable configuration.configuration examples.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ConfigurationTests {
+public class ConfigurationTests extends TestWithQpid {
 
     private static ServerAddress broker;
-    private static TestQpidServer server;
+    private static Server server;
     private static final Consumer<String> SIMPLE_RECEIVED_ASSERTER = s -> assertContains(s, "RECEIVED ");
     private static final boolean DEBUG = false;
 
@@ -83,7 +84,7 @@ public class ConfigurationTests {
     @BeforeClass
     public static void startup() {
         broker = new ServerAddress(Schema.IGNORE);
-        server = new TestQpidServer(broker);
+        server = TestWithQpid.fromPlugin(broker);
         server.start();
     }
 
@@ -119,7 +120,7 @@ public class ConfigurationTests {
         File res = File.createTempFile("examples-test-" + appName, ".out");
         SpringStartup.start(f, false, p -> configureProcess(p, res), 
             "--iip.test.stop=" + stopTime, "--iip.test.brokerPort=" + broker.getPort());
-        asserter.accept(FileUtils.readFileAsString(res));
+        asserter.accept(FileUtils.readFileToString(res));
         //res.deleteOnExit();
         //res.delete();
         Collector.collect("examples." + folder).addExecutionTimeMs(System.currentTimeMillis() - start).close();
