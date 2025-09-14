@@ -71,6 +71,9 @@ The plugin supports the following configuration settings:
   - `disableJava` (default `false`, user property `disableJava`) sets system properties to disable Java compilation, Java test compilation, test execution and Javadoc generation. Helpful shortcut for executing generation profiles.
   - `skipTests` and `maven.test.skip` are passed through, disabling tests (explicit `disableJavaTests`, default false, user property `disableJavaTests`).
   - `maven.build.cache.enabled` (default: not given) is passed through.
+  - `mavenJavadocSkip` (default `true`, user property `maven.javadoc.skip`) enables/disables JavaDoc generation
+  - `mavenAssemblySkip` (default `true`, user property `maven.assembly.skip`) enables/disables Assembly generation
+  - `mavenSourceSkip` (default `true`, user property `maven.source.skip`) enables/disables Source packaging
   - `enableJavadoc` (default `false`, user property `enableJava`) enables JavaDoc generation
   - `disablePython` (default `false`, user property `disablePython`) sets system properties to disable platform Python "compilation" and testing.
   - `disablePythonTests` (default `false`, user property `disablePythonTests`) sets system properties to disable platform Python testing.

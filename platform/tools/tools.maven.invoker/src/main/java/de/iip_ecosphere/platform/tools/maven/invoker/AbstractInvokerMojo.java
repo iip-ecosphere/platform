@@ -142,7 +142,13 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
 
     @Parameter(property = "maven.javadoc.skip", defaultValue = "false") 
     private boolean mavenJavadocSkip;
-    
+
+    @Parameter(property = "maven.assembly.skip", defaultValue = "false") 
+    private boolean mavenAssemblySkip;
+
+    @Parameter(property = "maven.source.skip", defaultValue = "false") 
+    private boolean mavenSourceSkip;
+
     @Parameter(property = "maven.build.cache.enabled")
     private String mavenBuildCacheEnabled;
 
@@ -258,6 +264,8 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
         boolean value = (!enableJavadoc || mavenJavadocSkip);
         request.addShellEnvironment("MAVEN_ARGS", "-Dmaven.javadoc.skip=" + value); // pass on 2 mvn levels
         sysProperties.put("maven.javadoc.skip", String.valueOf(value));
+        sysProperties.put("assembly.skipAssembly", String.valueOf(mavenAssemblySkip));
+        sysProperties.put("maven.source.skip", String.valueOf(mavenSourceSkip));
         if (unpackForce && !sysProperties.containsKey("unpack.force")) {
             sysProperties.put("unpack.force", "true");
         }
