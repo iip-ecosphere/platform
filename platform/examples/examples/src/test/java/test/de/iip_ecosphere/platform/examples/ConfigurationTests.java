@@ -83,6 +83,7 @@ public class ConfigurationTests extends TestWithQpid {
      */
     @BeforeClass
     public static void startup() {
+        TestWithQpid.loadPlugins();
         broker = new ServerAddress(Schema.IGNORE);
         server = TestWithQpid.fromPlugin(broker);
         server.start();
