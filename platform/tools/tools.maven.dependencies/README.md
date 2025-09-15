@@ -233,6 +233,45 @@ Moreover, for installations, if `relocate` is enabled, the `outputDirectory` bec
 
 If we are not in `relocate` mode, the plugin is only enabled, if the relative directories `../../support/support` (for arbitrary platform component) or `../support` (for support component) do not exist, which is the case for builds outside a local git workspace, e.g., on CI.
 
+## split-classpath
+
+Post-processing for app archives (JAR, ZIP) to establish isolated class loading. Currently supports plain Jar packaging as ZIP and Spring Boot packaging. Modifies the given archives based on internal platform knowledge. Application requires calling the `AppStarter` frpm `services.spring.loader` or a similar mechanism.
+
+  ```xml
+  <build>
+      <plugins>
+         <plugin>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>dependency-plugin</artifactId>
+            <version>${project.version}</version>
+            <executions>
+                 <execution>
+                    <id>postprocess</id>
+                    <goals>
+                        <goal>split-classpath</goal>
+                    </goals>
+                    <phase>package</phase>
+                    <configuration>
+                        <archiveFiles>
+                            <archiveFile>${project.build.directory}/test/test-spring.jar</archiveFile>
+                            <archiveFile>${project.build.directory}/test/test-spring.zip</archiveFile>
+                        </archiveFiles>
+                    </configuration>
+                </execution>
+            <executions>
+        </plugin>
+     </plugins>
+  </build>
+  ```
+  
+The example applies the split-classpath plugin in the package phase of that POM (further plugin executions might be added). Splitting is applied to the stated files (Jar/Zip) in-place based on default settings.
+
+- `archiveFiles` (default empty) specifies the individual files to apply the splitting to, all given as individual `archiveFile` entries
+- `mainPatterns` (default prefix artifactIds for core platform components) specifies components that shall stay in their place, i.e., be part of the initial classloading. All other not named components are separated for isolated classloading, either in a different classpath file (ZIP) or in a different folder (Spring)
+- `skip` (default `false`, user property `mdep.skip`, inherited from original maven plugin) skips the execution of this plugin.
+- `keepClasses` (default empty) defining file (sub-)paths for classes that shall reside in the main class loader rather than being moved into isolated classloading; introduced only for very specific testing situations
+
+
 # Missing
 
 Java-based tests as we do not understand how to correctly set up the testing harness. Testing is done here via ANT and, thus, not subject to coverage analysis.

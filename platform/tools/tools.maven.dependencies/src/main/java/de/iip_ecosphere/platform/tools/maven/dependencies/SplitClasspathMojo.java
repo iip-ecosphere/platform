@@ -27,6 +27,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
@@ -57,9 +58,9 @@ public class SplitClasspathMojo extends AbstractMojo {
 
     @Parameter( required = false )
     private List<String> mainPatterns;
-    
+
     @Parameter( required = false )
-    private List<String> deleteFiles;
+    private List<String> keepClasses;
 
     /**
      * Returns whether the given name/line contains on of the main file patterns.
@@ -67,13 +68,16 @@ public class SplitClasspathMojo extends AbstractMojo {
      * @param name the name to check
      * @return {@code true} for match, {@code false} else
      */
-    private boolean isMainFile(String name) {
+    private boolean isMainFile(String name, boolean includeSpringLoader) {
         boolean found = false;
         for (String m : mainPatterns) {
             if (name.contains(m)) {
                 found = true;
                 break;
             }
+        }
+        if (includeSpringLoader && !found) {
+            found = name.contains("spring-boot-loader-");
         }
         return found;
     }
@@ -161,7 +165,7 @@ public class SplitClasspathMojo extends AbstractMojo {
                             String token = tokenizer.nextToken();
                             StringBuilder target;
                             boolean sepBefore;
-                            if (isMainFile(token)) {
+                            if (isMainFile(token, true)) {
                                 target = main;
                                 sepBefore = !firstMain;
                                 firstMain = false;
@@ -184,11 +188,11 @@ public class SplitClasspathMojo extends AbstractMojo {
                 if (Files.exists(mainPath)) {
                     getLog().info("Processing " + file + " as spring app JAR archive");
                     appPath = fs.getPath("/BOOT-INF/classpath-app.idx");
-                    Files.createDirectory(fs.getPath("/BOOT-INF/lib2"));
+                    Files.createDirectory(fs.getPath("/BOOT-INF/lib-app"));
                     List<String> lines = IOUtils.readLines(Files.newInputStream(mainPath), Charset.defaultCharset());
                     for (String line: lines) {
                         StringBuilder target;
-                        if (isMainFile(line)) {
+                        if (isMainFile(line, false)) { // spring boot loader implicitly there
                             target = main;
                         } else {
                             target = app;
@@ -233,7 +237,7 @@ public class SplitClasspathMojo extends AbstractMojo {
     private String processSpringLine(FileSystem fs, String line) throws IOException {
         if (line.startsWith("- \"") && line.endsWith("\"")) {
             String src = line.substring(3, line.length() - 1);
-            String tgt = src.replace("BOOT-INF/lib/", "BOOT-INF/lib2/");
+            String tgt = src.replace("BOOT-INF/lib/", "BOOT-INF/lib-app/");
             Path srcPath = fs.getPath(src);
             Path tgtPath = fs.getPath(tgt);
             Files.move(srcPath, tgtPath, StandardCopyOption.REPLACE_EXISTING);
@@ -251,7 +255,14 @@ public class SplitClasspathMojo extends AbstractMojo {
     private void postProcessSpringJar(FileSystem fs) throws IOException {
         Path srcPath = fs.getPath("BOOT-INF/classes/");
         Path tgtPath = fs.getPath("BOOT-INF/classes-app/");
-        moveAll(srcPath, tgtPath, true);
+        Predicate<Path> filter = null;
+        if (null != keepClasses && keepClasses.size() > 0) {
+            filter = p -> {
+                String path = p.toString();
+                return !keepClasses.stream().anyMatch(k -> path.contains(k));
+            };
+        }
+        moveAll(srcPath, tgtPath, true, filter);
     }
     
     /**
@@ -260,13 +271,19 @@ public class SplitClasspathMojo extends AbstractMojo {
      * @param sourcePath The path to the source directory
      * @param destPath   The path to the destination directory
      * @param keepSourcePath keep {@code sourcePath} itself if {@code true}, else remove also {@code sourcePath}
+     * @param filter determines the files to move, may be <b>null</b> for all
      * @throws IOException If an I/O error occurs during the move operation
      */
-    public void moveAll(Path sourcePath, Path destPath, boolean keepSourcePath) throws IOException {
+    public void moveAll(Path sourcePath, Path destPath, boolean keepSourcePath, Predicate<Path> filter) 
+        throws IOException {
+        if (null == filter) {
+            filter = p -> true;
+        }
         if (!Files.exists(destPath)) {
             Files.createDirectories(destPath);
         }
         Files.walk(sourcePath)
+            .filter(filter)
             .forEach(source -> {
                 try {
                     Path destination = destPath.resolve(sourcePath.relativize(source));
@@ -289,6 +306,7 @@ public class SplitClasspathMojo extends AbstractMojo {
         // 4. Optionally, delete the now empty source directory after the move
         try {
             Files.walk(sourcePath)
+                .filter(filter)
                 .sorted(Comparator.reverseOrder()) // files (leftover?) before their parent directories
                 .forEach(path -> {
                     try {
