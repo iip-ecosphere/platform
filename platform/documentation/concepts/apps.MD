@@ -6,7 +6,7 @@ Applications running on the oktoflow platform consist of connectors and services
 
 In an app configuration, `MeshSource` (data source), `MeshProcessor` (processor) and `MeshSink` (receiver) are connected as nodes (refining `MeshElement`) in a service mesh. Each node references the underlying implementing service/connector, allowing the same service to be used in multiple service meshes or multiple times in the same service mesh. Data flows among service mesh elements are specified as `MeshConnector`. An application specifies its constituting service meshes (usually one) as well as technical information.
 
-Table 21 summarizes all configurable fiels for mesh and application types. As indicated in Figure 48, MeshElement is the most common type of mesh nodes. MeshSource and MeshInnerElement are refining MeshElement, and, in turn, MeshProcessor and MeshSink are refining MeshInnerElement. Besides constraints that apply, it is important to understand that the input/output data types of mesh elements must not be configured as they are pulled automatically \[14\] from the implementing services and compared along the data flow graph described by the mesh connectors to validate the data flow during configuration validation.
+Table 21 summarizes all configurable fields for mesh and application types. As indicated in Figure 48, MeshElement is the most common type of mesh nodes. MeshSource and MeshInnerElement are refining MeshElement, and, in turn, MeshProcessor and MeshSink are refining MeshInnerElement. Besides constraints that apply, it is important to understand that the input/output data types of mesh elements must not be configured as they are pulled automatically \[14\] from the implementing services and compared along the data flow graph described by the mesh connectors to validate the data flow during configuration validation.
 
 ## Application
 
@@ -82,4 +82,88 @@ Fields of the 'ServiceMesh' type.
 | --- |  --- | --- |
 | name |  The descriptive name of the connector. |     |
 | next |  The mesh element the connector is connecting to. |     |
+
+### An example of Application IVML file
+
+An application IVML configuration file from Asynchronous Python example in Oktoflow platform
+
+```
+project ApplicationPartPythonApp {
+
+    import ServiceMeshPartPythonApp*;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    Application myPythonApp = {
+        id = "PythonApp",
+        name = "Simple Python demo flow app",
+        ver = "0.1.0",
+        description = "",
+        services = {refBy(myPythonMesh)}        
+    };
+    
+    freeze {
+        .;
+    }
+
+}
+```
+
+The `ApplicationPartPythonApp` is an application IVML configuration file that is part of the Oktoflow platform examples: [Asynchronous Python](../../examples/examples.python). It imports the `ServiceMeshPartPythonApp*` from the same example, which includes the 'ServiceMesh' for the application. It defines the ID, name, version, description, and 'ServiceMesh' for the application.
+
+### An example of ServiceMesh IVML file
+
+A serviceMesh IVML configuration file from Asynchronous Python example in Oktoflow platform
+
+```
+project ServiceMeshPartPythonAppMyMesh {
+
+    import AllServices;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    ServiceMesh myPythonMesh = {
+        description = "VDW Service Net",
+        sources = {refBy(myPythonSource)}
+    };
+
+    MeshSource myPythonSource = {
+       impl = refBy(myPythonSourceService),
+       next = {refBy(myPythonConnMySourceMyTransformer)}
+    };
+
+    MeshConnector myPythonConnMySourceMyTransformer = {
+        name = "Source->Transformer",
+        next = refBy(myPythonTransformer)
+    };
+
+    MeshProcessor myPythonTransformer = {
+        impl = refBy(myPythonService),
+        next = {refBy(myPythonConnMyTransformerMyReceiver)}
+    };
+
+    MeshConnector myPythonConnMyTransformerMyReceiver = {
+        name = "Transformer->Receiver",
+        next = refBy(myPythonReceiver)
+    };
+    
+    MeshSink myPythonReceiver = {
+       impl = refBy(myPythonReceiverService)
+    };
+
+    freeze {
+        .;
+    }
+
+}
+```
+
+The `ServiceMeshPartPythonAppMyMesh` is a service mesh IVML configuration file that is part of the Oktoflow platform examples: [Asynchronous Python](../../examples/examples.python). It imports the `AllServices` from the same example, which includes the three services created for the application. It defines the data flow for the application starting from the source service and ending with the sink service, as follows:
+
+```
+
+myPythonSource ==>> myPythonConnMySourceMyTransformer ==>> myPythonTransformer ==>> myPythonConnMyTransformerMyReceiver ==>> myPythonReceiver
+
+```
+
 

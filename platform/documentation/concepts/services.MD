@@ -328,3 +328,64 @@ The `FlowerFederatedAiService` is a customizable service, for which an implement
 | framework |  AI framework to use, reference to `TensorFlowFlowerAiFramework` or `PyTorchFlowerAiFramework` | `refTo(TensorFlowFlowerAiFramework)` |
 | client |  Flower client to use, refernece to `NumpyFlowerAiClient` | `refTo(NumpyFlowerAiClient)` |
 
+### An example of Service IVML file
+
+A service IVML configuration file from Asynchronous Python example in Oktoflow platform
+
+```
+project AllServices {
+
+    import AllTypes; 
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    Service myPythonSourceService = JavaService {
+        id = "SimplePythonSource",
+        name = "Simple Python Data Source",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = true,
+        class = "de.iip_ecosphere.platform.examples.python.SimplePythonSourceImpl",
+        artifact = "de.iip-ecosphere.platform:examples.python:" + iipVer,
+        kind = ServiceKind::SOURCE_SERVICE,
+        output = {{type=refBy(PythonTestInput)}}
+    };
+    
+    Service myPythonService = PythonService {
+        id = "ExamplePythonService",
+        name = "Example Python Service",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        input = {{type=refBy(PythonTestInput)}},
+        output = {{type=refBy(PythonTestOutput)}},
+        artifact = "de.iip-ecosphere.platform:examples.python:" + iipVer,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        dependencies = {refBy(PYTHON313)},
+        integrationMode = PythonIntegrationMode::websocket_continuous
+    };
+    
+    Service myPythonReceiverService = JavaService {
+        id = "SimplePythonReceiver",
+        name = "Simple Python Data Receiver",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "de.iip_ecosphere.platform.examples.python.SimplePythonReceiverImpl",
+        artifact = "de.iip-ecosphere.platform:examples.python:" + iipVer,
+        kind = ServiceKind::SINK_SERVICE,
+        input = {{type=refBy(PythonTestOutput)}}
+    };
+    
+    freeze {
+        .;
+    }
+}
+```
+
+The `AllServices` is a service IVML configuration file that is part of Oktoflow platform examples: [Asynchronous Python](../../examples/examples.python). First of all, it imports the `AllTypes` from the same example. The `AllServices` includes three services:
+- `myPythonSourceService`: Java service that works as a source to generate the test data. As shown, it has the `SOURCE_SERVICE` as kind.
+- `myPythonService`: Python service that works as processing service to modified the test data. As shown, it has the `TRANSFORMATION_SERVICE` as kind.
+- `myPythonSourceService`: Java service that works as sink to receive for the modified data. As shown, it has the `SINK_SERVICE` as kind.
+
