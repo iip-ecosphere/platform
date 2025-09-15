@@ -115,6 +115,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         appendDependency(dep, "org.glassfish", "jakarta.el", scope="test");
         appendDependency(dep, "de.iip-ecosphere.platform", "services.environment", projectVersion);
         appendDependency(dep, iipGroup, serviceEnvironmentModule(config), projectVersion);
+        appendDependency(dep, iipGroup, serviceLoaderModule(config), projectVersion);
         appendDependency(dep, iipGroup, "kiServices.functions", projectVersion);
         d = appendDependency(dep, iipGroup, "examples", projectVersion);
         appendSingleExclusion(d, iipGroup, "services.spring");

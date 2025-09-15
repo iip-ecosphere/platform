@@ -192,6 +192,7 @@ public class IvmlDashboardMapper {
         createProperty(smB, "name", Type.STRING, appName, "application name");
         createProperty(smB, "id", Type.STRING, appId, "application id");
         createProperty(smB, "version", Type.STRING, appVersion, "application version");
+        createProperty(smB, "aasMetamodelVersion", Type.STRING, factory.getMetaModelVersion(), "AAS metamodel version");
     }
     
     /**
@@ -411,17 +412,7 @@ public class IvmlDashboardMapper {
             result = mapSemanticIdToUnit(result);
         }
         if (null == result) {
-            switch (IvmlUtils.getStringValue(type, "name", "")) {
-            case "String":
-                result = "string";
-                break;
-            case "Boolean": 
-                result = "bool"; // bool_yes_no, bool_on_off
-                break;
-            default:
-                result = "none";
-                break;
-            }
+            result = mapSemanticIdToUnit(IvmlUtils.getStringValue(type, "name", ""));
         }
         return result;
     }

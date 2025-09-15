@@ -58,6 +58,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         XmlElement d;
         if (!ifArtifact) {
             appendDependency(dep, iipGroup, serviceEnvironmentModule(config), projectVersion);
+            appendDependency(dep, iipGroup, serviceLoaderModule(config), projectVersion);
             appendDependency(dep, "org.springframework.boot", "spring-boot-starter-web");
             appendDependency(dep, "org.springframework.boot", "spring-boot-starter-actuator");
             appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);

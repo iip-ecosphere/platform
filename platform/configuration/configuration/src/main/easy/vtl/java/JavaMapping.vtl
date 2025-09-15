@@ -10,28 +10,42 @@ template JavaMapping(Configuration config, FileArtifact target) {
         serviceManagerModule(cfg.serviceManager);
     }
     
-    // dispatch basis
+    @DispatchBasis
     def String serviceManagerModule(ServiceManager mgr) {
         "";
     }
     
+    @DispatchCase
     def String serviceManagerModule(SpringCloudStream mgr) {
         "services.spring";
     }
-
-
 
     def String serviceEnvironmentModule(IIPEcosphere cfg) {
         serviceEnvironmentModule(cfg.serviceManager);
     }
     
-    // dispatch basis
+    @DispatchBasis
     def String serviceEnvironmentModule(ServiceManager mgr) {
         "";
     }
     
+    @DispatchCase
     def String serviceEnvironmentModule(SpringCloudStream mgr) {
         "services.environment.spring";
+    }
+
+    def String serviceLoaderModule(IIPEcosphere cfg) {
+        serviceLoaderModule(cfg.serviceManager);
+    }
+    
+    @DispatchBasis
+    def String serviceLoaderModule(ServiceManager mgr) {
+        "";
+    }
+    
+    @DispatchCase
+    def String serviceLoaderModule(SpringCloudStream mgr) {
+        "services.spring.loader";
     }
     
     // --------------------------------------------------------------
@@ -40,15 +54,17 @@ template JavaMapping(Configuration config, FileArtifact target) {
         containerManagerModule(cfg.containerManager);
     }
     
-    // dispatch basis
+    @DispatchBasis
     def String containerManagerModule(ContainerManager mgr) {
         "";
     }
 
+    @DispatchCase
     def String containerManagerModule(DockerContainerManager mgr) {
         "ecsRuntime.docker";
     }
 
+    @DispatchCase
     def String containerManagerModule(LxcContainerManager mgr) {
         "ecsRuntime.lxc";
     }
@@ -57,15 +73,17 @@ template JavaMapping(Configuration config, FileArtifact target) {
         containerManagerCfgClass(cfg.containerManager);
     }
     
-    // dispatch basis
+    @DispatchBasis
     def String containerManagerCfgClass(ContainerManager mgr) {
         "de.iip_ecosphere.platform.ecsRuntime.Configuration";
     }
 
+    @DispatchCase
     def String containerManagerCfgClass(DockerContainerManager mgr) {
         "de.iip_ecosphere.platform.ecsRuntime.docker.DockerSetup";
     }
 
+    @DispatchCase
     def String containerManagerCfgClass(LxcContainerManager mgr) {
         "de.iip_ecosphere.platform.ecsRuntime.lxc.LxcSetup";
     }
@@ -76,19 +94,22 @@ template JavaMapping(Configuration config, FileArtifact target) {
         transportProtocolModule(cfg.transportProtocol);
     }
     
-    // dispatch basis
+    @DispatchBasis
     def String transportProtocolModule(TransportProtocol proto) {
         "";
     }
 
+    @DispatchCase
     def String transportProtocolModule(TransportProtocolAMQP proto) {
         "transport.amqp";
     }
 
+    @DispatchCase
     def String transportProtocolModule(TransportProtocolMQTTv3 proto) {
         "transport.mqttv3";
     }
 
+    @DispatchCase
     def String transportProtocolModule(TransportProtocolMQTTv5 proto) {
         "transport.mqttv5";
     }
