@@ -17,6 +17,7 @@ import java.io.File;
 import org.apache.maven.project.MavenProject;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.tools.maven.invoker.InvokeInvokerMojo;
 import de.iip_ecosphere.platform.tools.maven.invoker.ValidateInvokerMojo;
 
 /**
@@ -48,7 +49,7 @@ public class InvokerTest extends AbstractTest {
     @Test
     public void testOk() throws Exception {
         MavenProject project = readMavenProject(new File( "src/test/resources/unit/project-ok"));
-        ValidateInvokerMojo myMojo = (ValidateInvokerMojo) lookupConfiguredMojo(project, "invoke");
+        InvokeInvokerMojo myMojo = (InvokeInvokerMojo) lookupConfiguredMojo(project, "invoke");
         assertNotNull(myMojo);
         myMojo.disable(); // just for testing
         myMojo.execute();
