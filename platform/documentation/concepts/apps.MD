@@ -83,7 +83,7 @@ Fields of the 'ServiceMesh' type.
 | name |  The descriptive name of the connector. |     |
 | next |  The mesh element the connector is connecting to. |     |
 
-### An example of application IVML file
+### An example of Application IVML file
 
 An application IVML configuration file from Asynchronous Python example in Oktoflow platform
 
