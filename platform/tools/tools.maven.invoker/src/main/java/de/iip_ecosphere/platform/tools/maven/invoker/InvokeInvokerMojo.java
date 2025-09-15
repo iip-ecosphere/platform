@@ -20,6 +20,6 @@ import org.apache.maven.plugins.annotations.Mojo;
  * 
  * @author Holger Eichelberger, SSE
  */
-@Mojo(name = "validate", defaultPhase = LifecyclePhase.VALIDATE)
-public class ValidateInvokerMojo extends AbstractInvokerMojo {
+@Mojo(name = "invoke", defaultPhase = LifecyclePhase.VALIDATE)
+public class InvokeInvokerMojo extends AbstractInvokerMojo {
 }
