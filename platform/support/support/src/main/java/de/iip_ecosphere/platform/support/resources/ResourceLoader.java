@@ -273,6 +273,14 @@ public class ResourceLoader {
             filters.add(filter);
         }
     }
+
+    /**
+     * Adds a set of default exclude filters to focus on app resources rather than test resources. [convenience]
+     */
+    public static void addTestExcludeFilters() {
+     // may require a different naming for ZIP
+        addFilter(u -> !u.toString().endsWith("-tests.jar!/identityStore.yml")); 
+    }
     
     /**
      * Returns whether resource filters have been defined. [testing]
