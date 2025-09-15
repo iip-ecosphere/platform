@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.services.spring.loader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -34,6 +35,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -45,6 +47,7 @@ import org.springframework.boot.loader.archive.Archive;
 import org.springframework.boot.loader.archive.ExplodedArchive;
 import org.springframework.boot.loader.archive.JarFileArchive;
 
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.IOUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.plugins.ChildClassLoader;
@@ -52,7 +55,6 @@ import de.iip_ecosphere.platform.support.plugins.ChildFirstClassLoader;
 import de.iip_ecosphere.platform.support.plugins.ChildFirstURLClassLoader;
 import de.iip_ecosphere.platform.support.plugins.CompoundEnumeration;
 import de.iip_ecosphere.platform.support.plugins.FindClassClassLoader;
-import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 
 import org.springframework.boot.loader.archive.Archive.EntryFilter;
 
@@ -99,11 +101,11 @@ public class AppStarter {
             if (entry.isDirectory()) {
                 return entry.getName().equals("BOOT-INF/classes-app/");
             }
-            return entry.getName().startsWith("BOOT-INF/lib2/");
+            return entry.getName().startsWith("BOOT-INF/lib-app/");
         };        
         
-        private final Archive archive;
-        private final ClassPathIndexFile classPathIndex;
+        private Archive archive;
+        private ClassPathIndexFile classPathIndex;
         
         /**
          * Creates the launcher by accessing the archive and trying to read the classpath index file.
@@ -115,6 +117,8 @@ public class AppStarter {
             try {
                 this.archive = createArchive();
                 this.classPathIndex = getClassPathIndex(this.archive);
+            } catch (NoSuchElementException ex) {
+                // ok, classPathIndex == null, start without classpath isolation
             } catch (Exception ex) {
                 throw new IllegalStateException(ex);
             }
@@ -149,9 +153,19 @@ public class AppStarter {
                 // also for testing, not via classloader
                 jf = new JarFile(new File(archive.getUrl().toURI())); 
                 ZipEntry ent = jf.getEntry(APP_CLASSPATH_INDEX_LOCATION);
-                result = new ClassPathIndexFile(ClassPathIndexFile.asFile(archive.getUrl()), 
-                    ClassPathIndexFile.loadLines(jf.getInputStream(ent)));
+                if (null != ent) {
+                    result = new ClassPathIndexFile(ClassPathIndexFile.asFile(archive.getUrl()), 
+                        ClassPathIndexFile.loadLines(jf.getInputStream(ent)));
+                }
                 jf.close();
+                if (null == ent) {
+                    throw new NoSuchElementException(APP_CLASSPATH_INDEX_LOCATION + " not found");
+                }
+            } catch (FileNotFoundException e) {
+                // ok, if not packaged for classpath separation
+                if (null != jf) {
+                    jf.close();
+                }
             } catch (URISyntaxException | IOException e) {
                 System.out.println("Cannot open archive for reading " + APP_CLASSPATH_INDEX_LOCATION);
                 if (null != jf) {
@@ -649,24 +663,39 @@ public class AppStarter {
         ClassLoader loader = AppStarter.class.getClassLoader();
         System.out.println("oktoflow Spring application loader, main class loader " + loader);        
         // adjust class loader
-        if (loader.getClass().getName().equals(LaunchedURLClassLoader.class.getName())) { // spring packaged
-            loader = new AccessibleLauncher().createStackedLoader(loader); // implies child first
-        } else {
-            InputStream cp = ResourceLoader.getResourceAsStream(loader, APP_CLASSPATH);
-            if (cp != null) { // legacy loading
-                List<String> lines = IOUtils.readLines(cp);
-                for (String line: lines) {
-                    if (!line.startsWith("#")) {
-                        List<URL> cpUrls = new ArrayList<>();
-                        StringTokenizer tokenizer = new StringTokenizer(line, ":;");
-                        while (tokenizer.hasMoreTokens()) {
-                            cpUrls.add(new URL(tokenizer.nextToken()));
-                        }
-                        loader = new ChildFirstURLClassLoader(cpUrls.toArray(new URL[cpUrls.size()]), loader);
-                        break;
+        String zipAppClasspathFile = System.getProperty("okto.loader.app");
+        File cpFile = null;
+        InputStream cp = null;
+        if (zipAppClasspathFile != null) {
+            cpFile = new File(zipAppClasspathFile);
+            if (cpFile.isDirectory()) {
+                cpFile = new File(cpFile, APP_CLASSPATH);
+            }
+            try {
+                cp = new FileInputStream(cpFile);
+            } catch (IOException e) {
+                // not found, ok
+            }
+        }
+        if (cp != null) { // legacy loading
+            List<String> lines = IOUtils.readLines(cp);
+            for (String line: lines) {
+                if (!line.startsWith("#")) {
+                    List<URL> cpUrls = new ArrayList<>();
+                    StringTokenizer tokenizer = new StringTokenizer(line, ":;");
+                    File cpParentFile = cpFile.getParentFile();
+                    while (tokenizer.hasMoreTokens()) {
+                        File f = new File(cpParentFile, tokenizer.nextToken()).getAbsoluteFile();
+                        cpUrls.add(f.toURI().toURL());
                     }
+                    loader = new ChildFirstURLClassLoader(cpUrls.toArray(new URL[cpUrls.size()]), loader);
+                    break;
                 }
             }
+            FileUtils.closeQuietly(cp);
+        } else if (loader.getClass().getName().equals(LaunchedURLClassLoader.class.getName())) { // spring packaged
+            // try it, loader == loader if there is no spring resource
+            loader = new AccessibleLauncher().createStackedLoader(loader); // implies child first
         }
         System.out.println("Using app class loader " + loader);        
         Thread.currentThread().setContextClassLoader(loader);

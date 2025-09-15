@@ -1,0 +1,4 @@
+/**
+ * App starting.
+ */
+package iip;

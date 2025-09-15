@@ -32,4 +32,246 @@
     </dependency>
   </dependencies>
 
+  <profiles>
+     <profile> <!-- This is just for testing, we do not need spring app dependencies in the AppStarter -->
+        <id>Spring</id>
+        <properties>
+           <maven.main.skip>true</maven.main.skip>
+           <maven.test.skip>true</maven.test.skip>
+           <python-compile.skip>true</python-compile.skip>
+           <maven.javadoc.skip>true</maven.javadoc.skip>
+        </properties>       
+        <dependencies>
+          <!-- some spring for packaging -->
+          <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+          </dependency>
+          <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+          </dependency>
+          <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+          </dependency>
+        </dependencies>
+        <build>
+          <plugins>
+              <plugin>
+                   <artifactId>maven-antrun-plugin</artifactId>
+                   <version>3.1.0</version>
+                   <executions>
+                      <execution>
+                         <phase>compile</phase>
+                         <goals>
+                           <goal>run</goal>
+                         </goals>
+                         <configuration>
+                            <target>
+                               <jar file="${project.build.directory}/${project.artifactId}-${project.version}.jar" basedir="${project.build.directory}/classes"/>
+                               <copy file="${project.build.directory}/${project.artifactId}-${project.version}.jar" 
+                                   tofile="${project.build.directory}/test/loader.jar" overwrite="true"/>
+                               <copy todir="${project.build.directory}/classes" overwrite="true">
+                                  <fileset dir="${project.build.directory}/test-classes"/>
+                               </copy>
+                            </target>
+                         </configuration>
+                      </execution>
+                   </executions>
+              </plugin>
+              <plugin>
+               <groupId>org.springframework.boot</groupId>
+               <artifactId>spring-boot-maven-plugin</artifactId>
+               <version>2.4.2</version>
+               <configuration>
+                   <addResources>false</addResources>
+               </configuration>
+               <executions>
+                   <execution>
+                       <phase>package</phase>
+                       <goals>
+                           <goal>repackage</goal>
+                       </goals>
+                       <configuration>
+                         <mainClass>de.iip_ecosphere.platform.services.spring.loader.AppStarter</mainClass>
+                         <outputDirectory>${project.build.directory}/spring</outputDirectory>
+                       </configuration>
+                   </execution>
+               </executions>
+             </plugin>
+          </plugins>
+        </build>
+     </profile>
+     <profile>
+        <id>Main</id>
+        <activation>
+           <activeByDefault>true</activeByDefault>
+        </activation>
+        
+          <build>
+            <plugins>
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${org.apache.maven.jar.version}</version>
+                <executions>
+                  <execution>
+                    <id>default-cli</id>
+                    <phase>process-test-classes</phase>
+                    <goals>
+                      <goal>test-jar</goal>
+                    </goals>
+                  </execution>
+                </executions>
+              </plugin>
+              <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-assembly-plugin</artifactId>
+                 <version>3.7.1</version>
+                 <executions>
+                     <execution>
+                         <id>make-serviceAssembly</id>
+                         <phase>process-test-classes</phase>
+                         <goals>
+                             <goal>single</goal>
+                         </goals>
+                         <configuration>
+                             <descriptors>
+                                 <descriptor>src/test/assembly/serviceZipAssembly.xml</descriptor>
+                             </descriptors>
+                             <!--<finalName>${project.build.finalName}-spring</finalName>-->
+                             <appendAssemblyId>true</appendAssemblyId>
+                             <attach>true</attach>
+                         </configuration>
+                     </execution>
+                 </executions>
+                </plugin>
+               <plugin> 
+                  <groupId>de.iip-ecosphere.platform</groupId>
+                  <artifactId>invoker-plugin</artifactId>
+                  <version>${project.version}</version>
+                  <executions>
+                      <execution>
+                          <id>package4Spring</id>
+                          <phase>process-test-classes</phase>
+                          <goals>
+                              <goal>invoke</goal>
+                          </goals>
+                          <configuration>
+                              <invokeProfiles>
+                                  <invokeProfile>Spring</invokeProfile>
+                              </invokeProfiles>
+                              <invokeGoals>
+                                  <invokeGoal>package</invokeGoal>
+                              </invokeGoals>
+                              <mavenTestSkip>true</mavenTestSkip>
+                              <mavenJavadocSkip>true</mavenJavadocSkip>
+                              <disableJava>true</disableJava>
+                              <disableJavaTests>true</disableJavaTests>
+                              <disablePython>true</disablePython>
+                              <disablePythonTests>true</disablePythonTests>
+                              <mavenAssemblySkip>true</mavenAssemblySkip>
+                              <mavenSourceSkip>true</mavenSourceSkip>
+                          </configuration>
+                      </execution>
+                  </executions>
+              </plugin>
+              <plugin>
+                   <artifactId>maven-antrun-plugin</artifactId>
+                   <version>3.1.0</version>
+                   <executions>
+                      <execution>
+                         <phase>process-test-classes</phase>
+                         <goals>
+                           <goal>run</goal>
+                         </goals>
+                         <configuration>
+                            <target>
+                               <copy file="${project.build.directory}/${project.artifactId}-${project.version}-spring.zip" tofile="${project.build.directory}/test/test-spring.zip" overwrite="true"/>
+                               <copy file="${project.build.directory}/${project.artifactId}-${project.version}-spring.zip" tofile="${project.build.directory}/test/test-spring-orig.zip" overwrite="true"/>
+                               <copy file="${project.build.directory}/spring/${project.artifactId}-${project.version}.jar" tofile="${project.build.directory}/test/test-spring.jar" overwrite="true"/>
+                               <copy file="${project.build.directory}/spring/${project.artifactId}-${project.version}.jar" tofile="${project.build.directory}/test/test-spring-orig.jar" overwrite="true"/>
+
+                               <copy file="${project.build.directory}/test/loader.jar" overwrite="true"
+                                   tofile="${project.build.directory}/${project.artifactId}-${project.version}.jar"/>
+                               <delete dir="${project.build.directory}/classes/iip"/>
+                               <delete dir="${project.build.directory}/classes/test"/>
+                               <delete file="${project.build.directory}/classes/classpath"/>
+                               <delete file="${project.build.directory}/classes/identityStore.yml"/>
+                               <delete file="${project.build.directory}/classes/iipecosphere.yml"/>
+                               <delete file="${project.build.directory}/classes/logback.xml"/>
+                               <delete file="${project.build.directory}/classes/serverStartStop.jar"/>
+                            </target>
+                         </configuration>
+                      </execution>
+                   </executions>
+                  </plugin>            
+               <plugin>
+                    <groupId>de.iip-ecosphere.platform</groupId>
+                    <artifactId>dependency-plugin</artifactId>
+                    <version>${iip.version}</version>
+                    <executions>
+                       <execution>
+                           <id>copy-dependencies</id>
+                           <goals>
+                               <goal>copy-dependencies</goal>
+                           </goals>
+                        <phase>test-compile</phase>
+                           <configuration>
+                               <prependGroupId>false</prependGroupId>
+                               <outputDirectory>${project.build.directory}/appJars</outputDirectory>
+                               <overWriteReleases>false</overWriteReleases>
+                               <overWriteSnapshots>true</overWriteSnapshots>
+                               <overWriteIfNewer>true</overWriteIfNewer>
+                               <includeScope>compile</includeScope>
+                           </configuration>
+                       </execution>
+                      <execution>
+                        <id>build-classpath</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                          <goal>build-classpath</goal>
+                        </goals>
+                        <configuration>
+                            <outputFile>${project.build.directory}/test-classes/classpath</outputFile>
+                            <prependGroupId>false</prependGroupId>
+                            <localRepoProperty>jars</localRepoProperty>
+                            <prefix>jars</prefix>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <fileSeparator>/</fileSeparator>
+                            <pathSeparator>:</pathSeparator>
+                            <includeScope>compile</includeScope>
+                            <prepends>
+                              <prepend>${project.artifactId}-${project.version}.jar</prepend>
+                              <prepend>${project.artifactId}-${project.version}-tests.jar</prepend>
+                            </prepends>
+                          <!-- configure the plugin here -->
+                        </configuration>
+                      </execution>
+                        <execution>
+                            <id>postprocess</id>
+                            <goals>
+                                <goal>split-classpath</goal>
+                            </goals>
+                            <phase>process-test-classes</phase>
+                            <configuration>
+                                <archiveFiles>
+                                    <archiveFile>${project.build.directory}/test/test-spring.jar</archiveFile>
+                                    <archiveFile>${project.build.directory}/test/test-spring.zip</archiveFile>
+                                </archiveFiles>
+                                <keepClasses>
+                                  <keepClass>/classes/de/</keepClass>
+                                </keepClasses>
+                            </configuration>
+                        </execution>
+                    </executions>
+               </plugin>
+            </plugins>
+          </build>
+        
+     </profile>
+  </profiles>
+
+
 </project>
