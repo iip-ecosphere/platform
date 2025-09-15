@@ -143,7 +143,6 @@ public class SparkRest extends de.iip_ecosphere.platform.support.rest.Rest {
 
         @Override
         public void definePost(String path, Route route) {
-System.out.println("POST " + path);            
             service.post(path, createRoute(route));
         }
 
