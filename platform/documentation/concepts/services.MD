@@ -328,7 +328,9 @@ The `FlowerFederatedAiService` is a customizable service, for which an implement
 | framework |  AI framework to use, reference to `TensorFlowFlowerAiFramework` or `PyTorchFlowerAiFramework` | `refTo(TensorFlowFlowerAiFramework)` |
 | client |  Flower client to use, refernece to `NumpyFlowerAiClient` | `refTo(NumpyFlowerAiClient)` |
 
-### Services from Asynchronous Python example in oktoflow platform
+### An example of Service IVML file
+
+A service IVML configuration file from Asynchronous Python example in Oktoflow platform
 
 ```
 project AllServices {
