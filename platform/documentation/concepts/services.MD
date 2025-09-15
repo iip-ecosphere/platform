@@ -382,4 +382,4 @@ project AllServices {
 }
 ```
 
-The `AllServices` is a service IVML configuration file which is part of oktoflow platform examples: [Asynchronous Python](platform/examples/examples.python).
+The `AllServices` is a service IVML configuration file which is part of oktoflow platform examples: [Asynchronous Python](../../platform/examples/examples.python).
