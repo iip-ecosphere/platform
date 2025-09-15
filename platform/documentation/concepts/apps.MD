@@ -83,7 +83,9 @@ Fields of the 'ServiceMesh' type.
 | name |  The descriptive name of the connector. |     |
 | next |  The mesh element the connector is connecting to. |     |
 
-### Application from Asynchronous Python example in oktoflow platform
+### An example of application IVML file
+
+An application IVML configuration file from Asynchronous Python example in Oktoflow platform
 
 ```
 project ApplicationPartPythonApp {
@@ -109,7 +111,9 @@ project ApplicationPartPythonApp {
 
 The `ApplicationPartPythonApp` is an application IVML configuration file that is part of the Oktoflow platform examples: [Asynchronous Python](../../examples/examples.python). It imports the `ServiceMeshPartPythonApp*` from the same example, which includes the 'ServiceMesh' for the application. It defines the ID, name, version, description, and 'ServiceMesh' for the application.
 
-### ServiceMesh from Asynchronous Python example in oktoflow platform
+### An example of ServiceMesh IVML file
+
+A serviceMesh IVML configuration file from Asynchronous Python example in Oktoflow platform
 
 ```
 project ServiceMeshPartPythonAppMyMesh {
