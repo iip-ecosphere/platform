@@ -382,7 +382,7 @@ project AllServices {
 }
 ```
 
-The `AllServices` is a service IVML configuration file which is part of oktoflow platform examples: [Asynchronous Python](../../examples/examples.python). First of all, it imports the `AllTypes` from the same example. The `AllServices` includes three services:
+The `AllServices` is a service IVML configuration file that is part of Oktoflow platform examples: [Asynchronous Python](../../examples/examples.python). First of all, it imports the `AllTypes` from the same example. The `AllServices` includes three services:
 - `myPythonSourceService`: Java service that works as a source to generate the test data. As shown, it has the `SOURCE_SERVICE` as kind.
 - `myPythonService`: Python service that works as processing service to modified the test data. As shown, it has the `TRANSFORMATION_SERVICE` as kind.
 - `myPythonSourceService`: Java service that works as sink to receive for the modified data. As shown, it has the `SINK_SERVICE` as kind.
