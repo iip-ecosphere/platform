@@ -269,6 +269,7 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
         });
         registerPlugin("springBroker", new TestSpringBroker());
         PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE); // "local" plugins
+        ResourceLoader.addFilter(u -> !u.toString().endsWith("-tests.jar!/identityStore.yml")); // exclude test JARs
         ResourceLoader.registerResourceResolver(new SpringResourceResolver()); // ensure spring resolution
         final String[] tmpArgs = args;
         setLocalTransportSetupSupplier(setup -> {
