@@ -188,7 +188,10 @@ public class SplitClasspathMojo extends AbstractMojo {
                 if (Files.exists(mainPath)) {
                     getLog().info("Processing " + file + " as spring app JAR archive");
                     appPath = fs.getPath("/BOOT-INF/classpath-app.idx");
-                    Files.createDirectory(fs.getPath("/BOOT-INF/lib-app"));
+                    Path libAppPath = fs.getPath("/BOOT-INF/lib-app");
+                    if (!Files.isDirectory(libAppPath)) {
+                        Files.createDirectory(libAppPath);
+                    }
                     List<String> lines = IOUtils.readLines(Files.newInputStream(mainPath), Charset.defaultCharset());
                     for (String line: lines) {
                         StringBuilder target;
@@ -276,7 +279,8 @@ public class SplitClasspathMojo extends AbstractMojo {
      */
     public void moveAll(Path sourcePath, Path destPath, boolean keepSourcePath, Predicate<Path> filter) 
         throws IOException {
-        if (null == filter) {
+        final boolean initialNoFilter = filter == null;
+        if (initialNoFilter) {
             filter = p -> true;
         }
         if (!Files.exists(destPath)) {
@@ -314,8 +318,10 @@ public class SplitClasspathMojo extends AbstractMojo {
                             Files.delete(path);
                         }
                     } catch (IOException e) {
-                        getLog().error("In Jar: Failed to delete " + ": " 
-                            + e.getClass().getSimpleName() + " " + e.getMessage());
+                        if (initialNoFilter) { // otherways there might be intentional leftovers
+                            getLog().error("In Jar: Failed to delete " + ": " 
+                                + e.getClass().getSimpleName() + " " + e.getMessage());
+                        }
                     }
                 });
         } catch (IOException e) {
