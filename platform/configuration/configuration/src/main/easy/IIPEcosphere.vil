@@ -277,7 +277,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 Boolean copyDependencies = enablesPackaging(a, AppPackagingSchema::ZipWithClasspath); // may be more...
                 // partition according to container strategy
                 String appVersion = getAppMvnVersion(a);
-                vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls="iip.Starter", appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests, copyRuntimeDependencies=copyDependencies);
+                vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls="iip_ecosphere.platform.services.spring.loader.AppStarter", appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests, copyRuntimeDependencies=copyDependencies);
                 vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
                 generatePlugins(cfg, appRoot);
                 mvn(appRoot);
