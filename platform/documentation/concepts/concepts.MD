@@ -31,9 +31,9 @@ The top-level structure (`project`) contains all related elements, starting with
 Managed platform configurations (and most of the oktoflow examples) follow a certain file structure, all files located in `src/main/easy`:
 - `AllConstants.ivml` (optional) global contants used by upstream IVML projects
 - `AllTypes.ivml` all datatype specifications (see [Datatypes](types.MD))
-- `AllServices.ivml` all service specifications using datatyoes (see [Services](services.MD))
+- `AllServices.ivml` all service specifications using datatypes (see [Services](services.MD))
 - `meshes/<MeshName>.ivml` mesh definition linking services to data flows (see [Apps](apps.MD))
-- `apps/<AppName>.ivml` app definition linkins all meshes of an app together (see [Apps](apps.MD))
+- `apps/<AppName>.ivml` app definition linking all meshes of an app together (see [Apps](apps.MD))
 - `TechnicalSetup.ivml` technical settings on where to find AAS servers, whether monitoring shall be started, etc.
 - `PlatformConfiguration.ivml` the top-most project gluing all files together via imports
 
