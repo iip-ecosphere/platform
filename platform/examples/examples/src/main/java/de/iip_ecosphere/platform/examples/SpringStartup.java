@@ -34,6 +34,8 @@ import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
+import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
 /**
  * Spring Cloud Stream emulating startup code. Considers system properties ({@value Starter#PROPERTY_JAVA8} 
@@ -144,6 +146,7 @@ public class SpringStartup {
         int adminPort = -1; // ephemeral
         String serviceProtocol = "";
 
+        PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE); // local plugins
         System.setProperty(NetworkManagerFactory.PROPERTY, PersistentLocalNetworkManagerDescriptor.class.getName());
         System.out.println("Spring Startup with args: " + Arrays.toString(args));
         System.out.println("System environment: " + System.getenv());
