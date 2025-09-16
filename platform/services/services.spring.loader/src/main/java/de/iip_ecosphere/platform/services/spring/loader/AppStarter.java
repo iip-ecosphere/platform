@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
@@ -47,8 +48,6 @@ import org.springframework.boot.loader.archive.Archive;
 import org.springframework.boot.loader.archive.ExplodedArchive;
 import org.springframework.boot.loader.archive.JarFileArchive;
 
-import de.iip_ecosphere.platform.support.FileUtils;
-import de.iip_ecosphere.platform.support.IOUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.plugins.ChildClassLoader;
 import de.iip_ecosphere.platform.support.plugins.ChildFirstClassLoader;
@@ -678,7 +677,7 @@ public class AppStarter {
             }
         }
         if (cp != null) { // legacy loading
-            List<String> lines = IOUtils.readLines(cp);
+            List<String> lines = readLines(cp);
             for (String line: lines) {
                 if (!line.startsWith("#")) {
                     List<URL> cpUrls = new ArrayList<>();
@@ -691,8 +690,12 @@ public class AppStarter {
                     loader = new ChildFirstURLClassLoader(cpUrls.toArray(new URL[cpUrls.size()]), loader);
                     break;
                 }
+                try {
+                    cp.close();
+                } catch (IOException e ) {
+                    // do nothing, quietly
+                }
             }
-            FileUtils.closeQuietly(cp);
         } else if (loader.getClass().getName().equals(LaunchedURLClassLoader.class.getName())) { // spring packaged
             // try it, loader == loader if there is no spring resource
             loader = new AccessibleLauncher().createStackedLoader(loader); // implies child first
@@ -715,5 +718,16 @@ public class AppStarter {
     }
 
     // checkstyle: resume exception type check
+
+    /**
+     * Reads the given input streams as lines.
+     * 
+     * @param in the input stream
+     * @return the lines
+     */
+    private static List<String> readLines(InputStream in) {
+        return new BufferedReader(new InputStreamReader(in, Charset.defaultCharset())).lines()
+            .collect(Collectors.toList());
+    }
     
 }
