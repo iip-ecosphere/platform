@@ -15,6 +15,9 @@ then
 fi
 
 docker system prune -f --volumes
+rm -rf /tmp/basyx-*
+rm -rf /tmp/jansi-*
+rm -rf /tmp/java-server-*
 rm -rf /tmp/tomcat-docbase.*
 rm -rf /tmp/tomcat.*
 rm -rf /tmp/qmProfiling*
