@@ -58,6 +58,8 @@ import test.de.iip_ecosphere.platform.support.logging.LoggerFactoryTest;
     CollectorTest.class,
     PluginManagerTest.class,
     AtomicDoubleTest.class,
+    CommonsTest.class,
+    ObjectUtilsTest.class,
     
     FallbackLoggerTest.class,
     LoggerFactoryTest.class

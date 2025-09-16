@@ -29,7 +29,7 @@ public abstract class Http {
     }
 
     /**
-     * Returns the Rest instance.
+     * Returns the Http instance.
      * 
      * @return the instance
      */
@@ -40,11 +40,11 @@ public abstract class Http {
     /**
      * Manually sets the instance. Shall not be needed, but may be required in some tests.
      * 
-     * @param rest the Rest instance
+     * @param http the Http instance
      */
-    public static void setInstance(Http rest) {
-        if (null != rest) {
-            instance = rest;
+    public static void setInstance(Http http) {
+        if (null != http) {
+            instance = http;
         }
     }
     

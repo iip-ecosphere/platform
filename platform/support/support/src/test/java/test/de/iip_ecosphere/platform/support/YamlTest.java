@@ -3,13 +3,12 @@ package test.de.iip_ecosphere.platform.support;
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.function.IOFunction;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.IOUtils;
+import de.iip_ecosphere.platform.support.function.IOFunction;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.yaml.Yaml;
 
@@ -48,7 +47,7 @@ public class YamlTest {
         Assert.assertNotNull(fromResource(in -> yaml.loadMapping(in)));
         Assert.assertNotNull(fromResource(in -> yaml.loadAs(in, Object.class)));
         Assert.assertNotNull(fromResource(in -> yaml.loadTolerantAs(in, Object.class)));
-        String s = fromResource(in -> IOUtils.toString(in, Charset.defaultCharset()));
+        String s = fromResource(in -> IOUtils.toString(in));
         Assert.assertNotNull(yaml.loadAs(s, Object.class));
 
         Assert.assertNotNull(yaml.dump(new Object()));

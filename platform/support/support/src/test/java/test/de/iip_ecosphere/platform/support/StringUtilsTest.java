@@ -92,6 +92,7 @@ public class StringUtilsTest {
      * Tests {@link StringUtils#toString(Object)} and 
      * {@link StringUtils#toStringShortStyle(Object)}.
      */
+    @Test
     public void testToString() {
         TestData t = new TestData();
         t.iVal = 10;
@@ -110,6 +111,7 @@ public class StringUtilsTest {
      * Tests {@link StringUtils#removeStart(String, String)} and 
      * {@link StringUtils#removeEnd(String, String)}.
      */
+    @Test
     public void testRemove() {
         Assert.assertEquals("This", StringUtils.removeEnd("ThisEnd", "End"));
         Assert.assertEquals("End", StringUtils.removeStart("ThisEnd", "This"));

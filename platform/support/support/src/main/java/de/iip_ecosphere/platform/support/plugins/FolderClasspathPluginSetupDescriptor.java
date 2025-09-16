@@ -18,14 +18,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.stream.Stream;
 
-import org.apache.commons.io.IOUtils;
-
+import de.iip_ecosphere.platform.support.IOUtils;
 import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
@@ -238,7 +236,7 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
      */
     public static ClasspathFile readClasspathFile(InputStream in, File base) throws IOException {
         ClasspathFile result = new ClasspathFile();
-        List<String> contents = IOUtils.readLines(in, Charset.defaultCharset());
+        List<String> contents = IOUtils.readLines(in);
         for (String line : contents) {
             if (line.startsWith("#")) {
                 if (line.startsWith(KEY_SETUP_DESCRIPTOR)) {
@@ -328,7 +326,7 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
             InputStream in = ZipUtils.findFile(url.openStream(), "META-INF/services/" 
                 + PluginDescriptor.class.getName());
             if (in != null) {
-                List<String> lines = IOUtils.readLines(in, Charset.defaultCharset());
+                List<String> lines = IOUtils.readLines(in);
                 for (String l : lines) {
                     try {
                         Class<?> cls = loader.loadClass(l);

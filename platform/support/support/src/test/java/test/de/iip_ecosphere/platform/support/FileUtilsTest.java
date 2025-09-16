@@ -17,6 +17,27 @@ import de.iip_ecosphere.platform.support.FileUtils;
  */
 public class FileUtilsTest {
     
+    private static int numberTestFiles = 24;
+    private static int numberTestNotServiceFiles = 11;
+
+    /**
+     * Sets the number of test files to be found.
+     * 
+     * @param number the number
+     */
+    protected static void setNumberTestFiles(int number) {
+        numberTestFiles = number;
+    }
+
+    /**
+     * Sets the number of not service files to be found.
+     * 
+     * @param number the number
+     */
+    protected static void setNumberTestNotServiceFiles(int number) {
+        numberTestNotServiceFiles = number;
+    }
+
     /**
      * Tests the temporary directory access.
      */
@@ -69,14 +90,14 @@ public class FileUtilsTest {
             fileCount.incrementAndGet();
         });
         
-        Assert.assertEquals(23, fileCount.get());
+        Assert.assertEquals(numberTestFiles, fileCount.get());
         fileCount.set(0);
 
         FileUtils.listFiles(f, g -> !g.getName().equals("services"), g -> {
             fileCount.incrementAndGet();
         });
 
-        Assert.assertEquals(11, fileCount.get());
+        Assert.assertEquals(numberTestNotServiceFiles, fileCount.get());
     }
     
     /**

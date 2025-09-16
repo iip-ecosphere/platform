@@ -18,11 +18,11 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.IOUtils;
 import de.iip_ecosphere.platform.support.ZipUtils;
 
 /**
@@ -113,7 +113,7 @@ public class ZipUtilsTest {
         InputStream in = getClass().getClassLoader().getResourceAsStream("test.zip");
         InputStream fileStream = ZipUtils.findFile(in, "folder2/text21.txt");
         Assert.assertNotNull(fileStream);
-        String test = IOUtils.toString(fileStream, StandardCharsets.UTF_8.name());
+        String test = IOUtils.toString(fileStream, StandardCharsets.UTF_8);
         fileStream.close();
         Assert.assertEquals("text21.txt", test);
         FileUtils.closeQuietly(in);
@@ -137,7 +137,7 @@ public class ZipUtilsTest {
         Assert.assertTrue(f.exists());
         InputStream fileStream = ZipUtils.findFile(f, "folder2/text21.txt");
         Assert.assertNotNull(fileStream);
-        String test = IOUtils.toString(fileStream, StandardCharsets.UTF_8.name());
+        String test = IOUtils.toString(fileStream, StandardCharsets.UTF_8);
         fileStream.close();
         Assert.assertEquals("text21.txt", test);
 
