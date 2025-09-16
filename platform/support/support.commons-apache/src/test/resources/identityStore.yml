@@ -1,0 +1,42 @@
+name: support
+identities:
+    axc3151-2: 
+        type: USERNAME
+        userName: abba
+        tokenData: babbab
+        tokenEncryptionAlgorithm: UTF-8
+    aas:
+        type: ANONYMOUS
+    secureStore:
+        type: X509
+        tokenPolicyId: polId
+        signatureAlgorithm: mySigAlg
+        signature: sig-1
+        tokenData: token-1
+    UI:
+        type: ISSUED
+        tokenPolicyId: polId-2
+        signatureAlgorithm: yourSigAlg
+        signature: sig-2
+        tokenData: token
+        tokenEncryptionAlgorithm: bla
+    keystore:
+        type: USERNAME
+        tokenData: a1234567    
+        tokenEncryptionAlgorithm: UTF-8
+        file: keystore.jks
+    aas-admin-1:
+        type: USERNAME
+        userName: admin
+        tokenData: password
+        tokenEncryptionAlgorithm: UTF-8
+    aas-user-1:
+        type: USERNAME
+        userName: user
+        tokenData: password
+        tokenEncryptionAlgorithm: UTF-8
+    aas-user-2:
+        type: USERNAME
+        userName: user2
+        tokenData: password
+        tokenEncryptionAlgorithm: UTF-8        

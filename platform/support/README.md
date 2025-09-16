@@ -3,6 +3,7 @@
 Basic functionality for the oktoflow platform in terms of:
   * Basic [support functions](support/README.md)
   * [Logging plugin](support.log-slf4j-simple/README.md)
+  * [Commons plugin](support.commons-apache/README.md)
   * [Yaml plugin](support.yaml-snakeyaml/README.md)
   * [JSON plugin](support.json-jackson/README.md)
   * [JSON plugin](support.rest-spark/README.md)
