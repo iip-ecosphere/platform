@@ -58,6 +58,12 @@
         <version>1.14.18</version> <!-- due to JDK 21 -->
         <scope>test</scope>
     </dependency>  
+    <dependency>
+      <artifactId>support.commons-apache</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
 </project>

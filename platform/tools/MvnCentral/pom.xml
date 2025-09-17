@@ -170,6 +170,18 @@
         <type>zip</type>
     </dependency>    
     <dependency>
+        <artifactId>support.commons-apache</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
+    <dependency>
+        <artifactId>support.commons-apache</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>    
+    <dependency>
         <artifactId>support.http-apache</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>

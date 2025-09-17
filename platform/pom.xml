@@ -15,13 +15,14 @@
      <module>platformDependencies</module>
      <module>support/support</module>
      <module>support/libs.ads</module>
+     <module>support.log-slf4j-simple</module>
+     <module>support.commons-apache</module>
      <module>support.yaml-snakeyaml</module>
      <module>support.websocket-websocket</module>
      <module>support.ssh-sshd</module>
      <module>support.rest-spark</module>
      <module>support.processInfo-OSHI</module>
      <module>support.metrics-micrometer</module>
-     <module>support.log-slf4j-simple</module>
      <module>support.json-jackson</module>
      <module>support.http-apache</module>
      <module>support.bytecode-bytebuddy</module>
