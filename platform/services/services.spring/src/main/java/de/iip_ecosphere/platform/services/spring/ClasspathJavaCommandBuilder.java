@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
@@ -218,7 +219,7 @@ public class ClasspathJavaCommandBuilder extends JavaCommandBuilder {
         if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_9) 
             && Boolean.valueOf(System.getProperty(PROP_ZIP_CLASSPATH, "true"))) {
             try {
-                String classpath = org.apache.commons.io.FileUtils.readFileToString(cpFile, "UTF-8");
+                String classpath = FileUtils.readFileToString(cpFile, StandardCharsets.UTF_8);
                 String mainJars = "";
                 File[] files = workDir.listFiles();
                 if (null != files) {  // file may contain only "jars"
@@ -242,7 +243,7 @@ public class ClasspathJavaCommandBuilder extends JavaCommandBuilder {
                 }
                 classpath = classpath.replace("/", fileSep).replace(':', File.pathSeparatorChar);
                 classpath = "-cp \"" + classpath + "\""; // turn into cp commandline argument
-                org.apache.commons.io.FileUtils.writeStringToFile(cpFile, classpath, "UTF-8");
+                FileUtils.writeStringToFile(cpFile, classpath, StandardCharsets.UTF_8);
                 result = true;
             } catch (IOException e) {
                 getLogger().info("Cannot rewrite classpath file: " + e.getMessage() 
@@ -274,7 +275,8 @@ public class ClasspathJavaCommandBuilder extends JavaCommandBuilder {
                     commands.add("-cp");
                     commands.add(classpath);
                 }
-                commands.add("iip.Starter");
+                commands.add("de.iip_ecosphere.platform.services.environment.spring.AppStarter");
+                commands.add("-Dokto.loader.app=" + workDir.getAbsolutePath());
             } else { // as in the base class
                 commands.add("-jar");
                 commands.add(path);

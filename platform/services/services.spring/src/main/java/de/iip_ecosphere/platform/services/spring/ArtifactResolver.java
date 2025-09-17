@@ -19,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,7 +73,7 @@ public class ArtifactResolver {
                 if (tmp.exists()) {
                     getLogger().info("Considering classpath file {}", tmp);
                     classpathArtifact = tmp;
-                    String classpath = org.apache.commons.io.FileUtils.readFileToString(classpathArtifact, "UTF-8");
+                    String classpath = FileUtils.readFileToString(classpathArtifact, StandardCharsets.UTF_8);
                     StringBuilder cpTmp = new StringBuilder();
                     findAppJars(f -> cpTmp.append(f.getName() + ":"));
                     
@@ -195,7 +196,7 @@ public class ArtifactResolver {
             }
             args.add("-cp");
             args.add(tmp);
-            args.add("iip.Starter");
+            args.add("de.iip_ecosphere.platform.services.environment.spring.AppStarter");
         }
 
     }
