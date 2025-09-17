@@ -49,6 +49,12 @@
         <scope>test</scope>
         <version>${project.version}</version>
       </dependency>
+        <dependency>
+          <artifactId>support.commons-apache</artifactId>
+          <groupId>de.iip-ecosphere.platform</groupId>
+          <scope>test</scope>
+          <version>${project.version}</version>
+        </dependency>
       <dependency>
         <groupId>de.iip-ecosphere.platform</groupId>
         <artifactId>transport</artifactId>
