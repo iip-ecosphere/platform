@@ -13,10 +13,6 @@
   </parent>
 
   <dependencies>
-    <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-    </dependency>
 <!--  -->    
     <dependency> <!-- override due to CVE-2021-44228 -->
       <groupId>org.apache.logging.log4j</groupId>
@@ -40,6 +36,11 @@
     </dependency>
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>services.spring.loader</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>services.environment.spring</artifactId>
      <version>${project.version}</version>
     </dependency>
@@ -48,7 +49,7 @@
       <artifactId>transport.amqp</artifactId>
       <version>${project.version}</version>
     </dependency>  
-    <dependency>  
+    <dependency>  <!-- binder, not plugin - stays here for spring -->
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>transport.spring.amqp</artifactId>
       <version>${project.version}</version>
@@ -57,7 +58,7 @@
         <groupId>org.glassfish</groupId>
         <artifactId>jakarta.el</artifactId>
         <optional>false</optional>
-    </dependency>    
+    </dependency>
     <dependency> <!-- fix it here into for now -->
       <artifactId>support.json-jackson</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
@@ -70,6 +71,11 @@
     </dependency> 
     <dependency>  <!-- fix it here into for now -->
       <artifactId>support.log-slf4j-simple</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+    </dependency>    
+    <dependency>  <!-- fix it here into for now -->
+      <artifactId>support.commons-apache</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <version>${project.version}</version>
     </dependency>    
@@ -107,6 +113,10 @@
      <artifactId>support.aas.basyx</artifactId>
      <version>${project.version}</version>
     </dependency>
+<dependency>
+ <groupId>org.springframework</groupId>
+ <artifactId>spring-beans</artifactId>
+</dependency>
   </dependencies>
   
   <build>
@@ -220,7 +230,8 @@
                        <goal>repackage</goal>
                    </goals>
                    <configuration>
-                     <mainClass>test.de.iip_ecosphere.platform.simpleStream.spring.Test</mainClass>
+                     <mainClass>de.iip_ecosphere.platform.services.spring.loader.AppStarter</mainClass>
+                     <!--<mainClass>test.de.iip_ecosphere.platform.simpleStream.spring.Test</mainClass>-->
                      <!-- experimental, make it smaller for re-use in tests. However, automatic exclude based on 
                           top-level package not foreseen :( -->
                      <excludeGroupIds>org.jetbrains.xodus,org.rocksdb,org.jetbrains.kotlin,io.dropwizard.metrics,jakarta.xml.bind,org.bouncycastle,org.threeten</excludeGroupIds>
@@ -240,10 +251,11 @@
                      </excludes>
                    </configuration>
                </execution>
+<!-- CAN WE REMOVE FULL? -->               
                <execution>
                    <id>With Broker</id>
                    <configuration>
-                       <mainClass>test.de.iip_ecosphere.platform.simpleStream.spring.TestWithBroker</mainClass>
+                       <mainClass>de.iip_ecosphere.platform.services.spring.loader.AppStarter</mainClass>
                        <classifier>full</classifier>
                    </configuration>
                    <goals>
