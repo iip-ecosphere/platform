@@ -13,7 +13,6 @@
 package de.iip_ecosphere.platform.services.environment;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -22,9 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.apache.commons.lang3.SystemUtils;
 
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.services.environment.testing.TestBroker;
@@ -43,6 +41,8 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
+import de.iip_ecosphere.platform.support.plugins.PluginManager.PluginFilter;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.setup.InstalledDependenciesSetup;
 import de.iip_ecosphere.platform.support.logging.Logger;
@@ -62,6 +62,7 @@ public class Starter {
     public static final String PARAM_IIP_PROTOCOL = "iip.protocol";
     public static final String PARAM_IIP_PORT = "iip.port";
     public static final String PARAM_IIP_APP_ID = "iip.appId";
+    public static final String PARAM_IIP_APP_PLUGINS = "iip.plugins";
     public static final String PARAM_IIP_TRANSPORT_GLOBAL = "iip.transport.global";
     public static final String PARAM_IIP_START_SERVER = "iip.start.server";
     public static final String PARAM_IIP_START_SERVER_ONLY = "iip.start.serverOnly";
@@ -90,6 +91,8 @@ public class Starter {
     private static EnvironmentSetup setup;
     private static String appId = "";
     private static Map<String, Plugin> plugins = new HashMap<>();
+    private static boolean oktoPluginsLoaded = false;
+    private static Consumer<ProtocolServerBuilder> cmdServerConfigurer = null;
     
     /**
      * Defines a starter plugin.
@@ -203,6 +206,17 @@ public class Starter {
      * @param args the arguments to add the application environment settings
      */
     public static void addAppEnvironment(List<String> args) {
+        addAppEnvironment(args, new File(""));
+    }
+
+    /**
+     * Adds all environment properties starting with {@link #IIP_APP_PREFIX} or {@link #IIP_TEST_PREFIX} to the command 
+     * line of the service to be started.
+     * 
+     * @param args the arguments to add the application environment settings
+     * @param pluginParent the folder containing the "jars" and the "plugins" folder if the do exist
+     */
+    public static void addAppEnvironment(List<String> args, File pluginParent) {
         for (Object k : System.getProperties().keySet()) {
             String key = k.toString();
             if (key != null && key.length() > 0) {
@@ -214,6 +228,8 @@ public class Starter {
                 }
             }
         }
+        args.add("-D" + PARAM_IIP_APP_PLUGINS + "=" + pluginParent.getAbsolutePath());
+        args.add("-D" + AasFactory.PROPERTY_PLUGIN_ID + "=" + AasFactory.getPluginId());
     }
     
     /**
@@ -245,7 +261,7 @@ public class Starter {
      * Considers installed dependencies properties, -D{@value #PROPERTY_JAVA8}.
      */
     public static void considerInstalledDependencies() {
-        if (!SystemUtils.IS_JAVA_1_8) {
+        if (!OsUtils.isJava1_8()) {
             String prop = System.getProperty(PROPERTY_JAVA8, null);
             if (prop != null) {
                 File java8 = new File(prop);
@@ -264,8 +280,7 @@ public class Starter {
     public static void transferArgsToEnvironment(String[] args) {
         for (String a : args) {
             String tmp = null;
-            if (a.startsWith("-D" + IIP_APP_PREFIX) 
-                || a.startsWith("-D" + IIP_TEST_PREFIX)) { // so far only -D, may need PARAM_IIP_TEST_SERVICE_AUTOSTART
+            if (a.startsWith("-D")) { // so far only -D, may need PARAM_IIP_TEST_SERVICE_AUTOSTART
                 tmp = a.substring(2);
             } else if (a.startsWith("--" + IIP_APP_PREFIX)) {
                 tmp = a.substring(2);
@@ -516,11 +531,25 @@ public class Starter {
     }
     
     /**
+     * Sets a configurer for the AAS asset command server.
+     * 
+     * @param configurer the configurer
+     */
+    protected static void setCmdServerConfigurer(Consumer<ProtocolServerBuilder> configurer) {
+        cmdServerConfigurer = configurer;
+    }
+    
+    /**
      * Starts the server instance(s).
+     * 
+     * @see #setCmdServerConfigurer(Consumer)
      */
     public static void start() {
         if (null != builder) {
             getLogger().info("Starting service command server");
+            if (null != cmdServerConfigurer) {
+                cmdServerConfigurer.accept(builder);
+            }
             cmdServer = builder.build();
             cmdServer.start();
         } else {
@@ -625,14 +654,14 @@ public class Starter {
             while (artPath.startsWith("/")) {
                 artPath = artPath.substring(1);
             }
-            FileInputStream fis = null;
             InputStream artifact = null; 
             try { // spring packaging
-                fis = new FileInputStream(artFile);
-                artifact = ZipUtils.findFile(fis, "BOOT-INF/classes/" + artPath);
+                artifact = ZipUtils.findFile(artFile, "BOOT-INF/classes/" + artPath);
                 if (null == artifact) {
-                    fis = new FileInputStream(artFile); // TODO preliminary, use predicate
-                    artifact = ZipUtils.findFile(fis, artPath);
+                    artifact = ZipUtils.findFile(artFile, "BOOT-INF/classes-app/" + artPath);
+                }
+                if (null == artifact) {
+                    artifact = ZipUtils.findFile(artFile, artPath);
                     if (null != artifact) {
                         getLogger().info("Found " + artPath + " in " + artFile + " " 
                             + artifact.getClass().getSimpleName());
@@ -656,7 +685,6 @@ public class Starter {
             ZipUtils.extractZip(artifact, processDir.toPath());
             getLogger().info("Extracted process artifact " + artPath + " to " + processDir);
             FileUtils.closeQuietly(artifact);
-            FileUtils.closeQuietly(fis);
         }
         return processDir;
     }
@@ -762,7 +790,7 @@ public class Starter {
      * @return the application setup as stream
      */
     public static InputStream getApplicationSetupAsStream() {
-        return ResourceLoader.getResourceAsStream(Starter.class, "application.yml"); // spring only?
+        return ResourceLoader.getResourceAsStream("application.yml"); // spring only?
     }
     
     /**
@@ -791,6 +819,41 @@ public class Starter {
             plugin.run(args);
         }
     }
+    
+    /**
+     * Loads the oktoflow plugins if present. Loads plugins only once. Needs args transferred
+     * to environment, i.e., after parse.
+     * 
+     * @see #transferArgsToEnvironment(String[])
+     * @see #parse(String...)
+     */
+    public static void loadOktoPlugins() {
+        if (!oktoPluginsLoaded) {
+            oktoPluginsLoaded = true;
+            File pluginParent = new File(System.getProperty(PARAM_IIP_APP_PLUGINS, "target"));
+            File plugins = new File(pluginParent, "plugins");
+            if (!plugins.isDirectory()) { // testing fallback
+                plugins = new File(pluginParent, "oktoPlugins");
+            }
+            LoggerFactory.getLogger(Starter.class).info("Using {} as oktoflow plugin directory", plugins);
+            if (plugins.isDirectory()) {
+                LoggerFactory.getLogger(Starter.class).info("Trying to load oktoflow plugins from {}", plugins);
+                PluginFilter filter = info -> {
+                    String name = info.getName();
+                    boolean ok = true;
+                    ok &= !name.startsWith("support.log-"); // local via services.environment.spring
+                    ok &= !name.startsWith("support.metrics-"); // local via services.environment.spring
+                    ok &= !name.startsWith("services."); // exclude higher platform level
+                    ok &= !name.startsWith("ecsRuntime."); // exclude higher platform level
+                    ok &= !name.startsWith("monitoring."); // exclude higher platform level
+                    ok &= !name.startsWith("configuration."); // exclude higher platform level
+                    ok &= !name.startsWith("deviceMgt."); // exclude higher platform level
+                    return ok;
+                };
+                PluginManager.loadAllFrom(plugins, filter);
+            }
+        }
+    }
 
     /**
      * Simple default start main program without mapping any services before startup. This can be done on-demand
@@ -801,6 +864,7 @@ public class Starter {
     public static void main(String[] args) {
         registerDefaultPlugins(a -> Starter.start());
         Starter.parse(args);
+        loadOktoPlugins();
         if (!startServer(args)) {
             getSetup(); // ensure instance
             runPlugin(args);

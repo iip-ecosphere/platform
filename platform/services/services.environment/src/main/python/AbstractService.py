@@ -130,4 +130,20 @@ class AbstractService(Service):
         
         if self.state == ServiceState.RUNNING:
             self.state = ServiceState.PASSIVATED # preliminary consider state machine
+
+# https://stackoverflow.com/questions/4821104/dynamic-instantiation-from-string-name-of-a-class-in-dynamically-imported-module
+# dynamically creating objects
+#module = __import__(module_name)
+#class_ = getattr(module, class_name)
+#instance = class_()    
+
+# https://stackoverflow.com/questions/243836/how-to-copy-all-properties-of-an-object-to-another-object-in-python
+def transferData(source, target):
+    """Transfers data from the source data object to the target data object. The caller 
+       is responsible that the objects are sufficiently compatible. 
     
+    Parameters:
+      - source -- the source object
+      - target -- the target object
+    """
+    target.__dict__ = source.__dict__.copy()    # just a shallow copy

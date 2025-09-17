@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 
+import de.iip_ecosphere.platform.support.ObjectUtils;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
@@ -539,5 +540,15 @@ public abstract class AbstractService implements Service {
         return true;
     }
 
+    /**
+     * Transfers all fields from the source object to the target object. The caller 
+     * is responsible that the objects are sufficiently compatible. 
+     * 
+     * @param source the source object (may be <b>null</b>)
+     * @param target the target object (may be <b>null</b>)
+     */
+    protected void transferData(Object source, Object target) {
+        ObjectUtils.copyFieldsSafe(source, target);
+    }
 
 }
