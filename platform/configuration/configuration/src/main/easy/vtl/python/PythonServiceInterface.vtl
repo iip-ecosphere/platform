@@ -1,3 +1,4 @@
+import Basics;
 import PythonBasics;
 import MeshBasics;
 import ServiceBasics;
@@ -92,15 +93,17 @@ template PythonServiceInterface(Configuration config, PythonCodeArtifact target,
             add = "Impl";
         }      
         for (IOType t: service.output) {
-            String type = toTypeName(t);
-            String implType = "${type}${add}";
-            String supplierAttr = "creator${type}";
-            addDatatypeImport(implType, false, target, true);
-            cls.addAttribute(supplierAttr, "lambda : ${implType}()").toAttributes();
-            cls.addMethod("create${type}", "Creates an actual instance of the output type ${type}.").(m|{
-                m.addRetType(type);
-                m.addReturn("self.${supplierAttr}()", "the instance");
-            });
+            if (resolveType(t).isTypeOf(RecordType)) {
+                String type = toTypeName(t);
+                String implType = "${type}${add}";
+                String supplierAttr = "creator${type}";
+                addDatatypeImport(implType, false, target, true);
+                cls.addAttribute(supplierAttr, "lambda : ${implType}()").toAttributes();
+                cls.addMethod("create${type}", "Creates an actual instance of the output type ${type}.").(m|{
+                    m.addRetType(type);
+                    m.addReturn("self.${supplierAttr}()", "the instance");
+                });
+            }
         }
     }
     

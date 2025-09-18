@@ -334,5 +334,22 @@ template Basics(Configuration config, FileArtifact target) {
     def hasUI(IIPEcosphere config) {
         isDefined(config.managementUi) and config.managementUi <> null and not(config.managementUi.isTypeOf(NoManagementUI));
     }
+    
+    // type resolution
+
+    def resolveType(IOType type) {
+        resolveType(type.type);
+    }
+    
+    // added v2->v3
+    @DispatchBasis
+    def resolveType(DataType type) {
+        type;
+    }
+    
+    @DispatchCase
+    def resolveType(AliasType type) {
+        resolveType(type.represents);
+    }
         
 }
