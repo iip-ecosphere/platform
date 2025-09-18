@@ -106,7 +106,7 @@ Alias types consitute an own type that is essentially based on an existing type 
 ```
 AliasType AmpereType refines AliasType {
     name = "Ampere",
-    represents = refTo(DoubleType),
+    represents = refBy(DoubleType),
     semanticId = "0173-1#05-AAA220#005"
 }
 ```
