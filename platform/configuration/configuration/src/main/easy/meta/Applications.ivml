@@ -11,6 +11,23 @@ project Applications {
     annotate String displayName = "" to .;
 
     enum AppPackagingSchema {SpringFat, ZipWithClasspath};
+    
+    compound TypeSubstitution {
+        refTo(DataType) fromType;
+        refTo(DataType) toType;
+        
+        Constraint fromTypeGiven = isDefined(fromType) and fromType<>null;
+        Constraint toTypeGiven = isDefined(toType) and toType<>null;
+        Constraint isRefining = isRefining(fromType, toType);
+    }
+    
+    @DispatchBasis
+    def Boolean isRefining(DataType fromType, DataType toType) = 
+        false;
+
+    @DispatchCase
+    def Boolean isRefining(RecordType fromType, RecordType toType) = 
+        createRecordTypeSet(toType)->closure(RecordType t|t.refining).includes(fromType);
 
     compound Application refines VersionedElement {
         Id id;
@@ -29,6 +46,7 @@ project Applications {
             String cmdArg; // for now, comma separated
             setOf(refTo(Server)) servers = {}; // additional server instances to be started
             setOf(AppPackagingSchema) packaging = { AppPackagingSchema::SpringFat };
+            setOf(TypeSubstitution) typeSubstitutions = {};
         }
         
         Constraint idOk = matches(id, "^[^@]+$");

@@ -337,18 +337,18 @@ template Basics(Configuration config, FileArtifact target) {
     
     // type resolution
 
-    def resolveType(IOType type) {
+    def DataType resolveType(IOType type) {
         resolveType(type.type);
     }
     
     // added v2->v3
     @DispatchBasis
-    def resolveType(DataType type) {
+    def DataType resolveType(DataType type) {
         type;
     }
     
     @DispatchCase
-    def resolveType(AliasType type) {
+    def DataType resolveType(AliasType type) {
         resolveType(type.represents);
     }
         

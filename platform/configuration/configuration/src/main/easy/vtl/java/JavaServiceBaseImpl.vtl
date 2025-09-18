@@ -203,21 +203,13 @@ template JavaServiceBaseImpl(Configuration config, JavaCodeArtifact target, Serv
         String add = "";
         if (cfg.sharedInterfaces) {
             add = "Impl";
-        }      
+        }
         for (IOType t: service.output) {
             if (resolveType(t).isTypeOf(RecordType)) {
                 String type = toTypeName(t);
-                String supplierType = "java.util.function.Supplier<iip.datatypes.${type}>";
-                String supplierAttr = "creator${type}";
-                mainCls.attribute(supplierType, supplierAttr).(a|{
-                    a.initializer(
-                        new JavaCodeLambdaExpression().expr(new JavaCodeConstructorCall("iip.datatypes.${type}${add}"))
-                    );
-                    a.addSetter(false);
-                });
-                mainCls.method(type, "create${type}", "Creates an actual instance of the output type ${type}.").(m|{
-                    m.return("creator${type}.get()", "the instance");
-                });
+                mainCls.method(type, "create${type}", "Creates an actual instance of the output type ${type}.")
+                    .return(new JavaCodeMethodCall("createType").classArg(type)
+                        .arg(new JavaCodeLambdaExpression().expr(new JavaCodeConstructorCall("iip.datatypes.${type}${add}"))));
             }
         }
     }

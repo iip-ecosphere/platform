@@ -1033,6 +1033,24 @@ block;
         typeAdd;
     }
     
+    // added v2->v3
+    def generateTypeSubstitutions(Application app, ServiceBase service, JavaCodeMethod meth) {
+        String add = getTypeAdd();
+        for (IOType t: service.output) {
+            DataType type = resolveType(t);
+            for (TypeSubstitution s: app.typeSubstitutions) {
+                if (s.fromType == type) {
+                    String fromType = toQualifiedTypeName(s.fromType);
+                    String toType = toQualifiedTypeName(s.toType);
+                    meth.call("service.addTypeSubstitution")
+                        .classArg(fromType)
+                        .classArg(toType)
+                        .arg(new JavaCodeLambdaExpression().expr(new JavaCodeConstructorCall("${toType}${add}")));
+                }
+            }
+        }        
+    }
+    
     // --------------------- main ---------------------------
 
     def gen(Configuration config, JavaCodeArtifact target, MeshElement elt, String pkg, Application app, 
@@ -1074,6 +1092,7 @@ block;
                m.assign("this.metrics", "metrics");
             }
             initialService(elt, impl, serviceVars, m);
+            generateTypeSubstitutions(app, impl, m);
         });
         
         generatedServiceInitMethod(elt, impl, mainCls);
