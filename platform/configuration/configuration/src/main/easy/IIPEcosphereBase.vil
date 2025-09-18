@@ -36,6 +36,7 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
     String assemblyRel = "src/main/assembly";
     String serviceArtifactsRel = "src/main/serviceArtifacts";
 
+    String appStarterCls = "de.iip_ecosphere.platform.services.spring.loader.AppStarter";
 
     generateOsScripts(Configuration config, String pathName, String dir, String main, String desc, String pidName, String requires, String addJavaOpts="", String sysd="") = {
         vilTemplateProcessor("WinBatch", config, "${pathName}.bat", dir=dir, main=main, addJavaOpts=addJavaOpts);
@@ -158,11 +159,16 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
         setOf(String) selectedApplications = getProperty("iip.easy.apps", "")
             .split(",")->reject(s|s.trim().length()==0) // for "" the result will be "", prune this
             .toSet();
-        setOf(Application) applications = Application.allInstances();
+        setOf(Application) applications = Application.allInstances()->select(a|isApplication(a));
         if (selectedApplications.size() > 0) {
             applications = applications->select(a|selectedApplications.includes(a.id));
         }
-        applications;        
+        applications;
+    }
+    
+    Boolean isApplication(Application app) = {
+        DecisionVariable dv = app;
+        not(dv.getParent().getName().startsWith("TemplatePart"));
     }
     
     setOf(RecordType) getRecordTypes() = {

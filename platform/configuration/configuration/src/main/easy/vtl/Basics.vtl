@@ -2,6 +2,8 @@
 @indent(indentation = 4, additional = 0)
 template Basics(Configuration config, FileArtifact target) {
 
+    mapOf(MeshSink, MeshElement) subMeshPseudoSinks = {};
+
     // for now, here to ease dependencies. Shall go to MavenBasics
 	
     compound AssemblyInfo {
@@ -150,6 +152,7 @@ template Basics(Configuration config, FileArtifact target) {
     }
     
     def setOf(MeshElement) mapNext(MeshElement elt, setOf(MeshConnector) next, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
+        next = reMapSubServiceMap(elt, elt.impl, next);
         for (MeshConnector c: next) {
             setOf(MeshConnector) connectors;
             if (mappedMesh.containsKey(elt)) {
@@ -161,6 +164,42 @@ template Basics(Configuration config, FileArtifact target) {
             connectors.add(c);
         }
         next->collect(MeshConnector c|c.next);
+    }
+    
+    @DispatchBasis
+    def setOf(MeshConnector) reMapSubServiceMap(MeshElement elt, ServiceBase impl, setOf(MeshConnector) next) {
+        next;
+    }
+    
+    @DispatchCase
+    def setOf(MeshConnector) reMapSubServiceMap(MeshElement elt, SubServiceMesh impl, setOf(MeshConnector) next) {
+        subMeshPseudoSinks.add(impl.pseudoSink, elt); // record pseudoSink for end-mapping
+        impl.sources; // go on with sub-mesh sources
+    }
+
+    @DispatchCase
+    def setOf(MeshConnector) reMapSubServiceMap(MeshSink elt, ServiceBase impl, setOf(MeshConnector) next) {
+        setOf(MeshConnector) result = next;
+        if (subMeshPseudoSinks.containsKey(elt)) {
+            MeshElement m = subMeshPseudoSinks.get(elt);
+            result = getNext(m);
+        }
+        result;
+    }
+    
+    @DispatchBasis
+    def setOf(MeshConnector) getNext(MeshElement elt) {
+        {};
+    }
+
+    @DispatchCase
+    def setOf(MeshConnector) getNext(MeshSource elt) {
+        elt.next;
+    }
+
+    @DispatchCase
+    def setOf(MeshConnector) getNext(MeshInnerElement elt) {
+        elt.next;
     }
     
     def mapOf(IOType, IOType) ioPairs(sequenceOf(IOType) input, sequenceOf(IOType) output) {

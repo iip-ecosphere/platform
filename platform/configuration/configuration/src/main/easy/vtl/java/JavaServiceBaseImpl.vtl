@@ -197,6 +197,27 @@ template JavaServiceBaseImpl(Configuration config, JavaCodeArtifact target, Serv
                 });
             });
         }
+
+        // added v2->v3  
+        IIPEcosphere cfg = config;
+        String add = "";
+        if (cfg.sharedInterfaces) {
+            add = "Impl";
+        }      
+        for (IOType t: service.output) {
+            String type = toTypeName(t);
+            String supplierType = "java.util.function.Supplier<iip.datatypes.${type}>";
+            String supplierAttr = "creator${type}";
+            mainCls.attribute(supplierType, supplierAttr).(a|{
+                a.initializer(
+                    new JavaCodeLambdaExpression().expr(new JavaCodeConstructorCall("iip.datatypes.${type}${add}"))
+                );
+                a.addSetter(false);
+            });
+            mainCls.method(type, "create${type}", "Creates an actual instance of the output type ${type}.").(m|{
+                m.return("creator${type}.get()", "the instance");
+            });
+        }
     }
     
 }

@@ -84,6 +84,24 @@ template PythonServiceInterface(Configuration config, PythonCodeArtifact target,
         cls.addFunc("registerMethods").(f|{
             reg->forEach(s|f.add(s));
         });
+
+        // added v2->v3  
+        IIPEcosphere cfg = config;
+        String add = "";
+        if (cfg.sharedInterfaces) {
+            add = "Impl";
+        }      
+        for (IOType t: service.output) {
+            String type = toTypeName(t);
+            String implType = "${type}${add}";
+            String supplierAttr = "creator${type}";
+            addDatatypeImport(implType, false, target, true);
+            cls.addAttribute(supplierAttr, "lambda : ${implType}()").toAttributes();
+            cls.addMethod("create${type}", "Creates an actual instance of the output type ${type}.").(m|{
+                m.addRetType(type);
+                m.addReturn("self.${supplierAttr}()", "the instance");
+            });
+        }
     }
     
 }

@@ -277,8 +277,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 Boolean copyDependencies = enablesPackaging(a, AppPackagingSchema::ZipWithClasspath); // may be more...
                 // partition according to container strategy
                 String appVersion = getAppMvnVersion(a);
-                // iip.Starter
-                vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls="de.iip_ecosphere.platform.services.spring.loader.AppStarter", appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests, copyRuntimeDependencies=copyDependencies);
+                vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, 
+                    starterCls=appStarterCls, appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests, copyRuntimeDependencies=copyDependencies);
                 vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
                 generatePlugins(cfg, appRoot);
                 mvn(appRoot);
@@ -2297,7 +2297,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         // partition according to container strategy
         
         sequenceOf(String) artList = cfg.sharedArtifact.split(":");
-        vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls="iip.Starter", 
+        vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls=appStarterCls, 
             appName=artList[1], appVersion=artList[2], appDescription="Shared application interfaces", tests=tests, springPackaging=false, groupId=artList[0], ifArtifact=true);
         vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=artList[1], srvFolderName="IIP-apps-${artList[1]}");
             

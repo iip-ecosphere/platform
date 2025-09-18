@@ -1,0 +1,82 @@
+project DataTypesPartEnergy {
+
+    import DataTypes;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    const String Eclass_Unit_Ampere = "0173-1#05-AAA220#005";
+    const String Eclass_Unit_MilliAmpere = "0173-1#05-AAA187#005";
+    const String Eclass_Unit_KiloAmpere = "0173-1#05-AAA280#005";
+
+    AliasType MilliAmpereDoubleType = {
+        name = "MilliAmpere Double",
+        represents = refBy(DoubleType),
+        semanticId = Eclass_Unit_MilliAmpere
+    };
+
+    AliasType MilliAmpereFloatType = {
+        name = "MilliAmpere Float",
+        represents = refBy(FloatType),
+        semanticId = Eclass_Unit_MilliAmpere
+    };
+    
+    AliasType AmpereDoubleType = {
+        name = "Ampere Double",
+        represents = refBy(DoubleType),
+        semanticId = Eclass_Unit_Ampere
+    };
+
+    AliasType AmpereFloatType = {
+        name = "Ampere Float",
+        represents = refBy(FloatType),
+        semanticId = Eclass_Unit_Ampere
+    };
+
+    AliasType KiloAmpereDoubleType = {
+        name = "KiloAmpere Double",
+        represents = refBy(DoubleType),
+        semanticId = Eclass_Unit_KiloAmpere
+    };
+
+    AliasType KiloAmpereFloatType = {
+        name = "KiloAmpere Float",
+        represents = refBy(FloatType),
+        semanticId = Eclass_Unit_KiloAmpere
+    };
+    
+    // -------------------------------- freeze fixed stuff ----------------------------------------
+    
+    // freeze all primitives
+    freeze {
+        IntegerType;
+        LongType;
+        StringType;
+        BooleanType;
+        FloatType;
+        DoubleType;
+        ObjectType;
+        Integer16Type;
+        Integer32Type;
+        Integer64Type;
+        SByteType;
+        UnsignedInteger16Type;
+        UnsignedInteger32Type;
+        UnsignedInteger64Type;
+        ByteStringType;
+        DateTimeType;
+        ByteArrayType;
+        IntegerArrayType;
+        DoubleArrayType;
+        StringArrayType;
+        IEC61131_3DateTimeType;
+        IntegerListType;
+        BooleanListType;
+        StringListType;
+        DoubleListType;
+        FloatListType;
+        iipVer;
+        BaSyx10Plugin;
+        BaSyx15Plugin;
+    };
+    
+}

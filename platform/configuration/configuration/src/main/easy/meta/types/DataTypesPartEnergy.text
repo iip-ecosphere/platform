@@ -1,0 +1,9 @@
+DataTypesPartEnergy::Eclass_Unit_Ampere = ECLASS semantic id for the unit Ampere.
+DataTypesPartEnergy::Eclass_Unit_MilliAmpere = ECLASS semantic id for the unit MilliAmpere.
+DataTypesPartEnergy::Eclass_Unit_KiloAmpere = ECLASS semantic id for the unit KiloAmpere.
+DataTypesPartEnergy::MilliAmpereDoubleType = Type for MilliAmpere as Double value including ECLASS semantic id.
+DataTypesPartEnergy::MilliAmpereFloatType = Type for MilliAmpere as Float value including ECLASS semantic id.
+DataTypesPartEnergy::AmpereDoubleType = Type for Ampere as Double value including ECLASS semantic id.
+DataTypesPartEnergy::AmpereFloatType = Type for Ampere as Float value including ECLASS semantic id.
+DataTypesPartEnergy::KiloAmpereDoubleType = Type for KiloAmpere as Double value including ECLASS semantic id.
+DataTypesPartEnergy::KiloAmpereFloatType = Type for KiloAmpere as Float value including ECLASS semantic id.

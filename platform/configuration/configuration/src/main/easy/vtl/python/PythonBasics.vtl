@@ -426,11 +426,16 @@ def generateReceiveClientServer(PythonServer server) {
             }
         }
     }
-    
+
+    // v2->v3
     def addDatatypeImport(String clsName, boolean addImpl, PythonCodeArtifact target) {
-        target.addImport("datatypes." + clsName, clsName);
+        addDatatypeImport(clsName, addImpl, target, false); // as it was before
+    }
+    
+    def addDatatypeImport(String clsName, boolean addImpl, PythonCodeArtifact target, Boolean toFront) {
+        target.addImport("datatypes." + clsName, clsName).toImports(toFront);
         if (addImpl) {
-            target.addImport("datatypes." + clsName + "Impl", clsName + "Impl");
+            target.addImport("datatypes." + clsName + "Impl", clsName + "Impl").toImports(toFront);
         }
     }
     

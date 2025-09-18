@@ -3,6 +3,7 @@ project Applications {
     import Connectors;
     import ConnectorsPart*;
     import DataTypes;
+    import DataTypesPart*;
     import Nameplate;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
@@ -43,11 +44,32 @@ project Applications {
     
     compound ServiceMesh {
         String description;
-        setOf(refTo(MeshSource)) sources;
+        sequenceOf(refTo(MeshSource)) sources;
 
         Constraint meshElementsUnique = self.sources->closure(refTo(MeshElement) e|nextElts(e))
             .toSequence()->isUnique(e|e.name);
     }
+
+    compound SubServiceMesh refines ServiceBase {
+        setOf(refTo(MeshConnector)) sources;
+        MeshSink pseudoSink;
+        Constraint inOk = input == subMeshInput(self);
+        Constraint outOk = output == subMeshOutput(self);
+    } 
+    
+    def sequenceOf(IOType) subMeshInput(SubServiceMesh mesh) =
+        mesh.sources.toSequence()
+        ->collect(c|c.next)
+        ->collectNested(refTo(MeshElement) e|e.impl.input) 
+        ->reject(sequenceOf(IOType) i|i.isEmpty())
+        .flatten();
+    def sequenceOf(refTo(MeshElement)) sinks(SubServiceMesh mesh) = 
+        mesh.sources
+        ->collect(c|c.next)
+        ->closure(refTo(MeshElement) e|nextElts(e))
+        ->reject(refTo(MeshElement) e|e.kind<>ServiceKind.SINK_SERVICE)
+        .toSequence();
+    def sequenceOf(IOType) subMeshOutput(SubServiceMesh mesh) = {}; // sinks(mesh)->collect(s|s.impl.output)->reject(i|i.isEmpty());
     
     compound MeshElement {
         String name; // no specific string, pulled up
