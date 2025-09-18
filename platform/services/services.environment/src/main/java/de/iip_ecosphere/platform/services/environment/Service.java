@@ -16,6 +16,7 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -138,6 +139,81 @@ public interface Service extends ParameterConfigurerProvider, ServiceBase {
     @Override
     public default Set<String> getParameterNames() {
         return null;
+    }
+    
+    /**
+     * Sets a type mapping, usually a substitution of more generic to more specific output types.
+     * 
+     * @param <T> the actual type
+     * @param cls the original class to apply the mapping for
+     * @param actCls the actual class that the supplier will create an instance of
+     * @param creator the creator supplier that creates an instance of the substitute
+     */
+    public default <T> void addTypeSubstitution(Class<? super T> cls, Class<T> actCls, Supplier<T> creator) {
+    }
+
+    /**
+     * Returns the actual (output) type, may be a substitute.
+     * 
+     * @param <T> the actual type
+     * @param cls the original class to return the creator for
+     * @return the type, may be {@code cls}
+     * @see #addTypeSubstitution(Class, Class, Supplier)
+     */
+    public default <T> Class<? extends T> getSubstitutedType(Class<T> cls) {
+        return cls;
+    }
+
+    /**
+     * Returns the actual (output) type substitutions.
+     * 
+     * @param <T> the actual type
+     * @return the type substitutions
+     * @see #addTypeSubstitution(Class, Class, Supplier)
+     */
+    public default Map<Class<?>, Class<?>> getTypeSubstitutions() {
+        return Map.of();
+    }
+
+    /**
+     * Returns an instance a certain (output) type, may be a substitute.
+     * 
+     * @param <T> the actual type
+     * @param cls the original class create the type for
+     * @return a constructor supplier, may be <b>null</b>
+     * @see #addTypeSubstitution(Class, Class, Supplier)
+     * @see #getTypeCreator(Class, Supplier)
+     */
+    public default <T> T createType(Class<T> cls) {
+        return createType(cls, null);
+    }
+
+    /**
+     * Returns an instance a certain (output) type, may be a substitute.
+     * 
+     * @param <T> the actual type
+     * @param cls the original class create the type for
+     * @param creator the default creator supplier if none is registered
+     * @return a constructor supplier, may be <b>null</b>
+     * @see #addTypeSubstitution(Class, Class, Supplier)
+     * @see #getTypeCreator(Class, Supplier)
+     */
+    public default <T> T createType(Class<T> cls, Supplier<T> creator) {
+        Supplier<T> c = getTypeCreator(cls, creator);
+        return null == c ? null : c.get();
+    }
+    
+    /**
+     * Returns the creator for a certain (output) type, may be a substitute.
+     * 
+     * @param <T> the actual type
+     * @param cls the original class to return the creator for
+     * @param creator the default creator supplier if none is registered
+     * @return a constructor supplier or {@code creator} if there is none
+     * @see #addTypeSubstitution(Class, Class, Supplier)
+     */
+    public default <T> Supplier<T> getTypeCreator(Class<T> cls, Supplier<T> creator) {
+        return creator;
     }
 
 }

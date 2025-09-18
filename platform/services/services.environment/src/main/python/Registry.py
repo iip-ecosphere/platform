@@ -6,3 +6,4 @@ senders = {}
 asyncTransformers = {}
 syncTransformers = {}
 netMgtKeyAddresses = {}
+typeSubst = {} # type name->creator mapping table

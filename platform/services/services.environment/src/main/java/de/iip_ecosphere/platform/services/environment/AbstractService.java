@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import de.iip_ecosphere.platform.support.ObjectUtils;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -36,7 +37,7 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
  * Basic implementation of the service interface (aligned with Python). Implementing classes shall at least either
- * have a no-arg constructor setting up the full/fallback service information, a signle string argument constructor 
+ * have a no-arg constructor setting up the full/fallback service information, a single string argument constructor 
  * taking the service id or a constructor like {@link #AbstractService(String, InputStream)}.
  * The three types of constructors are recognized by {@link #createInstance(String, Class, String, String)} or 
  * {@link #createInstance(ClassLoader, String, Class, String, String)} to be used from generated service code.
@@ -58,6 +59,7 @@ public abstract class AbstractService implements Service {
     private ServiceKind kind;
     private ServiceState state;
     private ManagedServerAddress netKeyMgtAddress;
+    private Map<Class<?>, TypeCreator<?>> typeCreators = new HashMap<>();
 
     /**
      * Fallback constructor setting most fields to "empty" default values.
@@ -549,6 +551,77 @@ public abstract class AbstractService implements Service {
      */
     protected void transferData(Object source, Object target) {
         ObjectUtils.copyFieldsSafe(source, target);
+    }
+
+    @Override
+    public <T> void addTypeSubstitution(Class<? super T> cls, Class<T> actCls, Supplier<T> creator) {
+        if (null != cls && null != creator) {
+            typeCreators.put(cls, new TypeCreator<T>(actCls, creator));
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> Class<? extends T> getSubstitutedType(Class<T> cls) {
+        TypeCreator<T> regCreator = (TypeCreator<T>) typeCreators.get(cls);
+        return null == regCreator ? cls : (Class<? extends T>) regCreator.getType();
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> Supplier<T> getTypeCreator(Class<T> cls, Supplier<T> creator) {
+        TypeCreator<T> regCreator = (TypeCreator<T>) typeCreators.get(cls);
+        return regCreator == null ? creator : regCreator.getCreator();
+    }
+    
+    @Override
+    public Map<Class<?>, Class<?>> getTypeSubstitutions() {
+        return typeCreators.entrySet().stream().collect(Collectors.toMap(
+            e -> e.getKey(),
+            e -> e.getValue().getType()
+        ));
+    }
+    
+    /**
+     * Represents a type creator with actual type being created.
+     * 
+     * @param <T> the actual type
+     * @author Holger Eichelberger, SSE
+     */
+    private static class TypeCreator<T> {
+        
+        private Class<T> cls;
+        private Supplier<T> creator;
+
+        /**
+         * Creates a type creator instance.
+         * 
+         * @param cls the actual type
+         * @param creator function creating an instance
+         */
+        private TypeCreator(Class<T> cls, Supplier<T> creator) {
+            this.cls = cls;
+            this.creator = creator;
+        }
+        
+        /**
+         * Returns the type being created.
+         * 
+         * @return the type
+         */
+        public Class<?> getType() {
+            return cls;
+        }
+        
+        /**
+         * Returns the creator function.
+         * 
+         * @return the creator function
+         */
+        public Supplier<T> getCreator() {
+            return creator;
+        }
+        
     }
 
 }

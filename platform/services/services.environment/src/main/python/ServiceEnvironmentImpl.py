@@ -104,6 +104,8 @@ def start(a):
         default=None, help='Resolved address of the netMgtKey of the service via the platform network management.')    
     parser.add_argument('--configure', dest='config', action='store', nargs=1, type=str, required=False,
         default="", help='JSON value map to be passed to the service for initial reconfiguration.')
+    parser.add_argument('--subst', dest='subst', action='store', nargs=1, type=str, required=False,
+        default="", help='JSON type-type map to be considered when creating type instances.')
         
     args = parser.parse_args(a)
     consoleMode = len(args.mode) > 0 and args.mode[0]=='console'
@@ -144,6 +146,12 @@ def start(a):
         service = Registry.services.get(sId)
         if service:
             service.reconfigure(json.loads(args.data))
+    
+    typeSubst = str(getArg(args.subst))
+    if len(typeSubst) > 0:
+        tmp = json.loads(typeSubst)
+        for fromType, toType in tmp.items():
+            Registry.typeSubst[fromType] = lambda : createDataInstance(toType)
 
     # register ingestors for types/services
     for (symb,s) in Registry.services.items():
@@ -157,6 +165,13 @@ def start(a):
     else: # currently no alternative, just use console as fallback
         console(a, args.data, sId)
 
+# https://stackoverflow.com/questions/4821104/dynamic-instantiation-from-string-name-of-a-class-in-dynamically-imported-module
+# dynamically creating objects
+def createDataInstance(class_name):
+    module = __import__("datatypes")
+    class_ = getattr(module, class_name)
+    return class_()    
+    
 def getArg(arg):
    if isinstance(arg, list):
        return arg[0]

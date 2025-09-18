@@ -25,6 +25,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -327,6 +328,35 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
             return "{}";
         }
     }
+    
+    /**
+     * Turns a Java data class name to a Python data class name.
+     * 
+     * @param cls the class
+     * @return the simple Python data class name
+     */
+    private static String toPythonDataCls(Class<?> cls) {
+        return cls.getSimpleName();
+    }
+    
+    /**
+     * Returns the type mappings as JSON.
+     * 
+     * @return the type mappings
+     */
+    protected String getTypeSubstitutionsJson() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            Map<String, String> tmp = getTypeSubstitutions().entrySet().stream().collect(Collectors.toMap(
+                e -> toPythonDataCls(e.getKey()),
+                e -> toPythonDataCls(e.getValue())
+                ));
+            return objectMapper.writeValueAsString(tmp);
+        } catch (JsonProcessingException e) {
+            getLogger().error("Translating type mappings to JSON failed: " + e.getMessage());
+            return "{}";
+        }
+    }
 
     /**
      * Creates and customizes the process.
@@ -356,6 +386,8 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
                 args.add("--data");
                 args.add(StringUtils.escapeJava(data)); // quote quotes -> JSON
             } 
+            args.add("--subst");
+            args.add(getTypeSubstitutionsJson());
             File pyExec = getPythonExecutable();
             int unbufferPos = 0; // python -u 
             if ("conda".equals(pyExec.getName())) {
