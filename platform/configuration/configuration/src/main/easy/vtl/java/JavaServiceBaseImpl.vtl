@@ -207,9 +207,10 @@ template JavaServiceBaseImpl(Configuration config, JavaCodeArtifact target, Serv
         for (IOType t: service.output) {
             if (resolveType(t).isTypeOf(RecordType)) {
                 String type = toTypeName(t);
-                mainCls.method(type, "create${type}", "Creates an actual instance of the output type ${type}.")
+                String qType = toQualifiedTypeName(t);
+                mainCls.method(qType, "create${type}", "Creates an actual instance of the output type ${type}.")
                     .return(new JavaCodeMethodCall("createType").classArg(type)
-                        .arg(new JavaCodeLambdaExpression().expr(new JavaCodeConstructorCall("iip.datatypes.${type}${add}"))));
+                        .arg(new JavaCodeLambdaExpression().expr(new JavaCodeConstructorCall(qType + add))));
             }
         }
     }
