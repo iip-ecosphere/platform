@@ -104,7 +104,7 @@ Background:
 Alias types consitute an own type that is essentially based on an existing type while giving this type a new name or refining certain properties. For example, for energy applications it makes sense to define the unit Ampere could as an alias of a double floating point number.
 
 ```
-AliasType AmpereType refines AliasType {
+AliasType AmpereType = {
     name = "Ampere",
     represents = refBy(DoubleType),
     semanticId = "0173-1#05-AAA220#005"

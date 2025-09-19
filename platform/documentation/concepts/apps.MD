@@ -26,6 +26,7 @@ Fields of the 'Application' type.
 | cmdArg |  Command line arguments to be passed to the application on startup. |     |
 | servers |  References to servers belonging to this application. Servers must also be referenced by services requiring individual servers. | {}  |
 | packaging |  Packaging scheme, see [platform handbook](../PlatformHandbook.pdf) Section 3.5.3 | SpringFat |
+| typeSubstitutions | Substitutes given input/output types by refined input/output types, specified in terms of `TypeSubstitution` instances consisting of `fromType` and `toType` | {} |
 
 ## ServiceMesh
 
@@ -82,6 +83,17 @@ Fields of the 'ServiceMesh' type.
 | --- |  --- | --- |
 | name |  The descriptive name of the connector. |     |
 | next |  The mesh element the connector is connecting to. |     |
+
+## Sub-mesh
+
+A sub-mesh represents a partial re-usable mesh, which actually is a service refines (`ServiceBase`) and allows specifying a mesh, which is substituted wherever the sub-mesh is used in a service-mesh. 
+
+A sub-mesh has all fields of `ServiceBase` as well as the following fields:
+
+| Field |  Description | Default |
+| --- |  --- | --- |
+| sources |  `MeshConnector` instances pointing to the source mesh elements of this sub-mesh. |     |
+| pseudoSink | A single sink where outgoing flows connect to. Will be virtually substituted by the outgoing mesh connectors of the referring `MeshElement`. |     |
 
 ### An example of Application IVML file
 
