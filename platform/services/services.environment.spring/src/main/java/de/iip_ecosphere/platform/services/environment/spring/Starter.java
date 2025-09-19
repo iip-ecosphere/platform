@@ -46,6 +46,7 @@ import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
+import de.iip_ecosphere.platform.support.plugins.PluginSetup;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
@@ -112,6 +113,7 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
                     + port);
             }
         }
+        setCmdServerConfigurer(b -> b.forTomcat());
         // start the command server
         try {
             // assuming that deployment.yml variants for testing contain the same service descriptions (modulo 
@@ -268,8 +270,13 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
             ctx = app.run(a);
         });
         registerPlugin("springBroker", new TestSpringBroker());
+        transferArgsToEnvironment(args);
+        
+        loadOktoPlugins();
+        PluginSetup.setClassLoader(Starter.class.getClassLoader());
         PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE); // "local" plugins
-        ResourceLoader.addFilter(u -> !u.toString().endsWith("-tests.jar!/identityStore.yml")); // exclude test JARs
+
+        ResourceLoader.addTestExcludeFilters(); // exclude test JARs
         ResourceLoader.registerResourceResolver(new SpringResourceResolver()); // ensure spring resolution
         final String[] tmpArgs = args;
         setLocalTransportSetupSupplier(setup -> {

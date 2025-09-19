@@ -819,7 +819,7 @@ public class ServicesAas implements AasContributor {
                 Operation op = elt.getOperation(NAME_OP_SVC_SET_STATE);
                 if (null != op) {
                     try {
-                        op.invoke(act.toString());
+                        op.invoke(ServiceState.toString(act));
                     } catch (ExecutionException e) {
                         getLogger().error("Cannot set state for service `{}`: {}", desc.getId(), e.getMessage());
                     }
@@ -831,7 +831,7 @@ public class ServicesAas implements AasContributor {
                 Property prop = elt.getProperty(NAME_PROP_STATE);
                 if (null != prop) {
                     try {
-                        prop.setValue(act.toString());
+                        prop.setValue(ServiceState.toString(act));
                     } catch (ExecutionException e) {
                         getLogger().warn("Cannot write state for service `{}`: {}", desc.getId(), e.getMessage());
                     }
