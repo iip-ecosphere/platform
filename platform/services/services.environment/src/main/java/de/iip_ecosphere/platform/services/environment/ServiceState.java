@@ -192,4 +192,25 @@ public enum ServiceState {
         }
     }
     
+    /**
+     * Turns the given {@code state} to a String.
+     * 
+     * @param state the state to turn into a String, may be <b>null</b>, {@link ServiceState#UNKNOWN} is used then
+     * @return the string representation
+     */
+    public static String toString(ServiceState state) { // move to service.environment?
+        return toString(state, ServiceState.UNKNOWN);
+    }
+
+    /**
+     * Turns the given {@code state} to a String.
+     * 
+     * @param state the state to turn into a String, may be <b>null</b>, {@code state} is used then
+     * @param dflt the default value to use if {@code state} is <b>null</b>
+     * @return the string representation
+     */
+    public static String toString(ServiceState state, ServiceState dflt) {
+        return (null == state ? dflt : state).toString(); 
+    }
+    
 }
