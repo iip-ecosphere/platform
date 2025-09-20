@@ -4,6 +4,9 @@ This folder contains the documentation of the okotflow platform.
 
 * The platform [handbook](PlatformHandbook.pdf)
 * [Install information](INSTALL.md) for own installation, Docker containers and for playing with pre-packaged containers.
+* The oktoflow [FAQ](FAQ.md)
+* The oktoflow [HOW-TO](HOWTO.MD)
+* The oktoflow [concepts documentation](concepts/concepts.MD)
 
 ## Technical Guidelines
 * The technical requirements are documented in [PREREQUISITES](PREREQUISITES.md).
