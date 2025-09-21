@@ -12,10 +12,12 @@
 
 package test.de.iip_ecosphere.platform.support;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 
 import org.junit.Assert;
@@ -127,6 +129,20 @@ public class AbstractSetupTest {
         Assert.assertTrue(AbstractSetup.isNotEmpty("a"));
         Assert.assertFalse(AbstractSetup.isNotEmpty(""));
         Assert.assertFalse(AbstractSetup.isNotEmpty(null));
+    }
+
+    /**
+     * Tests the global plugin folder.
+     */
+    @Test
+    public void testPluginFolder() {
+        String origProp = OsUtils.getPropertyOrEnv(AbstractSetup.PARAM_PLUGINS);
+        Cfg cfg = new Cfg();
+        Assert.assertEquals(null == origProp ? "plugins" : origProp, 
+            cfg.getPluginsFolder().toString()); // assuming that env is not set
+        cfg = new Cfg();
+        cfg.setPluginsFolder(new File("test2"));
+        Assert.assertEquals("test2", cfg.getPluginsFolder().toString());
     }
 
 }

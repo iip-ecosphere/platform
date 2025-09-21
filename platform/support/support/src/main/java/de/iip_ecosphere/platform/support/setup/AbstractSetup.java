@@ -12,12 +12,14 @@
 
 package de.iip_ecosphere.platform.support.setup;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.Map;
 
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.resources.MultiResourceResolver;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
@@ -31,6 +33,8 @@ import de.iip_ecosphere.platform.support.yaml.YamlFile;
  * @author Holger Eichelberger, SSE
  */
 public abstract class AbstractSetup {
+    
+    public static final String PARAM_PLUGINS = "iip.plugins";
     
     /**
      * The name of the default setup file, no extension, no path.
@@ -46,6 +50,26 @@ public abstract class AbstractSetup {
      * Name of the default setup override file with extension (no path).
      */
     public static final String DEFAULT_OVERRIDE_FNAME = "oktoflow-local" + ".yml"; // TODO use DEFAULT_NAME 
+    
+    private File pluginsFolder = new File(OsUtils.getPropertyOrEnv(PARAM_PLUGINS, "plugins"));
+
+    /**
+     * Changes the folder where the oktoflow plugins are located. [yaml convention]
+     * 
+     * @param pluginsFolder the plugins folder
+     */
+    public void setPluginsFolder(File pluginsFolder) {
+        this.pluginsFolder = pluginsFolder;
+    }
+    
+    /**
+     * Returns the folder where the oktoflow plugins are located.
+     * 
+     * @return the folder, by default taken from {@link #PARAM_PLUGINS} (env or sys property), fallback "plugins"
+     */
+    public File getPluginsFolder() {
+        return pluginsFolder;
+    }
     
     /**
      * Reads a configurationfrom {@link #DEFAULT_FNAME} in the  root folder of the JAR/classpath. Unknown properties 
