@@ -12,7 +12,6 @@
 
 package test.de.iip_ecosphere.platform.support;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
@@ -141,7 +140,7 @@ public class AbstractSetupTest {
         Assert.assertEquals(null == origProp ? "plugins" : origProp, 
             cfg.getPluginsFolder().toString()); // assuming that env is not set
         cfg = new Cfg();
-        cfg.setPluginsFolder(new File("test2"));
+        cfg.setPluginsFolder("test2");
         Assert.assertEquals("test2", cfg.getPluginsFolder().toString());
     }
 

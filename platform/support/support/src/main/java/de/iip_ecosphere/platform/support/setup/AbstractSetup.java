@@ -58,10 +58,19 @@ public abstract class AbstractSetup {
      * 
      * @param pluginsFolder the plugins folder
      */
-    public void setPluginsFolder(File pluginsFolder) {
+    public void setPluginsFolder(String pluginsFolder) { // file causes exception in snakeyaml
+        setPluginsFolderFile(null == pluginsFolder ? null : new File(pluginsFolder));
+    }
+
+    /**
+     * Changes the folder where the oktoflow plugins are located. [yaml convention]
+     * 
+     * @param pluginsFolder the plugins folder
+     */
+    public void setPluginsFolderFile(File pluginsFolder) {
         this.pluginsFolder = pluginsFolder;
     }
-    
+
     /**
      * Returns the folder where the oktoflow plugins are located.
      * 
