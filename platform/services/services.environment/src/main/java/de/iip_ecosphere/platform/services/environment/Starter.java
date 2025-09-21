@@ -39,6 +39,7 @@ import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
@@ -62,7 +63,7 @@ public class Starter {
     public static final String PARAM_IIP_PROTOCOL = "iip.protocol";
     public static final String PARAM_IIP_PORT = "iip.port";
     public static final String PARAM_IIP_APP_ID = "iip.appId";
-    public static final String PARAM_IIP_APP_PLUGINS = "iip.plugins";
+    public static final String PARAM_IIP_APP_PLUGINS = AbstractSetup.PARAM_PLUGINS;
     public static final String PARAM_IIP_TRANSPORT_GLOBAL = "iip.transport.global";
     public static final String PARAM_IIP_START_SERVER = "iip.start.server";
     public static final String PARAM_IIP_START_SERVER_ONLY = "iip.start.serverOnly";
