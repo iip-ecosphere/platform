@@ -9,3 +9,7 @@ grafana:
     String: string
     Float: none
     Double: none
+    Display_TimeSeries: timeseries
+    Display_Gauge: gauge
+    Display_BarChart: barchart
+    Display_Table: table

@@ -147,6 +147,14 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, YamlFileArtif
            node.addObject("netMgr").addValueNotEmpty("netmask", aasImplNetmask); // default is ""
        }
     }    
+
+    // added v2->v3    
+    def producePlugins(IIPEcosphere config, YamlNode node) {
+        String pluginsFolder = getStringValueSafe(config.pluginsFolder, getStringValueSafe(config.pluginsFolderDflt, ""));
+        if (pluginsFolder <> "") {
+            node.addValue("pluginsFolder", pluginsFolder);
+        }
+    }    
     
     def produceEcsRuntimeCfg(IIPEcosphere config, YamlFileArtifact target, EcsDevice deviceType) {
         YamlNode n = target.addDocument(true);
@@ -157,6 +165,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, YamlFileArtif
             sequenceOf(String) values = {deviceType.containerName};
             n.addList("artifactInfixes", values);
         }
+        producePlugins(config, n);
     } 
     
     def main(IIPEcosphere config, YamlFileArtifact target, EcsDevice deviceType) {

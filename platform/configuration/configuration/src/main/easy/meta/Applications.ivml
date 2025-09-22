@@ -48,6 +48,9 @@ project Applications {
             setOf(AppPackagingSchema) packaging = { AppPackagingSchema::SpringFat };
             setOf(TypeSubstitution) typeSubstitutions = {};
         }
+        assign (uiGroup = UiInvisibleGroup) to {
+            String derivedFrom = null;
+        }
         
         Constraint idOk = matches(id, "^[^@]+$");
         Constraint packagingOk = packaging.size() >= 1;

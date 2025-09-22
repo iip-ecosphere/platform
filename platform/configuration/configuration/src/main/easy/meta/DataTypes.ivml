@@ -138,7 +138,7 @@ project DataTypes {
     const Integer CACHE_ALWAYS = -1;
     const Integer CACHE_NONE = 0;
     
-    enum Display { TimeSeries, Gauge };
+    enum Display { TimeSeries, Gauge, BarChart, Table };
     
     compound Field {
         assign(bindingTime = BindingTime::specify) to { // may require staged freezing

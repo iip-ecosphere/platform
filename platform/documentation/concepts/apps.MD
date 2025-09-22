@@ -27,6 +27,7 @@ Fields of the 'Application' type.
 | servers |  References to servers belonging to this application. Servers must also be referenced by services requiring individual servers. | {}  |
 | packaging |  Packaging scheme, see [platform handbook](../PlatformHandbook.pdf) Section 3.5.3 | SpringFat |
 | typeSubstitutions | Substitutes given input/output types by refined input/output types, specified in terms of `TypeSubstitution` instances consisting of `fromType` and `toType` | {} |
+| derivedFrom | Name of the template this application is derived from, just as information | null |
 
 ## ServiceMesh
 

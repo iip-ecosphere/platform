@@ -374,7 +374,12 @@ public class IvmlDashboardMapper {
                 displayValue = ((EnumValue) val).getValue().getName();
             }
         }
-        // TODO mapping to grafana??
+        if (displayValue != null) {
+            Object tmp = unitMapping.get("Display_" + displayValue);
+            if (null != tmp) {
+                displayValue = tmp.toString();
+            }
+        }
         return displayValue;
     }
 

@@ -98,6 +98,7 @@ template PlatformYaml(IIPEcosphere config, YamlFileArtifact target, String model
         n.addValue("artifactsUriPrefix", config.artifactsUriPrefix);
         n.addValueNotEmpty("uploadFolder", getStringValueSafe(config.uploadFolder, ""));
         n.addValue("aasHeartbeatTimeout", getIntegerValueSafe(config.deviceHeartbeatTimeout, config.deviceHeartbeatTimeoutDflt));
+        producePlugins(config, n);
     }
 
 }

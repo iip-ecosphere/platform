@@ -24,6 +24,8 @@ project IIPEcosphere {
     String configFolder = null;
     String genTarget = "gen";
     String modelName = "PlatformConfiguration";
+    String pluginsFolderDflt = "plugins";
+    String pluginsFolder = pluginsFolderDflt;
     Boolean containerGeneration = true; // To generate or skip the creation of all containers.
     Boolean platformContainerGeneration = true; // To generate or skip the Platform container creation.
     assign (semanticId = Eclass_Unit_MByte) to {
@@ -65,6 +67,7 @@ project IIPEcosphere {
         instDirDflt;
         javaExeDflt;
         artifactsFolderDflt;
+        pluginsFolderDflt;
         footprintFolderDflt;
         platformPythonDflt;
     }

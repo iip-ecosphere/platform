@@ -7,12 +7,19 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraph;
+import de.iip_ecosphere.platform.configuration.ivml.IvmlGraphMapper.IvmlGraphNode;
+import de.iip_ecosphere.platform.configuration.serviceMesh.ServiceMeshGraphMapper;
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
+import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.uni_hildesheim.sse.ConstraintSyntaxException;
 import de.uni_hildesheim.sse.ModelUtility;
@@ -24,10 +31,12 @@ import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 import net.ssehub.easy.reasoning.core.frontend.ReasonerFrontend;
 import net.ssehub.easy.reasoning.core.reasoner.Message;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
+import net.ssehub.easy.reasoning.sseReasoner.model.SubstitutionVisitor;
 import net.ssehub.easy.varModel.confModel.AssignmentState;
 import net.ssehub.easy.varModel.confModel.ConfigurationException;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.cst.CSTSemanticException;
+import net.ssehub.easy.varModel.cst.ConstantValue;
 import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
 import net.ssehub.easy.varModel.cst.OCLFeatureCall;
 import net.ssehub.easy.varModel.cst.Variable;
@@ -37,16 +46,32 @@ import net.ssehub.easy.varModel.model.Constraint;
 import net.ssehub.easy.varModel.model.ContainableModelElement;
 import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
 import net.ssehub.easy.varModel.model.IvmlDatatypeVisitor;
+import net.ssehub.easy.varModel.model.IvmlModelQuery;
 import net.ssehub.easy.varModel.model.ModelQuery;
 import net.ssehub.easy.varModel.model.ModelQueryException;
 import net.ssehub.easy.varModel.model.Project;
 import net.ssehub.easy.varModel.model.ProjectImport;
+import net.ssehub.easy.varModel.model.datatypes.Compound;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 import net.ssehub.easy.varModel.model.datatypes.OclKeyWords;
 import net.ssehub.easy.varModel.model.datatypes.Reference;
 import net.ssehub.easy.varModel.model.datatypes.Sequence;
+import net.ssehub.easy.varModel.model.values.BooleanValue;
+import net.ssehub.easy.varModel.model.values.CompoundValue;
+import net.ssehub.easy.varModel.model.values.ConstraintValue;
+import net.ssehub.easy.varModel.model.values.ContainerValue;
+import net.ssehub.easy.varModel.model.values.EnumValue;
+import net.ssehub.easy.varModel.model.values.IValueVisitor;
+import net.ssehub.easy.varModel.model.values.IntValue;
+import net.ssehub.easy.varModel.model.values.MetaTypeValue;
+import net.ssehub.easy.varModel.model.values.NullValue;
+import net.ssehub.easy.varModel.model.values.RealValue;
+import net.ssehub.easy.varModel.model.values.ReferenceValue;
+import net.ssehub.easy.varModel.model.values.StringValue;
 import net.ssehub.easy.varModel.model.values.Value;
 import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
+import net.ssehub.easy.varModel.model.values.ValueFactory;
+import net.ssehub.easy.varModel.model.values.VersionValue;
 import net.ssehub.easy.varModel.persistency.IVMLWriter;
 
 /**
@@ -104,8 +129,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      * @throws ExecutionException if writing fails
      */
     protected static void saveTo(Project prj, File file) throws ExecutionException {
-        LoggerFactory.getLogger(AbstractIvmlModifier.class).info("Writing IVML project {} to file {}", 
-            prj.getName(), file);
+        getLogger().info("Writing IVML project {} to file {}", prj.getName(), file);
         file.getParentFile().mkdirs();
         try (FileWriter fWriter = new FileWriter(file)) {
             IVMLWriter writer = new IVMLWriter(fWriter);
@@ -168,7 +192,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      * @throws ExecutionException if creating the variable fails
      */
     public void deleteVariable(String varName) throws ExecutionException {
-        LoggerFactory.getLogger(getClass()).info("Deleting IVML variable {}", varName);
+        getLogger().info("Deleting IVML variable {}", varName);
         net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
         Project root = cfg.getProject();
         try {
@@ -185,7 +209,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                     ReasoningResult res = validateAndPropagate();
                     throwIfFails(res, true);
                     saveTo(prj, getIvmlFile(prj));
-                    LoggerFactory.getLogger(getClass()).info("Deleted IVML variable {}", varName);
+                    getLogger().info("Deleted IVML variable {}", varName);
                 } else {
                     throw new ExecutionException("Project " + prj.getName() + " is not allowed for modification", null);
                 }
@@ -195,6 +219,426 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
         } catch (ModelQueryException e) {
             throw new ExecutionException(e);
         }
+    }
+
+    /**
+     * Returns the IVML variable names representing application templates.
+     * 
+     * @return the IVML variable names as JSON array
+     * @throws ExecutionException if the execution of the operation fails
+     */
+    public String getTemplates() throws ExecutionException {
+        net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
+        Project root = cfg.getProject();
+        List<String> result = IvmlUtils.findTemplates(root)
+            .stream()
+            .map(var -> var.getName())
+            .collect(Collectors.toList());
+        return JsonUtils.toJson(result);
+    }
+    
+    /**
+     * Represents runtime (collected) information steering the template instantiation.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class InstantiationContext {
+        
+        private Map<String, String> adjustments;
+        private Set<Project> modified = new HashSet<>();
+        private Map<AbstractVariable, AbstractVariable> substitutions = new HashMap<>();
+        
+        /**
+         * Creates an instantiation context with given adjustments.
+         * 
+         * @param adjustments the adjustments
+         */
+        private InstantiationContext(Map<String, String> adjustments) {
+            this.adjustments = adjustments;
+        }
+        
+    }
+
+    /**
+     * Instantiates the template by the IVML variable {@code varName} to an application with given {@code appName}.
+     * 
+     * @param varName the name of the IVML variable representing the template
+     * @param appName the (display) name of the application, may be used to derive id/variable name
+     * @param adjustments variable settings, as variable=value or variable.field=value, may be <b>null</b>
+     * @return the IVML variable name of the instantiated application, the list of open variables
+     * @throws ExecutionException if the execution of the operation fails
+     */
+    public String instantiateTemplate(String varName, String appName, Map<String, String> adjustments) 
+        throws ExecutionException {
+        String result = "";
+        getLogger().info("Instantiating template {} to {} with {}", varName, appName, adjustments);
+        if (!isValidIdentifier(appName)) {
+            throw new ExecutionException("'" + appName + "' is not a valid identifier", null);
+        }
+        net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
+        Project root = cfg.getProject();
+        Optional<AbstractVariable> templateVarOpt = IvmlUtils.findTemplates(root)
+            .stream()
+            .filter(var -> var.getName().equals(varName))
+            .findFirst();
+        if (templateVarOpt.isPresent()) {
+            InstantiationContext context = new InstantiationContext(adjustments);
+            try {
+                AbstractVariable templateVar = templateVarOpt.get();
+                IDecisionVariable template = cfg.getDecision(templateVar);
+                IDecisionVariable templateMeshes = template.getNestedElement("services");
+                ServiceMeshGraphMapper mapper = new ServiceMeshGraphMapper();
+                Set<IDecisionVariable> consts = collectConstants(cfg, templateVar.getProject());
+                Set<IDecisionVariable> types = new HashSet<>();
+                Set<IDecisionVariable> services = new HashSet<>();
+                Set<IDecisionVariable> meshes = new HashSet<>();
+                for (int n = 0; n < templateMeshes.getNestedElementsCount(); n++) {
+                    IDecisionVariable mesh = IvmlUtils.dereference(templateMeshes.getNestedElement(n));
+                    meshes.add(mesh);
+                    IvmlGraph graph = mapper.getGraphFor(mesh);
+                    for (IvmlGraphNode node : graph.nodes()) {
+                        IDecisionVariable var = node.getVariable();
+                        IDecisionVariable impl = IvmlUtils.dereference(var.getNestedElement("impl"));
+                        if (null != impl) {
+                            services.add(impl);
+                            collectTypes(impl.getNestedElement("input"), types);
+                            collectTypes(impl.getNestedElement("output"), types);
+                            collectTypes(impl.getNestedElement("inInterface"), types);
+                            collectTypes(impl.getNestedElement("outInterface"), types);
+                        }                        
+                    }
+                }
+                integrateVariables(consts, "AllConstants", context);
+                integrateVariables(types, "AllTypes", context);
+                integrateVariables(services, "AllServices", context);
+                IDecisionVariable tmp;
+                for (IDecisionVariable m: meshes) {
+                    instantiateTemplateVariable(m, "ServiceMesh", m.getDeclaration().getName(), context);
+                }
+                tmp = instantiateTemplateVariable(cfg.getDecision(templateVar), "Application", appName, context);
+                if (null != tmp) {
+                    result = tmp.getDeclaration().getName();
+                    IDecisionVariable derivedFrom = tmp.getNestedElement("derivedFrom");
+                    derivedFrom.setValue(ValueFactory.createValue(
+                        derivedFrom.getDeclaration().getType(), templateVar.getName()), AssignmentState.ASSIGNED);
+                }
+                ReasoningResult res = validateAndPropagate();
+                throwIfFails(res, true);
+                for (Project p: context.modified) {
+                    saveTo(p, getIvmlFile(p));
+                }
+                getLogger().info("Instantiated template {} to {} with {}", varName, appName, adjustments);
+            } catch (ModelQueryException | ConfigurationException | ValueDoesNotMatchTypeException e) {
+                throw new ExecutionException(e);
+            }
+        } else {
+            throw new ExecutionException("Cannot find template " + varName, null);
+        }
+        return result;
+    }
+
+    /**
+     * Collects types that are used in a service/connector {@code var}.
+     * 
+     * @param var the variable to inspect
+     * @param result the types to be modified as a side effect
+     */
+    private void collectTypes(IDecisionVariable var, Set<IDecisionVariable> result) {
+        if (null != var) {
+            for (int n = 0; n < var.getNestedElementsCount(); n++) {
+                IDecisionVariable ioType = var.getNestedElement(n);
+                IDecisionVariable typeRef = ioType.getNestedElement("type");
+                if (null != typeRef) {
+                    result.add(IvmlUtils.dereference(typeRef));
+                }
+            }
+        }
+    }
+    
+    /**
+     * Collects constants in a given project.
+     * 
+     * @param cfg the configuration to resolve decision variables
+     * @param prj the project to scan
+     * @return the identified constants, may be empty
+     */
+    private Set<IDecisionVariable> collectConstants(net.ssehub.easy.varModel.confModel.Configuration cfg, Project prj) {
+        Set<IDecisionVariable> result = new HashSet<>();
+        IvmlUtils.iterElements(prj, AbstractVariable.class, v -> {
+            if (v.isConstant()) {
+                IDecisionVariable decVar = cfg.getDecision(v);
+                if (decVar != null) {
+                    result.add(decVar);
+                }
+            }
+        });
+        return result;
+    }
+    
+    /**
+     * Maps model elements/abstract variables by their name taken from a given project.
+     * 
+     * @param cfg the configuration to resolve decision variables
+     * @param prj the project to scan
+     * @return the identified name-element mappings
+     */
+    private Map<String, IDecisionVariable> mapElementsByName(net.ssehub.easy.varModel.confModel.Configuration cfg, 
+        Project prj) {
+        Map<String, IDecisionVariable> result = new HashMap<>();
+        IvmlUtils.iterElements(prj, AbstractVariable.class, v -> {
+            IDecisionVariable decVar = cfg.getDecision(v);
+            String name = getName(decVar, null); // decVar may be null
+            if (null != name) {
+                result.put(name, decVar);
+            }
+        });
+        return result;
+    }
+
+    /**
+     * Returns the oktoflow element name from a given decision variable.
+     * 
+     * @param var the decision variable
+     * @param dflt the value to take if no name is found
+     * @return the value or {@code dflt}
+     */
+    private static String getName(IDecisionVariable var, String dflt) {
+        String result = dflt;
+        if (null != var) {
+            IDecisionVariable nameVar = var.getNestedElement("name");
+            if (null != nameVar) {
+                Value val = nameVar.getValue();
+                if (val instanceof StringValue) {
+                    result = ((StringValue) val).getValue();
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Integrates given variables {@code vars} into {@code targetPrj}.
+     * 
+     * @param vars the variables
+     * @param targetPrj the target project to integrate the variables into
+     * @param context the instantiation context, to be modified as a side effect
+     * @throws ConfigurationException if setting IVML values fails
+     * @throws ExecutionException if setting IVML values fails
+     */
+    private void integrateVariables(Set<IDecisionVariable> vars, String targetPrj, InstantiationContext context) 
+        throws ConfigurationException, ExecutionException {
+        net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
+        Project root = cfg.getProject();
+        Project target = IvmlModelQuery.findProject(root, targetPrj);
+        Map<String, IDecisionVariable> known = mapElementsByName(cfg, target);
+        for (IDecisionVariable t : vars) {
+            String tName = getName(t, null);
+            if (null != tName && !known.containsKey(tName)) {
+                AbstractVariable tDecl = t.getDeclaration();
+                DecisionVariableDeclaration var = new DecisionVariableDeclaration(tDecl.getName(), 
+                    tDecl.getType(), target);
+                setValue(var, t.getValue(), context);
+                target.addBeforeFreeze(var);
+                IDecisionVariable dVar = cfg.createDecision(var);
+                notifyChange(dVar, ConfigurationChangeType.CREATED);
+                context.substitutions.put(t.getDeclaration(), var);
+                context.modified.add(target);
+            }
+        }
+    }
+    
+    /**
+     * Sets the configured value for {@code var} as {@code val} considering substitutions and adjustments from 
+     * {@code context}.
+     * 
+     * @param var the variable to configure
+     * @param val the (basic) value to set
+     * @param context the context driving the adjustment of individual values
+     * @throws ExecutionException if setting the value fails
+     */
+    private void setValue(DecisionVariableDeclaration var, Value val, InstantiationContext context) 
+        throws ExecutionException {
+        try {
+            ValueAdjustmentVisitor adj = new ValueAdjustmentVisitor(var, context);
+            val.clone().accept(adj);
+            ConstraintSyntaxTree cst = new ConstantValue(val);
+            cst.inferDatatype();
+            var.setValue(cst);
+        } catch (ValueDoesNotMatchTypeException | CSTSemanticException e) {
+            throw new ExecutionException(e.getMessage(), null);
+        }
+    }
+    
+    /**
+     * Applies substitutions and value adjustments to values.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class ValueAdjustmentVisitor implements IValueVisitor {
+        
+        private InstantiationContext context;
+        private Value value;
+        private String nested;
+        
+        /**
+         * Creates a value adjustment visitor.
+         * 
+         * @param var the variable to work on
+         * @param context the instantiation context
+         */
+        private ValueAdjustmentVisitor(AbstractVariable var, InstantiationContext context) {
+            this.context = context;
+            nested = var.getName();
+        }
+
+        @Override
+        public void visitConstraintValue(ConstraintValue value) {
+            try {
+                SubstitutionVisitor vis = new SubstitutionVisitor();
+                for (Map.Entry<AbstractVariable, AbstractVariable> ent : context.substitutions.entrySet()) {
+                    vis.addVariableMapping(ent.getKey(), ent.getValue(), 0);
+                }
+                value.getValue().accept(vis);
+                ConstraintSyntaxTree vr = vis.getResult();
+                this.value = null == vr || vr == value.getValue() ? value 
+                    : ValueFactory.createValue(value.getType(), vr);
+            } catch (ValueDoesNotMatchTypeException e) {
+                getLogger().error("Value does not match: {}", e.getMessage());
+            }
+        }
+
+        @Override
+        public void visitCompoundValue(CompoundValue value) {
+            String origNested = nested;
+            for (String slot : value.getSlotNames()) {
+                nested = origNested + "." + slot;
+                try {
+                    value.getNestedValue(slot).accept(this);
+                    if (context.adjustments != null) {
+                        String adj = context.adjustments.get(nested);
+                        if (null != adj) {
+                            IDatatype slotType = ((Compound) value.getType()).getElement(slot).getType();
+                            this.value = ValueFactory.createValue(slotType, adj);
+                        }
+                    }
+                    value.configureValue(slot, this.value);
+                } catch (ValueDoesNotMatchTypeException e) {
+                    getLogger().error("Value does not match: {}", e.getMessage());
+                }
+            }
+            nested = origNested;
+            this.value = value;
+        }
+
+        @Override
+        public void visitContainerValue(ContainerValue value) {
+            for (int e = 0; e < value.getElementSize(); e++) {
+                value.getElement(e).accept(null);
+                try {
+                    value.setValue(e, this.value);
+                } catch (ValueDoesNotMatchTypeException ex) {
+                    getLogger().error("Value does not match: {}", ex.getMessage());
+                }                
+            }
+            this.value = value;
+        }
+
+        @Override
+        public void visitReferenceValue(ReferenceValue referenceValue) {
+            AbstractVariable var = context.substitutions.get(referenceValue.getValue());
+            if (null != var) {
+                try {
+                    referenceValue.setValue(var);
+                } catch (ValueDoesNotMatchTypeException e) {
+                    getLogger().error("Value does not match: {}", e.getMessage());
+                }                
+            }
+            this.value = referenceValue;
+        }
+
+        @Override
+        public void visitEnumValue(EnumValue value) {
+            this.value = value;
+        }
+
+        @Override
+        public void visitStringValue(StringValue value) {
+            this.value = value;
+        }
+
+        @Override
+        public void visitIntValue(IntValue value) {
+            this.value = value;
+        }
+
+        @Override
+        public void visitRealValue(RealValue value) {
+            this.value = value;
+        }
+
+        @Override
+        public void visitBooleanValue(BooleanValue value) {
+            this.value = value;
+        }
+
+        @Override
+        public void visitMetaTypeValue(MetaTypeValue value) {
+            this.value = value;
+        }
+
+        @Override
+        public void visitNullValue(NullValue value) {
+            this.value = value;
+        }
+
+        @Override
+        public void visitVersionValue(VersionValue value) {
+            this.value = value;
+        }
+        
+    }
+    
+    /**
+     * Instantiates a template application variable.
+     * 
+     * @param templateVar the variable representing the template
+     * @param appName the desired application name
+     * @param context the instantiation context, may be modified as a side effect
+     * @return the IVML variable name of the instantiated application, the list of open variables
+     * @throws ModelQueryException if obtaining IVML types fails
+     * @throws ConfigurationException if setting IVML values fails
+     * @throws ExecutionException if adapting the target project fails
+     */
+    private IDecisionVariable instantiateTemplateVariable(IDecisionVariable decVar, String targetType, String varName, 
+        InstantiationContext context) throws ModelQueryException, ConfigurationException, ExecutionException {
+        IDecisionVariable result = null;
+        String varNameId = toIdentifier(varName);
+        net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
+        Project root = cfg.getProject();
+        IDatatype appType = findType(root, targetType);
+        Project appPrj = adaptTarget(root, getVariableTarget(root, appType));
+        if (null != appType) {
+            DecisionVariableDeclaration var = new DecisionVariableDeclaration(varNameId, appType, appPrj);
+            setValue(var, decVar.getValue(), context);
+            appPrj.addBeforeFreeze(var);
+            result = cfg.createDecision(var);
+            notifyChange(result, ConfigurationChangeType.CREATED);
+            context.modified.add(appPrj);
+        }
+        return result;
+    }
+
+    /**
+     * Returns the names of the IVML variables that still need values in the template represented by the IVML variable 
+     * {@code varName}.
+     * 
+     * @param varName the name of the IVML variable representing the template
+     * @return the open variables as JSON array
+     * @throws ExecutionException if the execution of the operation fails
+     */
+    public String getOpenTemplateVariables(String varName) throws ExecutionException {
+        ReasoningResult res = validateAndPropagate();
+        return JsonUtils.toJson(IvmlUtils.analyzeForTemplate(res, varName));
     }
 
     /**
@@ -228,7 +672,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                 }
             }
             EasyExecutor.printReasoningMessages(res); // preliminary
-            LoggerFactory.getLogger(getClass()).error("Reasoning failed: {}", msg);
+            getLogger().error("Reasoning failed: {}", msg);
             throw new ExecutionException(msg, null);
         }
     }
@@ -350,6 +794,32 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
     }
 
     /**
+     * Renames an IVML variable. [public for testing]
+     * 
+     * @param varName the IVML variable name
+     * @param newVarName the new IVML variable name
+     * @throws ExecutionException if creating the variable fails
+     */
+    public void renameVariable(String varName, String newVarName) throws ExecutionException {
+        getLogger().info("Renaming IVML variable {} to {}", varName, newVarName);
+        net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
+        Project root = cfg.getProject();
+        try {
+            AbstractVariable var = IvmlModelQuery.findVariable(root, varName, null);
+            var.setName(toIdentifier(newVarName));
+            ReasoningResult res = validateAndPropagate();
+            throwIfFails(res, true);
+            Set<Project> projects = IvmlUtils.findProjectsUsingVariable(root, var);
+            for (Project p : projects) {
+                saveTo(p, getIvmlFile(p));
+            }
+            getLogger().info("Renamed IVML variable {} to {}", varName, newVarName);
+        } catch (ModelQueryException e) {
+            throw new ExecutionException(e);
+        }
+    }
+    
+    /**
      * Creates an IVML variable. [public for testing]
      * 
      * @param varName the IVML variable name
@@ -361,7 +831,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
         if (!isValidIdentifier(varName)) {
             throw new ExecutionException("'" + varName + "' is not a valid identifier", null);
         }
-        LoggerFactory.getLogger(getClass()).info("Creating IVML variable {} {} = {};", type, varName, valueEx);
+        getLogger().info("Creating IVML variable {} {} = {};", type, varName, valueEx);
         net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
         Project root = cfg.getProject();
         try {
@@ -381,7 +851,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
             ReasoningResult res = validateAndPropagate();
             throwIfFails(res, true);
             saveTo(target, getIvmlFile(target));
-            LoggerFactory.getLogger(getClass()).info("Created IVML variable {} in {}", varName, target.getName());
+            getLogger().info("Created IVML variable {} in {}", varName, target.getName());
             reservedVariableNames.remove(varName);
         } catch (ModelQueryException | ConfigurationException e) {
             throw new ExecutionException(e);
@@ -533,14 +1003,14 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
             }
             throw new ExecutionException(text, null);*/
         } else {
-            LoggerFactory.getLogger(getClass()).info("Committing IVML changes:");
+            getLogger().info("Committing IVML changes:");
             history.commit();
             Map<Project, CopiedFile> copies = new HashMap<>();
             for (Project p: projects) {
                 File f = getIvmlFile(p);
                 copies.put(p, copyToTmp(f));
                 saveTo(p, f);
-                LoggerFactory.getLogger(getClass()).info(" - Writing IVML file {}", f);
+                getLogger().info(" - Writing IVML file {}", f);
             }
             reloadAndValidate(copies);
         }
@@ -935,6 +1405,15 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
     public static String getType(IDecisionVariable var) {
         IDatatype type = var.getDeclaration().getType();
         return IvmlDatatypeVisitor.getUnqualifiedType(type);
+    }
+    
+    /**
+     * Returns the logger.
+     * 
+     * @return the logger
+     */
+    private static Logger getLogger() {
+        return LoggerFactory.getLogger(AbstractIvmlModifier.class);
     }
 
 }

@@ -105,9 +105,13 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     public static final String OP_GET_VARIABLE_NAME = "getVariableName";
     public static final String OP_CREATE_VARIABLE = "createVariable";
     public static final String OP_DELETE_VARIABLE = "deleteVariable";
+    public static final String OP_RENAME_VARIABLE = "renameVariable";
     public static final String OP_GEN_INTERFACES = "genInterfacesAsync";
     public static final String OP_GEN_APPS_NO_DEPS = "genAppsNoDepsAsync";
     public static final String OP_GEN_APPS = "genAppsAsync";
+    public static final String OP_GET_TEMPLATES = "getTemplates";
+    public static final String OP_INSTANTIATE_TEMPLATE = "instantiateTemplate";
+    public static final String OP_GET_OPEN_TEMPLATE_VARIABLES = "getOpenTemplateVariables";
     
     public static final Predicate<AbstractVariable> FILTER_NO_CONSTRAINT_VARIABLES = 
         v -> !TypeQueries.isConstraint(v.getType());
@@ -355,6 +359,12 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 return null;
             }, getAasOperationCompletedListener())
         );
+        sBuilder.defineOperation(OP_RENAME_VARIABLE, 
+            new JsonResultWrapper(a -> {
+                getAasIvmlMapper().renameVariable(AasUtils.readString(a), AasUtils.readString(a, 1));
+                return null;
+            }, getAasOperationCompletedListener())
+        );
         sBuilder.defineOperation(OP_DELETE_VARIABLE, 
             new JsonResultWrapper(a -> {
                 getAasIvmlMapper().deleteVariable(AasUtils.readString(a));
@@ -384,7 +394,35 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                     , a);
             })
         );
+        bindTemplateOperations(sBuilder);
     }
+    
+    /**
+     * Binds the AAS template operations (ensure static lambda functions).
+     * 
+     * @param sBuilder the server builder
+     */
+    private static void bindTemplateOperations(ProtocolServerBuilder sBuilder) {
+        sBuilder.defineOperation(OP_GET_TEMPLATES, 
+            new JsonResultWrapper(a -> {
+                getAasIvmlMapper().getTemplates();
+                return null;
+            }, getAasOperationCompletedListener())
+        );
+        sBuilder.defineOperation(OP_INSTANTIATE_TEMPLATE, 
+            new JsonResultWrapper(a -> {
+                getAasIvmlMapper().instantiateTemplate(AasUtils.readString(a), AasUtils.readString(a, 1), 
+                    AasUtils.readMap(a, 1, null));
+                return null;
+            }, getAasOperationCompletedListener())
+        );
+        sBuilder.defineOperation(OP_GET_OPEN_TEMPLATE_VARIABLES, 
+            new JsonResultWrapper(a -> {
+                getAasIvmlMapper().getOpenTemplateVariables(AasUtils.readString(a));
+                return null;
+            }, getAasOperationCompletedListener())
+        );
+    }    
     
     /**
      * Instantiates according to the given {@code configurer}.
@@ -1227,6 +1265,11 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             .addInputVariable("valExpr", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_CREATE_VARIABLE))
             .build(aDesc);
+        smBuilder.createOperationBuilder(OP_RENAME_VARIABLE)
+            .addInputVariable("varName", Type.STRING)
+            .addInputVariable("newVarName", Type.STRING)
+            .setInvocable(iCreator.createInvocable(OP_RENAME_VARIABLE))
+            .build(aDesc);
         smBuilder.createOperationBuilder(OP_DELETE_VARIABLE)
             .addInputVariable("varName", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_DELETE_VARIABLE))
@@ -1242,6 +1285,19 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             .build(Type.STRING, aDesc);
         smBuilder.createOperationBuilder(OP_GEN_INTERFACES)
             .setInvocable(iCreator.createInvocable(OP_GEN_INTERFACES))
+            .build(Type.STRING, aDesc);
+
+        smBuilder.createOperationBuilder(OP_GET_TEMPLATES)
+            .setInvocable(iCreator.createInvocable(OP_GET_TEMPLATES))
+            .build(Type.STRING, aDesc);
+        smBuilder.createOperationBuilder(OP_INSTANTIATE_TEMPLATE)
+            .setInvocable(iCreator.createInvocable(OP_INSTANTIATE_TEMPLATE))
+            .addInputVariable("varName", Type.STRING)
+            .addInputVariable("appName", Type.STRING)
+            .build(Type.STRING, aDesc);
+        smBuilder.createOperationBuilder(OP_GET_OPEN_TEMPLATE_VARIABLES)
+            .setInvocable(iCreator.createInvocable(OP_GET_OPEN_TEMPLATE_VARIABLES))
+            .addInputVariable("varName", Type.STRING)
             .build(Type.STRING, aDesc);
     }
     
