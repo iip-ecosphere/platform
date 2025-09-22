@@ -835,7 +835,10 @@ public class Starter {
             File plugins = new File(pluginParent, "plugins");
             if (!plugins.isDirectory()) { // testing fallback
                 plugins = new File(pluginParent, "oktoPlugins");
-            }
+                if (!plugins.isDirectory()) {
+                    plugins = pluginParent;
+                }
+            } 
             LoggerFactory.getLogger(Starter.class).info("Using {} as oktoflow plugin directory", plugins);
             if (plugins.isDirectory()) {
                 LoggerFactory.getLogger(Starter.class).info("Trying to load oktoflow plugins from {}", plugins);

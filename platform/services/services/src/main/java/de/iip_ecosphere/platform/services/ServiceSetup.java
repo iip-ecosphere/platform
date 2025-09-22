@@ -12,13 +12,16 @@
 
 package de.iip_ecosphere.platform.services;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 import de.iip_ecosphere.platform.support.setup.EnableSetupMerge;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
@@ -38,6 +41,7 @@ public class ServiceSetup {
     private NetworkManagerSetup netMgr = new NetworkManagerSetup();
     private List<String> serviceCmdArgs = new ArrayList<>();
     private List<String> supportedAppIds = initialSupportedAppIds();
+    private String pluginsFolder = OsUtils.getPropertyOrEnv(AbstractSetup.PARAM_PLUGINS, "plugins");
 
     /**
      * Tries to read the supported App ids from {@link #PROPERTY_SUPPORTED_APPIDS} as environment variable or
@@ -59,7 +63,35 @@ public class ServiceSetup {
         }
         return result;
     }
-    
+
+    /**
+     * Changes the (parent) folder where the oktoflow plugins are located. [yaml convention]
+     * 
+     * @param pluginsFolder the plugins folder
+     */
+    public void setPluginsFolder(String pluginsFolder) { // file causes exception in snakeyaml
+        this.pluginsFolder = pluginsFolder;
+    }
+
+    /**
+     * Changes the (parent) folder where the oktoflow plugins are located. [yaml convention]
+     * 
+     * @param pluginsFolder the plugins folder
+     */
+    public void setPluginsFolderFile(File pluginsFolder) {
+        setPluginsFolder(null == pluginsFolder ? null : pluginsFolder.toString());
+    }
+
+    /**
+     * Returns the (parent) folder where the oktoflow plugins are located (the folder itself or by default 
+     * its sub-folders "plugins" or "oktoPlugins").
+     * 
+     * @return the folder, by default taken from {@link #PARAM_PLUGINS} (env or sys property), fallback "plugins"
+     */
+    public String getPluginsFolder() {
+        return pluginsFolder;
+    }
+
     /**
      * Returns the AAS setup.
      * 

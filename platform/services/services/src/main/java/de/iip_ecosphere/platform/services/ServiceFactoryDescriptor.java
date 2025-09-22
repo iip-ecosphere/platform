@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.services;
 
 import java.util.Optional;
+import java.util.ServiceLoader;
 
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
@@ -64,7 +65,10 @@ public interface ServiceFactoryDescriptor {
      */
     public default Class<?>[] getTests(int index) {
         Class<?>[] result = null;
-        Optional<TestProviderDescriptor> desc = ServiceLoaderUtils.findFirst(TestProviderDescriptor.class);
+        // be careful, usually not the app/context classloader
+        ServiceLoader<TestProviderDescriptor> serviceLoader = ServiceLoader.load(
+            TestProviderDescriptor.class, getClass().getClassLoader()); 
+        Optional<TestProviderDescriptor> desc = ServiceLoaderUtils.findFirst(serviceLoader);
         if (desc.isPresent()) {
             result = desc.get().getTests(index);
         }

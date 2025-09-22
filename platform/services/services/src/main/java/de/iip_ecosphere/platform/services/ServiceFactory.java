@@ -20,6 +20,8 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
+import de.iip_ecosphere.platform.support.plugins.Plugin;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
@@ -44,12 +46,18 @@ public class ServiceFactory {
      */
     private static void init() {
         if (null == desc) {
-            ServiceLoader<ServiceFactoryDescriptor> loader = ServiceLoader.load(ServiceFactoryDescriptor.class);
-            Optional<ServiceFactoryDescriptor> first = ServiceLoaderUtils.findFirst(loader);
-            if (first.isPresent()) {
-                desc = first.get();
-            } else {
-                LOGGER.warn("No Service manager implementation known.");
+            Plugin<ServiceFactoryDescriptor> plugin =  PluginManager.getPlugin(ServiceFactoryDescriptor.class);
+            if (null != plugin) {
+                desc = plugin.getInstance();
+            }
+            if (null == desc) {
+                ServiceLoader<ServiceFactoryDescriptor> loader = ServiceLoader.load(ServiceFactoryDescriptor.class);
+                Optional<ServiceFactoryDescriptor> first = ServiceLoaderUtils.findFirst(loader);
+                if (first.isPresent()) {
+                    desc = first.get();
+                } else {
+                    LOGGER.warn("No Service manager implementation known.");
+                }
             }
         }
     }

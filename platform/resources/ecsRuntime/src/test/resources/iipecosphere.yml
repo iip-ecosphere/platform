@@ -9,3 +9,4 @@ autoOnOffboarding: true
 artifactInfixes:
     - plcnext
     - -other
+pluginsFolder: plugins

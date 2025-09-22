@@ -18,7 +18,7 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.services.ServiceFactory;
 
 /**
- * Tests {@link ServiceFactory#getTest(int)} via {@link TestProviderDescriptor}.
+ * Tests {@link ServiceFactory#getTests(int)} via {@link TestProviderDescriptor}.
  * 
  * @author Holger Eichelberger, SSE
  */
