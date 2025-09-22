@@ -582,16 +582,38 @@
         <version>${project.version}</version>
     </dependency>
     <dependency>
+        <artifactId>ecsRuntime.docker</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>    
+    <dependency>
         <artifactId>ecsRuntime.lxc</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>
-    <!-- not part of 0.5 release -> check whether all Mvn artifacts are created
+    <dependency>
+        <artifactId>ecsRuntime.lxc</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>    
+    <!-- not part of release -> check whether all Mvn artifacts are created
     <dependency>
         <artifactId>ecsRuntime.kubernetes</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
-    </dependency>-->
+    </dependency>
+    <dependency>
+        <artifactId>ecsRuntime.kubernetes</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>    
+    -->
 
     <dependency>
         <artifactId>deviceMgt</artifactId>
@@ -604,7 +626,26 @@
         <version>${project.version}</version>
     </dependency>
     <dependency>
+        <artifactId>deviceMgt.basicRegistry</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>    
+    <dependency>
         <artifactId>deviceMgt.minio</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>deviceMgt.minio</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>    
+    <dependency>
+        <artifactId>deviceMgt.s3mock</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>
@@ -612,7 +653,9 @@
         <artifactId>deviceMgt.s3mock</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
-    </dependency>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>    
     <dependency>
         <artifactId>deviceMgt.thingsboard</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
@@ -624,6 +667,13 @@
         	</exclusion>
         </exclusions>
     </dependency>
+    <dependency>
+        <artifactId>deviceMgt.thingsboard</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>    
 
     <dependency>
         <artifactId>monitoring</artifactId>
@@ -635,6 +685,13 @@
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>
     </dependency>
+    <dependency>
+        <artifactId>monitoring.prometheus</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>    
      
    <dependency>
         <artifactId>platform</artifactId>

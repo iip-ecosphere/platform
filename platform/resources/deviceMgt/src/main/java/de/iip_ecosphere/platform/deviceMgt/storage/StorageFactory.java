@@ -16,6 +16,8 @@ import de.iip_ecosphere.platform.deviceMgt.DeviceMgtSetup;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.plugins.Plugin;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -89,12 +91,17 @@ public class StorageFactory {
      */
     private void initDesc() {
         if (desc == null) {
-            Optional<StorageFactoryDescriptor> storageFactoryDescriptors =
-                    ServiceLoaderUtils.findFirst(StorageFactoryDescriptor.class);
-            if (storageFactoryDescriptors.isPresent()) {
-                desc = storageFactoryDescriptors.get();
+            Plugin<StorageFactoryDescriptor> plugin = PluginManager.getPlugin(StorageFactoryDescriptor.class);
+            if (null != plugin) {
+                desc = plugin.getInstance();
             } else {
-                LOGGER.info("No StorageFactoryDescriptor implementation available");
+                Optional<StorageFactoryDescriptor> storageFactoryDescriptors =
+                    ServiceLoaderUtils.findFirst(StorageFactoryDescriptor.class);
+                if (storageFactoryDescriptors.isPresent()) {
+                    desc = storageFactoryDescriptors.get();
+                } else {
+                    LOGGER.info("No StorageFactoryDescriptor implementation available");
+                }
             }
         }
     }

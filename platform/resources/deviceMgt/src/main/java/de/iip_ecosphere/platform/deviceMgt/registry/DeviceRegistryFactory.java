@@ -15,6 +15,8 @@ package de.iip_ecosphere.platform.deviceMgt.registry;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.plugins.Plugin;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
 import java.util.Optional;
 
@@ -39,12 +41,18 @@ public class DeviceRegistryFactory {
      */
     public static DeviceRegistry getDeviceRegistry() {
         if (null == desc) {
-            Optional<DeviceRegistryFactoryDescriptor> first = ServiceLoaderUtils
-                    .findFirst(DeviceRegistryFactoryDescriptor.class);
-            if (first.isPresent()) {
-                desc = first.get();
+            Plugin<DeviceRegistryFactoryDescriptor> plugin 
+                = PluginManager.getPlugin(DeviceRegistryFactoryDescriptor.class);
+            if (null != plugin) {
+                desc = plugin.getInstance();
             } else {
-                LOGGER.warn("No Device Registry implementation available.");
+                Optional<DeviceRegistryFactoryDescriptor> first = ServiceLoaderUtils
+                        .findFirst(DeviceRegistryFactoryDescriptor.class);
+                if (first.isPresent()) {
+                    desc = first.get();
+                } else {
+                    LOGGER.warn("No Device Registry implementation available.");
+                }
             }
         }
 

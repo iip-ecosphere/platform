@@ -14,13 +14,27 @@ package de.iip_ecosphere.platform.deviceMgt.basicReg;
 
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistry;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryFactoryDescriptor;
+import de.iip_ecosphere.platform.support.plugins.SingletonPluginDescriptor;
 
 /**
  * The factory registry descriptor.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class BasicRegistryDeviceRegistryFactoryDescriptor implements DeviceRegistryFactoryDescriptor {
+public class BasicRegistryDeviceRegistryFactoryDescriptor 
+    extends SingletonPluginDescriptor<DeviceRegistry> implements DeviceRegistryFactoryDescriptor {
+
+    /**
+     * Creates the instance via JSL.
+     */
+    public BasicRegistryDeviceRegistryFactoryDescriptor() {
+        super(PLUGIN_ID, null, DeviceRegistry.class, null);
+    }
+    
+    @Override
+    protected PluginSupplier<DeviceRegistry> initPluginSupplier(PluginSupplier<DeviceRegistry> pluginSupplier) {
+        return p -> createDeviceRegistryInstance();
+    }
 
     @Override
     public DeviceRegistry createDeviceRegistryInstance() {

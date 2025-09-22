@@ -25,6 +25,7 @@ import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.identities.IdentityToken.TokenType;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.plugins.SingletonPluginDescriptor;
 
 /**
  * A S3StorageFactoryDescriptor is a service provider for
@@ -34,8 +35,22 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
  * @author Dennis Pidun, University of Hildesheim
  * @author Holger Eichelberger, SSE
  */
-public class S3StorageFactoryDescriptor implements StorageFactoryDescriptor {
+public class S3StorageFactoryDescriptor extends SingletonPluginDescriptor<StorageFactoryDescriptor> 
+    implements StorageFactoryDescriptor {
 
+    /**
+     * Creates the instance via JSL.
+     */
+    public S3StorageFactoryDescriptor() {
+        super(PLUGIN_ID, null, StorageFactoryDescriptor.class, null);
+    }
+    
+    @Override
+    protected PluginSupplier<StorageFactoryDescriptor> initPluginSupplier(
+        PluginSupplier<StorageFactoryDescriptor> pluginSupplier) {
+        return p -> this;
+    }      
+    
     @Override
     public Storage createPackageStorage(PackageStorageSetup storageSetup) {
         if (null == storageSetup) {

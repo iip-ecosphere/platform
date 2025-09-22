@@ -20,6 +20,8 @@ import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.plugins.Plugin;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
 /**
  * Provides access to the ECS instances.
@@ -38,12 +40,17 @@ public class EcsFactory {
      */
     private static void init() {
         if (null == desc) {
-            ServiceLoader<EcsFactoryDescriptor> loader = ServiceLoader.load(EcsFactoryDescriptor.class);
-            Optional<EcsFactoryDescriptor> first = ServiceLoaderUtils.findFirst(loader);
-            if (first.isPresent()) {
-                desc = first.get();
+            Plugin<EcsFactoryDescriptor> plugin = PluginManager.getPlugin(EcsFactoryDescriptor.class);
+            if (null != plugin) {
+                desc = plugin.getInstance();
             } else {
-                LOGGER.info("No container manager available. No container operations offered in AAS.");
+                ServiceLoader<EcsFactoryDescriptor> loader = ServiceLoader.load(EcsFactoryDescriptor.class);
+                Optional<EcsFactoryDescriptor> first = ServiceLoaderUtils.findFirst(loader);
+                if (first.isPresent()) {
+                    desc = first.get();
+                } else {
+                    LOGGER.info("No container manager available. No container operations offered in AAS.");
+                }
             }
         }
         if (null == conf) {

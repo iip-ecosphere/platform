@@ -19,10 +19,13 @@ package de.iip_ecosphere.platform.deviceMgt.registry;
  * @author Dennis Pidun, University of Hildesheim
  */
 public interface DeviceRegistryFactoryDescriptor {
+    
+    public static final String PLUGIN_ID = "deviceMgt";
 
     /**
      * Create a new DeviceRegistry instance.
      * @return a new {@link DeviceRegistry}
      */
     public DeviceRegistry createDeviceRegistryInstance();
+    
 }
