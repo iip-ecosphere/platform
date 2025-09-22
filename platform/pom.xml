@@ -113,8 +113,6 @@
      <module>examples/examples.templates</module>
      <module>examples/examples.MIP</module>
      <module>examples/examples.vdw</module>
-     <module>examples/examples.hm22</module>
-     <module>examples/examples.emo23</module>
   </modules>
 
 </project>
