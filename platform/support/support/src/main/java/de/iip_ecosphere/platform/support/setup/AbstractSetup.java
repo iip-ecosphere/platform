@@ -51,37 +51,38 @@ public abstract class AbstractSetup {
      */
     public static final String DEFAULT_OVERRIDE_FNAME = "oktoflow-local" + ".yml"; // TODO use DEFAULT_NAME 
     
-    private File pluginsFolder = new File(OsUtils.getPropertyOrEnv(PARAM_PLUGINS, "plugins"));
+    private String pluginsFolder = OsUtils.getPropertyOrEnv(PARAM_PLUGINS, "plugins");
 
     /**
-     * Changes the folder where the oktoflow plugins are located. [yaml convention]
+     * Changes the (parent) folder where the oktoflow plugins are located. [yaml convention]
      * 
      * @param pluginsFolder the plugins folder
      */
     public void setPluginsFolder(String pluginsFolder) { // file causes exception in snakeyaml
-        setPluginsFolderFile(null == pluginsFolder ? null : new File(pluginsFolder));
-    }
-
-    /**
-     * Changes the folder where the oktoflow plugins are located. [yaml convention]
-     * 
-     * @param pluginsFolder the plugins folder
-     */
-    public void setPluginsFolderFile(File pluginsFolder) {
         this.pluginsFolder = pluginsFolder;
     }
 
     /**
-     * Returns the folder where the oktoflow plugins are located.
+     * Changes the (parent) folder where the oktoflow plugins are located. [yaml convention]
+     * 
+     * @param pluginsFolder the plugins folder
+     */
+    public void setPluginsFolderFile(File pluginsFolder) {
+        setPluginsFolder(null == pluginsFolder ? null : pluginsFolder.toString());
+    }
+
+    /**
+     * Returns the (parent) folder where the oktoflow plugins are located (the folder itself or by default 
+     * its sub-folders "plugins" or "oktoPlugins").
      * 
      * @return the folder, by default taken from {@link #PARAM_PLUGINS} (env or sys property), fallback "plugins"
      */
-    public File getPluginsFolder() {
+    public String getPluginsFolder() {
         return pluginsFolder;
     }
-    
+
     /**
-     * Reads a configurationfrom {@link #DEFAULT_FNAME} in the  root folder of the JAR/classpath. Unknown properties 
+     * Reads a configuration from {@link #DEFAULT_FNAME} in the  root folder of the JAR/classpath. Unknown properties 
      * are ignored.
      *
      * @param <C> the specific type of configuration to read
