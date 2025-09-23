@@ -208,6 +208,8 @@ In the basic version, for testing, use
                                 <appends> <!-- complement the plugin, add the platform logging -->
                                    <append>log-slf4j-simple</append>
                                 </appends>                                
+                                <asTest>false</asTest>
+                                <setupDescriptor>FolderClasspaht</setupDescriptor>
                             </plugin>
                             <plugin>
                                 <name>support.aas.basyx</name>
@@ -225,7 +227,7 @@ In the basic version, for testing, use
   </build>
   ```
 
-for installation just add `<relocate>true</relocate>` to the `configuration`. The `plugins` are extended `ArtifactItems` which you may use instead. However, a `plugin` allows a more concise notation as we set up the `version` to the global `version` in `configuration`, the `type` to `zip`, the `classifier` to `plugin`, `overWrite` to `true` and `outputDirectory` to `${project.build.directory}/oktoPlugins`. If in a `plugin` the `groupId` is not given, we set it automatically to `de.iip-ecosphere.platform`. A plugin may have `appends`, simple names of previously unpacked plugins that shall be merged in given sequence in the classpath of the actual plugin, e.g., to include intentionally excluded plugins, such as logging, which is decided/merged into for platform services/applications by the platform instantiation. Takes into account the prefix path and the unpack mode written by the `build-plugin-classpath` plugin. 
+for installation just add `<relocate>true</relocate>` to the `configuration`. The `plugins` are extended `ArtifactItems` which you may use instead. However, a `plugin` allows a more concise notation as we set up the `version` to the global `version` in `configuration`, the `type` to `zip`, the `classifier` to `plugin`, `overWrite` to `true` and `outputDirectory` to `${project.build.directory}/oktoPlugins`. If in a `plugin` the `groupId` is not given, we set it automatically to `de.iip-ecosphere.platform`. A plugin may have `appends`, simple names of previously unpacked plugins that shall be merged in given sequence in the classpath of the actual plugin, e.g., to include intentionally excluded plugins, such as logging, which is decided/merged into for platform services/applications by the platform instantiation. Takes into account the prefix path and the unpack mode written by the `build-plugin-classpath` plugin. Further, a plugin may be just a test dependency (`asTest`, default `false`) or specify an overwriting `setupDescriptor` (default as packaged).
 
 The sequence of the plguins as given in the POM execution configuration is taken as initial sequence for loading the plugins.
 

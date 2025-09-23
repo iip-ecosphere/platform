@@ -116,6 +116,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         @Parameter(required = false) 
         private List<String> appends;
         private boolean asTest;
+        private String setupDescriptor;
         
         /**
          * Returns whether this item has appends.
@@ -124,6 +125,15 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
          */
         private boolean hasAppends() {
             return null != appends && !appends.isEmpty();
+        }
+
+        /**
+         * Returns whether this item has a setupDescriptor.
+         * 
+         * @return {@code true} for setupDescriptor, {@code false} else
+         */
+        private boolean hasSetupDescriptor() {
+            return null != setupDescriptor && setupDescriptor.length() > 0;
         }
 
     }
@@ -219,6 +229,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
 
         super.doExecute();
         
+        handleSetupDescriptors();
         if (skipIfExists() == null || !skipIfExists().exists()) {
             handleAppends();
         } else {
@@ -285,6 +296,39 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             }
         }
     }
+
+    /**
+     * Handles explicit setup descriptors by rewriting the classpath files.
+     */
+    private void handleSetupDescriptors() {
+        for (PluginItem pl : plugins) {
+            if (pl.hasSetupDescriptor()) {
+                String name = pl.getArtifactId();
+                File cpFile = getCpFile(name);
+                List<String> contents = null;
+                try (FileInputStream fis = new FileInputStream(cpFile)) {
+                    contents = IOUtils.readLines(fis, Charset.defaultCharset());
+                    for (int l = 0; l < contents.size(); l++) {
+                        String line = contents.get(l);
+                        if (line.startsWith(BuildPluginClasspathMojo.KEY_SETUP_DESCRIPTOR)) {
+                            contents.set(l, BuildPluginClasspathMojo.KEY_SETUP_DESCRIPTOR + pl.setupDescriptor);
+                        }
+                    }
+                } catch (IOException e) {
+                    getLog().error("Cannot read plugin '" + name + "' - ignoring: " + e.getMessage());
+                }
+                if (null != contents) {
+                    try (FileOutputStream fos = new FileOutputStream(cpFile)) {
+                        // Linux LF by default for plugin classpaths
+                        IOUtils.writeLines(contents, "\n", fos, Charset.defaultCharset());
+                    } catch (IOException e) {
+                        getLog().error("Cannot read plugin '" + name + "' - ignoring: " + e.getMessage());
+                    }
+                }
+            }
+        } 
+    }
+
     
     /**
      * Merges files from {@code src} into {@code tgt} by only copying those that do not already exist.
