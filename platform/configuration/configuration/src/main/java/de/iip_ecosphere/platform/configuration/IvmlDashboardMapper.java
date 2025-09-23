@@ -221,7 +221,7 @@ public class IvmlDashboardMapper {
                     result.add(row);
                     row.name = name;
                     row.displayName = IvmlUtils.getStringValue(element, "displayName", null);
-                    row.id = "row-" + result.size();
+                    row.id = factory.fixId("row_" + result.size());
                 }
             }
         }
@@ -273,7 +273,7 @@ public class IvmlDashboardMapper {
         for (DisplayRow row : displayRows) {
             SubmodelElementCollectionBuilder rowB = rowsB.createSubmodelElementCollectionBuilder(row.id);
             createProperty(rowB, "id", Type.STRING, row.id, "Unique id of display row");
-            createProperty(rowB, "name", Type.STRING, row.id, "Name of display row");
+            createProperty(rowB, "name", Type.STRING, row.name, "Name of display row");
             createProperty(rowB, "displayName", Type.STRING, row.displayName, "Display name of display row");
             rowB.build();
         }
@@ -332,7 +332,7 @@ public class IvmlDashboardMapper {
      * @return the database uid
      */
     private String processDb(IDecisionVariable impl, ConnectorInfo connInfo, SubmodelElementCollectionBuilder dbsB) {
-        String uid = connInfo.name.replace(" ", "_");
+        String uid = factory.fixId(connInfo.name.replace(" ", "_"));
         SubmodelElementCollectionBuilder dbB = dbsB.createSubmodelElementCollectionBuilder(uid);
         createProperty(dbB, "uid", Type.STRING, uid, "InfluxDB uid"); 
         if (isNotBlank(connInfo.host)) {
@@ -669,7 +669,7 @@ public class IvmlDashboardMapper {
     /**
      * Turns a panel legend into AAS.
      * 
-     * @param position the position
+     * @param legend the legend
      * @param panelB the parent builder
      */
     private void processLegend(Legend legend, SubmodelElementCollectionBuilder panelB) {
@@ -739,7 +739,6 @@ public class IvmlDashboardMapper {
      * Main functionality without returning exit code/output of help for re-use. Could be with explicit parameters...
      * 
      * @param args command line arguments
-     * @return the exit code
      * @throws ExecutionException in case that the VIL instantiation fails, shall not occur here as handled by 
      *     default {@link InstantiationConfigurer}
      * @throws IOException if files cannot be located/written

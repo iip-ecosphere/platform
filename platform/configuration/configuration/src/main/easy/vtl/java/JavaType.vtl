@@ -87,6 +87,11 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
     def String genHashCode(String access, ArrayType type, Boolean optional) {
         genHashCodeObject(access, optional);
     }
+
+    @DispatchCase
+    def String genHashCode(String access, ListType type, Boolean optional) {
+        genHashCodeObject(access, optional);
+    }
     
     def String genHashCodeObject(String access, Boolean optional) {
         "${access} != null ? ${access}.hashCode() : 0";

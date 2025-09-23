@@ -601,8 +601,9 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
     /**
      * Instantiates a template application variable.
      * 
-     * @param templateVar the variable representing the template
-     * @param appName the desired application name
+     * @param decVar the variable representing the template
+     * @param targetType target type of the variable
+     * @param varName the name of the variable to create/instantiate
      * @param context the instantiation context, may be modified as a side effect
      * @return the IVML variable name of the instantiated application, the list of open variables
      * @throws ModelQueryException if obtaining IVML types fails

@@ -285,7 +285,8 @@ public class IvmlUtils {
      * Analyzes/prints the relevant information from reasoning messages.
      * 
      * @param res the reasoning result to print
-     * @param includeWarnings shall warnings be included
+     * @param emitWarnings shall warnings be emitted
+     * @param emitMessages shall messages be emitted
      * @return {@code true} for conflict, {@code false} for ok
      */
     public static boolean analyzeReasoningResult(ReasoningResult res, boolean emitWarnings, boolean emitMessages) {
