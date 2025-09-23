@@ -153,6 +153,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         projectMap.put("Manufacturer", PRJ_NAME_ALLSERVICES);
         projectMap.put("Dependency", PRJ_NAME_ALLSERVICES);
         projectMap.put("DataType", PRJ_NAME_ALLTYPES);
+        projectMap.put("DisplayRow", PRJ_NAME_ALLTYPES);
+        projectMap.put("AliasType", PRJ_NAME_ALLTYPES);
         PROJECT_MAPPING = Collections.unmodifiableMap(projectMap);
     }
     

@@ -66,6 +66,7 @@ Fields of the `AuthenticationSettings` type:
 | Field | Description | Default |
 | --- | --- | --- |
 | authenticationKey | Mandatory: Identity store key indicating the identification token to be used. Must not be empty. |     |
+| enableTokenExport | Optional setting whether the referenced identity token may be exported, e.g., to create a UI. |  false   |
 
  The `SecuritySettings` compound type extends the authentication settings compound by specifying a keystore to be used for TLS encryption. As connectors or the transport setup usually defines a configuration variable based on AuthenticationSettings, applying security settings typically looks as follows:
 

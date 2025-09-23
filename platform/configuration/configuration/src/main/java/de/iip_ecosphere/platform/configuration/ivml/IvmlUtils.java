@@ -137,7 +137,31 @@ public class IvmlUtils {
     public static String getStringValue(IDecisionVariable var, String nested, String deflt) {
         return getStringValue(null == var ? null : var.getNestedElement(nested), deflt);
     }
-    
+
+    /**
+     * Returns an int value of the {@code nested} field of {@code var}.
+     * 
+     * @param var the variable (may be <b>null</b>)
+     * @param nested the nested field to take the value from
+     * @param deflt the default value to return if no value can be obtained
+     * @return the value or {@code deflt}
+     */
+    public static int getIntValue(IDecisionVariable var, String nested, int deflt) {
+        return getIntValue(null == var ? null : var.getNestedElement(nested), deflt);
+    }
+
+    /**
+     * Returns a Boolean value of the {@code nested} field of {@code var}.
+     * 
+     * @param var the variable (may be <b>null</b>)
+     * @param nested the nested field to take the value from
+     * @param deflt the default value to return if no value can be obtained
+     * @return the value or {@code deflt}
+     */
+    public static boolean getBooleanValue(IDecisionVariable var, String nested, boolean deflt) {
+        return getBooleanValue(null == var ? null : var.getNestedElement(nested), deflt);
+    }
+
     /**
      * Returns an enum value from the given {@code var}.
      * 

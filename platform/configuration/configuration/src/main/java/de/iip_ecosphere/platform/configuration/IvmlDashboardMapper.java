@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.configuration.PlatformInstantiator.InstantiationConfigurer;
@@ -36,12 +37,15 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.identities.IdentityStore;
+import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.iip_aas.IipVersion;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.plugins.FolderClasspathPluginSetupDescriptor;
 import de.iip_ecosphere.platform.support.plugins.Plugin;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
+import de.iip_ecosphere.platform.support.resources.MavenResourceResolver;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.yaml.Yaml;
 import net.ssehub.easy.varModel.confModel.Configuration;
@@ -62,9 +66,11 @@ import net.ssehub.easy.varModel.model.values.Value;
  */
 public class IvmlDashboardMapper {
 
+    private File projectFolder;
     private AasFactory factory;
     private Map<String, Object> unitMapping;
     private String targetMapping = "grafana";
+    private List<DisplayRow> displayRows;
     
     private transient String appName;
     private transient String appId;
@@ -78,7 +84,8 @@ public class IvmlDashboardMapper {
      * @param factory the AAS factory to use
      */
     @SuppressWarnings("unchecked")
-    public IvmlDashboardMapper(AasFactory factory) {
+    public IvmlDashboardMapper(AasFactory factory, File projectFolder) {
+        this.projectFolder = projectFolder;
         this.factory = factory;
         try {
             unitMapping = Yaml.getInstance().loadMapping(ResourceLoader.getResourceAsStream(
@@ -140,22 +147,25 @@ public class IvmlDashboardMapper {
         while (iter.hasNext()) {
             IDecisionVariable var = iter.next();
             IDatatype type = var.getDeclaration().getType();
-            // TODO filter out templates
-            if (applicationType.isAssignableFrom(type)) {
+            if (applicationType.isAssignableFrom(type) && !IvmlUtils.isTemplate(var.getDeclaration())) {
                 clear();
                 Aas appAas = null == aas ? factory.createAasBuilder("TestApplication", null).build() : aas;
                 SubmodelBuilder smB = appAas.createSubmodelBuilder("dashboardSpec", null);
                 appName = IvmlUtils.getStringValue(var, "name", "");
                 appId = IvmlUtils.getStringValue(var, "id", "");
                 appVersion = IvmlUtils.getStringValue(var, "ver", "");
-                if (StringUtils.isNotBlank(appVersion)) {
+                if (isNotBlank(appVersion)) {
                     if (IvmlUtils.getBooleanValue(var.getNestedElement("snapshot"), true)) {
                         appVersion += "-SNAPSHOT";
                     }
                 }
+                displayRows = collectDisplayRows(var.getNestedElement("displayRows"));
                 createHeader(smB);
+                createDisplayRows(smB);
                 SubmodelElementCollectionBuilder dashboardB = createDashboardSpec(smB);
                 SubmodelElementCollectionBuilder panelsB = dashboardB.createSubmodelElementCollectionBuilder("panels");
+                SubmodelElementCollectionBuilder dbB = dashboardB.createSubmodelElementCollectionBuilder("db");
+                Map<String, String> dbMapping = new HashMap<>();
                 
                 IDecisionVariable meshes = var.getNestedElement("services");
                 if (null != meshes) {
@@ -164,7 +174,7 @@ public class IvmlDashboardMapper {
                         IDecisionVariable mesh = Configuration.dereference(meshes.getNestedElement(n));
                         IvmlGraph graph = mapper.getGraphFor(mesh);
                         for (IvmlGraphNode node : graph.nodes()) {
-                            processNode(node, panelsB);
+                            processNode(node, panelsB, dbB, dbMapping);
                         }
                     }
                 }
@@ -172,6 +182,7 @@ public class IvmlDashboardMapper {
                 // TODO rows format??
 
                 panelsB.build();
+                dbB.build();
                 dashboardB.build();
                 Submodel submodel = smB.build();
 
@@ -183,9 +194,66 @@ public class IvmlDashboardMapper {
     }
     
     /**
+     * Represents a display row.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class DisplayRow {
+        private String id;
+        private String name;
+        private String displayName;
+    }
+
+    /**
+     * Collects the display rows.
+     * 
+     * @param var the (application) variable to get the display rows from
+     * @return the display rows
+     */
+    private List<DisplayRow> collectDisplayRows(IDecisionVariable var) {
+        List<DisplayRow> result = new ArrayList<>();
+        if (null != var) {
+            for (int e = 0; e < var.getNestedElementsCount(); e++) {
+                IDecisionVariable element = IvmlUtils.dereference(var.getNestedElement(e));
+                String name = IvmlUtils.getStringValue(element, "name", "");
+                if (name.length() > 0) {
+                    DisplayRow row = new DisplayRow();
+                    result.add(row);
+                    row.name = name;
+                    row.displayName = IvmlUtils.getStringValue(element, "displayName", null);
+                    row.id = "row-" + result.size();
+                }
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Returns whether {@code text} is not blank. Repeated from {@link StringUtils} as long as plugin loading for this
+     * app is not clear.
+     * 
+     * @param text the text to check
+     * @return {@code true} for blank, {@code false} else
+     */
+    private static boolean isNotBlank(CharSequence text) {
+        return !isBlank(text);
+    }
+
+    /**
+     * Returns whether {@code text} is blank. Repeated from {@link StringUtils} as long as plugin loading for this
+     * app is not clear.
+     * 
+     * @param text the text to check
+     * @return {@code true} for blank, {@code false} else
+     */
+    private static boolean isBlank(CharSequence text) {
+        return null == text || text.length() == 0;
+    }
+
+    /**
      * Creates submodel header information.
      * 
-     * @param smB the submodel builder
+     * @param smB the parent submodel builder
      */
     private void createHeader(SubmodelBuilder smB) {
         createProperty(smB, "oktoVersion", Type.STRING, IipVersion.getInstance().getVersionInfo(), "oktoflow version");
@@ -193,6 +261,23 @@ public class IvmlDashboardMapper {
         createProperty(smB, "id", Type.STRING, appId, "application id");
         createProperty(smB, "version", Type.STRING, appVersion, "application version");
         createProperty(smB, "aasMetamodelVersion", Type.STRING, factory.getMetaModelVersion(), "AAS metamodel version");
+    }
+
+    /**
+     * Creates the display rows submodel.
+     * 
+     * @param smB the parent submodel builder
+     */
+    private void createDisplayRows(SubmodelBuilder smB) {
+        SubmodelElementCollectionBuilder rowsB = smB.createSubmodelElementCollectionBuilder("Rows");
+        for (DisplayRow row : displayRows) {
+            SubmodelElementCollectionBuilder rowB = rowsB.createSubmodelElementCollectionBuilder(row.id);
+            createProperty(rowB, "id", Type.STRING, row.id, "Unique id of display row");
+            createProperty(rowB, "name", Type.STRING, row.id, "Name of display row");
+            createProperty(rowB, "displayName", Type.STRING, row.displayName, "Display name of display row");
+            rowB.build();
+        }
+        rowsB.build();
     }
     
     /**
@@ -216,20 +301,86 @@ public class IvmlDashboardMapper {
      * @param node the node to process
      * @param panelsB the panels (parent) builder
      */
-    private void processNode(IvmlGraphNode node, SubmodelElementCollectionBuilder panelsB) {
+    private void processNode(IvmlGraphNode node, SubmodelElementCollectionBuilder panelsB, 
+        SubmodelElementCollectionBuilder dbsB, Map<String, String> dbMapping) {
         IDecisionVariable var = node.getVariable();
         IDecisionVariable impl = Configuration.dereference(var.getNestedElement("impl"));
         if (null != impl) {
             if (IvmlUtils.isOfCompoundType(impl, "InfluxConnector")) {
                 ConnectorInfo connInfo = resolveConnector(impl);
+                String influxDb = dbMapping.get(connInfo.name);
+                if (null == influxDb) {
+                    influxDb = processDb(impl, connInfo, dbsB);
+                    dbMapping.put(connInfo.name, influxDb);
+                }
                 IDecisionVariable inputVar = impl.getNestedElement("input");
                 if (null != inputVar && inputVar.getNestedElementsCount() > 0) { // connectors have only one
                     IDecisionVariable ioTypeVar = inputVar.getNestedElement(0);
                     IDecisionVariable typeVar = Configuration.dereference(ioTypeVar.getNestedElement("type"));
-                    processType(resolveType(typeVar), connInfo, panelsB);
+                    processType(resolveType(typeVar), connInfo, panelsB, influxDb);
                 }
             }
         }
+    }
+    
+    /**
+     * Processes a database entry.
+     * 
+     * @param impl the service/connector implementation
+     * @param connInfo the connector information
+     * @param dbsB the databases collection builder
+     * @return the database uid
+     */
+    private String processDb(IDecisionVariable impl, ConnectorInfo connInfo, SubmodelElementCollectionBuilder dbsB) {
+        String uid = connInfo.name.replace(" ", "_");
+        SubmodelElementCollectionBuilder dbB = dbsB.createSubmodelElementCollectionBuilder(uid);
+        createProperty(dbB, "uid", Type.STRING, uid, "InfluxDB uid"); 
+        if (isNotBlank(connInfo.host)) {
+            String url;
+            if (connInfo.security != null && connInfo.security.ssl) {
+                url = "https";
+            } else {
+                url = "http";
+            }
+            url += "//:" + connInfo.host;
+            if (connInfo.port > 0) {
+                url += ":" + connInfo.port;
+            }
+            String path = IvmlUtils.getStringValue(impl, "urlPath", null);
+            if (isNotBlank(path)) {
+                url += "/" + path;
+            }
+            createProperty(dbB, "url", Type.STRING, url, "InfluxDB URL");
+        }
+        createProperty(dbB, "organization", Type.STRING, connInfo.organization, "InfluxDB organization"); 
+        ResourceLoader.registerResourceResolver(new MavenResourceResolver(projectFolder));
+        if (connInfo.security != null && isNotBlank(connInfo.security.authenticationKey)) {
+            String authKey = connInfo.security.authenticationKey;
+            if (connInfo.security.enableTokenExport) {
+                IdentityStore store = IdentityStore.getInstance();
+                String token = "";
+                IdentityToken tok = store.getToken(authKey);
+                if (null != tok) {
+                    switch (tok.getType()) {
+                    case ISSUED:
+                    case USERNAME:
+                        token = tok.getTokenDataAsString();
+                        break;
+                    default:
+                        getLogger().warn("Cannot process token of type {} for authentication key {}", 
+                            tok.getType(), authKey);
+                        break;
+                    }
+                } else {
+                    getLogger().warn("No authentication token for authentication key {}", authKey);
+                }
+                createProperty(dbB, "token", Type.STRING, token, "InfluxDB token");
+            } else {
+                getLogger().warn("No permission to export authentication token for authentication key {}", authKey);
+            }
+        }
+        dbB.build();
+        return uid;
     }
 
     /**
@@ -240,10 +391,30 @@ public class IvmlDashboardMapper {
     private static class ConnectorInfo {
         @SuppressWarnings("unused")
         private String id;
-        @SuppressWarnings("unused")
         private String name;
+        private String organization;
         private String bucket;
         private String measurement;
+        private String host;
+        private int port;
+        private SecuritySettings security;
+    }
+    
+    /**
+     * Represents optional security/authentication settings.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class SecuritySettings {
+        private boolean ssl;
+        private String authenticationKey;
+        private boolean enableTokenExport;
+        @SuppressWarnings("unused")
+        private String keystoreKey;
+        @SuppressWarnings("unused")
+        private String keyAlias;
+        @SuppressWarnings("unused")
+        private String idStoreAuthenticationPrefix;
     }
     
     /**
@@ -259,6 +430,11 @@ public class IvmlDashboardMapper {
         private PanelPosition position; // type-level or field-level?
     }
     
+    /**
+     * Represents a field in a {@link RecordType}.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
     private static class Field {
         private String name;
         private String field;
@@ -266,6 +442,7 @@ public class IvmlDashboardMapper {
         private String displayName;
         private String unit;
         private String panelType; // values??
+        private DisplayRow displayRow;
     }
     
     /**
@@ -304,8 +481,24 @@ public class IvmlDashboardMapper {
             final String fallbackPanelName = "panel " + panelCount++;
             result.id = IvmlUtils.getStringValue(var, "id", fallbackPanelName);
             result.name = IvmlUtils.getStringValue(var, "name", fallbackPanelName);
+            result.organization = IvmlUtils.getStringValue(var, "organization", "");
             result.bucket = IvmlUtils.getStringValue(var, "bucket", "");
             result.measurement = IvmlUtils.getStringValue(var, "measurement", "");
+            result.host = IvmlUtils.getStringValue(var, "host", null);
+            result.port = IvmlUtils.getIntValue(var, "port", -1);
+            
+            IDecisionVariable security = var.getNestedElement("security");
+            if (null != security) {
+                SecuritySettings sec = new SecuritySettings();
+                sec.ssl = IvmlUtils.getBooleanValue(var, "ssl", false);
+                sec.authenticationKey = IvmlUtils.getStringValue(security, "authenticationKey", null);
+                sec.enableTokenExport = IvmlUtils.getBooleanValue(security, "enableTokenExport", false);
+                sec.keystoreKey = IvmlUtils.getStringValue(security, "keystoreKey", null);
+                sec.keyAlias = IvmlUtils.getStringValue(security, "keyAlias", null);
+                sec.idStoreAuthenticationPrefix = IvmlUtils.getStringValue(security, 
+                    "idStoreAuthenticationPrefix", null);
+                result.security = sec;
+            }
         }
         return result;
     }
@@ -348,6 +541,17 @@ public class IvmlDashboardMapper {
                         fld.displayName = IvmlUtils.getStringValue(fieldVar, "displayName", "");
                         fld.unit = resolveSemanticIdToUnit(fieldVar);
                         fld.panelType = resolvePanelType(fieldVar);
+                        IDecisionVariable displayRow = IvmlUtils.dereference(fieldVar.getNestedElement("displayRow"));
+                        String displayRowName = IvmlUtils.getStringValue(displayRow, "name", null);
+                        if (displayRowName != null) {
+                            Optional<DisplayRow> dr = displayRows
+                                .stream()
+                                .filter(r -> r.name.equals(displayRowName))
+                                .findFirst();
+                            if (dr.isPresent()) {
+                                fld.displayRow = dr.get(); 
+                            }
+                        }
                         result.fields.add(fld);
                     }
                     recordIter = Configuration.dereference(recordIter.getNestedElement("refining"));
@@ -429,14 +633,16 @@ public class IvmlDashboardMapper {
      * @param influx the influx connector information
      * @param panelsB the parent panels builder
      */
-    private void processType(RecordType type, ConnectorInfo influx, SubmodelElementCollectionBuilder panelsB) {
+    private void processType(RecordType type, ConnectorInfo influx, SubmodelElementCollectionBuilder panelsB, 
+        String influxDb) {
         if (null != type && influx != null) {
             for (Field f : type.fields) {
-                if (!StringUtils.isBlank(f.unit) && !StringUtils.isBlank(f.panelType)) {
+                if (!isBlank(f.unit) && !isBlank(f.panelType)) {
                     SubmodelElementCollectionBuilder panelB = panelsB.createSubmodelElementCollectionBuilder(f.name);
                     createProperty(panelB, "title", Type.STRING, f.name, "Panel title");
                     createProperty(panelB, "unit", Type.STRING, f.unit, "Panel unit");
-                    // TODO datasource_uid ?? 
+                    createProperty(panelB, "datasource_uid", Type.STRING, influxDb, 
+                        "Unique identifier for InfluxDB in db section");
                     createProperty(panelB, "bucket", Type.STRING, influx.bucket, "InfluxDB bucket"); 
                     createProperty(panelB, "measurement", Type.STRING, influx.measurement, "InfluxDB measurement");
                     // TODO fields comma separated??
@@ -444,6 +650,11 @@ public class IvmlDashboardMapper {
                     createProperty(panelB, "panel_type", Type.STRING, f.panelType, "Panel type");
                     createProperty(panelB, "description", Type.STRING, f.description, "Panel description");
                     createProperty(panelB, "displayName", Type.STRING, f.displayName, "Panel display name");
+                    if (f.displayRow != null) {
+                        createProperty(panelB, "row", Type.STRING, f.displayRow.id, 
+                            "Display row id pointing to rows section");
+                    }
+                    
                     // TODO axis_max_soft
                     // TODO axis_min_soft
                     // TODO axis_label
@@ -483,7 +694,6 @@ public class IvmlDashboardMapper {
             createProperty(panelB, "height", Type.INTEGER, position.height, "Panel position: height");
         }
     }
-
     
     /**
      * Creates an AAS property.
@@ -511,8 +721,9 @@ public class IvmlDashboardMapper {
      * 
      * @throws ExecutionException in case that the VIL instantiation fails, shall not occur here as handled by 
      * default {@link InstantiationConfigurer}
+     * @throws IOException if files cannot be located/written
      */
-    public static void main(String[] args) throws ExecutionException {
+    public static void main(String[] args) throws ExecutionException, IOException {
         System.out.println("oktoflow dashboard instantiator");
         if (args.length < 2) {
             System.out.println("Following arguments are required:");
@@ -531,9 +742,12 @@ public class IvmlDashboardMapper {
      * @return the exit code
      * @throws ExecutionException in case that the VIL instantiation fails, shall not occur here as handled by 
      *     default {@link InstantiationConfigurer}
+     * @throws IOException if files cannot be located/written
      */
-    private static void mainImpl(String[] args) throws ExecutionException {
-        String supportFolder = "W:\\offlineFiles\\git\\IIP-ecosphere\\platform\\platform\\support";
+    private static void mainImpl(String[] args) throws ExecutionException, IOException {
+        // TODO determine plugin loading, currently setup for local loading
+        File support = new File("../../support").getCanonicalFile();
+        String supportFolder = support.toString();
         // explicitly load plugins
         PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(
             new File(supportFolder + "/support.aas.basyx")));
@@ -547,8 +761,9 @@ public class IvmlDashboardMapper {
         ConfigurationSetup setup = ConfigurationSetup.getSetup();
         EasySetup easySetup = setup.getEasyProducer();
         easySetup.reset();
+        File projectFolder = new File(args[1]);
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(args[0], 
-            new File(args[1]), new File("gen")); // gen is actually not used
+            projectFolder, new File("gen")); // gen is actually not used
         if (args.length >= 3) {
             configurer.setIvmlMetaModelFolder(new File(args[2]));
         }
@@ -557,7 +772,7 @@ public class IvmlDashboardMapper {
         lcd.startup(new String[0]); // shall register executor
         Configuration cfg = ConfigurationManager.getIvmlConfiguration();
         try {
-            new IvmlDashboardMapper(factory).process(cfg, null, (aas, sm, id) -> {
+            new IvmlDashboardMapper(factory, projectFolder).process(cfg, null, (aas, sm, id) -> {
                 String fileName = id.replace(' ', '_');
                 File file = new File("target/" + fileName + ".json");
                 try {

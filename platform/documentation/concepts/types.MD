@@ -95,9 +95,17 @@ In turn, `Field` instances may be equipped with more information as summarized b
 | semanticId | Optional semantic identifier (preferred ECLASS or AAS) characterizing the type, if not given, taken over from `type` if stated there. |  _type.semanticId_  |
 | displayName | Optional display name for values represented by this field, e.g., on a dashboard. | "" |
 | display | Optional setting on how to display the field on a dashboard (`TimeSeries`, `Gauge`, `BarChart`, `Table`) | - |
+| displayRow | Optional reference to display row that shall display this field. If not given, field will occur in some default (top)-row of dashboard. | - |
 
 Background:
 - Type and record names are used for naming generated classes or attributes/fields as well as related methods/functions within the classes. Thereby, given names are adjusted to the respective programming language conventions, e.g., Java or Python. However, within data formats, e.g., JSON, we keep the original names as specified in the model.
+
+Again, in turn, `Field` instances may specify a `DisplayRow` with the following fields:
+
+| Field | Description | Default |
+| --- | --- | --- |
+| name | Name of the field, must be unique for all `DisplayRow` instances. |     |
+| displayName | Optional display name  for the display row. |  ""   |
 
 ## Alias Type
 

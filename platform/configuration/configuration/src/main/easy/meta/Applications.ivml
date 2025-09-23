@@ -28,7 +28,7 @@ project Applications {
     @DispatchCase
     def Boolean isRefining(RecordType fromType, RecordType toType) = 
         createRecordTypeSet(toType)->closure(RecordType t|t.refining).includes(fromType);
-
+        
     compound Application refines VersionedElement {
         Id id;
         NonEmptyNameString name;
@@ -47,6 +47,7 @@ project Applications {
             setOf(refTo(Server)) servers = {}; // additional server instances to be started
             setOf(AppPackagingSchema) packaging = { AppPackagingSchema::SpringFat };
             setOf(TypeSubstitution) typeSubstitutions = {};
+            sequenceOf(refTo(DisplayRow)) displayRows = {};
         }
         assign (uiGroup = UiInvisibleGroup) to {
             String derivedFrom = null;
