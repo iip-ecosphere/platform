@@ -12,8 +12,6 @@
 
 package de.iip_ecosphere.platform.support.resources;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -39,36 +37,10 @@ import de.iip_ecosphere.platform.support.plugins.PluginSetup;
 public class ResourceLoader {
 
     /**
-     * Optional Maven resource resolver looking in src/main/resources and src/test/resources in this sequence.
+     * Optional Maven resource resolver looking in {@code src/main/resources} and {@code src/test/resources} in this 
+     * sequence.
      */
-    public static final ResourceResolver MAVEN_RESOLVER = new ResourceResolver() {
-        
-        @Override
-        public String getName() {
-            return "Maven resources";
-        }
-        
-        @Override
-        public InputStream resolve(ClassLoader loader, String resource) {
-            InputStream result = null;
-            File f = new File("src/main/resources/" + resource);
-            if (f.exists()) {
-                try {
-                    result = new FileInputStream(f);
-                } catch (IOException e) {
-                }
-            } else {
-                try {
-                    f = new File("src/test/resources/" + resource);
-                    if (f.exists()) {
-                        result = new FileInputStream(f);    
-                    }
-                } catch (IOException e) {
-                }
-            }
-            return result;
-        }
-    };
+    public static final ResourceResolver MAVEN_RESOLVER = new MavenResourceResolver();
     
     private static List<ResourceResolver> resolvers = new ArrayList<>();
     private static List<Predicate<URI>> filters = null;
