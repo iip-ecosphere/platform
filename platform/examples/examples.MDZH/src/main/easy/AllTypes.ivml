@@ -6,6 +6,16 @@ project AllTypes {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
     
+    DisplayRow topRow = {
+        name = "TopRow",
+        displayName = "The most important data."  
+    };
+
+    DisplayRow otherRow = {
+        name = "OtherRow",
+        displayName = "The less important data."  
+    };
+    
     RecordType Empty = {
         name = "Empty",
         fields = {}
@@ -143,7 +153,8 @@ project AllTypes {
                 cachingTime = CACHE_NONE,
                 displayName = "Power Consumption",
                 display = Display::TimeSeries,
-                semanticId = "0173-1#05-AAA187#005"
+                semanticId = "0173-1#05-AAA187#005",
+                displayRow = refBy(topRow)
             }        
         }
     };

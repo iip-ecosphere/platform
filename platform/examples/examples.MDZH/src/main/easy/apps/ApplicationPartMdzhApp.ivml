@@ -9,7 +9,8 @@ project ApplicationPartMdzhApp {
         name = "MDZH PCF app",
         ver = "0.1.0",
         description = "",
-        services = {refBy(myMdzhMesh)}        
+        services = {refBy(myMdzhMesh)},
+        displayRows = {refBy(topRow), refBy(otherRow)}
     };
     
     freeze {
