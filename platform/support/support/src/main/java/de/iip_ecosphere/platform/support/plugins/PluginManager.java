@@ -247,7 +247,7 @@ public class PluginManager {
      * @see PluginSetup#getClassLoader()
      */
     private static void registerPlugin(PluginSetupDescriptor desc, boolean onlyNew) {
-        LoggerFactory.getLogger(PluginManager.class).info("Found plugin setup descriptor {}. Trying registration...", 
+        LoggerFactory.getLogger(PluginManager.class).info("Found plugin setup descriptor {}. Registering plugin...", 
             desc.getClass());
         boolean allowAll = !desc.preventDuplicates();
         ClassLoader loader = PluginSetup.getClassLoader();
@@ -385,6 +385,7 @@ public class PluginManager {
      * @param local additional local plugin setup descriptors to be considered before the file-based ones
      */
     public static void loadAllFrom(File folder, PluginFilter filter, PluginSetupDescriptor... local) {
+        long startTime = System.currentTimeMillis();
         File[] files = folder.listFiles();
         for (File f : files) {
             File cpFile = null;
@@ -403,6 +404,8 @@ public class PluginManager {
                 }
             }
         }
+        LoggerFactory.getLogger(PluginManager.class).info("Plugin loading completed in {} ms. ", 
+            System.currentTimeMillis() - startTime);
     }
     
     /**

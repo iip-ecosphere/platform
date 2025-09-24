@@ -201,6 +201,32 @@ public abstract class AbstractSetup {
     }
 
     /**
+     * Reads a configuration from the root folder of the JAR/classpath as mapping.
+     *
+     * @return the setup mapping
+     * @throws IOException if the file cannot be read/found
+     */
+    public static Map<String, Object> readMappingFromYaml() throws IOException {
+        return readMappingFromYaml(getDefaultFileName());
+    }
+
+    /**
+     * Reads a configuration from the root folder of the JAR/classpath as mapping.
+     *
+     * @param filename the filename to read from
+     * @return the setup mapping
+     * @throws IOException if the file cannot be read/found
+     */
+    public static Map<String, Object> readMappingFromYaml(String filename) 
+        throws IOException {
+        InputStream in = ResourceLoader.getResourceAsStream(filename);
+        if (null == in) {
+            throw new IOException("Cannot read " + filename);
+        }
+        return Yaml.getInstance().loadMapping(in);
+    }
+    
+    /**
      * Returns if a string is valid, i.e. not <b>null</b> and not empty.
      *
      * @param str the string
