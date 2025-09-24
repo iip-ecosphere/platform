@@ -3,12 +3,13 @@ package test.de.oktoflow.platform.support.yaml.snakeyaml;
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.function.Function;
+import java.util.Iterator;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.IOUtils;
+import de.iip_ecosphere.platform.support.function.IOFunction;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.yaml.Yaml;
 import de.oktoflow.platform.support.yaml.snakeyaml.SnakeYaml;
@@ -21,27 +22,6 @@ import de.oktoflow.platform.support.yaml.snakeyaml.SnakeYaml;
 public class YamlTest {
     
     /**
-     * Like {@link Function} but throws {@link IOException}.
-     *
-     * @param <P> the type of the input to the operations.
-     * @param <R> the return type of the operations.
-     * @since 2.7
-     */
-    @FunctionalInterface
-    public interface IOFunction<P, R> {
-        
-        /**
-         * Applies this function to the given argument.
-         *
-         * @param t the function argument
-         * @return the function result
-         * @throws IOException if an I/O error occurs.
-         */
-        public R apply(final P param) throws IOException;
-        
-    }
-    
-    /**
      * Applies {@code func} to a test resource and returns the result.
      * 
      * @param func the function to apply
@@ -49,7 +29,19 @@ public class YamlTest {
      * @throws IOException shall not occur
      */
     private static <T> T fromResource(IOFunction<InputStream, T> func) throws IOException {
-        InputStream in = ResourceLoader.getResourceAsStream("nameplate.yml");
+        return fromResource("nameplate.yml", func);
+    }
+
+    /**
+     * Applies {@code func} to a test resource and returns the result.
+     * 
+     * @param resource the name of the resource
+     * @param func the function to apply
+     * @return the result from function
+     * @throws IOException shall not occur
+     */
+    private static <T> T fromResource(String resource, IOFunction<InputStream, T> func) throws IOException {
+        InputStream in = ResourceLoader.getResourceAsStream(resource);
         T result = func.apply(in);
         in.close();
         return result;
@@ -69,6 +61,12 @@ public class YamlTest {
         Assert.assertNotNull(fromResource(in -> yaml.loadMapping(in)));
         Assert.assertNotNull(fromResource(in -> yaml.loadAs(in, Object.class)));
         Assert.assertNotNull(fromResource(in -> yaml.loadTolerantAs(in, Object.class)));
+        Iterator<Object> iter = fromResource(in -> yaml.loadAll(in, Object.class));
+        Assert.assertTrue(iter.hasNext());
+        Assert.assertNotNull(iter.next());
+        iter = fromResource("nameplate-path.yml", in -> yaml.loadAll(in, "outer", Object.class));
+        Assert.assertTrue(iter.hasNext());
+        Assert.assertNotNull(iter.next());
         String s = fromResource(in -> IOUtils.toString(in));
         Assert.assertNotNull(yaml.loadAs(s, Object.class));
 

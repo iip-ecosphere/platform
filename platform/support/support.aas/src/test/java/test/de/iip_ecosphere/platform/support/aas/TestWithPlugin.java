@@ -40,8 +40,8 @@ public class TestWithPlugin extends test.de.iip_ecosphere.platform.support.TestW
     }
     
     static {
-        addPluginLocation("support", "support.aas.basyx2", "basyx2", false, "log-slf4j-simple");
-        addPluginLocation("support", "support.aas.basyx", "basyx", false, "log-slf4j-simple");
+        addPluginLocation("support", "support.aas.basyx2", "basyx2", false, "support.log-slf4j-simple");
+        addPluginLocation("support", "support.aas.basyx", "basyx", false, "support.log-slf4j-simple");
         addRunAfterLoading(() -> {
             // TODO default from AASFactory
             AasFactory.setPluginId(System.getProperty("okto.test.aas.pluginId", aasPluginId)); 
