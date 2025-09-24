@@ -87,6 +87,7 @@ public class AbstractSetupTest {
      */
     @Test
     public void testSetup() throws IOException {
+        String oldFName = AbstractSetup.setDefaultFileName("iipecosphere-test.yml");
         try {
             Cfg.readFromYaml(Cfg.class, "a");
             Assert.fail("No exception, file does not exist");
@@ -101,7 +102,7 @@ public class AbstractSetupTest {
         }
 
         // readable, without leading /
-        Cfg cfg = Cfg.readFromYaml(Cfg.class, AbstractSetup.DEFAULT_FNAME);
+        Cfg cfg = Cfg.readFromYaml(Cfg.class, AbstractSetup.getDefaultFileName());
         Assert.assertNotNull(cfg);
         Assert.assertEquals(42, cfg.getProperty());
 
@@ -111,13 +112,14 @@ public class AbstractSetupTest {
         Assert.assertEquals(42, cfg.getProperty());
 
         // readable, with leading /
-        cfg = Cfg.readFromYaml(Cfg.class, "/" + AbstractSetup.DEFAULT_FNAME);
+        cfg = Cfg.readFromYaml(Cfg.class, "/" + AbstractSetup.getDefaultFileName());
         Assert.assertNotNull(cfg);
         Assert.assertEquals(42, cfg.getProperty());
         
         cfg = Cfg.readFromYaml(Cfg.class, "/iipecosphere-over.yml");
         Assert.assertNotNull(cfg);
         Assert.assertEquals(43, cfg.getProperty());
+        AbstractSetup.setDefaultFileName(oldFName);
     }
     
     /**

@@ -51,7 +51,30 @@ public abstract class AbstractSetup {
      */
     public static final String DEFAULT_OVERRIDE_FNAME = "oktoflow-local" + ".yml"; // TODO use DEFAULT_NAME 
     
+    private static String defaultFName = DEFAULT_FNAME;
+    
     private String pluginsFolder = OsUtils.getPropertyOrEnv(PARAM_PLUGINS, "plugins");
+
+    /**
+     * Returns the default file name used for loading.
+     * 
+     * @return the default file name, by default {@link #DEFAULT_FNAME}
+     */
+    public static String getDefaultFileName() {
+        return defaultFName;
+    }
+    
+    /**
+     * Sets the default file name used for loading, by default {@link #DEFAULT_FNAME}. [testing]
+     * 
+     * @param name the new default filename
+     * @return the default filename before
+     */
+    public static String setDefaultFileName(String name) {
+        String oldFName = defaultFName;
+        defaultFName = name;
+        return oldFName;
+    }
 
     /**
      * Changes the (parent) folder where the oktoflow plugins are located. [yaml convention]
@@ -82,8 +105,8 @@ public abstract class AbstractSetup {
     }
 
     /**
-     * Reads a configuration from {@link #DEFAULT_FNAME} in the  root folder of the JAR/classpath. Unknown properties 
-     * are ignored.
+     * Reads a configuration from {@link #getDefaultFileName()} in the  root folder of the JAR/classpath. 
+     * Unknown properties are ignored.
      *
      * @param <C> the specific type of configuration to read
      * @param cls the class of configuration to read
@@ -91,7 +114,21 @@ public abstract class AbstractSetup {
      * @throws IOException if the file cannot be read/found, the configuration class cannot be instantiated
      */
     public static <C> C readFromYaml(Class<C> cls) throws IOException {
-        return readFromYaml(cls, DEFAULT_FNAME, DEFAULT_OVERRIDE_FNAME);
+        return readFromYamlWithPath(cls, null);
+    }
+
+    /**
+     * Reads a configuration from {@link #getDefaultFileName()} in the  root folder of the JAR/classpath. 
+     * Unknown properties are ignored.
+     *
+     * @param <C> the specific type of configuration to read
+     * @param cls the class of configuration to read
+     * @param yamlPath path within yaml to read from, may be <b>null</b> or empty for none 
+     * @return the configuration instance
+     * @throws IOException if the file cannot be read/found, the configuration class cannot be instantiated
+     */
+    public static <C> C readFromYamlWithPath(Class<C> cls, String yamlPath) throws IOException {
+        return readFromYamlWithPath(cls, yamlPath, getDefaultFileName(), DEFAULT_OVERRIDE_FNAME);
     }
     
     /**
@@ -104,7 +141,21 @@ public abstract class AbstractSetup {
      * @throws IOException if the file cannot be read/found, the configuration class cannot be instantiated
      */
     public static <C> C readFromYaml(Class<C> cls, String filename) throws IOException {
-        return readFromYaml(cls, filename, null);
+        return readFromYamlWithPath(cls, null, filename, null);
+    }
+
+    /**
+     * Reads a configuration from the root folder of the JAR/classpath. Unknown properties are ignored.
+     *
+     * @param <C> the specific type of configuration to read
+     * @param cls the class of configuration to read
+     * @param yamlPath path within yaml to read from, may be <b>null</b> or empty for none 
+     * @param filename the filename (a leading "/" is added if missing for JAR/classpath resource access)
+     * @return the configuration instance
+     * @throws IOException if the file cannot be read/found, the configuration class cannot be instantiated
+     */
+    public static <C> C readFromYamlWithPath(Class<C> cls, String yamlPath, String filename) throws IOException {
+        return readFromYamlWithPath(cls, yamlPath, filename, null);
     }
 
     /**
@@ -120,6 +171,24 @@ public abstract class AbstractSetup {
      * @throws IOException if the file cannot be read/found, the configuration class cannot be instantiated
      */
     public static <C> C readFromYaml(Class<C> cls, String filename, String overwrite) throws IOException {
+        return readFromYamlWithPath(cls, null, filename, overwrite);
+    }
+    
+    /**
+     * Reads a configuration from the root folder of the JAR/classpath. Unknown properties are ignored.
+     *
+     * @param <C> the specific type of configuration to read
+     * @param cls the class of configuration to read
+     * @param yamlPath path within yaml to read from, may be <b>null</b> or empty for none 
+     * @param filename the filename (a leading "/" is added if missing for JAR/classpath resource access)
+     * @param overwrite the name of an optional file (a leading "/" is added if missing for JAR/classpath 
+     *     resource access, using {@link MultiResourceResolver#SETUP_RESOLVER}) overwriting values in 
+     *     {@code filename}, may be <b>null</b> for none, does not lead to an exception if file does not exist
+     * @return the configuration instance
+     * @throws IOException if the file cannot be read/found, the configuration class cannot be instantiated
+     */
+    public static <C> C readFromYamlWithPath(Class<C> cls, String yamlPath, String filename, String overwrite) 
+        throws IOException {
         InputStream in = ResourceLoader.getResourceAsStream(filename);
         if (null == in) {
             throw new IOException("Cannot read " + filename);
@@ -128,7 +197,7 @@ public abstract class AbstractSetup {
         if (null != overwrite) {
             over = ResourceLoader.getResourceAsStream(overwrite, MultiResourceResolver.SETUP_RESOLVER);
         }
-        return readFromYaml(cls, in, over);  
+        return readFromYamlWithPath(cls, yamlPath, in, over);  
     }
 
     /**
@@ -165,10 +234,26 @@ public abstract class AbstractSetup {
      * @throws IOException if the data cannot be read, the configuration class cannot be instantiated
      */
     public static <C> C readFromYaml(Class<C> cls, InputStream in, InputStream overwrite) throws IOException {
+        return readFromYamlWithPath(cls, null, in, overwrite);
+    }
+    
+    /**
+     * Reads a instance from {@code in}. Unknown properties are ignored.
+     *
+     * @param <C> the specific type of configuration to read
+     * @param cls the class of configuration to read
+     * @param yamlPath path within yaml to read from, may be <b>null</b> or empty for none 
+     * @param in the stream to read from (ignored if <b>null</b>, else being closed)
+     * @param overwrite optional stream to overwrite values taken from {@code in} 
+     * @return the configuration instance
+     * @throws IOException if the data cannot be read, the configuration class cannot be instantiated
+     */
+    public static <C> C readFromYamlWithPath(Class<C> cls, String yamlPath, InputStream in, InputStream overwrite) 
+        throws IOException {
         C result = null;
         if (in != null) {
             try {
-                Iterator<Object> it = Yaml.getInstance().loadAll(in, cls);
+                Iterator<Object> it = Yaml.getInstance().loadAll(in, yamlPath, cls);
                 if (it.hasNext()) {
                     Object o = it.next(); // ignore the other sub-documents here
                     if (cls.isInstance(o)) {

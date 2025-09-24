@@ -108,12 +108,26 @@ public abstract class Yaml {
     /**
      * Loads all documents from a YAML file, trying to apply {@code cls} as type.
      * 
-     * @return an iterator over all documents
+     * @param in the input stream to load from
      * @param cls the class/type of the object to read; if given, only objects of that type will be returned
+     * @return an iterator over all documents
      * @throws IOException if accessing the input stream fails, if reading the structure fails
      */
-    public abstract Iterator<Object> loadAll(InputStream in, Class<?> cls) throws IOException;
-    
+    public Iterator<Object> loadAll(InputStream in, Class<?> cls) throws IOException {
+        return loadAll(in, null, cls);
+    }
+
+    /**
+     * Loads all documents from a YAML file, trying to apply {@code cls} as type.
+     * 
+     * @param in the input stream to load from
+     * @param path the path within YAML to load from, may be <b>null</b> or empty for none
+     * @param cls the class/type of the object to read; if given, only objects of that type will be returned
+     * @return an iterator over all documents
+     * @throws IOException if accessing the input stream fails, if reading the structure fails
+     */
+    public abstract Iterator<Object> loadAll(InputStream in, String path, Class<?> cls) throws IOException;
+
     /**
      * Loads all documents from a YAML file.
      * 

@@ -28,6 +28,8 @@ import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.representer.Representer;
 
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+
 /**
  * Implements the YAML interface by SnakeYaml.
  * 
@@ -57,11 +59,39 @@ public class TestYaml extends de.iip_ecosphere.platform.support.yaml.Yaml {
         return createYaml(cls).loadAs(in, cls);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Iterator<Object> loadAll(InputStream in, Class<?> cls) throws IOException {
-        Iterator<Object> it;
+    public Iterator<Object> loadAll(InputStream in, String path, Class<?> cls) throws IOException {
+        Iterator<Object> it = null;
         try {
-            it = createYaml(cls).loadAll(in).iterator();
+            if (path != null && path.length() > 0) {
+                Yaml yaml = createYaml(Map.class);
+                List<Object> documents = new ArrayList<>();
+                try {
+                    for (Object o : yaml.loadAll(in)) {
+                        if (o instanceof Map) {
+                            Map<String, Object> map = (Map<String, Object>) o;
+                            Map<String, Object> data = (Map<String, Object>) map.get(path);
+                            if (data != null) {
+                                documents.add(yaml.loadAs(yaml.dump(data), cls));
+                            } else {
+                                LoggerFactory.getLogger(this).warn("Cannot find YAML path {}, falling back to "
+                                    + "full document", path);
+                            }
+                        } else {
+                            LoggerFactory.getLogger(this).warn("Cannot read data, instance is of type {}", 
+                                o == null ? null : o.getClass().getName());
+                        }
+                    }
+                } catch (NullPointerException e) { // if end-of-string, NPE by snakeyaml
+                }
+                if (documents.size() > 0) {
+                    it = documents.iterator();
+                }
+            }
+            if (it == null) { // fallback if property not found
+                it = createYaml(cls).loadAll(in).iterator();
+            }
             if (null != cls) {
                 List<Object> results = new ArrayList<>();
                 if (it.hasNext()) {

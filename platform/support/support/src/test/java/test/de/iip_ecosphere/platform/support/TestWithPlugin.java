@@ -149,7 +149,7 @@ public class TestWithPlugin {
                 } else { // local, unpacked
                     folder = new File(installDir);
                     if (folder.isDirectory()) {
-                        File[] appends = collectAppends(folder.getParentFile(), loc.appends);
+                        File[] appends = collectAppends(folder, loc.appends);
                         LoggerFactory.getLogger(TestWithPlugin.class).info("Loading plugin from {} "
                             + "(test deployment)", installDir);
                         File cpFile = new File(installDir + "/" + loc.folder);
