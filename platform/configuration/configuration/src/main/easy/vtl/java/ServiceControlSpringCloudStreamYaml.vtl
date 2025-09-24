@@ -27,10 +27,10 @@ template ServiceControlSpringCloudStreamYaml(IIPEcosphere config, YamlFileArtifa
         produceTransport(config, serviceMgr);
         produceAas(config, serviceMgr, implLocalEphemerial=config.aasImplServer.devicesAsEphemeral);
         produceNetMgr(config, serviceMgr);
+        producePlugins(config, serviceMgr);
 
         n.addObject("metricsprovider").addValue("schedulerrate", mgr.monitoringUpdatePeriod);
         // executables based on target device
-        producePlugins(config, n); // does not harm if called twice
     }
 
     def main(IIPEcosphere config, YamlFileArtifact target) {
