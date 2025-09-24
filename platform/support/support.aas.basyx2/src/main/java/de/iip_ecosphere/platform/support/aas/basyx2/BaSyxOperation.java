@@ -173,11 +173,13 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
 
         @Override
         public OperationBuilder setInvocableLazy(de.iip_ecosphere.platform.support.aas.Invokable invocable) {
-            addInvocationQualifier(HTTPOperationDelegation.INVOCATION_DELEGATION_TYPE, invocable.getUrl());
-            final String submodelId = parentBuilder.getInstance().getIdentification();
-            addInvocationQualifier(INVOCATION_DELEGATION_SUBMODELID_TYPE, submodelId);
-            addInvocationQualifier(INVOCATION_DELEGATION_SUBMODELREGISTRYURL_TYPE, 
-                invocable.getSubmodelRepositoryUrl());
+            if (null != invocable) {
+                addInvocationQualifier(HTTPOperationDelegation.INVOCATION_DELEGATION_TYPE, invocable.getUrl());
+                final String submodelId = parentBuilder.getInstance().getIdentification();
+                addInvocationQualifier(INVOCATION_DELEGATION_SUBMODELID_TYPE, submodelId);
+                addInvocationQualifier(INVOCATION_DELEGATION_SUBMODELREGISTRYURL_TYPE, 
+                    invocable.getSubmodelRepositoryUrl());
+            }
             return this;
         }
 

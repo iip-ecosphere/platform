@@ -156,7 +156,9 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
 
         @Override
         public OperationBuilder setInvocableLazy(Invokable invocable) {
-            operation.setInvokable(invocable.getOperation());
+            if (null != invocable) {
+                operation.setInvokable(invocable.getOperation());
+            }
             return this;
         }
 
