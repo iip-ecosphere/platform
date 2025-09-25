@@ -478,7 +478,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         AasIvmlMapper mapper = getInstance(true);
         mapper.addGraphFormat(drawflowFormat);
         
-        mapper.createVariable("rec1", "RecordType", "{}");
+        mapper.createVariable("rec1", "RecordType", false, "{}");
         String valueEx = "{"
             + "id=\"SimpleSource\"," 
             + "name=\"Simple Data Source\","
@@ -491,7 +491,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
             + "kind=ServiceKind::SOURCE_SERVICE,"
             + "output={{type=rec1}}"
             + "}";
-        mapper.createVariable("src", "JavaService", valueEx);
+        mapper.createVariable("src", "JavaService", false, valueEx);
         valueEx = "{"
             + "id=\"SimpleSink\"," 
             + "name=\"Simple Data Sink\","
@@ -504,7 +504,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
             + "kind=ServiceKind::SINK_SERVICE,"
             + "input={{type=rec1}}"
             + "}";
-        mapper.createVariable("snk", "JavaService", valueEx);
+        mapper.createVariable("snk", "JavaService", false, valueEx);
         
         valueEx = "{"
             + "id=\"myApp\","
@@ -543,7 +543,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
         AasIvmlMapper mapper = getInstance(false);
 
-        mapper.createVariable("rec1", "RecordType", "{}");
+        mapper.createVariable("rec1", "RecordType", false, "{}");
 
         String valueEx = "{"
             + "id=\"SimpleSource\"," 
@@ -558,7 +558,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
             + "output={{type=rec1}}"
             + "}";
         
-        mapper.createVariable("test1", "JavaService", valueEx);
+        mapper.createVariable("test1", "JavaService", false, valueEx);
         assertIvmlFileChange("AllTypes", false, "rec1");
         assertIvmlFileChange("AllServices", false, "test1");
         
@@ -566,7 +566,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         assertIvmlFileChange("AllTypes", false, "rec1");
         assertIvmlFileChange("AllServices", true, "test1");
 
-        mapper.createVariable("test2", "setOf(Integer)", "{25, 27}");
+        mapper.createVariable("test2", "setOf(Integer)", false, "{25, 27}");
         assertIvmlFileChange("AllConstants", false, "test2");
         mapper.deleteVariable("test2");
         assertIvmlFileChange("AllConstants", true, "test2");

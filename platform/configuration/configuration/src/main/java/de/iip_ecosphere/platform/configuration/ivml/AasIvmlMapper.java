@@ -104,6 +104,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     public static final String OP_DELETE_GRAPH = "deleteGraph";
     public static final String OP_GET_VARIABLE_NAME = "getVariableName";
     public static final String OP_CREATE_VARIABLE = "createVariable";
+    public static final String OP_CREATE_CONSTANT = "createConstantVariable";
     public static final String OP_DELETE_VARIABLE = "deleteVariable";
     public static final String OP_RENAME_VARIABLE = "renameVariable";
     public static final String OP_GEN_INTERFACES = "genInterfacesAsync";
@@ -354,9 +355,16 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                     AasUtils.readString(a, 2));
             })
         );
+        sBuilder.defineOperation(OP_CREATE_CONSTANT, 
+            new JsonResultWrapper(a -> {
+                getAasIvmlMapper().createVariable(AasUtils.readString(a, 0), AasUtils.readString(a, 1), true,
+                    AasUtils.readString(a, 2));
+                return null;
+            }, getAasOperationCompletedListener())
+        );
         sBuilder.defineOperation(OP_CREATE_VARIABLE, 
             new JsonResultWrapper(a -> {
-                getAasIvmlMapper().createVariable(AasUtils.readString(a, 0), AasUtils.readString(a, 1), 
+                getAasIvmlMapper().createVariable(AasUtils.readString(a, 0), AasUtils.readString(a, 1), false,
                     AasUtils.readString(a, 2));
                 return null;
             }, getAasOperationCompletedListener())
@@ -1261,6 +1269,12 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             .addInputVariable("elementVersion", Type.STRING)
             .setInvocable(iCreator.createInvocable(OP_GET_VARIABLE_NAME))
             .build(Type.STRING, aDesc);
+        smBuilder.createOperationBuilder(OP_CREATE_CONSTANT)
+            .addInputVariable("varName", Type.STRING)
+            .addInputVariable("type", Type.STRING)
+            .addInputVariable("valExpr", Type.STRING)
+            .setInvocable(iCreator.createInvocable(OP_CREATE_CONSTANT))
+            .build(aDesc);
         smBuilder.createOperationBuilder(OP_CREATE_VARIABLE)
             .addInputVariable("varName", Type.STRING)
             .addInputVariable("type", Type.STRING)

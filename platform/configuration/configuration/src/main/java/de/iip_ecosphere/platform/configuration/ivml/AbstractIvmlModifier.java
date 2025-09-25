@@ -42,6 +42,7 @@ import net.ssehub.easy.varModel.cst.OCLFeatureCall;
 import net.ssehub.easy.varModel.cst.Variable;
 import net.ssehub.easy.varModel.cstEvaluation.EvaluationVisitor;
 import net.ssehub.easy.varModel.model.AbstractVariable;
+import net.ssehub.easy.varModel.model.ConstantDecisionVariableDeclaration;
 import net.ssehub.easy.varModel.model.Constraint;
 import net.ssehub.easy.varModel.model.ContainableModelElement;
 import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
@@ -828,7 +829,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      * @param valueEx the value as IVML expression 
      * @throws ExecutionException if creating the variable fails
      */
-    public void createVariable(String varName, String type, String valueEx) throws ExecutionException {
+    public void createVariable(String varName, String type, boolean asConst, String valueEx) throws ExecutionException {
         if (!isValidIdentifier(varName)) {
             throw new ExecutionException("'" + varName + "' is not a valid identifier", null);
         }
@@ -839,7 +840,12 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
             IDatatype t = findType(root, type);
             Project target = adaptTarget(root, getVariableTarget(root, t));
             if (null != t) {
-                DecisionVariableDeclaration var = new DecisionVariableDeclaration(toIdentifier(varName), t, target);
+                DecisionVariableDeclaration var;
+                if (asConst) {
+                    var = new ConstantDecisionVariableDeclaration(toIdentifier(varName), t, target);
+                } else {
+                    var = new DecisionVariableDeclaration(toIdentifier(varName), t, target);
+                }
                 setValue(var, valueEx);
                 target.add(var);
                 //alternative: in own constraint, remove setValue above; may be needed if t is container
@@ -973,9 +979,13 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                 if (null == subpath) { // if it is one of the "writable" wildcard imports
                     target = root;
                 }
-                removeConstraintsForVariable(target, varDecl);
-                createAssignment(varDecl, ent.getValue(), target); 
-                projects.add(target);
+                if (varDecl.getProject() == target) {
+                    setValue(varDecl, ent.getValue()); 
+                } else {
+                    removeConstraintsForVariable(target, varDecl);
+                    createAssignment(varDecl, ent.getValue(), target); 
+                    projects.add(target);
+                }
                 notifyChange(var, ConfigurationChangeType.MODIFIED);
             } catch (ExecutionException e) {
                 history.rollback();
