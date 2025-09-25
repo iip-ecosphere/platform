@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -49,7 +50,7 @@ public class AssemblePluginMojo extends AbstractMojo {
     @Parameter( property = "mdep.addTestArtifact", defaultValue = "false" )
     private boolean addTestArtifact;
   
-    @Parameter( property = "mdep.unpackMode", defaultValue = "jars" )
+    @Parameter( property = "mdep.unpackMode", defaultValue = Layers.DEFAULT_UNPACK_MODE )
     private String unpackMode;
     
     @Parameter( required = false )
@@ -79,19 +80,21 @@ public class AssemblePluginMojo extends AbstractMojo {
                 // initial style
                 addClasspathFiles(out, new File(targetDirectory, "classes"));
             }
-            addFile(out, new File(targetDirectory, namePrefix + ".jar"), "target/");
-            if (addTestArtifact || asTest) {
-                addFile(out, new File(targetDirectory, namePrefix + "-tests.jar"), "target/");
+            if (isJarUnpacking()) {
+                addFile(out, prependGroup(new File(targetDirectory, namePrefix + ".jar")), "target/", true);
+                if (addTestArtifact || asTest) {
+                    addFile(out, prependGroup(new File(targetDirectory, namePrefix + "-tests.jar")), "target/", true);
+                }
             }
             Set<File> excluded = new HashSet<>();
             FilesetUtils.determineFiles(furtherFiles, false, f -> excluded.add(f));
-            if ("jars".equals(unpackMode)) {
+            if (isJarUnpacking()) {
                 getLog().info("Adding dependencies jars from " + jarsDir);
                 File[] jars = jarsDir.listFiles();
                 if (null != jars) {
                     for (File f : jars) {
                         if (f.getName().endsWith(".jar") && !excluded.contains(f)) {
-                            addFile(out, f, "target/jars/");
+                            addFile(out, f, "target/jars/", false);
                         }
                     }
                 }
@@ -100,6 +103,31 @@ public class AssemblePluginMojo extends AbstractMojo {
             getLog().error("While packaging '" + outputFile + "': " + e.getMessage());
         }
         projectHelper.attachArtifact(project, "zip", "plugin" + (asTest ? "-test" : ""), outputFile);
+    }
+
+    /**
+     * Prepends the group id before an usual Maven artifact as we need it that way for resolution on unpacking.
+     * 
+     * @param file the file to prepend
+     * @return the prepended file
+     */
+    private File prependGroup(File file) {
+        File result = new File(file.getParent(), project.getGroupId() + "." + file.getName());
+        try {
+            Files.copy(file.toPath(), result.toPath());
+        } catch (IOException e) {
+            getLog().error("While prepending groupId: " + e.getMessage());
+        }
+        return result;
+    }
+    
+    /**
+     * Returns whether unpacking mode is "jars".
+     * 
+     * @return {@code true} for jars, else {@code false} in particular for "resolve"
+     */
+    private boolean isJarUnpacking() {
+        return "jars".equals(unpackMode);
     }
 
     /**
@@ -113,13 +141,13 @@ public class AssemblePluginMojo extends AbstractMojo {
         boolean done = false;
         File cpFile = new File(dir, "classpath");
         if (cpFile.exists()) {
-            addFile(out, new File(dir, "classpath"), "");
+            addFile(out, new File(dir, "classpath"), "", false);
             done = true;
             File[] jars = dir.listFiles();
             if (null != jars) {
                 for (File f : jars) {
                     if (f.getName().startsWith("classpath-")) {
-                        addFile(out, f, "");
+                        addFile(out, f, "", false);
                     }
                 }                
             }
@@ -134,7 +162,7 @@ public class AssemblePluginMojo extends AbstractMojo {
      * @param file the file to add
      * @param prefix path prefix for packaging file
      */
-    private void addFile(ZipOutputStream out, File file, String prefix) {
+    private void addFile(ZipOutputStream out, File file, String prefix, boolean deleteAfter) {
         if (file.exists()) {
             try (FileInputStream fis = new FileInputStream(file)) {
                 String name = prefix + file.getName();
@@ -146,6 +174,9 @@ public class AssemblePluginMojo extends AbstractMojo {
             } catch (IOException e) {
                 getLog().error("Cannot open " + file + ": " + e.getMessage());
             }
+        }
+        if (deleteAfter) {
+            FileUtils.deleteQuietly(file);
         }
     }
     

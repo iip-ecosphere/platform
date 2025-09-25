@@ -23,6 +23,8 @@ import org.apache.maven.plugin.logging.Log;
  */
 public class Layers {
 
+    public static final String DEFAULT_UNPACK_MODE = "jars"; // -> "resolve"
+    
     private static final String[] LAYERS = {
         "support", 
         "support.aas", 

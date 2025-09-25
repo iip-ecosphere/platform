@@ -44,7 +44,7 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
     @Parameter( property = "mdep.addTestArtifact", defaultValue = "false" )
     private boolean addTestArtifact;
 
-    @Parameter( property = "mdep.unpackMode", defaultValue = "jars" )
+    @Parameter( property = "mdep.unpackMode", defaultValue = Layers.DEFAULT_UNPACK_MODE )
     private String unpackMode;
 
     @Parameter( property = "mdep.setupDescriptor", defaultValue = "FolderClasspath" )
@@ -96,8 +96,9 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
         if (!extension.startsWith(".")) {
             extension = "." + extension;
         }
-        return getRelTargetDirectory() + "/" + getProject().getArtifactId() + "-" + getProject().getVersion() 
-            + classifier + extension;
+        // standard Maven naming does not add groupId, our packager is obliged to do so
+        return getRelTargetDirectory() + "/" + getProject().getGroupId() + "." + getProject().getArtifactId() 
+            + "-" + getProject().getVersion() + classifier + extension;
     }
 
     @Override

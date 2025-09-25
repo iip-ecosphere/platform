@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
@@ -81,7 +82,10 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
     @Parameter(property = "unpack.relocateTarget", required = false, defaultValue = "jars")
     private File relocateTarget;
 
-    @Parameter(property = "unpack.resolveAndCopy", required = false, defaultValue = "true")
+    @Parameter(property = "unpack.forceResolve", required = false, defaultValue = "false")
+    private boolean forceResolve;
+
+    @Parameter(property = "unpack.resolveAndCopy", required = false, defaultValue = "false")
     private boolean resolveAndCopy;
 
     @Parameter( defaultValue = "${project.build.directory}", readonly = true )
@@ -221,7 +225,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                 item.setOutputDirectory(getOutputDir(artId));
                 getLog().info("Configuring plugin '" + artId + "' -> " + item.getOutputDirectory());
                 item.setDestFileName(artId + ".zip");
-                item.setFileMappers(new FileMapper[] {new RelocatingFileMapper(artId, pl.hasAppends())});
+                item.setFileMappers(new FileMapper[] {new RelocatingFileMapper(artId, true)}); // pl.hasAppends()
                 artifactItems.add(item);
             }
             setArtifactItems(artifactItems);
@@ -491,8 +495,8 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                 String mode = null;
                 for (String line : contents) {
                     if (line.startsWith("#")) {
-                        prefix = extractSuffix(BuildPluginClasspathMojo.KEY_PREFIX, line, null);
-                        mode = extractSuffix(BuildPluginClasspathMojo.KEY_UNPACK_MODE, line, null);
+                        prefix = extractSuffix(BuildPluginClasspathMojo.KEY_PREFIX, line, prefix);
+                        mode = extractSuffix(BuildPluginClasspathMojo.KEY_UNPACK_MODE, line, mode);
                         out.println(line);
                     } else {
                         Tokenizer tokenizer = new Tokenizer(line);
@@ -500,7 +504,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                         if (relocate) {
                             processCpLineRelocation(cpFile, mode, out, tokenizer, prefix, relocateTarget);
                         } else {
-                            processCpLineNoRelocation(cpFile, line, out, tokenizer);
+                            processCpLineNoRelocation(cpFile, mode, line, out, tokenizer, prefix);
                         }
                         out.println();
                     } 
@@ -546,54 +550,108 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         Iterator<String> tokenIter = tokens.iterator();
         while (tokenIter.hasNext()) {
             String token = tokenIter.next();
-            if (tokenizer.win) {
-                token = token.replace("target\\jars\\", "jars\\");
-                token = token.replace("target\\", "jars\\");
-            } else {
-                token = token.replace("target/jars/", "jars/");
-                token = token.replace("target/", "jars/");
-            }
-            if (null != mode && mode.equalsIgnoreCase("resolve")) {
-                token = stripPrefix(prefix, token);
-                token = resolve(token, jarFolder);
-            }
+            token = rewriteToken(token, mode, prefix, jarFolder, tokenizer);
             out.print(token);
             if (tokenIter.hasNext()) {
                 out.print(tokenizer.sep);
             }
         }
     }
-    
-    // checkstyle: resume parameter number check
-    
+
     /**
      * Processes a classpath line without plugin relocation. 
      * 
      * @param name the name of the plugin
+     * @param mode the unpack mode, may be <b>null</b>
      * @param line the classpath line
      * @param out the output stream for the rewritten classpath file
      * @param tokenizer the tokenizer
+     * @param prefix the classpath token prefix (for {@link #forceResolve})
      */
-    private void processCpLineNoRelocation(String name, String line, PrintStream out, Tokenizer tokenizer) {
+    private void processCpLineNoRelocation(String name, String mode, String line, PrintStream out, Tokenizer tokenizer, 
+        String prefix) {
+        List<String> tokens = new ArrayList<>();
         Set<String> knownTokens = new HashSet<>();
         while (tokenizer.hasMoreTokens()) {
-            knownTokens.add(tokenizer.nextToken()); 
+            String tok = tokenizer.nextToken();
+            knownTokens.add(tok); 
+            tokens.add(tok);
         }
-        out.print(line);
-        int pos = name.indexOf("/");
-        if (pos > 0) { // differentiating directory, if not-relocating
-            name = name.substring(0, pos);
+        if (isModeResolve(mode)) {
+            handleAppends(name, knownTokens, cp -> tokens.add(cp));
+            List<String> processedTokens = tokens
+                .stream()
+                .map(token -> rewriteToken(token, mode, prefix, null, tokenizer))
+                .collect(Collectors.toList());
+            out.print(String.join(tokenizer.sep, processedTokens));
+        } else {
+            out.print(line);
+            int pos = name.indexOf("/");
+            if (pos > 0) { // differentiating directory, if not-relocating
+                name = name.substring(0, pos);
+            }
+            handleAppends(name, knownTokens, cp -> {
+                out.print(tokenizer.sep);
+                out.print(cp);
+            });
         }
+    }
+
+    // checkstyle: resume parameter number check
+
+    /**
+     * Rewrites a classpath token.
+     * 
+     * @param token the token
+     * @param mode the unpack mode, may be <b>null</b>
+     * @param prefix the classpath token prefix (for {@link #forceResolve})
+     * @param jarFolder the folder where to copy the jars to (considerd only for {@link #resolveAndCopy}, 
+     *     may be <b>null</b> considered as if {@link #resolveAndCopy} is {@code false})
+     * @param tokenizer the tokenizer
+     * @return {@code token} or the rewritten token
+     */
+    private String rewriteToken(String token, String mode, String prefix, File jarFolder, Tokenizer tokenizer) {
+        if (tokenizer.win) {
+            token = token.replace("target\\jars\\", "jars\\");
+            token = token.replace("target\\", "jars\\");
+        } else {
+            token = token.replace("target/jars/", "jars/");
+            token = token.replace("target/", "jars/");
+        }
+        if (isModeResolve(mode)) {
+            token = stripPrefix(prefix, token);
+            token = resolve(token, jarFolder);
+        }
+        return token;
+    }
+    
+    /**
+     * Returns whether we are in resolve mode, i.e., either {@code mode} indicates "resolve" or {@link #forceResolve}.
+     * 
+     * @param mode the unpack mode, may be <b>null</b>
+     * @return {@code true} for resolve, {@code false} else
+     */
+    private boolean isModeResolve(String mode) {
+        return (null != mode && mode.equalsIgnoreCase("resolve")) || forceResolve;
+    }
+
+    /**
+     * Handles appends, if specified, by passing elements that are not yet in {@code knownTokens} to {@code handler}.
+     * 
+     * @param name the name of the plugin
+     * @param knownTokens the tokens known so far (classpath entries), modified as a side effect
+     * @param handler the handler to be called
+     */
+    private void handleAppends(String name, Set<String> knownTokens, Consumer<String> handler) {
         List<String> plAppends = pluginAppends.get(name);
         if (null != plAppends) {
             for (String cp: plAppends) {
                 if (!knownTokens.contains(cp)) {
-                    out.print(tokenizer.sep);
-                    out.print(cp);
+                    handler.accept(cp);
                     knownTokens.add(cp);
                 }
             }
-        }        
+        }
     }
    
     /**
@@ -604,13 +662,18 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
      */
     private DefaultArtifact parsePath(String path) {
         String groupId = "";
-        String artifactId = path;
+        String artifactId = "";
         String version = "";
         String type = "";
         String classifier = "";
-    
+        // there might be a file path before
+        int pos = path.lastIndexOf('/');
+        if (pos > 0) {
+            path = path.substring(pos + 1);
+        }
+        artifactId = path;
         // split from backwards
-        int pos = artifactId.lastIndexOf('.');
+        pos = artifactId.lastIndexOf('.');
         if (pos > 0) { // extension
             type = artifactId.substring(pos + 1);
             artifactId = artifactId.substring(0, pos);
@@ -639,13 +702,28 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                 }
             }
         }
-        pos = artifactId.lastIndexOf('.');
+        pos = findArtifactId(artifactId);
         if (pos > 0) { // extension
             groupId = artifactId.substring(0, pos);
             artifactId = artifactId.substring(pos + 1);
         }
-    
         return new DefaultArtifact(groupId, artifactId, classifier, type, version);            
+    }
+    
+    /**
+     * Returns the position of the "." after the groupId in {@code name}.
+     * 
+     * @param name the name to analyze
+     * @return the position
+     */
+    private int findArtifactId(String name) {
+        // we do not follow the "convention" of no dot in artifactId
+        final String iipPrefix = "de.iip-ecosphere.platform.";
+        if (name.startsWith(iipPrefix)) {
+            return iipPrefix.length() - 1;
+        } else {
+            return name.lastIndexOf('.');
+        }
     }
 
     /**
@@ -663,7 +741,8 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
      * Tries to resolve the path.
      * 
      * @param path the given classpath path
-     * @param jarFolder the folder where to copy the jars to
+     * @param jarFolder the folder where to copy the jars to (considerd only for {@link #resolveAndCopy}, 
+     *     may be <b>null</b> considered as if {@link #resolveAndCopy} is {@code false})
      * @return {@code path} or the resolved path (in the local maven repo)
      */
     private String resolve(String path, File jarFolder) {
@@ -671,7 +750,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         try {
             DefaultArtifact artifact = parsePath(path);
             File res = resolve(artifact);
-            if (resolveAndCopy) {
+            if (resolveAndCopy && jarFolder != null) {
                 File tgt = new File(jarFolder, res.getName());
                 if (!res.exists()) {
                     try {
