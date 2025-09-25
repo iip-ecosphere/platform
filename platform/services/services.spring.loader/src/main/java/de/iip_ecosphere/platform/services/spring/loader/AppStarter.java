@@ -84,6 +84,54 @@ public class AppStarter {
     // checkstyle: stop exception type check
     
     /**
+     * Creates a classloader for {@code jarFile}.
+     * 
+     * @param jarFile the jar file to create a class loader for
+     * @return the class loader (single or isolating)
+     * @throws Exception if loading the archive/creating the class loader fails
+     */
+    public static ClassLoader createClassloader(File jarFile) throws Exception {
+        JarFileArchive archive = new JarFileArchive(jarFile);
+        AccessibleJarLauncher rootLauncher = new AccessibleJarLauncher(archive);
+        ClassLoader result = rootLauncher.createClassLoader();
+
+        AccessibleLauncher isolatedLauncher = new AccessibleLauncher(archive);
+        return isolatedLauncher.createStackedLoader(result);
+    }
+
+
+    /**
+     * An accessible Jar Launcher if we need an (usual) root classloader.
+     * 
+     * @author Holger Eichelberger, SSE
+        return launcher.createClassLoader();
+}
+
+     */
+    public static class AccessibleJarLauncher extends JarLauncher {
+
+        /**
+         * Creates an instance of the test program.
+         * 
+         * @param archive the JAR archive to load
+         */
+        public AccessibleJarLauncher(Archive archive) {
+            super(archive);
+        }
+
+        /**
+         * Creates a Spring class loader via the JarLauncher setup for the archive passed in to this class.
+         * 
+         * @return the classloader
+         * @throws Exception any kind of exception if loading the archive or constructing a class loader failed
+         */
+        public ClassLoader createClassLoader() throws Exception {
+            return createClassLoader(getClassPathArchivesIterator());
+        }
+
+    }
+    
+    /**
      * Implements an accessible launcher just to access the Spring packaged JARs in the way Spring is doing it.
      * Needed, as one method in the Spring Launcher hierarchy is final and the ClassPathIndexFile is package-local. 
      * Call {@link #createStackedLoader(ClassLoader)} on an instance.
@@ -200,7 +248,17 @@ public class AppStarter {
                 throw new IllegalStateException("Unable to determine code source archive from " + root);
             }
             return (root.isDirectory() ? new ExplodedArchive(root) : new JarFileArchive(root));
-        }        
+        }
+        
+        /**
+         * Creates a Spring class loader via the JarLauncher setup for the archive passed in to this class.
+         * 
+         * @return the classloader
+         * @throws Exception any kind of exception if loading the archive or constructing a class loader failed
+         */
+        public ClassLoader createClassLoader() throws Exception {
+            return createClassLoader(getClassPathArchivesIterator());
+        }
         
         /**
          * Creates a stacked class loader.
