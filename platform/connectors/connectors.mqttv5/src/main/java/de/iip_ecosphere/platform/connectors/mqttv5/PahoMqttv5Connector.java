@@ -15,7 +15,6 @@ package de.iip_ecosphere.platform.connectors.mqttv5;
 import java.io.IOException;
 import java.util.function.Supplier;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.eclipse.paho.mqttv5.client.IMqttToken;
 import org.eclipse.paho.mqttv5.client.MqttAsyncClient;
@@ -34,6 +33,7 @@ import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
+import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.net.SslUtils;
 import de.iip_ecosphere.platform.transport.connectors.basics.MqttQoS;
@@ -54,7 +54,7 @@ import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConn
 public class PahoMqttv5Connector<CO, CI> extends AbstractChannelConnector<byte[], byte[], CO, CI> {
 
     public static final String NAME = "MQTT v5";
-    private static final Logger LOGGER = Logger.getLogger(PahoMqttv5Connector.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(PahoMqttv5Connector.class);
     private MqttAsyncClient client;
     private boolean tlsEnabled = false;
 
@@ -267,7 +267,7 @@ public class PahoMqttv5Connector<CO, CI> extends AbstractChannelConnector<byte[]
 
     @Override
     protected void error(String message, Throwable th) {
-        LOGGER.log(Level.SEVERE, message, th);
+        LOGGER.error(message, th);
     }
 
     @Override

@@ -15,7 +15,6 @@ package de.oktoflow.platform.connectors.serial;
 import java.io.IOException;
 import java.util.function.Supplier;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortDataListenerWithExceptions;
@@ -30,6 +29,7 @@ import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
@@ -56,7 +56,7 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 public class JSerialCommConnector<CO, CI> extends AbstractChannelConnector<byte[], byte[], CO, CI> {
 
     public static final String NAME = "Serial";
-    private static final Logger LOGGER = Logger.getLogger(JSerialCommConnector.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSerialCommConnector.class);
     private SerialPort port;
 
     /**
@@ -234,7 +234,7 @@ public class JSerialCommConnector<CO, CI> extends AbstractChannelConnector<byte[
 
     @Override
     protected void error(String message, Throwable th) {
-        LOGGER.log(Level.SEVERE, message, th);
+        LOGGER.error(message, th);
     }
 
     @Override
