@@ -48,6 +48,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.iip_ecosphere.platform.support.aas.basyx2.AasOperationsProvider;
 import de.iip_ecosphere.platform.support.aas.basyx2.apps.common.ExcludeBasyxTypeFilter;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Spring application representing asset operations. Operations must be registered in the operations provider 
@@ -100,9 +101,19 @@ public class AssetSpringApp implements WebMvcConfigurer {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(auth -> auth.anyRequest().permitAll()).httpBasic(
             Customizer.withDefaults()).csrf(
-                c -> c.ignoringRequestMatchers(r -> r.getPathTranslated()
-                    .startsWith("/" + AasOperationsProvider.PREFIX_OPERATIONS)));
+                c -> c.ignoringRequestMatchers(r -> checkPath(r)));
         return httpSecurity.build();
+    }
+    
+    /**
+     * Checks a path for being equipped with requested prefix.
+     * 
+     * @param request the request
+     * @return {@code true} has prefix, {@code false} else
+     */
+    private boolean checkPath(HttpServletRequest request) {
+        String path = request.getPathTranslated();
+        return null == path ? false : path.startsWith("/" + AasOperationsProvider.PREFIX_OPERATIONS);
     }
     
     // checkstyle: stop exception type check

@@ -62,7 +62,7 @@ public class AasRestInvocablesCreator extends AbstractAasRestInvocablesCreator {
 
     @Override
     protected String getSubmodelRepositoryUrl() {
-        return spec.getSubmodelRepositoryEndpoint().toServerUri();
+        return null != spec.getSubmodelRepositoryEndpoint() ? spec.getSubmodelRepositoryEndpoint().toServerUri() : null;
     }
 
 }

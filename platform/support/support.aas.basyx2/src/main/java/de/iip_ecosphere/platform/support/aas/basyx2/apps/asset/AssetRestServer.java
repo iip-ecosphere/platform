@@ -33,6 +33,7 @@ import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.IdentityTo
 import de.iip_ecosphere.platform.support.aas.SetupSpec.ComponentSetup;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.State;
 import de.iip_ecosphere.platform.support.aas.basyx2.AasOperationsProvider;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 import de.iip_ecosphere.platform.support.rest.Rest;
 import de.iip_ecosphere.platform.support.rest.Rest.Request;
@@ -68,7 +69,7 @@ public class AssetRestServer implements Server {
         this.opProvider = opProvider;
         this.setup = setup;
     }
-    
+
     @Override
     public Server start() {
         mapper = new BaSyxHTTPConfiguration().jackson2ObjectMapperBuilder(
@@ -76,7 +77,7 @@ public class AssetRestServer implements Server {
 
         if (setup.getState() == State.STOPPED) {
             int port = setup.getServerAddress().getPort();
-            System.out.println("Starting AAS-REST server (rest-plugin) on " + port);
+            LoggerFactory.getLogger(this).info("Starting AAS-REST server (rest-plugin) on " + port);
             server = Rest.getInstance().createServer(port);
             KeyStoreDescriptor kDesc = setup.getKeyStore();
             if (kDesc != null) {
@@ -86,13 +87,13 @@ public class AssetRestServer implements Server {
             final String paramCategory = server.toPathVariable("category");
             server.definePost("/" + AasOperationsProvider.PREFIX_SERVICE + paramOpName, (req, res) -> {
                 String opName = req.getParam(paramOpName);
-                return handle(req, res, opName, opProvider.getServiceFunction(opName));
+                return handle(req, res, opName, null);
             });
             server.definePost("/" + AasOperationsProvider.PREFIX_OPERATIONS + paramOpName 
                 + "/" + paramCategory, (req, res) -> {
                     String opName = req.getParam(paramOpName);
                     String category = req.getParam(paramCategory);
-                    return handle(req, res, opName, opProvider.getOperation(category, opName));
+                    return handle(req, res, opName, category);
                 });
             AuthenticationDescriptor auth = setup.getAuthentication();
             if (AuthenticationDescriptor.isEnabledOnServer(auth)) {
@@ -149,21 +150,82 @@ public class AssetRestServer implements Server {
      * @param req the HTTP request
      * @param res the HTTP response
      * @param opName the operation name
-     * @param op the actual function to execute
+     * @param category the category, may be <b>null</b> then a service function is determined based on {@code opName}
      * @return the result body
      */
-    private String handle(Request req, Response res, String opName, Function<Object[], Object> op) {
-        res.setApplicationJsonType();
-        try {
-            OperationVariable[] args = mapper.readValue(req.getBody(), OperationVariable[].class);
-            ResponseEntity<OperationVariable[]> result = AssetSpringApp.invokeOperation(opName, args, op);
-            res.setStatus(result.getStatusCode().value());
-            // handle error implicit?
-            return mapper.writeValueAsString(result.getBody());
-        } catch (JsonProcessingException e) {
-            res.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            return ""; // value?
+    private String handle(Request req, Response res, String opName, String category) {
+        Function<Object[], Object> op;
+        if (null == category) {
+            op = opProvider.getServiceFunction(opName);
+        } else {
+            op = opProvider.getOperation(category, opName);
         }
+        res.setApplicationJsonType();
+        if (null == op) {
+            return createErrorObject(req, res, HttpStatus.FORBIDDEN, "Forbidden");
+        } else {
+            try {
+                OperationVariable[] args = mapper.readValue(req.getBody(), OperationVariable[].class);
+                ResponseEntity<OperationVariable[]> result = AssetSpringApp.invokeOperation(opName, args, op);
+                res.setStatus(result.getStatusCode().value());
+                // handle error implicit?
+                return mapper.writeValueAsString(result.getBody());
+            } catch (JsonProcessingException e) {
+                return createErrorObject(req, res, HttpStatus.INTERNAL_SERVER_ERROR, "Internal: " + e.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Appends a JSON key to {@code text}.
+     * 
+     * @param key the key
+     * @param text the text to append to
+     * @return the appended text
+     */
+    private String appendKey(String key, String text) {
+        return text + (text.endsWith("{") ? "" : ",") + "\"" + key + "\":";
+    }
+
+    /**
+     * Appends a JSON key-value pair to {@code text}.
+     * 
+     * @param key the key
+     * @param value the value
+     * @return the appended text
+     */
+    private String appendValue(String key, String value, String text) {
+        return appendKey(key, text) + "\"" + value + "\"";
+    }
+
+    /**
+     * Appends a JSON key-value pair to {@code text}.
+     * 
+     * @param key the key
+     * @param value the value
+     * @return the appended text
+     */
+    private String appendValue(String key, Number value, String text) {
+        return appendKey(key, text) + value;
+    }
+
+    /**
+     * Creates an error object (not using {@link #mapper} to avoid further exception handling).
+     * 
+     * @param req the request object
+     * @param res the response object
+     * @param status the status code (to be set on {@code res})
+     * @param error the error description
+     * @return the error object as JSON string
+     */
+    private String createErrorObject(Request req, Response res, HttpStatus status, String error) {
+        res.setStatus(status.value());
+        String result = "{";
+        result = appendValue("timestamp", System.currentTimeMillis(), result);
+        result = appendValue("status", status.value(), result);
+        result = appendValue("error", error, result);
+        result = appendValue("path", req.getPath(), result);
+        return result + "}";
     }
 
     @Override

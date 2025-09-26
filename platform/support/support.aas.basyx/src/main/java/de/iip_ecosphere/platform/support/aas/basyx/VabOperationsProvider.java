@@ -405,7 +405,7 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
         Map<String, Entry> cat = operations.get(category);
         if (null != cat) {
             Entry ent = cat.get(name);
-            if (Kind.OPERATION == ent.kind) {
+            if (ent != null && Kind.OPERATION == ent.kind) {
                 result = operationFunctions.get(ent.uName);
             }
         }

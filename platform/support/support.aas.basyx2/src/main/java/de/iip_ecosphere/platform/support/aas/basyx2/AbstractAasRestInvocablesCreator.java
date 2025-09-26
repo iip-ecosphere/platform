@@ -124,9 +124,19 @@ public abstract class AbstractAasRestInvocablesCreator implements InvocablesCrea
         return null; // not available in v3
     }
 
+    /**
+     * BaSyX2 operates with URLs rather than names. Get rid of problematic characters for URL composition.
+     * 
+     * @param name the name
+     * @return the fixed name
+     */
+    static String fixName(String name) {
+        return name.replace("@", "");
+    }
+
     @Override
     public Invokable createInvocable(String name) {
-        return new Operation(name);
+        return new Operation(fixName(name));
     }
     
     @Override

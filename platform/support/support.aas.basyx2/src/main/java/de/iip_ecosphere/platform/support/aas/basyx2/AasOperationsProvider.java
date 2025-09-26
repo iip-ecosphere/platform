@@ -317,6 +317,7 @@ public class AasOperationsProvider extends HashMap<String, Object> implements Op
 
     @Override
     public AasOperationsProvider defineOperation(String category, String name, Function<Object[], Object> function) {
+        name = AbstractAasRestInvocablesCreator.fixName(name);
         String uName = makeUnique(operationFunctions, category + "/" + name);
         Map<String, Entry> o = this.operations.get(category);
         if (null == o) {
@@ -332,11 +333,12 @@ public class AasOperationsProvider extends HashMap<String, Object> implements Op
 
     @Override
     public Function<Object[], Object> getOperation(String category, String name) {
+        name = AbstractAasRestInvocablesCreator.fixName(name);
         Function<Object[], Object> result = null;
         Map<String, Entry> cat = operations.get(category);
         if (null != cat) {
             Entry ent = cat.get(name);
-            if (Kind.OPERATION == ent.kind) {
+            if (ent != null && Kind.OPERATION == ent.kind) {
                 result = operationFunctions.get(ent.uName);
             }
         }
@@ -395,6 +397,7 @@ public class AasOperationsProvider extends HashMap<String, Object> implements Op
 
     @Override
     public AasOperationsProvider defineProperty(String name, Supplier<Object> get, Consumer<Object> set) {
+        name = AbstractAasRestInvocablesCreator.fixName(name);
         properties.put(name, new Property(get, set));
         status.put(name, new Entry(Kind.PROPERTY, name));
         LoggerFactory.getLogger(getClass()).info("Property " + name + " defined");
@@ -403,6 +406,7 @@ public class AasOperationsProvider extends HashMap<String, Object> implements Op
 
     @Override
     public Supplier<Object> getGetter(String name) {
+        name = AbstractAasRestInvocablesCreator.fixName(name);
         Property prop = properties.get(name);
         Supplier<Object> result = null == prop ? null : prop.get;
         if (null != interceptor) {
@@ -413,6 +417,7 @@ public class AasOperationsProvider extends HashMap<String, Object> implements Op
 
     @Override
     public Consumer<Object> getSetter(String name) {
+        name = AbstractAasRestInvocablesCreator.fixName(name);
         Property prop = properties.get(name);
         Consumer<Object> result = null == prop ? null : prop.set;
         if (null != interceptor) {
@@ -425,5 +430,7 @@ public class AasOperationsProvider extends HashMap<String, Object> implements Op
     public void setInterceptor(Interceptor interceptor) {
         this.interceptor = interceptor;
     }
+    
+
 
 }
