@@ -24,15 +24,7 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
         
         XmlElement dep = createDependencies(project);
         appendDependency(dep, iipGroup, "support", projectVersion); 
-        appendDependency(dep, iipGroup, "support.yaml-snakeyaml", projectVersion); // preliminary -> plugin
-        appendDependency(dep, iipGroup, "support.json-jackson", projectVersion); // preliminary -> plugin
-        appendDependency(dep, iipGroup, "support.log-slf4j-simple", projectVersion); // preliminary -> plugin
-        appendDependency(dep, iipGroup, "support.commons-apache", projectVersion); // preliminary -> plugin
-        appendDependency(dep, iipGroup, "support.websocket-websocket", projectVersion); // preliminary -> plugin
-        appendDependency(dep, iipGroup, "support.rest-spark", projectVersion); // preliminary -> plugin
-        appendDependency(dep, iipGroup, "support.processInfo-oshi", projectVersion); // preliminary -> plugin
-        appendDependency(dep, iipGroup, "support.bytecode-bytebuddy", projectVersion); // preliminary -> plugin
-        appendDependency(dep, iipGroup, "support.http-apache", projectVersion); // preliminary -> plugin
+        appendOktoflowPlugins(dep, projectVersion);
         XmlElement d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
         if (monitoring) {
             // conflicts on Linux with Tomcat

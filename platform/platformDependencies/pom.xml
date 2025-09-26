@@ -830,6 +830,14 @@
                                     <goals>
                                         <goal>unpack</goal>
                                         <goal>unpack-plugins</goal>
+                                        <goal>copy</goal>
+                                        <goal>build-classpath</goal>                                        
+                                        <goal>build-plugin-classpath</goal>                                        
+                                        <goal>unpack-dependencies</goal>
+                                        <goal>copy-dependencies</goal>
+                                        <goal>copy-plugin-dependencies</goal>
+                                        <goal>assemble-plugin</goal>
+                                        <goal>split-classpath</goal>
                                     </goals>
                                 </pluginExecutionFilter>
                                 <action>

@@ -611,5 +611,21 @@ template MavenBasics(Configuration config, FileArtifact target) {
         sequenceOf(String) res = {"*.yml", "*.png", "*.jpg", "*.json"};
         res;
     } 
+    
+    def appendOktoflowPlugins(XmlElement dep, String ver) { // preliminary -> plugin
+        String iipGroup = "de.iip-ecosphere.platform";
+        appendDependency(dep, iipGroup, "support.yaml-snakeyaml", ver); 
+        appendDependency(dep, iipGroup, "support.json-jackson", ver);
+        // later included simple may collide, we run for now with default implementation
+        /*XmlElement dep = appendDependency(dep, iipGroup, "support.log-slf4j-simple", ver);
+        XmlElement excl = appendExclusions(dep);
+        appendExclusion(excl, "org.slf4j", "slf4j-simple");        */
+        appendDependency(dep, iipGroup, "support.commons-apache", ver);
+        appendDependency(dep, iipGroup, "support.websocket-websocket", ver);
+        appendDependency(dep, iipGroup, "support.rest-spark", ver);
+        appendDependency(dep, iipGroup, "support.processInfo-oshi", ver);
+        appendDependency(dep, iipGroup, "support.bytecode-bytebuddy", ver);
+        appendDependency(dep, iipGroup, "support.http-apache", ver);
+    }
 
 }

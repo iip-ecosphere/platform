@@ -167,12 +167,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <artifactId>support.log-slf4j-simple</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <scope>test</scope>
-      <version>${project.version}</version>
-    </dependency>    
-    <dependency>
       <groupId>org.eclipse.basyx</groupId>
       <artifactId>basyx.sdk</artifactId>
       <version>${basyx.version}</version>
