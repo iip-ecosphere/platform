@@ -35,6 +35,9 @@ public class FallbackLogger implements Logger {
     
     private String name;
     private LogLevel level;
+    private PrintStream out = System.out;
+    private PrintStream err = System.err;
+    private Emitter emitter = (lvl, name, msg, th, out) -> emit(lvl, msg, th, out);
     
     static {
         stringConverter.put(int[].class, o -> Arrays.toString((int[]) o));
@@ -51,8 +54,33 @@ public class FallbackLogger implements Logger {
      * 
      * @param name the name of the logger
      */
-    FallbackLogger(String name) {
+    public FallbackLogger(String name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean setEmitter(Emitter emitter) {
+        boolean changed = false;
+        if (null != emitter) {
+            this.emitter = emitter;
+            changed = true;
+        }
+        return changed;
+    }
+
+    /**
+     * Sets the streams for logging.
+     * 
+     * @param out the output stream (ignored if <b>null</b>)
+     * @param err the error stream (ignored if <b>null</b>)
+     */
+    public void setStreams(PrintStream out, PrintStream err) {
+        if (null != out) {
+            this.out = out;
+        }
+        if (null != err) {
+            this.err = err;
+        }
     }
     
     @Override
@@ -63,127 +91,127 @@ public class FallbackLogger implements Logger {
 
     @Override
     public void trace(String msg) {
-        log(LogLevel.TRACE, msg, null, System.out);
+        log(LogLevel.TRACE, msg, null, out);
     }
 
     @Override
     public void trace(String format, Object arg) {
-        logArgs(LogLevel.TRACE, format, System.out, arg);
+        logArgs(LogLevel.TRACE, format, out, arg);
     }
 
     @Override
     public void trace(String format, Object arg1, Object arg2) {
-        logArgs(LogLevel.TRACE, format, System.out, arg1, arg2);
+        logArgs(LogLevel.TRACE, format, out, arg1, arg2);
     }
 
     @Override
     public void trace(String format, Object... arguments) {
-        logArgs(LogLevel.TRACE, format, System.out, arguments);
+        logArgs(LogLevel.TRACE, format, out, arguments);
     }
 
     @Override
     public void trace(String msg, Throwable th) {
-        log(LogLevel.TRACE, msg, th, System.out);
+        log(LogLevel.TRACE, msg, th, out);
     }
 
     @Override
     public void debug(String msg) {
-        log(LogLevel.DEBUG, msg, null, System.out);
+        log(LogLevel.DEBUG, msg, null, out);
     }
 
     @Override
     public void debug(String format, Object arg) {
-        logArgs(LogLevel.DEBUG, format, System.out, arg);
+        logArgs(LogLevel.DEBUG, format, out, arg);
     }
 
     @Override
     public void debug(String format, Object arg1, Object arg2) {
-        logArgs(LogLevel.DEBUG, format, System.out, arg1, arg2);
+        logArgs(LogLevel.DEBUG, format, out, arg1, arg2);
     }
 
     @Override
     public void debug(String format, Object... arguments) {
-        logArgs(LogLevel.DEBUG, format, System.out, arguments);
+        logArgs(LogLevel.DEBUG, format, out, arguments);
     }
 
     @Override
     public void debug(String msg, Throwable th) {
-        log(LogLevel.DEBUG, msg, th, System.out);
+        log(LogLevel.DEBUG, msg, th, out);
     }
 
     @Override
     public void info(String msg) {
-        log(LogLevel.INFO, msg, null, System.out);
+        log(LogLevel.INFO, msg, null, out);
     }
 
     @Override
     public void info(String format, Object arg) {
-        logArgs(LogLevel.INFO, format, System.out, arg);
+        logArgs(LogLevel.INFO, format, out, arg);
     }
 
     @Override
     public void info(String format, Object arg1, Object arg2) {
-        logArgs(LogLevel.INFO, format, System.out, arg1, arg2);
+        logArgs(LogLevel.INFO, format, out, arg1, arg2);
     }
 
     @Override
     public void info(String format, Object... arguments) {
-        logArgs(LogLevel.INFO, format, System.out, arguments);
+        logArgs(LogLevel.INFO, format, out, arguments);
     }
 
     @Override
     public void info(String msg, Throwable th) {
-        log(LogLevel.INFO, msg, th, System.out);
+        log(LogLevel.INFO, msg, th, out);
     }
 
     @Override
     public void warn(String msg) {
-        log(LogLevel.WARN, msg, null, System.out);
+        log(LogLevel.WARN, msg, null, out);
     }
 
     @Override
     public void warn(String format, Object arg) {
-        logArgs(LogLevel.WARN, format, System.out, arg);
+        logArgs(LogLevel.WARN, format, out, arg);
     }
 
     @Override
     public void warn(String format, Object arg1, Object arg2) {
-        logArgs(LogLevel.WARN, format, System.out, arg1, arg2);
+        logArgs(LogLevel.WARN, format, out, arg1, arg2);
     }
 
     @Override
     public void warn(String format, Object... arguments) {
-        logArgs(LogLevel.WARN, format, System.out, arguments);
+        logArgs(LogLevel.WARN, format, out, arguments);
     }
 
     @Override
     public void warn(String msg, Throwable th) {
-        log(LogLevel.WARN, msg, th, System.out);
+        log(LogLevel.WARN, msg, th, out);
     }
 
     @Override
     public void error(String msg) {
-        log(LogLevel.ERROR, msg, null, System.err);
+        log(LogLevel.ERROR, msg, null, err);
     }
 
     @Override
     public void error(String format, Object arg) {
-        logArgs(LogLevel.ERROR, format, System.err, arg);
+        logArgs(LogLevel.ERROR, format, err, arg);
     }
 
     @Override
     public void error(String format, Object arg1, Object arg2) {
-        logArgs(LogLevel.ERROR, format, System.err, arg1, arg2);
+        logArgs(LogLevel.ERROR, format, err, arg1, arg2);
     }
 
     @Override
     public void error(String format, Object... arguments) {
-        logArgs(LogLevel.ERROR, format, System.err, arguments);
+        logArgs(LogLevel.ERROR, format, err, arguments);
     }
 
     @Override
     public void error(String msg, Throwable th) {
-        log(LogLevel.ERROR, msg, th, System.err);
+        log(LogLevel.ERROR, msg, th, err);
     }
 
     /**
@@ -218,7 +246,6 @@ public class FallbackLogger implements Logger {
             th.printStackTrace(out);
         }
     }
-    
 
     /**
      * Logs the given message {@code msg} with no argument, possibly with the given throwable {@code th} if 
@@ -231,7 +258,7 @@ public class FallbackLogger implements Logger {
      */
     private void log(LogLevel level, String msg, Throwable th, PrintStream out) {
         if (isEnabled(level)) {
-            emit(level, msg, th, out);
+            emitter.emit(level, name, msg, th, out);
         }
     }
     
@@ -337,7 +364,7 @@ public class FallbackLogger implements Logger {
     private static String replaceOnce(final String text, final String searchString, final String replacement) {
         String result = text;
         int pos = text.indexOf(searchString);
-        if (pos > 0) {
+        if (pos >= 0) {
             result = text.substring(0, pos) + replacement + text.substring(pos + searchString.length());
         }
         return result;

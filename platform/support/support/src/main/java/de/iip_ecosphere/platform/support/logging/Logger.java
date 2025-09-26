@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.support.logging;
 
+import java.io.PrintStream;
+
 /**
  * A logger. Basic interface taken over from SLF4j except for markers. The format for parameterized log messages
  * is that of SLF4J, i.e., {} in the message are substituted in the order of given arguments.
@@ -25,6 +27,36 @@ public interface Logger {
      * Case insensitive String constant used to retrieve the name of the root logger.
      */
     public final String ROOT_LOGGER_NAME = "ROOT";
+    
+    /**
+     * Finally emits the log message.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface Emitter {
+
+        /**
+         * Finally emits the log message.
+         * 
+         * @param level the logging level
+         * @param name the name of the logger
+         * @param msg the logging message
+         * @param th the throwable detailing the message (may be <b>null</b>)
+         * @param out the target output stream
+         */
+        public void emit(LogLevel level, String name, String msg, Throwable th, PrintStream out);
+        
+    }
+    
+    /**
+     * Sets the emitter so that the output format can be changed programmatically. May not be supported by all loggers.
+     * 
+     * @param emitter the emitter, shall be ignored if <b>null</b>
+     * @return {@code true} if accepted, {@code false} if ignored
+     */
+    public default boolean setEmitter(Emitter emitter) {
+        return false;
+    }
     
     /**
      * Sets the log level.

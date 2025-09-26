@@ -15,6 +15,10 @@ package test.de.iip_ecosphere.platform.support.logging;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.logging.FallbackLogger;
+import de.iip_ecosphere.platform.support.logging.LogLevel;
+
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.junit.Assert;
 
 /**
@@ -25,7 +29,7 @@ import org.junit.Assert;
 public class FallbackLoggerTest {
     
     /**
-     * Tests {@link FallbackLoggerTest#testAbbreviate()}.
+     * Tests {@link FallbackLogger#abbreviate()}.
      */
     @Test
     public void testAbbreviate() {
@@ -37,6 +41,33 @@ public class FallbackLoggerTest {
         Assert.assertEquals(".", FallbackLogger.abbreviate("."));
         Assert.assertEquals("t.d.i.p.s.l." + getClass().getSimpleName(), 
             FallbackLogger.abbreviate(getClass().getName()));
+    }
+
+    /**
+     * Tests {@link FallbackLogger}.
+     */
+    @Test
+    public void testLogger() {
+        FallbackLogger logger = new FallbackLogger("cls");
+        logger.setLevel(LogLevel.INFO);
+        AtomicReference<LogLevel> rcvLevel = new AtomicReference<>();
+        AtomicReference<String> rcvName = new AtomicReference<>();
+        AtomicReference<String> rcvMsg = new AtomicReference<>();
+        AtomicReference<Throwable> rcvThrowable = new AtomicReference<>();
+        logger.setEmitter((lvl, name, msg, th, out) -> {
+            rcvLevel.set(lvl);
+            rcvName.set(name);
+            rcvMsg.set(msg);
+            rcvThrowable.set(th);
+        });
+        
+        String add = "";
+        final String msg = "Startup completed.";
+        logger.info("{}{}", msg, add);
+        Assert.assertEquals(msg, rcvMsg.get());
+        add = " Running until Ctrl-C.";
+        logger.info("{}{}", msg, add);
+        Assert.assertEquals(msg + add, rcvMsg.get());
     }
 
 }
