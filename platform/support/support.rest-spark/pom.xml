@@ -43,12 +43,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <artifactId>support.log-slf4j-simple</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <scope>test</scope>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>support</artifactId>
      <version>${project.version}</version>
