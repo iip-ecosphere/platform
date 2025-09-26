@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -114,7 +115,7 @@ public class AssemblePluginMojo extends AbstractMojo {
     private File prependGroup(File file) {
         File result = new File(file.getParent(), project.getGroupId() + "." + file.getName());
         try {
-            Files.copy(file.toPath(), result.toPath());
+            Files.copy(file.toPath(), result.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             getLog().error("While prepending groupId: " + e.getClass().getSimpleName() + " " + e.getMessage());
         }
