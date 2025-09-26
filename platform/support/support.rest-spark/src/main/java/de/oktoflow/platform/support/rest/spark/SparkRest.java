@@ -13,6 +13,7 @@
 package de.oktoflow.platform.support.rest.spark;
 
 import de.iip_ecosphere.platform.support.Server;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.rest.RestTarget;
 import spark.Service;
 
@@ -59,6 +60,11 @@ public class SparkRest extends de.iip_ecosphere.platform.support.rest.Rest {
         @Override
         public String getQueryString() {
             return request.queryString();
+        }
+
+        @Override
+        public String getPath() {
+            return request.pathInfo();
         }
 
     }
@@ -119,6 +125,9 @@ public class SparkRest extends de.iip_ecosphere.platform.support.rest.Rest {
          */
         private SparkRestServer(int port) {
             service = Service.ignite().port(port);
+            service.initExceptionHandler(e -> {
+                LoggerFactory.getLogger(this).error(e.getMessage(), e);
+            });
         }
 
         /**
@@ -201,6 +210,11 @@ public class SparkRest extends de.iip_ecosphere.platform.support.rest.Rest {
         @Override
         public void secure(String keystoreFile, String keystorePassword, String certAlias) {
             service = service.secure(keystoreFile, keystorePassword, certAlias, null, null);
+        }
+
+        @Override
+        public void addExceptionHandler(Class<Exception> cls, ExceptionHandler handler) {
+            service.exception(cls, (ex, req, res) -> handler.handle(ex, new SparkRequest(req), new SparkResponse(res)));
         }
         
     }

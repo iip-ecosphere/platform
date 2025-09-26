@@ -88,6 +88,10 @@ public class TestRest extends de.iip_ecosphere.platform.support.rest.Rest {
         public void stop(boolean dispose) {
         }
 
+        @Override
+        public void addExceptionHandler(Class<Exception> cls, ExceptionHandler handler) {
+        }
+
     }
     
     @Override
