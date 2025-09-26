@@ -87,6 +87,13 @@ public abstract class Rest {
          * @return the query string
          */
         public String getQueryString();
+        
+        /**
+         * Returns the requested path.
+         * 
+         * @return the requested path
+         */
+        public String getPath();
 
     }
 
@@ -165,7 +172,7 @@ public abstract class Rest {
     public interface Filter {
         
         /**
-         * Invoked when a request is made on this route's corresponding path e.g. '/hello'
+         * Invoked when a request is made on this route's corresponding path e.g. '/hello'.
          *
          * @param request  The request object providing information about the HTTP request
          * @param response The response object providing functionality for modifying the response
@@ -174,6 +181,25 @@ public abstract class Rest {
         public void handle(Request request, Response response) throws IOException;
         
     }
+    
+    /**
+     * Represents an exception handler, can be used to uniformly handle exceptions.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    @FunctionalInterface
+    public interface ExceptionHandler {
+        
+        /**
+         * Invoked when a registered exception type occurred.
+         *
+         * @param exception The exception thrown.
+         * @param request  The request object providing information about the HTTP request
+         * @param response The response object providing functionality for modifying the response
+         */
+        public void handle(Exception exception, Request request, Response response);
+        
+    }    
 
     /**
      * Represents a rest server.
@@ -262,6 +288,14 @@ public abstract class Rest {
          * @param certAlias          the default certificate Alias
          */
         public void secure(String keystoreFile, String keystorePassword, String certAlias);
+        
+        /**
+         * Adds an exception handler for a specified type.
+         * 
+         * @param cls the exception type
+         * @param handler the handler
+         */
+        public void addExceptionHandler(Class<Exception> cls, ExceptionHandler handler);
         
     }
 
