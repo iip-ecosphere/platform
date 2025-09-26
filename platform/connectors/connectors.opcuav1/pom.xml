@@ -48,12 +48,6 @@
       <artifactId>sdk-server</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <artifactId>support.log-slf4j-simple</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <scope>test</scope>
-      <version>${project.version}</version>
-    </dependency>
       <dependency>
         <artifactId>support.yaml-snakeyaml</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
