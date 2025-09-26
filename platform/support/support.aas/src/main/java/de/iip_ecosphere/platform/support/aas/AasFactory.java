@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.function.Function;
-import java.util.logging.Logger;
 
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.Schema;
@@ -32,6 +31,8 @@ import de.iip_ecosphere.platform.support.aas.SetupSpec.ComponentSetup;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.plugins.SingletonPlugin;
 import de.iip_ecosphere.platform.support.plugins.Plugin;
 import de.iip_ecosphere.platform.support.plugins.PluginDescriptor;
@@ -231,7 +232,7 @@ public abstract class AasFactory {
         
     }    
     
-    private static final Logger LOGGER = Logger.getLogger(AasFactory.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(AasFactory.class);
     // instance-based to allow later dependency injection
     private static AasFactory instance = DUMMY;
     private static String pluginId = OsUtils.getPropertyOrEnv("okto.aasFactoryId", DEFAULT_PLUGIN_ID);
@@ -329,7 +330,7 @@ public abstract class AasFactory {
                 } else {
                     if (!noInstanceWarningEmitted) {
                         noInstanceWarningEmitted = true;
-                        LOGGER.warning("No AAS factory implementation known. This may be intended in a simple testing "
+                        LOGGER.warn("No AAS factory implementation known. This may be intended in a simple testing "
                             + "setup where AAS operations are optional, but also a severe misconfiguration if this "
                             + "occurs in the context of a full platform instance where AAS operations are mandatory.");
                     }
@@ -344,7 +345,7 @@ public abstract class AasFactory {
      */
     private static void emitFactoryInstanceNotice() {
         if (null != instance) {
-            LOGGER.fine("Using AAS factory implementation: " + instance.getClass().getName());
+            LOGGER.info("Using AAS factory implementation: {}", instance.getClass().getName());
         }
     }
     
@@ -511,7 +512,7 @@ public abstract class AasFactory {
     public abstract PersistenceRecipe createPersistenceRecipe();
     
     /**
-     * Creates an invocables creator for a certain protocol.
+     * Creates an invocables creator for a certain protocol. <b>null</b> is turned into {@link #DEFAULT_PROTOCOL}
      * 
      * @param spec the setup specification with protocol from {@link #getProtocols()}, may be {@link #DEFAULT_PROTOCOL}
      * @return the invocables creator (may be <b>null</b> if the protocol does not exist)
@@ -519,9 +520,13 @@ public abstract class AasFactory {
      * @see #createProtocolServerBuilder(SetupSpec)
      */
     public InvocablesCreator createInvocablesCreator(SetupSpec spec) {
-        ProtocolCreator creator = protocolCreators.get(spec.getAssetServerProtocol());
+        String protocol = spec.getAssetServerProtocol();
+        if (null == protocol) {
+            protocol = DEFAULT_PROTOCOL;
+        }
+        ProtocolCreator creator = protocolCreators.get(protocol);
         if (null == creator) {
-            throw new IllegalArgumentException("Unknown/unregistered protocol: " + spec.getAssetServerProtocol());
+            throw new IllegalArgumentException("Unknown/unregistered protocol: " + protocol);
         }
         return creator.createInvocablesCreator(spec);
     }
