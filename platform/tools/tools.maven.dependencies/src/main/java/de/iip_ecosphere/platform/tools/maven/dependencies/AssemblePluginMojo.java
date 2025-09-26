@@ -81,9 +81,9 @@ public class AssemblePluginMojo extends AbstractMojo {
                 addClasspathFiles(out, new File(targetDirectory, "classes"));
             }
             if (isJarUnpacking()) {
-                addFile(out, prependGroup(new File(targetDirectory, namePrefix + ".jar")), "target/", true);
+                addFile(out, prependGroup(new File(targetDirectory, namePrefix + ".jar")), "target/", false);
                 if (addTestArtifact || asTest) {
-                    addFile(out, prependGroup(new File(targetDirectory, namePrefix + "-tests.jar")), "target/", true);
+                    addFile(out, prependGroup(new File(targetDirectory, namePrefix + "-tests.jar")), "target/", false);
                 }
             }
             Set<File> excluded = new HashSet<>();
@@ -116,7 +116,7 @@ public class AssemblePluginMojo extends AbstractMojo {
         try {
             Files.copy(file.toPath(), result.toPath());
         } catch (IOException e) {
-            getLog().error("While prepending groupId: " + e.getMessage());
+            getLog().error("While prepending groupId: " + e.getClass().getSimpleName() + " " + e.getMessage());
         }
         return result;
     }
