@@ -489,7 +489,6 @@
                              <appends> <!-- test dependencies, declared in configuration.maven -->
                                  <append>repo/de/iip-ecosphere/platform/support.json-jackson/${project.version}/support.json-jackson-${project.version}.jar</append>
                                  <append>repo/de/iip-ecosphere/platform/support.yaml-snakeyaml/${project.version}/support.yaml-snakeyaml-${project.version}.jar</append>
-                                 <append>repo/de/iip-ecosphere/platform/support.log-slf4j-simple/${project.version}/support.log-slf4j-simple-${project.version}.jar</append>
                              </appends>
                          </configuration>
                      </execution>
@@ -515,7 +514,6 @@
                              <appends> <!-- test dependencies, declared in configuration.maven -->
                                  <append>repo/de/iip-ecosphere/platform/support.json-jackson/${project.version}/support.json-jackson-${project.version}.jar</append>
                                  <append>repo/de/iip-ecosphere/platform/support.yaml-snakeyaml/${project.version}/support.yaml-snakeyaml-${project.version}.jar</append>
-                                 <append>repo/de/iip-ecosphere/platform/support.log-slf4j-simple/${project.version}/support.log-slf4j-simple-${project.version}.jar</append>
                              </appends>
                          </configuration>
                      </execution>
