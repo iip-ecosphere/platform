@@ -22,7 +22,7 @@ import de.iip_ecosphere.platform.transport.connectors.impl.DirectMemoryTransferT
  * 
  * @author Holger Eichelberger, SSE
  */
-public class DefaultTransportFactoryDescriptor extends SingletonPluginDescriptor<TransportConnector> 
+public class DefaultTransportFactoryDescriptor extends SingletonPluginDescriptor<TransportFactoryDescriptor> 
     implements TransportFactoryDescriptor {
 
     /**
@@ -47,12 +47,13 @@ public class DefaultTransportFactoryDescriptor extends SingletonPluginDescriptor
      * Creates a factory descriptor.
      */
     public DefaultTransportFactoryDescriptor() {
-        super("transport", null, TransportConnector.class, null);
+        super("transport", null, TransportFactoryDescriptor.class, null);
     }
 
     @Override // override plugin supplier on creation
-    protected PluginSupplier<TransportConnector> initPluginSupplier(PluginSupplier<TransportConnector> pluginSupplier) {
-        return p -> getMainCreator().createConnector();
+    protected PluginSupplier<TransportFactoryDescriptor> initPluginSupplier(
+        PluginSupplier<TransportFactoryDescriptor> pluginSupplier) {
+        return p -> this;
     }
 
     @Override

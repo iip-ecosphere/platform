@@ -15,6 +15,8 @@ import java.util.Optional;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.plugins.Plugin;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
 /**
  * A factory for creating transport connector instances. This factory shall
@@ -108,15 +110,23 @@ public class TransportFactory {
      */
     private static void initialize() {
         if (!initialized) {
-            Optional<TransportFactoryDescriptor> desc = ServiceLoaderUtils.filterExcluded(
-                TransportFactoryDescriptor.class);
-            if (desc.isPresent()) {
-                TransportFactoryDescriptor descriptor = desc.get();
+            TransportFactoryDescriptor tDesc = null;
+            Plugin<TransportFactoryDescriptor> pl = PluginManager.getPlugin(TransportFactoryDescriptor.class);
+            if (null != pl) {
+                tDesc = pl.getInstance();
+            } else {
+                Optional<TransportFactoryDescriptor> desc = ServiceLoaderUtils.filterExcluded(
+                    TransportFactoryDescriptor.class);
+                if (desc.isPresent()) {
+                    tDesc = desc.get();
+                }
+            }
+            if (null != tDesc) {
                 LoggerFactory.getLogger(TransportFactory.class).info("Configuring TransportFactory with " 
-                    + descriptor.getClass().getName());
-                mainCreator = getCreator(descriptor.getMainCreator(), mainCreator);
-                ipcCreator = getCreator(descriptor.getIpcCreator(), ipcCreator);
-                dmCreator = getCreator(descriptor.getDmCreator(), dmCreator);
+                    + tDesc.getClass().getName());
+                mainCreator = getCreator(tDesc.getMainCreator(), mainCreator);
+                ipcCreator = getCreator(tDesc.getIpcCreator(), ipcCreator);
+                dmCreator = getCreator(tDesc.getDmCreator(), dmCreator);
             } 
             initialized = true;
         } 
