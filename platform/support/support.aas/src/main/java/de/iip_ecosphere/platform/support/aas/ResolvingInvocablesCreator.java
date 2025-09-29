@@ -89,15 +89,16 @@ public class ResolvingInvocablesCreator implements InvocablesCreator {
          * 
          * @return the parent or <b>null</b> for none
          */
-        protected ElementContainer resolveParent() {
-            ElementContainer parent = null;
+        protected ElementsAccess resolveParent() {
+            AasFactory factory = AasFactory.getInstance();
+            ElementsAccess parent = null;
             try {
                 Aas aas = aasSupplier.get();
                 int pathPos = 0;
-                parent = aas.getSubmodel(elementPath[pathPos++]);
+                parent = aas.getSubmodel(factory.fixId(elementPath[pathPos++]));
                 while (parent != null && pathPos < elementPath.length) {
-                    SubmodelElement elt = parent.getSubmodelElement(elementPath[pathPos++]);
-                    parent = elt instanceof ElementContainer ? (ElementContainer) elt : null;
+                    SubmodelElement elt = parent.getSubmodelElement(factory.fixId(elementPath[pathPos++]));
+                    parent = elt instanceof ElementsAccess ? (ElementsAccess) elt : null;
                 }
             } catch (IOException e) {
                 LoggerFactory.getLogger(getClass()).error("While resolving {}: {}", 
@@ -161,7 +162,7 @@ public class ResolvingInvocablesCreator implements InvocablesCreator {
          */
         private boolean resolveProperty() {
             if (null == property) {
-                ElementContainer parent = resolveParent();
+                ElementsAccess parent = resolveParent();
                 if (null != parent) {
                     property = parent.getProperty(getName());
                 }
@@ -228,7 +229,7 @@ public class ResolvingInvocablesCreator implements InvocablesCreator {
          */
         private boolean resolveOperation() {
             if (null == operation) {
-                ElementContainer parent = resolveParent();
+                ElementsAccess parent = resolveParent();
                 if (null != parent) {
                     operation = parent.getOperation(getName());
                 }
@@ -248,6 +249,8 @@ public class ResolvingInvocablesCreator implements InvocablesCreator {
                             getName(), e.getMessage());
                         // result == null
                     }
+                } else {
+                    LoggerFactory.getLogger(getClass()).warn("Cannot resolve AAS operation `{}`", getName());
                 }
                 return result;
             };
