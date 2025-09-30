@@ -378,7 +378,7 @@ public class IvmlUtils {
                 ContainableModelElement elt = p.getElement(e);
                 if (elt instanceof AbstractVariable) {
                     AbstractVariable var = ((AbstractVariable) elt);
-                    if (IvmlUtils.isTemplate(var)) {
+                    if (isTemplate(var)) {
                         result.add(var);
                     }
                 }
@@ -421,9 +421,29 @@ public class IvmlUtils {
      * @return {@code true} for template, {@code false} else
      */
     public static boolean isTemplate(AbstractVariable var) {
-        return IvmlUtils.isOfCompoundType(var, "Application") && isTemplate(var.getProject());
+        return isApplication(var) && isInTemplate(var);
     }
-    
+
+    /**
+     * Returns whether {@code var} represents an application.
+     * 
+     * @param var the variable to check
+     * @return {@code true} for application, {@code false} else
+     */
+    public static boolean isApplication(AbstractVariable var) {
+        return isOfCompoundType(var, "Application");
+    }
+        
+    /**
+     * Returns whether {@code var} is in a template.
+     * 
+     * @param var the variable to check
+     * @return {@code true} if {@code var} is declared in a template, {@code false} else
+     */
+    public static boolean isInTemplate(AbstractVariable var) {
+        return isTemplate(var.getProject());
+    }
+
     /**
      * Returns the projects that use {@code var}.
      * 

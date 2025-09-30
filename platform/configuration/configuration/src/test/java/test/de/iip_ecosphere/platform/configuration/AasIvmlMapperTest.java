@@ -69,6 +69,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.instantiation.core.model.vilTypes.configuration.Configuration;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
@@ -574,6 +575,32 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         stopEasy(lcd);
         setupIvmlFiles(); // revert changes
     }
+    
+    /**
+     * Tests the getTemplates function.
+     * 
+     * @throws IOException if copying/resetting files fails
+     * @throws ExecutionException if the operation fails
+     */
+    @Test
+    public void testGetTemplates() throws IOException, ExecutionException {
+        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
+            ivmlFolder, FileUtils.getTempDirectory());
+        ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
+        AasIvmlMapper mapper = getInstance(false);
+        
+        String templates = mapper.getTemplates();
+        Assert.assertNotNull(templates);
+        java.util.List<String> templatesList = JsonUtils.listFromJson(templates, String.class);
+        Assert.assertNotNull(templatesList);
+        Assert.assertTrue(templatesList.contains("tplApp"));
+
+        stopEasy(lcd);
+        setupIvmlFiles(); // revert changes
+    }
+
+    // TODO rename variables
+    // TODO instantiateTemplate
 
     /**
      * Asserts that {@code var} has the {@code expected} String value.
