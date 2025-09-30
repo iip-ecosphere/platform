@@ -159,7 +159,7 @@ public class JsonUtils {
      * @return the list or <b>null</b> if reading fails
      * @see #toJson(Object)
      */
-    public <R> java.util.List<R> listFromJson(Object json, Class<R> cls) {
+    public static <R> java.util.List<R> listFromJson(Object json, Class<R> cls) {
         return Json.listFromJsonDflt(json, cls);
     }
 
@@ -174,7 +174,7 @@ public class JsonUtils {
      * @return the map or <b>null</b> if reading fails
      * @see #toJson(Object)
      */
-    public <K, V> Map<K, V> mapFromJson(Object json, Class<K> keyCls, Class<K> valueCls) {
+    public static <K, V> Map<K, V> mapFromJson(Object json, Class<K> keyCls, Class<K> valueCls) {
         return Json.mapFromJsonDflt(json, keyCls, valueCls);
     }
 
