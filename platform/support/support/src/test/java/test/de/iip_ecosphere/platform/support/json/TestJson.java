@@ -15,10 +15,12 @@ package test.de.iip_ecosphere.platform.support.json;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -77,6 +79,51 @@ public class TestJson extends de.iip_ecosphere.platform.support.json.Json {
             }
         }
         return result; 
+    }
+    
+    @Override
+    public <R> List<R> listFromJson(Object json, Class<R> cls) {
+        List<R> result = null;
+        if (null != json) {
+            try {
+                result = mapper.readValue(json.toString(), new ListTypeReference<R>());
+            } catch (JsonProcessingException e) {
+                //result = null;
+            }            
+        }
+        return result; 
+    }
+
+    @Override
+    public <K, V> Map<K, V> mapFromJson(Object json, Class<K> keyCls, Class<K> valueCls) {
+        Map<K, V> result = null;
+        if (null != json) {
+            try {
+                result = mapper.readValue(json.toString(), new MapTypeReference<K, V>());
+            } catch (JsonProcessingException e) {
+                //result = null;
+            }            
+        }
+        return result; 
+    }
+
+    /**
+     * Internal type to obtain a typed List from JSON.
+     *
+     * @param <T> the element type
+     * @author Holger Eichelberger, SSE
+     */
+    private static class ListTypeReference<T> extends TypeReference<java.util.List<T>> {
+    }
+    
+    /**
+     * Internal type to obtain a typed Map from JSON.
+     *
+     * @param <K> the key type
+     * @param <V> the value type
+     * @author Holger Eichelberger, SSE
+     */
+    private static class MapTypeReference<K, V> extends TypeReference<Map<K, V>> {
     }
 
     @Override

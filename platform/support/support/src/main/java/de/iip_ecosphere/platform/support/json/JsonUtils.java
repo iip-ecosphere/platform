@@ -151,6 +151,34 @@ public class JsonUtils {
     }
     
     /**
+     * Reads a typed List from a JSON string.
+     * 
+     * @param <R> the entity type
+     * @param json the JSON value (usually a String)
+     * @param cls the class of the entity type to read
+     * @return the list or <b>null</b> if reading fails
+     * @see #toJson(Object)
+     */
+    public <R> java.util.List<R> listFromJson(Object json, Class<R> cls) {
+        return Json.listFromJsonDflt(json, cls);
+    }
+
+    /**
+     * Reads a typed Map from a JSON string.
+     * 
+     * @param <K> the key type
+     * @param <V> the value type
+     * @param json the JSON value (usually a String)
+     * @param keyCls the class of the key type to read
+     * @param valueCls the class of the value type to read
+     * @return the map or <b>null</b> if reading fails
+     * @see #toJson(Object)
+     */
+    public <K, V> Map<K, V> mapFromJson(Object json, Class<K> keyCls, Class<K> valueCls) {
+        return Json.mapFromJsonDflt(json, keyCls, valueCls);
+    }
+
+    /**
      * Escapes an input string for JSON. Taken over from 
      * <a href="https://stackoverflow.com/questions/34706849/how-do-i-unescape-a-json-string-using-java-jackson">
      * Stackoverflow</a> and <a href="http://lemurproject.org/">Lemur Project</a>. The respective methods from <a 

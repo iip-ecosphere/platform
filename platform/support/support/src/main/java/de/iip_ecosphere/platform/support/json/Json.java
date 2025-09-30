@@ -83,6 +83,30 @@ public abstract class Json {
     public abstract <R> R fromJson(Object json, Class<R> cls) throws IOException;
 
     /**
+     * Reads a typed List from a JSON string.
+     * 
+     * @param <R> the entity type
+     * @param json the JSON value (usually a String)
+     * @param cls the class of the entity type to read
+     * @return the list or <b>null</b> if reading fails
+     * @see #toJson(Object)
+     */
+    public abstract <R> java.util.List<R> listFromJson(Object json, Class<R> cls);
+    
+    /**
+     * Reads a typed Map from a JSON string.
+     * 
+     * @param <K> the key type
+     * @param <V> the value type
+     * @param json the JSON value (usually a String)
+     * @param keyCls the class of the key type to read
+     * @param valueCls the class of the value type to read
+     * @return the map or <b>null</b> if reading fails
+     * @see #toJson(Object)
+     */
+    public abstract <K, V> Map<K, V> mapFromJson(Object json, Class<K> keyCls, Class<K> valueCls);
+    
+    /**
      * Reads a value from a string.
      * 
      * @param <T> the result type
@@ -131,7 +155,7 @@ public abstract class Json {
      * @param obj the object (may be <b>null</b>), must have getters/setters for all attributes and a no-arg constructor
      *   no-arg constructor
      * @return the JSON string or an empty string in case of problems/no address
-     * @see #fromJson(Object, Class)
+     * @see #toJson(Object)
      */
     public static String toJsonDflt(Object obj) throws IOException {
         return prototype.toJson(obj);
@@ -144,11 +168,39 @@ public abstract class Json {
      * @param json the JSON value (usually a String)
      * @param cls the class of the type to read
      * @return the object or <b>null</b> if reading fails
-     * @see #toJson(Object)
+     * @see #fromJson(Object, Class)
      */
     public static <R> R fromJsonDflt(Object json, Class<R> cls) throws IOException {
         return prototype.fromJson(json, cls);
     }
+
+    /**
+     * Reads a typed List from a JSON string.
+     * 
+     * @param <R> the entity type
+     * @param json the JSON value (usually a String)
+     * @param cls the class of the entity type to read
+     * @return the list or <b>null</b> if reading fails
+     * @see #listFromJson(Object, Class)
+     */
+    public static <R> java.util.List<R> listFromJsonDflt(Object json, Class<R> cls) {
+        return prototype.listFromJson(json, cls);
+    }
+    
+    /**
+     * Reads a typed Map from a JSON string.
+     * 
+     * @param <K> the key type
+     * @param <V> the value type
+     * @param json the JSON value (usually a String)
+     * @param keyCls the class of the key type to read
+     * @param valueCls the class of the value type to read
+     * @return the map or <b>null</b> if reading fails
+     * @see #mapFromJson(Object, Class, Class)
+     */
+    public static <K, V> Map<K, V> mapFromJsonDflt(Object json, Class<K> keyCls, Class<K> valueCls) {
+        return prototype.mapFromJson(json, keyCls, valueCls);
+    }    
     
     /**
      * Configures this instance for {@code cls} by considering the annotations in {@code cls}.

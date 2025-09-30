@@ -29,7 +29,7 @@ import org.junit.Assert;
 public class FallbackLoggerTest {
     
     /**
-     * Tests {@link FallbackLogger#abbreviate()}.
+     * Tests {@link FallbackLogger#abbreviate(String)}.
      */
     @Test
     public void testAbbreviate() {
