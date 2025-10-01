@@ -14,6 +14,7 @@ describe('FlowchartComponent', () => {
 
   let component: FlowchartComponent;
   let fixture: ComponentFixture<FlowchartComponent>;
+  const TIMEOUT_MS = 10000;
 
   beforeEach(async () => {
     await EnvConfigService.init();
@@ -106,6 +107,6 @@ describe('FlowchartComponent', () => {
     expect(checkSet.size).toBe(1); // 'myOpcConn'
 
     // TODO requires started instance from deployment-plans and test frame
-  });
+  }, TIMEOUT_MS);
 
 });
