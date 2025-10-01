@@ -1,6 +1,7 @@
 project UI {
 
     import Applications;
+    import TemplatePart*;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
 

@@ -69,11 +69,15 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.instantiation.core.model.vilTypes.configuration.Configuration;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.model.AbstractVariable;
+import net.ssehub.easy.varModel.model.IvmlModelQuery;
 import net.ssehub.easy.varModel.model.ModelQuery;
+import net.ssehub.easy.varModel.model.ModelQueryException;
 import net.ssehub.easy.varModel.model.Project;
 import net.ssehub.easy.varModel.model.ProjectImport;
 import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
@@ -574,6 +578,59 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         stopEasy(lcd);
         setupIvmlFiles(); // revert changes
     }
+    
+    /**
+     * Tests {@link AasIvmlMapper#getTemplates()}.
+     * 
+     * @throws IOException if copying/resetting files fails
+     * @throws ExecutionException if the operation fails
+     */
+    @Test
+    public void testGetTemplates() throws IOException, ExecutionException {
+        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
+            ivmlFolder, FileUtils.getTempDirectory());
+        ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
+        AasIvmlMapper mapper = getInstance(false);
+        
+        String templates = mapper.getTemplates();
+        Assert.assertNotNull(templates);
+        java.util.List<String> templatesList = JsonUtils.listFromJson(templates, String.class);
+        Assert.assertNotNull(templatesList);
+        Assert.assertTrue(templatesList.contains("tplApp"));
+
+        stopEasy(lcd);
+        setupIvmlFiles(); // revert changes
+    }
+
+    /**
+     * Tests renaming a variable using {@link AasIvmlMapper#renameVariable(String, String)}.
+     * 
+     * @throws IOException if copying/resetting files fails
+     * @throws ExecutionException if the operation fails
+     * @throws ModelQueryException if accessing IVML parts fails
+     */
+    @Test
+    public void testRenameVariable() throws IOException, ExecutionException, ModelQueryException {
+        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
+            ivmlFolder, FileUtils.getTempDirectory());
+        ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
+        AasIvmlMapper mapper = getInstance(false);
+
+        mapper.renameVariable("myMesh", "myMesh1");
+
+        net.ssehub.easy.varModel.confModel.Configuration cfg = ConfigurationManager.getIvmlConfiguration();
+        Project root = cfg.getProject();
+        AbstractVariable var = IvmlModelQuery.findVariable(root, "myMesh", null);
+        Assert.assertNull(var); // was renamed, shall not be there
+        var = IvmlModelQuery.findVariable(root, "myMesh1", null);
+        Assert.assertNotNull(var); // shall be there
+        Assert.assertEquals("ServiceMeshPartMyMesh", var.getProject().getName()); // shall still be there
+
+        stopEasy(lcd);
+        setupIvmlFiles(); // revert changes
+    }
+
+    // TODO instantiateTemplate
 
     /**
      * Asserts that {@code var} has the {@code expected} String value.

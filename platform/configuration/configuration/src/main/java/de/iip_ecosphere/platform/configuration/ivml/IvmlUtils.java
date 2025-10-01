@@ -290,38 +290,41 @@ public class IvmlUtils {
      * @return {@code true} for conflict, {@code false} for ok
      */
     public static boolean analyzeReasoningResult(ReasoningResult res, boolean emitWarnings, boolean emitMessages) {
-        boolean hasConflict = res.hasConflict();
-        int errorCount = 0;
-        int templateErrorCount = 0;
-        for (int m = 0; m < res.getMessageCount(); m++) {
-            Message msg = res.getMessage(m);
-            Status status = msg.getStatus();
-            boolean emit = true;
-            if (status == Status.ERROR) {
-                errorCount++;
-                boolean addressesTemplate = msg.getConflictProjects()
-                    .stream()
-                    .anyMatch(p -> isTemplate(p));
-                if (addressesTemplate) {
-                    templateErrorCount++;
-                    emit = false;
+        boolean hasConflict = true;
+        if (null != res) {
+            hasConflict = res.hasConflict();
+            int errorCount = 0;
+            int templateErrorCount = 0;
+            for (int m = 0; m < res.getMessageCount(); m++) {
+                Message msg = res.getMessage(m);
+                Status status = msg.getStatus();
+                boolean emit = true;
+                if (status == Status.ERROR) {
+                    errorCount++;
+                    boolean addressesTemplate = msg.getConflictProjects()
+                        .stream()
+                        .anyMatch(p -> isTemplate(p));
+                    if (addressesTemplate) {
+                        templateErrorCount++;
+                        emit = false;
+                    }
+                } else if (status == Status.WARNING) {
+                    emit = emitWarnings;
                 }
-            } else if (status == Status.WARNING) {
-                emit = emitWarnings;
+                if (emit && emitMessages) {
+                    System.out.println(msg.getDescription());
+                    if (!msg.getConflictComments().isEmpty()) {
+                        System.out.println(msg.getConflictComments());
+                    }
+                    if (!msg.getConflictSuggestions().isEmpty()) {
+                        System.out.println(msg.getConflictSuggestions());
+                    }
+                }
             }
-            if (emit && emitMessages) {
-                System.out.println(msg.getDescription());
-                if (!msg.getConflictComments().isEmpty()) {
-                    System.out.println(msg.getConflictComments());
-                }
-                if (!msg.getConflictSuggestions().isEmpty()) {
-                    System.out.println(msg.getConflictSuggestions());
-                }
+            if (templateErrorCount > 0 && templateErrorCount == errorCount) {
+                hasConflict = false; // ignore if we have only template errors
             }
-        }
-        if (templateErrorCount > 0 && templateErrorCount == errorCount) {
-            hasConflict = false; // ignore if we have only template errors
-        }
+        } // else see init
         return hasConflict;
     }    
 
@@ -378,7 +381,7 @@ public class IvmlUtils {
                 ContainableModelElement elt = p.getElement(e);
                 if (elt instanceof AbstractVariable) {
                     AbstractVariable var = ((AbstractVariable) elt);
-                    if (IvmlUtils.isTemplate(var)) {
+                    if (isTemplate(var)) {
                         result.add(var);
                     }
                 }
@@ -421,9 +424,29 @@ public class IvmlUtils {
      * @return {@code true} for template, {@code false} else
      */
     public static boolean isTemplate(AbstractVariable var) {
-        return IvmlUtils.isOfCompoundType(var, "Application") && isTemplate(var.getProject());
+        return isApplication(var) && isInTemplate(var);
     }
-    
+
+    /**
+     * Returns whether {@code var} represents an application.
+     * 
+     * @param var the variable to check
+     * @return {@code true} for application, {@code false} else
+     */
+    public static boolean isApplication(AbstractVariable var) {
+        return isOfCompoundType(var, "Application");
+    }
+        
+    /**
+     * Returns whether {@code var} is in a template.
+     * 
+     * @param var the variable to check
+     * @return {@code true} if {@code var} is declared in a template, {@code false} else
+     */
+    public static boolean isInTemplate(AbstractVariable var) {
+        return isTemplate(var.getProject());
+    }
+
     /**
      * Returns the projects that use {@code var}.
      * 

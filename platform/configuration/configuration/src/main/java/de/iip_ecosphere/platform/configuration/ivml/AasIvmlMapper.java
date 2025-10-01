@@ -1436,6 +1436,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("constant")))
             .setValue(Type.BOOLEAN, var.getDeclaration().isConstant())
             .build();
+        varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("template")))
+            .setValue(Type.BOOLEAN, IvmlUtils.isInTemplate(var.getDeclaration()))
+            .build();
         IDatatype type = var.getValue() != null ? var.getValue().getType() : varType;
         String declaredTypeName = IvmlDatatypeVisitor.getUnqualifiedType(var.getDeclaration().getType());
         String varName = var.getDeclaration().getName();
