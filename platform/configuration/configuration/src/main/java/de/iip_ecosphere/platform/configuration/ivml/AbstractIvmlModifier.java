@@ -657,23 +657,27 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                 reloadConfiguration();
             }
             String msg = "";
-            for (int m = 0; m < res.getMessageCount(); m++) {
-                if (msg.length() > 0) {
-                    msg += "\n";
-                }
-                Message rmsg = res.getMessage(m);
-                msg += rmsg.getDescription();
-                msg += rmsg.getConflictComments();
-                msg += rmsg.getConflictSuggestions();
-                // remove?
-                for (int v = 0; v < res.getAffectedVariablesCount(); v++) {
-                    if (v > 0) {
-                        msg += ", ";
+            if (null != res) {
+                for (int m = 0; m < res.getMessageCount(); m++) {
+                    if (msg.length() > 0) {
+                        msg += "\n";
                     }
-                    msg += res.getAffectedVariable(v).getQualifiedName();
+                    Message rmsg = res.getMessage(m);
+                    msg += rmsg.getDescription();
+                    msg += rmsg.getConflictComments();
+                    msg += rmsg.getConflictSuggestions();
+                    // remove?
+                    for (int v = 0; v < res.getAffectedVariablesCount(); v++) {
+                        if (v > 0) {
+                            msg += ", ";
+                        }
+                        msg += res.getAffectedVariable(v).getQualifiedName();
+                    }
                 }
+                EasyExecutor.printReasoningMessages(res); // preliminary
+            } else {
+                msg = "Internal reasoning issue. Please check logs.";
             }
-            EasyExecutor.printReasoningMessages(res); // preliminary
             getLogger().error("Reasoning failed: {}", msg);
             throw new ExecutionException(msg, null);
         }
@@ -803,21 +807,25 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      * @throws ExecutionException if creating the variable fails
      */
     public void renameVariable(String varName, String newVarName) throws ExecutionException {
-        getLogger().info("Renaming IVML variable {} to {}", varName, newVarName);
-        net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
-        Project root = cfg.getProject();
-        try {
-            AbstractVariable var = IvmlModelQuery.findVariable(root, varName, null);
-            var.setName(toIdentifier(newVarName));
-            ReasoningResult res = validateAndPropagate();
-            throwIfFails(res, true);
-            Set<Project> projects = IvmlUtils.findProjectsUsingVariable(root, var);
-            for (Project p : projects) {
-                saveTo(p, getIvmlFile(p));
+        if (varName.length() > 0 && newVarName.length() > 0 && !newVarName.equals(varName)) {
+            getLogger().info("Renaming IVML variable {} to {}", varName, newVarName);
+            net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
+            Project root = cfg.getProject();
+            try {
+                AbstractVariable var = IvmlModelQuery.findVariable(root, varName, null);
+                cfg.renameVariable(var, toIdentifier(newVarName));
+                ReasoningResult res = validateAndPropagate();
+                throwIfFails(res, true);
+                Set<Project> projects = IvmlUtils.findProjectsUsingVariable(root, var);
+                for (Project p : projects) {
+                    saveTo(p, getIvmlFile(p));
+                }
+                getLogger().info("Renamed IVML variable {} to {}", varName, newVarName);
+            } catch (ModelQueryException e) {
+                throw new ExecutionException(e);
             }
-            getLogger().info("Renamed IVML variable {} to {}", varName, newVarName);
-        } catch (ModelQueryException e) {
-            throw new ExecutionException(e);
+        } else {
+            getLogger().info("Skipped renaming IVML variable {} to {} as not given/same.", varName, newVarName);
         }
     }
     

@@ -290,38 +290,41 @@ public class IvmlUtils {
      * @return {@code true} for conflict, {@code false} for ok
      */
     public static boolean analyzeReasoningResult(ReasoningResult res, boolean emitWarnings, boolean emitMessages) {
-        boolean hasConflict = res.hasConflict();
-        int errorCount = 0;
-        int templateErrorCount = 0;
-        for (int m = 0; m < res.getMessageCount(); m++) {
-            Message msg = res.getMessage(m);
-            Status status = msg.getStatus();
-            boolean emit = true;
-            if (status == Status.ERROR) {
-                errorCount++;
-                boolean addressesTemplate = msg.getConflictProjects()
-                    .stream()
-                    .anyMatch(p -> isTemplate(p));
-                if (addressesTemplate) {
-                    templateErrorCount++;
-                    emit = false;
+        boolean hasConflict = true;
+        if (null != res) {
+            hasConflict = res.hasConflict();
+            int errorCount = 0;
+            int templateErrorCount = 0;
+            for (int m = 0; m < res.getMessageCount(); m++) {
+                Message msg = res.getMessage(m);
+                Status status = msg.getStatus();
+                boolean emit = true;
+                if (status == Status.ERROR) {
+                    errorCount++;
+                    boolean addressesTemplate = msg.getConflictProjects()
+                        .stream()
+                        .anyMatch(p -> isTemplate(p));
+                    if (addressesTemplate) {
+                        templateErrorCount++;
+                        emit = false;
+                    }
+                } else if (status == Status.WARNING) {
+                    emit = emitWarnings;
                 }
-            } else if (status == Status.WARNING) {
-                emit = emitWarnings;
+                if (emit && emitMessages) {
+                    System.out.println(msg.getDescription());
+                    if (!msg.getConflictComments().isEmpty()) {
+                        System.out.println(msg.getConflictComments());
+                    }
+                    if (!msg.getConflictSuggestions().isEmpty()) {
+                        System.out.println(msg.getConflictSuggestions());
+                    }
+                }
             }
-            if (emit && emitMessages) {
-                System.out.println(msg.getDescription());
-                if (!msg.getConflictComments().isEmpty()) {
-                    System.out.println(msg.getConflictComments());
-                }
-                if (!msg.getConflictSuggestions().isEmpty()) {
-                    System.out.println(msg.getConflictSuggestions());
-                }
+            if (templateErrorCount > 0 && templateErrorCount == errorCount) {
+                hasConflict = false; // ignore if we have only template errors
             }
-        }
-        if (templateErrorCount > 0 && templateErrorCount == errorCount) {
-            hasConflict = false; // ignore if we have only template errors
-        }
+        } // else see init
         return hasConflict;
     }    
 
