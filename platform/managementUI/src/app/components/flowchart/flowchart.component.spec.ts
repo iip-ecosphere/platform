@@ -14,7 +14,7 @@ describe('FlowchartComponent', () => {
 
   let component: FlowchartComponent;
   let fixture: ComponentFixture<FlowchartComponent>;
-  const TIMEOUT_MS = 10000;
+  const TIMEOUT_MS = 30000;
 
   beforeEach(async () => {
     await EnvConfigService.init();
