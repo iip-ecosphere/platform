@@ -935,7 +935,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     /**
      * Returns the IVML project name for a service mesh.
      * 
-     * @param appName the application name
      * @param meshName the configured name of the service mesh
      * @return the project name
      */

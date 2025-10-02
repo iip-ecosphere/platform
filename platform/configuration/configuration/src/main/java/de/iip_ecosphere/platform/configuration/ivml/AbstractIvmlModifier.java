@@ -205,7 +205,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      * 
      * @param prj the project
      * @return {@code true} allowed, {@code false} else
-     * @see #getVariableTarget(Project, IDatatype)
+     * @see #getVariableTarget(Project, IDatatype, String, List)
      */
     protected boolean isAllowedForModification(Project prj) {
         return false; 
@@ -807,7 +807,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
     }
 
     /**
-     * Adds an adjustment for the name of {@code decVar} if enabled by {@link #enableNameAdjustment}.
+     * Adds an adjustment for the name of {@code decVar} if enabled by {@code #enableNameAdjustment}.
      * 
      * @param decVar the decision variable to get the value for the adjustment from. If set up, 
      *     {@link InstantiationContext#prefixVarName(String)} will be applied to the value.

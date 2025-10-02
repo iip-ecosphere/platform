@@ -159,23 +159,37 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
         setOf(String) selectedApplications = getProperty("iip.easy.apps", "")
             .split(",")->reject(s|s.trim().length()==0) // for "" the result will be "", prune this
             .toSet();
-        setOf(Application) applications = Application.allInstances()->select(a|isApplication(a));
+        setOf(Application) applications = Application.allInstances()->select(a|not(isInTemplate(a)));
         if (selectedApplications.size() > 0) {
             applications = applications->select(a|selectedApplications.includes(a.id));
         }
         applications;
     }
     
+    Boolean isInTemplate(DecisionVariable dv) = {
+        dv.getDeclaration().getQualifiedName().startsWith("TemplatePart");
+    }
+    
     Boolean isApplication(Application app) = {
         DecisionVariable dv = app;
-        not(dv.getParent().getName().startsWith("TemplatePart"));
+        not(isInTemplate(dv));
     }
     
     setOf(RecordType) getRecordTypes() = {
         setOf(RecordType) recordTypes = RecordType.allInstances();
         recordTypes.remove(AasGenericSubmodelElementCollection);
         recordTypes.remove(AasGenericEntityType);
-        recordTypes;
+        recordTypes->select(r|not(isInTemplate(r)));
+    }
+    
+    setOf(ServiceBase) getServiceTypes() = {
+        setOf(ServiceBase) serviceTypes = ServiceBase.allInstances();
+        serviceTypes->select(s|not(isInTemplate(s)));
+    }
+    
+    setOf(Server) getServerTypes() = {
+        setOf(Server) serverTypes = Server.allInstances();
+        serverTypes->select(s|not(isInTemplate(s)));
     }
 
 }

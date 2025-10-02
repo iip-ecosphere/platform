@@ -337,7 +337,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 }
                 
                 mapOf(Server, setOf(ServiceBase)) serverServices = {};
-                for (ServiceBase s : ServiceBase.allInstances()) {
+                for (ServiceBase s : getServiceTypes()) {
                     if (isDefined(s.server) and s.server <> null) {
                         setOf(ServiceBase) sb = serverServices.getOrAdd(s, {});
                         sb.add(s);
@@ -2235,8 +2235,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         appRoot.mkdir();
 
         setOf(RecordType) recordTypes = getRecordTypes();
-        setOf(ServiceBase) serviceTypes = ServiceBase.allInstances();
-        setOf(Server) serverTypes = Server.allInstances();
+        setOf(ServiceBase) serviceTypes = getServiceTypes();
+        setOf(Server) serverTypes = getServerTypes();
         Path javaSrc = "${appRoot}/src/main/java";
         Path pySrc = "${appRoot}/src/main/python";
         Path resourcesSrc = "${appRoot}/src/main/resources";
