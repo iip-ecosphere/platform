@@ -96,7 +96,20 @@ A sub-mesh has all fields of `ServiceBase` as well as the following fields:
 | sources |  `MeshConnector` instances pointing to the source mesh elements of this sub-mesh. |     |
 | pseudoSink | A single sink where outgoing flows connect to. Will be virtually substituted by the outgoing mesh connectors of the referring `MeshElement`. |     |
 
-### An example of Application IVML file
+## Application Templates
+
+Sometimes it is helpful for users to have already working applications as starting point for own applications. As part of the [DATIpilot ReGaP innovation community](https://regap.de) we are investigating such templates. Currently, a template looks like a normal application, potentially containing sub-meshes, but due to specific conventions, configuration constraints that apply to normal applications are relaxed. In other words, templates may have configuration gaps that are then requested as user input on the user interface. An instantiated template becomes an application that must fullfill all constraints. In contrast to a manually implemented application, such an application model can be extended by the user and the oktoflow application code generation can be exploited as usual.
+
+The current conventions are:
+- template IVML files are located in the meta model or in an application the folder `src/main/easy/templates`
+- template the name of template IVML files/projects start with `TemplatePart`
+- template IVML files contain all application, service mesh, service, connector, datatype and constant definitions in the same file
+
+During template instantiation, the definitions from a single template file are extracted and transferred into the usual structure of a managed configuration. Currently, application and service mesh elements are renamed (to remain unique), while services, data types and constants are taken over for reuse. This is an initial approach that may prove practical or may require changes in the future. The template itself is not modified. 
+
+Further conventions will follow on how to handle re-usable service implementations that shall be distributed along with templates (probably either the oktoflow `defaultLib` or standalone Maven projects, not all-in-one examples).
+
+## An example of Application IVML file
 
 An application IVML configuration file from Asynchronous Python example in Oktoflow platform
 
@@ -124,7 +137,7 @@ project ApplicationPartPythonApp {
 
 The `ApplicationPartPythonApp` is an application IVML configuration file that is part of the Oktoflow platform examples: [Asynchronous Python](../../examples/examples.python). It imports the `ServiceMeshPartPythonApp*` from the same example, which includes the 'ServiceMesh' for the application. It defines the ID, name, version, description, and 'ServiceMesh' for the application.
 
-### An example of ServiceMesh IVML file
+## An example of ServiceMesh IVML file
 
 A serviceMesh IVML configuration file from Asynchronous Python example in Oktoflow platform
 
