@@ -97,9 +97,6 @@ In turn, `Field` instances may be equipped with more information as summarized b
 | display | Optional setting on how to display the field on a dashboard (`TimeSeries`, `Gauge`, `BarChart`, `Table`) | - |
 | displayRow | Optional reference to display row that shall display this field. If not given, field will occur in some default (top)-row of dashboard. | - |
 
-Background:
-- Type and record names are used for naming generated classes or attributes/fields as well as related methods/functions within the classes. Thereby, given names are adjusted to the respective programming language conventions, e.g., Java or Python. However, within data formats, e.g., JSON, we keep the original names as specified in the model.
-
 Again, in turn, `Field` instances may specify a `DisplayRow` with the following fields:
 
 | Field | Description | Default |
@@ -107,9 +104,46 @@ Again, in turn, `Field` instances may specify a `DisplayRow` with the following 
 | name | Name of the field, must be unique for all `DisplayRow` instances. |     |
 | displayName | Optional display name  for the display row. |  ""   |
 
+Although all display related fields are optional for usual `Field` instances in a `RecordType`, because an usual `Field` shall not be displayed on a dashboard, they partially become mandatory if a `Field` shall be displayed. The following example illustrates this:
+
+```
+    RecordType influxEnergyData = {
+        name = "InfluxEnergyData",
+        fields = {
+            Field {
+                name = "PowerConsumption",
+                description = "PowerConsumption in mA",
+                type = refBy(FloatType),
+                cachingTime = CACHE_NONE,
+                displayName = "Power Consumption",
+                display = Display::TimeSeries,
+                semanticId = "0173-1#05-AAA187#005", // ECLASS for mA
+                displayRow = refBy(topRow)
+            }        
+        }
+    };    
+    
+```
+
+i.e., `display` and `semanticId` become mandatory for dashboarding fields, `displayName` and `displayRow` are still optional where, if not given, default values are assumed. If a `displayRow` is given, a display row must be defined (also in `AllTypes.ivml`)
+
+```
+    DisplayRow topRow = {
+        name = "TopRow",
+        displayName = "The most important data."  
+    };
+    
+```
+
+and declared as one of the intended display rows in the application (e.g., `displayRows = {refBy(topRow), refBy(otherRow)}`).
+
+
+Background:
+- Type and record names are used for naming generated classes or attributes/fields as well as related methods/functions within the classes. Thereby, given names are adjusted to the respective programming language conventions, e.g., Java or Python. However, within data formats, e.g., JSON, we keep the original names as specified in the model.
+
 ## Alias Type
 
-Alias types consitute an own type that is essentially based on an existing type while giving this type a new name or refining certain properties. For example, for energy applications it makes sense to define the unit Ampere could as an alias of a double floating point number.
+Alias types consitute an own type that is essentially based on an existing type while giving this type a new name or refining certain properties. For example, for energy applications it makes sense to define the unit Ampere could as an alias of a double floating point number. 
 
 ```
 AliasType AmpereType = {
@@ -124,3 +158,5 @@ AliasType AmpereType = {
 | name | The unique name of the type | |
 | represents | Reference to the type variable that shall be aliased | |
 | semanticId | Optional semantic id detailing the type | _represents.semanticId_ | |
+
+Let us assume that similarly an `AliasType` called `MilliAmpereType` has been defined. Then, in the example `influxEnergyData` type above, the `type = refBy(FloatType)` can be replaced by `type = refBy(MilliAmpereType)` and the `semanticId` can be left out there as it has been already defined on `MilliAmpereType`.
