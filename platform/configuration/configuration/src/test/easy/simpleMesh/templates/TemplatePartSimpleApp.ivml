@@ -6,7 +6,7 @@ project TemplatePartSimpleApp {
     
     Application tplApp = {
         id = "SimpleApp",
-        //name = "Simple Template Testing App",
+        name = "", // template, for now, may be ifConfigured would help in the underlying constraint; we have to figure out
         ver = "0.1.0",
         description = "",
         services = {refBy(tplMesh)}        

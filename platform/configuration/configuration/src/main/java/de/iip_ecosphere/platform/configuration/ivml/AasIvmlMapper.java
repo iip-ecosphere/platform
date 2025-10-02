@@ -70,8 +70,10 @@ import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 import net.ssehub.easy.varModel.confModel.AssignmentState;
 import net.ssehub.easy.varModel.confModel.ConfigurationException;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
+import net.ssehub.easy.varModel.cst.CSTSemanticException;
 import net.ssehub.easy.varModel.management.VarModel;
 import net.ssehub.easy.varModel.model.AbstractVariable;
+import net.ssehub.easy.varModel.model.Attribute;
 import net.ssehub.easy.varModel.model.ContainableModelElement;
 import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
 import net.ssehub.easy.varModel.model.FreezeBlock;
@@ -88,6 +90,7 @@ import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
 import net.ssehub.easy.varModel.model.values.ContainerValue;
 import net.ssehub.easy.varModel.model.values.ReferenceValue;
 import net.ssehub.easy.varModel.model.values.Value;
+import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
 
 import static de.iip_ecosphere.platform.configuration.ConfigurationManager.*;
 
@@ -622,7 +625,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     }
 
     @Override
-    protected Project getVariableTarget(Project root, IDatatype type) {
+    protected Project getVariableTarget(Project root, IDatatype type, String name, List<String> meshes) 
+        throws ExecutionException {
         Project result = null;
         if (null != type) {
             for (Map.Entry<String, String> ent : PROJECT_MAPPING.entrySet()) {
@@ -639,6 +643,16 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                         "Cannot find type {} when checking for target IVML project {}: {}", ent.getKey(), 
                         ent.getValue(), e.getMessage());
                 }
+            }
+            if (null == result && IvmlUtils.isOfCompoundType(type, "ServiceMesh")) {
+                String prjName = getMeshProjectName(name);
+                result = findOrCreateProject(root, prjName, true);
+                prepareMeshProject(result, root);
+            }
+            if (null == result && IvmlUtils.isOfCompoundType(type, "Application")) {
+                String prjName = getApplicationProjectName(name);
+                result = findOrCreateProject(root, prjName, true);
+                prepareApplicationProject(result, root, meshes);
             }
             if (null == result) { // immediate fallback
                 result = ModelQuery.findProject(root, PRJ_NAME_ALLCONSTANTS);
@@ -717,7 +731,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         try {
             Map<Project, CopiedFile> copies = new HashMap<>();
             if (isNonEmptyString(meshName)) {
-                Project meshProject = ModelQuery.findProject(root, getMeshProjectName(appName, meshName));
+                Project meshProject = ModelQuery.findProject(root, getMeshProjectName(meshName));
                 IDatatype meshType = ModelQuery.findType(root, "ServiceMesh", null);
                 DecisionVariableDeclaration meshVarDecl = ModelQuery.findDeclaration(
                     meshProject, new FirstDeclTypeSelector(meshType));
@@ -886,7 +900,38 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     private String getApplicationProjectName(String appName) {
         return "ApplicationPart" + toIdentifierFirstUpper(appName);
     }
-    
+
+    /**
+     * Prepares an application project, e.g., adds default imports.
+     * 
+     * @param app the application project
+     * @param root the root project
+     * @param meshes the meshes to be added as imports, may be <b>null</b> for none
+     * @throws ExecutionException if adding imports fails
+     */
+    private void prepareApplicationProject(Project app, Project root, List<String> meshes) 
+        throws ExecutionException {
+        try {
+            addImport(app, "Applications", root, null);
+            addImport(app, "AllServices", root, null);
+            // > may go down to easy
+            Project wildcardPrj = new Project("");
+            if (null != meshes) {
+                for (String modelName : meshes) { // "resolve" wildcards
+                    Project tmp = ModelQuery.findProject(root, modelName);
+                    if (null != tmp) {
+                        addImport(wildcardPrj, modelName, root, tmp);
+                    }
+                }
+            }
+            // < may go down to Easy
+            addImport(app, "ServiceMeshPart*", root, wildcardPrj);
+        } catch (ModelManagementException e) {
+            throw new ExecutionException(e);
+        }
+        annotate(app);
+    }
+
     /**
      * Returns the IVML project name for a service mesh.
      * 
@@ -894,9 +939,42 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @param meshName the configured name of the service mesh
      * @return the project name
      */
-    private String getMeshProjectName(String appName, String meshName) {
-        return "ServiceMeshPart" //+ toIdentifierFirstUpper(appName) // mesh can be part of many applications
-            + toIdentifierFirstUpper(meshName);
+    private String getMeshProjectName(String meshName) {
+        return "ServiceMeshPart" + toIdentifierFirstUpper(meshName);
+    }
+
+    /**
+     * Prepares a mesh project, e.g., adds default imports.
+     * 
+     * @param mesh the mesh project
+     * @param root the root project
+     * @throws ExecutionException if adding imports fails
+     */
+    private void prepareMeshProject(Project mesh, Project root) throws ExecutionException {
+        try {
+            addImport(mesh, "Applications", root, null);
+            addImport(mesh, "AllServices", root, null);
+        } catch (ModelManagementException e) {
+            throw new ExecutionException(e);
+        }
+        annotate(mesh);
+    }
+
+    /**
+     * Annotates {@code prj} with the usual binding time.
+     * 
+     * @param prj the project
+     * @throws ExecutionException if the annotation cannot be created
+     */
+    private void annotate(Project prj) throws ExecutionException {
+        try {
+            final net.ssehub.easy.varModel.model.datatypes.Enum bindingTime = ModelQuery.findEnum(prj, "BindingTime");
+            Attribute attr = new Attribute("bindingTime", bindingTime, prj, prj.getVariable());
+            attr.setValue(createExpression(bindingTime, "BindingTime.compile", prj));
+            prj.addBeforeFreeze(attr);
+        } catch (ValueDoesNotMatchTypeException | CSTSemanticException | ModelQueryException e) {
+            throw new ExecutionException(e);
+        }
     }
     
     /**
@@ -916,20 +994,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         IDatatype applicationType = ModelQuery.findType(root, "Application", null);
         
         String appProjectName = getApplicationProjectName(appName);
-        results.appProject = findOrCreateProject(root, appProjectName, true); 
-        addImport(results.appProject, "Applications", root, null);
-        addImport(results.appProject, "AllServices", root, null);
-        // > may go down to easy
-        Project wildcardPrj = new Project("");
-        for (String modelName : VarModel.INSTANCE.getMatchingModelNames("ServiceMeshPart*")) {
-            Project tmp = ModelQuery.findProject(root, modelName);
-            if (null != tmp) {
-                addImport(wildcardPrj, modelName, root, tmp);
-            }
-        }
-        addImport(results.appProject, "ServiceMeshPart*", root, wildcardPrj);
-
-        // < may go down to Easy
+        results.appProject = findOrCreateProject(root, appProjectName, true);
+        prepareApplicationProject(results.appProject, root, 
+            VarModel.INSTANCE.getMatchingModelNames("ServiceMeshPart*"));
         List<Object> meshes = new ArrayList<Object>();
         boolean replaced = false;
         if (results.appProject != null) {
@@ -1078,10 +1145,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         throws ModelQueryException, ModelManagementException, ExecutionException {
         net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
         Project root = cfg.getProject();
-        String meshProjectName = getMeshProjectName(appName, meshName);
+        String meshProjectName = getMeshProjectName(meshName);
         results.meshProject = findOrCreateProject(root, meshProjectName, false); // just overwrite
-        addImport(results.meshProject, "Applications", root, null);
-        addImport(results.meshProject, "AllServices", root, null);
+        prepareMeshProject(results.meshProject, root);
         final IDatatype sourceType = ModelQuery.findType(root, "MeshSource", null);
         final IDatatype processorType = ModelQuery.findType(root, "MeshProcessor", null);
         final IDatatype sinkType = ModelQuery.findType(root, "MeshSink", null);

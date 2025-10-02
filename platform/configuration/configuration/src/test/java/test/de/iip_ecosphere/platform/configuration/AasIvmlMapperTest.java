@@ -630,7 +630,55 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         setupIvmlFiles(); // revert changes
     }
 
-    // TODO instantiateTemplate
+    /**
+     * Tests instantiating a template {@link AasIvmlMapper#getOpenTemplateVariables(String)}.
+     * 
+     * @throws IOException if copying/resetting files fails
+     * @throws ExecutionException if the operation fails
+     * @throws ModelQueryException if accessing IVML parts fails
+     */
+    @Test
+    public void testInstantiateTemplate() throws IOException, ExecutionException, ModelQueryException {
+        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
+            ivmlFolder, FileUtils.getTempDirectory());
+        ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
+        AasIvmlMapper mapper = getInstance(false);
+
+        // run getOpenTemplateVariables before, we assume fixed values here
+        Map<String, String> adjustments = new HashMap<>();
+        adjustments.put("tplApp.name", "myTestingTemplateApp");
+        final String appVarName = "testTemplateApp";
+        String res = mapper.instantiateTemplate("tplApp", appVarName, adjustments);
+        Assert.assertNotNull(res);
+        Assert.assertEquals(appVarName, res);
+
+        stopEasy(lcd);
+        setupIvmlFiles(); // revert changes
+    }
+
+    /**
+     * Tests instantiating a template {@link AasIvmlMapper#getOpenTemplateVariables(String)}.
+     * 
+     * @throws IOException if copying/resetting files fails
+     * @throws ExecutionException if the operation fails
+     * @throws ModelQueryException if accessing IVML parts fails
+     */
+    @Test
+    public void getOpenTemplateVariables() throws IOException, ExecutionException, ModelQueryException {
+        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
+            ivmlFolder, FileUtils.getTempDirectory());
+        ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
+        AasIvmlMapper mapper = getInstance(false);
+
+        String openVars = mapper.getOpenTemplateVariables("tplApp");
+        Assert.assertNotNull(openVars);
+        java.util.List<String> openVarsList = JsonUtils.listFromJson(openVars, String.class);
+        Assert.assertNotNull(mapper);
+        Assert.assertTrue("tplApp.name expected to be open", openVarsList.contains("tplApp.name"));
+
+        stopEasy(lcd);
+        setupIvmlFiles(); // revert changes
+    }
 
     /**
      * Asserts that {@code var} has the {@code expected} String value.

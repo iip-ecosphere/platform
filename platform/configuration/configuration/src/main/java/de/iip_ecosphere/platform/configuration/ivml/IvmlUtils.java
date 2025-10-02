@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 import net.ssehub.easy.basics.messages.Status;
 import net.ssehub.easy.reasoning.core.reasoner.Message;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
+import net.ssehub.easy.varModel.confModel.IConfigurationElement;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.cst.AttributeVariable;
 import net.ssehub.easy.varModel.cst.CompoundAccess;
@@ -87,9 +88,20 @@ public class IvmlUtils {
      * @param var the variable
      * @param typeName the type name of the compound
      * @return {@code true} if {@code var} is of a compound type with {@code typeName}, {@code false} else
+     * @see #isOfCompoundType(IDatatype, String)
      */
     public static boolean isOfCompoundType(AbstractVariable var, String typeName) {
-        IDatatype type = var.getType();
+        return isOfCompoundType(var.getType(), typeName);
+    }
+
+    /**
+     * Returns whether the given {@code type} is of compound type with name {@code typeName}.
+     * 
+     * @param type the type
+     * @param typeName the type name of the compound
+     * @return {@code true} if {@code var} is of a compound type with {@code typeName}, {@code false} else
+     */
+    public static boolean isOfCompoundType(IDatatype type, String typeName) {
         return TypeQueries.isCompound(type) && typeName.equals(type.getName());
     }
 
@@ -304,6 +316,13 @@ public class IvmlUtils {
                     boolean addressesTemplate = msg.getConflictProjects()
                         .stream()
                         .anyMatch(p -> isTemplate(p));
+                    if (!addressesTemplate) {
+                        for (Set<IDecisionVariable> s : msg.getProblemVariables()) {
+                            for (IDecisionVariable v: s) {
+                                addressesTemplate |= isInTemplate(v);
+                            }
+                        }
+                    }
                     if (addressesTemplate) {
                         templateErrorCount++;
                         emit = false;
@@ -335,19 +354,24 @@ public class IvmlUtils {
      * @param varName the variable representing the application
      * @return the names of the open variables
      */
-    public static List<String> analyzeForTemplate(ReasoningResult res, String varName) {
-        List<String> openVars = new ArrayList<>();
+    public static Set<String> analyzeForTemplate(ReasoningResult res, String varName) {
+        Set<String> openVars = new HashSet<>();
         for (int m = 0; m < res.getMessageCount(); m++) {
             Message msg = res.getMessage(m);
             Status status = msg.getStatus();
             if (status == Status.ERROR) {
-                boolean addressesTemplate = msg.getConflictProjects()
-                    .stream()
-                    .anyMatch(p -> isTemplate(p) && containsVariable(p, varName));
-                if (addressesTemplate) {
-                    for (Set<AbstractVariable> tmp : msg.getConstraintVariables()) {
-                        for (AbstractVariable var : tmp) {
-                            openVars.add(var.getName());
+                for (Set<IDecisionVariable> s : msg.getProblemVariables()) {
+                    for (IDecisionVariable v: s) {
+                        if (isInTemplate(v)) {
+                            String name = v.getQualifiedName();
+                            Project project = getProject(v);
+                            if (project != null) {
+                                String prefix = project.getName() + "::";
+                                if (name.startsWith(prefix)) {
+                                    name = name.substring(prefix.length());
+                                }
+                            }
+                            openVars.add(name.replace("::", "."));
                         }
                     }
                 }
@@ -445,6 +469,36 @@ public class IvmlUtils {
      */
     public static boolean isInTemplate(AbstractVariable var) {
         return isTemplate(var.getProject());
+    }
+
+    /**
+     * Returns whether {@code var} is in a template.
+     * 
+     * @param var the variable to check
+     * @return {@code true} if {@code var} is declared in a template, {@code false} else
+     */
+    public static boolean isInTemplate(IDecisionVariable var) {
+        boolean inTemplate = false;
+        IConfigurationElement iter = var;
+        while (!inTemplate && iter instanceof IDecisionVariable) {
+            inTemplate = isTemplate(iter.getDeclaration().getProject());
+            iter = iter.getParent();
+        }
+        return inTemplate;
+    }
+
+    /**
+     * Returns the project the outermost variable is declared within.
+     * 
+     * @param var the variable to return the project for
+     * @return the project or <b>null</b>
+     */
+    public static Project getProject(IDecisionVariable var) {
+        IConfigurationElement iter = var;
+        while (iter.getParent() instanceof IDecisionVariable) {
+            iter = iter.getParent();
+        }
+        return null == iter ? null : iter.getDeclaration().getProject();
     }
 
     /**
