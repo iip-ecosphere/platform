@@ -166,7 +166,6 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
         writer.setFormatInitializer(true);
         writer.setEmitProjectFreezeDot(true);
         writer.setEmitFilter(EMIT_FILTER);
-        writer.setValueFilter(v -> v != NullValue.INSTANCE); // usually we do not write null values through the UI
         prj.accept(writer);
     }
     
