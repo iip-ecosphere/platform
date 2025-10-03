@@ -70,6 +70,16 @@ Besides well known date types like IEC61131-3 that shall be part of the configur
 
 ![Generic DateTime type](HowTo_GenericDateTime.png)
 
+## Defining a type with a value unit (as alias type) in the configuration model
+
+Besides defining a new type, there is also the option of using an existing base type and just giving it some new properties without repeating the properties in all places where the basic type would be used instead. E.g., a `FloatType` or a `DoubleType` may well suite for a certain physical unit such as Ampere or Watt, where just the name and the semantic id needs to be redefined. This can achieved by type aliasing, in an application configuration as well as in the meta-model. For the meta-model there is also a mechanism that types belonging to a certain application area are treated as extension, which, if not needed, can be removed from the meta-model without affecting the meta-model and application models (as long as the declared types are not used). An example is the `DataTypesPartEnergy.ivml`. 
+
+To declare such a type:
+- Identify the place where the type fits in, e.g., into the application (`AllTypes.ivml`), an existing meta-model extension (`DataTypesPart*.ivml`) or the meta-model itself (`DataTypes.ivml`).
+- Declare the type as an `AliasType` of the original basic type (cf. [type concepts](concepts/types.MD)), with own unique name and, if appropriate, semantic id. For semantic ids we prefer [ECLASS](https://eclass.eu/) or AAS, but also other catalogues could be used although they may require extended some platform mechanisms.
+- If relevant for dashboards, modify `src/main/resources/semanticIdDashboard.yml` to provide a correct unit mapping to the dashboard technology, e.g., Grafana. If not specified, oktoflow will take the mapping of the aliased/basic type instead.
+- If the semantic id shall be shown as unit/tooltip on the management UI, a modification of the internalized platform catalogues may be required. For ECLASS there is also a code extension that queries the ECLASS catalogue online, with possible ramifications by internet connections and latency. As fallback, there is the internalized ECLASS "catalogue" in `support.iip-aas` in `src/main/resources/eclassCatalog.yml` as well as the AAS catalogue `src/main/resources/adminShellCatalog.yml`. Fallbacks for futher catalogues would need a code extension, e.g., in `support.iip-aas`.
+
 ## Using a different transport protocol
 
 The default transport protocol that is being set up and integrated by the platform integration is AMQP. The following describes what steps are needed to use one of the alternatives, e.g., MQTT v5.
