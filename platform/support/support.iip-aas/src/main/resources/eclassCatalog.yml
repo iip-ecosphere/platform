@@ -551,4 +551,136 @@ definitions:
         name: mA
         structuredName: mA
         description: 0,001 times the SI base unit ampere
+  - semanticId: 0173-1#05-AAA093#001
+    version: 1
+    revision: 5
+    naming:
+      de:
+        name: W
+        structuredName: W
+        description: Die physikalische Einheit der Leistung, die sich aus der Geschwindigkeit der Energieumwandlung ergibt.
+      en:
+        name: W
+        structuredName: W
+        description: The physical unit of power resulting from the rate of energy conversion.
+  - semanticId: 0173-1#05-AAA756#005
+    version: 5
+    revision: 5
+    naming:
+      de:
+        name: KW
+        structuredName: KW
+        description: 1 000-faches der SI-Basiseinheit Watt
+      en:
+        name: KW
+        structuredName: KW
+        description: 1 000 times the SI base unit Watt
+  - semanticId: 0173-1#05-AAA632#005
+    version: 5
+    revision: 5
+    naming:
+      de:
+        name: MW
+        structuredName: MW
+        description: 1 000 000-faches der SI-Basiseinheit Watt
+      en:
+        name: MW
+        structuredName: MW
+        description: 1 000 000 times the SI base unit Watt
+  - semanticId: 0173-1#05-AAA170#005
+    version: 5
+    revision: 5
+    naming:
+      de:
+        name: GW
+        structuredName: GW
+        description: 1 000 000 000-faches der SI-Basiseinheit Watt
+      en:
+        name: GW
+        structuredName: GW
+        description: 1 000 000 000 times the SI base unit Watt
+  - semanticId: 0173-1#05-AAA143#005
+    version: 5
+    revision: 5
+    naming:
+      de:
+        name: mW
+        structuredName: mW
+        description: 0,001-faches der SI-Basiseinheit Watt
+      en:
+        name: mW
+        structuredName: mW
+        description: 0,001 times the SI base unit Watt
+  - semanticId: 0173-1#05-AAA465#005
+    version: 5
+    revision: 5
+    naming:
+      de:
+        name: TW
+        structuredName: TW
+        description: 1 000 000 000 000-faches der SI-Basiseinheit Watt
+      en:
+        name: TW
+        structuredName: TW
+        description: 1 000 000 000 000 times the SI base unit Watt
+  - semanticId: 0173-1#05-AAA753#005
+    version: 5
+    revision: 5
+    naming:
+      de:
+        name: Wh
+        structuredName: Wh
+        description: Produkt aus der abgeleiteten SI-Einheit Watt und der Einheit Stunde 
+      en:
+        name: Wh
+        structuredName: Wh
+        description: Product of the derived SI unit watt and the unit hour
+  - semanticId: 0173-1#05-AAA555#005
+    version: 5
+    revision: 5
+    naming:
+      de:
+        name: kWh
+        structuredName: kWh
+        description: 1 000-faches des Produktes aus der abgeleiteten SI-Einheit Watt und der Einheit Stunde 
+      en:
+        name: kWh
+        structuredName: kWh
+        description: 1 000 times the product of the derived SI unit watt and the unit hour
+  - semanticId: 0173-1#05-AAA124#005
+    version: 5
+    revision: 5
+    naming:
+      de:
+        name: MWh
+        structuredName: MWh
+        description: 1 000 000-faches des Produktes aus der abgeleiteten SI-Einheit Watt und der Einheit Stunde 
+      en:
+        name: MWh
+        structuredName: MWh
+        description: 1 000 000 times the product of the derived SI unit watt and the unit hour
+  - semanticId: 0173-1#05-AAA124#005
+    version: 5
+    revision: 5
+    naming:
+      de:
+        name: GWh
+        structuredName: GWh
+        description: 1 000 000 000-faches des Produktes aus der abgeleiteten SI-Einheit Watt und der Einheit Stunde 
+      en:
+        name: GWh
+        structuredName: GWh
+        description: 1 000 000 000 times the product of the derived SI unit watt and the unit hour
+  - semanticId: 0173-1#05-AAA098#005
+    version: 5
+    revision: 5
+    naming:
+      de:
+        name: TWh
+        structuredName: TWh
+        description: 1 000 000 000 000-faches des Produktes aus der abgeleiteten SI-Einheit Watt und der Einheit Stunde 
+      en:
+        name: TWh
+        structuredName: TWh
+        description: 1 000 000 000 000 times the product of the derived SI unit watt and the unit hour
   
