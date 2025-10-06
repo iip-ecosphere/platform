@@ -640,7 +640,17 @@ public abstract class AasFactory {
     public boolean supportsOperationExecutionAuthorization() {
         return true;
     }
-
+    
+    /**
+     * Returns whether creating structures more statically/early is better supported by the implementation than
+     * later/dynamic. Typically, later creation requires a faster/more agile implementation.
+     * 
+     * @return {@code true} if late creation is suggested, {@code false} if early creation
+     */
+    public boolean createPropertiesEarly() {
+        return false;
+    }
+    
     /**
      * Composes an idShort from multiple names.
      * 

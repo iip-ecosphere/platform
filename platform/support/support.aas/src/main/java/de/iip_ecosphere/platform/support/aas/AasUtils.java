@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
@@ -431,4 +432,49 @@ public class AasUtils {
         return basicId + detailedId;
     }
 
+    /**
+     * Executes {@code func} if {@link AasFactory#createPropertiesEarly()}.
+     * 
+     * @param func the function if {@link AasFactory#createPropertiesEarly()}, may be 
+     *     <b>null</b> then nothing is executed
+     */
+    public static void ifEarlyAas(Runnable func) {
+        ifEarlyAas(null, func, null);
+    }
+
+    /**
+     * Executes {@code func} if {@link AasFactory#createPropertiesEarly()} (and if given {@code andIf}), 
+     * executes {@code elseFunc} if not {@link AasFactory#createPropertiesEarly()}.
+     * 
+     * @param func the function if {@link AasFactory#createPropertiesEarly()} (and if given {@code andIf}) holds, 
+     *     may be <b>null</b> then nothing is executed
+     * @param elseFunc the function if {@link AasFactory#createPropertiesEarly()} (or if given {@code andIf}) does not 
+     *     hold, may be <b>null</b> then nothing is executed
+     */
+    public static void ifEarlyAas(Runnable func, Runnable elseFunc) {
+        ifEarlyAas(null, func, elseFunc);
+    }
+
+    /**
+     * Executes {@code func} if {@link AasFactory#createPropertiesEarly()} (and if given {@code andIf}), 
+     * executes {@code elseFunc} if not {@link AasFactory#createPropertiesEarly()}.
+     * 
+     * @param andIf additional conjunctive clause/Boolean value, ignored if <b>null</b>
+     * @param func the function if {@link AasFactory#createPropertiesEarly()} (and if given {@code andIf}) holds, may 
+     *     be <b>null</b> then nothing is executed
+     * @param elseFunc the function if {@link AasFactory#createPropertiesEarly()} (or if given {@code andIf}) does not 
+     *     hold, may be <b>null</b> then nothing is executed
+     */
+    public static void ifEarlyAas(Supplier<Boolean> andIf, Runnable func, Runnable elseFunc) {
+        if (AasFactory.getInstance().createPropertiesEarly() && (null == andIf || andIf.get())) {
+            if (func != null) {
+                func.run();
+            }
+        } else {
+            if (elseFunc != null) {
+                elseFunc.run();
+            }
+        }
+    }
+    
 }

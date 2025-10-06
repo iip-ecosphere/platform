@@ -19,6 +19,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.support.function.IOSupplier;
+import de.iip_ecosphere.platform.support.logging.LogLevel;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
@@ -32,6 +33,7 @@ public class ResolvingInvocablesCreator implements InvocablesCreator {
     private Function<String, String> unqualifier;
     private IOSupplier<Aas> aasSupplier;
     private String[] elementPath;
+    private LogLevel logLevel = LogLevel.ERROR;
     
     /**
      * Creates an instance.
@@ -101,7 +103,7 @@ public class ResolvingInvocablesCreator implements InvocablesCreator {
                     parent = elt instanceof ElementsAccess ? (ElementsAccess) elt : null;
                 }
             } catch (IOException e) {
-                LoggerFactory.getLogger(getClass()).error("While resolving {}: {}", 
+                LoggerFactory.getLogger(getClass()).log(logLevel, "While resolving {}: {}", 
                     name, e.getMessage());
             }
             return parent;
@@ -178,7 +180,7 @@ public class ResolvingInvocablesCreator implements InvocablesCreator {
                     try {
                         return property.getValue();
                     } catch (ExecutionException e) {
-                        LoggerFactory.getLogger(getClass()).error("While getting value of {}: {}", 
+                        LoggerFactory.getLogger(getClass()).log(logLevel, "While getting value of {}: {}", 
                             getName(), e.getMessage());
                         // result == null
                     }
@@ -194,7 +196,7 @@ public class ResolvingInvocablesCreator implements InvocablesCreator {
                     try {
                         property.setValue(v);
                     } catch (ExecutionException e) {
-                        LoggerFactory.getLogger(getClass()).error("While setting value of {}: {}", 
+                        LoggerFactory.getLogger(getClass()).log(logLevel, "While setting value of {}: {}", 
                             getName(), e.getMessage());
                     }
                 }
@@ -245,16 +247,21 @@ public class ResolvingInvocablesCreator implements InvocablesCreator {
                     try {
                         return operation.invoke(args);
                     } catch (ExecutionException e) {
-                        LoggerFactory.getLogger(getClass()).error("While invoking {}: {}", 
+                        LoggerFactory.getLogger(getClass()).log(logLevel, "While invoking {}: {}", 
                             getName(), e.getMessage());
                         // result == null
                     }
                 } else {
-                    LoggerFactory.getLogger(getClass()).warn("Cannot resolve AAS operation `{}`", getName());
+                    LoggerFactory.getLogger(getClass()).log(logLevel, "Cannot resolve AAS operation `{}`", getName());
                 }
                 return result;
             };
         }
+    }
+
+    @Override
+    public void setLogLevel(LogLevel level) {
+        this.logLevel = level;
     }
 
 }

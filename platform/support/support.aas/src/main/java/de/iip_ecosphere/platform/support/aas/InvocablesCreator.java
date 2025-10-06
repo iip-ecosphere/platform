@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.support.aas;
 import java.util.function.Function;
 
 import de.iip_ecosphere.platform.support.function.IOSupplier;
+import de.iip_ecosphere.platform.support.logging.LogLevel;
 
 /**
  * Creates invocables for AAS, e.g., for a remote protocol. This interface just creates instances, i.e., it is
@@ -75,6 +76,15 @@ public interface InvocablesCreator {
     public default InvocablesCreator executableCreator(IOSupplier<Aas> aasSupplier, String[] elementPath, 
         Function<String, String> unqualifier) {
         return this;
+    }
+
+    /**
+     * Instructs the implementation that logging messages by the creator and its created instances shall be on the 
+     * given level.
+     * 
+     * @param level the logging level
+     */
+    public default void setLogLevel(LogLevel level) {
     }
     
 }
