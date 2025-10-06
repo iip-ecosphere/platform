@@ -286,4 +286,154 @@ public interface Logger {
      */
     public void error(String msg, Throwable th);
 
+    /**
+     * Log a message at the given level.
+     *
+     * @param level the logging level to use ({@link LogLevel#ALL} and {@link LogLevel#OFF} are ignored)
+     * @param msg the message string to be logged
+     */
+    public default void log(LogLevel level, String msg) {
+        switch(level) {
+        case DEBUG:
+            debug(msg);
+            break;
+        case ERROR:
+            error(msg);
+            break;
+        case INFO:
+            info(msg);
+            break;
+        case TRACE:
+            trace(msg);
+            break;
+        case WARN:
+            warn(msg);
+            break;
+        default:
+            // nothing
+            break;
+        }
+    }
+    
+    /**
+     * Log a message at the given level.
+     *
+     * @param level the logging level to use ({@link LogLevel#ALL} and {@link LogLevel#OFF} are ignored)
+     * @param format the format string
+     * @param arg    the argument
+     */
+    public default void log(LogLevel level, String format, Object arg) {
+        switch(level) {
+        case DEBUG:
+            debug(format, arg);
+            break;
+        case ERROR:
+            error(format, arg);
+            break;
+        case INFO:
+            info(format, arg);
+            break;
+        case TRACE:
+            trace(format, arg);
+            break;
+        case WARN:
+            warn(format, arg);
+            break;
+        default:
+            // nothing
+            break;
+        }
+    }
+    
+    /**
+     * Log a message at the given level.
+     *
+     * @param level the logging level to use ({@link LogLevel#ALL} and {@link LogLevel#OFF} are ignored)
+     * @param format the format string
+     * @param arg1   the first argument
+     * @param arg2   the second argument
+     */
+    public default void log(LogLevel level, String format, Object arg1, Object arg2) {
+        switch(level) {
+        case DEBUG:
+            debug(format, arg1, arg2);
+            break;
+        case ERROR:
+            error(format, arg1, arg2);
+            break;
+        case INFO:
+            info(format, arg1, arg2);
+            break;
+        case TRACE:
+            trace(format, arg1, arg2);
+            break;
+        case WARN:
+            warn(format, arg1, arg2);
+            break;
+        default:
+            // nothing
+            break;
+        }
+    }    
+
+    /**
+     * Log a message at the given level.
+     *
+     * @param level the logging level to use ({@link LogLevel#ALL} and {@link LogLevel#OFF} are ignored)
+     * @param format the format string
+     * @param arguments a list of 3 or more arguments
+     */
+    public default void log(LogLevel level, String format, Object... arguments) {
+        switch(level) {
+        case DEBUG:
+            debug(format, arguments);
+            break;
+        case ERROR:
+            error(format, arguments);
+            break;
+        case INFO:
+            info(format, arguments);
+            break;
+        case TRACE:
+            trace(format, arguments);
+            break;
+        case WARN:
+            warn(format, arguments);
+            break;
+        default:
+            // nothing
+            break;
+        }
+    }    
+
+    /**
+     * Log a message at the given level.
+     *
+     * @param level the logging level to use ({@link LogLevel#ALL} and {@link LogLevel#OFF} are ignored)
+     * @param msg the message accompanying the exception
+     * @param th   the exception (throwable) to log
+     */
+    public default void log(LogLevel level, String msg, Throwable th) {
+        switch(level) {
+        case DEBUG:
+            debug(msg, th);
+            break;
+        case ERROR:
+            error(msg, th);
+            break;
+        case INFO:
+            info(msg, th);
+            break;
+        case TRACE:
+            trace(msg, th);
+            break;
+        case WARN:
+            warn(msg, th);
+            break;
+        default:
+            // nothing
+            break;
+        }
+    }    
+    
 }
