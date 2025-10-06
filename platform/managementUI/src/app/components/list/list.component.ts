@@ -187,7 +187,7 @@ export class ListComponent extends Utils implements OnInit {
     for(const submodelElement of data) {
       if(submodelElement.value) {
         for(const elemtSubmodelElement of submodelElement.value) {
-          if (elemtSubmodelElement.idShort == "meta_template") {
+          if (elemtSubmodelElement.idShort == "metaTemplate") {
             isMetaTemplateExist = true;
             if (!elemtSubmodelElement.value) {
               result.push(submodelElement);
