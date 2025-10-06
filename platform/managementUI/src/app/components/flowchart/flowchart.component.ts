@@ -6,6 +6,7 @@ import { MeshFeedbackComponent } from './feedback/mesh-feedback/mesh-feedback.co
 import { MatDialog } from '@angular/material/dialog';
 import { ApiService, GRAPHFORMAT_DRAWFLOW } from 'src/app/services/api.service';
 import { MT_metaType, MT_varValue } from 'src/interfaces';
+import { DataUtils } from 'src/app/services/utils.service';
 
 interface Bus {
   id: string;
@@ -49,10 +50,13 @@ export class FlowchartComponent implements OnInit {
 
   async ngOnInit() {
     this.services = await this.api.getConfiguredServices();
+    this.services.value = DataUtils.filterMetaTemplate(this.services.value);
+
     if(this.services) {
       this.servicesLoading = false;
     }
     this.serviceMeshes = await this.api.getConfiguredServiceMeshes();
+    this.serviceMeshes.value = DataUtils.filterMetaTemplate(this.serviceMeshes.value);
 
     const drawFlowHtmlElement = <HTMLElement>document.getElementById('drawflow');
 

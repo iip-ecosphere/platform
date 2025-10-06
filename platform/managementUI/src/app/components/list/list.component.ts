@@ -175,32 +175,7 @@ export class ListComponent extends Utils implements OnInit {
       this.rawData = await this.api.getConfiguredElements("")
       this.filteredData = this.prefilter(metaProject)
     }
-    this.filteredData = this.filterMetaTemplate(this.filteredData);
-  }
-
-  /**It returns items with meta_template = false, 
-   * If the meta_template not exist, then return the item.
-   */
-  public filterMetaTemplate(data: any) {
-    let result = [];
-    let isMetaTemplateExist = false;
-    for(const submodelElement of data) {
-      if(submodelElement.value) {
-        for(const elemtSubmodelElement of submodelElement.value) {
-          if (elemtSubmodelElement.idShort == "meta_template") {
-            isMetaTemplateExist = true;
-            if (!elemtSubmodelElement.value) {
-              result.push(submodelElement);
-              break;
-            }
-          }
-        }
-        if (!isMetaTemplateExist) {
-          result.push(submodelElement);
-        }
-      }
-    }
-    return result;
+    this.filteredData = DataUtils.filterMetaTemplate(this.filteredData);
   }
 
   /**It returns items with given metaProject */

@@ -532,6 +532,35 @@ export class DataUtils {
   public static stringToArrayBuffer(str: string): ArrayBuffer {
     return new TextEncoder().encode(str);
   }
+  
+  /**
+   * Filter out the metaTemplate items 
+   * It returns items with metaTemplate = false, 
+   * If the metaTemplate not exist, then return the item.
+   * @param data the data items to filter out the metaTemplate
+   * @returns the filtered items
+   */
+  public static filterMetaTemplate(data: any) {
+    let result = [];
+    let isMetaTemplateExist = false;
+    for(const submodelElement of data) {
+      if(submodelElement.value) {
+        for(const elemtSubmodelElement of submodelElement.value) {
+          if (elemtSubmodelElement.idShort == "metaTemplate") {
+            isMetaTemplateExist = true;
+            if (!elemtSubmodelElement.value) {
+              result.push(submodelElement);
+              break;
+            }
+          }
+        }
+        if (!isMetaTemplateExist) {
+          result.push(submodelElement);
+        }
+      }
+    }
+    return result;
+  }
 
 }
 
