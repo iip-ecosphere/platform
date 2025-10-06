@@ -310,16 +310,12 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.digitaltwin.aas4
 
     @Override
     public SubmodelElementCollectionBuilder createSubmodelElementCollectionBuilder(String idShort) {
-        LoggerFactory.getLogger(getClass()).warn("Adding a submodel to a deployed AAS currently does not lead to "
-            + "the deployment of the new submodel (as for initial AAS). If possible, create the submodel in advance.");
         return obtainSubmodelElementCollectionBuilder(new BaSyxSubmodelBuilder(parent.createAasBuilder(), this), 
             idShort, false, false);
     }
 
     @Override
     public SubmodelElementListBuilder createSubmodelElementListBuilder(String idShort) {
-        LoggerFactory.getLogger(getClass()).warn("Adding a submodel to a deployed AAS currently does not lead to "
-            + "the deployment of the new submodel (as for initial AAS). If possible, create the submodel in advance.");
         return obtainSubmodelElementListBuilder(new BaSyxSubmodelBuilder(parent.createAasBuilder(), this), idShort);
     }
 

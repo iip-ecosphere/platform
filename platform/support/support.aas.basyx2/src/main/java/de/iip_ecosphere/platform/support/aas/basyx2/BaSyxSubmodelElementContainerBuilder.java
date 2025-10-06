@@ -75,7 +75,8 @@ public abstract class BaSyxSubmodelElementContainerBuilder<S extends org.eclipse
     
     @Override
     public OperationBuilder createOperationBuilder(String idShort) {
-        return new BaSyxOperation.BaSxyOperationBuilder(this, idShort);
+        return BaSyxOperation.BaSxyOperationBuilder.create(this, idShort, 
+            null == getInstance() ? null : getInstance().getOperation(idShort));
     }
     
     @Override

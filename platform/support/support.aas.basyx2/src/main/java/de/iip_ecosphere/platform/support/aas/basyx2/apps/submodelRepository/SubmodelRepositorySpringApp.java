@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.support.aas.basyx2.apps.submodelRepository;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.eclipse.digitaltwin.basyx.aasrepository.AasRepositoryFactory;
 import org.eclipse.digitaltwin.basyx.aasrepository.backend.CrudAasRepositoryFactory;
@@ -49,6 +50,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -56,6 +59,7 @@ import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.basyx2.AasRegistryUtils;
 import de.iip_ecosphere.platform.support.aas.basyx2.Tools;
 import de.iip_ecosphere.platform.support.aas.basyx2.apps.common.AssetServerKeyStoreDescriptor;
+import de.iip_ecosphere.platform.support.aas.basyx2.apps.common.BaSyxExceptionResolver;
 import de.iip_ecosphere.platform.support.aas.basyx2.apps.security.RbacUtils;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
@@ -72,7 +76,7 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 @ComponentScan(
     basePackages = { "org.eclipse.digitaltwin.basyx", "de.iip_ecosphere.platform.support.aas.basyx2.apps.security" }, 
     excludeFilters = @ComponentScan.Filter(type = FilterType.CUSTOM, classes = SubmodelRepositoryTypeFilter.class))
-public class SubmodelRepositorySpringApp {
+public class SubmodelRepositorySpringApp implements WebMvcConfigurer {
 
     @Autowired(required = false)
     private AssetServerKeyStoreDescriptor kstore;
@@ -214,5 +218,10 @@ public class SubmodelRepositorySpringApp {
     }    
 
     // checkstyle: resume exception type check
+
+    @Override
+    public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+        resolvers.add(0, new BaSyxExceptionResolver());
+    }
     
 }

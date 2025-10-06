@@ -191,4 +191,9 @@ public abstract class AbstractBaSyxAasFactory extends AasFactory {
         return false; // unclear whether this still applies, before it was on "value", "invocationList" -> Tools.checkId
     }
 
+    @Override
+    public boolean createPropertiesEarly() {
+        return true;
+    }
+
 }

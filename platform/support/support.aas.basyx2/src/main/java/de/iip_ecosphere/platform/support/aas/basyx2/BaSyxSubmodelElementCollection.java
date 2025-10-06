@@ -177,7 +177,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
         
         @Override
         public OperationBuilder createOperationBuilder(String idShort) {
-            return new BaSyxOperation.BaSxyOperationBuilder(this, idShort);
+            return BaSyxOperation.BaSxyOperationBuilder.create(this, idShort, instance.getOperation(idShort));
         }
 
         @Override

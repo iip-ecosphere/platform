@@ -39,6 +39,7 @@ import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 
@@ -84,6 +85,7 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
         private List<org.eclipse.digitaltwin.aas4j.v3.model.OperationVariable> inputVariables;
         private List<org.eclipse.digitaltwin.aas4j.v3.model.OperationVariable> outputVariables;
         private List<org.eclipse.digitaltwin.aas4j.v3.model.OperationVariable> inOutVariables;
+        private boolean isNew = true;
 
         /**
          * Creates an instance. Prevents from external creation.
@@ -98,7 +100,37 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
             operation = new org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultOperation();
             operation.setIdShort(Tools.checkId(idShort));
         }
+        
+        /**
+         * Creates an instance for modifying an existing property. Prevents external creation.
+         * 
+         * @param parentBuilder the parent builder
+         * @param instance the existing property
+         */
+        BaSxyOperationBuilder(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, BaSyxOperation instance) {
+            isNew = false;
+            this.parentBuilder = parentBuilder;
+            this.instance = instance;
+            this.operation = (org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultOperation) instance.operation;
+        }        
 
+        /**
+         * Creates an operation builder, if possible from {@code instance} else from {@code idShort}.
+         * 
+         * @param parentBuilder the parent builder
+         * @param idShort the id short
+         * @param instance the optional operation instance
+         * @return the builder
+         */
+        static BaSxyOperationBuilder create(BaSyxSubmodelElementContainerBuilder<?> parentBuilder, String idShort, 
+            Operation instance) {
+            if (instance instanceof BaSyxOperation) {
+                return new BaSxyOperationBuilder(parentBuilder, (BaSyxOperation) instance);
+            } else {
+                return new BaSxyOperationBuilder(parentBuilder, idShort);
+            }
+        }        
+        
         @Override
         public BaSyxSubmodelElementContainerBuilder<?> getParentBuilder() {
             return parentBuilder;
@@ -179,9 +211,19 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
                 if (null != url && null != submodelRepoUrl) {
                     addInvocationQualifier(HTTPOperationDelegation.INVOCATION_DELEGATION_TYPE, url);
                     final String submodelId = parentBuilder.getInstance().getIdentification();
+                    if (null == submodelId || submodelId.isEmpty()) {
+                        LoggerFactory.getLogger(this).warn("Operation execution of {} may fail as no submodelId is "
+                            + "known.", operation.getIdShort());
+                    }
                     addInvocationQualifier(INVOCATION_DELEGATION_SUBMODELID_TYPE, submodelId);
                     addInvocationQualifier(INVOCATION_DELEGATION_SUBMODELREGISTRYURL_TYPE, submodelRepoUrl);
+                } else {
+                    LoggerFactory.getLogger(this).info("Cannot set invokable of {} as urls are missing "
+                        + "(url: {}, submodelRepository {})", operation.getIdShort(), url, submodelRepoUrl);
                 }
+            } else {
+                LoggerFactory.getLogger(this).info("Cannot set invokable of {} as none is given (null)", 
+                    operation.getIdShort());
             }
             return this;
         }
@@ -204,7 +246,7 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
                 operation.setInoutputVariables(inOutVariables);
             }
             instance.operation = operation;
-            return updateInBuild(true, parentBuilder.register(instance));
+            return updateInBuild(isNew, parentBuilder.register(instance));
         }
         
         @Override
