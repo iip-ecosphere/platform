@@ -95,8 +95,12 @@ public class AppStarter {
         AccessibleJarLauncher rootLauncher = new AccessibleJarLauncher(archive);
         ClassLoader result = rootLauncher.createClassLoader();
 
-        AccessibleLauncher isolatedLauncher = new AccessibleLauncher(archive);
-        return isolatedLauncher.createStackedLoader(result);
+        try {
+            AccessibleLauncher isolatedLauncher = new AccessibleLauncher(archive);
+            return isolatedLauncher.createStackedLoader(result);
+        } catch (IllegalStateException e) { // legacy style
+            return result;
+        }
     }
 
 
