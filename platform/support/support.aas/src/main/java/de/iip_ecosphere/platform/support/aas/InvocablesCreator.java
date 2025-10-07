@@ -37,6 +37,29 @@ public interface InvocablesCreator {
     public static final Invokable READ_ONLY = Property.PropertyBuilder.READ_ONLY;
 
     /**
+     * A creator that does not return invocables. Shall only be used in situations where <b>null</b>
+     * instead of the creator is not feasible.
+     */
+    public static final InvocablesCreator NULL_CREATOR = new InvocablesCreator() {
+
+        @Override
+        public Invokable createGetter(String name) {
+            return null;
+        }
+
+        @Override
+        public Invokable createSetter(String name) {
+            return null;
+        }
+
+        @Override
+        public Invokable createInvocable(String name) {
+            return null;
+        }
+        
+    };
+    
+    /**
      * Creates a getter implementation for a property.
      * Use {@link #WRITE_ONLY} if no getter is intended but also the value shall not be held locally in the property.
      * 
