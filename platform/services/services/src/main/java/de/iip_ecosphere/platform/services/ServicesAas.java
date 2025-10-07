@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.services;
 
+import de.iip_ecosphere.platform.services.ServiceDescriptor.Action;
+import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceMapper;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstants;
@@ -51,6 +53,7 @@ import static de.iip_ecosphere.platform.support.aas.AasUtils.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
@@ -137,6 +140,11 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_OP_SERVICE_INSTANCE_COUNT  = "getServiceInstanceCount";
     public static final String NAME_OP_SERVICE_STATE_COUNT  = "getServiceStateCount";
     public static final String NAME_OP_SERVICE_STREAM_LOG = "serviceStreamLog";
+
+    // expected remote states
+    private static final Set<ServiceState> ERROR_IF_NOT_FOUND = Set.of(ServiceState.FAILED, ServiceState.RUNNING, 
+        ServiceState.STOPPING, ServiceState.PASSIVATING, ServiceState.PASSIVATED, ServiceState.RECONFIGURING, 
+        ServiceState.RECOVERED, ServiceState.RECOVERING, ServiceState.MIGRATING);
     
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
@@ -514,20 +522,9 @@ public class ServicesAas implements AasContributor {
             .setValue(Type.STRING, desc.getState().toString()) // value to be overridden, just for UI
             .build();
 
-        // we just need the invokable; implemented via service mapper
-        InvocablesCreator iCreator = desc.getInvocablesCreator();
-        if (iCreator != null) { // contribute when it's there, i.e., network ports are allocated to the service
-            descriptorBuilder.createOperationBuilder(NAME_OP_SVC_SET_STATE)
-                .addInputVariable("state", Type.STRING)
-                .setInvocable(iCreator.createInvocable(ServiceMapper.getQName(
-                    ServiceMapper.NAME_OP_SET_STATE, serviceId)))
-                .build(AasPartRegistry.getSubmodelAuthentication());
-            descriptorBuilder.createOperationBuilder(NAME_OP_SVC_GET_STATE)
-                .setInvocable(iCreator.createInvocable(ServiceMapper.getQName(
-                    ServiceMapper.NAME_OP_GET_STATE, serviceId)))
-                .build(Type.STRING, AasPartRegistry.getSubmodelAuthentication());
-        }
-
+        addServiceOperations(descriptorBuilder, desc);
+        ifEarlyAas(() -> desc.getApplicationInstanceId().length() == 0, 
+            () -> desc.attachAction(Action.COMMUNICATION_DETERMINED, () -> defineServiceOperations(desc, null)), null);
         descriptorBuilder.createPropertyBuilder(NAME_PROP_KIND)
             .setValue(Type.STRING, desc.getKind().toString())
             .build();
@@ -547,7 +544,7 @@ public class ServicesAas implements AasContributor {
         addTypedData(descriptorBuilder, NAME_SUBCOLL_PARAMETERS, desc.getParameters());
         addTypedData(descriptorBuilder, NAME_SUBCOLL_INPUT_DATA_CONN, desc.getInputDataConnectors());
         addTypedData(descriptorBuilder, NAME_SUBCOLL_OUTPUT_DATA_CONN, desc.getOutputDataConnectors());
-        
+        ifEarlyAas(() -> registerMetrics(descriptorBuilder));
         descriptorBuilder.build();
         
         serviceBuilder.build();
@@ -555,6 +552,56 @@ public class ServicesAas implements AasContributor {
         getLogger().info("Service information added for `{}` (idShort: {})", desc.getId(), serviceId);
     }
     
+    /**
+     * Adds the service operations to {@code descriptorBuilder}. Own method as depending on AAS setup may be called 
+     * twice, once without invokable, once to update the operations then with invokable.
+     * 
+     * @param descriptorBuilder the descriptor builder representing {@code desc}
+     * @param desc the actual service descriptor to represent
+     * @see ServiceDescriptor#getInvocablesCreator()
+     */
+    private static void addServiceOperations(SubmodelElementCollectionBuilder descriptorBuilder, 
+        ServiceDescriptor desc) {
+        // we just need the invokable; implemented via service mapper
+        InvocablesCreator iCreator = desc.getInvocablesCreator();
+        descriptorBuilder.createOperationBuilder(NAME_OP_SVC_SET_STATE)
+            .addInputVariable("state", Type.STRING)
+            .setInvocable(iCreator.createInvocable(ServiceMapper.getQName(
+                desc.getId(), ServiceMapper.NAME_OP_SET_STATE)))
+            .build(AasPartRegistry.getSubmodelAuthentication());
+        descriptorBuilder.createOperationBuilder(NAME_OP_SVC_GET_STATE)
+            .setInvocable(iCreator.createInvocable(ServiceMapper.getQName(
+                desc.getId(), ServiceMapper.NAME_OP_GET_STATE)))
+            .build(Type.STRING, AasPartRegistry.getSubmodelAuthentication());
+    }
+
+    /**
+     * Updates the service operations, e.g., to add information an updated/newly created invokable.
+     * 
+     * @param desc the descriptor
+     * @param mode the notification mode, may be <b>null</b> for default
+     * 
+     * @see ServiceDescriptor#getInvocablesCreator()
+     * @see #addServiceOperations(SubmodelElementCollectionBuilder, ServiceDescriptor)
+     */
+    private static void defineServiceOperations(ServiceDescriptor desc, NotificationMode mode) {
+        ActiveAasBase.processNotification(NAME_SUBMODEL, mode, (sub, aas) -> {
+            String serviceId = fixId(desc.getId());
+            InvocablesCreator iCreator = desc.getInvocablesCreator();
+            SubmodelElementCollectionBuilder subB = sub.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES);
+            SubmodelElementCollectionBuilder eltB = subB.createSubmodelElementCollectionBuilder(serviceId);
+            eltB.createOperationBuilder(NAME_OP_SVC_SET_STATE)
+                .addInputVariable("state", Type.STRING)
+                .setInvocable(iCreator.createInvocable(ServiceMapper.getQName(
+                    desc.getId(), ServiceMapper.NAME_OP_SET_STATE)))
+                .build(AasPartRegistry.getSubmodelAuthentication());
+            eltB.createOperationBuilder(NAME_OP_SVC_GET_STATE)
+                .setInvocable(iCreator.createInvocable(ServiceMapper.getQName(
+                    desc.getId(), ServiceMapper.NAME_OP_GET_STATE)))
+                .build(Type.STRING, AasPartRegistry.getSubmodelAuthentication());
+        });
+    }
+
     /**
      * Adds a typed data submodel elements collection to the given {@code builder}.
      * 
@@ -815,27 +862,34 @@ public class ServicesAas implements AasContributor {
             SubmodelElementCollection services = sub.getSubmodelElementCollection(NAME_COLL_SERVICES);
             String serviceId = fixId(desc.getId());
             SubmodelElementCollection elt = services.getSubmodelElementCollection(serviceId);
+            String actName = ServiceState.toString(act);
             if (null != elt) {
+                boolean logError = act != null && ERROR_IF_NOT_FOUND.contains(act) 
+                    && desc.getKind() != ServiceKind.SERVER;
                 Operation op = elt.getOperation(NAME_OP_SVC_SET_STATE);
                 if (null != op) {
                     try {
-                        op.invoke(ServiceState.toString(act));
+                        op.invoke(actName);
                     } catch (ExecutionException e) {
-                        getLogger().error("Cannot set state for service `{}`: {}", desc.getId(), e.getMessage());
+                        if (logError) {
+                            getLogger().error("Cannot set state for service `{}`: {}", desc.getId(), e.getMessage());
+                        }
                     }
-                } else {
-                    getLogger().error("Service state change - cannot find operation {} for service `{}`", 
-                            NAME_OP_SVC_SET_STATE, desc.getId());
+                } else if (logError) {
+                    getLogger().error("Service state change - cannot find operation {} for service `{}`. "
+                        + "Deployment descriptor ok? Network port reserved?", NAME_OP_SVC_SET_STATE, desc.getId());
                 }
                 // old style, kept for UI, overwrite property value
                 Property prop = elt.getProperty(NAME_PROP_STATE);
                 if (null != prop) {
                     try {
-                        prop.setValue(ServiceState.toString(act));
+                        prop.setValue(actName);
                     } catch (ExecutionException e) {
-                        getLogger().warn("Cannot write state for service `{}`: {}", desc.getId(), e.getMessage());
+                        if (logError) {
+                            getLogger().warn("Cannot write state for service `{}`: {}", desc.getId(), e.getMessage());
+                        }
                     }
-                } else {
+                } else if (logError) {
                     getLogger().warn("Service state change - cannot find property {} for service `{}`", 
                         NAME_PROP_STATE, desc.getId());
                 }
@@ -846,22 +900,23 @@ public class ServicesAas implements AasContributor {
             // synchronous execution needed??
             getLogger().info("Handling service state change `{}`: {} -> {}", desc.getId(), old, act);
             if (ServiceState.AVAILABLE == old && ServiceState.STARTING == act) {
-                registerMetrics(desc, sub, elt);
-                Transport.sendServiceStatusWithDescription(ActionTypes.CHANGED, desc.getId(), act.name());
+                ifEarlyAas(null, () -> registerMetrics(desc, sub, elt));
+                Transport.sendServiceStatusWithDescription(ActionTypes.CHANGED, desc.getId(), actName);
             } else if (ServiceState.STARTING == old && ServiceState.RUNNING == act) {
                 setupRelations(desc, sub, elt);
-                Transport.sendServiceStatusWithDescription(ActionTypes.CHANGED, desc.getId(), act.name());
+                Transport.sendServiceStatusWithDescription(ActionTypes.CHANGED, desc.getId(), actName);
             } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
                 && ServiceState.STOPPED == act) {
                 removeRelations(desc, sub, null);
                 removeService(desc, sub);
-                Transport.sendServiceStatusWithDescription(ActionTypes.REMOVED, desc.getId(), act.name());
+                Transport.sendServiceStatusWithDescription(ActionTypes.REMOVED, desc.getId(), actName);
             } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
                 && ServiceState.STOPPING == act) {
-                MetricsAasConstructor.removeProviderMetricsFromAasSubmodel(elt);
-                Transport.sendServiceStatusWithDescription(ActionTypes.CHANGED, desc.getId(), act.name());
+                ifEarlyAas(() -> MetricsAasConstructor.clearProviderMetricsInAasSubmodel(elt), 
+                    () -> MetricsAasConstructor.removeProviderMetricsFromAasSubmodel(elt));
+                Transport.sendServiceStatusWithDescription(ActionTypes.CHANGED, desc.getId(), actName);
             } else if (old != act) {
-                Transport.sendServiceStatusWithDescription(ActionTypes.CHANGED, desc.getId(), act.name());
+                Transport.sendServiceStatusWithDescription(ActionTypes.CHANGED, desc.getId(), actName);
             }
         });
     }
@@ -876,19 +931,26 @@ public class ServicesAas implements AasContributor {
     private static void registerMetrics(ServiceDescriptor desc, Submodel sub, SubmodelElementCollection elt) {
         if (!MetricsAasConstructor.containsMetrics(elt)) {
             SubmodelElementCollectionBuilder serviceB = 
-                    sub.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES);
+                sub.createSubmodelElementCollectionBuilder(NAME_COLL_SERVICES);
             SubmodelElementCollectionBuilder subB =
                 serviceB.createSubmodelElementCollectionBuilder(fixId(desc.getId()));
-            
-            String devId = Id.getDeviceId();
-            TransportSetup tSetup = ServiceFactory.getTransport();
-            MetricsAasConstructor.addProviderMetricsToAasSubmodel(subB, null, 
-                MetricsAasConstants.TRANSPORT_SERVICE_METRICS_CHANNEL, devId, tSetup);
-            MetricsAasConstructor.addServiceMetricsToAasSubmodel(subB, null, 
-                MetricsAasConstants.TRANSPORT_SERVICE_METRICS_CHANNEL, devId, tSetup);
-
+            registerMetrics(subB);
             subB.build();
         }
+    }
+    
+    /**
+     * Registers metrics for a service service.
+     * 
+     * @param subB the submodel element collection builder representing the service
+     */
+    private static void registerMetrics(SubmodelElementCollectionBuilder subB) {
+        String devId = Id.getDeviceId();
+        TransportSetup tSetup = ServiceFactory.getTransport();
+        MetricsAasConstructor.addProviderMetricsToAasSubmodel(subB, null, 
+            MetricsAasConstants.TRANSPORT_SERVICE_METRICS_CHANNEL, devId, tSetup);
+        MetricsAasConstructor.addServiceMetricsToAasSubmodel(subB, null, 
+            MetricsAasConstants.TRANSPORT_SERVICE_METRICS_CHANNEL, devId, tSetup);
     }
     
     /**
