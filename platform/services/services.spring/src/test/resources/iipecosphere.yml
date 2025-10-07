@@ -25,3 +25,4 @@ service-mgr:
     port: 8883
     password: pwd
     user: user  
+  pluginsFolder: target/plugins

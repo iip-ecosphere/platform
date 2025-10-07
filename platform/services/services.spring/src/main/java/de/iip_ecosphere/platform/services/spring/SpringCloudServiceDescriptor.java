@@ -56,11 +56,14 @@ import de.iip_ecosphere.platform.services.spring.yaml.YamlProcess;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlService;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
@@ -362,6 +365,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
         ManagedServerAddress springAddr = registerPort(mgr, "spring_" + getId());
         if (null == adminAddr) {
             adminAddr = registerPort(mgr, Starter.getServiceCommandNetworkMgrKey(getId()));
+            executeAction(Action.COMMUNICATION_DETERMINED);
         }
         return springAddr;
     }
@@ -427,7 +431,6 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
         if (null != cmdArgs) {
             cmdLine.addAll(cmdArgs);
         }
-        Starter.addAppEnvironment(cmdLine);
         if (null != getAdditionalArguments()) {
             cmdLine.addAll(getAdditionalArguments());
         }
@@ -453,6 +456,8 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
         if (null != config.getJavaOpts()) {
             cmdLine.addAll(config.getJavaOpts());
         }
+        File pluginParent = new File(SpringInstances.getConfig().getPluginsFolder());
+        Starter.addAppEnvironment(cmdLine, pluginParent); 
         cmdLine.addAll(service.getCmdArg(port, protocol));
         return cmdLine;
     }
@@ -505,13 +510,19 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      * Waits that the server on {@link #adminAddr} becomes available.
      *   
      * @param waitingTime maximum waiting time in ms
+     * @return {@code true} if available, {@code false} else
      */
-    void waitForAdminServer(int waitingTime) {
+    boolean waitForAdminServer(int waitingTime) {
+        boolean avail = false;
         if (null != adminAddr) {
             ProtocolServerBuilder psb = AasFactory.getInstance()
                 .createProtocolServerBuilder(new BasicSetupSpec(serviceProtocol, adminAddr.getPort()));
-            psb.isAvailable(adminAddr.getHost(), waitingTime);
+            avail = psb.isAvailable(adminAddr.getHost(), waitingTime);
         }
+        if (!avail) {
+            LoggerFactory.getLogger(this).warn("Asset server did not become available within {} ms", waitingTime);
+        }
+        return avail;
     }
     
     /**
@@ -536,8 +547,11 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
             proto = serviceProtocol;
         }
         if (null != addr) {
-            iCreator = AasFactory.getInstance().createInvocablesCreator(
-                new BasicSetupSpec(proto, addr.getHost(), addr.getPort()));
+            BasicSetupSpec spec = new BasicSetupSpec(AasPartRegistry.getSetup());
+            spec.setAssetServerAddress(new ServerAddress(Schema.IGNORE, addr.getHost(), addr.getPort()), proto);
+            iCreator = AasFactory.getInstance().createInvocablesCreator(spec);
+        } else {
+            iCreator = InvocablesCreator.NULL_CREATOR;
         }
         return iCreator;
     }

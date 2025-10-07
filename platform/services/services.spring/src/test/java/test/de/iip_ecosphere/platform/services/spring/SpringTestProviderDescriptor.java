@@ -28,8 +28,10 @@ public class SpringTestProviderDescriptor implements TestProviderDescriptor {
         case 0: // indexes along initial AllTest<x>.java
             result = new Class<?>[] {
                 SimpleStartStopServiceManagerTest.class, 
-                TestLifecycleDescriptor.class, 
                 ServerStartStopServiceManagerTest.class};
+            break;
+        case 1: // this does not run together with 0 in BaSyx2 (setURLStreamHandlerFactory)
+            result = new Class<?>[] {TestLifecycleDescriptor.class};
             break;
         case 2:
             result = new Class<?>[] {EnsembleStartStopServiceManagerTest.class};

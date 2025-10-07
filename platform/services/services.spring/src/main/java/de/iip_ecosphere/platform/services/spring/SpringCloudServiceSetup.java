@@ -27,7 +27,7 @@ import de.iip_ecosphere.platform.support.CollectionUtils;
  * 
  * @author Holger Eichelberger, SSE
  */
-@ConfigurationProperties(prefix = "service-mgr")
+@ConfigurationProperties(prefix = "service-mgr") // see SpringCloudServiceFactoryDescriptor
 @Component
 public class SpringCloudServiceSetup extends ServiceSetup {
 

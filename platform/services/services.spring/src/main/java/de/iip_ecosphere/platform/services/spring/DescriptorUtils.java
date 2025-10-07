@@ -15,7 +15,6 @@ package de.iip_ecosphere.platform.services.spring;
 import static de.iip_ecosphere.platform.services.spring.SpringInstances.getConfig;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -23,10 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-
-import org.springframework.boot.loader.JarLauncher;
-import org.springframework.boot.loader.archive.Archive;
-import org.springframework.boot.loader.archive.JarFileArchive;
 
 import de.iip_ecosphere.platform.services.ServiceDescriptor;
 import de.iip_ecosphere.platform.services.ServicesAas;
@@ -36,6 +31,7 @@ import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.services.spring.descriptor.Endpoint;
 import de.iip_ecosphere.platform.services.spring.descriptor.Relation;
 import de.iip_ecosphere.platform.services.spring.descriptor.Validator;
+import de.iip_ecosphere.platform.services.spring.loader.AppStarter;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlProcess;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlService;
@@ -86,6 +82,9 @@ public class DescriptorUtils {
         service.setState(state);
         // if service made an implicit transition, take up and notify
         ServiceState further = service.getState();
+        if (further == null) { // fallback, service does not respond
+            further = state;
+        }
         if (further != state) {
             ServicesAas.notifyServiceStateChanged(state, further, service, NotificationMode.SYNCHRONOUS); 
         }
@@ -104,9 +103,12 @@ public class DescriptorUtils {
             try {
                 String descName = getDescriptorName();
                 getLogger().info("Reading artifact " + file + ", descriptor " + descName);
-                InputStream descStream = ZipUtils.findFile(new FileInputStream(file), "BOOT-INF/classes/" + descName);
+                InputStream descStream = ZipUtils.findFile(file, "BOOT-INF/classes/" + descName);
                 if (null == descStream) {
-                    descStream = ZipUtils.findFile(new FileInputStream(file), descName);                    
+                    descStream = ZipUtils.findFile(file, "BOOT-INF/classes-app/" + descName);
+                }
+                if (null == descStream) {
+                    descStream = ZipUtils.findFile(file, descName);                    
                 }
                 if (null != descStream) {
                     result = YamlArtifact.readFromYaml(descStream);
@@ -303,29 +305,6 @@ public class DescriptorUtils {
     // checkstyle: resume parameter number check
     // checkstyle: stop exception type check
 
-    public static class AccessibleJarLauncher extends JarLauncher {
-
-        /**
-         * Creates an instance of the test program.
-         * 
-         * @param archive the JAR archive to load
-         */
-        public AccessibleJarLauncher(Archive archive) {
-            super(archive);
-        }
-
-        /**
-         * Creates a Spring class loader via the JarLauncher setup for the archive passed in to this class.
-         * 
-         * @return the classloader
-         * @throws Exception any kind of exception if loading the archive or constructing a class loader failed
-         */
-        public ClassLoader createClassLoader() throws Exception {
-            return createClassLoader(getClassPathArchivesIterator());
-        }
-
-    }
-
     /**
      * Creates a class loader for a JAR file, in particular an executable Spring-packaged Jar file.
      * 
@@ -335,8 +314,7 @@ public class DescriptorUtils {
      */
     public static ClassLoader createClassLoader(File jarFile) throws Exception {
         // reuse spring launcher, they know how to create the class loader
-        AccessibleJarLauncher launcher = new AccessibleJarLauncher(new JarFileArchive(jarFile));
-        return launcher.createClassLoader();
+        return AppStarter.createClassloader(jarFile);
     }
 
     // checkstyle: resume exception type check

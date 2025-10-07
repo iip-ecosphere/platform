@@ -16,6 +16,9 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
+
 /**
  * Some utility functions. [public for testing]
  * 
@@ -125,5 +128,43 @@ public class Utils {
     }
 
     // checkstyle: resume parameter number check
+
+    /**
+     * Sets up an application context.
+     * 
+     * @param applicationContext the application context
+     */
+    public static void initialize(ConfigurableApplicationContext applicationContext) {
+        initialize(applicationContext, null);
+    }
+
+    /**
+     * Sets up an application context.
+     * 
+     * @param applicationContext the application context
+     * @param overwrite overwriting property values, may be <b>null</b> for none
+     */
+    public static void initialize(ConfigurableApplicationContext applicationContext, Map<String, Object> overwrite) {
+        initialize(applicationContext.getEnvironment(), overwrite);
+    }
+
+    /**
+     * Sets up a configurable environment.
+     * 
+     * @param env the environment
+     */
+    public static void initialize(ConfigurableEnvironment env) {
+        initialize(env, null);
+    }
+
+    /**
+     * Sets up a configurable environment.
+     * 
+     * @param env the environment
+     * @param overwrite overwriting property values, may be <b>null</b> for none
+     */
+    public static void initialize(ConfigurableEnvironment env, Map<String, Object> overwrite) {
+        env.getPropertySources().addLast(new YamlPropertySource(overwrite));
+    }
 
 }

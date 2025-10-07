@@ -62,6 +62,7 @@ import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.support.net.UriResolver;
+import de.iip_ecosphere.platform.support.plugins.SingletonPluginDescriptor;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.support.logging.Logger;
@@ -102,7 +103,21 @@ public class SpringCloudServiceManager
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class SpringCloudServiceFactoryDescriptor implements ServiceFactoryDescriptor {
+    public static class SpringCloudServiceFactoryDescriptor extends SingletonPluginDescriptor<ServiceFactoryDescriptor> 
+        implements ServiceFactoryDescriptor {
+
+        /**
+         * Creates an instance. [JSL]
+         */
+        public SpringCloudServiceFactoryDescriptor() {
+            super("services-spring", null, ServiceFactoryDescriptor.class, null);
+        }
+
+        @Override
+        protected PluginSupplier<ServiceFactoryDescriptor> initPluginSupplier(
+            PluginSupplier<ServiceFactoryDescriptor> pluginSupplier) {
+            return p -> this;
+        }
 
         @Override
         public ServiceManager createInstance() {
@@ -613,6 +628,7 @@ public class SpringCloudServiceManager
         String serviceId) {
         SpringCloudServiceDescriptor result = template.instantiate(serviceId);
         result.getArtifact().addService(result);
+        result.registerNetworkPorts();
         return result;
     }
     
@@ -849,9 +865,11 @@ public class SpringCloudServiceManager
         AppDeployer deployer = getDeployer();
         for (SpringCloudServiceDescriptor desc: getServices()) {
             String deploymentId = desc.getDeploymentId();
-            AppStatus status = deployer.status(deploymentId);
-            if (DeploymentState.deployed == status.getState()) {
-                getDeployer().undeploy(deploymentId);
+            if (null != deploymentId) {
+                AppStatus status = deployer.status(deploymentId);
+                if (DeploymentState.deployed == status.getState()) {
+                    getDeployer().undeploy(deploymentId);
+                }
             }
         }
         super.clear();
