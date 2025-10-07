@@ -13,9 +13,6 @@
 package de.iip_ecosphere.platform.services.environment.spring.metricsProvider;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PreDestroy;
 
@@ -28,20 +25,8 @@ import org.springframework.stereotype.Component;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.CapacityBaseUnit;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstants;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor;
-import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor
-    .CollectionSupplier;
-import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor
-    .PushMeterPredicate;
-import de.iip_ecosphere.platform.support.aas.AasUtils;
-import de.iip_ecosphere.platform.support.aas.ElementsAccess;
-import de.iip_ecosphere.platform.support.aas.Property;
-import de.iip_ecosphere.platform.support.aas.SubmodelElement;
-import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
-import de.iip_ecosphere.platform.support.json.JsonArray;
-import de.iip_ecosphere.platform.support.json.JsonObject;
-import de.iip_ecosphere.platform.support.json.JsonValue;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
 import de.iip_ecosphere.platform.transport.TransportFactory;
@@ -98,74 +83,7 @@ public class MetricsProvider extends de.iip_ecosphere.platform.services.environm
     // Configurable data from the application.yml file
 
     /* By default, the scheduled task runs every 2 seconds */
-    private static final String SCHEDULE_RATE = "${metricsprovider.schedulerrate:2000}";
-    
-    /**
-     * Supplies all collection elements that match the {@code deviceId}.
-     */
-    private static final CollectionSupplier ALL_ELEMENTS_SUPPLIER = new CollectionSupplier() {
-
-        @Override
-        public List<ElementsAccess> get(ElementsAccess parent, String deviceId) {
-            List<ElementsAccess> result = null;
-            ElementsAccess coll = parent.getSubmodelElementCollection(
-                AasUtils.fixId(AasPartRegistry.NAME_COLLECTION_SERVICES));
-            if (coll instanceof SubmodelElementCollection) { // find id within collection
-                SubmodelElementCollection sec = (SubmodelElementCollection) coll;
-                result = new ArrayList<ElementsAccess>();
-                String fDeviceId = AasUtils.fixId(deviceId);
-                for (SubmodelElement e : sec.elements()) {
-                    if (e instanceof ElementsAccess) {
-                        ElementsAccess ea = (ElementsAccess) e;
-                        Property resource = ea.getProperty("resource");
-                        if (null != resource) {
-                            try {
-                                if (fDeviceId.equals(resource.getValue())) {
-                                    result.add(ea);
-                                }
-                            } catch (ExecutionException ex) {
-                                LoggerFactory.getLogger(MetricsProvider.class).warn(
-                                    "Cannot read resource property: {}", ex.getMessage());
-                            }
-                        }
-                        
-                    }
-                }
-            }
-            return result;
-        }
-        
-    };
-    
-    /**
-     * Tag matching predicate. Pre-matched deviceIds assumed.
-     */
-    private static final PushMeterPredicate TAG_PREDICATE = new PushMeterPredicate() {
-        
-        @Override
-        public boolean test(ElementsAccess parent, JsonValue meter) {
-            boolean allowPush = true;
-            JsonObject m = meter.asJsonObject();
-            JsonArray tags = m.getJsonArray("availableTags");
-            if (null != tags && !tags.isEmpty()) {
-                Property prop = parent.getProperty("id");
-                if (null != prop) {
-                    try {
-                        String tag = TAG_SERVICE_SERVICE + ":" + prop.getValue();
-                        allowPush = false;
-                        for (int i = 0; !allowPush && i < tags.size(); i++) {
-                            allowPush = tags.getString(i).equals(tag);
-                        }
-                    } catch (ExecutionException e) {
-                        LoggerFactory.getLogger(MetricsProvider.class).warn(
-                            "Cannot read id property: {}", e.getMessage());
-                    }
-                }
-            } 
-            return allowPush;
-        }
-    };
-    
+    private static final String SCHEDULE_RATE = "${metricsprovider.schedulerrate:5000}";
     
     /* By default, the base unit for the memory metrics is bytes */
     @Value("${metricsprovider.memorybaseunit:bytes}")
@@ -292,7 +210,7 @@ public class MetricsProvider extends de.iip_ecosphere.platform.services.environm
             update = true;
         }
         MetricsAasConstructor.pushToAas(json, AasPartRegistry.NAME_SUBMODEL_SERVICES, 
-            ALL_ELEMENTS_SUPPLIER, update, TAG_PREDICATE);
+            MetricsAasConstructor.ALL_ELEMENTS_SUPPLIER, update, TAG_PREDICATE);
     }
     
     /**

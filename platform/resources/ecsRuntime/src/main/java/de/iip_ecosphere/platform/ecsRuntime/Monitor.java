@@ -74,7 +74,7 @@ public class Monitor {
                             LoggerFactory.getLogger(Monitor.class).error(
                                 "Cannot sent monitoring message: No transport connector");
                         }
-                        MetricsAasConstructor.pushToAas(json, EcsAas.NAME_SUBMODEL, 
+                        MetricsAasConstructor.pushToAasAlways(json, EcsAas.NAME_SUBMODEL, 
                             MetricsAasConstructor.DFLT_SUBMODEL_SUPPLIER, update, null);
                     } catch (IOException e) {
                         LoggerFactory.getLogger(Monitor.class).error(
