@@ -23,7 +23,7 @@ import java.util.StringTokenizer;
 import org.springframework.boot.loader.archive.Archive;
 import org.springframework.boot.loader.archive.JarFileArchive;
 
-import de.iip_ecosphere.platform.services.spring.DescriptorUtils.AccessibleJarLauncher;
+import de.iip_ecosphere.platform.services.spring.loader.AppStarter.AccessibleJarLauncher;
 
 /**
  * Simple program to test Spring-packaged jar files for contained classes.
