@@ -40,6 +40,7 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
      */
     @Before
     public void setup() {
+        TestWithPlugin.setupAASPlugins();
         TestWithPlugin.loadPlugins();
     }    
     

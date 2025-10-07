@@ -167,7 +167,6 @@ public interface Service extends ParameterConfigurerProvider, ServiceBase {
     /**
      * Returns the actual (output) type substitutions.
      * 
-     * @param <T> the actual type
      * @return the type substitutions
      * @see #addTypeSubstitution(Class, Class, Supplier)
      */

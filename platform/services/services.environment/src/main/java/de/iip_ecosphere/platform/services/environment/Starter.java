@@ -71,7 +71,9 @@ public class Starter {
     
     public static final String PARAM_IIP_TEST_TRANSPORT_PORT = "iip.test.transport.port";
     public static final String PARAM_IIP_TEST_AAS_PORT = "iip.test.aas.port";
+    public static final String PARAM_IIP_TEST_SM_PORT = "iip.test.sm.port";
     public static final String PARAM_IIP_TEST_AASREG_PORT = "iip.test.aasRegistry.port";
+    public static final String PARAM_IIP_TEST_SMREG_PORT = "iip.test.smRegistry.port";
     public static final String PARAM_IIP_TEST_SERVICE_AUTOSTART = "iip.test.service.autostart";
     public static final String ARG_AAS_NOTIFICATION = "iip.test.aas.notification";
     public static final String PROPERTY_JAVA8 = "iip.test.java8";
@@ -465,6 +467,20 @@ public class Starter {
     public static Service getMappedService(String serviceId) {
         return null == serviceId ? null : mappedServices.get(serviceId);
     }
+    
+    /**
+     * Configures a port.
+     * 
+     * @param args the command line arguments
+     * @param paramName the parameter name to look for
+     * @param consumer the port consumer
+     */
+    private static void configurePort(String[] args, String paramName, Consumer<Integer> consumer) {
+        int tmpPort = getIntArg(args, paramName, -1);
+        if (tmpPort > 0) {
+            consumer.accept(tmpPort);
+        }
+    }
 
     /**
      * Parses command line arguments. Collects information for {@link #getServicePort(String)}.
@@ -487,16 +503,22 @@ public class Starter {
         if (transportPort > 0 || transportHost != null) {
             getSetup();
         }
-        int tmpPort = getIntArg(args, PARAM_IIP_TEST_AAS_PORT, -1);
-        if (tmpPort > 0) {
-            AasPartRegistry.getSetup().getServer().setPort(tmpPort);
-            getLogger().info("Configuring IIP server port to {}", tmpPort);
-        }
-        tmpPort = getIntArg(args, PARAM_IIP_TEST_AASREG_PORT, -1);
-        if (tmpPort > 0) {
-            AasPartRegistry.getSetup().getRegistry().setPort(tmpPort);
-            getLogger().info("Configuring IIP registry port to {}", tmpPort);
-        }
+        configurePort(args, PARAM_IIP_TEST_AAS_PORT, p -> {
+            AasPartRegistry.getSetup().getServer().setPort(p);
+            getLogger().info("Configuring AAS repository port to {}", p);
+        });
+        configurePort(args, PARAM_IIP_TEST_SM_PORT, p -> {
+            AasPartRegistry.getSetup().getSubmodelServer().setPort(p);
+            getLogger().info("Configuring SM repository port to {}", p);
+        });
+        configurePort(args, PARAM_IIP_TEST_AASREG_PORT, p -> {
+            AasPartRegistry.getSetup().getRegistry().setPort(p);
+            getLogger().info("Configuring AAS registry port to {}", p);
+        });
+        configurePort(args, PARAM_IIP_TEST_SMREG_PORT, p -> {
+            AasPartRegistry.getSetup().getSubmodelRegistry().setPort(p);
+            getLogger().info("Configuring SM registry port to {}", p);
+        });
         appId = CmdLine.getArg(args, PARAM_IIP_APP_ID, "");
         setAasNotificationMode(args, null); // keep default unless specified differently
         serviceAutostart = getBooleanArg(args, PARAM_IIP_TEST_SERVICE_AUTOSTART, serviceAutostart);

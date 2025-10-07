@@ -22,9 +22,11 @@ import de.iip_ecosphere.platform.support.aas.Invokable.GetterInvokable;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel;
+import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.Irdi;
 import de.iip_ecosphere.platform.support.json.Json;
@@ -41,11 +43,14 @@ import static de.iip_ecosphere.platform.services.environment.metricsProvider.met
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
@@ -81,6 +86,47 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 public class MetricsAasConstructor {
 
     /**
+     * Supplies all collection elements that match the {@code deviceId}.
+     */
+    public static final CollectionSupplier ALL_ELEMENTS_SUPPLIER = new CollectionSupplier() {
+
+        @Override
+        public List<ElementsAccess> get(ElementsAccess parent, String deviceId) {
+            List<ElementsAccess> result = null;
+            ElementsAccess coll = parent.getSubmodelElementCollection(
+                AasUtils.fixId(AasPartRegistry.NAME_COLLECTION_SERVICES));
+            if (coll instanceof SubmodelElementCollection) { // find id within collection
+                SubmodelElementCollection sec = (SubmodelElementCollection) coll;
+                result = new ArrayList<ElementsAccess>();
+                String fDeviceId = AasUtils.fixId(deviceId);
+                for (SubmodelElement e : sec.elements()) {
+                    if (e instanceof ElementsAccess) {
+                        ElementsAccess ea = (ElementsAccess) e;
+                        Property state = ea.getProperty("state");
+                        Property resource = ea.getProperty("resource");
+                        if (null != resource && state != null)  {
+                            try {
+                                Object tmpStateVal = state.getValue();
+                                String stateVal = null == tmpStateVal ? "" : tmpStateVal.toString();
+                                boolean stateOk = stateVal.length() > 0 && !"AVAILABLE".equals(state);
+                                if (fDeviceId.equals(resource.getValue()) && stateOk) {
+                                    result.add(ea);
+                                }
+                            } catch (ExecutionException ex) {
+                                LoggerFactory.getLogger(MetricsAasConstructor.class).warn(
+                                    "Cannot read resource property: {}", ex.getMessage());
+                            }
+                        }
+                        
+                    }
+                }
+            }
+            return result;
+        }
+        
+    };
+    
+    /**
      * Default supplier for the submodel identified by the given id.
      */
     public static final CollectionSupplier DFLT_SUBMODEL_SUPPLIER = 
@@ -97,6 +143,7 @@ public class MetricsAasConstructor {
      * a less performant fallback.
      */
     public static final boolean LAMBDA_SETTERS_SUPPORTED = AasFactory.getInstance().supportsPropertyFunctions(); 
+    public static final boolean RECEIVE_METRICS_FROM_TRANSPORT = true;
 
     private static Map<String, TransportConnector> conns = new HashMap<>();
     private static Map<String, JsonObjectHolder> holders = new HashMap<>();
@@ -144,15 +191,17 @@ public class MetricsAasConstructor {
      * 
      * @param channel the transport channel
      * @param setup the transport setup
+     * @param callbackSupplier supplies the reception callback to use
      * @return the (cached) transport connector
      */
-    private static TransportConnector getTransportConnector(String channel, TransportSetup setup) {
+    private static TransportConnector getTransportConnector(String channel, TransportSetup setup, 
+        Supplier<ReceptionCallback<?>> callbackSupplier) {
         TransportConnector conn = conns.get(channel);
         if (null == conn && !conns.containsKey(channel)) {
             conn = TransportFactory.createConnector();
             try {
                 conn.connect(setup.createParameter());
-                conn.setReceptionCallback(channel, new MetricsReceptionCallback());
+                conn.setReceptionCallback(channel, callbackSupplier.get());
             } catch (IOException e) {
                 LoggerFactory.getLogger(MetricsAasConstructor.class).error(
                     "Cannot create connector: " + e.getMessage());
@@ -216,8 +265,28 @@ public class MetricsAasConstructor {
      */
     public static void pushToAas(String json, String submodel, CollectionSupplier cSupplier, boolean update, 
         PushMeterPredicate mPredicate) {
-        pushToAas(json, submodel, cSupplier, update, monMapping, mPredicate);
+        if (!RECEIVE_METRICS_FROM_TRANSPORT) {
+            pushToAasAlways(json, submodel, cSupplier, update, mPredicate);
+        }
     }
+    
+    /**
+     * Alternative approach to update the metric values. Can be called from the regular sending thread. Enabled only if 
+     * not {@link #LAMBDA_SETTERS_SUPPORTED}. Uses the default meter-shortId names mapping defined in this class.
+     * Initial approach, not really performant. May have to be throttled.
+     * 
+     * @param json the JSON to be sent to the monitoring channel
+     * @param submodel the submodel to update (elements are assumed to be in a submodel elements collection on 
+     *     the next level)
+     * @param cSupplier collection supplier
+     * @param update whether this is an update or the first call
+     * @param mPredicate optional predicate to identify whether pushing a value shall happen, may be <b>null</b> 
+     *     then {@link #PREDICATE_ALWAYS_TRUE} is used
+     */
+    public static void pushToAasAlways(String json, String submodel, CollectionSupplier cSupplier, boolean update, 
+        PushMeterPredicate mPredicate) {
+        pushToAas(json, submodel, cSupplier, update, monMapping, mPredicate);
+    }    
     
     /**
      * Generic collection supplier.
@@ -339,12 +408,6 @@ public class MetricsAasConstructor {
      */
     private static class MetricsReceptionCallback implements ReceptionCallback<String> {
 
-        /**
-         * Creates a callback.
-         */
-        public MetricsReceptionCallback() {
-        }
-        
         @Override
         public void received(String data) {
             try {
@@ -360,6 +423,26 @@ public class MetricsAasConstructor {
                 LoggerFactory.getLogger(MetricsAasConstructor.class).error("Cannot parse JSON: " 
                     + e.getMessage() + " " + data);
             }
+        }
+
+        @Override
+        public Class<String> getType() {
+            return String.class;
+        }
+
+    }
+
+    /**
+     * Receives monitoring information via the transport layer.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class PushingMetricsReceptionCallback implements ReceptionCallback<String> {
+
+        @Override
+        public void received(String data) {
+            pushToAas(data, AasPartRegistry.NAME_SUBMODEL_SERVICES, 
+                ALL_ELEMENTS_SUPPLIER, true, monMapping, MetricsProvider.TAG_PREDICATE);
         }
 
         @Override
@@ -443,7 +526,7 @@ public class MetricsAasConstructor {
      * @return the (shared) object holder instance
      */
     private static JsonObjectHolder getHolder(String id, String channel, TransportSetup setup) {
-        getTransportConnector(channel, setup);
+        getTransportConnector(channel, setup, () -> new MetricsReceptionCallback());
         JsonObjectHolder result = holders.get(id);
         if (null == result) {
             result = new JsonObjectHolder();
@@ -483,6 +566,9 @@ public class MetricsAasConstructor {
         if (LAMBDA_SETTERS_SUPPORTED) {
             pBuilder.bind(new MeterGetter(channel, id, setup, metricsName), InvocablesCreator.READ_ONLY);
         } else {
+            if (RECEIVE_METRICS_FROM_TRANSPORT) {
+                getTransportConnector(channel, setup, () -> new PushingMetricsReceptionCallback());
+            }
             Object dflt;
             switch (type) { // typical defaults for monitoring here for now
             case AAS_INTEGER:
@@ -569,7 +655,7 @@ public class MetricsAasConstructor {
         createProperty(smBuilder, Type.DOUBLE, channel, id, setup, MetricsProvider.SERVICE_TIME_PROCESSED, 
             Irdi.AAS_IRDI_UNIT_MILLISECOND);
     }    
-    
+
     /**
      * Removes provider metrics and all related elements from {@code sub}.
      * 
@@ -588,6 +674,25 @@ public class MetricsAasConstructor {
         sub.deleteElement(SYSTEM_MEMORY_TOTAL);
         sub.deleteElement(SYSTEM_MEMORY_USAGE);
         sub.deleteElement(SYSTEM_MEMORY_USED);
+    }
+    
+    /**
+     * Clears provider metrics in {@code sub} but does not remove them.
+     * 
+     * @param sub the submodel elements collection to clear the elements within
+     */
+    public static void clearProviderMetricsInAasSubmodel(SubmodelElementCollection sub) {
+        /* System Disk Capacity metrics */
+        AasUtils.setPropertyValueSafe(sub, SYSTEM_DISK_FREE, 0.0);
+        AasUtils.setPropertyValueSafe(sub, SYSTEM_DISK_TOTAL, 0.0);
+        AasUtils.setPropertyValueSafe(sub, SYSTEM_DISK_USABLE, 0.0);
+        AasUtils.setPropertyValueSafe(sub, SYSTEM_DISK_USED, 0.0);
+
+        /* System Physical Memory metrics */
+        AasUtils.setPropertyValueSafe(sub, SYSTEM_MEMORY_FREE, 0.0);
+        AasUtils.setPropertyValueSafe(sub, SYSTEM_MEMORY_TOTAL, 0.0);
+        AasUtils.setPropertyValueSafe(sub, SYSTEM_MEMORY_USAGE, 0.0);
+        AasUtils.setPropertyValueSafe(sub, SYSTEM_MEMORY_USED, 0.0);
     }
 
 }

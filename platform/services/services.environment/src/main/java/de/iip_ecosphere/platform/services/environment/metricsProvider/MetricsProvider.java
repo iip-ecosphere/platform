@@ -21,14 +21,23 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import com.sun.management.OperatingSystemMXBean;
 
 import de.iip_ecosphere.platform.services.environment.UpdatingMonitoringService;
+import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsAasConstructor
+    .PushMeterPredicate;
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.AtomicDouble;
+import de.iip_ecosphere.platform.support.aas.ElementsAccess;
+import de.iip_ecosphere.platform.support.aas.Property;
+import de.iip_ecosphere.platform.support.json.JsonArray;
+import de.iip_ecosphere.platform.support.json.JsonObject;
+import de.iip_ecosphere.platform.support.json.JsonValue;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.metrics.Clock;
 import de.iip_ecosphere.platform.support.metrics.Counter;
 import de.iip_ecosphere.platform.support.metrics.Gauge;
@@ -66,6 +75,35 @@ import de.iip_ecosphere.platform.support.metrics.Timer;
  */
 public class MetricsProvider {
 
+    /**
+     * Tag matching predicate. Pre-matched deviceIds assumed.
+     */
+    public static final PushMeterPredicate TAG_PREDICATE = new PushMeterPredicate() {
+        
+        @Override
+        public boolean test(ElementsAccess parent, JsonValue meter) {
+            boolean allowPush = true;
+            JsonObject m = meter.asJsonObject();
+            JsonArray tags = m.getJsonArray("availableTags");
+            if (null != tags && !tags.isEmpty()) {
+                Property prop = parent.getProperty("id");
+                if (null != prop) {
+                    try {
+                        String tag = TAG_SERVICE_SERVICE + ":" + prop.getValue();
+                        allowPush = false;
+                        for (int i = 0; !allowPush && i < tags.size(); i++) {
+                            allowPush = tags.getString(i).equals(tag);
+                        }
+                    } catch (ExecutionException e) {
+                        LoggerFactory.getLogger(MetricsProvider.class).warn(
+                            "Cannot read id property: {}", e.getMessage());
+                    }
+                }
+            } 
+            return allowPush;
+        }
+    };
+    
     public static final List<Tag> EMPTY_TAGS = Collections.unmodifiableList(new ArrayList<Tag>());
     public static final MeterFilter[] DEFAULT_METER_FILTERS = {
         MetricsFactory.denyNameStartsWith("jvm."),
@@ -143,7 +181,7 @@ public class MetricsProvider {
     
     private float deviceCpuTemperature;
     private float deviceCaseTemperature;
-
+    
     /**
      * Create a new Metrics Provider Instance with default registry.
      * 

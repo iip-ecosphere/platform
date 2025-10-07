@@ -28,6 +28,7 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
+import de.iip_ecosphere.platform.support.logging.LogLevel;
 
 /**
  * Implements the service interface through AAS protocol operations. The operations stored in here can be
@@ -68,6 +69,7 @@ public class ServiceStub implements Service {
         }
         // we need something executable here
         iCreator = iCreator.executableCreator(aasSupplier, path, s -> ServiceMapper.unqualify(s));
+        iCreator.setLogLevel(LogLevel.INFO); // application asset communication may fail on startup/shutdown
         for (String n : PROP_READONLY) {
             registerProperty(n, iCreator.createGetter(getQName(serviceId, n)), InvocablesCreator.READ_ONLY);
         }
