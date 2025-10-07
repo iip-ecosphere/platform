@@ -177,7 +177,7 @@ public interface ServiceDescriptor {
      * Returns the invocables creator of this services, e.g., to connect metrics access from an AAS via this creator.
      * Depending on the service manager, there may be prerequisites that this method returns a creator instance.
      * 
-     * @return the creator, may be <b>null</b>
+     * @return the creator, may return {@link InvocablesCreator#NULL_CREATOR} but not <b>null</b>
      */
     public InvocablesCreator getInvocablesCreator();
     
@@ -194,5 +194,28 @@ public interface ServiceDescriptor {
      * @return the arguments, may be empty or <b>null</b> for none
      */
     public List<String> getAdditionalArguments();
+    
+    /**
+     * Denotes attachable actions.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public enum Action {
+        
+        /**
+         * When communication parameters like IP address/port are (dynamically) determined and subsequent actions
+         * such as adjusting AAS operations can happen.
+         */
+        COMMUNICATION_DETERMINED
+    }
+    
+    /**
+     * Attaches a runnable to an action.
+     * 
+     * @param action the action
+     * @param run the runnable
+     */
+    public default void attachAction(Action action, Runnable run) {
+    }
     
 }

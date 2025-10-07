@@ -15,8 +15,10 @@ package de.iip_ecosphere.platform.services;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -55,6 +57,7 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
     private List<TypedDataConnectorDescriptor> output = new ArrayList<>(); 
     private ServiceStub stub;
     private List<String> additionalArgs;
+    private Map<Action, Runnable> actions; // -> abstract
     
     /**
      * Creates an instance. Call {@link #setClassification(ServiceKind, boolean, boolean)} afterwards.
@@ -197,10 +200,13 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
     public void setState(ServiceState state) throws ExecutionException {
         ServiceState.validateTransition(this.state, state);
         if (null != stub) {
-            try {            
+            try {
                 stub.setState(state);
                 // if service/stub made an implicit transition, take it up
-                state = stub.getState(); // may do a transition
+                ServiceState tmp = stub.getState(); // may do a transition
+                if (null != tmp) { // may fail if already gone, then ignore
+                    state = tmp;
+                }
             } catch (Throwable e) {
                 // may fail, e.g., shutdown may just be faster, keep local; handover needed
                 if (state != ServiceState.STOPPED && state != ServiceState.UNDEPLOYING) {
@@ -376,4 +382,24 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
             .collect(Collectors.toSet());
     }
 
+    @Override
+    public void attachAction(Action action, Runnable run) {
+        if (null == actions) { // lazy init
+            actions = new HashMap<>();
+        }
+        actions.put(action, run);        
+    }
+
+    /**
+     * If there is a registered runnable for {@code action}, execute it.
+     * 
+     * @param action the action to look for
+     */
+    protected void executeAction(Action action) {
+        Runnable act = actions == null ? null : actions.get(action);
+        if (null != act) {
+            act.run();
+        }
+    }    
+    
 }

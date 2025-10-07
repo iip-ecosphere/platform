@@ -40,6 +40,17 @@ public class ServiceFactory {
     private static AasSetup setup;
     private static TransportSetup transport;
     private static NetworkManagerSetup netwMgrSetup;
+    private static String yamlPath;
+    
+    /**
+     * Sets the YAML path if setup YAML must be read from a nested object. Shall be maintained by implementing 
+     * class or tests. [testing]
+     * 
+     * @param path the path, by default none/<b>null</b>
+     */
+    public static void setYamlPath(String path) {
+        yamlPath = path;
+    }
 
     /**
      * Initializes this factory.
@@ -95,7 +106,7 @@ public class ServiceFactory {
             }
             if (null == service) {
                 try {
-                    service = AbstractSetup.readFromYaml(ServiceSetup.class);
+                    service = AbstractSetup.readFromYamlWithPath(ServiceSetup.class, yamlPath);
                 } catch (IOException e) {
                     LoggerFactory.getLogger(ServiceFactory.class).warn("Cannot read setup: " + e.getMessage());
                 }
@@ -120,7 +131,7 @@ public class ServiceFactory {
             }
             if (null == setup) {
                 try {
-                    ServiceSetup cfg = AbstractSetup.readFromYaml(ServiceSetup.class);
+                    ServiceSetup cfg = AbstractSetup.readFromYamlWithPath(ServiceSetup.class, yamlPath);
                     setup = cfg.getAas();
                 } catch (IOException e) {
                     LoggerFactory.getLogger(ServiceFactory.class).warn("Cannot read setup: " + e.getMessage());
@@ -142,7 +153,7 @@ public class ServiceFactory {
         if (null == netwMgrSetup) {
             init();
             try {
-                ServiceSetup cfg = AbstractSetup.readFromYaml(ServiceSetup.class);
+                ServiceSetup cfg = AbstractSetup.readFromYamlWithPath(ServiceSetup.class, yamlPath);
                 netwMgrSetup = cfg.getNetMgr();
             } catch (IOException e) {
                 LoggerFactory.getLogger(ServiceFactory.class).warn("Cannot read setup: " + e.getMessage());
@@ -167,7 +178,7 @@ public class ServiceFactory {
             }
             if (null == transport) {
                 try {
-                    ServiceSetup cfg = AbstractSetup.readFromYaml(ServiceSetup.class);
+                    ServiceSetup cfg = AbstractSetup.readFromYamlWithPath(ServiceSetup.class, yamlPath);
                     transport = cfg.getTransport();
                 } catch (IOException e) {
                     LoggerFactory.getLogger(ServiceFactory.class).warn("Cannot read setup: " + e.getMessage());

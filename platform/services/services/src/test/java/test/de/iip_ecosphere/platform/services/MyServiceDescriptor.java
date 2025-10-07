@@ -96,7 +96,7 @@ class MyServiceDescriptor extends AbstractServiceDescriptor<MyArtifactDescriptor
 
     @Override
     public InvocablesCreator getInvocablesCreator() {
-        return null;
+        return InvocablesCreator.NULL_CREATOR;
     }
     
 }

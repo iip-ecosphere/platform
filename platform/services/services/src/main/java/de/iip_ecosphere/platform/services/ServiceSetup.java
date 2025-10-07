@@ -86,7 +86,8 @@ public class ServiceSetup {
      * Returns the (parent) folder where the oktoflow plugins are located (the folder itself or by default 
      * its sub-folders "plugins" or "oktoPlugins").
      * 
-     * @return the folder, by default taken from {@link #PARAM_PLUGINS} (env or sys property), fallback "plugins"
+     * @return the folder, by default taken from {@link AbstractSetup#PARAM_PLUGINS} (env or sys property), 
+     * fallback "plugins"
      */
     public String getPluginsFolder() {
         return pluginsFolder;
@@ -107,7 +108,7 @@ public class ServiceSetup {
      * @return the service administration protocol (see {@link AasFactory#getProtocols()}
      */
     public String getServiceProtocol() {
-        return serviceProtocol;
+        return null == serviceProtocol ? AasFactory.DEFAULT_PROTOCOL : serviceProtocol;
     }
 
     /**
