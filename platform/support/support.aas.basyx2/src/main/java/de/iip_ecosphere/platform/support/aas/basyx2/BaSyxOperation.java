@@ -14,12 +14,15 @@ package de.iip_ecosphere.platform.support.aas.basyx2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.digitaltwin.aas4j.v3.model.DataTypeDefXsd;
 import org.eclipse.digitaltwin.aas4j.v3.model.OperationVariable;
 import org.eclipse.digitaltwin.aas4j.v3.model.Property;
+import org.eclipse.digitaltwin.aas4j.v3.model.Qualifier;
 import org.eclipse.digitaltwin.aas4j.v3.model.QualifierKind;
 import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultOperationVariable;
@@ -195,12 +198,21 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
          * @param value the qualifier value
          */
         private void addInvocationQualifier(String type, String value) {
-            DefaultQualifier qual = new DefaultQualifier();
-            qual.setKind(QualifierKind.CONCEPT_QUALIFIER);
-            qual.setType(type);
-            qual.setValueType(DataTypeDefXsd.STRING);
-            qual.setValue(value);
-            operation.setQualifiers(Tools.addElement(operation.getQualifiers(), qual));
+            Optional<Qualifier> exQual = operation.getQualifiers()
+                .stream().filter(q -> q.getKind() == QualifierKind.CONCEPT_QUALIFIER && q.getType().equals(type))
+                .findFirst();
+            if (exQual.isPresent()) {
+                Qualifier qual = exQual.get();
+                qual.setValueType(DataTypeDefXsd.STRING);
+                qual.setValue(value);
+            } else {
+                DefaultQualifier qual = new DefaultQualifier();
+                qual.setKind(QualifierKind.CONCEPT_QUALIFIER);
+                qual.setType(type);
+                qual.setValueType(DataTypeDefXsd.STRING);
+                qual.setValue(value);
+                operation.setQualifiers(Tools.addElement(operation.getQualifiers(), qual));
+            }
         }
 
         @Override
@@ -303,20 +315,21 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
     
     @Override
     public Object invoke(Object... args) throws ExecutionException {
-        StringBuilder submodelId = new StringBuilder();
-        StringBuilder submodelRegistryUrl = new StringBuilder();
+        String[] qualifiers = {"", ""};
         operation.getQualifiers().forEach(q -> {
             if (INVOCATION_DELEGATION_SUBMODELID_TYPE.equals(q.getType())) {
-                submodelId.append(q.getValue());
+                qualifiers[0] = q.getValue();
             } else if (INVOCATION_DELEGATION_SUBMODELREGISTRYURL_TYPE.equals(q.getType())) {
-                submodelRegistryUrl.append(q.getValue());
+                qualifiers[1] = q.getValue();
             }
         });
-        if (submodelId.isEmpty()) {
+        String submodelId = qualifiers[0];
+        String submodelRegistryUrl = qualifiers[1];
+        if (StringUtils.isEmpty(submodelId)) {
             throw new ExecutionException("Cannot invoke operation " + operation.getIdShort() 
                 + " as submodelId is missing", null);
         }
-        if (submodelRegistryUrl.isEmpty()) {
+        if (StringUtils.isEmpty(submodelRegistryUrl)) {
             throw new ExecutionException("Cannot invoke operation " + operation.getIdShort() 
                 + " as submodelRegistryUrl is missing", null);
         }
