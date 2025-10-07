@@ -1,13 +1,14 @@
 # oktoflow platform: Releases
 
-### Version 0.7.1 (consolidation, JDK 17/JDK 21):
+### Version 0.8.0 (consolidation, ReGaP basics, JDK 17/JDK 21):
 
 In progress:
 * [#164](https://github.com/iip-ecosphere/platform/issues/164): UI design revision
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 * [#170](https://github.com/iip-ecosphere/platform/issues/170): Integrate BaSyx2
-* [#165](https://github.com/iip-ecosphere/platform/issues/170): Upgrade automated container building/Python
 * [#122](https://github.com/iip-ecosphere/platform/issues/122): Transparent encryption, RBAC on AAS (incl. UI authentication)
+* [#181](https://github.com/iip-ecosphere/platform/issues/181): Allow MIMO containers
+* [#180](https://github.com/iip-ecosphere/platform/issues/180): Add application templates
 
 Improvements:
 * Support for JDK 21 based on Eclipse 2024-06.
@@ -25,6 +26,8 @@ Improvements:
 * [#176](https://github.com/iip-ecosphere/platform/issues/176): Archived/nailed-down basis containers for container generation.
 * [#177](https://github.com/iip-ecosphere/platform/issues/177): Local Python venvs in installation scripts.
 * [#178](https://github.com/iip-ecosphere/platform/issues/178): Python console output.
+* [#165](https://github.com/iip-ecosphere/platform/issues/170): Upgrade automated container building/Python
+* [#110](https://github.com/iip-ecosphere/platform/issues/110): UI startup/excution complains (disappeared)
 
 New features:
 * [#169](https://github.com/iip-ecosphere/platform/issues/169): File-based connector for CSV, JSON (ReGaP)
