@@ -66,7 +66,7 @@ public class CleanMvnArtifacts {
             }
             String intro = simulate ? "Would clean up " : "Cleaned up ";
             System.out.println(intro + cleanupCount + " files with " 
-                + MavenUtils.humanReadableByteCount(cleanupSize, false) + " in summary.");
+                + MavenUtils.humanReadableByteCount(cleanupSize, false));
         }
     }
     

@@ -17,6 +17,7 @@ import java.io.File;
 
 import de.iip_ecosphere.platform.maven.MavenUtils.CleanupStatistics;
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.setup.CmdLine;
 
 /**
  * Deletes typical temp-leftovers.
@@ -31,6 +32,7 @@ public class CleanTemp {
      * @param args ignored
      */
     public static void main(String[] args) {
+        boolean simulate = CmdLine.getBooleanArgNoVal(args, "simulate", false);
         CleanupStatistics statistics = new CleanupStatistics();
         File tmp = new File(System.getProperty("java.io.tmpdir"));
         File[] files = tmp.listFiles();
@@ -42,13 +44,20 @@ public class CleanTemp {
                 delete |= name.startsWith("java-server");
                 delete |= name.startsWith("basyx-temp");
                 if (delete) {
-                    System.out.println("Deleting " + f);
-                    statistics.clearedFile(f.length());
-                    FileUtils.deleteQuietly(f);
+                    if (simulate) {
+                        System.out.println("May delete " + f);
+                    } else {
+                        System.out.println("Deleting " + f);
+                        statistics.cleared(f);
+                        FileUtils.deleteQuietly(f);
+                    }
                 }
             }
         }
-        System.out.println("Cleaned up " + statistics.getFileCount() + " files/dirs");
+        if (!simulate) {
+            System.out.println("Cleaned up " + statistics.getFileCount() + " files with " 
+                + MavenUtils.humanReadableByteCount(statistics.getBytesCleared(), false) + " in summary.");
+        }
     }
 
 }

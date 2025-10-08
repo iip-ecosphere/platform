@@ -16,6 +16,8 @@
 package de.iip_ecosphere.platform.maven;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,6 +40,7 @@ public class MavenUtils {
      * @author Holger Eichelberger
      */
     public static class CleanupStatistics {
+
         private int fileCount;
         private long bytesCleared;
         
@@ -49,6 +52,43 @@ public class MavenUtils {
         public void clearedFile(long length) {
             fileCount++;
             bytesCleared += length;
+        }
+
+        /**
+         * Called when a file or a folder was cleared.
+         * 
+         * @param file the file/folder
+         */
+        public void cleared(File file) {
+            if (file.isFile()) {
+                clearedFile(file);
+            } else {
+                clearedFolder(file);
+            }
+        }
+
+        /**
+         * Called when a file was cleared.
+         * 
+         * @param file the file
+         */
+        public void clearedFile(File file) {
+            fileCount++;
+            bytesCleared += file.length();
+        }
+
+        /**
+         * Called when a folder was cleared.
+         * 
+         * @param folder the folder
+         */
+        public void clearedFolder(File folder) {
+            try {
+                Files.walk(folder.toPath())
+                    .filter(p -> p.toFile().isFile())
+                    .forEach(p -> clearedFile(p.toFile()));
+            } catch (IOException e) {
+            }
         }
 
         /**

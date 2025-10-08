@@ -30,7 +30,7 @@ public class CleanMvnSnapshots {
         CleanupStatistics statistics = MavenUtils.cleanSnapshots(3);
 
         System.out.println("Cleaned up " + statistics.getFileCount() + " files with " 
-            + MavenUtils.humanReadableByteCount(statistics.getBytesCleared(), false) + " in summary.");
+            + MavenUtils.humanReadableByteCount(statistics.getBytesCleared(), false));
     }
 
 }
