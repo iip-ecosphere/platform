@@ -523,8 +523,8 @@ block;
         m.var("de.iip_ecosphere.platform.connectors.Connector" + connGen, "conn").initializer(init);
         m.call("conn.setInstanceIdentification").stringArg(conn.name);
         m.call("conn.enablePolling").arg(false); // independent of notifications, disable as @Autowired may not be
+        m.call("${serviceName}.addConnector").arg("conn"); // add first (!)
         m.call("${serviceName}.setReceptionCallback").newArg(getReceptionCallbackClassName(conn));
-        m.call("${serviceName}.addConnector").arg("conn");
 
 /*        mapOf(IOType, IOType) pairs = ioPairs(conn);
         connTypes.clear();
