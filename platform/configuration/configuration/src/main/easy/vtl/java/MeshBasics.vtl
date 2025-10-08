@@ -39,7 +39,11 @@ template MeshBasics(Configuration config, FileArtifact target) {
     }
     
     def getFirstTypeName(sequenceOf(IOType) types) {
-        DataType dt = getFirstType(types);
+        getTypeName(getFirstType(types));
+    }
+
+    // added v2->v3
+    def getTypeName(DataType dt) {
         if (dt <> null) {
             dt.name;
         } else {

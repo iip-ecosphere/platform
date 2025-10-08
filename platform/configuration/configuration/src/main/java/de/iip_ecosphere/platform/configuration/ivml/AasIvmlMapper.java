@@ -958,6 +958,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         }
         annotate(mesh);
     }
+    
 
     /**
      * Annotates {@code prj} with the usual binding time.
@@ -966,13 +967,17 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @throws ExecutionException if the annotation cannot be created
      */
     private void annotate(Project prj) throws ExecutionException {
-        try {
-            final net.ssehub.easy.varModel.model.datatypes.Enum bindingTime = ModelQuery.findEnum(prj, "BindingTime");
-            Attribute attr = new Attribute("bindingTime", bindingTime, prj, prj.getVariable());
-            attr.setValue(createExpression(bindingTime, "BindingTime.compile", prj));
-            prj.addBeforeFreeze(attr);
-        } catch (ValueDoesNotMatchTypeException | CSTSemanticException | ModelQueryException e) {
-            throw new ExecutionException(e);
+        final String attrBindingTime = "bindingTime";
+        if (!IvmlUtils.hasAnnotation(prj, attrBindingTime)) {
+            try {
+                final net.ssehub.easy.varModel.model.datatypes.Enum bindingTime 
+                    = ModelQuery.findEnum(prj, "BindingTime");
+                Attribute attr = new Attribute(attrBindingTime, bindingTime, prj, prj.getVariable());
+                attr.setValue(createExpression(bindingTime, "BindingTime.compile", prj));
+                prj.addBeforeFreeze(attr);
+            } catch (ValueDoesNotMatchTypeException | CSTSemanticException | ModelQueryException e) {
+                throw new ExecutionException(e);
+            }
         }
     }
     

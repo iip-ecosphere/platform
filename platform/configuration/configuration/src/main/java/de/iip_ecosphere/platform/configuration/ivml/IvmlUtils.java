@@ -735,4 +735,23 @@ public class IvmlUtils {
         }
     }
 
+    /**
+     * Returns whether in {@code prj} an annotation with given {@code name} is declared/annotated.
+     * 
+     * @param prj the project
+     * @param name the name of the annotation
+     * @return {@code true} for exists, {@code false} else
+     */
+    public static boolean hasAnnotation(Project prj, String name) {
+        boolean found = false;
+        for (int e = 0; !found && e < prj.getElementCount(); e++) {
+            ContainableModelElement elt = prj.getElement(e);
+            if (elt instanceof Attribute) {
+                Attribute attr = (Attribute) elt;
+                found = attr.getName().equals(name);
+            }
+        }
+        return found;
+    }
+
 }

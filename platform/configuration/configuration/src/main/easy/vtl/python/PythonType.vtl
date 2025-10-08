@@ -41,7 +41,7 @@ template PythonType(Configuration config, PythonCodeArtifact target, RecordType 
 
     // generates code for the setters
     def setters(RecordType type, PythonCodeClass c) {
-        for (Field f: type.fields->select(f|not(f.readOnly))) {
+        for (Field f: type.fields->select(f|not(getBooleanValueSafe(f.readOnly, false)))) {
             String comment = 'Changes the value of ${asIdentifier(f.name)}.${prependIfNotEmpty(" ", f.description)}';
         	PythonCodeFunction func = c.addFunc("set${asMethodNameSuffix(f.name)}", comment);
             func.addParameter("v", toTypeName(f.type), "the new value of ${f.name}${genSetterParamVDoc(f, f.type)}");
@@ -63,7 +63,7 @@ template PythonType(Configuration config, PythonCodeArtifact target, RecordType 
 
         for (Field f: type.fields) {
             String set;
-            if (f.readOnly) {
+            if (getBooleanValueSafe(f.readOnly, false)) {
                 set = "";
             } else {
                 set = ", set${asMethodNameSuffix(f.name)}";

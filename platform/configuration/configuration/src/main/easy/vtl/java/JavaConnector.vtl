@@ -176,12 +176,12 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
         if (conn.inAdapterClass.length() > 0) {
             inAdapter = new JavaCodeConstructorCall(conn.inAdapterClass);
         } else {
-            inAdapter = new JavaCodeConstructorCall("MachineInputTranslator").arg("inPathSupplier");
+            inAdapter = new JavaCodeConstructorCall(getInputTranslatorClassName(conn)).arg("inPathSupplier");
         }
         if (conn.outAdapterClass.length() > 0) {
             outAdapter = new JavaCodeConstructorCall(conn.outAdapterClass);
         } else {
-            outAdapter = new JavaCodeConstructorCall("MachineOutputTranslator").arg("outPathSupplier");
+            outAdapter = new JavaCodeConstructorCall(getOutputTranslatorClassName(conn)).arg("outPathSupplier");
         }
         m.var(adapterType(conn, false, false), varName);
         m.if("${metricsVarName} != null").(i|{
@@ -618,7 +618,7 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
             setAdd(config);
             String coType = asTypeName(getFirstTypeName(conn.output));
             String oType = getMachineOutputTypeName(conn);
-            JavaCodeClass c = generateConnectorTranslator(parent, "MachineOutputTranslator", "AbstractConnectorOutputTypeTranslator", oType, coType);
+            JavaCodeClass c = generateConnectorTranslator(parent, getOutputTranslatorClassName(conn), "AbstractConnectorOutputTypeTranslator", oType, coType);
             genOutputTransTo(outIoType.type, getPath(conn.outInterface), getFirstType(conn.output), conn.operations, oType, coType, c);
             c.method("initializeModelAccess").(m|{
                 m.override();
@@ -638,7 +638,7 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
             setAdd(config);
             String ciType = asTypeName(getFirstTypeName(conn.input));
             String iType = getMachineInputTypeName(conn);
-            JavaCodeClass c = generateConnectorTranslator(parent, "MachineInputTranslator", "AbstractConnectorInputTypeTranslator", ciType, iType);
+            JavaCodeClass c = generateConnectorTranslator(parent, getInputTranslatorClassName(conn), "AbstractConnectorInputTypeTranslator", ciType, iType);
             genOutputTransFrom(inIoType.type, getPath(conn.inInterface), getFirstType(conn.input), conn.operations, iType, ciType, c);
             generateConnectorTranslatorSourceTarget(c, iType, ciType);
         }
@@ -651,6 +651,21 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
     }
     
     def generateReceptionCallback(MeshElement elt, ServiceBase service, Application app, JavaCodeClass parent) {
+    }
+
+    // added v2->v3    
+    def getReceptionCallbackClassName(Connector conn) {
+        asTypeName(conn.name) + "ReceptionCallback";
+    }
+    
+    // added v2->v3    
+    def getInputTranslatorClassName(Connector conn) {
+        asTypeName(getFirstTypeName(conn.input)) + "InputTranslator";
+    }
+
+    // added v2->v3    
+    def getOutputTranslatorClassName(Connector conn) {
+        asTypeName(getFirstTypeName(conn.output)) + "OutputTranslator";
     }
     
     def generateReceptionCallback(MeshElement elt, Connector conn, Application app, JavaCodeClass parent) {
@@ -680,7 +695,7 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
             connectionIds = connectionIds + ", \"${c}\"";
         }
         
-        parent.addClass("ConnectorReceptionCallback").implements("de.iip_ecosphere.platform.transport.connectors.ReceptionCallback<${coType}>").setPrivate().(c|{
+        parent.addClass(getReceptionCallbackClassName(conn)).implements("de.iip_ecosphere.platform.transport.connectors.ReceptionCallback<${coType}>").setPrivate().(c|{
             c.initializer(false).(i|{
                 i.SLComment("initialize Transport if needed");
                 i.call("de.iip_ecosphere.platform.services.environment.spring.Starter.getSetup", JavaCodeImportScope.CLASS);

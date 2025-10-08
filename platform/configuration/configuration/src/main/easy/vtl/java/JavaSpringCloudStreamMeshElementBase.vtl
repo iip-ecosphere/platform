@@ -299,7 +299,7 @@ block;
             forward = t.forward;
         }
         if (forward or sType == getFirstTypeName(conn.input)) {
-            expr = '${fallbackToNull(src, "${sel}.send(data)", false)}';
+            expr = '${fallbackToNull(src, "${sel}.send(${type}.class, data)", false)}';
         } else {
             expr = sel;
         }
@@ -346,7 +346,7 @@ block;
     }
     
     def generateAsyncProcessorBody(MeshElement proc, Connector conn, String methodSuffix, String methodSuffixWithServiceId, String type, JavaCodeMethod m) {
-        String expr = '${fallbackToNull(proc, "service.send(data)", false)}';
+        String expr = '${fallbackToNull(proc, "service.send(${type}.class, data)", false)}';
         m.return(new JavaCodeLambdaExpression("data").asExpr(genRcvProbe(conn, expr, type, "data")));
     }
 
@@ -373,7 +373,7 @@ block;
     }
 
     def generateSyncProcessorBody(MeshProcessor proc, Connector conn, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType, JavaCodeMethod m) {
-        m.return('data -> ${fallbackToNull(proc, "service.send(data)", true)}');
+        m.return('data -> ${fallbackToNull(proc, "service.send(${inType}.class, data)", true)}');
     }
     
     // called via MeshBasics.generateDataMethods for MeshSink
@@ -501,30 +501,59 @@ block;
     }*/
     
     def initialService(MeshElement elt, Connector conn, setOf(String) serviceVars, JavaCodeMethod m) {
-        String connGen = getConnectorGenerics(conn, true);
         String clsName = getClsName(elt);
         serviceVars.add("service");
         m.var("ConnectorParameter", "param", "createConnectorParameter()");
+        getYamlServiceFragment("serviceData", clsName, conn.id, m);
+        JavaCodeMethodCall init = new JavaCodeConstructorCall(wrapperCls(conn)).arg("serviceData").arg("() -> param");
+        wrapperCtorParam(conn, init);
+        m.assign("service", init);
+        genMultiConnectors(conn, getConnectorCls(conn), "service", m);
+        setDataTimeDiffProvider(conn, "service", m);
+        initAppInstId("service", m);
+    }
+    
+    // added v2->v3
+    def genMultiConnectors(Connector conn, String connClsName, String serviceName, JavaCodeBlockInterface m) {
+        String connGen = getConnectorGenerics(conn, true);
         JavaCodeMethodCall init = new JavaCodeMethodCall("de.iip_ecosphere.platform.connectors.ConnectorFactory.createConnector", JavaCodeImportScope.METHOD_CLASS_IMPORT);
-        init.stringArg(getConnectorCls(conn));
+        init.stringArg(connClsName);
         init.arg("() -> param");
         init.addCallArgument("createConnectorAdapter").arg(genCreateConnectorAdapterSuppliers(conn));
         m.var("de.iip_ecosphere.platform.connectors.Connector" + connGen, "conn").initializer(init);
         m.call("conn.setInstanceIdentification").stringArg(conn.name);
         m.call("conn.enablePolling").arg(false); // independent of notifications, disable as @Autowired may not be
-        getYamlServiceFragment("serviceData", clsName, conn.id, m);
-        init = new JavaCodeConstructorCall(wrapperCls(conn) + connGen).arg("serviceData").arg("conn").arg("() -> param");
-        wrapperCtorParam(conn, init);
-        m.assign("service", init);
-        m.call("service.setReceptionCallback").newArg("ConnectorReceptionCallback");
-        setDataTimeDiffProvider(conn, "service", m);
-        initAppInstId("service", m);
+        m.call("${serviceName}.setReceptionCallback").newArg(getReceptionCallbackClassName(conn));
+        m.call("${serviceName}.addConnector").arg("conn");
+
+/*        mapOf(IOType, IOType) pairs = ioPairs(conn);
+        connTypes.clear();
+        Integer pos = 0;
+        for (IOType i : pairs.keys()) {
+            ConnectorTypes ct = new ConnectorTypes();
+            ct.input = i;
+            ct.output = pairs.get(i);
+            ct.inInterface = conn.inInterface; // TODO conn.inInterfaces.get(pos);
+            ct.outInterface = conn.outInterface; // TODO conn.outInterfaces.get(pos);
+            if (pos == 0) {
+                ct.fieldName = "service"; // TODO preliminary
+            } else {
+                ct.fieldName = "service" + pos; // TODO preliminary
+            }   
+            connTypes.add(ct);
+            pos = pos + 1;
+        }
+println("CONNTYPES*");        
+println(connTypes);        */
+
+        
     }
     
+    
     def wrapperCls(Connector conn) {
-        String wrapperCls = "de.iip_ecosphere.platform.services.environment.ConnectorServiceWrapper";
+        String wrapperCls = "de.iip_ecosphere.platform.services.environment.MultiConnectorServiceWrapper";
         if (isDefined(conn.mock) and conn.mock) {
-            wrapperCls = "de.iip_ecosphere.platform.services.environment.MockingConnectorServiceWrapper";
+            wrapperCls = "de.iip_ecosphere.platform.services.environment.MockingMultiConnectorServiceWrapper";
         }
         wrapperCls;
     }
@@ -673,7 +702,7 @@ block;
     
     def getServiceType(MeshElement elt, Connector conn) {
         isConnector = true;
-        String cls = "ConnectorServiceWrapper" + getConnectorGenerics(conn, true);
+        String cls = "MultiConnectorServiceWrapper";// + getConnectorGenerics(conn, true);
         if (isDefined(conn.mock) and conn.mock) {
             cls = "Mocking" + cls;
         }
@@ -879,7 +908,8 @@ block;
                 String service = "service";
                 String connGen = getConnectorGenerics(conn, true);
                 String clsName = getClsName(elt);
-                String connAccess = "service.getConnector()";
+                String inTypeName = asTypeName(getFirstTypeName(conn.input));
+                String connAccess = "service.getEventHandlingConnector(${inTypeName}.class)";
                 if (isDefined(conn.mock) and conn.mock) {
                     connAccess = "service"; // mock can handle triggers as proxy
                 }
@@ -889,23 +919,22 @@ block;
                         a.var("String", "newCls", "${handleVar}.getNewConnectorClass(data)");
                         a.if("null != newCls && newCls.length() > 0").(a1|{
                             a1.var("ConnectorParameter", "param", "createConnectorParameter()");
-                            a1.var("Connector" + connGen, "conn", new JavaCodeMethodCall("de.iip_ecosphere.platform.connectors.ConnectorFactory.createConnector", JavaCodeImportScope.METHOD_CLASS_IMPORT)
-                                .arg("newCls").arg("() -> param").arg("createConnectorAdapter(${genCreateConnectorAdapterSuppliers(conn)})"));
-                            a1.if("null != conn").(a2|{
-                                a2.try().(t|{
-                                    t.addSLComment("as experiment, simple form, no switching strategy for now");
-                                    t.call("conn.enablePolling").arg(false); // independent of notifications, disable as @Autowired may not be
-                                    getYamlServiceFragment("serviceData", clsName, conn.id, t);
-                                    t.var(serviceType, "oldService", service);
-                                    t.var(serviceType, "newService", wrapperCtorParam(conn, new JavaCodeConstructorCall(wrapperCls(conn) + getConnectorGenerics(conn, true)).arg("serviceData").arg("conn").arg("() -> param")));
-                                    t.call("newService.setReceptionCallback").newArg("ConnectorReceptionCallback");
-                                    setDataTimeDiffProvider(conn, "newService", t);
-                                    t.call("newService.setState").addConstantArgument("de.iip_ecosphere.platform.services.environment.ServiceState.STARTING");
-                                    t.assign(service, "newService");
-                                    t.call("oldService.setState").addConstantArgument("de.iip_ecosphere.platform.services.environment.ServiceState.STOPPING");
-                                    t.callQualified("de.iip_ecosphere.platform.services.environment.spring.Starter.mapService").arg(service);
-                                    t.catch("java.util.concurrent.ExecutionException", "e").SystemOutPrintln().arg('"Cannot switch connector: " + e.getMessage()');
+                            //a1.var("Connector" + connGen, "conn", new JavaCodeMethodCall("de.iip_ecosphere.platform.connectors.ConnectorFactory.createConnector", JavaCodeImportScope.METHOD_CLASS_IMPORT)
+                            //    .arg("newCls").arg("() -> param").arg("createConnectorAdapter(${genCreateConnectorAdapterSuppliers(conn)})"));
+                            a1.try().(t|{
+                                t.addSLComment("as experiment, simple form, no switching strategy for now");
+                                getYamlServiceFragment("serviceData", clsName, conn.id, t);
+                                t.var(serviceType, "oldService", service);
+                                t.var(serviceType, "newService", wrapperCtorParam(conn, new JavaCodeConstructorCall(wrapperCls(conn)).arg("serviceData").arg("() -> param")));
+                                genMultiConnectors(conn, "newCls", "newService", t);
+                                setDataTimeDiffProvider(conn, "newService", t);
+                                t.if("!newService.isEmpty()").(a2|{
+                                    a2.call("newService.setState").addConstantArgument("de.iip_ecosphere.platform.services.environment.ServiceState.STARTING");
+                                    a2.assign(service, "newService");
+                                    a2.call("oldService.setState").addConstantArgument("de.iip_ecosphere.platform.services.environment.ServiceState.STOPPING");
+                                    a2.callQualified("de.iip_ecosphere.platform.services.environment.spring.Starter.mapService").arg(service);
                                 });
+                                t.catch("java.util.concurrent.ExecutionException", "e").SystemOutPrintln().arg('"Cannot switch connector: " + e.getMessage()');
                             });
                         });
                         a.call("received").qualifiedBy(handleVar).arg("data").arg(connAccess);
