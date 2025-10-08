@@ -72,6 +72,20 @@ public interface Connector <O, I, CO, CI> extends EventHandlingConnector {
     public void setReceptionCallback(ReceptionCallback<CO> callback) throws IOException;
 
     /**
+     * Attaches a reception {@code callback} to this connector. The {@code callback}
+     * is called upon a reception. Exceptions are not thrown rather than logged.
+     * 
+     * @param callback the callback to attach
+     */
+    public default void setReceptionCallbackSafe(ReceptionCallback<CO> callback) {
+        try {
+            setReceptionCallback(callback);
+        } catch (IOException e) {
+            LoggerFactory.getLogger(this).error("While setting reception callback: {}", e.getMessage());
+        }
+    }
+
+    /**
      * Disconnects the connector from the underlying machine/platform.
      * 
      * @throws IOException in case that connecting fails
