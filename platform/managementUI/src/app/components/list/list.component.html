@@ -55,6 +55,7 @@ mat-raised-button color="success"
 
             <span class="row-title" >
               <span style="height: 5px; vertical-align: top; margin-right: 10px;" id="data.item.idShort">
+                <mat-icon *ngIf="isConstantValue(item)" class="const-icon" matTooltip="Constant Variable">lock</mat-icon>
                 {{item.idShort}}
               </span>
             </span>
@@ -63,9 +64,11 @@ mat-raised-button color="success"
             </div>
             <div *ngFor="let property of item.value" class="subtext" >
               <div *ngIf="property.value" id="data.item.value">
+             <!--  <div id="data.item.value"> -->
                 {{property.value}}
               </div>
             </div>
+            
           </td>
 
           <!-- Buttons -->

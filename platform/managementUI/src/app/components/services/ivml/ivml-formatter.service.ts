@@ -9,7 +9,7 @@ import { DataUtils, EditorPartition, UtilsService } from '../../../services/util
 })
 export class IvmlFormatterService extends UtilsService {
 
-  constructor(public api:ApiService) { 
+  constructor(public api: ApiService) {
     super();
   }
 
@@ -24,12 +24,14 @@ export class IvmlFormatterService extends UtilsService {
    * @returns user feedback
    */
   public async createVariable(variableName: string, data: IvmlRecordValue, type: string) {
+    const isConst: boolean = this.isConstVar(data);
+    let operation = isConst ? "createConstantVariable" : "createVariable";
     let ivmlFormat = this.getIvml(variableName, data, type);
     let params: InputVariable[] = [];
-    params.push(ApiService.createAasOperationParameter("varName", AAS_TYPE_STRING, ivmlFormat[0]));
-    params.push(ApiService.createAasOperationParameter("type", AAS_TYPE_STRING, ivmlFormat[1]));
-    params.push(ApiService.createAasOperationParameter("valExpr", AAS_TYPE_STRING, ivmlFormat[2]));
-    return await this.callConfigOperation("createVariable", params, "Values have been stored!");
+    params.push(ApiService.createAasOperationParameter("varName", AAS_TYPE_STRING, ivmlFormat.variableName));
+    params.push(ApiService.createAasOperationParameter("type", AAS_TYPE_STRING, ivmlFormat.type));
+    params.push(ApiService.createAasOperationParameter("valExpr", AAS_TYPE_STRING, ivmlFormat.ivml));
+    return await this.callConfigOperation(operation, params, "Values have been stored!");
   }
 
   /**
@@ -70,7 +72,7 @@ export class IvmlFormatterService extends UtilsService {
    * @returns user feedback
    */
   private async callConfigOperation(opName: string, params: InputVariable[], successText: string) {
-    const response = await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_CONFIGURATION, 
+    const response = await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_CONFIGURATION,
       AAS_OP_PREFIX_SME + opName, params);
     let exception = this.api.getPlatformResponse(response);
     return this.getFeedback(exception, successText);
@@ -84,7 +86,7 @@ export class IvmlFormatterService extends UtilsService {
    * @returns feedback as success text/flag or the text returned as exception
    */
   private getFeedback(opResult: JsonPlatformOperationResult | null, success: string): UserFeedback {
-    let result: UserFeedback = {feedback:success, successful:true};
+    let result: UserFeedback = { feedback: success, successful: true };
     if (opResult && opResult.exception) {
       result.feedback = "Exception: " + opResult.exception;
       result.successful = false;
@@ -100,7 +102,9 @@ export class IvmlFormatterService extends UtilsService {
    */
   private toIvml(value: IvmlValue) {
     let result = "";
-    if (value._type == IVML_TYPE_String) {
+    if (value === undefined) {
+      result = `undefined{}`;
+    } else if (value._type == IVML_TYPE_String) {
       result = `"${value.value}"`;
     } else if (primitiveDataTypes.includes(value._type)) {
       result = String(value.value);
@@ -122,7 +126,7 @@ export class IvmlFormatterService extends UtilsService {
     } else if (DataUtils.isIvmlRefTo(value._type)) {
       result = `refBy(${value.value})`;
     } else if (this.isString(value.value) && value.value.startsWith(IVML_TYPE_PREFIX_enumeration)) { // ivml enums in internal notation
-        result = value.value.replace(IVML_TYPE_PREFIX_enumeration, "");
+      result = value.value.replace(IVML_TYPE_PREFIX_enumeration, "");
     } else { // compound
       result = value._type + "{";
       let first = true;
@@ -154,7 +158,7 @@ export class IvmlFormatterService extends UtilsService {
       } else if (this.isString(data["value"].value) && data["value"].value.startsWith(IVML_TYPE_PREFIX_enumeration)) {
         result = true;
       }
-    } 
+    }
     return result;
   }
 
@@ -170,7 +174,7 @@ export class IvmlFormatterService extends UtilsService {
     variableName = this.replaceWhitespaces(variableName)
 
     // removing empty entries
-    for(const key in data) {
+    for (const key in data) {
       if (data[key].value === "") {
         delete data[key]
       }
@@ -202,77 +206,77 @@ export class IvmlFormatterService extends UtilsService {
         ivml += key + " = " + this.toIvml(data[key]);
         first = false;
       }
-/*
-      // non-primitive types ---------------------------------------------------------
-      ivml += "{\n"
-      let i = 0
-
-      for (const key in data) {
-        if (this.isNumber(data[key].value)) {  // TODO maybe input check will be there some day
-          ivml += key + " = " + Number(data[key])
-
-        } else if (this.isString(data[key].value)) {
-          // refTo, string inside non-primitive type, ivml enum
-          ivml += key + " = " + this.convertToIvml(data[key].value)[0]
-
-        } else if (Array.isArray(data[key].value)) {
-          // setOf, sequenceOf ---------------------------------------------
-          ivml += key + " = {"
-          if (data[key].value.length > 1) {
-            let j = 0
-
-            if (this.isObject(data[key].value[0])) {
-              // sequence with more than one entry
-              ivml += this.handleIvmlSeq(data[key])
-
-            } else {
-              for (let elemt of data[key].value) {
-                let return_val = this.convertToIvml(elemt)
-                ivml += return_val[0]
-
-                // no comma after the last value
-                if (j < (Object.keys(data[key]).length - 1)) {
-                  ivml += ","
+      /*
+            // non-primitive types ---------------------------------------------------------
+            ivml += "{\n"
+            let i = 0
+      
+            for (const key in data) {
+              if (this.isNumber(data[key].value)) {  // TODO maybe input check will be there some day
+                ivml += key + " = " + Number(data[key])
+      
+              } else if (this.isString(data[key].value)) {
+                // refTo, string inside non-primitive type, ivml enum
+                ivml += key + " = " + this.convertToIvml(data[key].value)[0]
+      
+              } else if (Array.isArray(data[key].value)) {
+                // setOf, sequenceOf ---------------------------------------------
+                ivml += key + " = {"
+                if (data[key].value.length > 1) {
+                  let j = 0
+      
+                  if (this.isObject(data[key].value[0])) {
+                    // sequence with more than one entry
+                    ivml += this.handleIvmlSeq(data[key])
+      
+                  } else {
+                    for (let elemt of data[key].value) {
+                      let return_val = this.convertToIvml(elemt)
+                      ivml += return_val[0]
+      
+                      // no comma after the last value
+                      if (j < (Object.keys(data[key]).length - 1)) {
+                        ivml += ","
+                      }
+                      j += 1
+                    }
+                  }
+                } else {
+                  if (this.isObject(data[key].value[0])) {
+                    // ivml sequence
+                    ivml += this.handleIvmlSeq(data[key])
+      
+                  } else {
+                    // refTo, string or boolean
+                    let elemt = data[key].value[0]
+                    let return_val = this.convertToIvml(elemt)
+                    if (return_val[1] === LIST) {
+                      ivml += "{" + return_val[0] + "}"
+                    } else {
+                      ivml += return_val[0]
+                    }
+                  }
                 }
-                j += 1
-              }
-            }
-          } else {
-            if (this.isObject(data[key].value[0])) {
-              // ivml sequence
-              ivml += this.handleIvmlSeq(data[key])
-
-            } else {
-              // refTo, string or boolean
-              let elemt = data[key].value[0]
-              let return_val = this.convertToIvml(elemt)
-              if (return_val[1] === LIST) {
-                ivml += "{" + return_val[0] + "}"
+                ivml += "}"
+      
+              } else if (this.isObject(data[key])) {
+                // compound ---------------------------------------------
+                ivml += key + " = {" + this.getCompundStructure(data[key]) + "}"
+      
               } else {
-                ivml += return_val[0]
+                // integer, real
+                ivml += key + " = " + data[key]
               }
-            }
-          }
-          ivml += "}"
-
-        } else if (this.isObject(data[key])) {
-          // compound ---------------------------------------------
-          ivml += key + " = {" + this.getCompundStructure(data[key]) + "}"
-
-        } else {
-          // integer, real
-          ivml += key + " = " + data[key]
-        }
-        // no comma after the last value
-        if (i < (Object.keys(data).length - 1)) {
-          ivml += ",\n"
-        }
-        i += 1
-      }*/
+              // no comma after the last value
+              if (i < (Object.keys(data).length - 1)) {
+                ivml += ",\n"
+              }
+              i += 1
+            }*/
       ivml += "\n}"
     }
 
-    let result =  [variableName, type, ivml]
+    let result = { variableName, type, ivml }
     return result
   }
 
@@ -337,7 +341,7 @@ export class IvmlFormatterService extends UtilsService {
     let temp = value.split(' ')
     return temp.join('_')
   }
-  
+
   // ------------- setGraph --------------------------------------------------
 
   /**
@@ -347,8 +351,8 @@ export class IvmlFormatterService extends UtilsService {
    * @param data the application data from the editor variables
    * @returns the user feedback
    */
-  public async createApp(appName:string, data:IvmlRecordValue) {
-    let ivmlFormat = this.getIvml(appName, data, "")[2]
+  public async createApp(appName: string, data: IvmlRecordValue) {
+    let ivmlFormat = this.getIvml(appName, data, "").ivml
     return await this.setMesh(appName, ivmlFormat, "", "");
   }
 
@@ -361,7 +365,7 @@ export class IvmlFormatterService extends UtilsService {
    * @param val the graph in drawflow format
    * @returns the user feedback
    */
-  public async setMesh(appName: string, appValExpr: string, serviceMeshName:string, val:string) {
+  public async setMesh(appName: string, appValExpr: string, serviceMeshName: string, val: string) {
     let params: InputVariable[] = [];
     params.push(ApiService.createAasOperationParameter("appName", AAS_TYPE_STRING, appName));
     params.push(ApiService.createAasOperationParameter("appValExpr", AAS_TYPE_STRING, appValExpr));
@@ -405,7 +409,7 @@ export class IvmlFormatterService extends UtilsService {
    * @returns the UI groups
    */
   public calculateUiGroupsInf(type: editorInput | null, meta: Resource | undefined) {
-    let uiGroups : uiGroup[] = [];
+    let uiGroups: uiGroup[] = [];
     if (type && type.type && meta) {
       let t = DataUtils.stripGenericType(type.type);
       let sel = meta.value?.find(item => item.idShort === t) as configMetaContainer;
@@ -424,28 +428,78 @@ export class IvmlFormatterService extends UtilsService {
    * @returns the UI groups
    */
   public calculateUiGroups(selectedType: configMetaContainer | undefined, type: editorInput | null, meta: Resource | undefined, metaBackup: Resource | undefined) {
-    let uiGroups : uiGroup[] = [];
+    let uiGroups: uiGroup[] = [];
+    let inputs: editorInput[] = [];
+
     if (selectedType && selectedType.value) {
       // (Constants) hard-coded in case of primitive types
       let selMetaTypeKind = DataUtils.getPropertyValue(selectedType.value, MT_metaTypeKind);
       if (primitiveDataTypes.includes(selectedType.idShort) || selMetaTypeKind == MTK_enum) {
-        let meta_entry:configMetaEntry = {
-          modelType: {name: ""},
+        let meta_entry: configMetaEntry = {
+          modelType: { name: "" },
           kind: "",
           value: "",
           idShort: "value"
         }
-        let val = [type?.value]; 
-        let editorInput:editorInput =
-          {name: "value", type: selectedType.idShort, value:val,
-          description: [{language: '', text: ''}],
-          refTo: false, multipleInputs: false, meta:meta_entry};
-        editorInput.metaTypeKind = selMetaTypeKind;
+
+        let val = [type?.value];
+        const hasIsConst = DataUtils.getPropertyValue(type?.value, "isConst");
+
+        if (primitiveDataTypes.includes(selectedType.idShort) && hasIsConst !== undefined) {
+          let meta_name: configMetaEntry = {
+            modelType: { name: "" },
+            kind: "",
+            value: "",
+            idShort: "name"
+          }
+
+          let meta_const: configMetaEntry = {
+            modelType: { name: "" },
+            kind: "",
+            value: "",
+            idShort: "isConst"
+          }
+
+          let name = DataUtils.getPropertyValue(type?.value, "name");
+          val = !type && selectedType.idShort == IVML_TYPE_Boolean ? 'true' : DataUtils.getPropertyValue(type?.value, "value");
+          let isConst = !type ? 'false' : DataUtils.getPropertyValue(type?.value, "isConst");
+
+          let editorInputIsConst: editorInput =
+          {
+            name: "isConst", type: IVML_TYPE_Boolean, value: isConst,
+            description: [{ language: '', text: '' }],
+            refTo: false, multipleInputs: false, meta: meta_const,
+            isReadOnly: false
+          };
+          editorInputIsConst.metaTypeKind = selMetaTypeKind;
+          inputs.push(editorInputIsConst);
+
+          let editorInputName: editorInput =
+          {
+            name: "name", type: IVML_TYPE_String, value: name,
+            description: [{ language: '', text: '' }],
+            refTo: false, multipleInputs: false, meta: meta_name,
+            isReadOnly: name ? true : false
+          };
+          editorInputName.metaTypeKind = selMetaTypeKind;
+          inputs.push(editorInputName);
+        }
+
+        let editorInputValue: editorInput =
+        {
+          name: "value", type: selectedType.idShort, value: val,
+          description: [{ language: '', text: '' }],
+          refTo: false, multipleInputs: false, meta: meta_entry,
+          isReadOnly: false
+        };
+        editorInputValue.metaTypeKind = selMetaTypeKind;
+
+        inputs.push(editorInputValue);
 
         let uiGroup = 1
         uiGroups.push({
           uiGroup: uiGroup,
-          inputs: [editorInput],
+          inputs: inputs,
           optionalInputs: [],
           fullLineInputs: [],
           fullLineOptionalInputs: []
@@ -460,12 +514,15 @@ export class IvmlFormatterService extends UtilsService {
               uiGroup = uiGroup * -1;
             }
             if (uiGroup > 0) { // 0 == invisible
-              let uiGroupCompare =  uiGroups.find(item => item.uiGroup === uiGroup);
+              let uiGroupCompare = uiGroups.find(item => item.uiGroup === uiGroup);
 
               let editorInput: editorInput =
-                {name: '', type: '', value:[], description:
-                  [{language: '', text: ''}],
-                  refTo: false, multipleInputs: false};
+              {
+                name: '', type: '', value: [], description:
+                  [{ language: '', text: '' }],
+                refTo: false, multipleInputs: false,
+                isReadOnly: false
+              };
 
               let name = DataUtils.getProperty(input.value, 'name');
               if (name) {
@@ -474,7 +531,7 @@ export class IvmlFormatterService extends UtilsService {
                   && name.description[0]
                   && name.description[0].text
                   && name.description[0].language) {
-                    editorInput.description = name.description;
+                  editorInput.description = name.description;
                 }
               }
               let val = DataUtils.getProperty(type?.value, input.idShort); // TODO may need object access for nested objects
@@ -488,7 +545,7 @@ export class IvmlFormatterService extends UtilsService {
               let foundType = meta?.value?.find(type => type.idShort === typeGenerics);
               if (foundType) {
                 editorInput.metaTypeKind = DataUtils.getPropertyValue(foundType.value, MT_metaTypeKind);
-              } else if(metaBackup && metaBackup.value) {
+              } else if (metaBackup && metaBackup.value) {
                 let iterType = editorInput.type;
                 do {
                   let temp = metaBackup.value.find(item => item.idShort === DataUtils.stripGenericType(iterType));
@@ -517,12 +574,12 @@ export class IvmlFormatterService extends UtilsService {
                 editorInput.multipleInputs = true;
               }
               editorInput.defaultValue = DataUtils.getPropertyValue(input.value, MT_metaDefault);
-              let ivmlValue = type?.value || editorInput.defaultValue || ""; 
+              let ivmlValue = type?.value || editorInput.defaultValue || "";
               if (selMetaTypeKind === MTK_compound && this.isArray(ivmlValue)) {
                 ivmlValue = DataUtils.getPropertyValue(ivmlValue, input.idShort);
               }
               let initial;
-              if (this.isObject(ivmlValue) && ivmlValue && input.idShort in ivmlValue) { 
+              if (this.isObject(ivmlValue) && ivmlValue && input.idShort in ivmlValue) {
                 // compound instances may be passed in as object with properties, those being undefined are defaults
                 ivmlValue = ivmlValue[input.idShort];
                 if (!ivmlValue) {
@@ -550,7 +607,7 @@ export class IvmlFormatterService extends UtilsService {
                 }
               }
               editorInput.value = initial;
-              if (!uiGroupCompare){
+              if (!uiGroupCompare) {
                 if (isOptional) {
                   if (editorInput.multipleInputs) {
                     uiGroups.push({
@@ -590,7 +647,7 @@ export class IvmlFormatterService extends UtilsService {
                 }
               } else {
                 if (isOptional) {
-                  if(editorInput.multipleInputs) {
+                  if (editorInput.multipleInputs) {
                     uiGroupCompare?.fullLineOptionalInputs.push(editorInput);
                   } else {
                     uiGroupCompare?.optionalInputs.push(editorInput);
@@ -618,8 +675,8 @@ export class IvmlFormatterService extends UtilsService {
    * @returns the partitioned UI groups, currently as maximal two column layout per uiGroup
    */
   public partitionUiGroups(uiGroups: uiGroup[]) {
-    let result : EditorPartition[] = [];
-    let actual : EditorPartition | null = null;
+    let result: EditorPartition[] = [];
+    let actual: EditorPartition | null = null;
     let group = 1;
     let cols = 1;
     for (let u of uiGroups) {
@@ -631,7 +688,7 @@ export class IvmlFormatterService extends UtilsService {
             c = 2;
           }
           if (!actual || u.uiGroup != group || c != cols) {
-            actual = { count : 1, columns : c};
+            actual = { count: 1, columns: c };
             result.push(actual);
             group = u.uiGroup;
             cols = c;
@@ -668,13 +725,13 @@ export class IvmlFormatterService extends UtilsService {
     params.push(ApiService.createAasOperationParameter("type", AAS_TYPE_STRING, type));
     params.push(ApiService.createAasOperationParameter("elementName", AAS_TYPE_STRING, elementName));
     params.push(ApiService.createAasOperationParameter("elementVersion", AAS_TYPE_STRING, elementVersion));
-    const response = await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_CONFIGURATION, 
+    const response = await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_CONFIGURATION,
       AAS_OP_PREFIX_SME + "getVariableName", params);
     let opResult = this.api.getPlatformResponse(response);
     if (opResult?.result) {
       result = opResult?.result;
     } else { // a bit fallback
-      result = type;    
+      result = type;
       if (data) {
         let name = data["name"];
         if (name) {
@@ -682,11 +739,11 @@ export class IvmlFormatterService extends UtilsService {
         }
       }
       if (type.length > 0) {
-        type = type[0].toLowerCase() + type.substring(1);       
+        type = type[0].toLowerCase() + type.substring(1);
       }
       result = type;
     }
-    return type; // preliminary
+    return result; // preliminary
   }
 
   /**
@@ -704,15 +761,15 @@ export class IvmlFormatterService extends UtilsService {
         }
 
         if (!this.isAbstract(item)) {
-          if(filter?.metaRef.includes(idShort)) {
+          if (filter?.metaRef.includes(idShort)) {
             newMetaValues.push(item)
           }
 
           if (this.getMetaRef(item)) {
             let metaRefVal = DataUtils.getPropertyValue(item.value, MT_metaRefines)
-            if(metaRefVal != "") {
+            if (metaRefVal != "") {
               // sub-type
-              if(filter?.metaRef.includes(metaRefVal)) {
+              if (filter?.metaRef.includes(metaRefVal)) {
                 // direct inheritance
                 newMetaValues.push(item)
               } else {
@@ -730,7 +787,7 @@ export class IvmlFormatterService extends UtilsService {
           } else {
             // ivml types
             if (this.isTypeMetaKindEqualNum(item, MTK_primitive)
-                  && filter?.metaRef.length == 0) {
+              && filter?.metaRef.length == 0) {
               newMetaValues.push(item)
             }
           }
@@ -743,7 +800,7 @@ export class IvmlFormatterService extends UtilsService {
 
   /** Returns false when metaAbstract is false or
    * there is no attribute "metaAbstract" */
-  private isAbstract(item:any) {
+  private isAbstract(item: any) {
     let abstract = DataUtils.getPropertyValue(item.value, MT_metaAbstract);
     if (abstract) {
       return true
@@ -761,7 +818,7 @@ export class IvmlFormatterService extends UtilsService {
     }
   }
 
-  private isTypeMetaKindEqualNum(item:any, num:number) {
+  private isTypeMetaKindEqualNum(item: any, num: number) {
     let value = DataUtils.getPropertyValue(item.value, MT_metaTypeKind);
     if (value == num) {
       return true
@@ -774,7 +831,7 @@ export class IvmlFormatterService extends UtilsService {
    * Documentation in src/assets/doc/filterMeta.jpg
    * @returns {boolean}
    */
-  private isSubtype(meta: Resource, metaRefines_value: any, category: string):boolean{
+  private isSubtype(meta: Resource, metaRefines_value: any, category: string): boolean {
     let parent_item = this.getParentItem(meta, metaRefines_value)
     if (parent_item) {
       let filter = reqTypes.find(type => type.cat === category)
@@ -782,7 +839,7 @@ export class IvmlFormatterService extends UtilsService {
         return true
       } else {
         let metaRef_val_parent = this.getMetaRef(parent_item)
-        if(metaRef_val_parent) {
+        if (metaRef_val_parent) {
           return this.isSubtype(meta, metaRef_val_parent, category) //recursion
         } else {
           return false
@@ -795,11 +852,21 @@ export class IvmlFormatterService extends UtilsService {
 
   private getParentItem(meta: Resource, metaRefines: string) {
     let result = meta?.value?.find(item => item.idShort === metaRefines)
-    if(result) {
+    if (result) {
       return result
     } else {
       return null
     }
+  }
+
+  /**
+   * Check if the variable is Constant
+   * @returns {boolean}
+   */
+  private isConstVar(creationData: IvmlRecordValue): boolean {
+    const raw = creationData["isConst"]?.value;
+    delete creationData["isConst"];
+    return raw === true || raw === "true";
   }
 
 }
@@ -809,16 +876,16 @@ export class IvmlFormatterService extends UtilsService {
   includes names of toplevel types -> returns the toplevel type (if not abstract) and all subtypes
   */
 const reqTypes = [
-    {cat: "Constants", metaRef: []},
-    {cat: "Types", metaRef: ["RecordType", "ArrayType"]},
-    {cat: "Dependencies", metaRef: ["Dependency"]},
-    {cat: "Nameplates", metaRef: ["NameplateInfo"]},
-    {cat: "Services", metaRef: ["Service"]},
-    {cat: "Servers", metaRef: ["Server"]},
-    {cat: "Meshes", metaRef: ["ServiceMesh"]},
-    {cat: "Applications", metaRef: ["Application"]}
-  ];
+  { cat: "Constants", metaRef: [] },
+  { cat: "Types", metaRef: ["RecordType", "ArrayType"] },
+  { cat: "Dependencies", metaRef: ["Dependency"] },
+  { cat: "Nameplates", metaRef: ["NameplateInfo"] },
+  { cat: "Services", metaRef: ["Service"] },
+  { cat: "Servers", metaRef: ["Server"] },
+  { cat: "Meshes", metaRef: ["ServiceMesh"] },
+  { cat: "Applications", metaRef: ["Application"] }
+];
 
-  // ivml data types
+// ivml data types
 //const REF_TO = "refTo";
 //const LIST = "list";

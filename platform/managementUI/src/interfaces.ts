@@ -361,6 +361,10 @@ export interface editorInput {
    */
   refTo?: boolean;
   /**
+   * Does the variable/value disabled.
+   */
+  isReadOnly: boolean;
+  /**
    * Shall the editor represent multiple selectable/modifiable inputs.
    */
   multipleInputs?: boolean;
@@ -464,13 +468,15 @@ export const MT_metaTypeKind = 'metaTypeKind';
 export const MT_metaDefault = 'metaDefault';
 export const MT_metaVariable = 'metaVariable';
 export const MT_metaDisplayName = 'metaDisplayName';
+export const MT_metaConstant = 'metaConstant';
+export const MT_metaTemplate = 'metaTemplate';
 export const MT_varValue = 'varValue';
 
 export const metaTypes = [MT_metaState, MT_metaProject,
   MT_metaSize, MT_metaType, MT_metaRefines, MT_metaAbstract, MT_metaTypeKind]; // TODO same as allMetaTypes???
 
 export const allMetaTypes = [MT_metaState, MT_metaProject,
-    MT_metaSize, MT_metaType, MT_metaRefines, MT_metaAbstract, MT_metaTypeKind, MT_metaDefault, MT_metaVariable, MT_metaDisplayName];
+    MT_metaSize, MT_metaType, MT_metaRefines, MT_metaAbstract, MT_metaTypeKind, MT_metaDefault, MT_metaVariable, MT_metaDisplayName, MT_metaConstant, MT_metaTemplate];
   
 export const IVML_TYPE_String = "String";
 export const IVML_TYPE_Boolean = "Boolean";

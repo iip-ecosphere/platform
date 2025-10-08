@@ -110,10 +110,10 @@ describe('IvmlFormatterService', () => {
 
 });
 
-function exp(data: string[], varName: string, type: string, ivml: string):void {
-  expect(data[0]).toBe(varName);
-  expect(data[1]).toBe(type);
-  expect(String(data[2]).replace(/[\s\r\n]/g, "")).toBe(ivml.replace(/[\s\r\n]/g, ""));
+function exp(data: any, varName: string, type: string, ivml: string):void {
+  expect(data.variableName).toBe(varName);
+  expect(data.type).toBe(type);
+  expect(String(data.ivml).replace(/[\s\r\n]/g, "")).toBe(ivml.replace(/[\s\r\n]/g, ""));
 }
 
 function toIvmlRecordValue(val: any, varType: string) {
