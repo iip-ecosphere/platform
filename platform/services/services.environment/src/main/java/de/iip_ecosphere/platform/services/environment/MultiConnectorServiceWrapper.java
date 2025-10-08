@@ -39,7 +39,6 @@ public class MultiConnectorServiceWrapper extends AbstractService {
      * Creates a service wrapper instance.
      * 
      * @param yaml the service information as read from YAML
-     * @param connector the connector instance to wrap
      * @param connParamSupplier the connector parameter supplier for connecting the underlying connector
      */
     public MultiConnectorServiceWrapper(YamlService yaml, Supplier<ConnectorParameter> connParamSupplier) {
@@ -55,8 +54,6 @@ public class MultiConnectorServiceWrapper extends AbstractService {
     /**
      * Adds a connector. Already registered connectors will be overwritten.
      * 
-     * @param coCls the output type class of the connector
-     * @param ciCls the input type class of the connector
      * @param connector the connector to register (may be <b>null</b>, ignored)
      */
     public void addConnector(Connector<?, ?, ?, ?> connector) {
@@ -102,10 +99,23 @@ public class MultiConnectorServiceWrapper extends AbstractService {
      * @return the resolved class
      */
     protected static Class<?> resolve(Class<?> cls) {
-        if (cls.getName().endsWith("Impl")) {
-            Class<?> su = cls.getSuperclass();
-            if (null != su) {
-                cls = su;
+        String name = cls.getName();
+        String modName = name;
+        final String mockPrefix = "iip.mock";
+        final String mockSuffix = "Mock";
+        if (modName.startsWith(mockPrefix) && modName.endsWith(mockSuffix)) { // in testing
+            modName = modName.substring(mockPrefix.length()); 
+            modName = modName.substring(0, modName.length() - mockSuffix.length()); 
+            modName = "iip.datatypes" + modName; 
+        }
+        final String implSuffix = "Impl";
+        if (modName.endsWith(implSuffix)) {
+            modName = modName.substring(0, modName.length() - implSuffix.length()); 
+        }
+        if (!name.equals(modName)) {
+            try {
+                cls = Class.forName(modName);
+            } catch (ClassNotFoundException e) {
             }
         }
         return cls;

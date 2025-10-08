@@ -48,7 +48,6 @@ public class MockingMultiConnectorServiceWrapper extends MultiConnectorServiceWr
      * Creates a service wrapper instance.
      * 
      * @param yaml the service information as read from YAML
-     * @param connector the connector instance to wrap
      * @param connParamSupplier the connector parameter supplier for connecting the underlying connector
      */
     public MockingMultiConnectorServiceWrapper(YamlService yaml, Supplier<ConnectorParameter> connParamSupplier) {
