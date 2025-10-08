@@ -46,7 +46,7 @@ public class MavenUtils {
          * 
          * @param length the number of bytes
          */
-        private void clearedFile(long length) {
+        public void clearedFile(long length) {
             fileCount++;
             bytesCleared += length;
         }
