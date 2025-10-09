@@ -286,7 +286,7 @@ block;
             }
         });
     }
-
+    
     def generateSourceMethod(MeshSource src, Connector conn, String type, String methodSuffix, String methodSuffixWithServiceId, JavaCodeClass c) {
         String sel = insertSelector(conn, type, "data");
         String expr;
@@ -298,7 +298,9 @@ block;
             IOType t = tps[0];
             forward = t.forward;
         }
-        if (forward or sType == getFirstTypeName(conn.input)) {
+        sequenceOf(IOType) inTypes = reduce(conn, conn.input);
+        sequenceOf(IOType) outTypes = reduce(conn, conn.output);
+        if (forward or inTypes->exists(IOType t|sType == ioTypeTypeName(t))) {
             expr = '${fallbackToNull(src, "${sel}.send(${type}.class, data)", false)}';
         } else {
             expr = sel;
@@ -515,40 +517,26 @@ block;
     
     // added v2->v3
     def genMultiConnectors(Connector conn, String connClsName, String serviceName, JavaCodeBlockInterface m) {
-        String connGen = getConnectorGenerics(conn, true);
-        JavaCodeMethodCall init = new JavaCodeMethodCall("de.iip_ecosphere.platform.connectors.ConnectorFactory.createConnector", JavaCodeImportScope.METHOD_CLASS_IMPORT);
-        init.stringArg(connClsName);
-        init.arg("() -> param");
-        init.addCallArgument("createConnectorAdapter").arg(genCreateConnectorAdapterSuppliers(conn));
-        m.var("de.iip_ecosphere.platform.connectors.Connector" + connGen, "conn").initializer(init);
-        m.call("conn.setInstanceIdentification").stringArg(conn.name);
-        m.call("conn.enablePolling").arg(false); // independent of notifications, disable as @Autowired may not be
-        m.call("${serviceName}.addConnector").arg("conn"); // add first (!)
-        m.call("${serviceName}.setReceptionCallback").newArg(getReceptionCallbackClassName(conn));
-
-/*        mapOf(IOType, IOType) pairs = ioPairs(conn);
-        connTypes.clear();
+        sequenceOf(IOType) inTypes = reduce(conn, conn.input); // IVML collection unmodifiable
+        sequenceOf(IOType) outTypes = reduce(conn, conn.output);
         Integer pos = 0;
-        for (IOType i : pairs.keys()) {
-            ConnectorTypes ct = new ConnectorTypes();
-            ct.input = i;
-            ct.output = pairs.get(i);
-            ct.inInterface = conn.inInterface; // TODO conn.inInterfaces.get(pos);
-            ct.outInterface = conn.outInterface; // TODO conn.outInterfaces.get(pos);
-            if (pos == 0) {
-                ct.fieldName = "service"; // TODO preliminary
-            } else {
-                ct.fieldName = "service" + pos; // TODO preliminary
-            }   
-            connTypes.add(ct);
+        for (IOType outType : outTypes) {
+            IOType inType = inTypes.get(pos);            
+            String connVarName = "conn" + pos;
+            String connGen = getConnectorGenerics(conn, inType, outType, true);
+            JavaCodeMethodCall init = new JavaCodeMethodCall("de.iip_ecosphere.platform.connectors.ConnectorFactory.createConnector", JavaCodeImportScope.METHOD_CLASS_IMPORT);
+            init.stringArg(connClsName);
+            init.arg("() -> param");
+            String adapterMethodName = getAdapterCreationMethodName(conn, inType, outType, pos);
+            init.addCallArgument(adapterMethodName).arg(genCreateConnectorAdapterSuppliers(conn));
+            m.var("de.iip_ecosphere.platform.connectors.Connector" + connGen, connVarName).initializer(init);
+            m.call("${connVarName}.setInstanceIdentification").stringArg(conn.name);
+            m.call("${connVarName}.enablePolling").arg(false); // independent of notifications, disable as @Autowired may not be
+            m.call("${serviceName}.addConnector").arg(connVarName); // add first (!)
+            m.call("${serviceName}.setReceptionCallback").newArg(getReceptionCallbackClassName(conn, outType));
             pos = pos + 1;
         }
-println("CONNTYPES*");        
-println(connTypes);        */
-
-        
     }
-    
     
     def wrapperCls(Connector conn) {
         String wrapperCls = "de.iip_ecosphere.platform.services.environment.MultiConnectorServiceWrapper";
@@ -590,32 +578,40 @@ println(connTypes);        */
     }
     
     def genConnectorAdapterMethod(Boolean withPathSuppliers, Boolean withMetrics, Connector conn, JavaCodeClass c) {
-        c.method(adapterType(conn, false, true), "createConnectorAdapter", "Creates the connector adapter. [public for testing]").setStatic().(m|{
-            JavaCodeMethodCall r = new JavaCodeMethodCall("createConnectorAdapter");            
-            if (withMetrics) {
-                m.param("de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider", "metrics", "the metrics provider to use, <b>null</b> for no metric measurements");
-                m.param("java.io.File", "log", "the log file to use to record individual measurements in experiments, <b>null</b> for no logging. Only becomes active if {@code metrics} is not <b>null</b>");
-                r.arg("metrics").arg("log");
-            } else {
-                r.addNullArgument().addNullArgument();
-            }
-            if (withPathSuppliers) {
-                m.param("java.util.function.Supplier<String>", "inPathSupplier", "function returning the actual input base path to use for data accesses, may be <b>null</b>");
-                m.param("java.util.function.Supplier<String>", "outPathSupplier", "function returning the actual output base path to use for data accesses, may be <b>null</b>");
-                r.arg("inPathSupplier").arg("outPathSupplier");
-            } else {
-                r.addNullArgument().addNullArgument();
-            }
-            if (not(withMetrics) and not(withPathSuppliers)) {
-                m.getJavadocComment().setComment("Creates the default connector adapter without path suppliers. [public for testing]");
-            }
-            if (withMetrics and withPathSuppliers) {
-                adapterCreationFragment(conn, "adapter", "metrics", "log", m);
-                m.return("adapter", "the connector adapter");
-            } else {
-                m.return(r, "the connector adapter");
-            }
-        });
+        sequenceOf(IOType) inTypes = reduce(conn, conn.input); // IVML collection unmodifiable
+        sequenceOf(IOType) outTypes = reduce(conn, conn.output);
+        Integer pos = 0;
+        for (IOType outType : outTypes) {
+            IOType inType = inTypes.get(pos);
+            String methodName = getAdapterCreationMethodName(conn, inType, outType, pos);
+            c.method(adapterType(conn, inType, outType, false, true), methodName, "Creates the connector adapter. [public for testing]").setStatic().(m|{
+                JavaCodeMethodCall r = new JavaCodeMethodCall(methodName);            
+                if (withMetrics) {
+                    m.param("de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider", "metrics", "the metrics provider to use, <b>null</b> for no metric measurements");
+                    m.param("java.io.File", "log", "the log file to use to record individual measurements in experiments, <b>null</b> for no logging. Only becomes active if {@code metrics} is not <b>null</b>");
+                    r.arg("metrics").arg("log");
+                } else {
+                    r.addNullArgument().addNullArgument();
+                }
+                if (withPathSuppliers) {
+                    m.param("java.util.function.Supplier<String>", "inPathSupplier", "function returning the actual input base path to use for data accesses, may be <b>null</b>");
+                    m.param("java.util.function.Supplier<String>", "outPathSupplier", "function returning the actual output base path to use for data accesses, may be <b>null</b>");
+                    r.arg("inPathSupplier").arg("outPathSupplier");
+                } else {
+                    r.addNullArgument().addNullArgument();
+                }
+                if (not(withMetrics) and not(withPathSuppliers)) {
+                    m.getJavadocComment().setComment("Creates the default connector adapter without path suppliers. [public for testing]");
+                }
+                if (withMetrics and withPathSuppliers) {
+                    adapterCreationFragment(conn, inType, outType, "adapter", "metrics", "log", m);
+                    m.return("adapter", "the connector adapter");
+                } else {
+                    m.return(r, "the connector adapter");
+                }
+            });
+            pos = pos + 1;
+        }
     }
     
     def generatedServiceInitMethod(MeshElement elt, Connector conn, JavaCodeClass c) {
@@ -902,25 +898,20 @@ println(connTypes);        */
     def generateEventHandlers(MeshElement elt, Connector conn, JavaCodeClass c) {
         String serviceType = getServiceType(elt, conn);
         if (conn.inputHandlers <> null and conn.inputHandlers.size() > 0) {
+            sequenceOf(IOType) inTypes = reduce(conn, conn.input); // IVML collection unmodifiable
+            sequenceOf(IOType) outTypes = reduce(conn, conn.output);
             for (ConnectorInputHandler h: conn.inputHandlers) {
                 String typeName = toTypeName(h.type);
                 String handleVar = "${firstToLowerCase(typeName)}Handler";
                 String service = "service";
                 String connGen = getConnectorGenerics(conn, true);
                 String clsName = getClsName(elt);
-                String inTypeName = asTypeName(getFirstTypeName(conn.input));
-                String connAccess = "service.getEventHandlingConnector(${inTypeName}.class)";
-                if (isDefined(conn.mock) and conn.mock) {
-                    connAccess = "service"; // mock can handle triggers as proxy
-                }
                 c.method(serviceType, "handle" + typeName).setPrivate().(m|{
                     m.param(typeName, "data");
                     m.if("null != ${handleVar}").(a|{
                         a.var("String", "newCls", "${handleVar}.getNewConnectorClass(data)");
                         a.if("null != newCls && newCls.length() > 0").(a1|{
                             a1.var("ConnectorParameter", "param", "createConnectorParameter()");
-                            //a1.var("Connector" + connGen, "conn", new JavaCodeMethodCall("de.iip_ecosphere.platform.connectors.ConnectorFactory.createConnector", JavaCodeImportScope.METHOD_CLASS_IMPORT)
-                            //    .arg("newCls").arg("() -> param").arg("createConnectorAdapter(${genCreateConnectorAdapterSuppliers(conn)})"));
                             a1.try().(t|{
                                 t.addSLComment("as experiment, simple form, no switching strategy for now");
                                 getYamlServiceFragment("serviceData", clsName, conn.id, t);
@@ -937,7 +928,14 @@ println(connTypes);        */
                                 t.catch("java.util.concurrent.ExecutionException", "e").SystemOutPrintln().arg('"Cannot switch connector: " + e.getMessage()');
                             });
                         });
-                        a.call("received").qualifiedBy(handleVar).arg("data").arg(connAccess);
+                        for (IOType t : inTypes) {
+                            String inTypeName = ioTypeTypeName(t);
+                            String connAccess = "service.getEventHandlingConnector(${inTypeName}.class)";
+                            if (isDefined(conn.mock) and conn.mock) {
+                                connAccess = "service"; // mock can handle triggers as proxy
+                            }
+                            a.call("received").qualifiedBy(handleVar).arg("data").arg(connAccess);
+                        }
                     });
                     m.return(service);
                 });

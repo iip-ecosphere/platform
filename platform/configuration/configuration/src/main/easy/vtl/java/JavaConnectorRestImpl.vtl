@@ -12,7 +12,6 @@ template JavaConnectorRestImpl(Configuration config, JavaCodeArtifact target, Re
     
         String typeName = asTypeName(conn.name);
         String clsName = typeName + "Extension";
-        //String generics = getConnectorGenerics(conn, false); // , pkg=pkg + ".", typeAdd="RestType", adjust to rest, allow for auto-imports
 
         JavaCodeClass mainCls = codeCreateClass(target, pkg, clsName, 'Rest connector extension for ${typeName}');
         mainCls.addExtends("de.iip_ecosphere.platform.connectors.ConnectorExtensionDescriptor.DefaultConnectorExtension<Class<?>[]>");
