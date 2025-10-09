@@ -52,6 +52,8 @@ The common fields (some fields are detailed below) of all service types defined 
 | deployable |  Mandatory flag for central or remotely deployable service. |     |
 | artifacts | Optional set of names of file names in the artifact that shall be unpacked with this service. |     |
 
+Forward entries in `input` and `output` are matched pairwise, i.e., the first type in `input` is the input type for producing an instance of the first type in `output`. Non-forward (broadcast) entries are treated separately.
+
 ## Authentication and Security
 
 The compound types `AuthenticationSettings` or `SecuritySettings` represent the information to specify authentication or encryption information given in an identity store (cf. see [platform handbook](../PlatformHandbook.pdf), Section 3.3.13) to be passed on to the implementation of, e.g., a connector. In the simplest case of an `AuthenticationSettings` instance, e.g., in a service, looks like the following example:

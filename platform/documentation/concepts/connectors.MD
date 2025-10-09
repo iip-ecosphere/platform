@@ -53,6 +53,8 @@ Basically, a 'Connector' supports the following fields (in addition to those of 
 | dataTimeDiffProvider |  Optional plugins to adjust data ingestion time differences based on last data points data. |     |
 | deviceServiceKey | Optional name for service name to realize ad-hoc connectivity via the device AAS, may, e.g., override host and port. |     |
 
+Entries in `input` and `output` are matched pairwise with the corresponding entries in `inInterface` and `outInterface`. For legacy reason, currently only the first entry are matched but an extension for multiple types (MIMO-connectors) is in preparation. Typically, the number of matching quadruples is determined by `inInterface` and `outInterface`. The remaining entries in `input` and `output` are treated separately, e.g., as backwards/broadcasting input (for input handlers / connector triggers).
+
 In addition, a `ChannelConnector` offers the following fields:
 
 | Field | Description | Default |
