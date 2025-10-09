@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { editorInput } from 'src/interfaces';
 
 @Component({
@@ -10,6 +10,15 @@ import { editorInput } from 'src/interfaces';
 export class BooleanDropdownComponent implements OnInit {
 
   @Input() input: editorInput | undefined;
+  @Output() valueChange = new EventEmitter<boolean>(); // the output
+
+  onChange(value: boolean) {
+    this.selected = value;
+    if (this.input) {
+      this.input.value = value; // reflect back to parent data
+    }
+  }
+
   selected: boolean | undefined;
   
   constructor() { }

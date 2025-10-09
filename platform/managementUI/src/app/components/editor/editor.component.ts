@@ -2,16 +2,18 @@ import { Component, EventEmitter, Input, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ApiService } from 'src/app/services/api.service';
 import { IvmlFormatterService } from 'src/app/components/services/ivml/ivml-formatter.service';
-import { Resource, uiGroup, editorInput, configMetaContainer, ResourceAttribute, 
-  primitiveDataTypes, IvmlRecordValue, IvmlValue, UserFeedback, MT_metaRefines} from 'src/interfaces';
+import {
+  Resource, uiGroup, editorInput, configMetaContainer, ResourceAttribute,
+  primitiveDataTypes, IvmlRecordValue, IvmlValue, UserFeedback, MT_metaRefines
+} from 'src/interfaces';
 import { Utils, DataUtils } from 'src/app/services/utils.service';
 import { SaveEvent } from './inputControls/subeditor-button/subeditor-button.component';
 
 @Component({
-    selector: 'app-editor',
-    templateUrl: './editor.component.html',
-    styleUrls: ['./editor.component.scss'],
-    standalone: false
+  selector: 'app-editor',
+  templateUrl: './editor.component.html',
+  styleUrls: ['./editor.component.scss'],
+  standalone: false
 })
 export class EditorComponent extends Utils implements OnInit {
 
@@ -34,7 +36,7 @@ export class EditorComponent extends Utils implements OnInit {
   //showDropdown = true;
   showInputs = true;
   variableName = '';
-  ivmlType:string = "";
+  ivmlType: string = "";
   feedback: string = ""
   topLevel: boolean = true;
   saveEvent: EventEmitter<SaveEvent> | null = null;
@@ -42,7 +44,7 @@ export class EditorComponent extends Utils implements OnInit {
   constructor(private api: ApiService,
     public dialog: MatDialogRef<EditorComponent>,
     public ivmlFormatter: IvmlFormatterService) {
-      super();
+    super();
   }
 
   async ngOnInit() {
@@ -51,9 +53,9 @@ export class EditorComponent extends Utils implements OnInit {
         idShort: 'meta',
         value: this.refinedTypes
       }
-    } else if(!this.type) {
+    } else if (!this.type) {
       await this.populateMeta();
-    } else if (this.type.type){
+    } else if (this.type.type) {
       if (!this.metaBackup || !this.metaBackup.value) {
         await this.populateMeta();
       }
@@ -63,12 +65,12 @@ export class EditorComponent extends Utils implements OnInit {
         this.generateInputs()
       }
     }
-    if(this.metaBackup && this.metaBackup.value) {
+    if (this.metaBackup && this.metaBackup.value) {
       let searchTerm = 'Field'
-      for(const type of this.metaBackup.value) {
+      for (const type of this.metaBackup.value) {
         const refined = DataUtils.getProperty(type.value, MT_metaRefines);
         if (refined && refined.value != '') {
-          if(searchTerm === refined.value) {
+          if (searchTerm === refined.value) {
             console.debug("TYPE " + type);
           }
         }
@@ -81,7 +83,7 @@ export class EditorComponent extends Utils implements OnInit {
     this.metaBackup = DataUtils.deepCopy(this.meta);
     this.meta = this.ivmlFormatter.filterMeta(this.metaBackup, this.category);
     // single item
-    let newMetaValues = this.meta!.value; 
+    let newMetaValues = this.meta!.value;
     if (newMetaValues && newMetaValues.length == 1) {
       this.selectedType = newMetaValues[0];
       this.generateInputs();
@@ -103,9 +105,9 @@ export class EditorComponent extends Utils implements OnInit {
 
   public displayName(property: Resource | string) {
     let displayName = '';
-    if(typeof(property) == 'string') {
+    if (typeof (property) == 'string') {
       displayName = property;
-    } else if(property.value) {
+    } else if (property.value) {
       displayName = property.value.find(
         item => item.idShort === 'name')?.value;
     }
@@ -130,6 +132,9 @@ export class EditorComponent extends Utils implements OnInit {
     this.showInputs = false;
     this.transferUiGroups(this.uiGroups, creationData);
     let variableName = await this.ivmlFormatter.generateVariableName(this.ivmlType, creationData);
+    if (primitiveDataTypes.includes(this.ivmlType)) {
+      delete creationData["name"];
+    }
     if (this.selectedType?.idShort == "Application") {
       this.handleFeedback(await this.ivmlFormatter.createApp(variableName, creationData));
     } else {
@@ -154,13 +159,17 @@ export class EditorComponent extends Utils implements OnInit {
       this.transferUiGroups(this.uiGroups, complexType);
       if (!DataUtils.isEmpty(complexType)) {
         if (this.topLevel) {
+          if (primitiveDataTypes.includes(this.ivmlType)) {
+            delete complexType["name"];
+            delete complexType["isConst"];
+          }
           this.handleFeedback(await this.ivmlFormatter.setVariable(this.variableName, complexType, this.ivmlType));
         } else if (this.saveEvent) {
-          this.saveEvent.emit({idShort: this.type.name, value: complexType, multipleInputs: this.type.multipleInputs});
+          this.saveEvent.emit({ idShort: this.type.name, value: complexType, multipleInputs: this.type.multipleInputs });
         }
       }
     }
-    this.dialog.close(); 
+    this.dialog.close();
   }
 
   /**
@@ -172,7 +181,7 @@ export class EditorComponent extends Utils implements OnInit {
     let prop = DataUtils.getProperty(this.type?.value, event.idShort); // sub-level editor comes from an existing property, shall exist
     let host;
     if (event.multipleInputs) {
-      host = {value: []};
+      host = { value: [] };
     } else {
       host = prop;
     }
@@ -182,7 +191,7 @@ export class EditorComponent extends Utils implements OnInit {
         host.value[entry] = src.value;
       } else {
         if (this.isArray(host.value)) {
-          host.value.push(src.value); 
+          host.value.push(src.value);
         } else {
           host.value[entry] = src.value;
         }
@@ -228,8 +237,8 @@ export class EditorComponent extends Utils implements OnInit {
       } else if (primitiveDataTypes.includes(input.type)) { // was only in prepareCreation and only for uiGroup.inputs
         tmp = this.getValue(input);
       }
-      if (tmp && tmp != input.defaultValue) { // don't write back IVML default values
-        let val : IvmlValue = {value: tmp, _type: input.type};
+      if (tmp !== null && tmp !== undefined && tmp != input.defaultValue) { // don't write back IVML default values
+        let val: IvmlValue = { value: tmp, _type: input.type };
         result[input.name] = val;
         //result[input.name] = tmp;
       }

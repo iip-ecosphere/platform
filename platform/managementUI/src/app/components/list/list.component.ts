@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { EditorComponent } from '../editor/editor.component';
-import { DEFAULT_UPLOAD_CHUNK, InputVariable, MT_metaType, MT_metaVariable, MT_varValue, Resource, configMetaEntry, editorInput } from 'src/interfaces';
+import { DEFAULT_UPLOAD_CHUNK, IVML_TYPE_Boolean, InputVariable, MT_metaType, MT_metaVariable, MT_varValue, Resource, configMetaEntry, editorInput, primitiveDataTypes } from 'src/interfaces';
 import { Utils, DataUtils } from 'src/app/services/utils.service';
 import { WebsocketService } from 'src/app/websocket.service';
 import { StatusCollectionService } from 'src/app/services/status-collection.service';
@@ -16,7 +16,7 @@ import { IvmlFormatterService } from 'src/app/components/services/ivml/ivml-form
  * Information on a file being uploaded.
  */
 interface FileUploadInfo {
-  
+
   /**
    * File object representing the data to upload.
    */
@@ -31,24 +31,24 @@ interface FileUploadInfo {
 
 class RowEntry {
 
-  idShort: any; 
+  idShort: any;
   logo: any;
   value: any;
-  varName: any; 
+  varName: any;
   varType: any;
   varValue: any;
 
-  constructor(init?:Partial<RowEntry>) {
+  constructor(init?: Partial<RowEntry>) {
     Object.assign(this, init);
   }
 
 }
 
 @Component({
-    selector: 'app-list',
-    templateUrl: './list.component.html',
-    styleUrls: ['./list.component.scss'],
-    standalone: false
+  selector: 'app-list',
+  templateUrl: './list.component.html',
+  styleUrls: ['./list.component.scss'],
+  standalone: false
 })
 export class ListComponent extends Utils implements OnInit {
   //currentTab: string | null = null;
@@ -68,28 +68,28 @@ export class ListComponent extends Utils implements OnInit {
     public http: HttpClient,
     public api: ApiService,
     public dialog: MatDialog,
-    public websocketService: WebsocketService, 
-    public collector: StatusCollectionService, 
+    public websocketService: WebsocketService,
+    public collector: StatusCollectionService,
     private ivmlFormatter: IvmlFormatterService) {
-      super();
-      this.sub = websocketService.getMsgSubject().subscribe((value: any) => {
-        collector.receiveStatus(JSON.parse(value)) 
-      })      
-    }
+    super();
+    this.sub = websocketService.getMsgSubject().subscribe((value: any) => {
+      collector.receiveStatus(JSON.parse(value))
+    })
+  }
 
   // Filter ---------------------------------------------------------------------
   // Information how the raw data for a given tab should be filtered:
   // with the metaProject or with a name of the submodelElement
   tabsParam = [
-    {tabName: "Setup", metaProject:"TechnicalSetup", submodelElement:null},
-    {tabName: "Constants", metaProject:"AllConstants", submodelElement:null},
-    {tabName: "Types", metaProject:"AllTypes", submodelElement:null},
-    {tabName: "Dependencies", metaProject: "", submodelElement: "Dependency"},
-    {tabName: "Nameplates", metaProject:null, submodelElement:"Manufacturer"},
-    {tabName: "Services", metaProject:null, submodelElement:"ServiceBase"},
-    {tabName: "Servers", metaProject:null, submodelElement:"Server"},
-    {tabName: "Meshes", metaProject:null, submodelElement:"ServiceMesh"},
-    {tabName: "Applications", metaProject:null, submodelElement:"Application"}
+    { tabName: "Setup", metaProject: "TechnicalSetup", submodelElement: null },
+    { tabName: "Constants", metaProject: "AllConstants", submodelElement: null },
+    { tabName: "Types", metaProject: "AllTypes", submodelElement: null },
+    { tabName: "Dependencies", metaProject: "", submodelElement: "Dependency" },
+    { tabName: "Nameplates", metaProject: null, submodelElement: "Manufacturer" },
+    { tabName: "Services", metaProject: null, submodelElement: "ServiceBase" },
+    { tabName: "Servers", metaProject: null, submodelElement: "Server" },
+    { tabName: "Meshes", metaProject: null, submodelElement: "ServiceMesh" },
+    { tabName: "Applications", metaProject: null, submodelElement: "Application" }
   ]
 
   // Display ---------------------------------------------------------------------
@@ -102,7 +102,7 @@ export class ListComponent extends Utils implements OnInit {
     ["globalHost", "Global host: ", ""],
     ["port", "Port: ", ""],
     ["description", "", ""],
-   // ["running", "Running: ", ""],
+    // ["running", "Running: ", ""],
     ["schema", "Schema: ", ""],
     ["waitingTime", "Waiting time: ", " sec"],
     ["type", "Type: ", ""],
@@ -120,7 +120,7 @@ export class ListComponent extends Utils implements OnInit {
     this.meta = this.ivmlFormatter.filterMeta(this.metaBackup, this.currentTab);
   }
 
-  public async getDisplayData(tabName:string, metaProject: string | null, submodelElement: string | null) {
+  public async getDisplayData(tabName: string, metaProject: string | null, submodelElement: string | null) {
     this.currentTab = tabName
     this.selectedType = undefined;
     if (this.metaBackup) {
@@ -133,7 +133,7 @@ export class ListComponent extends Utils implements OnInit {
     await this.loadData(metaProject, submodelElement)
 
     // filter
-    switch(this.currentTab) {
+    switch (this.currentTab) {
       case "Setup":
         this.filterSetup();
         break;
@@ -162,7 +162,7 @@ export class ListComponent extends Utils implements OnInit {
     }
   }
 
-  public async loadData(metaProject: any, submodelElement: any){
+  public async loadData(metaProject: any, submodelElement: any) {
     if (submodelElement) {
       this.rawData = await this.api.getConfiguredElements(submodelElement);
       if (this.rawData) {
@@ -181,14 +181,14 @@ export class ListComponent extends Utils implements OnInit {
   /**It returns items with given metaProject */
   public prefilter(metaProject: string | null) {
     let result = []
-    for(const submodelElement of this.rawData) {
-      if(submodelElement.value) {
-        for(const elemtSubmodelElement of submodelElement.value) {
-          for(const valElemtSubmodelElement of elemtSubmodelElement.value) {
+    for (const submodelElement of this.rawData) {
+      if (submodelElement.value) {
+        for (const elemtSubmodelElement of submodelElement.value) {
+          for (const valElemtSubmodelElement of elemtSubmodelElement.value) {
             let val = String(valElemtSubmodelElement.value);
-            if(valElemtSubmodelElement.idShort == "metaProject" && 
-                (val == metaProject || val.startsWith(metaProject + "Part")) ) { // part check for testing models
-                result.push(elemtSubmodelElement)
+            if (valElemtSubmodelElement.idShort == "metaProject" &&
+              (val == metaProject || val.startsWith(metaProject + "Part"))) { // part check for testing models
+              result.push(elemtSubmodelElement)
             }
           }
         }
@@ -203,13 +203,13 @@ export class ListComponent extends Utils implements OnInit {
    * Filters the row data/display data for the setup category.
    */
   public filterSetup() {
-    let temp : any = [];
+    let temp: any = [];
     let val: any;
     this.filteredData = this.createRows(this.filteredData, (row, rowType) => {
       let goOn = false;
       if ((typeof rowType) == "string") {
         if (row.idShort == MT_varValue) {
-          let new_rowValue = {"value": row.value}
+          let new_rowValue = { "value": row.value }
           val = row.value
           temp.push(new_rowValue)
         }
@@ -218,7 +218,7 @@ export class ListComponent extends Utils implements OnInit {
           val = row.value
         }
         // AAS  startup timeout
-        let new_rowValue = {"value": rowType  + " sec"} // TODO is it true?
+        let new_rowValue = { "value": rowType + " sec" } // TODO is it true?
         temp.push(new_rowValue)
       } else {
         goOn = true;
@@ -232,8 +232,8 @@ export class ListComponent extends Utils implements OnInit {
       if (val) { // do this only for string and number, do not override compound/array values
         rowResult.varValue = val;
       }
-      rowResult.value = temp; 
-      temp = [];  
+      rowResult.value = temp;
+      temp = [];
       val = undefined;
     });
   }
@@ -252,9 +252,9 @@ export class ListComponent extends Utils implements OnInit {
   createRows(data: any, rowFn: (row: any, rowType: any) => boolean, resultFn: (rowResult: RowEntry) => void) {
     let result = []
     for (let tableRow of data) {
-      let val : any = [];
+      let val: any = [];
       let varName = DataUtils.getPropertyValue(tableRow.value, MT_metaVariable) || tableRow.idShort;
-      let rowEntry = new RowEntry({idShort: tableRow.idShort, varName: varName, varValue: val});
+      let rowEntry = new RowEntry({ idShort: tableRow.idShort, varName: varName, varValue: val });
       let rowType = tableRow.value[0].value
       this.api.createRowValue(tableRow.value, val, true, row => {
         let result = rowFn(row, rowType);
@@ -274,24 +274,24 @@ export class ListComponent extends Utils implements OnInit {
    * Filters the row data/display data for the types category.
    */
   public filterTypes() {
-    this.filteredData = this.createRows(this.filteredData, (row, rowType) => true, rowResult => {});
+    this.filteredData = this.createRows(this.filteredData, (row, rowType) => true, rowResult => { });
   }
 
   /**
    * Filters the row data/display data for the dependencies category.
    */
   public filterDependencies() {
-    let temp : any = [];
+    let temp: any = [];
     this.filteredData = this.createRows(this.filteredData, (row, rowType) => {
       if (row.idShort == "version") {
         let new_value = DataUtils.getPropertyValue(row.value, this.varValue);
-        if(new_value != "") {
-          temp.push({ "value":  "Version: " + new_value})
+        if (new_value != "") {
+          temp.push({ "value": "Version: " + new_value })
         }
       }
       return true;
     }, rowResult => {
-      rowResult.value = temp; 
+      rowResult.value = temp;
       temp = [];
     });
   }
@@ -300,18 +300,21 @@ export class ListComponent extends Utils implements OnInit {
    * Filters the row data/display data for the constants category.
    */
   public filterConstants() {
-    let temp : any = [];
+    let temp: any = [];
     let val: any;
     this.filteredData = this.createRows(this.filteredData, (row, rowType) => {
       if (row.idShort == this.varValue) {
-        let new_rowValue = {"value": row.value};
+        let new_rowValue = { "value": row.value };
         temp.push(new_rowValue);
         val = row.value;
+      } else if (row.idShort == "metaConstant") {
+        let new_rowValue = { "metaConstant": row.value };
+        temp.push(new_rowValue);
       }
       return true;
     }, rowResult => {
-      rowResult.value = temp; 
-      temp = [];  
+      rowResult.value = temp;
+      temp = [];
       rowResult.varValue = val
     });
   }
@@ -320,13 +323,13 @@ export class ListComponent extends Utils implements OnInit {
    * Filters the row data/display data for the meshes category.
    */
   public filterMeshes() {
-    let temp : any = [];
+    let temp: any = [];
     this.filteredData = this.createRows(this.filteredData, (row, rowType) => {
       this.composeValueByFilter(row, temp, this.paramToDisplay);
       return true;
     }, rowResult => {
-      rowResult.value = temp; 
-      temp = [];  
+      rowResult.value = temp;
+      temp = [];
     });
   }
 
@@ -334,7 +337,7 @@ export class ListComponent extends Utils implements OnInit {
    * Filters the row data/display data for the manufacturer category.
    */
   public filterManufacturer() {
-    let temp : any = [];
+    let temp: any = [];
     let name: any;
     let logo: any = null;
     this.filteredData = this.createRows(this.filteredData, (row, rowType) => {
@@ -345,24 +348,24 @@ export class ListComponent extends Utils implements OnInit {
         if (row.idShort == param[0]) {
           if (param[0] == "manufacturerLogo") {
             let logoValue = row.value[0].value
-            if(logoValue !== "") {
+            if (logoValue !== "") {
               logo = this.imgPath + logoValue
             }
           } else if (param[0] == "address") {
             for (let val of row.value) {
               if (this.isArray(val.value) && val.value[0].value) {
-                let addressValue = {"value": DataUtils.getLangStringText(val.value[0].value)}
+                let addressValue = { "value": DataUtils.getLangStringText(val.value[0].value) }
                 temp.push(addressValue)
               }
             }
           }
         }
       }
-      return true;      
+      return true;
     }, rowResult => {
       rowResult.idShort = DataUtils.getLangStringText(name);
       rowResult.logo = logo;
-      rowResult.value = temp; 
+      rowResult.value = temp;
       temp = [];
       logo = null;
     });
@@ -372,18 +375,18 @@ export class ListComponent extends Utils implements OnInit {
    * Filters the row data/display data for the services, servers and apps category.
    */
   public filterServicesServersApps() {
-    let temp : any = [];
+    let temp: any = [];
     let name: any;
     this.filteredData = this.createRows(this.filteredData, (row, rowType) => {
       if (row.idShort == "id") {
         name = row.value[0].value
-      } 
+      }
       this.composeValueByFilter(row, temp, this.paramToDisplay);
       return true;
     }, r => {
       r.idShort = name;
-      r.value = temp; 
-      temp = [];  
+      r.value = temp;
+      temp = [];
     });
   }
 
@@ -398,7 +401,7 @@ export class ListComponent extends Utils implements OnInit {
     for (let param of filter) {
       if (value.idShort == param[0]) {
         let tmp = DataUtils.getPropertyValue(value.value, this.varValue);
-        let new_rowValue = { "value":  param[1] + tmp + param[2]};
+        let new_rowValue = { "value": param[1] + tmp + param[2] };
         result.push(new_rowValue);
       }
     }
@@ -415,16 +418,23 @@ export class ListComponent extends Utils implements OnInit {
     if (this.currentTab === "Meshes") {
       this.router.navigateByUrl('flowchart/' + item.idShort);
     } else {
-      let meta_entry:configMetaEntry = {
-        modelType: {name: ""},
+      let meta_entry: configMetaEntry = {
+        modelType: { name: "" },
         kind: "",
         value: "",
         idShort: "value"
       };
-      let editorInput:editorInput = {name: "value", 
-        type: item.varType, value:item.varValue,
-        description: [{language: '', text: ''}],
-        refTo: false, multipleInputs: false, meta:meta_entry};
+      let editorInput: editorInput = {
+        name: "value",
+        type: item.varType, value: item.varValue,
+        description: [{ language: '', text: '' }],
+        refTo: false, multipleInputs: false, meta: meta_entry,
+        isReadOnly: false
+      };
+
+      if (primitiveDataTypes.includes(editorInput.type) && this.currentTab == "Constants") {
+        this.getConstantValues(editorInput, item.varName, item.varValue, item.value[1].metaConstant);
+      }
 
       let uiGroups = this.ivmlFormatter.calculateUiGroupsInf(editorInput, this.metaBackup);
       let parts = this.ivmlFormatter.partitionUiGroups(uiGroups);
@@ -432,7 +442,7 @@ export class ListComponent extends Utils implements OnInit {
       let component = dialogRef.componentInstance;
       editorInput.name = item.idShort;
       component.variableName = item.varName;
-      component.type = editorInput; 
+      component.type = editorInput;
       //component.showDropdown = false;
       component.category = this.currentTab;
       component.selectedType = this.selectedType;
@@ -480,16 +490,23 @@ export class ListComponent extends Utils implements OnInit {
       this.router.navigateByUrl("flowchart");
     } else {
       let type = this.selectedType?.idShort || "";
-      let meta_entry:configMetaEntry = {
-        modelType: {name: ""},
+      let meta_entry: configMetaEntry = {
+        modelType: { name: "" },
         kind: "",
         value: "",
         idShort: "value"
       };
-      let editorInput:editorInput = {name: "value", 
-        type: type, value : "",
-        description: [{language: '', text: ''}],
-        refTo: false, multipleInputs: false, meta:meta_entry};
+      let editorInput: editorInput = {
+        name: "value",
+        type: type, value: "",
+        description: [{ language: '', text: '' }],
+        refTo: false, multipleInputs: false, meta: meta_entry,
+        isReadOnly: false
+      };
+
+      if (primitiveDataTypes.includes(editorInput.type)) {
+        this.getConstantValues(editorInput, undefined, undefined, undefined);
+      }
 
       let uiGroups = this.ivmlFormatter.calculateUiGroupsInf(editorInput, this.metaBackup);
       let parts = this.ivmlFormatter.partitionUiGroups(uiGroups);
@@ -520,7 +537,7 @@ export class ListComponent extends Utils implements OnInit {
   }
 
   public uploadAppFile(appId: string, file: File) {
-    let info : FileUploadInfo = {file: file, uploading: true};
+    let info: FileUploadInfo = { file: file, uploading: true };
     this.appFiles.set(appId, info);
     chunkInput(file, DEFAULT_UPLOAD_CHUNK, (chunk, seqNr) => {
       this.api.uploadFileAsArrayBuffer(ArtifactKind.IMPLEMENTATION_ARTIFACT, seqNr, file.name, chunk);
@@ -533,14 +550,52 @@ export class ListComponent extends Utils implements OnInit {
     let inputVariables: InputVariable[] = [];
     inputVariables.push(ApiService.createAasOperationParameter("appId", AAS_TYPE_STRING, appId));
     let fileInfo = this.appFiles.get(appId);
-    let fileName = fileInfo?.file.name  || '';
+    let fileName = fileInfo?.file.name || '';
     this.appFiles.delete(appId);
     inputVariables.push(ApiService.createAasOperationParameter("codeFile", AAS_TYPE_STRING, fileName));
     this.execFunctionInConfig("genAppsAsync", inputVariables)
   }
 
   public async execFunctionInConfig(basyxFun: string, inputVariables: InputVariable[]) {
-      await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_CONFIGURATION, AAS_OP_PREFIX_SME + basyxFun, inputVariables);
+    await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_CONFIGURATION, AAS_OP_PREFIX_SME + basyxFun, inputVariables);
+  }
+
+  /**
+   * Add the name and value to the Constant type.
+   * 
+   * @param editorInput the editor input type
+   * @param name the name of the Constant 
+   * @param value the value of the Constant 
+   */
+
+  private getConstantValues(editorInput: editorInput, name: string | undefined, value: string | undefined, isConst: boolean | undefined) {
+    let values = [{
+      idShort: "name",
+      value: name,
+    }, {
+      idShort: "value",
+      value: !name && editorInput.type == IVML_TYPE_Boolean ? 'true' : value,
+    }, {
+      idShort: "isConst",
+      value: !name && editorInput.type == IVML_TYPE_Boolean ? 'true' : isConst,
+    }];
+    editorInput.value = values;
+  }
+
+  /**
+   * Return the constant for html page.
+   * 
+   * @param item html item
+   * @returns the vlue of the metaConstant
+   */
+
+  isConstantValue(item: any): boolean {
+    let result: boolean = false;
+    if (primitiveDataTypes.includes(item.varType) && item.value.length > 0) {
+      let values: any[] = item.value;
+      result = values.find(obj => obj.metaConstant);
+    }
+    return result;
   }
 
 }

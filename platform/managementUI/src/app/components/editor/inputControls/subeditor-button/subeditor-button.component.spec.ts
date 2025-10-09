@@ -60,7 +60,8 @@ describe('SubeditorButtonComponent', () => {
       }],
       refTo: false,
       multipleInputs: true,
-      metaTypeKind : MTK_compound
+      metaTypeKind : MTK_compound,
+      isReadOnly: false
       // meta left out
     };
     component.meta = await apiService.getMeta(); // we could construct it, easier as e2e test

@@ -109,7 +109,7 @@
                   <mat-form-field appearance="outline" class="formField inputField">
                     <input matInput class="inputEditor"
                       [matTooltip]="input.description[0].text"
-                      type="text" ngDefaultControl [(ngModel)]=input.value />
+                      type="text" ngDefaultControl [(ngModel)]=input.value [readonly]="input.isReadOnly"/>
                   </mat-form-field>
                 </div>
               </div>
