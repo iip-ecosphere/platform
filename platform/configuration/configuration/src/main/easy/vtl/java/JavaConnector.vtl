@@ -135,7 +135,7 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
         if (pkg <> "") {
             pkg + asTypeName(getTypeName(typeType));
         } else {
-            asTypeName(toQualifiedTypeName(getTypeName(typeType)));
+            toQualifiedTypeName(asTypeName(getTypeName(typeType)));
         }
     }
 
