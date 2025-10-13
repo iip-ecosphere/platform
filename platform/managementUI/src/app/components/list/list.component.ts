@@ -577,7 +577,7 @@ export class ListComponent extends Utils implements OnInit {
       value: !name && editorInput.type == IVML_TYPE_Boolean ? 'true' : value,
     }, {
       idShort: "isConst",
-      value: !name && editorInput.type == IVML_TYPE_Boolean ? 'true' : isConst,
+      value: !name ? 'true' : isConst,
     }];
     editorInput.value = values;
   }
