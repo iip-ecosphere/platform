@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.events.EventHandlingConnector;
+import de.iip_ecosphere.platform.connectors.model.SharedSpace;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
@@ -34,6 +35,7 @@ public class MultiConnectorServiceWrapper extends AbstractService {
     private Map<String, ParameterConfigurer<?>> paramConfigurers = new HashMap<>();
     private String outPath; // the runtime-reconfigured data path
     private String inPath; // the runtime-reconfigured data path
+    private SharedSpace sharedSpace;
 
     /**
      * Creates a service wrapper instance.
@@ -52,12 +54,18 @@ public class MultiConnectorServiceWrapper extends AbstractService {
     }
     
     /**
-     * Adds a connector. Already registered connectors will be overwritten.
+     * Adds a connector. Already registered connectors will be overwritten. Creates/enables a shared connector space
+     * if available.
      * 
      * @param connector the connector to register (may be <b>null</b>, ignored)
      */
     public void addConnector(Connector<?, ?, ?, ?> connector) {
         if (null != connector) {
+            if (inConnectors.isEmpty()) {
+                sharedSpace = connector.createSharedSpace();
+            } else {
+                connector.enableSharedSpace(sharedSpace);
+            }
             inConnectors.put(connector.getConnectorInputType(), connector);
             outConnectors.put(connector.getConnectorOutputType(), connector);
         }
