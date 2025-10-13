@@ -443,7 +443,7 @@ export class IvmlFormatterService extends UtilsService {
         }
 
         let val = [type?.value];
-        const hasIsConst = DataUtils.getPropertyValue(type?.value, "isConst");
+        const hasIsConst = (type == null ? true : DataUtils.getPropertyValue(type.value, "isConst"));
 
         if (primitiveDataTypes.includes(selectedType.idShort) && hasIsConst !== undefined) {
           let meta_name: configMetaEntry = {
