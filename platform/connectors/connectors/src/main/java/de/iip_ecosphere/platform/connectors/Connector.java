@@ -15,6 +15,7 @@ import java.io.IOException;
 
 import de.iip_ecosphere.platform.connectors.events.DataTimeDifferenceProvider;
 import de.iip_ecosphere.platform.connectors.events.EventHandlingConnector;
+import de.iip_ecosphere.platform.connectors.model.SharedSpace;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
@@ -197,5 +198,26 @@ public interface Connector <O, I, CO, CI> extends EventHandlingConnector {
      * @return the identification, set before by {@link #setInstanceIdentification(String)}
      */
     public String getInstanceIdentification();
+    
+    /**
+     * Creates a shared space among connector instances of the same type. Shall be created before 
+     * {@link #connect(ConnectorParameter)}.
+     * 
+     * @return the shared space or <b>null</b> if no shared space is supported.
+     */
+    public default SharedSpace createSharedSpace() {
+        return null;
+    }
+
+    /**
+     * Enables a shared space among connector instances of the same type (created by the first MIMO connector). Shall 
+     * be enabled before {@link #connect(ConnectorParameter)}.
+     * 
+     * @param space the shared space, may be <b>null</b> if a {@link #createSharedSpace()} has returned <b>null</b>
+     * @return {@code true} if the space has been taken up/established, {@code false} else
+     */
+    public default boolean enableSharedSpace(SharedSpace space) {
+        return false;
+    }
 
 }
