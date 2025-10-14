@@ -67,8 +67,8 @@ project Rest {
 			
 		input = {{type=refBy(restPhoenixRwEEMMixed)}},
 		output = {{type=refBy(restPhoenixEEMMixed)}},
-		inInterface = {type=refBy(restPhoenixRwEEMMixed)},
-		outInterface = {type=refBy(restPhoenixEEMMixed)}
+		inInterface = {{type=refBy(restPhoenixRwEEMMixed)}},
+		outInterface = {{type=refBy(restPhoenixEEMMixed)}}
 	};
 	
 	

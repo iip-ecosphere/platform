@@ -18,8 +18,8 @@ project AllServices {
         
         input = {{type=refBy(Empty)}},
         output = {{type=refBy(EanScannerOutput)}},
-        inInterface = {type=refBy(Empty)},
-        outInterface = {type=refBy(EanScannerOutput)},
+        inInterface = {{type=refBy(Empty)}},
+        outInterface = {{type=refBy(EanScannerOutput)}},
         traceRcv = TraceKind::SYSOUT,
         traceSent = TraceKind::SYSOUT,
         inChannel = "in",
@@ -49,8 +49,8 @@ project AllServices {
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(EanScannerOutput)}},
         output = {{type=refBy(MdzhConfigOutput)}},
-        inInterface = {type=refBy(EanScannerOutput)}, 
-        outInterface = {type=refBy(MdzhConfigOutput), path="ProductData/"},
+        inInterface = {{type=refBy(EanScannerOutput)}}, 
+        outInterface = {{type=refBy(MdzhConfigOutput), path="ProductData/"}},
         // TODO translation operations
         traceRcv = TraceKind::SYSOUT,
         traceSent = TraceKind::SYSOUT
@@ -73,8 +73,8 @@ project AllServices {
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         input = {{type=refBy(MdzhConfigOutput)}},
         output = {{type=refBy(LaserOutput)}},
-        inInterface = {type=refBy(MdzhConfigOutput), path="Objects/LasPaintControl/Inputs/"},
-        outInterface = {type=refBy(LaserOutput), path="Objects/LasPaintControl/Outputs/"},
+        inInterface = {{type=refBy(MdzhConfigOutput), path="Objects/LasPaintControl/Inputs/"}},
+        outInterface = {{type=refBy(LaserOutput), path="Objects/LasPaintControl/Outputs/"}},
         traceRcv = TraceKind::SYSOUT,
         traceSent = TraceKind::SYSOUT
     };
@@ -111,8 +111,8 @@ project AllServices {
         mock = false, 
         input = {{type=refBy(PcfOutput)}},
         output = {{type=refBy(PcfAasOutput)}},
-        inInterface = {type=refBy(PcfOutput)}, 
-        outInterface = {type=refBy(PcfAasOutput), path="ProductData/"},
+        inInterface = {{type=refBy(PcfOutput)}}, 
+        outInterface = {{type=refBy(PcfAasOutput), path="ProductData/"}},
         kind = ServiceKind::TRANSFORMATION_SERVICE,
         // TODO translation operations
         traceRcv = TraceKind::SYSOUT,
@@ -131,8 +131,8 @@ project AllServices {
         
         input = {{type=refBy(Empty)}},
         output = {{type=refBy(sentronOutput)}},
-        inInterface = {type=refBy(Empty)}, 
-        outInterface = {type=refBy(sentronOutput)}
+        inInterface = {{type=refBy(Empty)}}, 
+        outInterface = {{type=refBy(sentronOutput)}}
     };
     
     // org: democompany
@@ -161,8 +161,8 @@ project AllServices {
         batchSize = 1,
         input = {{type=refBy(influxEnergyData)}},
         output = {{type=refBy(influxEnergyData)}},
-        inInterface = {type=refBy(influxEnergyData)}, 
-        outInterface = {type=refBy(influxEnergyData)}
+        inInterface = {{type=refBy(influxEnergyData)}}, 
+        outInterface = {{type=refBy(influxEnergyData)}}
     };
    
     freeze {

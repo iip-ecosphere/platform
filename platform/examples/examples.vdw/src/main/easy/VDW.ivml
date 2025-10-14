@@ -119,10 +119,8 @@ project VDW {
         
         input = {{type=refBy(opcIn)}},
         output = {{type=refBy(opcOut)}},
-    //inInterface = refBy(opcIn), 
-        //outInterface = refBy(opcOut)
-    inInterface = {type=refBy(opcIn), path="Objects/Machines/FullWoodworking/"}, 
-        outInterface = {type=refBy(opcOut), path="Objects/Machines/FullWoodworking/"}
+        inInterface = {{type=refBy(opcIn), path="Objects/Machines/FullWoodworking/"}}, 
+        outInterface = {{type=refBy(opcOut), path="Objects/Machines/FullWoodworking/"}}
         /*operations = {
           FieldAssignmentOperation{field=myConnPltfIn.fields[1], 
             operation=AddDataTranslationOperation{

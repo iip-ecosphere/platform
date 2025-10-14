@@ -68,8 +68,8 @@ project Modbus {
         
         input = {{type=refBy(modbusPhoenixRwEEM)}},
         output = {{type=refBy(modbusPhoenixEEM)}},
-        inInterface = {type=refBy(modbusPhoenixRwEEM)}, 
-        outInterface = {type=refBy(modbusPhoenixEEM)}
+        inInterface = {{type=refBy(modbusPhoenixRwEEM)}}, 
+        outInterface = {{type=refBy(modbusPhoenixEEM)}}
     };
     
     ModbusTcpV1Connector myModbusSentronConn = {
@@ -85,8 +85,8 @@ project Modbus {
         
         input = {{type=refBy(modbusSiemensRwSentron)}},
         output = {{type=refBy(modbusSiemensSentron)}},
-        inInterface = {type=refBy(modbusSiemensRwSentron)}, 
-        outInterface = {type=refBy(modbusSiemensSentron)}
+        inInterface = {{type=refBy(modbusSiemensRwSentron)}}, 
+        outInterface = {{type=refBy(modbusSiemensSentron)}}
     };    
 
     // not really needed except for populating the interfaces package
