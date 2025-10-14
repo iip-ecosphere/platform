@@ -15,7 +15,6 @@ package de.iip_ecosphere.platform.configuration;
 import java.io.File;
 import java.io.IOException;
 
-import de.iip_ecosphere.platform.configuration.ivml.IvmlUtils;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;

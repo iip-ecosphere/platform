@@ -150,8 +150,8 @@ project SerializerConfig1 {
         output = {{type=refBy(myConnPltfIn)}},
         inChannel = "IN",
         outChannel = "OUT",
-        inInterface = {type=refBy(myConnMachineIn)}, 
-        outInterface = {type=refBy(myConnMachineOut)},
+        inInterface = {{type=refBy(myConnMachineIn)}}, 
+        outInterface = {{type=refBy(myConnMachineOut)}},
         machineFormatter = JavaMachineFormatter{class="de.iip_ecosphere.platform.connectors.formatter.TextLineFormatter", converterClass="de.iip_ecosphere.platform.connectors.formatter.TextLineFormatter.TextLineFormatterConverter", artifact=""},
         machineParser = JavaMachineParser{class="de.iip_ecosphere.platform.connectors.parser.JsonInputParser", converterClass="de.iip_ecosphere.platform.connectors.parser.JsonInputParser.JsonInputConverter", resultClass="de.iip_ecosphere.platform.connectors.parser.JsonInputParser.JsonParseResult", artifact=""}
     };
