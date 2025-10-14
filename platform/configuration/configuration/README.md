@@ -95,3 +95,11 @@ Then update the FROM in the dockerfile to
 ```
 FROM python@sha256:e191a71397fd61fbddb6712cd43ef9a2c17df0b5e7ba67607128554cd6bff267
 ```
+To find the Python version from a specific SHA256 hash - this command will pull the image
+```
+docker run --rm python@sha256:e191a71397fd61fbddb6712cd43ef9a2c17df0b5e7ba67607128554cd6bff267 python --version
+```
+The result should be something like 
+```
+Python 3.8.20
+```
