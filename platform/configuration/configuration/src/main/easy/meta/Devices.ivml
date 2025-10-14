@@ -131,8 +131,8 @@ project Devices {
     
     SystemDependency PYTHON313 = {
         key = "PYTHON313",
-        dependencies = {refBy(pyyaml602), refBy(pyflakes250), refBy(websockets1102), refBy(pyzbar019), refBy(OpenCVPython45564), refBy(NumPy224), refBy(Pillow1110)}, // TODO please adjust
-        version = "3.13.2" // TODO please adjust if needed
+        dependencies = {refBy(pyyaml602), refBy(pyflakes340), refBy(websockets1501), refBy(pyzbar019), refBy(OpenCVPython412088), refBy(NumPy224), refBy(Pillow1130)}, // TODO please adjust
+        version = "3.13.5" // TODO please adjust if needed
     };
    
     compound PythonDependency refines Dependency {      //e.g. numpy 1.21.5
@@ -252,7 +252,12 @@ project Devices {
        name = "pyflakes",
        version = "2.5.0"
     };
-    
+
+    PythonDependency pyflakes340 = {
+       name = "pyflakes",
+       version = "3.4.0"
+    };
+
     PythonDependency websocketsNoVersion = {
        name = "websockets",
        version = ""
@@ -261,6 +266,11 @@ project Devices {
     PythonDependency websockets1102 = {
        name = "websockets",
        version = "11.0.2"
+    };
+
+    PythonDependency websockets1501 = {
+       name = "websockets",
+       version = "15.0.1"
     };
 
     PythonDependency pyzbar019 = {
@@ -272,7 +282,12 @@ project Devices {
        name = "opencv-python",
        version = "4.5.5.64"
     };
-    
+
+    PythonDependency OpenCVPython412088 = {
+       name = "opencv-python",
+       version = "4.12.0.88"
+    };
+
     LinuxCommandBasedSystemDependency SysPythonNative = {
         installCommands = {"apk add make automake gcc g++ subversion python3-dev"}
     };
@@ -296,6 +311,11 @@ project Devices {
     PythonDependency Pillow1110 = {
        name = "Pillow",
        version = "11.1.0"
+    };
+
+    PythonDependency Pillow1130 = {
+       name = "Pillow",
+       version = "11.3.0"
     };
 
     // ------------------ DeviceId --------------------------- 
