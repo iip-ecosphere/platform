@@ -18,7 +18,7 @@
 
 Depending on the use of Python packages/libraries by your/used platform services, installation of further Python libraries may be required. Services shall declare their full dependencies in the configuration model, including the required Python version, so that containers can be build automatically from this information. For development, testing or bare metal installation, the Python dependencies above as well as the following dependencies are needed.
 
-| oktoflow Component    | Python        | 3.8.10    |  3.9.21     | 3.13.2      |
+| oktoflow Component    | Python        | 3.8.10    |  3.9.21     | 3.13.5      |
 | --------------------- | ------------- | --------- | ----------- | ----------- |
 | kiservices.functions  | pyzbar        | 0.1.9     |  0.1.9      | 0.1.9       |
 | kiservices.functions  | opencv-python | 4.5.5.64  |  4.5.5.64   | 4.12.0.88   |

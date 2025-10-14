@@ -100,3 +100,7 @@ Devices::pickle4_001 = Common python dependency.
 Devices::NumPy224 = Numpy basic platform dependency for 2.2.4.
 Devices::Pillow1110 = Pillow basic platform dependency for 11.1.0.
 Devices::pyyaml602 = Pyyaml basic platform dependency for 6.0.2.
+Devices::pyflakes340 = Pyflakes basic platform dependency for 3.4.0.
+Devices::websockets1501 = Websockets basic platform dependency for 15.0.5.
+Devices::OpenCVPython412088 = OpenCV basic platform dependency for 4.12.0.88.
+Devices::Pillow1130 = Pillow basic platform dependency for 11.3.0.
