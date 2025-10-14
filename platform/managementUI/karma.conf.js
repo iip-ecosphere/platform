@@ -36,6 +36,17 @@ module.exports = function (config) {
         { type: 'cobertura', subdir: '.', file: 'cobertura.xml' }
       ]
     },
+    customLaunchers: {
+      ChromeHeadlessCI: {
+        base: 'ChromeHeadless',
+        flags: [
+          '--no-sandbox', // try handling "/system.slice/jenkins.service is not a snap cgroup"
+          '--disable-gpu', // for now, unsure
+          '--disable-dev-shm-usage' // for now, unsure; important, especially in Docker/CI
+        ]
+      }
+    },
+    browsers: ['ChromeHeadlessCI'],    
     //reporters: ['spec'],    // for debugging
     reporters: ['progress', 'kjhtml'],
     port: 9876,
