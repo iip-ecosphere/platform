@@ -8,11 +8,11 @@
 - Maven 3.9.7 in path
 - Python in path with the following packages (required if Python services are used, required for building and basic operations) 
 
-| Python     | 3.8.10 | 3.9.21 | 3.13.2   |
+| Python     | 3.8.10 | 3.9.21 | 3.13.5   |
 | ---------- | ------ | ------ | -------- |
 | pyyaml     | 6.0    | 6.0    |  6.0.2   |
-| pyflakes   | 3.2.0  | 3.3.2  |  3.3.2   |
-| websockets | 11.0.2 | 11.0.2 | 11.0.2   |
+| pyflakes   | 3.2.0  | 3.3.2  |  3.4.0   |
+| websockets | 11.0.2 | 11.0.2 | 15.0.1   |
 
 ### Python service setup
 
@@ -21,9 +21,9 @@ Depending on the use of Python packages/libraries by your/used platform services
 | oktoflow Component    | Python        | 3.8.10    |  3.9.21     | 3.13.2      |
 | --------------------- | ------------- | --------- | ----------- | ----------- |
 | kiservices.functions  | pyzbar        | 0.1.9     |  0.1.9      | 0.1.9       |
-| kiservices.functions  | opencv-python | 4.5.5.64  |  4.5.5.64   | 4.5.5.64    |
+| kiservices.functions  | opencv-python | 4.5.5.64  |  4.5.5.64   | 4.12.0.88   |
 | kiservices.functions  | numpy         | 1.20.1    |  1.20.1     | 2.2.4       |
-| kiservices.functions  | pillow        | 9.1.0     |  9.1.0      | 11.1.0      |
+| kiservices.functions  | pillow        | 9.1.0     |  9.1.0      | 11.3.0      |
 | flower service/server | flwr          | 1.2.0     | in prep.    | in prep.    |
 | flower service/server | tensorflow*   | 2.9.0     | in prep.    | in prep.    |
 | flower service/server | pytorch*      | 2.0.1     | in prep.    | in prep.    |
