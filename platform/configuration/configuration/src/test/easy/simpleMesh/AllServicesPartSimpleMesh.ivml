@@ -64,8 +64,8 @@ project AllServicesPartSimpleMesh {
         
         input = {{type=refBy(rec1)}},
         output = {{type=refBy(rec1)}},
-        inInterface = {type=refBy(rec1), path="/opc/machIn/"}, 
-        outInterface = {type=refBy(rec1), path="/opc/machOut/"},
+        inInterface = {{type=refBy(rec1), path="/opc/machIn/"}}, 
+        outInterface = {{type=refBy(rec1), path="/opc/machOut/"}},
         traceRcv = TraceKind::TRACE,
         traceSent = TraceKind::TRACE,
         security = {

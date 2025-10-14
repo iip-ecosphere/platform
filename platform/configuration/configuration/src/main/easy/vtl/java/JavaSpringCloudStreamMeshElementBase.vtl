@@ -299,7 +299,6 @@ block;
             forward = t.forward;
         }
         sequenceOf(IOType) inTypes = reduce(conn, conn.input);
-        sequenceOf(IOType) outTypes = reduce(conn, conn.output);
         if (forward or inTypes->exists(IOType t|sType == ioTypeTypeName(t))) {
             expr = '${fallbackToNull(src, "${sel}.send(${type}.class, data)", false)}';
         } else {
@@ -487,8 +486,8 @@ block;
     def initialServiceRest(JavaService service, JavaCodeMethod m) {
     }
     
-    def genCreateConnectorAdapterSuppliers(Connector conn) {
-        '()->service.getInPath("${getPath(conn.inInterface)}"), ()->service.getOutPath("${getPath(conn.outInterface)}")';
+    def genCreateConnectorAdapterSuppliers(Connector conn, IOTypeWithPath ifInType, IOTypeWithPath ifOutType) {
+        '()->service.getInPath("${getPath(ifInType)}"), ()->service.getOutPath("${getPath(ifOutType)}")';
     }
     
     /* @DispatchBasis
@@ -517,24 +516,24 @@ block;
     
     // added v2->v3
     def genMultiConnectors(Connector conn, String connClsName, String serviceName, JavaCodeBlockInterface m) {
-        sequenceOf(IOType) inTypes = reduce(conn, conn.input); // IVML collection unmodifiable
-        sequenceOf(IOType) outTypes = reduce(conn, conn.output);
-        Integer pos = 0;
-        for (IOType outType : outTypes) {
-            IOType inType = inTypes.get(pos);            
-            String connVarName = "conn" + pos;
+        sequenceOf(ConnectorTypes) cTypes = pairTypes(conn);
+        for (ConnectorTypes cType : cTypes) {
+            IOType outType = cType.outType;
+            IOType inType = cType.inType;            
+            IOTypeWithPath ifInType = cType.ifInType; 
+            IOTypeWithPath ifOutType = cType.ifOutType;
+            String connVarName = "conn" + cType.pos;
             String connGen = getConnectorGenerics(conn, inType, outType, true);
             JavaCodeMethodCall init = new JavaCodeMethodCall("de.iip_ecosphere.platform.connectors.ConnectorFactory.createConnector", JavaCodeImportScope.METHOD_CLASS_IMPORT);
             init.stringArg(connClsName);
             init.arg("() -> param");
-            String adapterMethodName = getAdapterCreationMethodName(conn, inType, outType, pos);
-            init.addCallArgument(adapterMethodName).arg(genCreateConnectorAdapterSuppliers(conn));
+            String adapterMethodName = getAdapterCreationMethodName(conn, cType.inType, cType.outType, cType.pos);
+            init.addCallArgument(adapterMethodName).arg(genCreateConnectorAdapterSuppliers(conn, ifInType, ifOutType));
             m.var("de.iip_ecosphere.platform.connectors.Connector" + connGen, connVarName).initializer(init);
             m.call("${connVarName}.setInstanceIdentification").stringArg(conn.name);
             m.call("${connVarName}.enablePolling").arg(false); // independent of notifications, disable as @Autowired may not be
             m.call("${serviceName}.addConnector").arg(connVarName); // add first (!)
             m.call("${serviceName}.setReceptionCallback").newArg(getReceptionCallbackClassName(conn, outType));
-            pos = pos + 1;
         }
     }
     
@@ -578,13 +577,12 @@ block;
     }
     
     def genConnectorAdapterMethod(Boolean withPathSuppliers, Boolean withMetrics, Connector conn, JavaCodeClass c) {
-        sequenceOf(IOType) inTypes = reduce(conn, conn.input); // IVML collection unmodifiable
-        sequenceOf(IOType) outTypes = reduce(conn, conn.output);
-        Integer pos = 0;
-        for (IOType outType : outTypes) {
-            IOType inType = inTypes.get(pos);
-            String methodName = getAdapterCreationMethodName(conn, inType, outType, pos);
-            c.method(adapterType(conn, inType, outType, false, true), methodName, "Creates the connector adapter. [public for testing]").setStatic().(m|{
+        sequenceOf(ConnectorTypes) cTypes = pairTypes(conn);
+        for (ConnectorTypes cType : cTypes) {
+            IOType outType = cType.outType;            
+            IOType inType = cType.inType;
+            String methodName = getAdapterCreationMethodName(conn, cType.inType, cType.outType, cType.pos);
+            c.method(adapterType(conn, cType.inType, cType.outType, false, true), methodName, "Creates the connector adapter. [public for testing]").setStatic().(m|{
                 JavaCodeMethodCall r = new JavaCodeMethodCall(methodName);            
                 if (withMetrics) {
                     m.param("de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider", "metrics", "the metrics provider to use, <b>null</b> for no metric measurements");
@@ -604,13 +602,12 @@ block;
                     m.getJavadocComment().setComment("Creates the default connector adapter without path suppliers. [public for testing]");
                 }
                 if (withMetrics and withPathSuppliers) {
-                    adapterCreationFragment(conn, inType, outType, "adapter", "metrics", "log", m);
+                    adapterCreationFragment(conn, cType, "adapter", "metrics", "log", m);
                     m.return("adapter", "the connector adapter");
                 } else {
                     m.return(r, "the connector adapter");
                 }
             });
-            pos = pos + 1;
         }
     }
     
@@ -899,7 +896,6 @@ block;
         String serviceType = getServiceType(elt, conn);
         if (conn.inputHandlers <> null and conn.inputHandlers.size() > 0) {
             sequenceOf(IOType) inTypes = reduce(conn, conn.input); // IVML collection unmodifiable
-            sequenceOf(IOType) outTypes = reduce(conn, conn.output);
             for (ConnectorInputHandler h: conn.inputHandlers) {
                 String typeName = toTypeName(h.type);
                 String handleVar = "${firstToLowerCase(typeName)}Handler";

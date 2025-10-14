@@ -656,29 +656,31 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         IIPEcosphere cfg = config;
         Path javaSrc = "${appRoot}/src/main/java";
         Path javaNodesSrc = "${javaSrc}/${toPath(javaNodesPackage)}";
-        IOTypeWithPath machineInIf = conn.inInterface;
-        IOTypeWithPath machineOutIf = conn.outInterface;
-        DataType platfIn = firstType(conn.output);
-        DataType platfOut = firstType(conn.input);
-        Boolean sharedIf = cfg.sharedInterfaces;
-        String connName = asTypeName(conn.name);
         
-        if (isConfigured(conn.machineParser) and conn.machineParser <> null) {
-            String parserName = connName + "ParserSerializer";
-            vilTemplateProcessor("JavaConnectorSerializer", config, "${javaNodesSrc}/${parserName}.java", imType=machineOutIf.type,
-                path=getPath(machineOutIf), pltfType=platfIn, pkg=javaNodesPackage, typePkg=javaDatatypesPackage, 
-                sharedInterfaces=sharedIf, impl=false, formatter=null, parser=conn.machineParser, className=parserName, 
-                assng=conn.operations);
-            determineArtifacts(artifacts, conn.machineParser);
-        }
-
-        if (isConfigured(conn.machineFormatter) and conn.machineFormatter <> null) {
-            String formatterName = connName + "FormatterSerializer";
-            vilTemplateProcessor("JavaConnectorSerializer", config, "${javaNodesSrc}/${formatterName}.java", imType=machineInIf.type,
-                path=getPath(machineInIf), pltfType=platfOut, pkg=javaNodesPackage, typePkg=javaDatatypesPackage, 
-                sharedInterfaces=sharedIf, impl=false, formatter=conn.machineFormatter, parser=null, className=formatterName, 
-                assng=conn.operations);
-            determineArtifacts(artifacts, conn.machineFormatter);
+        sequenceOf(ConnectorTypes) cTypes = pairTypes(conn);
+        for (ConnectorTypes cType : cTypes) {
+            DataType platfIn = cType.outType.type;
+            DataType platfOut = cType.inType.type;
+            Boolean sharedIf = cfg.sharedInterfaces;
+            String connName = asTypeName(conn.name);
+            
+            if (isConfigured(conn.machineParser) and conn.machineParser <> null) {
+                String parserName = getParserSerializerClassName(conn, cType.inType);
+                vilTemplateProcessor("JavaConnectorSerializer", config, "${javaNodesSrc}/${parserName}.java", imType=cType.ifOutType.type,
+                    path=getPath(cType.ifOutType), pltfType=platfIn, pkg=javaNodesPackage, typePkg=javaDatatypesPackage, 
+                    sharedInterfaces=sharedIf, impl=false, formatter=null, parser=conn.machineParser, className=parserName, 
+                    assng=conn.operations);
+                determineArtifacts(artifacts, conn.machineParser);
+            }
+    
+            if (isConfigured(conn.machineFormatter) and conn.machineFormatter <> null) {
+                String formatterName = getFormatterSerializerClassName(conn, cType.outType);
+                vilTemplateProcessor("JavaConnectorSerializer", config, "${javaNodesSrc}/${formatterName}.java", imType=cType.ifInType.type,
+                    path=getPath(cType.ifInType), pltfType=platfOut, pkg=javaNodesPackage, typePkg=javaDatatypesPackage, 
+                    sharedInterfaces=sharedIf, impl=false, formatter=conn.machineFormatter, parser=null, className=formatterName, 
+                    assng=conn.operations);
+                determineArtifacts(artifacts, conn.machineFormatter);
+            }
         }
     }
     
@@ -2117,8 +2119,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         setOf(RecordType) types = {};
         setOf(RecordType) outTypes = {};
         setOf(RecordType) usedTypes = {};
-        collectRestTypes(conn.inInterface.type, types, usedTypes);
-        collectRestTypes(conn.outInterface.type, outTypes, usedTypes);
+        conn.inInterface->forEach(t|collectRestTypes(t.type, types, usedTypes));
+        conn.outInterface->forEach(t|collectRestTypes(t.type, outTypes, usedTypes));
         types = types.including(outTypes);
         vilTemplateProcessor("JavaConnectorRestImpl", config, "${javaNodesSrc}/${typeName}Extension.java", conn=conn, pkg=javaNodesPackage, usedRestTypes=usedTypes);
         addAppJsl("de.iip_ecosphere.platform.connectors.ConnectorExtensionDescriptor", "${javaNodesPackage}.${typeName}Extension");

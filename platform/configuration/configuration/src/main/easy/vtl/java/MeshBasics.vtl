@@ -57,6 +57,107 @@ template MeshBasics(Configuration config, FileArtifact target) {
         }
     }
     
+    // added v2->v3    
+    def sequenceOf(IOType) reduce(Connector conn, sequenceOf(IOType) types) {
+        Integer maxSize = 1; // TODO take inIf/outIf into account as maximum size
+        sequenceOf(IOType) result = {}; // typically from IVML, i.e., non modifiable container
+        Integer pos = 0;
+        while (result.size() < maxSize and pos < types.size()) {
+            result.add(types.get(pos));
+            pos = pos + 1;
+        }
+        result;
+    }    
+    
+    // added v2->v3    
+    compound ConnectorTypes {
+        Integer pos;
+        IOType inType;
+        IOType outType;
+        IOTypeWithPath ifInType;
+        IOTypeWithPath ifOutType;
+        String inAdapterCls;
+        String outAdapterCls;
+        String inSerializerCls;
+        String outSerializerCls;
+    }
+    
+    // added v2->v3    
+    def sequenceOf(ConnectorTypes) pairTypes(Connector conn) {
+        sequenceOf(ConnectorTypes) result = {};
+        sequenceOf(IOType) inTypes = reduce(conn, conn.input); // IVML collection unmodifiable
+        sequenceOf(IOType) outTypes = reduce(conn, conn.output);
+
+        Integer pos = 0;
+        for (IOType outType : outTypes) {
+            ConnectorTypes ct = new ConnectorTypes();
+            ct.pos = pos;
+            ct.outType = outType;
+            ct.inType = inTypes.get(pos);
+            ct.ifInType = conn.inInterface.get(pos);
+            ct.ifOutType = conn.outInterface.get(pos);
+            ct.inAdapterCls = getStringValueSafe(conn.inAdapterClass, conn.inAdapterClass, pos, "");
+            ct.outAdapterCls = getStringValueSafe(conn.outAdapterClass, conn.outAdapterClass, pos, "");
+            String inSer = "";
+            String outSer = "";
+            if (conn.isKindOf(ChannelConnector)) {
+                ChannelConnector chConn = conn;
+                inSer = getStringValueSafe(chConn.inSerializerClass, chConn.inSerializerClass, pos, "");
+                outSer = getStringValueSafe(chConn.outSerializerClass, chConn.outSerializerClass, pos, "");
+            }
+            ct.inSerializerCls = inSer;
+            ct.outSerializerCls = outSer;
+            result.add(ct);
+            pos = pos + 1;
+        }
+        result;
+    }
+    
+    // added v2->v3    
+    def String getStringValueSafe(DecisionVariable var, sequenceOf(String) seq, Integer pos, String dflt) {
+        String result = dflt;
+        if (isDefined(var)) {
+            if (pos < seq.size()) {
+                result = seq.get(pos);
+            }
+        }
+        result;
+    }    
+
+    // added v2->v3    
+    def getParserSerializerClassName(Connector conn, IOType outType) {
+        asTypeName(conn.name) + ioTypeTypeName(outType) + "ParserSerializer";
+    }
+
+    // added v2->v3    
+    def getFormatterSerializerClassName(Connector conn, IOType outType) {
+        asTypeName(conn.name) + ioTypeTypeName(outType) + "FormatterSerializer";
+    }
+    
+    // added v2->v3    
+    def getReceptionCallbackClassName(Connector conn, IOType outType) {
+        ioTypeTypeName(outType) + "ReceptionCallback";
+    }
+    
+    // added v2->v3    
+    def getInputTranslatorClassName(Connector conn, IOType inType, IOType outType) {
+        ioTypeTypeName(inType) + "InputTranslator";
+    }
+
+    // added v2->v3    
+    def getOutputTranslatorClassName(Connector conn, IOType inType, IOType outType) {
+        ioTypeTypeName(outType) + "OutputTranslator";
+    }
+    
+    // added v2->v3    
+    def getAdapterCreationMethodName(Connector conn, IOType inType, IOType outType, Integer pairIdx) {
+        String add = "";        
+        if (pairIdx > 0) {
+            add = getTypeName(inType.type) + getTypeName(outType.type);
+        }
+        "createConnectorAdapter" + add;
+    }
+    
     // -------------------------------------------- suffixes -------------------------------
 
     def String getOutName(MeshElement elt, String inType) {

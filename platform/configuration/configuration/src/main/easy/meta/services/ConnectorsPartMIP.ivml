@@ -21,8 +21,8 @@ project ConnectorsPartMIP {
        OktoVersion ver = "0.1.0";
        sequenceOf(IOType) input = {{type=refBy(MipMqttInput), forward=false}};
        sequenceOf(IOType) output = {{type=refBy(MipMqttOutput)}};
-       IOTypeWithPath inInterface = {type=refBy(MipMqttInput)};
-       IOTypeWithPath outInterface = {type=refBy(MipMqttOutput)};
+       sequenceOf(IOTypeWithPath) inInterface = {{type=refBy(MipMqttInput)}};
+       sequenceOf(IOTypeWithPath) outInterface = {{type=refBy(MipMqttOutput)}};
        MachineFormatter machineFormatter = JsonFormatter{};
        MachineParser machineParser = JsonParser{};
        NameplateInfo nameplateInfo = {

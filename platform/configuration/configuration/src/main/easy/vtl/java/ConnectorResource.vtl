@@ -25,8 +25,8 @@ template ConnectorResource(Configuration config, FileArtifact target, Connector 
     def genContents(Connector conn, JsonFileArtifact json) {
         collectIOTypes(conn.input, conn, json);
         collectIOTypes(conn.output, conn, json);
-        collectIOType(conn.inInterface, conn, json);
-        collectIOType(conn.outInterface, conn, json);
+        collectIOTypes(conn.inInterface, conn, json);
+        collectIOTypes(conn.outInterface, conn, json);
     }
     
     def collectIOTypes(sequenceOf(IOType) types, Connector conn, JsonFileArtifact json) {

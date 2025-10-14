@@ -100,8 +100,8 @@ project TemplatePartSimpleApp {
         
         input = {{type=refBy(tplRec1)}},
         output = {{type=refBy(tplRec1)}},
-        inInterface = {type=refBy(tplRec1), path="/opc/machIn/"}, 
-        outInterface = {type=refBy(tplRec1), path="/opc/machOut/"},
+        inInterface = {{type=refBy(tplRec1), path="/opc/machIn/"}}, 
+        outInterface = {{type=refBy(tplRec1), path="/opc/machOut/"}},
         traceRcv = TraceKind::TRACE,
         traceSent = TraceKind::TRACE,
         security = {

@@ -36,11 +36,11 @@ Basically, a 'Connector' supports the following fields (in addition to those of 
 | --- |  --- | --- |
 | class |  Mandatory fully qualified class name of the connector protocol implementation. |     |
 | artifact |  Mandatory maven artifact containing the connector protocol, may be empty. |     |
-| inInterface |  Mandatory type representing data to be written into the external data sink wrapped by the connector. |     |
-| outInterface |  Mandatory type representing data read from the external data source wrapped by the connector. |     |
+| inInterface |  Mandatory types representing data to be written into the external data sink wrapped by the connector. |     |
+| outInterface |  Mandatory types representing data read from the external data source wrapped by the connector. |     |
 | operations |  Field-based data translation and assignment operations between inInterface / input and outInterface / output defining special semantics of the connector. | {}  |
-| inAdapterClass |  Optional fully qualified Java class name translating data from inInterface to input. If given, no code will be generated for this connector part. | "" |
-| outAdapterClass | Optional fully qualified Java class name translating data from outInterface to output. If given, no code will be generated for this connector part. | "" |
+| inAdapterClass |  Optional fully qualified Java class names translating data from inInterface to input. If given, no code will be generated for this connector part. | "" |
+| outAdapterClass | Optional fully qualified Java class names translating data from outInterface to output. If given, no code will be generated for this connector part. | "" |
 | encoding |  Text encoding | ASCII |
 | mapping | Field mapping between inInterface / input and outInterface / output. | {}  |
 | host | Mandatory network host to connect to. May be superseded by device AAS. |     |
@@ -53,7 +53,7 @@ Basically, a 'Connector' supports the following fields (in addition to those of 
 | dataTimeDiffProvider |  Optional plugins to adjust data ingestion time differences based on last data points data. |     |
 | deviceServiceKey | Optional name for service name to realize ad-hoc connectivity via the device AAS, may, e.g., override host and port. |     |
 
-Entries in `input` and `output` are matched pairwise with the corresponding entries in `inInterface` and `outInterface`. For legacy reason, currently only the first entry are matched but an extension for multiple types (MIMO-connectors) is in preparation. Typically, the number of matching quadruples is determined by `inInterface` and `outInterface`. The remaining entries in `input` and `output` are treated separately, e.g., as backwards/broadcasting input (for input handlers / connector triggers).
+Entries in `input` and `output` are matched pairwise with the corresponding entries in `inInterface` and `outInterface` as well as `inAdapterClass` and `outAdapterClass`. Typically, the number of matching tuples is determined by `inInterface` and `outInterface`. The remaining entries in `input` and `output` are treated separately, e.g., as backwards/broadcasting input (for input handlers / connector triggers).
 
 In addition, a `ChannelConnector` offers the following fields:
 
@@ -61,13 +61,13 @@ In addition, a `ChannelConnector` offers the following fields:
 | --- |  --- | --- |
 | machineFormatter |  Optional pre-defined formatter towards the external data sink, e.g., `JsonFormatter` or `TextLineFormatter`. | null |
 | machineParser | Optional pre-defined parser for data read from the external data source, e.g., `JsonParser` or `TextLineParser`. | null |
-| inSerializerClass |  Optional qualified Java class turning application data into external data. If given, supersedes `machineFormatter`. | ""  |
-| outSerializerClass |  Optional qualified Java class turning external data into application data. If given, supersedes `machineParser`. | "" |
+| inSerializerClass |  Optional qualified Java classes turning application data into external data. If given, supersedes `machineFormatter`. | ""  |
+| outSerializerClass |  Optional qualified Java classes turning external data into application data. If given, supersedes `machineParser`. | "" |
 | inChannel |  Channel name/pattern for data written to the external sink. | "" |
 | outChannel |  Channel name/pattern for data read from the external source. | ""  |
 | outChannels |  Optional multiple name/pattern for data read from the external source. If given, supersedes `outChannel`. |     |
 
-While `JsonFormatter`/`JsonParser` do not require further information, `TextLineFormatter`/`TextLineParser` must be configured with a `separator`, e.g., "," for CSV, "\t" for TSV etc.
+While `JsonFormatter`/`JsonParser` do not require further information, `TextLineFormatter`/`TextLineParser` must be configured with a `separator`, e.g., "," for CSV, "\t" for TSV etc. If specified, `inSerializerClass` and `outSerializerClass` contribute to the pairing of `input`, `output`, `inInterface` and `outInterface`.
 
 ## OPC UA connector
 

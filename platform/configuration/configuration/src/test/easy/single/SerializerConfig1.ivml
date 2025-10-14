@@ -135,8 +135,8 @@ project SerializerConfig1 {
         
         input = {{type=refBy(myConnPltfOut)}}, // PRELIMINARY
         output = {{type=refBy(myConnPltfIn)}},
-        inInterface = {type=refBy(myConnMachineIn)},
-        outInterface = {type=refBy(myConnMachineOut)}
+        inInterface = {{type=refBy(myConnMachineIn)}},
+        outInterface = {{type=refBy(myConnMachineOut)}}
     };
     
     MqttV3Connector myMqttConn = {

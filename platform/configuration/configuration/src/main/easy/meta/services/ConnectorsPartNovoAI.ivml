@@ -21,8 +21,8 @@ project ConnectorsPartNovoAI {
        OktoVersion ver = "0.1.0";
        sequenceOf(IOType) input = {{type=refBy(AvaMqttOutput)}};
        sequenceOf(IOType) output = {{type=refBy(AvaMqttOutput)}};
-       IOTypeWithPath inInterface = {type=refBy(AvaMqttOutput)};
-       IOTypeWithPath outInterface = {type=refBy(AvaMqttOutput)};
+       sequenceOf(IOTypeWithPath) inInterface = {{type=refBy(AvaMqttOutput)}};
+       sequenceOf(IOTypeWithPath) outInterface = {{type=refBy(AvaMqttOutput)}};
        MachineFormatter machineFormatter = JsonFormatter{};
        MachineParser machineParser = JsonParser{};
        NameplateInfo nameplateInfo = {

@@ -1,13 +1,12 @@
 # oktoflow platform: Releases
 
-### Version 0.8.0 (consolidation, ReGaP basics, JDK 17/JDK 21):
+### Version 0.8.0 (consolidation, ReGaP basics, JDK 17/JDK 21/Angular19/Python 3.11):
 
 In progress:
 * [#164](https://github.com/iip-ecosphere/platform/issues/164): UI design revision
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 * [#170](https://github.com/iip-ecosphere/platform/issues/170): Integrate BaSyx2
 * [#122](https://github.com/iip-ecosphere/platform/issues/122): Transparent encryption, RBAC on AAS (incl. UI authentication)
-* [#181](https://github.com/iip-ecosphere/platform/issues/181): Allow MIMO containers
 * [#180](https://github.com/iip-ecosphere/platform/issues/180): Add application templates
 
 Improvements:
@@ -17,7 +16,7 @@ Improvements:
 * Build process improvements for multiple Java/Maven installations like CI.
 * [#19](https://github.com/iip-ecosphere/platform/issues/19): Integration of generated IDTA interfaces.
 * Revision of code generation to Java/Python/JSON/YAML artifacts provided by EASy-Producer
-* [#167](https://github.com/iip-ecosphere/platform/issues/167): Generated Windows/Linux script line endings.
+* [#181](https://github.com/iip-ecosphere/platform/issues/181): Allow MIMO containers
 * [#166](https://github.com/iip-ecosphere/platform/issues/166): Upgrade Angular for UI.
 * [#171](https://github.com/iip-ecosphere/platform/issues/171): Migrate build-jk.xml to maven deployment (where possible).
 * [#173](https://github.com/iip-ecosphere/platform/issues/173): Fix Python version selection for Python services.
@@ -25,6 +24,7 @@ Improvements:
 * [#175](https://github.com/iip-ecosphere/platform/issues/175): Revise Python tests, please check/adjust your Python tests according to the generated Python test templates.
 * [#176](https://github.com/iip-ecosphere/platform/issues/176): Archived/nailed-down basis containers for container generation.
 * [#177](https://github.com/iip-ecosphere/platform/issues/177): Local Python venvs in installation scripts.
+* [#167](https://github.com/iip-ecosphere/platform/issues/167): Generated Windows/Linux script line endings.
 * [#178](https://github.com/iip-ecosphere/platform/issues/178): Python console output.
 * [#165](https://github.com/iip-ecosphere/platform/issues/170): Upgrade automated container building/Python
 * [#110](https://github.com/iip-ecosphere/platform/issues/110): UI startup/excution complains (disappeared)
@@ -35,6 +35,9 @@ New features:
 Changes:
 * As part of cleaning up dependencies in the core components of oktoflow:
   * Turning Java objects generically into text is now done via `de.iip_ecosphere.platform.support.StringUtils.toString(object)` for a default format and `de.iip_ecosphere.platform.support.StringUtils.toStringShortStyle(object)` for the short format. The latter replaces the approach with `org.apache.commons.lang3.builder.ReflectionToStringBuilder.toString(object, IipStringStyle.SHORT_STRING_STYLE)` using `de.iip_ecosphere.platform.services.environment.IipStringStyle` as formatting. `de.iip_ecosphere.platform.services.environment.IipStringStyle` was internalized into `de.iip_ecosphere.platform.support.StringUtils` and, thus, can be/was removed from `services.environment`. Please re-build your applications.
+
+Required adjustments:
+* Due to [#181](https://github.com/iip-ecosphere/platform/issues/181), `inInterface` and `outInterface` of connectors are now sequences, i.e., in IVML `inInterface = {type=...}` turns to `inInterface = {{type=...}}`, akin for `outInterface`, `inAdapterClass` and `outAdapterClass`.
 
 ### Version 0.7.0 (2024/07/11, no maven central release):
 

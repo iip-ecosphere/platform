@@ -175,23 +175,23 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
         adapterBaseType(conn, monitoring) + getConnectorGenerics(conn, inType, outType, true);
     }
     
-    def adapterCreationFragment(Connector conn, IOType inType, IOType outType, String varName, String metricsVarName, String logFileVarName, JavaCodeMethod m) {
+    def adapterCreationFragment(Connector conn, ConnectorTypes cType, String varName, String metricsVarName, String logFileVarName, JavaCodeMethod m) {
         JavaCodeExpression inAdapter;
         JavaCodeExpression outAdapter;
-        if (conn.inAdapterClass.length() > 0) {
-            inAdapter = new JavaCodeConstructorCall(conn.inAdapterClass);
+        if (cType.inAdapterCls.length() > 0) {
+            inAdapter = new JavaCodeConstructorCall(cType.inAdapterCls);
         } else {
-            inAdapter = new JavaCodeConstructorCall(getInputTranslatorClassName(conn, inType, outType)).arg("inPathSupplier");
+            inAdapter = new JavaCodeConstructorCall(getInputTranslatorClassName(conn, cType.inType, cType.outType)).arg("inPathSupplier");
         }
-        if (conn.outAdapterClass.length() > 0) {
-            outAdapter = new JavaCodeConstructorCall(conn.outAdapterClass);
+        if (cType.outAdapterCls.length() > 0) {
+            outAdapter = new JavaCodeConstructorCall(cType.outAdapterCls);
         } else {
-            outAdapter = new JavaCodeConstructorCall(getOutputTranslatorClassName(conn, inType, outType)).arg("outPathSupplier");
+            outAdapter = new JavaCodeConstructorCall(getOutputTranslatorClassName(conn, cType.inType, cType.outType)).arg("outPathSupplier");
         }
-        m.var(adapterType(conn, inType, outType, false, false), varName);
+        m.var(adapterType(conn, cType.inType, cType.outType, false, false), varName);
         m.if("${metricsVarName} != null").(i|{
-            i.assign(varName).addNew(adapterType(conn, inType, outType, true, false)).arg(outAdapter).arg(inAdapter).arg(metricsVarName).arg(logFileVarName);
-            i.else().assign(varName).addNew(adapterType(conn, inType, outType, false, false)).arg(outAdapter).arg(inAdapter);
+            i.assign(varName).addNew(adapterType(conn, cType.inType, cType.outType, true, false)).arg(outAdapter).arg(inAdapter).arg(metricsVarName).arg(logFileVarName);
+            i.else().assign(varName).addNew(adapterType(conn, cType.inType, cType.outType, false, false)).arg(outAdapter).arg(inAdapter);
         });
     }
     
@@ -229,47 +229,47 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
         '${name}${connGen}${array}';
     }
 
-    def adapterCreationFragment(ChannelConnector conn, IOType inType, IOType outType, String varName, String metricsVarName, String logFileVarName, JavaCodeMethod m) {
+    def adapterCreationFragment(ChannelConnector conn, ConnectorTypes cType, String varName, String metricsVarName, String logFileVarName, JavaCodeMethod m) {
         String inSerializer;
         String outSerializer;
-        if (conn.inSerializerClass.length() > 0) {
-            if (conn.inSerializerClass == "*") {
-                inSerializer = "new ${toTypeName(conn.inInterface)}Serializer()";
+        if (cType.inSerializerCls.length() > 0) {
+            if (cType.inSerializerCls == "*") {
+                inSerializer = "new ${toTypeName(cType.ifInType)}Serializer()";
             } else {
                 m.addImport("de.iip_ecosphere.platform.transport.serialization.Serializer");
-                inSerializer = "(Serializer<"+ioTypeTypeName(inType)+">) TypeTranslators.createSerializer(getClass().getClassLoader(), \"" + conn.inSerializerClass + "\")";
+                inSerializer = "(Serializer<"+ioTypeTypeName(cType.inType)+">) TypeTranslators.createSerializer(getClass().getClassLoader(), \"" + cType.inSerializerCls + "\")";
             }
         } else {
-            inSerializer = 'new ${asTypeName(conn.name)}FormatterSerializer(${escapeString(getEncoding(conn))}, null, inPathSupplier)';
+            inSerializer = 'new ${getFormatterSerializerClassName(conn, cType.outType)}(${escapeString(getEncoding(conn))}, null, inPathSupplier)';
         }
-        if (conn.outSerializerClass.length() > 0) {
-            if (conn.outSerializerClass == "*") {
-                outSerializer = "new ${toTypeName(conn.outInterface)}Serializer()";
+        if (cType.outSerializerCls.length() > 0) {
+            if (cType.outSerializerCls == "*") {
+                outSerializer = "new ${toTypeName(cType.ifOutType)}Serializer()";
             } else {
                 m.addImport("de.iip_ecosphere.platform.transport.serialization.Serializer");
-                outSerializer = "(Serializer<"+ioTypeTypeName(outType)+">) TypeTranslators.createSerializer(getClass().getClassLoader(), \"" + conn.outSerializerClass + "\")";
+                outSerializer = "(Serializer<"+ioTypeTypeName(cType.outType)+">) TypeTranslators.createSerializer(getClass().getClassLoader(), \"" + cType.outSerializerCls + "\")";
             }
         } else {
-            outSerializer = 'new ${asTypeName(conn.name)}ParserSerializer(${escapeString(getEncoding(conn))}, null, outPathSupplier)';
+            outSerializer = 'new ${getParserSerializerClassName(conn, cType.inType)}(${escapeString(getEncoding(conn))}, null, outPathSupplier)';
         }
 
         String inAdapter;
         String outAdapter;
-        if (conn.inAdapterClass.length() > 0) {
-            inAdapter = "new ${conn.inAdapterClass}()";
+        if (cType.inAdapterCls.length() > 0) {
+            inAdapter = "new ${cType.inAdapterCls}()";
         } else {
             m.addImport("de.iip_ecosphere.platform.connectors.types.ConnectorInputTypeAdapter");
-            inAdapter = "new ConnectorInputTypeAdapter<${ioTypeTypeName(inType)}>(${inSerializer})";
+            inAdapter = "new ConnectorInputTypeAdapter<${ioTypeTypeName(cType.inType)}>(${inSerializer})";
         }
-        if (conn.outAdapterClass.length() > 0) {
-            outAdapter = "new ${conn.outAdapterClass}()";
+        if (cType.outAdapterCls.length() > 0) {
+            outAdapter = "new ${cType.outAdapterCls}()";
         } else {
             m.addImport("de.iip_ecosphere.platform.connectors.types.ChanneledConnectorOutputTypeAdapter");
-            outAdapter = "new ChanneledConnectorOutputTypeAdapter<${ioTypeTypeName(outType)}>(${outSerializer})";
+            outAdapter = "new ChanneledConnectorOutputTypeAdapter<${ioTypeTypeName(cType.outType)}>(${outSerializer})";
         }
         
         setOf(String) outChannels = getOutChannels(conn);
-        JavaCodeVariableDeclaration d = m.var(adapterType(conn, inType, outType, false, true), varName);
+        JavaCodeVariableDeclaration d = m.var(adapterType(conn, cType.inType, cType.outType, false, true), varName);
         if (outChannels.size() > 1) {
             d.suppressWarnings().stringArg("unchecked");
             d.newArray(adapterBaseType(conn, false)).dimension(outChannels.size());
@@ -282,11 +282,11 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
             }
             arrayCount = arrayCount + 1;
             m.if("${metricsVarName} != null").(i|{
-                i.assign(varName + arrayAccess).addNew(adapterType(conn, inType, outType, true, false))
+                i.assign(varName + arrayAccess).addNew(adapterType(conn, cType.inType, cType.outType, true, false))
                     .stringArg(outChannel).arg(outAdapter.substitute("#CHANNEL#", outChannel))
                     .stringArg(conn.inChannel).arg(inAdapter.substitute("#CHANNEL#", conn.inChannel))
                     .arg(metricsVarName).arg(logFileVarName);
-                i.else().assign(varName + arrayAccess).addNew(adapterType(conn, inType, outType, false, false))
+                i.else().assign(varName + arrayAccess).addNew(adapterType(conn, cType.inType, cType.outType, false, false))
                     .stringArg(outChannel).arg(outAdapter.substitute("#CHANNEL#", outChannel))
                     .stringArg(conn.inChannel).arg(inAdapter.substitute("#CHANNEL#", conn.inChannel));
             });
@@ -307,17 +307,21 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
 
     // generate the adaptor translator classes for a generic connector    
     def generateAdapterTranslators(Connector conn, JavaCodeClass parent) {
-        sequenceOf(IOType) outTypes = reduce(conn, conn.output);
-        sequenceOf(IOType) inTypes = reduce(conn, conn.input);
-        Integer pos = 0;
-        for (IOType outType : outTypes) {
-            IOType inType = inTypes.get(pos);            
-            IOTypeWithPath ifInType = conn.inInterface; // TODO select from sequence -> IVML
-            IOTypeWithPath ifOutType = conn.outInterface;
-            generateMachineInputTranslator(conn, inType, outType, ifInType, ifOutType, parent);
-            generateMachineOutputTranslator(conn, inType, outType, ifInType, ifOutType, parent);
-            pos = pos + 1;
+        sequenceOf(ConnectorTypes) cTypes = pairTypes(conn);
+        for (ConnectorTypes cType : cTypes) {
+            generateMachineInputTranslator(conn, cType, parent);
+            generateMachineOutputTranslator(conn, cType, parent);
         }
+    }
+
+    def String getStringValueSafe(DecisionVariable var, sequenceOf(String) seq, Integer pos, String dflt) {
+        String result = dflt;
+        if (isDefined(var)) {
+            if (pos < seq.size()) {
+                result = seq.get(pos);
+            }
+        }
+        result;
     }
     
     // don't generate translator classes for channel connectors    
@@ -623,18 +627,18 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
         });
     }
 
-    def generateMachineOutputTranslator(Connector conn, IOType inType, IOType outType, IOTypeWithPath ifInType, IOTypeWithPath ifOutType, JavaCodeClass parent) {
+    def generateMachineOutputTranslator(Connector conn, ConnectorTypes cType, JavaCodeClass parent) {
         clearTemporaryVariables();
         Boolean useNotifications = conn.samplingPeriod <= 0; // else polling
         cachingTimes = mappedCachingTimes(conn.mapping);
-        if (conn.inAdapterClass.length() == 0) {
-            DataType outTypeType = outType.type;
-            DataType ifOutTypeType = ifOutType.type;
+        if (cType.inAdapterCls.length() == 0) {
+            DataType outTypeType = cType.outType.type;
+            DataType ifOutTypeType = cType.ifOutType.type;
             setAdd(config);
             String coType = asTypeName(getTypeName(outTypeType));
             String oType = getMachineOutputTypeName(conn);
-            JavaCodeClass c = generateConnectorTranslator(parent, getOutputTranslatorClassName(conn, inType, outType), "AbstractConnectorOutputTypeTranslator", oType, coType);
-            genOutputTransTo(ifOutTypeType, getPath(conn.outInterface), outTypeType, conn.operations, oType, coType, c);
+            JavaCodeClass c = generateConnectorTranslator(parent, getOutputTranslatorClassName(conn, cType.inType, cType.outType), "AbstractConnectorOutputTypeTranslator", oType, coType);
+            genOutputTransTo(ifOutTypeType, getPath(cType.ifOutType), outTypeType, conn.operations, oType, coType, c);
             c.method("initializeModelAccess").(m|{
                 m.override();
                 m.throws("java.io.IOException");
@@ -644,18 +648,18 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
             generateConnectorTranslatorSourceTarget(c, oType, coType);
         }
     }
-
-    def generateMachineInputTranslator(Connector conn, IOType inType, IOType outType, IOTypeWithPath ifInType, IOTypeWithPath ifOutType, JavaCodeClass parent) {
+    
+    def generateMachineInputTranslator(Connector conn, ConnectorTypes cType, JavaCodeClass parent) {
         clearTemporaryVariables();
         cachingTimes = mappedCachingTimes(conn.mapping);
-        if (conn.outAdapterClass.length() == 0) {
+        if (cType.outAdapterCls.length() == 0) {
             setAdd(config);
-            DataType inTypeType = inType.type;
-            DataType ifInTypeType = ifInType.type;
+            DataType inTypeType = cType.inType.type;
+            DataType ifInTypeType = cType.ifInType.type;
             String ciType = asTypeName(getTypeName(inTypeType));
             String iType = getMachineInputTypeName(conn);
-            JavaCodeClass c = generateConnectorTranslator(parent, getInputTranslatorClassName(conn, inType, outType), "AbstractConnectorInputTypeTranslator", ciType, iType);
-            genOutputTransFrom(ifInTypeType, getPath(conn.inInterface), inTypeType, conn.operations, iType, ciType, c);
+            JavaCodeClass c = generateConnectorTranslator(parent, getInputTranslatorClassName(conn, cType.inType, cType.outType), "AbstractConnectorInputTypeTranslator", ciType, iType);
+            genOutputTransFrom(ifInTypeType, getPath(cType.ifInType), inTypeType, conn.operations, iType, ciType, c);
             generateConnectorTranslatorSourceTarget(c, iType, ciType);
         }
     }
@@ -668,42 +672,6 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
     
     def generateReceptionCallback(MeshElement elt, ServiceBase service, Application app, JavaCodeClass parent) {
     }
-
-    // added v2->v3    
-    def getReceptionCallbackClassName(Connector conn, IOType outType) {
-        ioTypeTypeName(outType) + "ReceptionCallback";
-    }
-    
-    // added v2->v3    
-    def getInputTranslatorClassName(Connector conn, IOType inType, IOType outType) {
-        ioTypeTypeName(inType) + "InputTranslator";
-    }
-
-    // added v2->v3    
-    def getOutputTranslatorClassName(Connector conn, IOType inType, IOType outType) {
-        ioTypeTypeName(outType) + "OutputTranslator";
-    }
-    
-    // added v2->v3    
-    def getAdapterCreationMethodName(Connector conn, IOType inType, IOType outType, Integer pairIdx) {
-        String add = "";        
-        if (pairIdx > 0) {
-            add = getTypeName(inType.type) + getTypeName(outType.type);
-        }
-        "createConnectorAdapter" + add;
-    }
-    
-    // added v2->v3    
-    def sequenceOf(IOType) reduce(Connector conn, sequenceOf(IOType) types) {
-        Integer maxSize = 1; // TODO take inIf/outIf into account as maximum size
-        sequenceOf(IOType) result = {}; // typically from IVML, i.e., non modifiable container
-        Integer pos = 0;
-        while (result.size() < maxSize and pos < types.size()) {
-            result.add(types.get(pos));
-            pos = pos + 1;
-        }
-        result;
-    }
     
     def generateReceptionCallback(MeshElement elt, Connector conn, Application app, JavaCodeClass parent) {
         String serviceId = "_" + toIdentifier(conn.id);
@@ -711,10 +679,9 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
         for (IOType t: forward(conn.output)) {
             outFwd.add(t.type);
         }
-        sequenceOf(IOType) inTypes = reduce(conn, conn.input);
-        sequenceOf(IOType) outTypes = reduce(conn, conn.output);
-        for (IOType t : outTypes) {
-            DataType type = t.type;
+        sequenceOf(ConnectorTypes) cTypes = pairTypes(conn);
+        for (ConnectorTypes cType : cTypes) {
+            DataType type = cType.outType.type;
             String coType = asTypeName(getTypeName(type));
             String suffix = coType.firstToUpperCase() + serviceId;
             String methodSuffix = "create" + suffix;
@@ -736,7 +703,7 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
                 connectionIds = connectionIds + ", \"${c}\"";
             }
 
-            parent.addClass(getReceptionCallbackClassName(conn, t)).implements("de.iip_ecosphere.platform.transport.connectors.ReceptionCallback<${coType}>").setPrivate().(c|{
+            parent.addClass(getReceptionCallbackClassName(conn, cType.outType)).implements("de.iip_ecosphere.platform.transport.connectors.ReceptionCallback<${coType}>").setPrivate().(c|{
                 c.initializer(false).(i|{
                     i.SLComment("initialize Transport if needed");
                     i.call("de.iip_ecosphere.platform.services.environment.spring.Starter.getSetup", JavaCodeImportScope.CLASS);
@@ -992,7 +959,10 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
     */
     @DispatchCase
     def generateSpecificSettings(InfluxConnector conn, JavaCodeMethodCall r) {
-        String tags = collectTags(conn.inInterface.type, "");
+        String tags = "";
+        for (IOTypeWithPath t : conn.inInterface) {
+            appendWithSeparator(tags, ",", collectTags(t.type, ""));
+        }
         String connectorName = toIdentifier(conn.name);
         r.call("setSpecificSetting").stringArg("ORG").stringArg(conn.organization);
         r.call("setSpecificSetting").stringArg("BUCKET").stringArg(conn.bucket);

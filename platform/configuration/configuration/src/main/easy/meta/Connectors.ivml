@@ -131,8 +131,8 @@ project Connectors {
     compound Connector refines Service { // not abstract, may be implemented in application code
        String class;
        String artifact;
-       IOTypeWithPath inInterface; // provided data input to be mapped into adapter, alternative to adapterClass
-       IOTypeWithPath outInterface; // provided data output to be mapped into adapter, alternative to adapterClass
+       sequenceOf(IOTypeWithPath) inInterface; // provided data input to be mapped into adapter, alternative to adapterClass
+       sequenceOf(IOTypeWithPath) outInterface; // provided data output to be mapped into adapter, alternative to adapterClass
        NonEmptyString host = "localhost";
        Port port;
        Integer samplingPeriod = 0; // no sampling by default
@@ -141,8 +141,8 @@ project Connectors {
        assign (uiGroup = UiOptionalGroup1) to {
            setOf(AssignmentOperation) operations = {};
            TextEncoding encoding = TextEncoding::ASCII;
-           String inAdapterClass = ""; // if given, use adapter; may be "*" to use generated transport serializer
-           String outAdapterClass = ""; // if given, use adapter; may be "*" to use generated transport serializer
+           sequenceOf(String) inAdapterClass = {}; // if given, use adapter; may be "*" to use generated transport serializer
+           sequenceOf(String) outAdapterClass = {}; // if given, use adapter; may be "*" to use generated transport serializer
            setOf(ConnectorInputHandler) inputHandlers = {};
            DataTimeDiffProvider dataTimeDiffProvider = null;
            CacheMode cacheMode = CacheMode::NONE;
@@ -172,6 +172,11 @@ project Connectors {
        Constraint connectorDeployability = deployable == true;
        Constraint inInterfaceOk = isDefined(inInterface) and inInterface <> null;
        Constraint outInterfaceOk = isDefined(outInterface) and outInterface <> null;
+       Constraint inOutInterfaceOk = inInterface.size() == outInterface.size();
+       Constraint inputSizeOk = input.size() >= inInterface.size();
+       Constraint outputSizeOk = output.size() >= outInterface.size();
+       Constraint inAdapterClassSize = inAdapterClass.size() > 0 implies inAdapterClass.size() == inInterface.size();
+       Constraint outAdapterClassSize = outAdapterClass.size() > 0 implies outAdapterClass.size() == outInterface.size();
    }
    
    abstract compound ChannelConnector refines Connector {
@@ -181,8 +186,8 @@ project Connectors {
        MachineParser machineParser = null;
        assign (uiGroup = UiOptionalGroup1) to {
            setOf(String) outChannels; // additional out channels towards platform, unified with outChannel; may also be used instead of outChannel
-           String inSerializerClass = ""; // if not given, use registry
-           String outSerializerClass = ""; // if not given, use registry
+           sequenceOf(String) inSerializerClass = {}; // if not given, use registry
+           sequenceOf(String) outSerializerClass = {}; // if not given, use registry
        }
        assign (uiGroup = UiInvisibleGroup) to {
            Integer samplingPeriod = 0; // no sampling by default
@@ -191,6 +196,8 @@ project Connectors {
        Constraint noModelCallOperation = collectOperations(operations)->selectByKind(ModelCallOperation).isEmpty();
        Constraint mustHaveParser = machineParser <> null;
        Constraint mustHaveFormatter = machineFormatter <> null;
+       Constraint inSerializerClassSize = inSerializerClass.size() > 0 implies inSerializerClass.size() == inInterface.size();
+       Constraint outSerializerClassSize = outSerializerClass.size() > 0 implies outSerializerClass.size() == outInterface.size();
    }
 
    // marker type for connectors that are not fully implemented and need some code generation
@@ -457,8 +464,8 @@ project Connectors {
        assign (uiGroup = UiOptionalGroup2) to {
            String deviceServiceKey = "modbus/tcp";
        }
-       Constraint inInterfaceOk = isModbusPath(inInterface);
-       Constraint outInterfaceOk = isModbusPath(outInterface);
+       Constraint inInterfaceOk = inInterface->forAll(i|isModbusPath(i));
+       Constraint outInterfaceOk = outInterface->forAll(i|isModbusPath(i));
    }
 
    // ------------------------ REST ----------------------------------
