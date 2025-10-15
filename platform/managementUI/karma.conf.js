@@ -1,8 +1,23 @@
 // Karma configuration file, see link for more information
 // https://karma-runner.github.io/1.0/config/configuration-file.html
 
+// Debug what Jenkins injected
+console.log('[karma] CHROME_BIN before override:', process.env.CHROME_BIN);
+
+// Force Google Chrome (deb), ignore EnvInject value
+process.env.CHROME_BIN = '/usr/bin/google-chrome';
+
+console.log('[karma] CHROME_BIN after override:', process.env.CHROME_BIN);
+
 module.exports = function (config) {
   config.set({
+    browsers: [process.env.CI ? 'ChromeHeadlessNoSandbox' : 'ChromeHeadless'],
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-setuid-sandbox'],
+      },
+    },
     basePath: '',
     frameworks: ['jasmine', '@angular-devkit/build-angular'],
     plugins: [
@@ -36,17 +51,6 @@ module.exports = function (config) {
         { type: 'cobertura', subdir: '.', file: 'cobertura.xml' }
       ]
     },
-    customLaunchers: {
-      ChromeHeadlessCI: {
-        base: 'ChromeHeadless',
-        flags: [
-          '--no-sandbox', // try handling "/system.slice/jenkins.service is not a snap cgroup"
-          '--disable-gpu', // for now, unsure
-          '--disable-dev-shm-usage' // for now, unsure; important, especially in Docker/CI
-        ]
-      }
-    },
-    browsers: ['ChromeHeadlessCI'],    
     //reporters: ['spec'],    // for debugging
     reporters: ['progress', 'kjhtml'],
     port: 9876,
