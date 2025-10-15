@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -86,6 +87,9 @@ import net.ssehub.easy.varModel.persistency.IVMLWriter.EmitFilter;
  * @author Holger Eichelberger, SSE
  */
 public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
+
+    public static final Predicate<Project> NO_PROJECT_FILTER = p -> true;
+    public static final Predicate<Project> NO_TEMPLATE_FILTER = p -> !IvmlUtils.isTemplate(p);
 
     private static final EmitFilter EMIT_FILTER = (var, val) -> {
         boolean emit = true;
@@ -234,7 +238,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                     IDecisionVariable dVar = cfg.getDecision(var);
                     cfg.removeDecision(dVar);
                     notifyChange(dVar, ConfigurationChangeType.DELETED);
-                    ReasoningResult res = validateAndPropagate();
+                    ReasoningResult res = validateAndPropagate(NO_TEMPLATE_FILTER);
                     throwIfFails(res, true);
                     saveTo(prj, getIvmlFile(prj));
                     getLogger().info("Deleted IVML variable {}", varName);
@@ -439,7 +443,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                     derivedFrom.setValue(ValueFactory.createValue(
                         derivedFrom.getDeclaration().getType(), templateVar.getName()), AssignmentState.ASSIGNED);
                 }
-                ReasoningResult res = validateAndPropagate();
+                ReasoningResult res = validateAndPropagate(NO_TEMPLATE_FILTER);
                 throwIfFails(res, true);
                 for (Project p: context.modified) {
                     saveTo(p, getIvmlFile(p));
@@ -835,7 +839,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      * @throws ExecutionException if the execution of the operation fails
      */
     public String getOpenTemplateVariables(String varName) throws ExecutionException {
-        ReasoningResult res = validateAndPropagate();
+        ReasoningResult res = validateAndPropagate(NO_PROJECT_FILTER); // must include templates
         return JsonUtils.toJson(IvmlUtils.analyzeForTemplate(res, varName));
     }
 
@@ -1014,7 +1018,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
             try {
                 AbstractVariable var = IvmlModelQuery.findVariable(root, varName, null);
                 cfg.renameVariable(var, toIdentifier(newVarName));
-                ReasoningResult res = validateAndPropagate();
+                ReasoningResult res = validateAndPropagate(NO_TEMPLATE_FILTER);
                 throwIfFails(res, true);
                 Set<Project> projects = IvmlUtils.findProjectsUsingVariable(root, var);
                 for (Project p : projects) {
@@ -1063,7 +1067,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
             } else {
                 throw new ExecutionException("No such type " + type, null);
             }
-            ReasoningResult res = validateAndPropagate();
+            ReasoningResult res = validateAndPropagate(NO_TEMPLATE_FILTER);
             throwIfFails(res, true);
             saveTo(target, getIvmlFile(target));
             getLogger().info("Created IVML variable {} in {}", varName, target.getName());
@@ -1402,7 +1406,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      */
     protected void reloadAndValidate(Map<Project, CopiedFile> copies) throws ExecutionException {
         reloadConfiguration();
-        ReasoningResult res = validateAndPropagate();
+        ReasoningResult res = validateAndPropagate(NO_TEMPLATE_FILTER);
         String msg = "";
         boolean hasConflict = IvmlUtils.analyzeReasoningResult(res, false, false);
         if (hasConflict) {
@@ -1552,7 +1556,17 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      * 
      * @return the reasoning result
      */
-    protected abstract ReasoningResult validateAndPropagate();
+    protected ReasoningResult validateAndPropagate() {
+        return validateAndPropagate(null);
+    }
+
+    /**
+     * Validates the model and propagates values within the model.
+     * 
+     * @param projectFilter optional filter on projects to reason on, may be <b>null</b>
+     * @return the reasoning result
+     */
+    protected abstract ReasoningResult validateAndPropagate(Predicate<Project> projectFilter);
 
     /**
      * Reloads the configuration model.

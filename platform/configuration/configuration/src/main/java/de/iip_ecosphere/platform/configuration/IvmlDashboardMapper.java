@@ -342,7 +342,7 @@ public class IvmlDashboardMapper {
             } else {
                 url = "http";
             }
-            url += "//:" + connInfo.host;
+            url += "://" + connInfo.host;
             if (connInfo.port > 0) {
                 url += ":" + connInfo.port;
             }

@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.configuration;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
 
 import de.iip_ecosphere.platform.configuration.ivml.AasIvmlMapper;
 import de.iip_ecosphere.platform.configuration.ivml.IvmlUtils;
@@ -39,6 +40,7 @@ import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.model.ModelQueryException;
+import net.ssehub.easy.varModel.model.Project;
 
 /**
  * Holds the platform configuration and provides operations on the configuration. The 
@@ -292,17 +294,32 @@ public class ConfigurationManager {
             : null;
     }
     
-    // checkstyle: stop exception type check
-    
     /**
      * Validates the model and propagates values within the model.
      * 
      * @return the reasoning result (preliminary)
      */
     public static ReasoningResult validateAndPropagate() {
+        return validateAndPropagate(null);
+    }
+    
+    // checkstyle: stop exception type check
+    
+    /**
+     * Validates the model and propagates values within the model.
+     * 
+     * @param projectFilter optional filter on projects to reason on, may be <b>null</b>
+     * @return the reasoning result (preliminary)
+     */
+    public static ReasoningResult validateAndPropagate(Predicate<Project> projectFilter) {
         init();
         try {
-            return executor != null ? executor.propagateOnIvmlModel() : null;
+            if (executor != null) {
+                executor.setReasoningProjectFilter(null == projectFilter ? p -> true : projectFilter);
+                return executor.propagateOnIvmlModel();
+            } else {
+                return null;
+            }
         } catch (IllegalStateException e) {
             getLogger().error(e.getMessage());
             return null;

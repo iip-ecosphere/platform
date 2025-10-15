@@ -1072,8 +1072,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     }
     
     @Override
-    protected ReasoningResult validateAndPropagate() {
-        return ConfigurationManager.validateAndPropagate();
+    protected ReasoningResult validateAndPropagate(Predicate<Project> projectFilter) {
+        return ConfigurationManager.validateAndPropagate(projectFilter);
     }
 
     @Override
