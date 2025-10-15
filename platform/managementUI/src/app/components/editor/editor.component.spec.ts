@@ -119,7 +119,7 @@ describe('EditorComponent', () => {
         {name:"machineFormatter", kind:InputKind.sub}, {name:"machineParser", kind:InputKind.sub},
         {name:"encoding", kind:InputKind.enum}, {name:"host", kind:InputKind.text},
         {name:"inAdapterClass", kind:InputKind.text}, {name:"outAdapterClass", kind:InputKind.text},
-        {name:"inInterface", kind:InputKind.sub}, {name:"outInterface", kind:InputKind.sub},
+        {name:"inInterface", kind:InputKind.sub}, {name:"outInterface", kind:InputKind.ref},
         {name:"samplingPeriod", kind:InputKind.text}, {name:"security", kind:InputKind.sub},
         {name:"mock", kind:InputKind.bool}, {name:"cacheMode", kind:InputKind.enum},
         {name:"parameter", kind:InputKind.text} // TODO check
