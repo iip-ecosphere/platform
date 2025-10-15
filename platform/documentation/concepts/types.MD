@@ -96,13 +96,19 @@ In turn, `Field` instances may be equipped with more information as summarized b
 | displayName | Optional display name for values represented by this field, e.g., on a dashboard. | "" |
 | display | Optional setting on how to display the field on a dashboard (`TimeSeries`, `Gauge`, `BarChart`, `Table`) | - |
 | displayRow | Optional reference to display row that shall display this field. If not given, field will occur in some default (top)-row of dashboard. | - |
+| displayRow | Optional reference to display panel that shall display this field. If not given, a field will be placed into it's own panel. If given, fields share the same panel, e.g., being displayed as multiple timeseries. | - |
 
-Again, in turn, `Field` instances may specify a `DisplayRow` with the following fields:
+Again, in turn, `Field` instances may specify a `DisplayRow` or a `DisplayPanel` with the following fields:
 
 | Field | Description | Default |
 | --- | --- | --- |
-| name | Name of the field, must be unique for all `DisplayRow` instances. |     |
-| displayName | Optional display name  for the display row. |  ""   |
+| name | Name of the row, must be unique for all `DisplayRow` instances. |     |
+| displayName | Optional display name  for the row. |  ""   |
+
+| Field | Description | Default |
+| --- | --- | --- |
+| name | Name of the panel, must be unique for all `DisplayPanel` instances. |     |
+| displayName | Optional display name for the panel. |  ""   |
 
 Although all display related fields are optional for usual `Field` instances in a `RecordType`, because an usual `Field` shall not be displayed on a dashboard, they partially become mandatory if a `Field` shall be displayed. The following example illustrates this:
 

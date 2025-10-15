@@ -724,11 +724,11 @@ public class AppStarter {
         ClassLoader loader = AppStarter.class.getClassLoader();
         System.out.println("oktoflow Spring application loader, main class loader " + loader);        
         // adjust class loader
-        String zipAppClasspathFile = System.getProperty("okto.loader.app");
+        String appFolder = System.getProperty("okto.loader.app");
         File cpFile = null;
         InputStream cp = null;
-        if (zipAppClasspathFile != null) {
-            cpFile = new File(zipAppClasspathFile);
+        if (appFolder != null) {
+            cpFile = new File(appFolder);
             if (cpFile.isDirectory()) {
                 cpFile = new File(cpFile, APP_CLASSPATH);
             }
