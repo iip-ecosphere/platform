@@ -39,10 +39,53 @@ The compiler plugin supports the following configuration settings:
   - `useHash` (default `true`, user property `python-compile.useHash`) use hash file to identify whether python files have changed to speed up testing
   - `hashDir` (default ``, user property `python-compile.hashDir`) use the given directory to store the file (named according to artifact) for ``useHash``.
   - `python.binary` optional absolute path to python binary (may also be given as environment variable `IIP_PYTHON`)
+
+## Python exec plugin
+
+The Python test plugin executes a given Python file as main program. The plugin has no default lifecycle assignment. The plugin adds the `PYTHONPATH` if specified and sets the environment variable `PRJ_HOME` to the home directory of the project.
+
+  ```xml
+  <build>
+      <plugins>
+         <plugin>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>maven-python</artifactId>
+            <version>${project.version}</version>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>exec-python</goal>
+                    </goals>
+                    <phase>compile</phase>
+                    <configuration>
+                        <failOnError>true</failOnError>
+                        <directory>src/main/python</directory>
+                        <file>MyPython</file>
+                        <args>
+                          <arg>some arg</arg>
+                          <arg>42</arg>
+                        </args>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+     </plugins>
+  </build>
+  ```
+
+The exec plugin supports the following configuration settings:
+  - `failOnError` (default `true`, user property `python-exec.failOnError`): Whether the build process shall fail if Python execution errors are detected.
+  - `skip` (default `false`, user property `python-exec.skip`) skips the execution of this plugin. 
+  - `file` (user property `python-exec.file`): Mandatory Python file to execute, within the working directory. Must be specified.
+  - `directory` (default `src/main/python`, user property `python-exec.directory`): Optional work directory, interpreted relative to the project's home directory.
+  - `args` (default not given, user property `python-exec.args`) command line arguments for the program to be executed (as individual `arg` entries).
+  - `pythonArgs` (default not given, user property `python-exec.pythonArgs`) command line arguments for the Python interpreter (as individual `pythonArg` entries).
+  - `python.binary` optional absolute path to python binary (may also be given as environment variable `IIP_PYTHON`)
+  - `python.pythonpath` optional PYTHONPATH, if not given composed based on `target/pySrc`, the application interfaces of the generated application in `target/gen` and the python source folders for services in `src/main/python`
   
 ## Python test plugin
 
-The Python test plugin currently executes Python files, either those directly located in `src/test/python` or those specified by a file set. The plugin runs by default in the `test` lifecycle phase with the goal `test-python`. The test runner extends the `PYTHONPATH` and sets the environment variable `PRJ_HOME` to the home directory of the project.
+The Python test plugin executes Python files, either those directly located in `src/test/python` or those specified by a file set. The plugin runs by default in the `test` lifecycle phase with the goal `test-python`. The test runner extends the `PYTHONPATH` and sets the environment variable `PRJ_HOME` to the home directory of the project.
 
   ```xml
   <build>
@@ -73,7 +116,7 @@ The Python test plugin currently executes Python files, either those directly lo
   ```
 
 The test runner plugin supports the following configuration settings:
-  - `failOnError` (default `true`, user property `python-test.failOnError`): Whether the build process shall fail if Python compile errors are detected.
+  - `failOnError` (default `true`, user property `python-test.failOnError`): Whether the build process shall fail if Python execution errors are detected.
   - `modelProject` (default `../../../target/pySrc`, user property `python-test.modelProject`): Optional set if generated templates are moved, set to path of generated python 	sources.
   - `fileset` (default not given, execute all files directly located in `src/test/python`) is optional and can be used to determine the tests to be executed.
   - `skip` (default `false`, user property `python-test.skip`) skips the execution of this plugin. 
