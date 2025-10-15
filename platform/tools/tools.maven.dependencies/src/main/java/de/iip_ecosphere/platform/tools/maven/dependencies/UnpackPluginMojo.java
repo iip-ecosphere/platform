@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -52,9 +51,7 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.eclipse.aether.resolution.ArtifactResult;
 
 /**
  * Extended unpack Mojo for plugins.
@@ -109,6 +106,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
     private RepositorySystem repoSystem;
     
     private Map<String, List<String>> pluginAppends = new HashMap<>();
+    private Resolver resolver;
     
     /**
      * Represents a plugin, an extended artifact.
@@ -187,6 +185,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
     
     @Override
     public void doExecute() throws MojoExecutionException, MojoFailureException {
+        resolver = new Resolver(repoSystem, repoSession, remoteRepositories, getLog());
         File targetDir = relocate ? relocateTarget : new File(targetDirectory, "oktoPlugins");
         setForceCleanup(true);
         FileSet cleanup = new FileSet();
@@ -727,17 +726,6 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
     }
 
     /**
-     * Translates a maven artifact to an Aether artifact.
-     * 
-     * @param artifact the maven artifact
-     * @return the aether artifact
-     */
-    private DefaultArtifact translate(Artifact artifact) {
-        return new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getClassifier(), 
-            artifact.getType(), artifact.getVersion());            
-    }
-
-    /**
      * Tries to resolve the path.
      * 
      * @param path the given classpath path
@@ -749,7 +737,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         String resolved = path;
         try {
             DefaultArtifact artifact = parsePath(path);
-            File res = resolve(artifact);
+            File res = resolver.resolve(artifact);
             if (resolveAndCopy && jarFolder != null) {
                 File tgt = new File(jarFolder, res.getName());
                 if (!res.exists()) {
@@ -767,52 +755,6 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             getLog().warn("Cannot resolve to artifact, keeping path: " + path);
         }
         return resolved;
-    }
-
-    /**
-     * Resolves a list of artifacts to a composed path.
-     * 
-     * @param artifacts the artifacts, may be <b>null</b>
-     * @return the path, may be <b>empty</b>
-     */
-    @SuppressWarnings("unused")
-    private String resolve(List<Artifact> artifacts) {
-        return null == artifacts ? "" : artifacts.stream()
-            .map(a -> resolve(a))
-            .filter(p -> p != null)
-            .collect(Collectors.joining(":", ":", ""));
-    }
-    
-    /**
-     * Resolves a single artifact.
-     * 
-     * @param artifact the artifact
-     * @return the resolved path, empty if not resolvable
-     */
-    private String resolve(Artifact artifact) {
-        String result;
-        try {
-            result = resolve(translate(artifact)).getAbsolutePath();
-        } catch (ArtifactResolutionException e) {
-            getLog().warn("Cannot resolve to artifact, ignoring: " + artifact);
-            result = "";
-        }
-        return result;
-    }
-
-    /**
-     * Resolves an artifact via the repository system.
-     * 
-     * @param artifact the artifact to resolve
-     * @return the resolved path
-     * @throws ArtifactResolutionException if resolution fails
-     */
-    private File resolve(DefaultArtifact artifact) throws ArtifactResolutionException {
-        ArtifactRequest request = new ArtifactRequest();
-        request.setArtifact(artifact);
-        request.setRepositories(remoteRepositories);
-        ArtifactResult result = repoSystem.resolveArtifact(repoSession, request);
-        return result.getArtifact().getFile();
     }
 
     @Override

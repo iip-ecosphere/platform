@@ -24,12 +24,19 @@ import java.util.StringTokenizer;
 import java.util.function.Function;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingRequest;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
 
 /**
  * Reused build-classpath Mojo, allowing to prepend/append classpath elements not part of the Maven classpath.
@@ -55,6 +62,9 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
     
     @Parameter( property = "mdep.localRepoProperty", defaultValue = "" )
     private String localRepoProperty; // -> setter
+    
+    @Parameter( property = "mdep.fileSeparator", defaultValue = "" )
+    private String fileSeparator;  // -> setter
 
     @Parameter( property = "mdep.cleanup", defaultValue = "true" )
     private boolean cleanup;
@@ -77,6 +87,24 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
     @Parameter(required = false) 
     private boolean rollout;
     
+    @Parameter( property = "mdep.addTestArtifact", defaultValue = "false" )
+    private boolean addTestArtifact;
+
+    @Parameter( property = "mdep.addAppLoader", defaultValue = "false" )
+    private boolean addAppLoader;
+
+    @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
+    private List<RemoteRepository> remoteRepositories;
+
+    @Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
+    private RepositorySystemSession repoSession;
+
+    @Parameter( defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true )
+    private List<ArtifactRepository> remoteArtifactRepositories;
+    
+    @Component
+    private RepositorySystem repoSystem;
+    
     private Set<String> oldEntries;
 
     @Override
@@ -84,7 +112,13 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
         super.setOutputFile(outputFile);
         this.outputFile = outputFile;
     }
-    
+
+    @Override
+    public void setFileSeparator(String theFileSeparator) {
+        super.setFileSeparator(theFileSeparator);
+        this.fileSeparator = theFileSeparator;
+    }
+
     @Override
     public void setPathSeparator(String thePathSeparator) {
         super.setPathSeparator(thePathSeparator);
@@ -227,6 +261,29 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
      */
     public void adjustTo(Function<String, String> func) {
     }
+
+    /**
+     * Handles the spring loader appends.
+     */
+    private void handleSpringLoader() {
+        if (addAppLoader) {
+            Resolver resolver = new Resolver(repoSystem, repoSession, remoteRepositories, getLog());
+            File file = resolver.resolveSpringBootLoader(getProject());
+            if (null != file) {
+                if (null == appends) {
+                    appends = new ArrayList<>();
+                }
+                String name = file.getName();
+                if (null != prefix) {
+                    if (!prefix.endsWith(fileSeparator)) {
+                        prefix = prefix + fileSeparator;
+                    }
+                    name = prefix + name;
+                }
+                appends.add(name);
+            }
+        }
+    }
     
     /**
      * The actual extended implementation.
@@ -242,6 +299,8 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
             }
         }
         super.doExecute();
+        handleSpringLoader();
+        
         boolean hasPrepends = (prepends != null && !prepends.isEmpty());
         boolean hasAppends = (appends != null && !appends.isEmpty());
         boolean hasBefores = (befores != null && !befores.isEmpty());
@@ -300,6 +359,15 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
                 getLog().error("Reading: " + e.getMessage());
             }           
         }
+    }
+
+    @Override
+    public ProjectBuildingRequest newResolveArtifactProjectBuildingRequest() {
+        // no artifact resolution so far
+        ProjectBuildingRequest buildingRequest =
+            new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
+        buildingRequest.setRemoteRepositories(remoteArtifactRepositories);
+        return buildingRequest;
     }
 
 }
