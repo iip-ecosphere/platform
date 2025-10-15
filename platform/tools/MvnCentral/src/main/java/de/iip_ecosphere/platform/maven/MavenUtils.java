@@ -83,6 +83,7 @@ public class MavenUtils {
          * @param folder the folder
          */
         public void clearedFolder(File folder) {
+            fileCount++; // the folder itself
             try {
                 Files.walk(folder.toPath())
                     .filter(p -> p.toFile().isFile())
