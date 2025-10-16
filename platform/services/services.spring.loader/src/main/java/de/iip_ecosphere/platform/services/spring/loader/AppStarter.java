@@ -32,10 +32,8 @@ import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.jar.JarFile;
@@ -439,7 +437,6 @@ public class AppStarter {
     static class ChildLaunchedURLClassLoader extends LaunchedURLClassLoader implements ChildClassLoader {
         
         private FindClassClassLoader realParent;
-        private Map<String, Class<?>> classes = new HashMap<>();
 
         /**
          * Creates an instance with delegation to the real parent class loader.
@@ -496,10 +493,9 @@ public class AppStarter {
         
         @Override
         public Class<?> findClass(String name) throws ClassNotFoundException {
-            Class<?> result = classes.get(name);
+            Class<?> result = findLoadedClass(name); 
             if (null == result) { // linkage error else, due to inconsistent response (?)
                 result = findClassIntern(name);
-                classes.put(name, result);
             }
             return result;
         }
@@ -787,7 +783,7 @@ public class AppStarter {
      * @param in the input stream
      * @return the lines
      */
-    private static List<String> readLines(InputStream in) {
+    static List<String> readLines(InputStream in) {
         return new BufferedReader(new InputStreamReader(in, Charset.defaultCharset())).lines()
             .collect(Collectors.toList());
     }
