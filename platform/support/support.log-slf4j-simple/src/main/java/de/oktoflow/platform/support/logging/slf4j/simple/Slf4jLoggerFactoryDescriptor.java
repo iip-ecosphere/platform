@@ -39,6 +39,10 @@ public class Slf4jLoggerFactoryDescriptor extends SingletonPluginDescriptor<ILog
         
     }
     
+    static {
+        System.setProperty("log4j2.formatMsgNoLookups", "true");
+    }
+    
     /**
      * Creates the descriptor.
      */
