@@ -41,6 +41,8 @@ public class CleanTemp {
                 String name = f.getName();
                 boolean delete = name.startsWith("tomcat.");
                 delete |= name.startsWith("tomcat-docbase");
+                delete |= name.startsWith("undertow.");
+                delete |= name.startsWith("undertow-docbase");
                 delete |= name.startsWith("java-server");
                 delete |= name.startsWith("basyx-temp");
                 if (delete) {
