@@ -85,12 +85,24 @@ class ChildURLClassLoader extends URLClassLoader implements ChildClassLoader {
 
     @Override
     public Class<?> findClass(String name) throws ClassNotFoundException {
+        Class<?> result = findLoadedClass(name); 
+        if (null == result) {
+            result = findClassIntern(name);
+        }
+        return result;
+    }
+        
+    /**
+     * Finds a class (no caching).
+     * 
+     * @param name the qualified class name
+     * @return the class object
+     * @throws ClassNotFoundException if the class cannot be found
+     */
+    public Class<?> findClassIntern(String name) throws ClassNotFoundException {
         boolean isJava = name.startsWith("java.") || name.startsWith("javax."); // java is java
-        boolean isLogger = false; 
-//        name.startsWith("org.slf4j.") // otherwise LinkageError
-//            || name.startsWith("ch.qos.logback."); // often instanceof required
         try {
-            if (isJava || isLogger) {
+            if (isJava) {
                 return realParent.loadClass(name);
             }
         } catch (ClassNotFoundException e) {
@@ -104,6 +116,7 @@ class ChildURLClassLoader extends URLClassLoader implements ChildClassLoader {
             return realParent.loadClass(name);
         }
     }
+        
 }    
 
 /**
