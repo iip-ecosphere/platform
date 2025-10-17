@@ -21,6 +21,10 @@ import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.configuration.ivml.IvmlUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.collector.Collector;
+import de.iip_ecosphere.platform.support.logging.LogLevel;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import net.ssehub.easy.instantiation.core.model.common.ITraceFilter;
 import net.ssehub.easy.instantiation.core.model.common.NoTraceFilter;
 import net.ssehub.easy.instantiation.core.model.common.TopLevelExecutionTraceFilter;
@@ -306,6 +310,10 @@ public class PlatformInstantiator {
          * @return the descriptor
          */
         public ConfigurationLifecycleDescriptor obtainLifecycleDescriptor() {
+            // confusing output for instantiator, ok for platform service
+            LoggerFactory.getLogger(Collector.class).setLevel(LogLevel.OFF);
+            LoggerFactory.getLogger(ResourceLoader.class).setLevel(LogLevel.OFF);
+            LoggerFactory.getLogger(ConfigurationSetup.class).setLevel(LogLevel.OFF);
             return new ConfigurationLifecycleDescriptor();
         }
         

@@ -399,6 +399,12 @@ block;
         String expr = '${fallbackToNull(snk, "service.${methodName}(data)", false)}';
         m.return(new JavaCodeLambdaExpression("data").asExpr(genRcvProbe(service, expr, type, "data")));
     }
+
+    // added v2->v3
+    def generateSinkMethodBody(MeshSink snk, Connector service, String methodName, String methodSuffixWithServiceId, String type, JavaCodeMethod m) {
+        String expr = '${fallbackToNull(snk, "service.${methodName}(${type}.class, data)", false)}';
+        m.return(new JavaCodeLambdaExpression("data").asExpr(genRcvProbe(service, expr, type, "data")));
+    }
     
     // ----------------------- initial service parameters -----------------------------------------------
     

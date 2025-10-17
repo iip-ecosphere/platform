@@ -144,8 +144,15 @@ project DataTypes {
         NonEmptyString name;
         String displayName = "";
     }
+
+    compound DisplayPanel {
+        NonEmptyString name;
+        String displayName = "";
+        refTo(DisplayRow) displayRow = null;
+    }
     
     Constraint displayRowNamesUnique = allInstances(DisplayRow)->isUnique(t|t.name);
+    Constraint displayPanelNamesUnique = allInstances(DisplayPanel)->isUnique(t|t.name);
     
     compound Field {
         assign(bindingTime = BindingTime::specify) to { // may require staged freezing
@@ -159,6 +166,7 @@ project DataTypes {
             String displayName = "";
             Display display = null;
             refTo(DisplayRow) displayRow = null;
+            setOf(refTo(DisplayPanel)) displayPanel = null;
         }
         Integer cachingTime = CACHE_ALWAYS;
         Constraint isNameOk = isNameOk(self);
