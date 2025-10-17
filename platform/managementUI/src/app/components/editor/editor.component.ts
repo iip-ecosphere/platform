@@ -178,27 +178,43 @@ export class EditorComponent extends Utils implements OnInit {
    * @param event the event
    */
   public saveEventHandler(event: SaveEvent) {
-    let prop = DataUtils.getProperty(this.type?.value, event.idShort); // sub-level editor comes from an existing property, shall exist
+    let prop; // sub-level editor comes from an existing property, shall exist
+    if (this.type) {
+      prop = DataUtils.getProperty(this.type?.value, event.idShort);
+    } else {
+      prop = DataUtils.getEditorInputByName(this.uiGroups, event.idShort);
+    }
     let host;
     if (event.multipleInputs) {
       host = { value: [] };
     } else {
       host = prop;
     }
+    let resultProp: any = {};
     for (let entry in event.value) {
       let src = event.value[entry];
       if (host.value.hasOwnProperty(entry)) {
         host.value[entry] = src.value;
       } else {
         if (this.isArray(host.value)) {
-          host.value.push(src.value);
+          resultProp[entry] = src;
         } else {
           host.value[entry] = src.value;
         }
       }
     }
+
+    if (prop.value === null) {
+      prop.value = [];
+    }
     if (event.multipleInputs) {
-      prop.value.push(host);
+      let type = prop.type;
+      if (this.type) {
+        let uniGroup = DataUtils.getEditorInputByName(this.uiGroups, event.idShort);
+        type = uniGroup?.type;
+         uniGroup?.value.push({value : resultProp, _type: DataUtils.stripGenericType(type)});
+      }
+      prop.value.push({value : resultProp, _type: DataUtils.stripGenericType(type)});
     }
   }
 

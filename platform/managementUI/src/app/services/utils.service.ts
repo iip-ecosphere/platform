@@ -84,7 +84,7 @@ export class Utils {
     if (input) {
       result = input.value;
       if (input.valueTransform) {
-        result = input.valueTransform(input);
+        result = !input.value ? null : input.valueTransform(input);
       }
     }
     return result;
@@ -245,6 +245,29 @@ export class DataUtils {
     } else {
       return undefined; // null?
     }
+  }
+
+  /**
+   * Returns an EditorInput, i.e., searches for an EditorInput in uiGroup with name.
+   * 
+   * @param uiGroup[] the array of uiGroup to search
+   * @param name the EditorInput name to find 
+   * @returns the EditorInput or undefined
+   */
+  public static getEditorInputByName(
+  uiGroups: uiGroup[],
+  name: string
+  ): editorInput | undefined {
+    for (const uiGroup of uiGroups) {
+      const editor =
+        uiGroup.inputs.find((item) => item.name === name) ||
+        uiGroup.optionalInputs.find((item) => item.name === name) ||
+        uiGroup.fullLineInputs.find((item) => item.name === name) ||
+        uiGroup.fullLineOptionalInputs.find((item) => item.name === name);
+
+      if (editor) return editor;
+    }
+    return undefined;
   }
 
   /**

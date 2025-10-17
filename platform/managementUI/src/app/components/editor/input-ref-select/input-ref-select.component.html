@@ -19,7 +19,7 @@
     {{ getDisplayName(input) }} 
     <span #subEditor *ngIf="input.metaTypeKind == 10 && input.multipleInputs else other" 
       id="ref-select.inputName.subEd"> 
-      <app-subeditor-button [meta]="meta" [input]="input" matIcon="add"></app-subeditor-button>
+      <app-subeditor-button [meta]="meta" [input]="input" matIcon="add" (saveEvent)="onChildSaveEvent($event)"></app-subeditor-button>
     </span>
     <ng-template #other>
       <button mat-icon-button class="itemButton" (click)="selectElement()" id="ref-select.inputName.btn-add">

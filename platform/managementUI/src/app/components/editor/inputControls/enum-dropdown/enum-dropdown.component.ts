@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Resource, editorInput, metaTypes, MT_varValue } from 'src/interfaces';
 
 @Component({
@@ -11,9 +11,17 @@ export class EnumDropdownComponent implements OnInit {
 
   @Input() input: editorInput | undefined
   @Input() meta: Resource | undefined
-
+  @Output() valueChange = new EventEmitter<boolean>(); // the output
+  
   enum: string[] = [];
   selected: string = "";
+
+  onChange(value: string) {
+    this.selected = value;
+    if (this.input) {
+      this.input.value = value; // reflect back to parent data
+    }
+  }
 
   constructor() { }
 
