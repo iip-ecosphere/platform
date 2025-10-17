@@ -95,8 +95,8 @@ In turn, `Field` instances may be equipped with more information as summarized b
 | semanticId | Optional semantic identifier (preferred ECLASS or AAS) characterizing the type, if not given, taken over from `type` if stated there. |  _type.semanticId_  |
 | displayName | Optional display name for values represented by this field, e.g., on a dashboard. | "" |
 | display | Optional setting on how to display the field on a dashboard (`TimeSeries`, `Gauge`, `BarChart`, `Table`) | - |
-| displayRow | Optional reference to display row that shall display this field. If not given, field will occur in some default (top)-row of dashboard. | - |
-| displayRow | Optional reference to display panel that shall display this field. If not given, a field will be placed into it's own panel. If given, fields share the same panel, e.g., being displayed as multiple timeseries. | - |
+| displayRow | Optional reference to display row that shall display this field. If not given, field will occur in some default (top)-row of the dashboard. | - |
+| displayPanel | Optional set of references to display panels that shall display this field. If not given, a field will be placed into it's own panel. If given, fields share the same panel, e.g., being displayed as multiple timeseries. | - |
 
 Again, in turn, `Field` instances may specify a `DisplayRow` or a `DisplayPanel` with the following fields:
 
@@ -109,6 +109,7 @@ Again, in turn, `Field` instances may specify a `DisplayRow` or a `DisplayPanel`
 | --- | --- | --- |
 | name | Name of the panel, must be unique for all `DisplayPanel` instances. |     |
 | displayName | Optional display name for the panel. |  ""   |
+| displayRow | Optional reference to the display row that shall display this panel. If not given, the panel will occur in some default (top)-row of the dashboard. | - |
 
 Although all display related fields are optional for usual `Field` instances in a `RecordType`, because an usual `Field` shall not be displayed on a dashboard, they partially become mandatory if a `Field` shall be displayed. The following example illustrates this:
 
