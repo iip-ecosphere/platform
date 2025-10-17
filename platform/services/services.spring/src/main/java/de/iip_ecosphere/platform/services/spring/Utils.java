@@ -145,7 +145,7 @@ public class Utils {
      * @param overwrite overwriting property values, may be <b>null</b> for none
      */
     public static void initialize(ConfigurableApplicationContext applicationContext, Map<String, Object> overwrite) {
-        initialize(applicationContext.getEnvironment(), overwrite);
+        initialize(applicationContext.getEnvironment(), overwrite, null);
     }
 
     /**
@@ -154,7 +154,18 @@ public class Utils {
      * @param env the environment
      */
     public static void initialize(ConfigurableEnvironment env) {
-        initialize(env, null);
+        initialize(env, null, null);
+    }
+
+    /**
+     * Sets up a configurable environment.
+     * 
+     * @param env the environment
+     * @param ignores the properties for not to return any value although defined or overridden, may be <b>null</b> 
+     *     or empty for none
+     */
+    public static void initialize(ConfigurableEnvironment env, Iterable<String> ignores) {
+        initialize(env, null, ignores);
     }
 
     /**
@@ -162,9 +173,12 @@ public class Utils {
      * 
      * @param env the environment
      * @param overwrite overwriting property values, may be <b>null</b> for none
+     * @param ignores the properties for not to return any value although defined or overridden, may be <b>null</b> 
+     *     or empty for none
      */
-    public static void initialize(ConfigurableEnvironment env, Map<String, Object> overwrite) {
-        env.getPropertySources().addLast(new YamlPropertySource(overwrite));
+    public static void initialize(ConfigurableEnvironment env, Map<String, Object> overwrite, 
+        Iterable<String> ignores) {
+        env.getPropertySources().addLast(new YamlPropertySource(overwrite, ignores));
     }
 
 }

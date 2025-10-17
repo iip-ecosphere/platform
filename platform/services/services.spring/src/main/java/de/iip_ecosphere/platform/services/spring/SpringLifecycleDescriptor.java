@@ -20,12 +20,16 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+
 import org.springframework.boot.Banner;
 
 import de.iip_ecosphere.platform.services.ServicesAas;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.IipVersion;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
+import de.iip_ecosphere.platform.support.setup.CmdLine;
 
 /**
  * The lifecycle descriptor for the spring cloud service manager. Requires service management implementation and AAS 
@@ -42,9 +46,9 @@ public class SpringLifecycleDescriptor implements LifecycleDescriptor {
         Thread.currentThread().setContextClassLoader(SpringLifecycleDescriptor.class.getClassLoader()); 
         SpringApplication app = new SpringApplicationBuilder(SpringLifecycleDescriptor.class)
             .properties("spring.config.name:" + AbstractSetup.DEFAULT_NAME)
-            /*.initializers(c -> {
-                Utils.initialize(c.getEnvironment());                
-            })*/
+            .initializers(c -> {
+                Utils.initialize(c.getEnvironment(), () -> Arrays.stream(CmdLine.extractArgNames(args)).iterator());
+            })
             .build();
         app.setBannerMode(Banner.Mode.OFF);        
         app.setResourceLoader(new DefaultResourceLoader(SpringLifecycleDescriptor.class.getClassLoader()));        

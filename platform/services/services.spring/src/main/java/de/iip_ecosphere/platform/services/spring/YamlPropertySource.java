@@ -14,7 +14,9 @@ package de.iip_ecosphere.platform.services.spring;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.text.StringTokenizer;
@@ -31,19 +33,31 @@ public class YamlPropertySource extends PropertySource<String> {
 
     private Map<String, Object> properties;
     private Pattern kebabPattern = Pattern.compile("-(.)");
-    private Map<String, Object> overwrite;
+    private Map<String, Object> overwrite = new HashMap<>();
+    private Set<String> ignore = new HashSet<>();
 
     /**
      * Constructs a property source.
      */
     public YamlPropertySource() {
-        this(null);
+        this(null, null);
     }
 
     /**
      * Constructs a property source.
      */
     public YamlPropertySource(Map<String, Object> overwrite) {
+        this(overwrite, null);
+    }
+
+    /**
+     * Constructs a property source.
+     * 
+     * @param overwrite properties to overwrite as full-name/value pairs, may be <b>null</b> for none
+     * @param ignore properties in full-name to ignore and to return no value at all, e.g., as defined via command line;
+     *    may be <b>null</b> or empty for none
+     */
+    public YamlPropertySource(Map<String, Object> overwrite, Iterable<String> ignore) {
         super("oktoflow YAML");
         try {
             properties = AbstractSetup.readMappingFromYaml();
@@ -51,7 +65,10 @@ public class YamlPropertySource extends PropertySource<String> {
             properties = new HashMap<>();
         }
         if (null != overwrite) {
-            overwrite.putAll(overwrite);
+            this.overwrite.putAll(overwrite);
+        }
+        if (null != ignore) {
+            ignore.forEach(ig -> this.ignore.add(ig));
         }
     }
 
@@ -59,27 +76,29 @@ public class YamlPropertySource extends PropertySource<String> {
     @Override
     public Object getProperty(String name) {
         Object result = null;
-        Map<String, Object> prop = properties;
-        StringTokenizer parts = new StringTokenizer(name, ".");
-        while (parts.hasNext()) {
-            String key = parts.next();
-            Object tmp = prop.get(key);
-            if (tmp == null) {
-                key = kebabPattern.matcher(key).replaceAll(mr -> mr.group(1).toUpperCase());
-                tmp = prop.get(key);
-            }
-            if (parts.hasNext()) {
-                if (tmp instanceof Map) {
-                    prop = (Map<String, Object>) tmp;
-                } else {
-                    break;
+        if (!ignore.contains(name)) {
+            Map<String, Object> prop = properties;
+            StringTokenizer parts = new StringTokenizer(name, ".");
+            while (parts.hasNext()) {
+                String key = parts.next();
+                Object tmp = prop.get(key);
+                if (tmp == null) {
+                    key = kebabPattern.matcher(key).replaceAll(mr -> mr.group(1).toUpperCase());
+                    tmp = prop.get(key);
                 }
-            } else {
-                result = tmp;
+                if (parts.hasNext()) {
+                    if (tmp instanceof Map) {
+                        prop = (Map<String, Object>) tmp;
+                    } else {
+                        break;
+                    }
+                } else {
+                    result = tmp;
+                }
             }
-        }
-        if (null != overwrite && overwrite.containsKey(name)) {
-            result = overwrite.get(name);
+            if (null != overwrite && overwrite.containsKey(name)) {
+                result = overwrite.get(name);
+            }
         }
         return result;
     }
