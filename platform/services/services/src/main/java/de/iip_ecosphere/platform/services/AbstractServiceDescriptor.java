@@ -211,7 +211,7 @@ public abstract class AbstractServiceDescriptor<A extends ArtifactDescriptor> im
                 // may fail, e.g., shutdown may just be faster, keep local; handover needed
                 if (state != ServiceState.STOPPED && state != ServiceState.UNDEPLOYING) {
                     LoggerFactory.getLogger(getClass()).info("Cannot set state {} for service '{}' via AAS. "
-                        + "Falling back to local state. Resason: {} {}", state, getId(), e.getClass(), e.getMessage());
+                        + "Falling back to local state. Reason: {} {}", state, getId(), e.getClass(), e.getMessage());
                 } // else: probably AAS server already gone, ignore
             }
         }

@@ -716,11 +716,15 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
     /**
      * Checks for service instances regarding application id and application instance id. If needed, creates instances 
      * using existing service descriptors as templates via 
-     * {@link #instantiateFromTemplate(AbstractServiceDescriptor, String)}.
+     * {@link #instantiateFromTemplate(AbstractServiceDescriptor, String)}. Call 
+     * {@link #handleInstantiatedServices(Iterable)} on the result, immediately or after further initializations are 
+     * done.
      * 
      * @param sId service ids to check
+     * @return the instantiated services
      */
-    protected void checkServiceInstances(String[] sId) {
+    protected List<String> checkServiceInstances(String[] sId) {
+        List<String> instantiated = new ArrayList<>();
         for (String id: sId) {
             if (null == getService(id)) {
                 S template = null;
@@ -747,9 +751,21 @@ public abstract class AbstractServiceManager<A extends AbstractArtifactDescripto
                         + "to instantiate.", id);
                 } else {
                     instantiateFromTemplate(template, id);
-                    ServicesAas.notifyServiceAdded(getService(id));
+                    instantiated.add(id);
                 }
             }
+        }
+        return instantiated;
+    }
+    
+    /**
+     * Handles the services instantiated in {@link #checkServiceInstances(String[])} by adding them to the Services AAS.
+     * 
+     * @param sId the instantiated service ids, may be empty
+     */
+    protected void handleInstantiatedServices(Iterable<String> sId) {
+        for (String id : sId) {
+            ServicesAas.notifyServiceAdded(getService(id));
         }
     }
 
