@@ -227,7 +227,7 @@ public class ArtifactResolver {
         String artId = artifact.getId();
         File jar = artifact.getJar();
         if (isSpringJar()) { 
-            getLogger().info("Creating Spring classloader for {}/{}", artId, jar);
+            getLogger().info("Creating Spring classloader for {}:{}", artId, jar);
             try {
                 loader = DescriptorUtils.createClassLoader(jar);
             } catch (Exception e) {

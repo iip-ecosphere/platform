@@ -273,7 +273,6 @@ public class DescriptorUtils {
         result = new ArrayList<String>();
         result.add("java");
         result.add("-jar");
-        result.add("-Dlog4j2.formatMsgNoLookups=true");
         result.add("--add-opens=java.base/java.lang=ALL-UNNAMED"); // JDK 17
         Starter.addAppEnvironment(result);
         result.add(jar.getAbsolutePath());

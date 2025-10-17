@@ -361,13 +361,29 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
      * @return the spring managed server address
      */
     ManagedServerAddress registerNetworkPorts() {
-        NetworkManager mgr = NetworkManagerFactory.getInstance();
-        ManagedServerAddress springAddr = registerPort(mgr, "spring_" + getId());
-        if (null == adminAddr) {
-            adminAddr = registerPort(mgr, Starter.getServiceCommandNetworkMgrKey(getId()));
+        ManagedServerAddress springAddr;
+        if (null == ensembleLeader) {
+            NetworkManager mgr = NetworkManagerFactory.getInstance();
+            springAddr = registerPort(mgr, "spring_" + getId());
+            if (null == adminAddr) {
+                adminAddr = registerPort(mgr, Starter.getServiceCommandNetworkMgrKey(getId()));
+                executeAction(Action.COMMUNICATION_DETERMINED);
+            }
+        } else {
+            springAddr = ensembleLeader.adminAddr; // registration shall happen there
             executeAction(Action.COMMUNICATION_DETERMINED);
         }
         return springAddr;
+    }
+   
+    /**
+     * Returns the address for the admin service/asset. {@link #registerNetworkPorts()} must have been called before
+     * or an {@link #ensembleLeader} must have been set.
+     * 
+     * @return the admin address, may be <b>null</b> if not assigned before
+     */
+    ManagedServerAddress getAdminAddr() {
+        return null == ensembleLeader ? adminAddr : ensembleLeader.adminAddr;
     }
     
     /**
@@ -400,7 +416,7 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
         ManagedServerAddress springAddr = registerNetworkPorts();
         appProps.put("server.port", String.valueOf(springAddr.getPort())); // shall work, not another cmd arg
         serviceProtocol = config.getServiceProtocol();
-        List<String> cmdLine = collectCmdArguments(config, adminAddr.getPort(), serviceProtocol);
+        List<String> cmdLine = collectCmdArguments(config, getAdminAddr().getPort(), serviceProtocol);
         for (Relation r : service.getRelations()) {
             Endpoint endpoint = r.getEndpoint();
             if (r.getChannel().length() == 0) {
