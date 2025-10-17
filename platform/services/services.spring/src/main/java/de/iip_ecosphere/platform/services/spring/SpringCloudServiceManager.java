@@ -365,7 +365,13 @@ public class SpringCloudServiceManager
                 }
             }
             for (String sId : serviceIds) {
-                mgr.getService(sId).setAdditionalArguments(argList); // set/reset
+                ServiceDescriptor sd = mgr.getService(sId);
+                if (sd != null) {
+                    sd.setAdditionalArguments(argList); // set/reset
+                } else {
+                    LoggerFactory.getLogger(SpringCloudServiceManager.class).info(
+                        "Cannot set options on service {} as service is null", sId);
+                }
             }
         }
     }
@@ -549,10 +555,11 @@ public class SpringCloudServiceManager
         serverManager.startServers(options, getArtifacts());
         serviceIds = registerNetworkPorts(pruneServers(this, serviceIds));
         
-        checkServiceInstances(serviceIds);
+        List<String> instServiceIds = checkServiceInstances(serviceIds);
         serviceIds = topLevel(this, serviceIds); // avoid accidentally accessing family members
         LOGGER.info("Preparing to start top-level services {} (options {})", Arrays.toString(serviceIds), options);
         handleOptions(options, serviceIds);
+        handleInstantiatedServices(instServiceIds); // after handle options, i.e., turning services to ensemble leaders
         AppDeployer deployer = getDeployer();
         // TODO add/check causes for failing, potentially re-sort remaining services iteratively 
         List<String> errors = new ArrayList<>();
@@ -628,9 +635,21 @@ public class SpringCloudServiceManager
         String serviceId) {
         SpringCloudServiceDescriptor result = template.instantiate(serviceId);
         result.getArtifact().addService(result);
-        result.registerNetworkPorts();
         return result;
     }
+    
+    @Override
+    protected void handleInstantiatedServices(Iterable<String> sId) {
+        // must happen after all templates/services are instantiated but before the AAS is modified
+        for (String id : sId) {
+            SpringCloudServiceDescriptor desc = getService(id);
+            if (null != desc) { 
+                desc.registerNetworkPorts();
+            }
+        }
+        // modify AAS
+        super.handleInstantiatedServices(sId);
+    }    
     
     /**
      * Returns the specified memory limit of {@code sIds} given in service descriptors or {@code options}.
