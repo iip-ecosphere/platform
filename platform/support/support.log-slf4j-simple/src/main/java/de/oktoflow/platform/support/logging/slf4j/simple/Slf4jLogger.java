@@ -23,6 +23,7 @@ import de.iip_ecosphere.platform.support.logging.Logger;
 public class Slf4jLogger implements Logger {
 
     private org.slf4j.Logger logger;
+    private LogLevel level = LogLevel.ALL;
 
     /**
      * Creates a wrapping logger.
@@ -35,132 +36,145 @@ public class Slf4jLogger implements Logger {
     
     @Override
     public boolean setLevel(LogLevel level) {
-        return false;
+        this.level = level;
+        return true;
     }
 
+    /**
+     * Execute {@code func} if the given level is enabled.
+     * 
+     * @param level the target logging level
+     * @param func the function to execute
+     */
+    private void ifEnabled(LogLevel level, Runnable func) {
+        if (level.isEnabled(this.level)) {
+            func.run();
+        }
+    }    
+    
     @Override
     public void trace(String msg) {
-        logger.trace(msg);
+        ifEnabled(LogLevel.TRACE, () -> logger.trace(msg));
     }
 
     @Override
     public void trace(String format, Object arg) {
-        logger.trace(format, arg);
+        ifEnabled(LogLevel.TRACE, () -> logger.trace(format, arg));
     }
 
     @Override
     public void trace(String format, Object arg1, Object arg2) {
-        logger.trace(format, arg1, arg2);
+        ifEnabled(LogLevel.TRACE, () -> logger.trace(format, arg1, arg2));
     }
 
     @Override
     public void trace(String format, Object... arguments) {
-        logger.trace(format, arguments);
+        ifEnabled(LogLevel.TRACE, () -> logger.trace(format, arguments));
     }
 
     @Override
     public void trace(String msg, Throwable th) {
-        logger.trace(msg, th);
+        ifEnabled(LogLevel.TRACE, () -> logger.trace(msg, th));
     }
 
     @Override
     public void debug(String msg) {
-        logger.debug(msg);
+        ifEnabled(LogLevel.DEBUG, () -> logger.debug(msg));
     }
 
     @Override
     public void debug(String format, Object arg) {
-        logger.debug(format, arg);
+        ifEnabled(LogLevel.DEBUG, () -> logger.debug(format, arg));
     }
 
     @Override
     public void debug(String format, Object arg1, Object arg2) {
-        logger.debug(format, arg1, arg2);
+        ifEnabled(LogLevel.DEBUG, () -> logger.debug(format, arg1, arg2));
     }
 
     @Override
     public void debug(String format, Object... arguments) {
-        logger.debug(format, arguments);
+        ifEnabled(LogLevel.DEBUG, () -> logger.debug(format, arguments));
     }
 
     @Override
     public void debug(String msg, Throwable th) {
-        logger.debug(msg, th);
+        ifEnabled(LogLevel.DEBUG, () -> logger.debug(msg, th));
     }
 
     @Override
     public void info(String msg) {
-        logger.info(msg);
+        ifEnabled(LogLevel.INFO, () -> logger.info(msg));
     }
 
     @Override
     public void info(String format, Object arg) {
-        logger.info(format, arg);
+        ifEnabled(LogLevel.INFO, () -> logger.info(format, arg));
     }
 
     @Override
     public void info(String format, Object arg1, Object arg2) {
-        logger.info(format, arg1, arg2);
+        ifEnabled(LogLevel.INFO, () -> logger.info(format, arg1, arg2));
     }
 
     @Override
     public void info(String format, Object... arguments) {
-        logger.info(format, arguments);
+        ifEnabled(LogLevel.INFO, () -> logger.info(format, arguments));
     }
 
     @Override
     public void info(String msg, Throwable th) {
-        logger.info(msg, th);
+        ifEnabled(LogLevel.INFO, () -> logger.info(msg, th));
     }
 
     @Override
     public void warn(String msg) {
-        logger.warn(msg);
+        ifEnabled(LogLevel.WARN, () -> logger.warn(msg));
     }
 
     @Override
     public void warn(String format, Object arg) {
-        logger.warn(format, arg);
+        ifEnabled(LogLevel.WARN, () -> logger.warn(format, arg));
     }
 
     @Override
     public void warn(String format, Object arg1, Object arg2) {
-        logger.warn(format, arg1, arg2);
+        ifEnabled(LogLevel.WARN, () -> logger.warn(format, arg1, arg2));
     }
 
     @Override
     public void warn(String format, Object... arguments) {
-        logger.warn(format, arguments);
+        ifEnabled(LogLevel.WARN, () -> logger.warn(format, arguments));
     }
 
     @Override
     public void warn(String msg, Throwable th) {
-        logger.warn(msg, th);
+        ifEnabled(LogLevel.WARN, () -> logger.warn(msg, th));
     }
 
     @Override
     public void error(String msg) {
-        logger.error(msg);
+        ifEnabled(LogLevel.ERROR, () -> logger.error(msg));
     }
 
     @Override
     public void error(String format, Object arg) {
-        logger.error(format, arg);
+        ifEnabled(LogLevel.ERROR, () -> logger.error(format, arg));
     }
 
     @Override
     public void error(String format, Object arg1, Object arg2) {
-        logger.error(format, arg1, arg2);
+        ifEnabled(LogLevel.ERROR, () -> logger.error(format, arg1, arg2));
     }
 
     @Override
     public void error(String format, Object... arguments) {
-        logger.error(format, arguments);
+        ifEnabled(LogLevel.ERROR, () -> logger.error(format, arguments));
     }
 
     @Override
     public void error(String msg, Throwable th) {
-        logger.error(msg, th);
+        ifEnabled(LogLevel.ERROR, () -> logger.error(msg, th));
     }
 
 }
