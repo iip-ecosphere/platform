@@ -132,7 +132,7 @@
           <ng-template #ref>
             <mat-card appearance="outlined" [ngClass]="input.multipleInputs? 'inputBox custom' : 'refInput custom'">
                 <span hidden id="inputName">{{ getDisplayName(input) }}</span> <!-- for tests -->
-                <app-input-ref-select [activeTextinput]="true" [input]="input" [meta]="metaBackup">
+                <app-input-ref-select [activeTextinput]="true" [input]="input" [meta]="metaBackup" (saveEvent)="saveEventHandler($event)">
                 </app-input-ref-select>
             </mat-card>
           </ng-template>
@@ -144,7 +144,7 @@
             <span hidden id="inputName"> <!-- for tests -->
               {{ getDisplayName(input) }} 
             </span>
-            <app-input-ref-select [meta]="metaBackup" [activeTextinput]="true" [input]="input">
+            <app-input-ref-select [meta]="metaBackup" [activeTextinput]="true" [input]="input" (saveEvent)="saveEventHandler($event)">
             </app-input-ref-select>
           </mat-card>
         </div>
@@ -189,7 +189,7 @@
                 <!--<span class="inputLabel">{{ getDisplayName(input) }}
                   <button mat-icon-button class="itemButton"><mat-icon>cancel</mat-icon></button>
                 </span>-->
-                <app-input-ref-select [activeTextinput]="true" [input]="input" [meta]="metaBackup">
+                <app-input-ref-select [activeTextinput]="true" [input]="input" [meta]="metaBackup" (saveEvent)="saveEventHandler($event)">
                 </app-input-ref-select>
             </ng-template>
           </mat-card>
@@ -199,7 +199,7 @@
           <div *ngFor="let input of uiGroup.fullLineOptionalInputs">
             <mat-card appearance="outlined" class="refInput custom">
               <!--<p class="inputLabel">{{ getDisplayName(input) }}</p>-->
-              <app-input-ref-select [activeTextinput]="true" [input]="input" [meta]="metaBackup">
+              <app-input-ref-select [activeTextinput]="true" [input]="input" [meta]="metaBackup" (saveEvent)="saveEventHandler($event)">
               </app-input-ref-select>
             </mat-card>
           </div>

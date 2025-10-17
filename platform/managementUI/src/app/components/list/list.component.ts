@@ -515,6 +515,8 @@ export class ListComponent extends Utils implements OnInit {
       let component = dialogRef.componentInstance;
       component.category = this.currentTab;
       component.selectedType = this.selectedType;
+      component.meta = this.meta;
+      component.metaBackup = this.metaBackup;
       if (component.generateInputs) { // fails in tests
         component.generateInputs();
       }

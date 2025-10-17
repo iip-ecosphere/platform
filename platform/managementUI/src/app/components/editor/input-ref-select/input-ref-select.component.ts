@@ -1,5 +1,5 @@
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
-import { Resource, editorInput, configMeta, metaTypes, DR_type } from 'src/interfaces';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { Resource, editorInput, configMeta, metaTypes, DR_type, IvmlRecordValue } from 'src/interfaces';
 import { DataUtils, EditorPartition, Utils, WIDTH_CARD, WIDTH_CARD_GRID } from 'src/app/services/utils.service';
 import { EditorComponent } from '../editor.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -18,7 +18,8 @@ export class InputRefSelectComponent extends Utils implements OnInit {
   @Input() input: editorInput = {name: '', type: '', description: [{text: '', language: ''}], refTo: true, value: undefined, isReadOnly: false};
   @Input() meta: Resource | undefined;
   @Input() rows: number = -1; // unset, calculate
-
+  @Output() saveEvent = new EventEmitter<SaveEvent>();
+  
   textInput: string | null = null;
   isSetOf = false;
   isSequenceOf = false;
@@ -142,9 +143,9 @@ export class InputRefSelectComponent extends Utils implements OnInit {
   public addFromRef() {
     if (this.selectedRef && this.selectedRef.idShort) {
       if (this.isSetOf) {
-        this.input.value.push('refTo(' + this.selectedRef.idShort + ')');
+        this.input.value.push(this.selectedRef.idShort);
       } else {
-        this.input.value = 'refTo(' + this.selectedRef.idShort + ')';
+        this.input.value = this.selectedRef.idShort;
       }
     }
   }
@@ -232,4 +233,14 @@ export class InputRefSelectComponent extends Utils implements OnInit {
     }
   }
 
+  onChildSaveEvent(event: SaveEvent) {
+    // Optionally, do something with the event first
+    this.saveEvent.emit(event); // forwards to grandparent
+  }
+}
+
+export interface SaveEvent {
+  idShort: string;
+  value: IvmlRecordValue; 
+  multipleInputs?: boolean;
 }

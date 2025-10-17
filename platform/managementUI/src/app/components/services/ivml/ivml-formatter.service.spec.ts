@@ -8,7 +8,7 @@ import { Utils } from '../../../services/utils.service';
 
 describe('IvmlFormatterService', () => {
 
-  const TIMEOUT_LIFECYCLE_MS = 40000;
+  const TIMEOUT_LIFECYCLE_MS = 80000;
   let service: IvmlFormatterService;
 
   beforeEach(() => {

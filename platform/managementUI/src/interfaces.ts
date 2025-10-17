@@ -484,6 +484,8 @@ export const IVML_TYPE_Real = "Real";
 export const IVML_TYPE_Integer = "Integer";
 export const primitiveDataTypes = [IVML_TYPE_String, IVML_TYPE_Boolean, IVML_TYPE_Real, IVML_TYPE_Integer];
 
+export const IVML_TYPE_NonEmptyString = "NonEmptyString";
+
 export const IVML_TYPE_PREFIX_enumeration = "IvmlEnumeration:";  
 
 /*
