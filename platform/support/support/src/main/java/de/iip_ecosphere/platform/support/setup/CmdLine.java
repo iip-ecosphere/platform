@@ -195,5 +195,27 @@ public class CmdLine {
         return CmdLine.getBooleanArg(args, argName, false) 
                 || CmdLine.hasArgument(args, argName, true, false);
     }
-
+    
+    /**
+     * Extracts the argument names of those arguments complying with {@link #PARAM_PREFIX} and {@link #PARAM_VALUE_SEP} 
+     * from {@code args}.
+     * 
+     * @param args the arguments
+     * @return the extracted complying argument names, no values are contained; may be empty for no complying args
+     */
+    public static String[] extractArgNames(String[] args) {
+        List<String> names = new ArrayList<>();
+        for (String a: args) {
+            if (a.startsWith(CmdLine.PARAM_PREFIX)) {
+                a = a.substring(2);
+                int pos = a.indexOf(CmdLine.PARAM_VALUE_SEP);
+                if (pos > 0) {
+                    a = a.substring(0, pos);
+                }
+                names.add(a);
+            }
+        }
+        return names.toArray(new String[names.size()]);
+    }
+    
 }

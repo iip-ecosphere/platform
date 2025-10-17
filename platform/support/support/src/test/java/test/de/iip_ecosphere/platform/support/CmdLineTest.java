@@ -138,4 +138,26 @@ public class CmdLineTest {
         Assert.assertFalse(CmdLine.getBooleanArgNoVal(new String[] {"--repo=false"}, "repo", false));
     }
 
+    /**
+     * Tests {@link CmdLine#extractArgNames(String[])}.
+     */
+    @Test
+    public void testExtractArgs() {
+        String[] names = CmdLine.extractArgNames(new String[] {});
+        Assert.assertNotNull(names);
+        Assert.assertEquals(0, names.length);
+
+        names = CmdLine.extractArgNames(new String[] {"--repo1"});
+        Assert.assertNotNull(names);
+        Assert.assertArrayEquals(new String[] {"repo1"}, names);
+
+        names = CmdLine.extractArgNames(new String[] {"--repo1=myRepo"});
+        Assert.assertNotNull(names);
+        Assert.assertArrayEquals(new String[] {"repo1"}, names);
+
+        names = CmdLine.extractArgNames(new String[] {"--repo1=myRepo", "--repo1.active=true", "-Djava=true"});
+        Assert.assertNotNull(names);
+        Assert.assertArrayEquals(new String[] {"repo1", "repo1.active"}, names);
+    }
+
 }
