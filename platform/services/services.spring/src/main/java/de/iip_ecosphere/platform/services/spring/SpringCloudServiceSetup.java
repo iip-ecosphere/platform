@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.services.spring;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -20,7 +21,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import de.iip_ecosphere.platform.services.ServiceSetup;
-import de.iip_ecosphere.platform.support.CollectionUtils;
 
 /**
  * Configures the service manager.
@@ -39,7 +39,7 @@ public class SpringCloudServiceSetup extends ServiceSetup {
     private int waitingTime = 120000;
     private int availabilityRetryDelay = 500;
     private HashMap<String, String> executables = new HashMap<String, String>();
-    private List<String> javaOpts = CollectionUtils.toList("-Dlog4j2.formatMsgNoLookups=true"); 
+    private List<String> javaOpts = new ArrayList<>(); 
     private File sharedLibs = new File("/shared"); // preliminary default
 
     /**

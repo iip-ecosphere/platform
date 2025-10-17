@@ -41,6 +41,7 @@ import de.iip_ecosphere.platform.services.ServiceManager;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceSetup;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
 import de.iip_ecosphere.platform.services.spring.StartupApplicationListener;
+import de.iip_ecosphere.platform.services.spring.Utils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
@@ -108,6 +109,7 @@ public class ServerStartStopServiceManagerTest extends AbstractTestServiceManage
         
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
+            Utils.initialize(applicationContext);
         }
         
     }

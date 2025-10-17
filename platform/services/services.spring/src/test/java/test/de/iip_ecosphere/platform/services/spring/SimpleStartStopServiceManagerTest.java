@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -25,7 +24,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 import org.springframework.cloud.deployer.spi.local.LocalAppDeployer;
 import org.springframework.cloud.deployer.spi.local.LocalDeployerProperties;
@@ -48,6 +46,7 @@ import de.iip_ecosphere.platform.services.spring.SpringCloudServiceDescriptor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
 import de.iip_ecosphere.platform.services.spring.StartupApplicationListener;
 import de.iip_ecosphere.platform.services.spring.descriptor.ProcessSpec;
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
@@ -178,9 +177,7 @@ public class SimpleStartStopServiceManagerTest extends AbstractTestServiceManage
         
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
-            TestPropertyValues
-                .of("service-mgr.brokerPort=" + BROKER.getPort())
-                .applyTo(applicationContext);
+            AbstractTestServiceManager.initialize(applicationContext, BROKER);
         }
         
     }
@@ -216,8 +213,8 @@ public class SimpleStartStopServiceManagerTest extends AbstractTestServiceManage
      */
     @Test
     public void testSetup() {
-        Assert.assertNotNull(getConfig().getJavaOpts());
-        Assert.assertTrue(getConfig().getJavaOpts().size() > 0);
+        Assert.assertNotNull(getConfig().getJavaOpts()); // default changed -> plugin
+        Assert.assertEquals(500, getConfig().getAvailabilityRetryDelay()); // see src/test/resources/iipecosphere.yml
     }
 
 }

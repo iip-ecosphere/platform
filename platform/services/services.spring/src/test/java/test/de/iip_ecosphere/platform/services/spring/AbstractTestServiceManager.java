@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.util.TestPropertyValues;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import de.iip_ecosphere.platform.services.ArtifactDescriptor;
 import de.iip_ecosphere.platform.services.ServiceDescriptor;
@@ -51,6 +53,7 @@ import de.iip_ecosphere.platform.services.spring.SpringCloudArtifactDescriptor;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceManager;
 import de.iip_ecosphere.platform.services.spring.SpringCloudServiceSetup;
 import de.iip_ecosphere.platform.services.spring.SpringInstances;
+import de.iip_ecosphere.platform.services.spring.Utils;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.FileUtils;
@@ -137,6 +140,7 @@ public class AbstractTestServiceManager extends AbstractTest {
         TestWithQpid.loadPlugins();
         server = TestWithQpid.fromPlugin(broker); // prescribes protocol for artifacts
         // spring is too late, AbstractSetup does not load it even with modified constructor...
+        ServiceFactory.setYamlPath("service-mgr");
         TransportSetup setup = ServiceFactory.getTransport();
         setup.setPort(broker.getPort());
         setup.setHost("localhost");
@@ -160,14 +164,20 @@ public class AbstractTestServiceManager extends AbstractTest {
         aasServer.start();
         
         int aasRegPort = AasPartRegistry.getSetup().getRegistry().getPort();
+        int smRegPort = AasPartRegistry.getSetup().getSubmodelRegistry().getPort();
         int aasPort = AasPartRegistry.getSetup().getServer().getPort();
+        int smPort = AasPartRegistry.getSetup().getSubmodelServer().getPort();
+        System.out.println("AAS repository on port " + aasPort);
+        System.out.println("SM repository on port " + smPort);
         System.out.println("AAS registry on port " + aasRegPort);
-        System.out.println("AAS server on port " + aasPort);
+        System.out.println("SM registry on port " + smRegPort);
 
         // additional arguments that AAS can be reached from service
         SpringInstances.setServiceCmdArgs(CollectionUtils.toList(
             CmdLine.composeArgument(Starter.PARAM_IIP_TEST_AAS_PORT, aasPort),
-            CmdLine.composeArgument(Starter.PARAM_IIP_TEST_AASREG_PORT, aasRegPort)));
+            CmdLine.composeArgument(Starter.PARAM_IIP_TEST_SM_PORT, smPort),
+            CmdLine.composeArgument(Starter.PARAM_IIP_TEST_AASREG_PORT, aasRegPort),
+            CmdLine.composeArgument(Starter.PARAM_IIP_TEST_SMREG_PORT, smRegPort)));
         
         System.out.println("Gateway server");
         gatewayServer = TransportConverterFactory.getInstance().createServer(null, setup).start();
@@ -352,8 +362,6 @@ public class AbstractTestServiceManager extends AbstractTest {
         Submodel sub = aas.getSubmodel(ServicesAas.NAME_SUBMODEL);
         Assert.assertNotNull(sub);
         sub.accept(new AasPrintVisitor());
-
-        TimeUtils.sleep(8000);
         
         Map<String, Predicate<Object>> expectedMetrics = new HashMap<>();
         expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_TOTAL, POSITIVE_GAUGE_VALUE);
@@ -590,6 +598,24 @@ public class AbstractTestServiceManager extends AbstractTest {
         mgr.stopService("simpleStream-create", "simpleStream-log");
         mgr.removeArtifact(aid);
         System.setProperty(ClasspathJavaCommandBuilder.PROP_ZIP_CLASSPATH, prop);
+    }
+
+    /**
+     * Initializes the application context for testing.
+     * 
+     * @param applicationContext the application context
+     * @param broker the broker address
+     */
+    protected static void initialize(ConfigurableApplicationContext applicationContext, ServerAddress broker) {
+        Map<String, Object> overwrite = new HashMap<>();
+        overwrite.put("service-mgr.brokerPort", broker.getPort());
+        overwrite.put("service-mgr.transport.port", broker.getPort());
+        Utils.initialize(applicationContext, overwrite);
+        TestPropertyValues
+            .of("service-mgr.brokerPort=" + broker.getPort(), 
+                "service-mgr.transport.port=" + broker.getPort(),
+                "logging.level.org.apache.catalina.core.ContainerBase=WARN")
+            .applyTo(applicationContext);
     }
 
 }
