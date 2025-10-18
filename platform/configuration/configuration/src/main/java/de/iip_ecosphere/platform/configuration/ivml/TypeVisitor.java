@@ -113,7 +113,7 @@ class TypeVisitor implements IDatatypeVisitor {
 
     @Override
     public void visitRealType(RealType type) {
-        aasType = Type.FLOAT; // no real in AAS
+        aasType = Type.DOUBLE; // no real in AAS, IVML real = double
     }
 
     @Override
