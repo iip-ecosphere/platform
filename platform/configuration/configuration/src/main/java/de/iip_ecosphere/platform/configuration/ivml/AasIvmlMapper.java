@@ -88,7 +88,6 @@ import net.ssehub.easy.varModel.model.datatypes.DerivedDatatype;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
 import net.ssehub.easy.varModel.model.datatypes.TypeQueries;
 import net.ssehub.easy.varModel.model.values.ContainerValue;
-import net.ssehub.easy.varModel.model.values.NullValue;
 import net.ssehub.easy.varModel.model.values.ReferenceValue;
 import net.ssehub.easy.varModel.model.values.Value;
 import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
@@ -1427,8 +1426,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         if (variableFilter.test(var.getDeclaration())) {
             AbstractVariable decl = var.getDeclaration();
             String varName = decl.getName();
-            IDatatype varType = null == var.getValue() || var.getValue() == NullValue.INSTANCE 
-                ? decl.getType() : var.getValue().getType(); // prefer dynamic type
+            IDatatype varType = null == var.getValue() ? decl.getType() : var.getValue().getType();
+            //**IDatatype varType = null == var.getValue() || var.getValue() == NullValue.INSTANCE 
+            //**    ? decl.getType() : var.getValue().getType(); // prefer dynamic type
             IDatatype rVarType = DerivedDatatype.resolveToBasis(varType);
             String lang = getLang();
             String semanticId = null;
@@ -1468,7 +1468,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 String propName = id == null ? varName : id;
                 varBuilder = builder.createSubmodelElementCollectionBuilder(AasUtils.fixId(propName));
                 Object aasValue = getValue(var);
-                varType.accept(TYPE_VISITOR); // resolved anyway
+                varType.getType().accept(TYPE_VISITOR); // resolved anyway
+                //**varType.accept(TYPE_VISITOR); // resolved anyway
                 Type aasType = TYPE_VISITOR.getAasType();
                 // prop name "value" is/was reserved by BaSyx/AAS
                 PropertyBuilder pb = varBuilder.createPropertyBuilder(AasUtils.fixId("varValue")); 

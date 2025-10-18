@@ -210,7 +210,9 @@ public class ConfigurationManager {
         if (!initialized) {
             if (null != executor) {
                 try {
+                    long start = System.currentTimeMillis();
                     executor.loadIvmlModel();
+                    getLogger().info("Loaded EASy-Producer models in {} ms", System.currentTimeMillis() - start);
                 } catch (ModelManagementException e) {
                     getLogger().error("Cannot load EASy-Producer models: " + e.getMessage());
                 }
@@ -230,10 +232,12 @@ public class ConfigurationManager {
     public static void reload() {
         if (null != executor) {
             try {
+                long start = System.currentTimeMillis();
                 executor.discardLocations();
                 executor.clearModels();
                 executor.setupLocations();
                 executor.loadIvmlModel();
+                getLogger().info("Reoaded EASy-Producer models in {} ms", System.currentTimeMillis() - start);
             } catch (ModelManagementException e) {
                 getLogger().error("Cannot load EASy-Producer models: " + e.getMessage());
             }
@@ -315,8 +319,11 @@ public class ConfigurationManager {
         init();
         try {
             if (executor != null) {
+                long start = System.currentTimeMillis();
                 executor.setReasoningProjectFilter(null == projectFilter ? p -> true : projectFilter);
-                return executor.propagateOnIvmlModel();
+                ReasoningResult result = executor.propagateOnIvmlModel();
+                getLogger().info("EASy-Producer model reasoning done in {} ms", System.currentTimeMillis() - start);
+                return result;
             } else {
                 return null;
             }
@@ -356,8 +363,10 @@ public class ConfigurationManager {
         init();
         if (executor != null) {
             try {
+                long start = System.currentTimeMillis();
                 executor.setVilStartRuleName(startRuleName);
                 executor.executeVil();
+                getLogger().info("EASy-Producer instantiation done in {} ms", System.currentTimeMillis() - start);
             } catch (ModelManagementException | VilException | IllegalStateException e) {
                 throw new ExecutionException(e);
             } catch (Throwable e) { // not nice but if something goes wrong with the reasoner...
