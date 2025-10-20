@@ -216,8 +216,16 @@ public class ClasspathJavaCommandBuilder extends JavaCommandBuilder {
      */
     private boolean checkCpFile(File cpFile, AppDeploymentRequest request, File workDir) {
         boolean result = false;
-        if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_9) 
-            && Boolean.valueOf(System.getProperty(PROP_ZIP_CLASSPATH, "true"))) {
+        boolean propZipClasspath = Boolean.valueOf(System.getProperty(PROP_ZIP_CLASSPATH, "true"));
+        if (!propZipClasspath && cpFile.getName().equals("classpath")) {
+            File cpFileApp = new File(cpFile.getParentFile(), "classpath-app"); // isolated spring packaging?
+            if (cpFileApp.exists()) {
+                LoggerFactory.getLogger(ClasspathJavaCommandBuilder.class).info("Isolated packaging detected. "
+                    + "Reading classpath from file. Ignoring -D{}", PROP_ZIP_CLASSPATH);
+                propZipClasspath = true;
+            }
+        }
+        if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_9) && propZipClasspath) {
             try {
                 String classpath = FileUtils.readFileToString(cpFile, StandardCharsets.UTF_8);
                 String mainJars = "";
@@ -275,8 +283,8 @@ public class ClasspathJavaCommandBuilder extends JavaCommandBuilder {
                     commands.add("-cp");
                     commands.add(classpath);
                 }
-                commands.add("de.iip_ecosphere.platform.services.environment.spring.AppStarter");
                 commands.add("-Dokto.loader.app=" + workDir.getAbsolutePath());
+                commands.add("de.iip_ecosphere.platform.services.spring.loader.AppStarter");
             } else { // as in the base class
                 commands.add("-jar");
                 commands.add(path);
