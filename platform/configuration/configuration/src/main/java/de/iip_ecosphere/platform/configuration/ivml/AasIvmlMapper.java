@@ -1427,8 +1427,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             AbstractVariable decl = var.getDeclaration();
             String varName = decl.getName();
             IDatatype varType = null == var.getValue() ? decl.getType() : var.getValue().getType();
-            //**IDatatype varType = null == var.getValue() || var.getValue() == NullValue.INSTANCE 
-            //**    ? decl.getType() : var.getValue().getType(); // prefer dynamic type
+            //IDatatype varType = null == var.getValue() || var.getValue() == NullValue.INSTANCE 
+            //    ? decl.getType() : var.getValue().getType(); // including null values causes reasoning issues
             IDatatype rVarType = DerivedDatatype.resolveToBasis(varType);
             String lang = getLang();
             String semanticId = null;
@@ -1468,8 +1468,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 String propName = id == null ? varName : id;
                 varBuilder = builder.createSubmodelElementCollectionBuilder(AasUtils.fixId(propName));
                 Object aasValue = getValue(var);
-                varType.getType().accept(TYPE_VISITOR); // resolved anyway
-                //**varType.accept(TYPE_VISITOR); // resolved anyway
+                varType.accept(TYPE_VISITOR); // resolved anyway
                 Type aasType = TYPE_VISITOR.getAasType();
                 // prop name "value" is/was reserved by BaSyx/AAS
                 PropertyBuilder pb = varBuilder.createPropertyBuilder(AasUtils.fixId("varValue")); 
