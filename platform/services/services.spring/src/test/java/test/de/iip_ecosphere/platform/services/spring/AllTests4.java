@@ -15,7 +15,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Defines the tests to be executed independently.
+ * Defines the tests to be executed in a separate JVM, in particular AAS-plugin dependent.
  * 
  * @author Holger Eichelberger, SSE
  */

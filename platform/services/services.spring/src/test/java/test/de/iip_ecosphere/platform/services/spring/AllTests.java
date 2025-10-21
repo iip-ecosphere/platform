@@ -14,21 +14,18 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Defines the tests to be executed.
+ * Defines all basic tests (no app execution, AAS plugin independent) to be executed.
  * 
  * @author Holger Eichelberger, SSE
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     UtilsTest.class,
-    //SimpleStartStopServiceManagerTest.class,
     ArtifactInfoTest.class,
-    //TestLifecycleDescriptor.class,
     ServiceMgrAndDescriptorTest.class,
-    //ServerStartStopServiceManagerTest.class,
-    
     DescriptorUtilsTest.class,
-    ServerManagerTest.class
+    ServerManagerTest.class,
+    SetupTest.class
 })
 public class AllTests {
 }

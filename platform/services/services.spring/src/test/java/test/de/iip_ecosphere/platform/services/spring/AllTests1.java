@@ -20,7 +20,9 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    ZipCpServiceManagerTest.class
+    SimpleStartStopServiceManagerTest.class,
+    TestLifecycleDescriptor.class,
+    ServerStartStopServiceManagerTest.class
 })
-public class AllTests3 {
+public class AllTests1 {
 }

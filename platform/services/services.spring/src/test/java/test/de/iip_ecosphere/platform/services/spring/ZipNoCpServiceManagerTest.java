@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 import org.springframework.cloud.deployer.spi.local.LocalAppDeployer;
 import org.springframework.cloud.deployer.spi.local.LocalDeployerProperties;
@@ -82,9 +81,7 @@ public class ZipNoCpServiceManagerTest extends AbstractTestServiceManager {
         
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
-            TestPropertyValues
-                .of("service-mgr.brokerPort=" + BROKER.getPort())
-                .applyTo(applicationContext);
+            AbstractTestServiceManager.initialize(applicationContext, BROKER);
         }
         
     }
