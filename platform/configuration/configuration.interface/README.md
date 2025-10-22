@@ -1,3 +1,3 @@
-# oktoflow platform: Component template
+# oktoflow platform: configuration.interface
 
-Maven template for implementing components of the oktoflow platform.
+The interface to the basic configuration (execution) capabilities to enable configuration plugins.
