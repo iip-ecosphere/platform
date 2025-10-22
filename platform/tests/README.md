@@ -1,4 +1,4 @@
 # oktoflow platform: Test artifacts
 
-This folder contains projects for re-usable test artifacts, e.g., a simple stream to be deployed in regression testing. In particular, it contains the [distributed test and evaluation environment](test.environment/README.md) for the platform and platform applications.
+This folder contains message brokers/servers for testing (partially used as default variants for message brokers when instantiating the platform as well as the [distributed test and evaluation environment](test.environment/README.md) for the platform and platform applications.
 
