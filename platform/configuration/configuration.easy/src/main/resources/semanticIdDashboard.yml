@@ -1,0 +1,26 @@
+grafana: 
+    0173-1#05-AAA220#005: amp  
+    0173-1#05-AAA187#005: mamp
+    0173-1#05-AAA280#005: kamp
+    0173-1#05-AAA093#001: watt 
+    0173-1#05-AAA756#005: kwatt
+    0173-1#05-AAA632#005: megwatt
+    0173-1#05-AAA170#005: gwatt
+    0173-1#05-AAA143#005: mwatt
+    0173-1#05-AAA465#005: none
+    0173-1#05-AAA753#005: watth
+    0173-1#05-AAA555#005: kwatth
+    0173-1#05-AAA124#005: mwatth
+    0173-1#05-AAA124#005: none
+    0173-1#05-AAA098#005: none
+    Boolean: bool
+    Integer: none
+    Long: none
+    Short: none
+    String: string
+    Float: none
+    Double: none
+    Display_TimeSeries: timeseries
+    Display_Gauge: gauge
+    Display_BarChart: barchart
+    Display_Table: table
