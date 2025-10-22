@@ -7,6 +7,8 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
-	    <maven pomFile="pom.xml" goal="deploy"/>
+	    <maven pomFile="pom.xml" goal="deploy">
+          <arg value="-Dokto.test.easy.model.parent=${model_parent}"/> <!-- must be set in jenkins ANT build step -->
+        </maven>
 	</target>
 </project>
