@@ -1,0 +1,28 @@
+logging:
+    level:
+        root: INFO
+spring:
+    main:
+        banner-mode: off
+        web-application-type: none
+    cloud:
+        deployer:
+            local:
+                deleteFilesOnExit: true
+                0workingDirectoriesRoot: FOLDER
+service-mgr:
+  deleteArtifacts: false
+  waitingTime: 300000
+  brokerHost: localhost
+  brokerPort: 8883
+  availabilityRetryDelay: 500
+  serviceProtocol: 
+  executables:
+    perl: /usr/bin/perl
+    php: /home/edge/php/active/bin/php
+  transport:
+    host: localhost
+    port: 8883
+    password: pwd
+    user: user  
+  pluginsFolder: target/plugins

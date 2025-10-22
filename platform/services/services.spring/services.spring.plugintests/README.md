@@ -160,9 +160,6 @@ The configuration structure is as shown below (the `executables` mapping is indi
 One of the service start commands can take a map of options. The Spring Cloud Service manager implements the following options:
 * `ensemble`: Change the ensemble/leader assignments at startup. Existing assignments from the artifact deployment descriptor can be overridden for top-level services. Unwanted assignments must be overridden too. The value of the option is a map in JSON format, i.e., `{"ens":"leader",...}` assigning the service with id `leader` as ensemble leader to the service with id `ens`. If leader cannot be resolved, e.g., an empty string, the leader assignment is cleared.
 
-## Structure
-This project contains its on test application (`test.simpleStream.spring`) and to enable plugin tests, a test project (`services.spring.plugintests`) which starts tests from the main project in a clean classloading environment. `test.simpleStream.spring` must be built first, then `services.spring`, then `services.spring.plugintests`.
-
 ## Hints
 Service startup on slow machines may fail due to Spring timeouts. Might be some deployer settings could help then.
 

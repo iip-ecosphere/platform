@@ -1,0 +1,5 @@
+/target/
+/work/
+derby.log
+/log
+/copy.bat

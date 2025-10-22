@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>services.spring.plugintests</artifactId>
+  <packaging>jar</packaging>
+  <name>Services (Spring) PluginTests</name>
+  <description>The plugin-based tests for the Spring Cloud Stream service management interface implementation.</description>
+
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependenciesSpring</artifactId>
+     <version>0.7.1-SNAPSHOT</version>
+     <relativePath/>
+  </parent>
+
+  <dependencies>
+    <!-- only core layers, no plugins -->
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>transport</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>services</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>support</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>support.aas</artifactId>
+     <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>  
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>support.aas</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>transport</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
+  <build>
+
+    <plugins>
+        <plugin>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>dependency-plugin</artifactId>
+            <version>${iip.version}</version>
+            <executions>
+
+                <execution>
+                    <id>okto plugins</id>
+                    <goals>
+                        <goal>unpack-plugins</goal>
+                    </goals>
+                    <phase>test-compile</phase>
+                    <configuration>
+                        <plugins>
+                            <plugin>
+                                <artifactId>support.log-slf4j-simple</artifactId>
+                                <setupDescriptor>None</setupDescriptor> <!-- for only appending -->
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.processInfo-oshi</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.websocket-websocket</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.yaml-snakeyaml</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.bytecode-bytebuddy</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.rest-spark</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.commons-apache</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.json-jackson</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.metrics-micrometer</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>transport.amqp</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>transport.spring.amqp</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>services.spring</artifactId>
+                                <appends> <!-- complement the plugin, add the platform logging and spring parts -->
+                                   <append>transport.spring.amqp</append>
+                                   <append>support.log-slf4j-simple</append>
+                                </appends>
+                                <asTest>true</asTest>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.aas.basyx2</artifactId>
+                                <appends> <!-- complement the plugin, add the platform logging -->
+                                   <append>support.log-slf4j-simple</append>
+                                </appends>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.aas.basyx</artifactId>
+                                <appends> <!-- complement the plugin, add the platform logging -->
+                                   <append>support.log-slf4j-simple</append>
+                                </appends>
+                            </plugin>
+                            <plugin>
+                                <artifactId>test.amqp.qpid</artifactId>
+                            </plugin>
+                        </plugins>
+                        <relocate>true</relocate> <!-- needed to enable append -->
+                        <relocateTarget>${project.build.directory}/jars</relocateTarget>
+                        <version>${iip.version}</version>
+                    </configuration>
+                </execution>
+
+              <!-- get test application, after plugins as that cleans up the folder -->            
+              <execution>
+                <id>copy</id>
+                  <phase>test-compile</phase>
+                <goals>
+                  <goal>copy</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>de.iip-ecosphere.platform</groupId>
+                      <artifactId>test.simpleStream.spring</artifactId>
+                      <version>${project.version}</version>
+                      <type>jar</type>
+                      <overWrite>true</overWrite>
+                      <outputDirectory>${project.build.directory}/jars</outputDirectory>
+                      <destFileName>simpleStream.spring.jar</destFileName>
+                    </artifactItem>
+                    <artifactItem>
+                      <groupId>de.iip-ecosphere.platform</groupId>
+                      <artifactId>test.simpleStream.spring</artifactId>
+                      <version>${project.version}</version>
+                      <classifier>spring</classifier>
+                      <type>zip</type>
+                      <overWrite>true</overWrite>
+                      <outputDirectory>${project.build.directory}/jars</outputDirectory>
+                      <destFileName>simpleStream.spring.zip</destFileName>
+                    </artifactItem>
+                  </artifactItems>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
+                  <overWriteReleases>false</overWriteReleases>
+                  <overWriteSnapshots>true</overWriteSnapshots>
+                </configuration>
+              </execution>
+
+            </executions>
+        </plugin>
+      </plugins>
+
+  </build>
+
+</project>
