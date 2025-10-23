@@ -106,17 +106,12 @@
     </dependency>
     <dependency>
        <groupId>de.iip-ecosphere.platform</groupId>
-       <artifactId>configuration.configuration</artifactId>
-        <!--<exclusions>
-            <exclusion>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-            </exclusion>
-            <exclusion>
-                <groupId>com.google.guava</groupId>
-                <artifactId>failureaccess</artifactId>
-            </exclusion>
-        </exclusions>-->
+       <artifactId>configuration.interface</artifactId>
+       <version>${project.version}</version>
+    </dependency>
+    <dependency> <!-- todo preliminary -->
+       <groupId>de.iip-ecosphere.platform</groupId>
+       <artifactId>configuration.easy</artifactId>
        <version>${project.version}</version>
     </dependency>
     <dependency>

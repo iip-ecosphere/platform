@@ -16,7 +16,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
+import de.iip_ecosphere.platform.configuration.cfg.ConfigurationFactory;
 
 /**
  * Extends the basic configuration mojo of this plugin to handle the apps to be generated.
@@ -30,7 +30,7 @@ public abstract class AbstractAppsConfigurationMojo extends AbstractConfiguratio
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, apps);
+        ConfigurationFactory.hintAppsToInstantiate(apps);
         super.execute();
     }
 

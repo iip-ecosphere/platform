@@ -40,7 +40,8 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 
-import de.iip_ecosphere.platform.configuration.PlatformInstantiatorExecutor;
+import de.iip_ecosphere.platform.configuration.cfg.ConfigurationFactory;
+import de.iip_ecosphere.platform.configuration.cfg.PlatformInstantiation;
 import de.iip_ecosphere.platform.configuration.maven.DependencyResolver.Caller;
 import de.iip_ecosphere.platform.tools.maven.python.AbstractLoggingMojo;
 import de.iip_ecosphere.platform.tools.maven.python.FileChangeDetector;
@@ -444,7 +445,7 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
         String[] args = {getModel(), modelDir, outputDir, getStartRule(), metaModelDir};
         if (isModelDirectoryValid()) {
             if (enableRun(metaModelDir, modelDir, outputDir)) {
-                PlatformInstantiatorExecutor executor = createExecutor();
+                PlatformInstantiation executor = createExecutor();
                 try {
                     if (asProcess) {
                         executor.executeAsProcess(getClass().getClassLoader(), resourcesDir, getTracingLevel(), 
@@ -480,13 +481,13 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
      * 
      * @return the instance
      */
-    private PlatformInstantiatorExecutor createExecutor() {
+    private PlatformInstantiation createExecutor() {
         File localRepo = null;
         LocalRepository lr = getRepoSession().getLocalRepository();
         if (lr != null) { // seems to fail at least in tests, usual fallback
             localRepo = lr.getBasedir();
         }
-        return new PlatformInstantiatorExecutor(localRepo, w -> getLog().warn(w), 
+        return ConfigurationFactory.createInstantiator(localRepo, w -> getLog().warn(w), 
             i -> getLog().info(i), t -> recordExecutionTime(t));
     }
     
