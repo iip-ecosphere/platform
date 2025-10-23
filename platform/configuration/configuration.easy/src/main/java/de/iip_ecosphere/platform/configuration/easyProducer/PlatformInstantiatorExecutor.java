@@ -231,6 +231,7 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
         if (inTesting) {
             System.out.println("Hint: to update the classpath, see README.MD");
         }
+        boolean debug = Boolean.valueOf(System.getProperty("okto.instantiator.debug", "false"));
         InputStream cpIn = loader.getResourceAsStream(cpFile);
         if (null != cpIn) {
             if (null == localRepo) { // usual fallback
@@ -239,6 +240,9 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
                     tmp = System.getProperty("user.home") + "/.m2/repository";
                 }
                 localRepo = new File(tmp);
+            }
+            if (debug) {
+                System.out.println("Local repo: " + localRepo);
             }
             try {
                 String cpElementString = IOUtils.toString(cpIn, StandardCharsets.UTF_8);
@@ -253,6 +257,9 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
                     result.add(cpElement);
                 }
                 cpIn.close();
+                if (debug) {
+                    System.out.println("Classpath: " + result);
+                }
             } catch (IOException e) {
                 warn.accept("Cannot load EASy-Producer classpath file from resources: " + e.getMessage());    
             }
