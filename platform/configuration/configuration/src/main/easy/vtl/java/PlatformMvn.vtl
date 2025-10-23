@@ -25,6 +25,7 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
         XmlElement dep = createDependencies(project);
         appendDependency(dep, iipGroup, "support", projectVersion); 
         appendOktoflowPlugins(dep, projectVersion);
+        appendDependency(dep, iipGroup, "configuration.easy", projectVersion);
         XmlElement d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
         if (monitoring) {
             // conflicts on Linux with Tomcat

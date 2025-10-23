@@ -28,7 +28,7 @@ import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.collector.Collector;
-import test.de.iip_ecosphere.platform.configuration.AbstractIvmlTests;
+import test.de.iip_ecosphere.platform.configuration.easyProducer.AbstractIvmlTests;
 import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 /**

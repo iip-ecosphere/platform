@@ -1,31 +1,10 @@
 # oktoflow platform: Configuration Component and Configuration Model
 
-IIP-Ecosphere aims at an encompassing and consistent configuration of the whole platform in order to enable model-based platform instantiation, i.e., to include relevant parts and to exclude unwanted parts. This is the point in the platform where optional components such as transport protocols, connectors, service execution managers, container managers, service chains and applications etc. are combined, configured, validated and ultimately turned into instantiated code and installable artifacts.
+We aim at an encompassing and consistent configuration of the whole platform in order to enable model-based platform instantiation, i.e., to include relevant parts and to exclude unwanted parts. This is the point in the platform where optional components such as transport protocols, connectors, service execution managers, container managers, service chains and applications etc. are combined, configured, validated and ultimately turned into instantiated code and installable artifacts. 
 
-As configuration technology, we rely on [EASy-Producer](https://sse.uni-hildesheim.de/forschung/projekte/easy-producer/), it's variability modeling language IVML and its instantiation languages VIL/VTL. All languages are described on the EASy-Producer website. We integrate EASy-Producer here through it's Maven artifacts, define the variability model in IVML, the variability instantiation in VTL and perform respective tests.
-
-It is important to understand that the configuration model and the related code generation are evolving, i.e., modeling capabilities, properties, mechanisms and code generation may change over time. A graphical user interface is also evolving in terms of the webbased [management UI](../../managementUI).
-
-So far there is no graphical user interface which shall be located one layer above this component, i.e., use the interface the component provides. For initial instantiation, we provide the PlatformInstantiator class which executes the configuration process from command line.
-
-```yaml
-easyProducer:
-  base: <String>
-  genTarget: <String>
-  ivmlMetaModelFolder: <String>
-  ivmlConfigFolder <String>
-  ivmlModelName: <String>
-  easyLogLevel: NORMAL|VERBOSE|EXTRA_VERBOSE
-serviceArtifactStorage:
-  ...
-containerImageStorage:
-  ...
-```
-
-The setup for this component defines the `base` folder for the model, which typically contains the meta-model folder `ivmlMetaModelFolder` (default `model`), the folder where the configuration of the actually installed platform and the running apps is located (`ivmlConfigFolder`, per default undefined, thus in `base`), the name of the top-level IVML file (per default `IIPEcosphere`, but usually the top-level model in `ivmlConfigFolder`) and a writable folder where to locate generated artifacts (`genTarget`). Further, the logging level of the underlying EASy-Producer toolset can be defined (by default `NORMAL`).
+This component realizes the embedding and the configuration model. The graphical user interface is in [managementUi](../../managementUi) which is located one layer above this component, i.e., uses the interfaces the component provides. The default configuration plugin is [EASy-Producer](../configuration.easy). This plugin relies on its model being located in `src/main/easy` and `src/test/easy`. Alternative implementations may demand similar folders, for which, however, the assembly packaging must be adjusted.
 
 The setup also may contain a `serviceArtifactStorage`and a `containerImageStorage` PackageStorageSetup specification from [deviceMgt](../../resources/deviceMgt/README.md), which are currently not used.
-
 
 ## Configuration meta-model
 
@@ -65,7 +44,7 @@ Applications projects containing the configuration model of the application typi
 
 Tracing for tests is set to `TOP` since version 0.7.0. Tracing can be enabled via the system property `iip.easy.tracing` using the values `ALL`, `FUNC` or `TOP`.
 
-For running the tests locally, you need a Python 3.9 with all IIP-Python dependencies (see platform handbook and [Install Package](../../tools/Install)) installed. On Windows, this can easily be obtained from the Microsoft Store.
+For running the tests locally, you need a Python 3.9 with all required Python dependencies (see [Prerequisites](../../documentation/PREREQUISITES.md) and [Install Package](../../tools/Install)) installed. 
 
 For running the container tests, you need Docker and LXC (Linux only). To bypass the container creation in either case, use `-Deasy.docker.failOnError=false` to disable failure reporting during Docker instantiator execution or `-Deasy.lxc.failOnError=false` to disable failure reporting for the LXC instantiator. The instantiation process shall then run anyway and produce the related artifacts, e.g., Dockerfiles or LXC templates, but no container images are created/deployed.
 
@@ -75,9 +54,7 @@ Some of the test models include the RapidMiner RTSA integration. As RTSA is an I
 
 ## Tests
 
-Some tests are executed for code generation in this project, the remainder is executed by the `examples` project there. Since version 0.7.1 the generated code is in `target/gen` rather than `gen`.
-
-Some tests are executed in own JVMs to prevent conflicting dependencies with Maven. To update the persisted dependency list, call `mvn prepare-package`. To build this component without tests, run `mvn install -DdisableJavaTests=true`. 
+Tests are now in configuration.easy which relies on the files in src/main/easy, src/test/easy and generates into target/gen.
 
 ## Docker base images for Python (Using Digest)
 

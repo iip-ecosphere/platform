@@ -16,10 +16,10 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import test.de.iip_ecosphere.platform.configuration.AbstractIvmlTests;
-import test.de.iip_ecosphere.platform.configuration.IvmlContainerLxcTests;
-import test.de.iip_ecosphere.platform.configuration.IvmlContainerTests;
-import test.de.iip_ecosphere.platform.configuration.IvmlSerializerConfig1Tests;
+import test.de.iip_ecosphere.platform.configuration.easyProducer.AbstractIvmlTests;
+import test.de.iip_ecosphere.platform.configuration.easyProducer.IvmlContainerLxcTests;
+import test.de.iip_ecosphere.platform.configuration.easyProducer.IvmlContainerTests;
+import test.de.iip_ecosphere.platform.configuration.easyProducer.IvmlSerializerConfig1Tests;
 
 /**
  * Defines the tests to be executed.

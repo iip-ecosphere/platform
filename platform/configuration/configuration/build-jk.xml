@@ -9,38 +9,11 @@
 	<property name="genFolder" value="target/gen"/>
     <property name="genFolderTests" value="${genFolder}/tests"/>
 	
-    <!-- Check - no typedef shall be required as installed in ANT/lib -->
-    <path id="maven-ant-tasks.classpath" path="${ant-maven.lib}" />
-    <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
-       uri="antlib:org.apache.maven.artifact.ant"
-       classpathref="maven-ant-tasks.classpath" />
-
     <!-- deploy to SSE Mvn repo -->
     <target name="maven">
-        <exec executable="/bin/bash">
-          <arg value="${basedir}/cleanup.sh"/>
-        </exec>
-    	
-        <maven pomFile="pom.xml" goal="install">
+        <maven pomFile="pom.xml" goal="deploy">
     	    <arg value="-Diip.tests=true"/>
-            <arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
-        	<arg value="-Dokto.mvn.home=${maven.bin.dir}/bin"/>
     	</maven>
-    	
-        <mvnDeployResolveArtifact folderName="IIP-configuration.configuration" pomFile="pom.xml" jarFolder="target" artifactPattern="configuration.configuration-*.*.*.jar" />
-        
-        <ant dir="${genFolderTests}/SimpleMesh/ApplicationInterfaces" antfile="build-jk.xml" />
-        <ant dir="${genFolderTests}/SimpleMesh3/ApplicationInterfaces" antfile="build-jk.xml" />
-        <ant dir="${genFolderTests}/KodexMesh/ApplicationInterfaces" antfile="build-jk.xml" />
-        <ant dir="${genFolderTests}/ContainerCreation/ApplicationInterfaces" antfile="build-jk.xml" />
-        <ant dir="${genFolderTests}/RoutingTest/ApplicationInterfaces" antfile="build-jk.xml" />
-
-        <mvnDeployResolveArtifact folderName="IIP-test.configuration.configuration" pomFile="test.configuration.configuration/pom.xml" jarFolder="test.configuration.configuration/target" artifactPattern="apps.ServiceImpl-*.*.*.jar" />
-
-    	<ant dir="${genFolderTests}/SimpleMesh/SimpleMeshTestingApp" antfile="build-jk.xml" />
-        <ant dir="${genFolderTests}/SimpleMesh3/SimpleMeshTestingApp3" antfile="build-jk.xml" />
-        <ant dir="${genFolderTests}/KodexMesh/SimpleKodexTestingApp" antfile="build-jk.xml" />
-        <ant dir="${genFolderTests}/RoutingTest/RoutingTestApp" antfile="build-jk.xml" />
     </target>
 	
 </project>

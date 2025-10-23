@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.configuration;
 
+import de.iip_ecosphere.platform.configuration.cfg.ConfigurationFactory;
+import de.iip_ecosphere.platform.configuration.cfg.ConfigurationSetup;
 import de.iip_ecosphere.platform.deviceMgt.storage.Storage;
 
 /**
@@ -31,7 +33,7 @@ public class StorageFactory {
      * @return the storage, may be <b>null</b> if no setup for the storage is known
      */
     public static Storage createServiceArtifactStorage() {
-        ConfigurationSetup setup = ConfigurationSetup.getSetup();
+        ConfigurationSetup setup = ConfigurationFactory.getSetup();
         if (null != setup.getServiceArtifactStorage() && null == serviceArtifactStorage) {
             serviceArtifactStorage = de.iip_ecosphere.platform.deviceMgt.storage.StorageFactory.getInstance()
                 .createStorage(setup.getServiceArtifactStorage());
@@ -45,7 +47,7 @@ public class StorageFactory {
      * @return the storage, may be <b>null</b> if no setup for the storage is known
      */
     public static Storage createContainerImageStorage() {
-        ConfigurationSetup setup = ConfigurationSetup.getSetup();
+        ConfigurationSetup setup = ConfigurationFactory.getSetup();
         if (null != setup.getContainerImageStorage() && null == containerImageStorage) {
             containerImageStorage = de.iip_ecosphere.platform.deviceMgt.storage.StorageFactory.getInstance()
                 .createStorage(setup.getServiceArtifactStorage());

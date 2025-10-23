@@ -1,5 +1,6 @@
-/********************************************************************************
- * Copyright (c) {2021} The original author or authors
+/**
+ * ******************************************************************************
+ * Copyright (c) {2025} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
  * available under the terms of the Eclipse Public License 2.0 which is available 
@@ -8,20 +9,16 @@
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
-package test.de.iip_ecosphere.platform.configuration;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+package de.iip_ecosphere.platform.configuration;
 
 /**
- * Defines the tests to be executed.
+ * Classes of configuration changes.
  * 
  * @author Holger Eichelberger, SSE
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-    // other tests -> plugin environment of configuration.easy
-    StorageFactoryTest.class,
-})
-public class AllTests {
+public enum ConfigurationChangeType {
+    CREATED,
+    MODIFIED,
+    DELETED
 }
