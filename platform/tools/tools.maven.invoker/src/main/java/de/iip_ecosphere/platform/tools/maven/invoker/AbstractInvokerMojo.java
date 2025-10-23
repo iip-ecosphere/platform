@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.tools.maven.invoker;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.util.List;
 import java.util.Properties;
 
@@ -26,6 +27,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.CommandLineConfigurationException;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
+import org.apache.maven.shared.invoker.InvocationOutputHandler;
 import org.apache.maven.shared.invoker.InvocationRequest;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
@@ -166,6 +168,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
 
     @Parameter(property = "iip.ciBuildId", defaultValue = "") 
     private String buildId;
+
+    @Parameter(property = "okto.test.easy.model.parent", defaultValue = "") 
+    private String oktoModelParent;
     
     @Parameter(property = "easy.docker.failOnError")
     private String easyDockerFailOnError;
@@ -295,6 +300,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
         if (buildId != null && buildId.length() > 0) { // CI defined build id for time collector
             sysProperties.put("iip.ciBuildId", buildId);
         }
+        if (oktoModelParent != null && oktoModelParent.length() > 0) {
+            sysProperties.put("okto.test.easy.model.parent", oktoModelParent);
+        }
         if (oktoMvnHome != null && oktoMvnHome.length() > 0) { // CI defined maven
             sysProperties.put("okto.mvn.home", oktoMvnHome);
         }
@@ -307,6 +315,41 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
         request.setProperties(sysProperties);
         getLog().info("Setting sys properties " + request.getProperties());
     }
+    
+    /**
+     * An implementation of InvocationOutputHandler that captures the output 
+     * and echoes it to a {@link PrintStream}.
+     */
+    private static class CapturingOutputHandler implements InvocationOutputHandler {
+        
+        private final PrintStream echoStream;
+        private boolean indicatesBuildFailure;
+
+        /**
+         * Creates an instance.
+         * 
+         * @param echoStream the stream to echo the captured output to
+         */
+        public CapturingOutputHandler(PrintStream echoStream) {
+            this.echoStream = echoStream;
+        }
+
+        @Override
+        public void consumeLine(String line) {
+            echoStream.println(line);
+            line.contains("BUILD FAILURE");
+        }
+        
+        /**
+         * Whether the log indicates a build failure.
+         * 
+         * @return {@code true} for build failure, {@code false} else
+         */
+        public boolean indicatesBuildFailure() {
+            return indicatesBuildFailure;
+        }
+        
+    }    
 
     /**
      * If {@code value} is not <b>null</b>, set {@code value} for {@code key} in {@code sysProperties}.
@@ -373,7 +416,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
     
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        CapturingOutputHandler outputHandler = new CapturingOutputHandler(System.out);
         final InvocationRequest request = createInvocationRequest();
+        request.setOutputHandler(outputHandler);
         boolean enableOnSkip = null == skipIfExists ? true : !skipIfExists.exists(); 
         boolean enableOnExecute = null == executeIfExists ? false : executeIfExists.exists(); 
         boolean enableOnFile = enableOnSkip || enableOnExecute; 
@@ -405,6 +450,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
                 } else if (result.getExitCode() != 0) {
                     throw new MojoExecutionException( "The Maven invocation failed. Exit code: " 
                         + result.getExitCode());
+                } else if (outputHandler.indicatesBuildFailure()) {
+                    throw new MojoExecutionException( "The Maven invocation failed (indicated by log). "
+                        + result.getExecutionException().getMessage());
                 }
             } catch (MavenInvocationException ex) {
                 getLog().debug("Error invoking Maven: " + ex.getMessage(), ex);
