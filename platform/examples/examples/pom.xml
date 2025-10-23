@@ -13,6 +13,11 @@
      <relativePath/>
   </parent>
 
+  <properties>
+    <model.parent>../configuration</model.parent> <!-- must be set by ANT/Jenkins -->
+    <okto.test.easy.model.parent>${model.parent}</okto.test.easy.model.parent> <!-- pass on -->
+  </properties>
+
   <dependencies>
     <!-- This is not needed in normal programs! Here we know that the test shall be Spring-based,
          but in normal settings it's even not known what the service execution framework is. -->
