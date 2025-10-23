@@ -26,6 +26,10 @@
         <url>https://jcenter.bintray.com</url>
     </repository>
   </repositories>  
+  
+  <properties>
+    <model.parent>../configuration</model.parent>
+  </properties>
 
   <dependencies>
     <dependency> <!-- required for xtext -->
@@ -211,6 +215,9 @@
   <profiles>
      <profile>
         <id>Cfg</id>
+        <properties>
+            <okto.test.easy.model.parent>${model.parent}</okto.test.easy.model.parent>
+        </properties>
           <build>
             <plugins>
               <plugin>
@@ -296,6 +303,7 @@
            <maven.test.skip>true</maven.test.skip>
            <python-compile.skip>true</python-compile.skip>
            <maven.javadoc.skip>true</maven.javadoc.skip>
+           <okto.test.easy.model.parent>${model.parent}</okto.test.easy.model.parent>
        </properties>       
 
        <build>

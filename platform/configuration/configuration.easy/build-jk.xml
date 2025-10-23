@@ -14,7 +14,7 @@
         </exec>	
 		
 	    <maven pomFile="pom.xml" goal="install">
-          <arg value="-Dokto.test.easy.model.parent=${model_parent}"/> <!-- must be set in jenkins ANT build step -->
+          <arg value="-Dmodel.parent=${model_parent}"/> <!-- must be set in jenkins ANT build step -->
           <arg value="-Diip.tests=true"/>
           <arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
           <arg value="-Dokto.mvn.home=${maven.bin.dir}/bin"/>
