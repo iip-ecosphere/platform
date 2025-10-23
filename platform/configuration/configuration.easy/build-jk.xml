@@ -6,6 +6,8 @@
 	<include file="${user.home}/macros.xml"/>
     <property environment="env"/>
     <property name="iip.build.initial" value="${env.iipbuildinitial}"/>
+    <property name="genFolder" value="${model_parent}/target/gen"/> <!-- must be set in jenkins ANT build step -->
+    <property name="genFolderTests" value="${genFolder}/tests"/>
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
@@ -21,8 +23,20 @@
         </maven>
 		
         <mvnDeployResolveArtifact folderName="IIP-configuration.easy" pomFile="pom.xml" jarFolder="target" artifactPattern="configuration.easy-*.*.*.jar" />
-        <mvnDeployResolveArtifact folderName="IIP-test.configuration.easy" pomFile="test.configuration.configuration/pom.xml" jarFolder="test.configuration.configuration/target" artifactPattern="apps.ServiceImpl-*.*.*.jar" />
-		
+
+        <ant dir="${genFolderTests}/SimpleMesh/ApplicationInterfaces" antfile="build-jk.xml" />
+        <ant dir="${genFolderTests}/SimpleMesh3/ApplicationInterfaces" antfile="build-jk.xml" />
+        <ant dir="${genFolderTests}/KodexMesh/ApplicationInterfaces" antfile="build-jk.xml" />
+        <ant dir="${genFolderTests}/ContainerCreation/ApplicationInterfaces" antfile="build-jk.xml" />
+        <ant dir="${genFolderTests}/RoutingTest/ApplicationInterfaces" antfile="build-jk.xml" />
+	
+		<mvnDeployResolveArtifact folderName="IIP-test.configuration.easy" pomFile="test.configuration.configuration/pom.xml" jarFolder="test.configuration.configuration/target" artifactPattern="apps.ServiceImpl-*.*.*.jar" />
+
+        <ant dir="${genFolderTests}/SimpleMesh/SimpleMeshTestingApp" antfile="build-jk.xml" />
+        <ant dir="${genFolderTests}/SimpleMesh3/SimpleMeshTestingApp3" antfile="build-jk.xml" />
+        <ant dir="${genFolderTests}/KodexMesh/SimpleKodexTestingApp" antfile="build-jk.xml" />
+        <ant dir="${genFolderTests}/RoutingTest/RoutingTestApp" antfile="build-jk.xml" />
+
         <exec executable="/bin/bash">
           <arg value="${basedir}/cleanup.sh"/>
         </exec>	

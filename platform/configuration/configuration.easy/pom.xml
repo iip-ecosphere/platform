@@ -308,6 +308,40 @@
 
        <build>
           <plugins>
+              <!-- explicitly attach artifacts not transported from invoker to this context -->
+              <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.4.0</version>
+                <executions>
+                  <execution>
+                    <id>attach-artifacts</id>
+                    <phase>prepare-package</phase>
+                    <goals>
+                      <goal>attach-artifact</goal>
+                    </goals>
+                    <configuration>
+                      <artifacts>
+                        <artifact>
+                          <file>${project.build.directory}/${project.build.finalName}-javadoc.jar</file>
+                          <type>jar</type>
+                          <classifier>javadoc</classifier>
+                        </artifact>
+                        <artifact>
+                          <file>${project.build.directory}/${project.build.finalName}-tests.jar</file>
+                          <type>jar</type>
+                          <classifier>tests</classifier>
+                        </artifact>
+                        <artifact>
+                          <file>${project.build.directory}/${project.build.finalName}-test-javadoc.jar</file>
+                          <type>jar</type>
+                          <classifier>test-javadoc</classifier>
+                        </artifact>
+                      </artifacts>
+                    </configuration>
+                  </execution>
+                </executions>
+              </plugin>
                 <plugin>
                   <groupId>de.iip-ecosphere.platform</groupId>
                   <artifactId>invoker-plugin</artifactId>
