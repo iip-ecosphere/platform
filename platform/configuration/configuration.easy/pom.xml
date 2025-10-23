@@ -207,10 +207,167 @@
     </dependency>
   </dependencies>
 
-    <build>
-      <plugins>
-         <!-- for configuration.maven, localRepoProperty/prefix to prevent full local paths -->
-         <plugin>
+
+  <profiles>
+     <profile>
+        <id>Cfg</id>
+          <build>
+            <plugins>
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${org.apache.maven.jar.version}</version>
+                <executions>
+                  <execution>
+                    <goals>
+                      <goal>test-jar</goal>
+                    </goals>
+                    <configuration>
+                        <skip>false</skip>                        
+                    </configuration>
+                  </execution>
+                </executions>
+              </plugin>
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.2</version>
+                <executions>
+                  <execution>
+                    <id>copy</id>
+                    <phase>compile</phase>
+                    <goals>
+                      <goal>copy</goal>
+                    </goals>
+                  </execution>
+                </executions>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>de.iip-ecosphere.platform</groupId>
+                      <artifactId>services.environment</artifactId>
+                      <version>${project.version}</version>
+                      <classifier>python</classifier>
+                      <type>zip</type>
+                      <overWrite>true</overWrite>
+                      <outputDirectory>${project.build.directory}/python</outputDirectory>
+                      <destFileName>services.environment-python.zip</destFileName>
+                    </artifactItem>
+                  </artifactItems>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
+                  <overWriteReleases>false</overWriteReleases>
+                  <overWriteSnapshots>true</overWriteSnapshots>
+                </configuration>
+              </plugin>
+                <plugin>
+                  <groupId>org.codehaus.mojo</groupId>
+                  <artifactId>exec-maven-plugin</artifactId>
+                  <version>3.0.0</version>
+                  <executions>
+                      <execution>
+                         <id>testAasIvml</id>
+                         <configuration>
+                             <mainClass>test.de.iip_ecosphere.platform.configuration.easyProducer.TestAasIvmlModel</mainClass>
+                             <cleanupDaemonThreads>false</cleanupDaemonThreads>
+                             <classpathScope>test</classpathScope>
+                             <!-- Example, please override on command line with -Dexec.args="" -->
+                             <!-- Does not work without further arguments for simpleMesh, simpleMesh3, rountingTest as they rely on common! -->
+                             <arguments>
+                                 <argument>ContainerCreation</argument>
+                                 <argument>${project.basedir}\src\test\easy\single</argument>
+                                 <argument>myMesh</argument>
+                             </arguments>
+                         </configuration>
+                      </execution>
+                  </executions>
+                </plugin>
+                   
+            </plugins>
+          </build>
+     </profile>
+
+     <profile>
+        <id>Main</id>
+        <activation>
+           <activeByDefault>true</activeByDefault>
+        </activation>
+       <properties>
+           <maven.main.skip>true</maven.main.skip>
+           <maven.test.skip>true</maven.test.skip>
+           <python-compile.skip>true</python-compile.skip>
+           <maven.javadoc.skip>true</maven.javadoc.skip>
+       </properties>       
+
+       <build>
+          <plugins>
+                <plugin>
+                  <groupId>de.iip-ecosphere.platform</groupId>
+                  <artifactId>invoker-plugin</artifactId>
+                  <version>${project.version}</version>
+                  <executions>
+                      <execution>
+                          <id>genInterfaces</id>
+                          <goals>
+                              <goal>install</goal>
+                          </goals>
+                          <configuration>
+                              <invokeProfiles>
+                                  <invokeProfile>Cfg</invokeProfile>
+                              </invokeProfiles>
+                              <invokeGoals>
+                                  <invokeGoal>install</invokeGoal>
+                              </invokeGoals>
+                              <systemProperties>
+                                  <systemProperty>
+                                      <key>iip.tests</key>
+                                      <value>true</value>
+                                  </systemProperty>
+                                  <systemProperty>
+                                      <key>iip.build.initial</key>
+                                      <value>true</value>
+                                  </systemProperty>
+                              </systemProperties>
+                              <skipIfExists>target/genInterfaces-${project.version}</skipIfExists>
+                          </configuration>
+                      </execution>
+                      <execution>
+                          <id>installServices</id>
+                          <goals>
+                              <goal>install</goal>
+                          </goals>
+                          <configuration>
+                              <invokeGoals>
+                                  <invokeGoal>install</invokeGoal>
+                              </invokeGoals>
+                              <pom>test.configuration.configuration</pom>
+                          </configuration>
+                      </execution>
+                      <execution>
+                          <id>genAppsAndTest</id>
+                          <goals>
+                              <goal>install</goal>
+                          </goals>
+                          <configuration>
+                              <invokeProfiles>
+                                  <invokeProfile>Cfg</invokeProfile>
+                              </invokeProfiles>
+                              <invokeGoals>
+                                  <invokeGoal>install</invokeGoal>
+                              </invokeGoals>
+                              <systemProperties>
+                                  <systemProperty>
+                                      <key>iip.tests</key>
+                                      <value>true</value>
+                                  </systemProperty>
+                              </systemProperties>
+                              <skipTests>false</skipTests>
+                          </configuration>
+                      </execution>
+                  </executions>
+              </plugin>
+                        
+           <!-- for configuration.maven, localRepoProperty/prefix to prevent full local paths -->
+           <plugin>
              <groupId>de.iip-ecosphere.platform</groupId>
              <artifactId>dependency-plugin</artifactId>
              <version>${project.version}</version>
@@ -311,6 +468,8 @@
               
           </plugins>
         </build>
-
+      </profile>
+      
+    </profiles>
 
 </project>
