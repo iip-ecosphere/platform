@@ -556,4 +556,9 @@ class JerseyJsonObject implements JsonObject {
             other instanceof JerseyJsonObject ? ((JerseyJsonObject) other).object : other);
     }
 
+    @Override
+    public boolean containsKey(String key) {
+        return object.containsKey(key);
+    }
+
 }

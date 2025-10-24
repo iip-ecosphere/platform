@@ -40,6 +40,16 @@ public class Slf4jLogger implements Logger {
         return true;
     }
 
+    @Override
+    public LogLevel getLevel() {
+        return level;
+    }
+    
+    @Override
+    public String getName() {
+        return logger.getName();
+    }
+
     /**
      * Execute {@code func} if the given level is enabled.
      * 

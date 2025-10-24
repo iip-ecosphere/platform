@@ -159,6 +159,19 @@ public class JacksonJson extends de.iip_ecosphere.platform.support.json.Json {
     }    
     
     @Override
+    public String writeValueAsString(Object value) throws IOException {
+        try {
+            if (writer != null) {
+                return writer.writeValueAsString(value);
+            } else {
+                return mapper.writeValueAsString(value);
+            }
+        } catch (JsonProcessingException e) {
+            throw new IOException(e);
+        }
+    }       
+    
+    @Override
     public Json configureFor(Class<?> cls) {
         mapper = JsonUtils.configureFor(mapper, cls);
         return this;

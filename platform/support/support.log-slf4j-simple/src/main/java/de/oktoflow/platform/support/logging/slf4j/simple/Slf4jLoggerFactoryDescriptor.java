@@ -12,7 +12,10 @@
 
 package de.oktoflow.platform.support.logging.slf4j.simple;
 
+import java.util.Map;
+
 import de.iip_ecosphere.platform.support.logging.ILoggerFactory;
+import de.iip_ecosphere.platform.support.logging.LogLevel;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactoryDescriptor;
 import de.iip_ecosphere.platform.support.plugins.SingletonPluginDescriptor;
@@ -32,9 +35,23 @@ public class Slf4jLoggerFactoryDescriptor extends SingletonPluginDescriptor<ILog
      */
     private static class Slf4jLoggerFactory implements ILoggerFactory {
 
+        private Map<String, LogLevel> initialLevels;
+        
         @Override
         public Logger createLogger(String name) {
-            return new Slf4jLogger(org.slf4j.LoggerFactory.getLogger(name));
+            Slf4jLogger result = new Slf4jLogger(org.slf4j.LoggerFactory.getLogger(name));
+            if (initialLevels != null) {
+                LogLevel initialLevel = initialLevels.get(name);
+                if (null != initialLevel) {
+                    result.setLevel(initialLevel);
+                }
+            }
+            return result;
+        }
+
+        @Override
+        public void initialLevels(Map<String, LogLevel> levels) {
+            initialLevels = levels;
         }
         
     }
