@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.support.logging;
 
+import java.util.Map;
+
 /**
  * The internal logger factory.
  * 
@@ -26,5 +28,14 @@ public interface ILoggerFactory {
      * @return the logger
      */
     public Logger createLogger(String name);
+    
+    /**
+     * Sets the initial levels to be considered when creating loggers if supported. Initial levels may occur when
+     * log levels are dynamically configured on the fallback implementation before the actual logger implementation 
+     * is ready.
+     * 
+     * @param levels the levels to consider
+     */
+    public void initialLevels(Map<String, LogLevel> levels);
 
 }

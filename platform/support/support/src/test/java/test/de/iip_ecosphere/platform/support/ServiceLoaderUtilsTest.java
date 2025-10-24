@@ -55,7 +55,7 @@ public class ServiceLoaderUtilsTest {
         Assert.assertTrue(ServiceLoaderUtils.hasExcludeFirst(new ExcludedDescriptor()));
         
         Assert.assertEquals(2, CollectionUtils.toList(
-            ServiceLoader.load(ServiceLoaderUtilsDescriptor.class).iterator()).size());
+            ServiceLoaderUtils.load(ServiceLoaderUtilsDescriptor.class).iterator()).size());
         
         Optional<ServiceLoaderUtilsDescriptor> first = ServiceLoaderUtils.filterExcluded(
             ServiceLoaderUtilsDescriptor.class);

@@ -556,4 +556,9 @@ class TestJsonObject implements JsonObject {
             other instanceof TestJsonObject ? ((TestJsonObject) other).object : other);
     }
 
+    @Override
+    public boolean containsKey(String key) {
+        return object.containsKey(key);
+    }
+
 }

@@ -36,6 +36,11 @@ public abstract class LoggerFactory {
             logger.setLevel(LEVEL);
             return logger;
         }
+
+        @Override
+        public void initialLevels(Map<String, LogLevel> levels) {
+            // this is the basic fallback logger factory, ignore
+        }
         
     };
     private static ILoggerFactory factory = FALLBACK_FACTORY;
@@ -51,7 +56,10 @@ public abstract class LoggerFactory {
         ILoggerFactory f = PluginManager.getPluginInstance(ILoggerFactory.class, LoggerFactoryDescriptor.class);
         if (null != f) { // be careful
             factory = f;
+            Map<String, LogLevel> initialLevels = new HashMap<>();
+            loggers.values().forEach(l -> initialLevels.put(l.getName(), l.getLevel()));
             loggers.clear(); // reset
+            factory.initialLevels(initialLevels);
             System.out.println("Using logger factory " + factory.getClass().getName());
         }
     }

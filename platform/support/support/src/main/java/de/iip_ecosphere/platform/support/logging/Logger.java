@@ -67,6 +67,20 @@ public interface Logger {
     public boolean setLevel(LogLevel level);
     
     /**
+     * Returns the log level.
+     * 
+     * @return the log level, may be <b>null</b> if not accessible/unknown
+     */
+    public LogLevel getLevel();
+    
+    /**
+     * Returns the name of the logger.
+     * 
+     * @return the name of the logger
+     */
+    public String getName();
+    
+    /**
      * Log a message at the TRACE level.
      *
      * @param msg the message string to be logged

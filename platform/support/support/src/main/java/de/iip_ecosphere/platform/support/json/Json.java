@@ -136,6 +136,15 @@ public abstract class Json {
     public abstract byte[] writeValueAsBytes(Object value) throws IOException;
     
     /**
+     * Writes a given values into a string representation.
+     * 
+     * @param value the value to write
+     * @return the string representation
+     * @throws IOException if writing fails
+     */
+    public abstract String writeValueAsString(Object value) throws IOException;
+    
+    /**
      * Convenience method for doing two-step conversion from given value, into
      * instance of given value type, by writing value into temporary buffer
      * and reading from the buffer into specified target type.
@@ -201,6 +210,28 @@ public abstract class Json {
     public static <K, V> Map<K, V> mapFromJsonDflt(Object json, Class<K> keyCls, Class<K> valueCls) {
         return prototype.mapFromJson(json, keyCls, valueCls);
     }    
+    
+    /**
+     * Writes a given values into a byte array representation.
+     * 
+     * @param value the value to write
+     * @return the byte array representation
+     * @throws IOException if writing fails
+     */
+    public static byte[] writeValueAsBytesDflt(Object value) throws IOException {
+        return prototype.writeValueAsBytes(value);
+    }
+    
+    /**
+     * Writes a given values into a string representation.
+     * 
+     * @param value the value to write
+     * @return the string representation
+     * @throws IOException if writing fails
+     */
+    public static String writeValueAsStringDflt(Object value) throws IOException {
+        return prototype.writeValueAsString(value);
+    }
     
     /**
      * Configures this instance for {@code cls} by considering the annotations in {@code cls}.

@@ -57,6 +57,11 @@ public class FallbackLogger implements Logger {
     public FallbackLogger(String name) {
         this.name = name;
     }
+    
+    @Override
+    public String getName() {
+        return name;
+    }
 
     @Override
     public boolean setEmitter(Emitter emitter) {
@@ -87,6 +92,13 @@ public class FallbackLogger implements Logger {
     public boolean setLevel(LogLevel level) {
         this.level = level;
         return true;
+    }
+    
+    /**
+     * Returns the log level.
+     */
+    public LogLevel getLevel() {
+        return level;
     }
 
     @Override

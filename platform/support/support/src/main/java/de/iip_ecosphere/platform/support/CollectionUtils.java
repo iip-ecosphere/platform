@@ -20,7 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.ArrayUtils;
+import de.iip_ecosphere.platform.support.commons.Commons;
 
 /**
  * Some useful additional collection methods.
@@ -214,7 +214,7 @@ public class CollectionUtils {
      * @param array  the array to reverse, may be <b>null</b>
      */
     public static void reverse(final Object[] array) {
-        ArrayUtils.reverse(array);
+        Commons.getInstance().reverse(array);
     }
     
 }

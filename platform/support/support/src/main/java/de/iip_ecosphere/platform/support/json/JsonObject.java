@@ -128,4 +128,12 @@ public interface JsonObject extends JsonValue {
      */
     public Set<String> keys();
 
+    /**
+     * Returns whether this object contains a certain key.
+     * 
+     * @param key the key
+     * @return {@code true} for contains, {@code false} else
+     */
+    public boolean containsKey(String key);
+    
 }
