@@ -47,7 +47,7 @@ public class ConfigurationFactory {
             if (null != plugin) {
                 desc = plugin.getInstance();
             } else {
-                ServiceLoader<ConfigurationFactoryDescriptor> loader = ServiceLoader.load(
+                ServiceLoader<ConfigurationFactoryDescriptor> loader = ServiceLoaderUtils.load(
                     ConfigurationFactoryDescriptor.class);
                 Optional<ConfigurationFactoryDescriptor> first = ServiceLoaderUtils.findFirst(loader);
                 if (first.isPresent()) {
