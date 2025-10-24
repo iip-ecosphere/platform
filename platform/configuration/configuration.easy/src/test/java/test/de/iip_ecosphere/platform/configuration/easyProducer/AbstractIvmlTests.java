@@ -84,7 +84,16 @@ public abstract class AbstractIvmlTests {
      * @return {@code file} or file relocated into {@link #testModelBase}.
      */
     protected static File relocateTestModel(File file) {
-        return null == testModelBase ? file : new File(testModelBase, file.getPath());
+        File result = file;
+        if (testModelBase != null) {
+            String f = file.getPath();
+            String prefix = new File(EasySetup.getTestingEasyModelParent()).toString();
+            if (f.startsWith(prefix)) {
+                f = f.substring(prefix.length());
+            }
+            result = new File(testModelBase, f);
+        }
+        return result;
     }
 
     /**

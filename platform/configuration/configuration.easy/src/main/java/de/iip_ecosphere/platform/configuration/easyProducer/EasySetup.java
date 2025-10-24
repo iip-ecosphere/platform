@@ -23,6 +23,7 @@ import java.util.List;
 public class EasySetup {
 
     public static final String PLATFORM_META_MODEL_NAME = "IIPEcosphere";
+    public static final String PROP_TEST_MODEL_PARENT = "okto.test.easy.model.parent";
 
     private File base;
     private File genTarget;
@@ -38,7 +39,7 @@ public class EasySetup {
      * @return the folder, per default "../configuration", or the value in "-Dokto.test.easy.model.parent"
      */
     public static String getTestingEasyModelParent() {
-        return System.getProperty("okto.test.easy.model.parent", "../configuration");
+        return System.getProperty(PROP_TEST_MODEL_PARENT, "../configuration");
     }
     
     /**
