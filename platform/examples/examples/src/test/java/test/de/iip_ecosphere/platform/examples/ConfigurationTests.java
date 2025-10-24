@@ -96,7 +96,7 @@ public class ConfigurationTests extends TestWithQpid {
     public static void shutdown() {
         server.stop(true);
     }
-
+    
     /**
      * Tests an instantiated example.
      * 
@@ -108,7 +108,7 @@ public class ConfigurationTests extends TestWithQpid {
      */
     private void testInstantiatedExample(String folder, String appName, int stopTime, Consumer<String> asserter) 
         throws IOException {
-        String base = AbstractIvmlTests.TEST_BASE_FOLDER.getPath();
+        String base = AbstractIvmlTests.stripTestingEasyModelParent(AbstractIvmlTests.TEST_BASE_FOLDER);
         long start = System.currentTimeMillis();
         File cfg = new File(System.getProperty("test.genFolder", "../../configuration/configuration/" + base)); // git
         if (!cfg.exists()) {
