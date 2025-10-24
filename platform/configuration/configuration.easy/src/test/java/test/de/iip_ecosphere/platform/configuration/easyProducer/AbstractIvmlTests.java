@@ -84,16 +84,21 @@ public abstract class AbstractIvmlTests {
      * @return {@code file} or file relocated into {@link #testModelBase}.
      */
     protected static File relocateTestModel(File file) {
-        File result = file;
-        if (testModelBase != null) {
-            String f = file.getPath();
-            String prefix = new File(EasySetup.getTestingEasyModelParent()).toString();
-            if (f.startsWith(prefix)) {
-                f = f.substring(prefix.length());
-            }
-            result = new File(testModelBase, f);
+        return testModelBase == null ? file : new File(testModelBase, stripTestingEasyModelParent(file));
+    }
+
+    /**
+     * Strips {@link EasySetup#getTestingEasyModelParent()} from file's path.
+     * 
+     * @return {@code file} or {@code file} without {@link EasySetup#getTestingEasyModelParent()} as prefix
+     */
+    public static String stripTestingEasyModelParent(File file) {
+        String f = file.getPath();
+        String prefix = new File(EasySetup.getTestingEasyModelParent()).toString();
+        if (f.startsWith(prefix)) {
+            f = f.substring(prefix.length());
         }
-        return result;
+        return f;
     }
 
     /**
@@ -143,7 +148,7 @@ public abstract class AbstractIvmlTests {
      */
     protected static ConfigurationLifecycleDescriptor assertLifecycleDescriptor() {
         // check that the registration works, but do not execute all descriptors
-        ServiceLoader<LifecycleDescriptor> loader = ServiceLoader.load(LifecycleDescriptor.class);
+        ServiceLoader<LifecycleDescriptor> loader = ServiceLoaderUtils.load(LifecycleDescriptor.class);
         Optional<LifecycleDescriptor> first = ServiceLoaderUtils
             .stream(loader)
             .filter(s -> s instanceof ConfigurationLifecycleDescriptor)
