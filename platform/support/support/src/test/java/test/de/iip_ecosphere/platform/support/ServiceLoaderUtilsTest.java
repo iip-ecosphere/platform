@@ -13,7 +13,6 @@
 package test.de.iip_ecosphere.platform.support;
 
 import java.util.Optional;
-import java.util.ServiceLoader;
 
 import org.junit.Assert;
 import org.junit.Test;
