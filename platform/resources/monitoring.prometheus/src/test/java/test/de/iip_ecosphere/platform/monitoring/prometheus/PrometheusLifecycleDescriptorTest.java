@@ -113,7 +113,7 @@ public class PrometheusLifecycleDescriptorTest extends AbstractMonitoringReceive
         @Override
         public void start(TransportSetup transSetup) {
             PrometheusMonitoringSetup.getInstance().setTransport(transSetup);
-            ServiceLoader<LifecycleDescriptor> loader = ServiceLoader.load(LifecycleDescriptor.class);
+            ServiceLoader<LifecycleDescriptor> loader = ServiceLoaderUtils.load(LifecycleDescriptor.class);
             Optional<PrometheusLifecycleDescriptor> pml = ServiceLoaderUtils
                 .stream(loader)
                 .filter(d-> d instanceof PrometheusLifecycleDescriptor)
