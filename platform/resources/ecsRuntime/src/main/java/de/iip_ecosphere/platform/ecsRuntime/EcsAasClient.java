@@ -18,13 +18,11 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.iip_ecosphere.platform.deviceMgt.Credentials;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.SubmodelElementsCollectionClient;
+import de.iip_ecosphere.platform.support.json.Json;
 
 /**
  * A client for {@link EcsAas} for accessing the operations provided by a certain resource.
@@ -73,11 +71,10 @@ public class EcsAasClient extends SubmodelElementsCollectionClient implements Ec
     @Override
     public Credentials createRemoteConnectionCredentials() throws ExecutionException {
         String result = (String) getOperation(EcsAas.NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS).invoke();
-        ObjectMapper mapper = new ObjectMapper();
         Credentials credentials = null;
         try {
-            credentials = mapper.readValue(result, Credentials.class);
-        } catch (JsonProcessingException ignore) {
+            credentials = Json.fromJsonDflt(result, Credentials.class);
+        } catch (IOException ignore) {
             // should not happen
         }
 

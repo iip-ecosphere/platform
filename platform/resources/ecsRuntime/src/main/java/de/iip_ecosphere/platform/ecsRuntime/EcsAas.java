@@ -14,12 +14,10 @@ package de.iip_ecosphere.platform.ecsRuntime;
 
 import static de.iip_ecosphere.platform.support.aas.AasUtils.*;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.iip_ecosphere.platform.deviceMgt.Credentials;
 import de.iip_ecosphere.platform.ecsRuntime.deviceAas.DeviceAasProvider;
@@ -45,6 +43,7 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.iip_aas.Eclass;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.Irdi;
+import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
 import de.iip_ecosphere.platform.support.metrics.SystemMetricsFactory;
@@ -261,11 +260,10 @@ public class EcsAas implements AasContributor {
                 Credentials credentials = RemoteAccessServerFactory.create()
                     .getCredentialsManager()
                     .addGeneratedCredentials();
-                ObjectMapper mapper = new ObjectMapper();
                 String result = null;
                 try {
-                    result = mapper.writeValueAsString(credentials);
-                } catch (JsonProcessingException e) {
+                    result = Json.writeValueAsStringDflt(credentials);
+                } catch (IOException e) {
                     LoggerFactory.getLogger(EcsAas.class).error(NAME_OP_CREATE_REMOTE_CONNECTION_CREDENTIALS 
                         + ": " + e.getMessage());
                 }

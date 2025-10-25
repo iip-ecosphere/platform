@@ -44,7 +44,7 @@ public class EcsFactory {
             if (null != plugin) {
                 desc = plugin.getInstance();
             } else {
-                ServiceLoader<EcsFactoryDescriptor> loader = ServiceLoader.load(EcsFactoryDescriptor.class);
+                ServiceLoader<EcsFactoryDescriptor> loader = ServiceLoaderUtils.load(EcsFactoryDescriptor.class);
                 Optional<EcsFactoryDescriptor> first = ServiceLoaderUtils.findFirst(loader);
                 if (first.isPresent()) {
                     desc = first.get();
