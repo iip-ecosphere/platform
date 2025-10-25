@@ -73,7 +73,8 @@ public interface ConnectorExtensionDescriptor {
      */
     public static <T> T getExtension(String id, Class<T> cls, Supplier<T> dflt) {
         T result;
-        ServiceLoader<ConnectorExtensionDescriptor> loader = ServiceLoader.load(ConnectorExtensionDescriptor.class);
+        ServiceLoader<ConnectorExtensionDescriptor> loader = ServiceLoaderUtils.load(
+            ConnectorExtensionDescriptor.class);
         Optional<ConnectorExtensionDescriptor> desc = ServiceLoaderUtils.stream(loader)
             .filter(d -> d.handlesConnectorForExtension(id))
             .findFirst();

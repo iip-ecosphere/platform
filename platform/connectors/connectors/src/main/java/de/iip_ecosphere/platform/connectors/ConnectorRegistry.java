@@ -18,6 +18,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 
+import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
+
 /**
  * A service type/instance registry as internal structure to manage the contents of an AAS for this component.
  *  
@@ -34,7 +36,7 @@ public class ConnectorRegistry {
      * @return the service loader
      */
     public static ServiceLoader<ConnectorDescriptor> getRegisteredConnectorDescriptorsLoader() {
-        return ServiceLoader.load(ConnectorDescriptor.class);
+        return ServiceLoaderUtils.load(ConnectorDescriptor.class);
     }
     
     /**
