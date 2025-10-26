@@ -12,7 +12,6 @@
 
 package de.iip_ecosphere.platform.deviceMgt.basicReg;
 
-import com.fasterxml.jackson.core.JsonProcessingException; 
 import de.iip_ecosphere.platform.deviceMgt.DeviceDescriptor;
 import de.iip_ecosphere.platform.deviceMgt.DeviceDescriptor.State;
 
@@ -20,6 +19,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -227,11 +227,11 @@ public class BasicDeviceRegistryTest {
     /**
      * Tests that sending valid telemetry leads to saved data.
      * 
-     * @throws JsonProcessingException JSON processing shall not fail
+     * @throws IOException JSON processing shall not fail
      * @throws ExecutionException AAS execution shall not fail
      */
     @Test
-    public void sendTelemetry_withValidData_shouldSaveTelemetry() throws ExecutionException, JsonProcessingException {
+    public void sendTelemetry_withValidData_shouldSaveTelemetry() throws ExecutionException, IOException {
         Assert.assertTrue(deviceRegistry.getIds().isEmpty());
         deviceRegistry.addDevice(A_DEVICE, AN_IP);
         DeviceDescriptor desc = deviceRegistry.getDevice(A_DEVICE);
@@ -248,11 +248,11 @@ public class BasicDeviceRegistryTest {
     /**
      * Tests that heartbeats with a valid device leads to telemetry.
      * 
-     * @throws JsonProcessingException JSON processing shall not fail
+     * @throws IOException JSON processing shall not fail
      * @throws ExecutionException AAS execution shall not fail
      */
     @Test
-    public void imAlive_sendImAliveAsTelemetry() throws JsonProcessingException, ExecutionException {
+    public void imAlive_sendImAliveAsTelemetry() throws IOException, ExecutionException {
         Assert.assertTrue(deviceRegistry.getIds().isEmpty());
         deviceRegistry.addDevice(A_DEVICE, AN_IP);
         deviceRegistry.sendTelemetry(A_DEVICE, "{\"active\": true}");
@@ -267,11 +267,11 @@ public class BasicDeviceRegistryTest {
     /**
      * Tests that heartbeats with unknown device does not lead to telemetry.
      * 
-     * @throws JsonProcessingException JSON processing shall not fail
+     * @throws IOException JSON processing shall not fail
      * @throws ExecutionException AAS execution shall not fail
      */
     @Test
-    public void imAlive_withUnknownDevice_shouldNotSendImAliveAsTelemetry() throws JsonProcessingException, 
+    public void imAlive_withUnknownDevice_shouldNotSendImAliveAsTelemetry() throws IOException, 
         ExecutionException {
         Assert.assertTrue(deviceRegistry.getIds().isEmpty());
         deviceRegistry.addDevice(A_DEVICE, AN_IP);

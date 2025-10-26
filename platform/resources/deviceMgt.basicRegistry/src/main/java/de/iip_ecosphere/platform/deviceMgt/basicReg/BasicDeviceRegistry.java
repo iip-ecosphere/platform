@@ -12,13 +12,13 @@
 
 package de.iip_ecosphere.platform.deviceMgt.basicReg;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.iip_ecosphere.platform.deviceMgt.DeviceDescriptor;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistrationResponse;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistry;
+import de.iip_ecosphere.platform.support.json.Json;
+import de.iip_ecosphere.platform.support.json.JsonObject;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -95,14 +95,13 @@ public class BasicDeviceRegistry implements DeviceRegistry {
 
     @Override
     public void sendTelemetry(String id, String telemetryData) throws ExecutionException {
-        ObjectMapper mapper = new ObjectMapper();
         try {
-            JsonNode telemetry = mapper.readTree(telemetryData);
+            JsonObject telemetry = Json.createObject(telemetryData);
             BasicRegistryDeviceDescriptor desc = getDevice(id);
             if (null != desc) {
                 desc.saveEntityTelemetry(telemetry);
             }
-        } catch (JsonProcessingException e) {
+        } catch (IOException e) {
             throw new ExecutionException("TelemetryData is not json: ", e);
         }
     }

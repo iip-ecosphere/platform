@@ -131,8 +131,6 @@ public class S3StorageTest {
 
     /**
      * Tests that uploading a file correctly fails. 
-     * 
-     * @throws IOException shall not occur
      */
     @Test
     public void uploadFile_fileNotFound() {

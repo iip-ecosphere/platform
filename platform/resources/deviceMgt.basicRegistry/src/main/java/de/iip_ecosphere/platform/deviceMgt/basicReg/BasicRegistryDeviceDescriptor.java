@@ -13,8 +13,7 @@
 package de.iip_ecosphere.platform.deviceMgt.basicReg;
 
 import de.iip_ecosphere.platform.deviceMgt.DeviceDescriptor;
-
-import com.fasterxml.jackson.databind.JsonNode;
+import de.iip_ecosphere.platform.support.json.JsonObject;
 
 /**
  * Implements the things board device descriptor.
@@ -93,11 +92,10 @@ public class BasicRegistryDeviceDescriptor implements DeviceDescriptor {
      * 
      * @param telemetry the telemetry
      */
-    void saveEntityTelemetry(JsonNode telemetry) {
+    void saveEntityTelemetry(JsonObject telemetry) {
         // adapted from thingsboard
         long now = System.currentTimeMillis();
-        JsonNode active = telemetry.get("active");
-        if (null == active || !active.asBoolean()) {
+        if (!telemetry.containsKey("active") || !telemetry.getBoolean("active")) {
             state = State.STARTING;
         } else {
             stateUpdateActive = System.currentTimeMillis();

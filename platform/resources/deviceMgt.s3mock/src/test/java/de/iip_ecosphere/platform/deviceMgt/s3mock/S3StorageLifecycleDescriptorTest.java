@@ -14,7 +14,6 @@ package de.iip_ecosphere.platform.deviceMgt.s3mock;
 
 import java.io.File;
 import java.util.Optional;
-import java.util.ServiceLoader;
 
 import org.junit.Test;
 
@@ -118,7 +117,8 @@ public class S3StorageLifecycleDescriptorTest {
      * Asserts and executes the lifecycle descriptor of this extension.
      */
     private static void assertLifecycleDescriptor() {
-        Optional<LifecycleDescriptor> result = ServiceLoaderUtils.stream(ServiceLoader.load(LifecycleDescriptor.class))
+        Optional<LifecycleDescriptor> result = ServiceLoaderUtils.stream(
+            ServiceLoaderUtils.load(LifecycleDescriptor.class))
             .filter(l -> l instanceof S3StorageLifecycleDescriptor)
             .findFirst();
         Assert.assertTrue(result.isPresent());
