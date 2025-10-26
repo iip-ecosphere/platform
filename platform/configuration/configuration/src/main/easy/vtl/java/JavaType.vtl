@@ -259,7 +259,7 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
         if (typeNeedsAasElement(type)) {
             mainCls.addImport("de.iip_ecosphere.platform.transport.serialization.QualifiedElement");
         }
-        mainCls.addAnnotation("de.iip_ecosphere.platform.support.iip_aas.ConfiguredName").addStringArgument(type.name);
+        mainCls.addAnnotation("de.iip_ecosphere.platform.support.ConfiguredName").addStringArgument(type.name);
         mainCls.addInterface(implements);
         mainCls.addExtends(ext);
         mainCls.asInterface(interface);
@@ -268,7 +268,7 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
             mainCls.createAttribute(getTypeName(f), asMethodFieldIdentifier(f.name), not(interface)).(attr|{
                 if (not(interface)) {
                     attr.addAnnotation("com.fasterxml.jackson.annotation.JsonProperty").addStringArgument(f.name); // unconditional -> service integrations
-                    attr.addAnnotation("de.iip_ecosphere.platform.support.iip_aas.ConfiguredName").addStringArgument(f.name);        
+                    attr.addAnnotation("de.iip_ecosphere.platform.support.ConfiguredName").addStringArgument(f.name);        
                 }
                 configureGetterSetter(mainCls.addGetter(attr), true, f);
                 configureGetterSetter(mainCls.addSetter(attr, "value"), false, f);
