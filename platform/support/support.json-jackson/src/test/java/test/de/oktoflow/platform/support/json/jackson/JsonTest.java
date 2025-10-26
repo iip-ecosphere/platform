@@ -29,6 +29,7 @@ import de.iip_ecosphere.platform.support.json.JsonObject;
 import de.iip_ecosphere.platform.support.json.JsonString;
 import de.oktoflow.platform.support.json.jackson.JacksonJson;
 import de.oktoflow.platform.support.json.jackson.JsoniterAny;
+import iip.datatypes.DataImpl;
 
 /**
  * Tests {@link Json}.
@@ -244,6 +245,69 @@ public class JsonTest {
         Assert.assertTrue(tmpData.length < data.length);
         String tmpStr = new String(tmpData);
         Assert.assertTrue(tmpStr.startsWith("[") && tmpStr.endsWith("]"));
+    }
+    
+    /**
+     * Tests {@link Json#handleIipDataClasses()}.
+     */
+    @Test
+    public void testHandleIipDataClasses() {
+        iip.datatypes.Data data = new DataImpl();
+        data.setValue(20);
+        
+        try {
+            String str = Json.toJsonDflt(data);
+            Assert.assertFalse(str.contains("iField"));
+            Assert.assertTrue(str.contains("value"));
+            Json.fromJsonDflt(str, iip.datatypes.Data.class);
+            Assert.fail("Shall not succeed as cannot instantiate interface");
+        } catch (IOException e) {
+            // ok
+        }
+        Json json = Json.createInstance(iip.datatypes.Data.class, DataImpl.class).handleIipDataClasses();
+        try {
+            String str = json.toJson(data);
+            Assert.assertTrue(str.contains("iField"));
+            Assert.assertFalse(str.contains("value"));
+            iip.datatypes.Data d = json.fromJson(str, iip.datatypes.Data.class);
+            Assert.assertNotNull(d);
+            Assert.assertEquals(data.getValue(), d.getValue());
+        } catch (IOException e) {
+            Assert.fail("Shall not fail");
+        }
+
+        json = Json.createInstance4All().handleIipDataClasses();
+        try {
+            String str = json.toJson(data);
+            Assert.assertTrue(str.contains("iField"));
+            Assert.assertFalse(str.contains("value"));
+            iip.datatypes.Data d = json.fromJson(str, iip.datatypes.Data.class);
+            Assert.assertNotNull(d);
+            Assert.assertEquals(data.getValue(), d.getValue());
+        } catch (IOException e) {
+            Assert.fail("Shall not fail");
+        }
+    }
+    
+    /**
+     * Tests {@link Json#exceptFields(String...)}.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testExceptFields() throws IOException {
+        DataImpl data = new DataImpl();
+        // consider plain fields
+        Json json = Json.createInstance().exceptFields("value");
+        String str = json.toJson(data);
+        Assert.assertFalse(str.contains("iField"));
+        Assert.assertFalse(str.contains("value"));
+
+        // consider annotations
+        json = Json.createInstance4All().exceptFields("iField");
+        str = json.toJson(data);
+        Assert.assertFalse(str.contains("iField"));
+        Assert.assertFalse(str.contains("value"));
     }
 
 }

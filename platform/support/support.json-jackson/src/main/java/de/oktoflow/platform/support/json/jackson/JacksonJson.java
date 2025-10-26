@@ -15,6 +15,7 @@ package de.oktoflow.platform.support.json.jackson;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,9 +48,98 @@ public class JacksonJson extends de.iip_ecosphere.platform.support.json.Json {
     private ObjectMapper mapper = new ObjectMapper();
     private ObjectWriter writer; 
 
+    /**
+     * Self-configuring Json implementation based on provided types.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private class JacksonJson4All extends JacksonJson {
+        
+        private Set<Class<?>> configured = new HashSet<>();
+
+        /**
+         * Configures this instance for {@code cls}.
+         * 
+         * @param <T> the actual type
+         * @param cls the class to configure for
+         * @return cls
+         */
+        private <T> Class<T> cfg(Class<T> cls) {
+            if (!configured.contains(cls)) {
+                configureFor(cls);
+            }
+            return cls;
+        }
+
+        /**
+         * Configures this instance for the class of {@code obj}.
+         * 
+         * @param obj the object to configure for, ignored if <b>null</b>
+         * @return obj
+         */
+        private Object cfg(Object obj) {
+            if (null != obj) {
+                cfg(obj.getClass());
+            }
+            return obj;
+        }
+
+        @Override
+        public String toJson(Object obj) throws IOException {
+            return super.toJson(cfg(obj));
+        }
+        
+        @Override
+        public <R> R fromJson(Object json, Class<R> cls) throws IOException {
+            return super.fromJson(json, cfg(cls));
+        }
+
+        @Override
+        public <R> List<R> listFromJson(Object json, Class<R> cls) {
+            return super.listFromJsonDflt(json, cfg(cls));
+        }
+        
+        @Override
+        public <K, V> Map<K, V> mapFromJson(Object json, Class<K> keyCls, Class<K> valueCls) {
+            return super.mapFromJson(json, cfg(keyCls), cfg(valueCls));
+        }
+        
+        @Override
+        public <T> T readValue(String src, Class<T> cls) throws IOException {
+            return super.readValue(src, cfg(cls));
+        }
+
+        @Override
+        public <T> T readValue(byte[] src, Class<T> valueType) throws IOException {
+            return super.readValue(src, cfg(valueType));
+        }
+        
+        @Override
+        public <T> T convertValue(Object value, Class<T> cls) throws IllegalArgumentException {
+            cfg(cls);
+            return super.convertValue(value, cfg(cls));
+        }
+
+        @Override
+        public <T> EnumMapping<T> createEnumMapping(Class<T> type, Map<String, T> mapping) {
+            return super.createEnumMapping(cfg(type), mapping);
+        }
+        
+        @Override
+        public byte[] writeValueAsBytes(Object value) throws IOException {
+            return super.writeValueAsBytes(cfg(value));
+        }    
+        
+        @Override
+        public String writeValueAsString(Object value) throws IOException {
+            return super.writeValueAsString(cfg(value));
+        }        
+        
+    }
+
     @Override
-    public Json createInstanceImpl() {
-        return new JacksonJson();
+    public Json createInstanceImpl(boolean considerAnnotations) {
+        return considerAnnotations ? new JacksonJson4All() : new JacksonJson();
     }
 
     @Override
