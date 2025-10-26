@@ -15,15 +15,14 @@ package de.iip_ecosphere.platform.deviceMgt.registry;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.SubmodelElementsCollectionClient;
+import de.iip_ecosphere.platform.support.json.Json;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static de.iip_ecosphere.platform.support.json.JsonResultWrapper.fromJson;
 
@@ -72,9 +71,8 @@ public class DeviceRegistryAasClient extends SubmodelElementsCollectionClient
             String json = fromJson(getOperation(DeviceRegistryAas.NAME_OP_DEVICE_ADD).invoke(id, ip));
             if (null != json) {
                 try {
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    result = objectMapper.readValue(json.toString(), DeviceRegistrationResponse.class);
-                } catch (JsonProcessingException e) {
+                    result = Json.fromJsonDflt(json.toString(), DeviceRegistrationResponse.class);
+                } catch (IOException e) {
                     // result = null;
                 }
             }

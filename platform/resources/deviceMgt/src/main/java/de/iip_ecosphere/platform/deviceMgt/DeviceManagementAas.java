@@ -12,16 +12,16 @@
 
 package de.iip_ecosphere.platform.deviceMgt;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryFactory;
 import de.iip_ecosphere.platform.support.aas.*;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import static de.iip_ecosphere.platform.support.aas.AasUtils.readString;
@@ -99,8 +99,8 @@ public class DeviceManagementAas implements AasContributor {
                 DeviceRemoteManagementOperations.SSHConnectionDetails connectionDetails;
                 try {
                     connectionDetails = DeviceManagementFactory.getDeviceManagement().establishSsh(readString(p));
-                    return new ObjectMapper().writeValueAsString(connectionDetails);
-                } catch (JsonProcessingException | ExecutionException e) {
+                    return Json.writeValueAsStringDflt(connectionDetails);
+                } catch (IOException | ExecutionException e) {
                     e.printStackTrace();
                 }
                 return null;

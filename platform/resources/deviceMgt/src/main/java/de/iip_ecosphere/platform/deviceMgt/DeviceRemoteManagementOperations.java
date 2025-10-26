@@ -42,7 +42,7 @@ public interface DeviceRemoteManagementOperations {
         private String password;
 
         /**
-         * Default constructor, required for Jackson.
+         * Default constructor, required for JSON.
          */
         public SSHConnectionDetails() {
         }

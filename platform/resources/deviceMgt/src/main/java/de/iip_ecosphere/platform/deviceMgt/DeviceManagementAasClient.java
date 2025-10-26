@@ -12,10 +12,9 @@
 
 package de.iip_ecosphere.platform.deviceMgt;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAas;
 import de.iip_ecosphere.platform.support.iip_aas.SubmodelElementsCollectionClient;
+import de.iip_ecosphere.platform.support.json.Json;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -46,10 +45,9 @@ public class DeviceManagementAasClient extends SubmodelElementsCollectionClient 
         String operationResult = (String) getOperation(DeviceManagementAas.NAME_OP_ESTABLISH_SSH).invoke(id);
         SSHConnectionDetails connectionDetails = null;
         if (operationResult != null) {
-            ObjectMapper mapper = new ObjectMapper();
             try {
-                connectionDetails = mapper.readValue(operationResult, SSHConnectionDetails.class);
-            } catch (JsonProcessingException e) {
+                connectionDetails = Json.fromJsonDflt(operationResult, SSHConnectionDetails.class);
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
