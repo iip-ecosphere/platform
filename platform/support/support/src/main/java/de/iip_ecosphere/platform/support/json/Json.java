@@ -35,14 +35,49 @@ public abstract class Json {
     }
     
     /**
-     * Creates a configurable instance.
+     * Creates a configurable instance, no annotations are considered by default.
      * 
      * @return the Json instance
      */
     public static Json createInstance() {
-        return prototype.createInstanceImpl();
+        return prototype.createInstanceImpl(false);
     }
-    
+
+    /**
+     * Creates a configurable instance, all annotations are considered by default.
+     * 
+     * @return the Json instance
+     */
+    public static Json createInstance4All() {
+        return prototype.createInstanceImpl(true);
+    }
+
+    /**
+     * Creates a pre-configured configurable instance by applying {@link Json#configureFor(Class)} so that
+     * usual annotations are considered.
+     * 
+     * @param cls the class to configure for
+     * @return the Json instance
+     */
+    public static Json createInstance(Class<?> cls) {
+        return prototype.createInstanceImpl(false).configureFor(cls);
+    }
+
+    /**
+     * Creates a pre-configured configurable instance by applying {@link Json#configureFor(Class)} so that
+     * usual annotations are considered.
+     * 
+     * @param cls the classes to configure for
+     * @return the Json instance
+     */
+    public static Json createInstance(Class<?>... cls) {
+        Json result = prototype.createInstanceImpl(false);
+        for (Class<?> c: cls) {
+            result.configureFor(c);
+        }
+        return result;
+    }
+
     /**
      * Manually sets the instance. Shall not be needed, but may be required in some tests.
      * 
@@ -57,9 +92,10 @@ public abstract class Json {
     /**
      * Creates the actual instance.
      * 
+     * @param considerAnnotations whether annotations shall be considered automatically
      * @return the instance
      */
-    protected abstract Json createInstanceImpl();
+    protected abstract Json createInstanceImpl(boolean considerAnnotations);
     
     /**
      * Turns an {@code object} to JSON.

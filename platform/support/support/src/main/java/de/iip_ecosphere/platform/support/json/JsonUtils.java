@@ -57,6 +57,7 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.ConfiguredName;
 import de.iip_ecosphere.platform.support.json.Json.EnumMapping;
 
 /**
@@ -463,7 +464,8 @@ public class JsonUtils {
     }
     
     /**
-     * Handles supported annotations on an accessible object.
+     * Handles supported annotations ({@link ConfiguredName}, {@link JsonIgnore}, {@link JsonProperty}) on an 
+     * accessible object.
      * 
      * @param propName the property name
      * @param obj the accessible object
@@ -472,12 +474,15 @@ public class JsonUtils {
      */
     private static void handleAnnotations(String propName, AccessibleObject obj, Set<String> ignores, 
         Map<String, String> renames) {
+        ConfiguredName cfgName = obj.getAnnotation(ConfiguredName.class);
         JsonIgnore annIgnore = obj.getAnnotation(JsonIgnore.class);
         JsonProperty annProp = obj.getAnnotation(JsonProperty.class);
         if (null != annIgnore && annIgnore.value()) {
             ignores.add(propName);
         }
-        if (null != annProp && annProp.value() != null && annProp.value().length() > 0) {
+        if (null != cfgName && cfgName.value() != null && cfgName.value().length() > 0) {
+            renames.put(propName, cfgName.value());
+        } else if (null != annProp && annProp.value() != null && annProp.value().length() > 0) {
             renames.put(propName, annProp.value());
         }
     }
@@ -540,7 +545,26 @@ public class JsonUtils {
 
             @Override
             public boolean hasIgnoreMarker(final AnnotatedMember member) {
-                return exclusions.contains(member.getName()) || super.hasIgnoreMarker(member);
+                boolean excludesByName = exclusions.contains(member.getName()) || super.hasIgnoreMarker(member);
+                if (!excludesByName) {
+                    ConfiguredName cfgName = member.getAnnotation(ConfiguredName.class);
+                    if (null != cfgName && cfgName.value() != null) {
+                        excludesByName = exclusions.contains(cfgName.value());
+                    }
+                }
+                if (!excludesByName) {
+                    JsonIgnore jsonIgnore = member.getAnnotation(JsonIgnore.class);
+                    if (null != jsonIgnore) {
+                        excludesByName = jsonIgnore.value();
+                    }
+                }
+                if (!excludesByName) {
+                    JsonProperty jsonProp = member.getAnnotation(JsonProperty.class);
+                    if (null != jsonProp && jsonProp.value() != null) {
+                        excludesByName = exclusions.contains(jsonProp.value());
+                    }
+                }
+                return excludesByName;
             }
         });
         
