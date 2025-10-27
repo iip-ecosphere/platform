@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -52,6 +53,7 @@ import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.LifecycleHandler;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
@@ -111,6 +113,7 @@ public class SpringCloudServiceManager
          */
         public SpringCloudServiceFactoryDescriptor() {
             super("services-spring", null, ServiceFactoryDescriptor.class, null);
+            LifecycleHandler.consider(getClass().getClassLoader());
         }
 
         @Override
@@ -984,7 +987,12 @@ public class SpringCloudServiceManager
                 SpringCloudServiceSetup setup = SpringInstances.getConfig();
                 LogTailerListener listener = new LogTailerListener(setup.getAas(), setup.getTransport(), 
                     desc.getId().replace(ServiceBase.APPLICATION_SEPARATOR, "/") + "/" + field);
-                Tailer tailer = Tailer.create(file, listener, 300, mode == StreamLogMode.TAIL);
+                Tailer tailer = Tailer.builder()
+                        .setFile(file)
+                        .setTailerListener(listener)
+                        .setDelayDuration(Duration.ofMillis(300))
+                        .setTailFromEnd(mode == StreamLogMode.TAIL)
+                        .get();
                 listener.attachTailer(tailer);
                 desc.attachCloseable(field + "_" + inst.getId(), listener);
                 URI uri = listener.getURI();
