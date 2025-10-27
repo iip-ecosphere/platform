@@ -16,10 +16,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import de.iip_ecosphere.platform.support.json.JsonUtils;
+import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
@@ -30,7 +27,7 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
  */
 public class GenericJsonSerializer<T> implements Serializer<T> {
     
-    private ObjectMapper mapper = new ObjectMapper();
+    private Json mapper = Json.createInstance4All();
     private Class<T> cls;
     
     /**
@@ -40,7 +37,7 @@ public class GenericJsonSerializer<T> implements Serializer<T> {
      */
     public GenericJsonSerializer(Class<T> cls) {
         this.cls = cls;
-        JsonUtils.handleIipDataClasses(mapper);
+        mapper.handleIipDataClasses();
     }
     
     /**
@@ -48,26 +45,18 @@ public class GenericJsonSerializer<T> implements Serializer<T> {
      * 
      * @return the mapper
      */
-    public ObjectMapper getMapper() {
+    public Json getMapper() {
         return mapper;
     }
     
     @Override             
     public T from(byte[] data) throws IOException {
-        try {
-            return mapper.readValue(data, cls);
-        } catch (JsonProcessingException e) {
-            throw new IOException(e);
-        }
+        return mapper.readValue(data, cls);
     }
 
     @Override    
     public byte[] to(T source) throws IOException {
-        try {
-            return mapper.writeValueAsBytes(source);
-        } catch (JsonProcessingException e) {
-            throw new IOException(e);
-        }
+        return mapper.writeValueAsBytes(source);
     }
 
     @Override

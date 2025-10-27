@@ -18,10 +18,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
-import de.iip_ecosphere.platform.support.json.JsonUtils;
+import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.transport.serialization.GenericJsonToStringTranslator;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
@@ -62,8 +60,8 @@ public class TraceRecordSerializer implements Serializer<TraceRecord> {
      * 
      * @return the object mapper
      */
-    private static ObjectMapper createMapper() {
-        return JsonUtils.configureLazy(new ObjectMapper(), ignore);
+    private static Json createMapper() {
+        return Json.createInstance4All().configureLazy(ignore);
     }
 
     /**

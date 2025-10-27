@@ -14,8 +14,7 @@ package de.iip_ecosphere.platform.transport.status;
 
 import java.io.IOException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 
 /**
@@ -25,7 +24,7 @@ import de.iip_ecosphere.platform.transport.serialization.Serializer;
  */
 public class AlertSerializer implements Serializer<Alert> {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final Json MAPPER = Json.createInstance();
     
     @Override
     public Alert from(byte[] data) throws IOException {

@@ -14,10 +14,7 @@ package de.iip_ecosphere.platform.transport.serialization;
 
 import java.io.IOException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import de.iip_ecosphere.platform.support.json.JsonUtils;
+import de.iip_ecosphere.platform.support.json.Json;
 
 /**
  * A simple, generic, reusable JSON serializer.
@@ -27,7 +24,7 @@ import de.iip_ecosphere.platform.support.json.JsonUtils;
  */
 public class GenericJsonToStringTranslator<T> implements TypeTranslator<T, String> {
     
-    private ObjectMapper mapper;
+    private Json mapper;
     private Class<T> cls;
     
     /**
@@ -45,11 +42,11 @@ public class GenericJsonToStringTranslator<T> implements TypeTranslator<T, Strin
      * @param cls the class to be serialized
      * @param mapper the object mapper to use
      */
-    public GenericJsonToStringTranslator(Class<T> cls, ObjectMapper mapper) {
+    public GenericJsonToStringTranslator(Class<T> cls, Json mapper) {
         this.cls = cls;
         if (null == mapper) {
-            this.mapper = new ObjectMapper();
-            JsonUtils.handleIipDataClasses(this.mapper);
+            this.mapper = Json.createInstance4All();
+            this.mapper.handleIipDataClasses();
         } else {
             this.mapper = mapper;
         }
@@ -60,26 +57,18 @@ public class GenericJsonToStringTranslator<T> implements TypeTranslator<T, Strin
      * 
      * @return the mapper
      */
-    public ObjectMapper getMapper() {
+    public Json getMapper() {
         return mapper;
     }
 
     @Override             
     public T from(String data) throws IOException {
-        try {
-            return mapper.readValue(data, cls);
-        } catch (JsonProcessingException e) {
-            throw new IOException(e);
-        }
+        return mapper.readValue(data, cls);
     }
 
     @Override    
     public String to(T source) throws IOException {
-        try {
-            return mapper.writeValueAsString(source);
-        } catch (JsonProcessingException e) {
-            throw new IOException(e);
-        }
+        return mapper.writeValueAsString(source);
     }
 
 }

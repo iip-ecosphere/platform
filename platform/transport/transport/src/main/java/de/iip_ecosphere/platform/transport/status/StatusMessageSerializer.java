@@ -18,10 +18,7 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-
-import de.iip_ecosphere.platform.support.json.JsonUtils.EnumDeserializer;
+import de.iip_ecosphere.platform.support.json.Json;
 
 import de.iip_ecosphere.platform.transport.serialization.GenericJsonToStringTranslator;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
@@ -36,7 +33,7 @@ public class StatusMessageSerializer implements Serializer<StatusMessage> {
 
     private static final Map<String, ActionType> ACTION_CONSTANTS = new HashMap<>();
     private static final Map<String, ComponentType> COMPONENT_CONSTANTS = new HashMap<>();
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final Json MAPPER = Json.createInstance4All();
 
     /**
      * Creates an object mapper instances.
@@ -46,15 +43,9 @@ public class StatusMessageSerializer implements Serializer<StatusMessage> {
     static  {
         registerActions(ActionTypes.class);
         registerComponents(ComponentTypes.class);
-        
-        SimpleModule module = new SimpleModule();
-        // fill module
-        module.addDeserializer(ActionType.class, 
-            new EnumDeserializer<ActionType>(ACTION_CONSTANTS, ActionType.class));
-        module.addDeserializer(ComponentType.class, 
-            new EnumDeserializer<ComponentType>(COMPONENT_CONSTANTS, ComponentType.class));
-        
-        MAPPER.registerModule(module);
+        MAPPER.declareEnums(
+            MAPPER.createEnumMapping(ActionType.class, ACTION_CONSTANTS),
+            MAPPER.createEnumMapping(ComponentType.class, COMPONENT_CONSTANTS));
     }
     
     /**
