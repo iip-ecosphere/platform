@@ -254,6 +254,7 @@ public class LifecycleHandler {
     public static void consider(ClassLoader loader) {
         if (null != loader) {
             if (null == loaders) {
+                loaders = new ArrayList<>();
                 loaders.add(loader);
             }
             if (descriptors != null) { // complement
