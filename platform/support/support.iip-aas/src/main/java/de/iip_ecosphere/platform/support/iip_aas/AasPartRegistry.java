@@ -57,6 +57,7 @@ import de.iip_ecosphere.platform.support.iip_aas.config.ProtocolAddressHolder;
 import de.iip_ecosphere.platform.support.iip_aas.config.RuntimeSetupEndpointValidator;
 import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
 import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
+import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
@@ -801,7 +802,7 @@ public class AasPartRegistry {
      * @return the loader instance
      */
     private static ServiceLoader<AasContributor> getContributorLoader() {
-        return ServiceLoader.load(AasContributor.class);        
+        return ServiceLoaderUtils.load(AasContributor.class);        
     }
     
     /**

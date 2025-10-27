@@ -12,9 +12,6 @@
 
 package de.iip_ecosphere.platform.support.iip_aas;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Type;
@@ -26,11 +23,14 @@ import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
+import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManager;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 
 import static de.iip_ecosphere.platform.support.aas.AasUtils.*;
+
+import java.io.IOException;
 
 /**
  * Builds an active AAS for the {@link NetworkManager}.
@@ -51,7 +51,6 @@ public class NetworkManagerAas implements AasContributor {
     public static final String OP_REGISTER_INSTANCE = "registerInstance";
     public static final String OP_UNREGISTER_INSTANCE = "unregisterInstance";
     public static final String OP_GET_REGISTERED_INSTANCES = "getRegisteredInstances";
-    private static final ObjectMapper MAPPER = new ObjectMapper();
     
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
@@ -214,9 +213,9 @@ public class NetworkManagerAas implements AasContributor {
         ManagedServerAddress result = null;
         if (null != json) {
             try {
-                ManagedServerAddressHolder tmp = MAPPER.readValue(json.toString(), ManagedServerAddressHolder.class);
+                ManagedServerAddressHolder tmp = Json.fromJsonDflt(json.toString(), ManagedServerAddressHolder.class);
                 result = new ManagedServerAddress(tmp.getSchema(), tmp.getHost(), tmp.getPort(), tmp.isNew());
-            } catch (JsonProcessingException e) {
+            } catch (IOException e) {
                 //result = null;
             }
         }
@@ -234,8 +233,8 @@ public class NetworkManagerAas implements AasContributor {
         if (null != address) {
             try {
                 ManagedServerAddressHolder tmp = new ManagedServerAddressHolder(address);
-                result = MAPPER.writeValueAsString(tmp);
-            } catch (JsonProcessingException e) {
+                result = Json.writeValueAsStringDflt(tmp);
+            } catch (IOException e) {
                 // handled by default value
             }
         }
