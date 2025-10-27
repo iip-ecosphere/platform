@@ -13,7 +13,6 @@
 package test.de.iip_ecosphere.platform.support;
 
 import java.io.File;
-import java.util.ServiceLoader;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -23,6 +22,7 @@ import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.LifecycleHandler;
 import de.iip_ecosphere.platform.support.PidLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.TerminatingLifecycleDescriptor;
+import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 
 /**
  * Tests {@link LifecycleDescriptor} and {@link LifecycleHandler}.
@@ -135,7 +135,7 @@ public class LifecycleHandlerTest {
         shutdownHookCalledCount = 0;
         countDescriptors = 0;
         
-        ServiceLoader.load(LifecycleDescriptor.class).forEach(l -> { countDescriptors++; });
+        ServiceLoaderUtils.load(LifecycleDescriptor.class).forEach(l -> { countDescriptors++; });
         Assert.assertEquals(2, countDescriptors);
        
         Assert.assertNotNull(LifecycleHandler.descriptors());

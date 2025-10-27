@@ -249,7 +249,7 @@ public abstract class AasFactory {
      */
     protected AasFactory() {
         // load specified first so that refined classes can overwrite protocols on demand later in their constructor
-        ServiceLoader<ProtocolDescriptor> loader = ServiceLoader.load(ProtocolDescriptor.class);
+        ServiceLoader<ProtocolDescriptor> loader = ServiceLoaderUtils.load(ProtocolDescriptor.class);
         Iterator<ProtocolDescriptor> iter = loader.iterator();
         while (iter.hasNext()) {
             ProtocolDescriptor desc = iter.next();

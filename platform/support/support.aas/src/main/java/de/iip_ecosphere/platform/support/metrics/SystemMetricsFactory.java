@@ -13,7 +13,8 @@
 package de.iip_ecosphere.platform.support.metrics;
 
 import java.util.Iterator;
-import java.util.ServiceLoader;
+
+import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 
 /**
  * Provides the system metrics instance to use. This class installs a shutdown hook on {@link SystemMetrics#close()}.
@@ -32,7 +33,8 @@ public class SystemMetricsFactory {
     public static SystemMetrics getSystemMetrics() {
         if (null == instance) {
             SystemMetricsDescriptor desc;
-            Iterator<SystemMetricsDescriptor> iterator = ServiceLoader.load(SystemMetricsDescriptor.class).iterator();
+            Iterator<SystemMetricsDescriptor> iterator = ServiceLoaderUtils.load(
+                SystemMetricsDescriptor.class).iterator();
             SystemMetricsDescriptor first = null;
             SystemMetricsDescriptor firstEnabled = null;
             SystemMetricsDescriptor firstFallback = null;

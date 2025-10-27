@@ -19,11 +19,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
+import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
@@ -126,7 +126,7 @@ public class LifecycleHandler {
             }
         }
         if (!profileName.equals(DefaultProfile.NAME)) {
-            Iterator<LifecycleProfile> iter = ServiceLoader.load(LifecycleProfile.class).iterator();
+            Iterator<LifecycleProfile> iter = ServiceLoaderUtils.load(LifecycleProfile.class).iterator();
             while (iter.hasNext()) {
                 LifecycleProfile p = iter.next();
                 if (profileName.equals(p.getName())) {
@@ -236,7 +236,7 @@ public class LifecycleHandler {
      */
     private static List<LifecycleDescriptor> getDescriptors() {
         if (null == descriptors) {
-            descriptors = CollectionUtils.toList(ServiceLoader.load(LifecycleDescriptor.class).iterator()); // JDK 1.8
+            descriptors = CollectionUtils.toList(ServiceLoaderUtils.load(LifecycleDescriptor.class).iterator());
         }
         return descriptors;
     }
