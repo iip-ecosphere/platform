@@ -19,12 +19,11 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.iip_ecosphere.platform.services.environment.GenericMultiTypeServiceImpl.OutTypeInfo;
 import de.iip_ecosphere.platform.services.environment.services.WsAdapter;
 import de.iip_ecosphere.platform.support.PythonUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.support.logging.Logger;
@@ -169,7 +168,7 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
      */
     private class PyWebSocket extends WsAdapter {
 
-        private ObjectMapper objectMapper = new ObjectMapper();
+        private Json objectMapper = Json.createInstance();
 
         /**
          * Creates a web socket for the given server URI.

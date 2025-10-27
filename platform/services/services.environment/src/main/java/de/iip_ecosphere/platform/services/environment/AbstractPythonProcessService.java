@@ -27,15 +27,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.iip_ecosphere.platform.services.environment.GenericMultiTypeServiceImpl.InTypeInfo;
 import de.iip_ecosphere.platform.services.environment.GenericMultiTypeServiceImpl.OutTypeInfo;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.PythonUtils;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.StringUtils;
+import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.setup.InstalledDependenciesSetup;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
@@ -320,10 +318,9 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
      * @return the JSON representation
      */
     protected String toJson(Map<String, String> reconfValues) {
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            return objectMapper.writeValueAsString(reconfValues);
-        } catch (JsonProcessingException e) {
+            return Json.writeValueAsStringDflt(reconfValues);
+        } catch (IOException e) {
             getLogger().error("Translating " + reconfValues + " to JSON failed: " + e.getMessage());
             return "{}";
         }
@@ -345,14 +342,13 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
      * @return the type mappings
      */
     protected String getTypeSubstitutionsJson() {
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
             Map<String, String> tmp = getTypeSubstitutions().entrySet().stream().collect(Collectors.toMap(
                 e -> toPythonDataCls(e.getKey()),
                 e -> toPythonDataCls(e.getValue())
                 ));
-            return objectMapper.writeValueAsString(tmp);
-        } catch (JsonProcessingException e) {
+            return Json.writeValueAsStringDflt(tmp);
+        } catch (IOException e) {
             getLogger().error("Translating type mappings to JSON failed: " + e.getMessage());
             return "{}";
         }
