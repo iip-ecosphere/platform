@@ -58,6 +58,8 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.ConfiguredName;
+import de.iip_ecosphere.platform.support.Ignore;
+import de.iip_ecosphere.platform.support.IgnoreProperties;
 import de.iip_ecosphere.platform.support.json.Json.EnumMapping;
 
 /**
@@ -424,11 +426,15 @@ public class JsonUtils {
      * @return {@code mapper}
      */
     public static ObjectMapper configureFor(ObjectMapper mapper, Class<?> cls) {
-        JsonIgnoreProperties annIgnoreProp = cls.getAnnotation(JsonIgnoreProperties.class);
+        IgnoreProperties annIgnoreProp = cls.getAnnotation(IgnoreProperties.class);
+        JsonIgnoreProperties jsonIgnoreProp = cls.getAnnotation(JsonIgnoreProperties.class);
         Set<String> ignores = new HashSet<>();
         Map<String, String> renames = new HashMap<>();
         boolean ignoreCls = false;
         if (null != annIgnoreProp && annIgnoreProp.ignoreUnknown()) {
+            ignoreCls = true;
+        }
+        if (null != jsonIgnoreProp && jsonIgnoreProp.ignoreUnknown()) {
             ignoreCls = true;
         }
         for (Field f : cls.getDeclaredFields()) {
@@ -464,8 +470,8 @@ public class JsonUtils {
     }
     
     /**
-     * Handles supported annotations ({@link ConfiguredName}, {@link JsonIgnore}, {@link JsonProperty}) on an 
-     * accessible object.
+     * Handles supported annotations ({@link ConfiguredName}, {@link Ignore}, {@link IgnoreProperties}, 
+     * {@link JsonIgnore}, {@link JsonProperty}) on an accessible object.
      * 
      * @param propName the property name
      * @param obj the accessible object
@@ -475,9 +481,13 @@ public class JsonUtils {
     private static void handleAnnotations(String propName, AccessibleObject obj, Set<String> ignores, 
         Map<String, String> renames) {
         ConfiguredName cfgName = obj.getAnnotation(ConfiguredName.class);
-        JsonIgnore annIgnore = obj.getAnnotation(JsonIgnore.class);
+        Ignore annIgnore = obj.getAnnotation(Ignore.class);
+        JsonIgnore jsonIgnore = obj.getAnnotation(JsonIgnore.class);
         JsonProperty annProp = obj.getAnnotation(JsonProperty.class);
         if (null != annIgnore && annIgnore.value()) {
+            ignores.add(propName);
+        }
+        if (null != jsonIgnore && jsonIgnore.value()) {
             ignores.add(propName);
         }
         if (null != cfgName && cfgName.value() != null && cfgName.value().length() > 0) {
@@ -550,6 +560,12 @@ public class JsonUtils {
                     ConfiguredName cfgName = member.getAnnotation(ConfiguredName.class);
                     if (null != cfgName && cfgName.value() != null) {
                         excludesByName = exclusions.contains(cfgName.value());
+                    }
+                }
+                if (!excludesByName) {
+                    Ignore ignore = member.getAnnotation(Ignore.class);
+                    if (null != ignore) {
+                        excludesByName = ignore.value();
                     }
                 }
                 if (!excludesByName) {
@@ -760,7 +776,7 @@ public class JsonUtils {
     }
 
     /**
-     * Property exclusion modifier to simulate {@link JsonIgnoreProperties}.
+     * Property exclusion modifier to simulate {@link IgnoreProperties}, {@link JsonIgnoreProperties}.
      * 
      * @author Holger Eichelberger, SSE
      */

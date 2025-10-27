@@ -18,8 +18,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import de.iip_ecosphere.platform.support.ConfiguredName;
+
 /**
- * Simplified annotation to specify properties.
+ * Simplified annotation to specify properties. To be replaced by {@link ConfiguredName}.
  * 
  * @author Fasterxml/Jackson
  */

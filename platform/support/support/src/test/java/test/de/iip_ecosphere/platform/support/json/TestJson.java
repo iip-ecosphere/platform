@@ -349,5 +349,5 @@ public class TestJson extends de.iip_ecosphere.platform.support.json.Json {
     public String writeValueAsString(Object value) throws IOException {
         return mapper.writeValueAsString(value);
     }
-
+    
 }

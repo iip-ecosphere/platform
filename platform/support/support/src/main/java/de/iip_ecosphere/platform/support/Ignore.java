@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.support.json;
+package de.iip_ecosphere.platform.support;
 
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -18,16 +18,14 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import de.iip_ecosphere.platform.support.Ignore;
-
 /**
- * Simplified annotation to ignore properties. To be replaced by {@link Ignore}.
+ * Simplified annotation to ignore properties.
  * 
  * @author Fasterxml/Jackson
  */
 @Retention(RUNTIME)
 @Target({ANNOTATION_TYPE, METHOD, CONSTRUCTOR, FIELD})
-public @interface JsonIgnore {
+public @interface Ignore {
 
     /**
      * Optional argument that defines whether this annotation is active

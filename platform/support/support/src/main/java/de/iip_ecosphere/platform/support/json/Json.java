@@ -103,9 +103,27 @@ public abstract class Json {
      * @param obj the object (may be <b>null</b>), must have getters/setters for all attributes and a no-arg constructor
      *   no-arg constructor
      * @return the JSON string or an empty string in case of problems/no address
+     * @throws IOException in case of serious issues
      * @see #fromJson(Object, Class)
      */
     public abstract String toJson(Object obj) throws IOException;
+
+    /**
+     * Turns an {@code object} to JSON without throwing exceptions.
+     * 
+     * @param obj the object (may be <b>null</b>), must have getters/setters for all attributes and a no-arg constructor
+     *   no-arg constructor
+     * @return the JSON string or an empty string in case of problems/no address
+     */
+    public String toJsonQuiet(Object obj) {
+        String result;
+        try {
+            result = toJson(obj);
+        } catch (IOException e) {
+            result = "";
+        }
+        return result;
+    }
 
     /**
      * Reads an Object from a JSON string.

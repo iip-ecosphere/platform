@@ -3,6 +3,7 @@ package de.iip_ecosphere.platform.support.json;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Map;
 
 /**
  * An iterable JSON structure. Abstraction based on Jsoniter.
@@ -184,5 +185,14 @@ public interface JsonIterator {
      * @throws IOException if the actual value is not a big decimal
      */
     public BigDecimal toBigDecimalValue() throws IOException;
+    
+    /**
+     * Turns the full iterator into a map of objects.
+     * 
+     * @return the data as map; types may be larger than expected, e.g., int may be returned as long; arrays are 
+     *     returned as list, objects as {@code Map<String, Object>}
+     * @throws IOException if reading fails
+     */
+    public Map<String, Object> asMap() throws IOException;
     
 }
