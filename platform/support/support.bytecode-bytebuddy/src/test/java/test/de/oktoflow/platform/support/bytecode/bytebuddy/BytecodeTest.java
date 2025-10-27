@@ -2,6 +2,8 @@ package test.de.oktoflow.platform.support.bytecode.bytebuddy;
 
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.ConfiguredName;
+import de.iip_ecosphere.platform.support.IgnoreProperties;
 import de.iip_ecosphere.platform.support.bytecode.Bytecode;
 import de.iip_ecosphere.platform.support.bytecode.Bytecode.ClassBuilder;
 import de.iip_ecosphere.platform.support.json.JsonIgnoreProperties;
@@ -124,10 +126,16 @@ public class BytecodeTest {
         ClassBuilder<Data> builder = Bytecode.getInstance().createClassBuilder("iip.mock.Mock", 
             Data.class, BytecodeTest.class.getClassLoader());
         builder.implement(BaseDataUnitFunctions.class);
+        builder.annotate(IgnoreProperties.class)
+            .define("ignoreUnknown", true)
+            .build();
         builder.annotate(JsonIgnoreProperties.class)
             .define("ignoreUnknown", true)
             .build();
         builder.defineProperty("$period", Integer.TYPE)
+            .annotate(ConfiguredName.class)
+                .define("value", "abc")
+                .build()
             .annotate(JsonProperty.class)
                 .define("value", "abc")
                 .build()
@@ -182,6 +190,9 @@ public class BytecodeTest {
         Class<? extends Object> cls = Bytecode.getInstance().createClassBuilder("MyType", 
             Object.class, BytecodeTest.class.getClassLoader())
             .definePublicField("intField", Integer.TYPE)
+                .annotate(ConfiguredName.class)
+                    .define("value", "bce")
+                    .build()
                 .annotate(JsonProperty.class)
                     .define("value", "bce")
                     .build()

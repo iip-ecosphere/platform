@@ -245,4 +245,40 @@ public class JsoniterAny implements JsonIterator {
         }
     }
 
+    @Override
+    public Map<String, Object> asMap() throws IOException {
+        Map<String, Object> result = new HashMap<>();
+        final com.jsoniter.any.Any.EntryIterator iter = any.entries();
+        while (iter.next()) {
+            String key = iter.key();
+            Any value = iter.value();
+            collectAll(key, value, result);
+        }
+        return result;
+    }
+
+    /**
+     * Collects all (nested) entries for field {@code name}-{@code any} in {@code result}.
+     * 
+     * @param the name of the field
+     * @param any the value of the field
+     * @param fields the fields representing the parent of this field, to be modified as a side effect
+     */
+    private void collectAll(String name, Any any, Map<String, Object> fields) {
+        final com.jsoniter.any.Any.EntryIterator iter = any.entries();
+        Map<String, Object> nested = null;
+        while (iter.next()) {
+            if (null == nested) {
+                nested = new HashMap<>();
+            }
+            String key = iter.key();
+            Any value = iter.value();
+            collectAll(key, value, nested);
+            fields.put(name, nested);
+        }
+        if (null == nested) {
+            fields.put(name, any.object());
+        }
+    }
+
 }

@@ -13,9 +13,8 @@
 package iip.datatypes;
 
 import de.iip_ecosphere.platform.support.ConfiguredName;
+import de.iip_ecosphere.platform.support.Ignore;
 import de.iip_ecosphere.platform.support.StringUtils;
-import de.iip_ecosphere.platform.support.json.JsonIgnore;
-import de.iip_ecosphere.platform.support.json.JsonProperty;
 
 /**
  * Implements {@link Data}.
@@ -24,7 +23,6 @@ import de.iip_ecosphere.platform.support.json.JsonProperty;
  */
 public class DataImpl implements Data {
     
-    @JsonProperty("iField")
     @ConfiguredName("iField")
     private int value;
 
@@ -44,13 +42,13 @@ public class DataImpl implements Data {
     }
 
     @Override
-    @JsonIgnore
+    @Ignore
     public int getValue() {
         return value;
     }
 
     @Override
-    @JsonIgnore
+    @Ignore
     public void setValue(int value) {
         this.value = value;
     }

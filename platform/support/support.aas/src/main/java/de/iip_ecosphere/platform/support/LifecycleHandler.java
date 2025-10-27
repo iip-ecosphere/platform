@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -103,6 +104,7 @@ public class LifecycleHandler {
     private static String[] cmdArgs;
     private static boolean waiting = false;
     private static List<LifecycleDescriptor> descriptors;
+    private static List<ClassLoader> loaders;
     private static LifecycleProfile profile = DefaultProfile.INSTANCE;
     
     // checkstyle: stop exception type check
@@ -237,8 +239,42 @@ public class LifecycleHandler {
     private static List<LifecycleDescriptor> getDescriptors() {
         if (null == descriptors) {
             descriptors = CollectionUtils.toList(ServiceLoaderUtils.load(LifecycleDescriptor.class).iterator());
+            if (loaders != null) {
+                loaders.forEach(l -> complementDescriptors(l));
+            }
         }
         return descriptors;
+    }
+    
+    /**
+     * Considers the given (plugin) class loader for obtaining all descriptors.
+     * 
+     * @param loader the class loader
+     */
+    public static void consider(ClassLoader loader) {
+        if (null != loader) {
+            if (null == loaders) {
+                loaders.add(loader);
+            }
+            if (descriptors != null) { // complement
+                complementDescriptors(loader);
+            }
+        }
+    }
+
+    /**
+     * Adds unknown descriptors from {@code loader}.
+     * 
+     * @param loader the loader to consider
+     */
+    private static void complementDescriptors(ClassLoader loader) {
+        Iterator<LifecycleDescriptor> iter = ServiceLoader.load(LifecycleDescriptor.class, loader).iterator();
+        while (iter.hasNext()) {
+            LifecycleDescriptor d = iter.next();
+            if (!descriptors.contains(d)) {
+                descriptors.add(d);
+            }
+        }
     }
     
     /**

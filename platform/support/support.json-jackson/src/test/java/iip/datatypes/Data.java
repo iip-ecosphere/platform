@@ -13,7 +13,7 @@
 package iip.datatypes;
 
 import de.iip_ecosphere.platform.support.ConfiguredName;
-import de.iip_ecosphere.platform.support.json.JsonIgnore;
+import de.iip_ecosphere.platform.support.Ignore;
 
 /**
  * A data interface for testing.
@@ -28,7 +28,7 @@ public interface Data {
      * 
      * @return the value
      */
-    @JsonIgnore
+    @Ignore
     public int getValue();
     
     /**
@@ -36,7 +36,7 @@ public interface Data {
      * 
      * @param value the new value
      */
-    @JsonIgnore
+    @Ignore
     public void setValue(int value);
     
 }

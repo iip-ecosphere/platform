@@ -246,7 +246,42 @@ public class JsonTest {
         String tmpStr = new String(tmpData);
         Assert.assertTrue(tmpStr.startsWith("[") && tmpStr.endsWith("]"));
     }
-    
+
+    /**
+     * Tests {@link JsoniterAny#asMap()}.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testJsonIterAsMap() throws IOException {
+        JsonObject jobj = Json.createObjectBuilder()
+            .add("intVal", 1)
+            .add("strVal", "abc")
+            .add("boolVal", true)
+            .add("dblVal", 2.0)
+            .add("arr", Json.createArrayBuilder()
+                .add(1)
+                .add("str")
+                .add(true)
+                .add(Json.createArrayBuilder()) // as array builder
+                .build()) // as array value
+            .add("obj", Json.createObjectBuilder()
+                .add("innerIntVal", 1)
+                .build())
+            .build();
+        String json = jobj.toString();
+        
+        Map<String, Object> data = Json.parse(json).asMap();
+        Assert.assertEquals(1L, data.get("intVal"));
+        Assert.assertEquals("abc", data.get("strVal"));
+        Assert.assertEquals(true, data.get("boolVal"));
+        Assert.assertEquals(2.0, data.get("dblVal"));
+        Assert.assertTrue(data.get("obj") instanceof Map);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> obj = (Map<String, Object>) data.get("obj");
+        Assert.assertEquals(1L, obj.get("innerIntVal"));
+    }
+
     /**
      * Tests {@link Json#handleIipDataClasses()}.
      */
