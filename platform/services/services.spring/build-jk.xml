@@ -14,5 +14,9 @@
         <maven pomFile="test.simpleStream.spring/pom.xml" goal="deploy"/>
 	    <maven pomFile="pom.xml" goal="deploy"/>
         <maven pomFile="services.spring.plugintests/pom.xml" goal="deploy"/>
+        <delete>
+            <dirset dir="${basedir}" includes="java-server-*" />
+            <dirset dir="${basedir}/services.spring.plugintests" includes="java-server-*" />
+        </delete>
 	</target>
 </project>
