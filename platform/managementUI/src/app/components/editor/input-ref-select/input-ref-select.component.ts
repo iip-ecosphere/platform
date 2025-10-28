@@ -128,6 +128,7 @@ export class InputRefSelectComponent extends Utils implements OnInit {
 
   public async getConfigurationType(type: string) {
     const response = await this.api.getConfiguredElements(type);
+    response.value = DataUtils.filterMetaTemplate(response.value);
     if (response && response.value) {
       for (let dep of response.value) {
         if (dep.idShort && metaTypes.indexOf(dep.idShort) === -1) {
