@@ -137,10 +137,11 @@
       <artifactId>netty-codec-http</artifactId>
       <version>4.1.59.Final</version><!--$NO-MVN-MAN-VER$-->
     </dependency>
-    <!--<dependency>
+    <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
-    </dependency>  -->
+      <version>1.27</version>
+    </dependency>
           
     <dependency>
       <groupId>junit</groupId>
