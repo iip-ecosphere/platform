@@ -78,10 +78,12 @@
        <groupId>com.hivemq</groupId>
        <artifactId>hivemq-community-edition-embedded</artifactId>
        <scope>test</scope>
+       <version>${com.hivemq.version}</version>
      </dependency>
      <dependency>
        <groupId>com.googlecode.json-simple</groupId>
        <artifactId>json-simple</artifactId>
+       <version>${com.googlecode.json-simple.version}</version>
        <scope>test</scope>
      </dependency>      
 

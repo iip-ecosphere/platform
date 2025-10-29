@@ -12,6 +12,10 @@
      <version>0.7.1-SNAPSHOT</version>
      <relativePath/>
   </parent>
+  
+  <properties>
+      <eclipse.milo.version>0.6.4</eclipse.milo.version>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -32,10 +36,12 @@
     <dependency>
       <groupId>org.eclipse.milo</groupId>
       <artifactId>sdk-client</artifactId>
+      <version>${eclipse.milo.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
+      <version>${apache.commons.io.version}</version>
     </dependency>
     
     <dependency>
@@ -46,6 +52,7 @@
     <dependency>
       <groupId>org.eclipse.milo</groupId>
       <artifactId>sdk-server</artifactId>
+      <version>${eclipse.milo.version}</version>
       <scope>test</scope>
     </dependency>
       <dependency>
