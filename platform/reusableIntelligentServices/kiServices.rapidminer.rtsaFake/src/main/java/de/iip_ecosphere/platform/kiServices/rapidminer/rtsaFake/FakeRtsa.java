@@ -29,10 +29,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.iip_ecosphere.platform.support.ZipUtils;
+import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
 import spark.Route;
@@ -492,7 +490,7 @@ public class FakeRtsa {
     private static String createResponse(String request, Deployment deployment) {
         String result;
         try {
-            ObjectMapper mapper = new ObjectMapper();
+            Json mapper = Json.createInstance();
             Input input = mapper.readValue(request, Input.class);
             if (input.data != null) {
                 for (Map<String, Object> values : input.data) {
@@ -527,7 +525,7 @@ public class FakeRtsa {
                 }
             }
             result = mapper.writeValueAsString(input);
-        } catch (JsonProcessingException e) {
+        } catch (IOException e) {
             System.out.println("Cannot read input: " + request + ": " + e.getMessage());
             result = request;
         }

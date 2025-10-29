@@ -37,6 +37,7 @@
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
       <scope>test</scope>
+      <version>${com.googlecode.json-simple.version}</version>
     </dependency>
     <dependency>
       <artifactId>support.processInfo-oshi</artifactId>
