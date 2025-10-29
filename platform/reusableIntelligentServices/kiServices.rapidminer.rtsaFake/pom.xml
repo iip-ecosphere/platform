@@ -36,7 +36,12 @@
       <artifactId>jackson-databind</artifactId>
       <version>2.11.4</version>
     </dependency>     
-
+    <dependency> <!-- exception, this is a standalone program -->
+      <artifactId>support.json-jackson</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+    </dependency> 
+    
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
