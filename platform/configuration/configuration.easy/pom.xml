@@ -29,8 +29,21 @@
   
   <properties>
     <model.parent>../configuration</model.parent>
+    <net.ssehub.easyProducer.version>1.3.10-SNAPSHOT</net.ssehub.easyProducer.version>
   </properties>
-
+  
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>net.ssehub.easy.runtime</groupId>
+        <artifactId>EASy-dependencies</artifactId>
+        <version>${net.ssehub.easyProducer.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  
   <dependencies>
     <dependency> <!-- required for xtext -->
       <groupId>com.google.guava</groupId>
@@ -119,6 +132,7 @@
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
+      <version>${com.googlecode.json-simple.version}</version>
     </dependency>
     <dependency> <!-- preliminary -->
         <groupId>org.apache.poi</groupId>
