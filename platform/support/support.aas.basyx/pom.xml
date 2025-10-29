@@ -130,16 +130,17 @@
     <dependency>
          <groupId>com.google.guava</groupId>
          <artifactId>guava</artifactId>    
+         <version>33.2.0-jre</version>
     </dependency>
     <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-codec-http</artifactId>
       <version>4.1.59.Final</version><!--$NO-MVN-MAN-VER$-->
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
-    </dependency>  
+    </dependency>  -->
           
     <dependency>
       <groupId>junit</groupId>
