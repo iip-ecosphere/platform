@@ -34,6 +34,7 @@
         <groupId>com.hivemq</groupId>
         <artifactId>hivemq-community-edition-embedded</artifactId>
         <scope>test</scope>
+        <version>${com.hivemq.version}</version>
       </dependency>
         
   </dependencies>

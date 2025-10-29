@@ -33,6 +33,7 @@
       <dependency>
         <groupId>io.moquette</groupId>
         <artifactId>moquette-broker</artifactId>
+        <version>${io.moquette.version}</version>
         <scope>test</scope>
       </dependency>
         
