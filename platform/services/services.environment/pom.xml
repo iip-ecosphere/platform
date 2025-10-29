@@ -33,10 +33,10 @@
      <artifactId>connectors</artifactId>
      <version>${project.version}</version>
     </dependency>
-     <dependency>
+     <!--<dependency>
       <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-client</artifactId>
-     </dependency>
+     </dependency>-->
     <!--<dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
@@ -88,6 +88,7 @@
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
+      <version>${com.googlecode.json-simple.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

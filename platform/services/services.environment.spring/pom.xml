@@ -66,10 +66,11 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-     </dependency>
+      <version>33.2.0-jre</version>
+     </dependency>-->
 
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
