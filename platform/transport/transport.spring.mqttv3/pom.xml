@@ -43,6 +43,7 @@
     <dependency>
       <groupId>org.eclipse.paho</groupId>
       <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+      <version>${eclipse.paho.version}</version>
     </dependency>
 
     <dependency>
@@ -65,6 +66,7 @@
     <dependency>
         <groupId>io.moquette</groupId>
         <artifactId>moquette-broker</artifactId>
+        <version>${io.moquette.version}</version>
         <scope>test</scope>
     </dependency>
     <dependency>
