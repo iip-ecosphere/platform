@@ -24,14 +24,17 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
+      <version>${apache.commons.io.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
+      <version>${apache.commons.lang3.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-text</artifactId>
+      <version>${apache.commons.text.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-validator</groupId>
@@ -48,10 +51,12 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
+      <version>2.11.4</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
+      <version>2.11.4</version>
     </dependency>
     <!-- end preliminary json-jackson -->
     <dependency>
@@ -79,10 +84,11 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
+    <dependency> <!-- preliminary -->
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
       <scope>test</scope>
+      <version>1.27</version>
     </dependency>
     <dependency> <!-- May cause jetty http request factory conflicts with spring -->
         <groupId>com.sparkjava</groupId>
@@ -90,10 +96,11 @@
         <version>2.9.3</version>
         <scope>test</scope>
     </dependency>
-     <dependency>
+     <dependency> <!-- preliminary -->
       <groupId>org.glassfish</groupId>
       <artifactId>javax.json</artifactId>
-        <scope>test</scope>
+      <scope>test</scope>
+      <version>1.1.4</version>
     </dependency>    
   </dependencies>
   
