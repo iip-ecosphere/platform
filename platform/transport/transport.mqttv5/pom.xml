@@ -27,6 +27,7 @@
       <dependency>
         <groupId>org.eclipse.paho</groupId>
         <artifactId>org.eclipse.paho.mqttv5.client</artifactId>
+        <version>${eclipse.paho.version}</version>
       </dependency>
 
       <!-- tests -->
@@ -66,6 +67,7 @@
         <groupId>com.google.protobuf</groupId>
         <artifactId>protobuf-java</artifactId>
         <scope>test</scope>
+        <version>${protobuf.version}</version>
       </dependency>      
 	  <dependency>
 	    <groupId>de.iip-ecosphere.platform</groupId>
@@ -78,11 +80,13 @@
         <groupId>com.hivemq</groupId>
         <artifactId>hivemq-community-edition-embedded</artifactId>
         <scope>test</scope>
+        <version>${com.hivemq.version}</version>
       </dependency>
       <dependency>
         <groupId>com.googlecode.json-simple</groupId>
         <artifactId>json-simple</artifactId>
         <scope>test</scope>
+        <version>${com.googlecode.json-simple.version}</version>
       </dependency>
         
   </dependencies>

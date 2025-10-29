@@ -27,6 +27,7 @@
     <dependency>
       <groupId>com.rabbitmq</groupId>
       <artifactId>amqp-client</artifactId>
+      <version>${rabbitmq.version}</version>
     </dependency>
     
     <dependency>
@@ -73,17 +74,20 @@
       <groupId>org.apache.qpid</groupId>
       <artifactId>qpid-broker</artifactId>
       <scope>test</scope>
+      <version>${org.apache.qpid.version}</version>
     </dependency>
     <!-- A bit JSON for testing serialization/deserialization -->
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
       <scope>test</scope>
+      <version>${com.googlecode.json-simple.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
       <scope>test</scope>
+      <version>${protobuf.version}</version>
     </dependency>      
   </dependencies>
 
