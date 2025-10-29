@@ -57,10 +57,36 @@
       <scope>test</scope>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <artifactId>support.json-jackson</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency> 
   </dependencies>
   
   <build>
     <plugins>
+       <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-antrun-plugin</artifactId>
+         <version>1.8</version>
+         <executions>
+            <execution>
+                <id>cleanup fake RTSA</id>
+                <phase>process-test-resources</phase>
+                <goals>
+                    <goal>run</goal>
+                </goals>         
+                <configuration>
+                  <target>
+                    <delete dir="${project.build.directory}/fake/rtsa"/>
+                  </target>
+                </configuration>
+            </execution>
+         </executions>
+       </plugin>
+
       <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>

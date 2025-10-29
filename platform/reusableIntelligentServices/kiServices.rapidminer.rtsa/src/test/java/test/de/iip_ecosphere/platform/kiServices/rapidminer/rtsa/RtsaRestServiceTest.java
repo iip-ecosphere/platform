@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,6 +29,7 @@ import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.YamlProcess;
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.ZipUtils;
@@ -182,7 +182,7 @@ public class RtsaRestServiceTest {
      */
     @BeforeClass
     public static void startup() {
-        if (!SystemUtils.IS_JAVA_1_8) {
+        if (!OsUtils.isJava1_8()) {
             String prop = System.getProperty("iip.test.java8", null);
             if (prop != null) {
                 File java8 = new File(prop);
