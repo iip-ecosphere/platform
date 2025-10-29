@@ -70,6 +70,7 @@
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
+      <version>${com.googlecode.json-simple.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
