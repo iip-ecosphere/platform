@@ -18,6 +18,18 @@
      <relativePath/>
   </parent>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.glassfish.jersey</groupId>
+        <artifactId>jersey-bom</artifactId>
+        <type>pom</type>
+        <scope>import</scope>
+        <version>2.32</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>

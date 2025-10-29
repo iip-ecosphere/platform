@@ -195,6 +195,7 @@ public class AssetSpringApp implements WebMvcConfigurer {
             } catch (Throwable t) {
                 LoggerFactory.getLogger(AssetSpringApp.class).error("Calling AAS operation '{}': {}", 
                     opName, t.getMessage());
+                LoggerFactory.getLogger(AssetSpringApp.class).error("Exception: " + t);
                 responseStatus = HttpStatus.INTERNAL_SERVER_ERROR;
             }
         } else {

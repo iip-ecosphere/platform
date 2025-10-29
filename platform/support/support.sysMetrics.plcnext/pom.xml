@@ -19,6 +19,18 @@
     <grpc.version>1.36.2</grpc.version>
     <protoc.version>3.9.0</protoc.version>
   </properties>
+  
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-bom</artifactId>
+        <type>pom</type>
+        <version>4.1.59.Final</version>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>

@@ -160,7 +160,8 @@
     </dependency>
     <dependency>
          <groupId>com.google.guava</groupId>
-         <artifactId>guava</artifactId>    
+         <artifactId>guava</artifactId>
+         <version>33.2.0-jre</version>
     </dependency>
     <dependency>
       <groupId>io.netty</groupId>

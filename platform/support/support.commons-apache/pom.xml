@@ -27,17 +27,17 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.18.0</version>
+      <version>${apache.commons.io.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.11</version>
+      <version>${apache.commons.lang3.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-text</artifactId>
-      <version>1.9</version>
+      <version>${apache.commons.text.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-validator</groupId>
