@@ -13,6 +13,7 @@
 package test.de.oktoflow.platform.support.json.jackson;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +22,7 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.json.JsonArray;
+import de.iip_ecosphere.platform.support.json.JsonGenerator;
 import de.iip_ecosphere.platform.support.json.JsonIterator;
 import de.iip_ecosphere.platform.support.json.JsonIterator.EntryIterator;
 import de.iip_ecosphere.platform.support.json.JsonIterator.ValueType;
@@ -343,6 +345,55 @@ public class JsonTest {
         str = json.toJson(data);
         Assert.assertFalse(str.contains("iField"));
         Assert.assertFalse(str.contains("value"));
+    }
+    
+    /**
+     * Tests the generator.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testGenerator() throws IOException {
+        StringWriter writer = new StringWriter();
+        JsonGenerator gen = Json.createGenerator(writer);
+        gen.writeStartObject();
+        gen.writeFieldName("test");
+        gen.writeNumber(1);
+        gen.writeFieldName("val");
+        gen.writeNull();
+        gen.writeFieldName("text");
+        gen.writeString("abc");
+        gen.writeFieldName("flag");
+        gen.writeBoolean(true);
+        gen.writeFieldName("arr");
+        gen.writeArray(new int[] {1, 2}, 0, 2);
+        gen.writeFieldName("arr2");
+        gen.writeStartArray();
+        gen.writeNumber(1.23);
+        gen.writeEndArray();
+        gen.writeEndObject();
+        gen.close();
+        String tmp = writer.toString();
+        JsonObject obj = Json.createObject(tmp);
+        Assert.assertTrue(obj.containsKey("test"));
+        Assert.assertEquals(1, obj.getInt("test"));
+        Assert.assertTrue(obj.containsKey("val"));
+        Assert.assertNull(obj.getValue("val"));
+        Assert.assertTrue(obj.containsKey("text"));
+        Assert.assertEquals("abc", obj.getString("text"));
+        Assert.assertTrue(obj.containsKey("flag"));
+        Assert.assertEquals(true, obj.getBoolean("flag"));
+        Assert.assertTrue(obj.containsKey("arr"));
+        JsonArray arr = obj.getJsonArray("arr");
+        Assert.assertNotNull(arr);
+        Assert.assertEquals(2, arr.size());
+        Assert.assertEquals(1, arr.getInt(0));
+        Assert.assertEquals(2, arr.getInt(1));
+        Assert.assertTrue(obj.containsKey("arr2"));
+        arr = obj.getJsonArray("arr2");
+        Assert.assertNotNull(arr);
+        Assert.assertEquals(1, arr.size());
+        Assert.assertEquals(1.23, arr.getJsonNumber(0).doubleValue(), 0.01);
     }
 
 }

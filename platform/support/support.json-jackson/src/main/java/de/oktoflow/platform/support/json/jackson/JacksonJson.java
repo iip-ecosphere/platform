@@ -15,11 +15,15 @@ package de.oktoflow.platform.support.json.jackson;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.Writer;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -32,6 +36,7 @@ import com.jsoniter.any.Any;
 import de.iip_ecosphere.platform.support.json.IOIterator;
 import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.json.JsonArrayBuilder;
+import de.iip_ecosphere.platform.support.json.JsonGenerator;
 import de.iip_ecosphere.platform.support.json.JsonIterator;
 import de.iip_ecosphere.platform.support.json.JsonObject;
 import de.iip_ecosphere.platform.support.json.JsonObjectBuilder;
@@ -364,6 +369,137 @@ public class JacksonJson extends de.iip_ecosphere.platform.support.json.Json {
             tmp = Any.lazyObject(data, 0, data.length - 1);    
         }
         return new JsoniterAny(tmp);
+    }
+    
+    /**
+     * Wraps the Jacskon Json Generator.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class JacksonJsonGenerator implements JsonGenerator {
+        
+        private com.fasterxml.jackson.core.JsonGenerator gen;
+        
+        /**
+         * Creates a wrapping generator instance.
+         * 
+         * @param gen the Jackson instance
+         */
+        private JacksonJsonGenerator(com.fasterxml.jackson.core.JsonGenerator gen) {
+            this.gen = gen;
+        }
+
+        @Override
+        public void close() throws IOException {
+            gen.close();
+        }
+
+        @Override
+        public void writeNumber(short number) throws IOException {
+            gen.writeNumber(number);
+        }
+
+        @Override
+        public void writeNumber(int number) throws IOException {
+            gen.writeNumber(number);
+        }
+
+        @Override
+        public void writeNumber(long number) throws IOException {
+            gen.writeNumber(number);
+        }
+
+        @Override
+        public void writeNumber(BigInteger number) throws IOException {
+            gen.writeNumber(number);
+        }
+
+        @Override
+        public void writeNumber(double number) throws IOException {
+            gen.writeNumber(number);
+        }
+
+        @Override
+        public void writeNumber(float number) throws IOException {
+            gen.writeNumber(number);
+        }
+
+        @Override
+        public void writeNumber(BigDecimal number) throws IOException {
+            gen.writeNumber(number);
+        }
+
+        @Override
+        public void writeString(String text) throws IOException {
+            gen.writeString(text);
+        }
+
+        @Override
+        public void writeBoolean(boolean value) throws IOException {
+            gen.writeBoolean(value);
+        }
+
+        @Override
+        public void writeNull() throws IOException {
+            gen.writeNull();
+        }
+
+        @Override
+        public void writeArray(int[] array, int offset, int length) throws IOException {
+            gen.writeArray(array, offset, length);
+        }
+
+        @Override
+        public void writeArray(long[] array, int offset, int length) throws IOException {
+            gen.writeArray(array, offset, length);
+        }
+
+        @Override
+        public void writeArray(double[] array, int offset, int length) throws IOException {
+            gen.writeArray(array, offset, length);
+        }
+
+        @Override
+        public void writeArray(String[] array, int offset, int length) throws IOException {
+            gen.writeArray(array, offset, length);
+        }
+
+        @Override
+        public void writeStartArray() throws IOException {
+            gen.writeStartArray();
+        }
+
+        @Override
+        public void writeEndArray() throws IOException {
+            gen.writeEndArray();
+        }
+
+        @Override
+        public void writeStartObject() throws IOException {
+            gen.writeStartObject();
+        }
+
+        @Override
+        public void writeEndObject() throws IOException {
+            gen.writeEndObject();
+        }
+
+        @Override
+        public void writeFieldName(String name) throws IOException {
+            gen.writeFieldName(name);
+        }
+
+        @Override
+        public void writeObject(Object object) throws IOException {
+            gen.writeObject(object);
+        }
+        
+    }
+    
+    @Override
+    protected JsonGenerator createGeneratorImpl(Writer writer) throws IOException {
+        JsonFactory f = mapper.getFactory();
+        return new JacksonJsonGenerator(f.createGenerator(writer));
     }
     
 }

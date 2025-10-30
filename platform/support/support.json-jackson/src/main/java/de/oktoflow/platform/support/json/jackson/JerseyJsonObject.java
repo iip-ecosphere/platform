@@ -6,6 +6,7 @@ import java.util.Set;
 
 import javax.json.Json;
 import javax.json.JsonException;
+import javax.json.JsonValue.ValueType;
 
 import de.iip_ecosphere.platform.support.json.JsonArray;
 import de.iip_ecosphere.platform.support.json.JsonArrayBuilder;
@@ -516,7 +517,7 @@ class JerseyJsonObject implements JsonObject {
      */
     static JsonValue map(javax.json.JsonValue value) {
         JsonValue result;
-        if (value == null) {
+        if (value == null || value.getValueType() == ValueType.NULL) {
             result = null;
         } else if (value instanceof javax.json.JsonNumber) {
             result = new JerseyJsonNumber((javax.json.JsonNumber) value);
