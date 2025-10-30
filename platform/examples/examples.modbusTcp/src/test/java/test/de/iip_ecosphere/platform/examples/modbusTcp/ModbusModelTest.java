@@ -19,15 +19,15 @@ import java.util.concurrent.ExecutionException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.configuration.ConfigurationSetup;
-import de.iip_ecosphere.platform.configuration.EasyLogLevel;
-import de.iip_ecosphere.platform.configuration.EasySetup;
-import de.iip_ecosphere.platform.configuration.PlatformInstantiator;
-import de.iip_ecosphere.platform.configuration.PlatformInstantiator.InstantiationConfigurer;
+import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationSetup;
+import de.iip_ecosphere.platform.configuration.easyProducer.EasyLogLevel;
+import de.iip_ecosphere.platform.configuration.easyProducer.EasySetup;
+import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator;
+import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator.InstantiationConfigurer;
 import de.iip_ecosphere.platform.examples.modbusTcp.GeneratedConnector;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 import net.ssehub.easy.varModel.confModel.Configuration;
-import test.de.iip_ecosphere.platform.configuration.AbstractIvmlTests;
+import test.de.iip_ecosphere.platform.configuration.easyProducer.AbstractIvmlTests;
 
 /**
  * MODBUS test with generated platform/connector.
