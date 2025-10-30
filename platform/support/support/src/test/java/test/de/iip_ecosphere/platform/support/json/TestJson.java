@@ -15,6 +15,7 @@ package test.de.iip_ecosphere.platform.support.json;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.Writer;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import de.iip_ecosphere.platform.support.json.IOIterator;
 import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.json.JsonArrayBuilder;
+import de.iip_ecosphere.platform.support.json.JsonGenerator;
 import de.iip_ecosphere.platform.support.json.JsonIterator;
 import de.iip_ecosphere.platform.support.json.JsonObject;
 import de.iip_ecosphere.platform.support.json.JsonObjectBuilder;
@@ -348,6 +350,11 @@ public class TestJson extends de.iip_ecosphere.platform.support.json.Json {
     @Override
     public String writeValueAsString(Object value) throws IOException {
         return mapper.writeValueAsString(value);
+    }
+    
+    @Override
+    protected JsonGenerator createGeneratorImpl(Writer writer) {
+        return null;
     }
     
 }

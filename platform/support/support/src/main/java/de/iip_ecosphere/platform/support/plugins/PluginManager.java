@@ -129,7 +129,7 @@ public class PluginManager {
         if (null != plugin) {
             result = plugin.getInstance();
         } else if (iCls != null) {
-            Optional<I> svc = ServiceLoaderUtils.findFirst(iCls);
+            Optional<I> svc = ServiceLoaderUtils.filterExcluded(iCls);
             if (svc.isPresent()) {
                 result = svc.get().create();
             }

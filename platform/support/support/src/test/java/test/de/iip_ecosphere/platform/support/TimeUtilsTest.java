@@ -39,8 +39,8 @@ public class TimeUtilsTest {
         long after = System.currentTimeMillis();
         long diff = after - before;
         // may diff, e.g., laptop without power plug
-        Assert.assertTrue("Diff shall not be less than 40 ms", 60 < diff);
-        Assert.assertTrue("Diff shall not be larger than 100 ms", diff < 200);
+        Assert.assertTrue("Diff shall not be less than 40 ms ( " + diff + ")", 60 < diff);
+        Assert.assertTrue("Diff shall not be larger than 100 ms (" + diff + ")", diff < 200);
     }
     
     /**

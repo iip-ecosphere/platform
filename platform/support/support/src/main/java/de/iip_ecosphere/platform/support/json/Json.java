@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
 
@@ -510,6 +511,26 @@ public abstract class Json {
      */
     public static JsonIterator parse(byte[] data) {
         return prototype.parseImpl(data);
+    }
+
+    /**
+     * Creates a generator instance for {@code writer}.
+     * 
+     * @param writer the writer
+     * @return the generator
+     * @throws IOException if the generator cannot be created
+     */
+    protected abstract JsonGenerator createGeneratorImpl(Writer writer) throws IOException;
+
+    /**
+     * Creates a generator instance for {@code writer}.
+     * 
+     * @param writer the writer
+     * @return the generator
+     * @throws IOException if the generator cannot be created
+     */
+    public static JsonGenerator createGenerator(Writer writer) throws IOException {
+        return prototype.createGeneratorImpl(writer);
     }
 
 }
