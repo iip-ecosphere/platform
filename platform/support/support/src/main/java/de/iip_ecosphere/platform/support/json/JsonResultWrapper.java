@@ -12,14 +12,12 @@
 
 package de.iip_ecosphere.platform.support.json;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import de.iip_ecosphere.platform.support.Include;
 
 import de.iip_ecosphere.platform.support.TaskRegistry;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
@@ -32,7 +30,7 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 public class JsonResultWrapper implements Function<Object[], Object>, Serializable {
 
     private static final long serialVersionUID = 6531890963314078947L;
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final Json MAPPER = Json.createInstance4All();
     private ExceptionFunction func;
     private OperationCompletedListener listener;
     private Function<Object[], String> taskIdSupplier;
@@ -89,10 +87,10 @@ public class JsonResultWrapper implements Function<Object[], Object>, Serializab
         
         private static final long serialVersionUID = -4586150559933545643L;
 
-        @JsonInclude(Include.NON_NULL)
+        @Include(Include.Type.NON_NULL)
         private String result;
 
-        @JsonInclude(Include.NON_NULL)
+        @Include(Include.Type.NON_NULL)
         private String exception;
 
         /**
@@ -232,7 +230,7 @@ public class JsonResultWrapper implements Function<Object[], Object>, Serializab
         if (null != res) {
             try {
                 result = MAPPER.writeValueAsString(res);
-            } catch (JsonProcessingException e) {
+            } catch (IOException e) {
                 // handled by default value
             }
         } 
@@ -251,7 +249,7 @@ public class JsonResultWrapper implements Function<Object[], Object>, Serializab
         if (null != json) {
             try {
                 result = MAPPER.readValue(json.toString(), Result.class);
-            } catch (JsonProcessingException e) {
+            } catch (IOException e) {
                 result = new Result(e);
             }
         }

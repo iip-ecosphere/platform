@@ -20,8 +20,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Records configured names which may be different from class or field names. May in future take over the role 
- * of certain serializer annotations.
+ * Records configured names which may be different from class or field names. Similar to {@code JsonProperty} in 
+ * Jackson, but simplified/more generic here.
  * 
  * @author Holger Eichelberger, SSE
  */

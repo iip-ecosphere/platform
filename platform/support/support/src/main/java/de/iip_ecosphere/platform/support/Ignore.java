@@ -19,9 +19,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Simplified annotation to ignore properties.
+ * Simplified annotation to ignore properties. Similar to {@code JsonIgnore} in 
+ * Jackson, but simplified/more generic here.
  * 
- * @author Fasterxml/Jackson
+ * @author Holger Eichelberger, SSE
  */
 @Retention(RUNTIME)
 @Target({ANNOTATION_TYPE, METHOD, CONSTRUCTOR, FIELD})

@@ -18,7 +18,6 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -30,6 +29,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.BeanDescription;
@@ -39,9 +39,11 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyName;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -60,6 +62,7 @@ import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.ConfiguredName;
 import de.iip_ecosphere.platform.support.Ignore;
 import de.iip_ecosphere.platform.support.IgnoreProperties;
+import de.iip_ecosphere.platform.support.Include;
 import de.iip_ecosphere.platform.support.json.Json.EnumMapping;
 
 /**
@@ -430,6 +433,7 @@ public class JsonUtils {
         JsonIgnoreProperties jsonIgnoreProp = cls.getAnnotation(JsonIgnoreProperties.class);
         Set<String> ignores = new HashSet<>();
         Map<String, String> renames = new HashMap<>();
+        Set<String> nonNullInclude = new HashSet<>();
         boolean ignoreCls = false;
         if (null != annIgnoreProp && annIgnoreProp.ignoreUnknown()) {
             ignoreCls = true;
@@ -438,7 +442,7 @@ public class JsonUtils {
             ignoreCls = true;
         }
         for (Field f : cls.getDeclaredFields()) {
-            handleAnnotations(f.getName(), f, ignores, renames);
+            handleAnnotations(f.getName(), f, ignores, renames, nonNullInclude);
         }
         for (Method m : cls.getDeclaredMethods()) {
             String name = m.getName();
@@ -446,12 +450,16 @@ public class JsonUtils {
                 name = name.substring(3);
             }
             name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
-            handleAnnotations(name, m, ignores, renames);
+            handleAnnotations(name, m, ignores, renames, nonNullInclude);
         }
-        if (ignoreCls || ignores.size() > 0) {
+        if (ignoreCls || ignores.size() > 0 || nonNullInclude.size() > 0) {
             SimpleModule module = new SimpleModule();
-            ignores = ignores.isEmpty() ? null : ignores; // ignore all
-            module.setSerializerModifier(new CustomPropertyExclusionModifier(cls, ignores));
+            if (ignoreCls || ignores.size() > 0) {
+                ignores = ignores.isEmpty() ? null : ignores; // ignore all
+                module.setSerializerModifier(new CustomPropertyExclusionModifier(cls, ignores));
+            } else {
+                module.setSerializerModifier(new CustomPropertyInclusionModifier(cls, nonNullInclude));
+            }
             mapper.registerModule(module);
         }
         if (!renames.isEmpty()) {
@@ -477,13 +485,15 @@ public class JsonUtils {
      * @param obj the accessible object
      * @param ignores the properties to ignore
      * @param renames the property renamings (original name, new name)
+     * @param nonNullInclude the properties to not include if their value is <b>null</b>
      */
     private static void handleAnnotations(String propName, AccessibleObject obj, Set<String> ignores, 
-        Map<String, String> renames) {
+        Map<String, String> renames, Set<String> nonNullInclude) {
         ConfiguredName cfgName = obj.getAnnotation(ConfiguredName.class);
         Ignore annIgnore = obj.getAnnotation(Ignore.class);
         JsonIgnore jsonIgnore = obj.getAnnotation(JsonIgnore.class);
         JsonProperty annProp = obj.getAnnotation(JsonProperty.class);
+        Include annIncl = obj.getAnnotation(Include.class);
         if (null != annIgnore && annIgnore.value()) {
             ignores.add(propName);
         }
@@ -494,6 +504,9 @@ public class JsonUtils {
             renames.put(propName, cfgName.value());
         } else if (null != annProp && annProp.value() != null && annProp.value().length() > 0) {
             renames.put(propName, annProp.value());
+        }
+        if (null != annIncl && annIncl.value() == Include.Type.NON_NULL) {
+            nonNullInclude.add(propName);
         }
     }
     
@@ -789,16 +802,6 @@ public class JsonUtils {
          * Creates an instance.
          * 
          * @param targetClass the target class
-         * @param propertiesToExclude properties to specifically exclude 
-         */
-        public CustomPropertyExclusionModifier(Class<?> targetClass, String... propertiesToExclude) {
-            this(targetClass, new HashSet<>(Arrays.asList(propertiesToExclude)));
-        }
-
-        /**
-         * Creates an instance.
-         * 
-         * @param targetClass the target class
          * @param propertiesToExclude properties to specifically exclude, if <b>null</b> exclude all
          */
         public CustomPropertyExclusionModifier(Class<?> targetClass, Set<String> propertiesToExclude) {
@@ -825,6 +828,94 @@ public class JsonUtils {
             return super.changeProperties(config, beanDesc, beanProperties);
         }
     }    
+    
+    /**
+     * Property exclusion modifier to simulate {@link Include}.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class CustomPropertyInclusionModifier extends BeanSerializerModifier {
+
+        private final Set<String> nonNullInclude;
+        private final Class<?> targetClass;
+
+        /**
+         * Creates an instance.
+         * 
+         * @param targetClass the target class
+         * @param nonNullInclude the properties that shall not included if null, ignored if <b>null</b> 
+         */
+        public CustomPropertyInclusionModifier(Class<?> targetClass, Set<String> nonNullInclude) {
+            this.targetClass = targetClass;
+            this.nonNullInclude = nonNullInclude;
+        }
+
+        @Override
+        public List<BeanPropertyWriter> changeProperties(
+            SerializationConfig config,
+            BeanDescription beanDesc,
+            List<BeanPropertyWriter> beanProperties) {
+            
+            // Only apply this modifier to the specific target class
+            if (beanDesc.getBeanClass() == targetClass) {
+                List<BeanPropertyWriter> newProperties = new ArrayList<>();
+                for (BeanPropertyWriter writer : beanProperties) {
+                    if (nonNullInclude != null && nonNullInclude.contains(writer.getName())) {
+                        newProperties.add(new JsonNullableBeanPropertyWriter(writer));
+                    } else {
+                        newProperties.add(writer);
+                    }
+                }
+                return newProperties;
+            }
+            return super.changeProperties(config, beanDesc, beanProperties);
+        }
+        
+    }
+
+    /**
+     * Writer to prevent writing null properties if disabled by {@link Include}.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class JsonNullableBeanPropertyWriter extends BeanPropertyWriter {
+
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * Creates a property bean writer based on the given one.
+         * 
+         * @param base the base writer
+         */
+        protected JsonNullableBeanPropertyWriter(BeanPropertyWriter base) {
+            super(base);
+        }
+
+        /**
+         * Creates a property bean writer based on the given one and the property name.
+         * 
+         * @param base the base writer
+         * @param newName the new property name
+         */
+        protected JsonNullableBeanPropertyWriter(BeanPropertyWriter base, PropertyName newName) {
+            super(base, newName);
+        }
+
+        @Override
+        protected BeanPropertyWriter _new(PropertyName newName) {
+            return new JsonNullableBeanPropertyWriter(this, newName);
+        }
+
+        @Override
+        public void serializeAsField(Object bean, JsonGenerator jgen, SerializerProvider prov) throws Exception {
+            Object value = get(bean);
+            if (value == null) {
+                return;
+            }
+            super.serializeAsField(bean, jgen, prov);
+        }
+
+    }
     
     /**
      * Renames properties.

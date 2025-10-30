@@ -22,9 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
@@ -288,8 +286,7 @@ public class YamlFile {
      * @return a new instance for {@code obj} containing the updated fields
      */
     public static <T> T overwrite(T obj, Class<T> cls, Map<String, Object> data) {
-        ObjectMapper mapper = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        Json mapper = Json.createInstance4All().failOnUnknownProperties(false);
         @SuppressWarnings("unchecked")
         Map<String, Object> myObjectMap = mapper.convertValue(obj, HashMap.class);
         data.forEach((k, v) -> map(k, v, myObjectMap));

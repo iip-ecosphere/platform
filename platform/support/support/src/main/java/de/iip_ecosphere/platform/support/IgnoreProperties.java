@@ -19,9 +19,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Simplified annotation to ignore properties.
+ * Simplified annotation to ignore properties. Similar to {@code JsonIgnoreProperties} in 
+ * Jackson, but simplified/more generic here.
  * 
- * @author Fasterxml/Jackson
+ * @author Holger Eichelberger, SSE
  */
 @Retention(RUNTIME)
 @Target({ANNOTATION_TYPE, TYPE, METHOD, CONSTRUCTOR, FIELD})
@@ -30,11 +31,6 @@ public @interface IgnoreProperties {
     /**
      * Property that defines whether it is ok to just ignore any
      * unrecognized properties during deserialization.
-     * If true, all properties that are unrecognized -- that is,
-     * there are no setters or creators that accept them -- are
-     * ignored without warnings (although handlers for unknown
-     * properties, if any, will still be called) without
-     * exception.
      * Does not have any effect on serialization.
      *
      * @return true if any and all unknown properties are to be ignored without
