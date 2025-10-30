@@ -38,6 +38,7 @@ Changes:
 
 Required adjustments:
 * Due to [#181](https://github.com/iip-ecosphere/platform/issues/181), `inInterface` and `outInterface` of connectors are now sequences, i.e., in IVML `inInterface = {type=...}` turns to `inInterface = {{type=...}}`, akin for `outInterface`, `inAdapterClass` and `outAdapterClass`.
+* Managed dependencies from oktoflow's parent POM are removed to keep (plugin) dependencies local and to prevent accidental classpath pollutions. Applications may have to change their POMs, e.g., `slf4j` dependencies are not needed anymore due to the integrated platform logging (please use inside) and some dependencies may need explicit versions (some are declared as properties in the platform's parent POMs).
 
 ### Version 0.7.0 (2024/07/11, no maven central release):
 
