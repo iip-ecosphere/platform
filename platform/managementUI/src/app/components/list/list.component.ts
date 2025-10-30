@@ -118,6 +118,11 @@ export class ListComponent extends Utils implements OnInit {
   private async populateMeta() {
     this.metaBackup = await this.api.getMeta();
     this.meta = this.ivmlFormatter.filterMeta(this.metaBackup, this.currentTab);
+    const tabName = this.currentTab === '' ? 'Setup' : this.currentTab;
+    const selectedTab = this.tabsParam.find(tab => tab.tabName === tabName);
+    if (selectedTab) {
+      this.getDisplayData(selectedTab?.tabName, selectedTab?.metaProject, selectedTab?.submodelElement)
+    }
   }
 
   public async getDisplayData(tabName: string, metaProject: string | null, submodelElement: string | null) {
@@ -520,6 +525,15 @@ export class ListComponent extends Utils implements OnInit {
       if (component.generateInputs) { // fails in tests
         component.generateInputs();
       }
+
+      // Subscribe to dialog close event
+      dialogRef.afterClosed().subscribe(result => {
+        const tabName = this.currentTab === '' ? 'Setup' : this.currentTab;
+        const selectedTab = this.tabsParam.find(tab => tab.tabName === tabName);
+        if (selectedTab) {
+          this.getDisplayData(selectedTab?.tabName, selectedTab?.metaProject, selectedTab?.submodelElement)
+        }
+      });
     }
   }
 
