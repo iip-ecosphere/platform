@@ -17,9 +17,19 @@
 <div style="padding: 0;">
   <span id="inputName" class="inputLabel" *ngIf="!selector">
     {{ getDisplayName(input) }} 
+    <span *ngIf="fieldsMeta && fieldsMeta.value">
+      <mat-form-field appearance="outline">
+        <mat-select id="typeSelect" [(value)]="selectedType">
+          <mat-option *ngFor="let type of fieldsMeta?.value" [value]="type">
+            {{ type.idShort }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </span>
+    &nbsp;
     <span #subEditor *ngIf="input.metaTypeKind == 10 && input.multipleInputs else other" 
       id="ref-select.inputName.subEd"> 
-      <app-subeditor-button [meta]="meta" [input]="input" matIcon="add" (saveEvent)="onChildSaveEvent($event)"></app-subeditor-button>
+      <app-subeditor-button [meta]="meta" [input]="input" [selectedType]="selectedType" matIcon="add" (saveEvent)="onChildSaveEvent($event)"></app-subeditor-button>
     </span>
     <ng-template #other>
       <button mat-icon-button class="itemButton" (click)="selectElement()" id="ref-select.inputName.btn-add">

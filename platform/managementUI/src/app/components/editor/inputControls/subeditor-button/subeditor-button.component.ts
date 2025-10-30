@@ -15,6 +15,7 @@ export class SubeditorButtonComponent extends Utils implements OnInit {
 
   @Input() meta: Resource | undefined;
   @Input() input!: editorInput;
+  @Input() selectedType: Resource | undefined;
   @Input() buttonText: string = "edit";
   @Input() matIcon: string = "";
   @Input() showValue: string = "false";
@@ -34,8 +35,9 @@ export class SubeditorButtonComponent extends Utils implements OnInit {
     this.disabled = this.validateEditorInputType(this.input)
   }
 
-  public openSubeditor(type: editorInput) {
+  public openSubeditor(type: editorInput, selectedType: Resource | undefined) {
     if (this.meta) {
+      type.type = getFieldType(type.type, selectedType);
       let uiGroups = this.ivmlFormatter.calculateUiGroupsInf(type, this.meta);
       let parts = this.ivmlFormatter.partitionUiGroups(uiGroups);
       let dialogRef = this.subDialog.open(EditorComponent, this.configureDialog('80%', '80%', parts));
@@ -126,4 +128,11 @@ export interface SaveEvent {
   idShort: string;
   value: IvmlRecordValue; 
   multipleInputs?: boolean;
+}
+
+function getFieldType(type: string, selectedType: Resource | undefined): string {
+  if (selectedType && selectedType.idShort?.includes("Field")) {
+    return type.replace("Field", selectedType.idShort);
+  }
+  return type
 }

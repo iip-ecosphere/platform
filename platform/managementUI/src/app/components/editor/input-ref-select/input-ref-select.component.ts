@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
-import { Resource, editorInput, configMeta, metaTypes, DR_type, IvmlRecordValue } from 'src/interfaces';
+import { Resource, editorInput, configMeta, metaTypes, DR_type, IvmlRecordValue, ResourceAttribute } from 'src/interfaces';
 import { DataUtils, EditorPartition, Utils, WIDTH_CARD, WIDTH_CARD_GRID } from 'src/app/services/utils.service';
 import { EditorComponent } from '../editor.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -30,12 +30,24 @@ export class InputRefSelectComponent extends Utils implements OnInit {
   parent: InputRefSelectComponent | null = null;
   dialog: MatDialogRef<InputRefSelectComponent, any> | null = null;
   actualRows : number = 2;
+  selectedType: Resource | undefined;
+  fieldsMeta: Resource | undefined;
 
   constructor(private api: ApiService, public subDialog: MatDialog, private ivmlFormatter: IvmlFormatterService) { 
     super();
   }
 
   async ngOnInit() {
+    if (this.meta && this.input.name === "fields") {
+      this.fieldsMeta = this.ivmlFormatter.filterMeta(this.meta, 'Fields');
+      if (this.fieldsMeta && this.fieldsMeta.value && this.fieldsMeta.value?.length > 0) {
+        if (this.isArray(this.input.value)) {
+          this.selectedType = findFieldType(this.input.value[0]._type, this.fieldsMeta.value)
+        } else {
+          this.selectedType = this.fieldsMeta.value[0]
+        }
+      }
+    }
     if (!this.selector) {
       let type = this.input.type;
       await this.init(type);
@@ -245,3 +257,8 @@ export interface SaveEvent {
   value: IvmlRecordValue; 
   multipleInputs?: boolean;
 }
+
+function findFieldType(_type: any, value: ResourceAttribute[]): Resource | undefined {
+  return value.find(fieldType => fieldType.idShort === _type);
+}
+

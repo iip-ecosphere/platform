@@ -212,9 +212,8 @@ export class EditorComponent extends Utils implements OnInit {
       if (this.type) {
         let uniGroup = DataUtils.getEditorInputByName(this.uiGroups, event.idShort);
         type = uniGroup?.type;
-         uniGroup?.value.push({value : resultProp, _type: DataUtils.stripGenericType(type)});
-      }
-      prop.value.push({value : resultProp, _type: DataUtils.stripGenericType(type)});
+      } 
+      prop.value.push({value : resultProp, name: resultProp?.name?.value ?? "unnamed", _type: DataUtils.stripGenericType(type)});
     }
   }
 

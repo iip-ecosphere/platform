@@ -8,12 +8,12 @@
     </ng-template>
   </span>
   <span *ngIf="matIcon && matIcon.length > 0 else noIcon">
-    <button #button mat-icon-button class="itemButton" [disabled]="disabled" (click)="openSubeditor(input)">
+    <button #button mat-icon-button class="itemButton" [disabled]="disabled" (click)="openSubeditor(input, selectedType)">
       <mat-icon>{{matIcon}}</mat-icon>
     </button>
   </span>
   <ng-template #noIcon>
-    <button #button mat-raised-button class="okto-button" [disabled]="disabled" (click)="openSubeditor(input)">
+    <button #button mat-raised-button class="okto-button" [disabled]="disabled" (click)="openSubeditor(input, selectedType)">
       {{buttonText}}
     </button>
   </ng-template>

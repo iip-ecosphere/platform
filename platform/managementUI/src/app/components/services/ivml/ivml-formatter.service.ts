@@ -880,6 +880,7 @@ export class IvmlFormatterService extends UtilsService {
 const reqTypes = [
   { cat: "Constants", metaRef: [] },
   { cat: "Types", metaRef: ["RecordType", "ArrayType"] },
+  { cat: "Fields", metaRef: ["Field"] },
   { cat: "Dependencies", metaRef: ["Dependency"] },
   { cat: "Nameplates", metaRef: ["NameplateInfo"] },
   { cat: "Services", metaRef: ["Service"] },
