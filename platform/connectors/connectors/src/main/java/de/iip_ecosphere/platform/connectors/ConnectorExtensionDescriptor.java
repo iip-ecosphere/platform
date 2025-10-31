@@ -66,7 +66,7 @@ public interface ConnectorExtensionDescriptor {
      * Returns a connector extension.
      * 
      * @param <T> the type of the extension
-     * @param is the connector instance identification to be matched by the related extension
+     * @param id the connector instance identification to be matched by the related extension
      * @param cls the requested extension type
      * @param dflt the default value if none was found
      * @return {@code dflt} or the extension value

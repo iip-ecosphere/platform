@@ -20,12 +20,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Stack;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.function.IOConsumer;
+import de.iip_ecosphere.platform.support.json.Json;
+import de.iip_ecosphere.platform.support.json.JsonGenerator;
 import de.iip_ecosphere.platform.transport.serialization.QualifiedElement;
 
 /**
@@ -41,7 +39,6 @@ public class JsonOutputFormatter implements OutputFormatter<IOConsumer<JsonGener
         OBJECT
     }
     
-    private ObjectMapper objectMapper = new ObjectMapper();
     private StringWriter writer; // 
     private JsonGenerator gen; // temporary
     private String parentName = ""; // temporary, initial top-level
@@ -203,9 +200,8 @@ public class JsonOutputFormatter implements OutputFormatter<IOConsumer<JsonGener
      */
     private void initialize() throws IOException {
         if (null == gen) {
-            JsonFactory f = objectMapper.getFactory();
             writer = new StringWriter();
-            gen = f.createGenerator(writer);
+            gen = Json.createGenerator(writer);
             gen.writeStartObject();
         }
     }
