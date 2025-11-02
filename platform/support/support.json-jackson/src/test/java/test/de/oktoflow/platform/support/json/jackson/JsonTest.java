@@ -20,6 +20,8 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.support.Filter;
+import de.iip_ecosphere.platform.support.IgnoreProperties;
 import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.json.JsonArray;
 import de.iip_ecosphere.platform.support.json.JsonGenerator;
@@ -32,6 +34,14 @@ import de.iip_ecosphere.platform.support.json.JsonString;
 import de.oktoflow.platform.support.json.jackson.JacksonJson;
 import de.oktoflow.platform.support.json.jackson.JsoniterAny;
 import iip.datatypes.DataImpl;
+import iip.datatypes.RoutingCommandNew;
+import iip.datatypes.RoutingCommandNewImpl;
+import iip.datatypes.RoutingCommandOld;
+import iip.datatypes.RoutingCommandOldImpl;
+import iip.serializers.RoutingCommandNewImplSerializer;
+import iip.serializers.RoutingCommandNewSerializer;
+import iip.serializers.RoutingCommandOldImplSerializer;
+import iip.serializers.RoutingCommandOldSerializer;
 
 /**
  * Tests {@link Json}.
@@ -39,12 +49,15 @@ import iip.datatypes.DataImpl;
  * @author Holger Eichelberger, SSE
  */
 public class JsonTest {
+    
+    public static final String FILTER_ID_DATA = "dataFilter";
 
     /**
      * A test data class.
      * 
      * @author Holger Eichelberger, SSE
      */
+    @Filter(FILTER_ID_DATA)
     public static class Data {
         
         private int iValue;
@@ -394,6 +407,114 @@ public class JsonTest {
         Assert.assertNotNull(arr);
         Assert.assertEquals(1, arr.size());
         Assert.assertEquals(1.23, arr.getJsonNumber(0).doubleValue(), 0.01);
+    }
+    
+    /**
+     * From configuration's Routing test, test two classes (old, before/new, after migration to plugins) in oktoflow's 
+     * serialization style.
+     */
+    @Test
+    public void testSerializerMigration() throws IOException {
+        RoutingCommandNewImpl rcni = new RoutingCommandNewImpl();
+        RoutingCommandNew rcn = rcni;
+        rcn.setCmd("myCmdNew");
+        RoutingCommandOldImpl rcoi = new RoutingCommandOldImpl();
+        RoutingCommandOldImpl rco = rcoi;
+        rco.setCmd("myCmdOld");
+        
+        RoutingCommandNewSerializer rcnS = new RoutingCommandNewSerializer();
+        byte[] rcnJ = rcnS.to(rcn);
+        RoutingCommandNewImplSerializer rcniS = new RoutingCommandNewImplSerializer();
+        byte[] rcniJ = rcniS.to(rcni);
+        RoutingCommandOldSerializer rcoS = new RoutingCommandOldSerializer();
+        byte[] rcoJ = rcoS.to(rco);
+        RoutingCommandOldImplSerializer rcoiS = new RoutingCommandOldImplSerializer();
+        byte[] rcoiJ = rcoiS.to(rco);
+        
+        RoutingCommandNewImpl rcniD = rcniS.from(rcniJ);
+        RoutingCommandNew rcnD = rcnS.from(rcnJ);
+        RoutingCommandOldImpl rcoiD = rcoiS.from(rcoiJ);
+        RoutingCommandOld rcoD = rcoS.from(rcoJ);
+        
+        Assert.assertEquals(rcoi.getCmd(), rcoiD.getCmd());
+        Assert.assertEquals(rcoi, rcoiD);
+        Assert.assertEquals(rco.getCmd(), rcoD.getCmd());
+        Assert.assertEquals(rco, rcoD);
+        Assert.assertEquals(rcni.getCmd(), rcniD.getCmd());
+        Assert.assertEquals(rcni, rcniD);
+        Assert.assertEquals(rcn.getCmd(), rcnD.getCmd());
+        Assert.assertEquals(rcn, rcnD);
+    }
+
+    @IgnoreProperties(ignoreUnknown = true)
+    static class TestIgnoreUnknown {
+        
+        private boolean flag;
+
+        /**
+         * Returns the flag.
+         * 
+         * @return the flag value
+         */
+        public boolean getFlag() {
+            return flag;
+        }
+
+        /**
+         * Changes the flag.
+         * 
+         * @param flag the new flag value
+         */
+        public void setFlag(boolean flag) {
+            this.flag = flag;
+        }
+        
+    }
+    
+    /**
+     * Tests {@link IgnoreProperties} and {@link Json#failOnUnknownProperties(boolean)}.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testIgnoreUnkown() throws IOException {
+        Json json = Json.createInstance(TestIgnoreUnknown.class); // or 4All
+        String data = Json.createObjectBuilder()
+            .add("field", 123)
+            .add("flag", true)
+            .build()
+            .toString();
+        TestIgnoreUnknown obj = json.fromJson(data, TestIgnoreUnknown.class);
+        Assert.assertNotNull(obj);
+        Assert.assertTrue(obj.getFlag());
+        
+        json = Json.createInstance().failOnUnknownProperties(false); // or 4All
+        obj = json.fromJson(data, TestIgnoreUnknown.class);
+        Assert.assertNotNull(obj);
+        Assert.assertTrue(obj.getFlag());
+    }
+    
+    /**
+     * Tests explicitly filtering for fields using {@link Json#configureExceptFieldsFilter(String, String...)}.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testExcludeFilter() throws IOException {
+        Json json = Json.createInstance(Data.class).configureExceptFieldsFilter(FILTER_ID_DATA, "sValue");
+        Data data = new Data();
+        data.setiValue(10);
+        data.setsValue("abc");
+
+        String text = json.toJson(data);
+        JsonObject obj = Json.createObject(text);
+        Assert.assertNotNull(obj);
+        Assert.assertFalse(obj.containsKey("sValue")); // excluded based on annotation, but not in other tests
+
+        byte[] ser = json.writeValueAsBytes(data);
+        obj = Json.createObject(ser);
+        Assert.assertNotNull(obj);
+        Assert.assertFalse(obj.containsKey("sValue")); // excluded based on annotation, but not in other tests
     }
 
 }

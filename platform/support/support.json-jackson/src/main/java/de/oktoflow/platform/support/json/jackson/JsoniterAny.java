@@ -260,7 +260,7 @@ public class JsoniterAny implements JsonIterator {
     /**
      * Collects all (nested) entries for field {@code name}-{@code any} in {@code result}.
      * 
-     * @param the name of the field
+     * @param name the name of the field
      * @param any the value of the field
      * @param fields the fields representing the parent of this field, to be modified as a side effect
      */

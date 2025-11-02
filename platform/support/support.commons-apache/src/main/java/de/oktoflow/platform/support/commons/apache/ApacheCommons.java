@@ -335,6 +335,11 @@ public class ApacheCommons extends de.iip_ecosphere.platform.support.commons.Com
     }
 
     @Override
+    public void cleanDirectory(final File directory) throws IOException {
+        org.apache.commons.io.FileUtils.cleanDirectory(directory);
+    }
+    
+    @Override
     public void deleteDirectory(final File directory) throws IOException {
         org.apache.commons.io.FileUtils.deleteDirectory(directory);
     }
