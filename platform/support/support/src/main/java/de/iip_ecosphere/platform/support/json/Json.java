@@ -12,14 +12,17 @@
 
 package de.iip_ecosphere.platform.support.json;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
 
+import de.iip_ecosphere.platform.support.Filter;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
 /**
@@ -329,6 +332,18 @@ public abstract class Json {
     public abstract Json exceptFields(String... fieldNames);
 
     /**
+     * Enables a filter for the given id (as declared by {@link Filter}) that excepts the given fields. Combination
+     * of annotation and configured filter in case that excepts cannot be setup directly on classes or the class
+     * object is not available/accessible for some reason. Similar to {@link #filterAllExceptFields(String...)}, which
+     * is applied to all classes to be serialized.
+     * 
+     * @param filterId the filter id
+     * @param fieldNames the fields to except
+     * @return <b>this</b> for chaining
+     */
+    public abstract Json configureExceptFieldsFilter(String filterId, String... fieldNames);
+    
+    /**
      * Configures this instance to filter to all given field names. 
      * 
      * @param fieldNames the field names that shall be excluded
@@ -423,6 +438,18 @@ public abstract class Json {
      */
     public static JsonObject createObject(String string) throws IOException {
         return createObject(new StringReader(string));
+    }
+
+    /**
+     * Creates a JSON object for individual access from the byte array {@code data}.
+     * 
+     * @param data the byte array
+     * @return the JSON object
+     * @throws IOException if the object cannot be read/constructed
+     * @see #createObject(Reader)
+     */
+    public static JsonObject createObject(byte[] data) throws IOException {
+        return createObject(new InputStreamReader(new ByteArrayInputStream(data))); // or new String(data)??
     }
 
     /**

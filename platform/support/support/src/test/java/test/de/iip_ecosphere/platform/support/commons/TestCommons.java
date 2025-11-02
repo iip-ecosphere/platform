@@ -342,6 +342,11 @@ public class TestCommons extends Commons {
     }
 
     @Override
+    public void cleanDirectory(final File directory) throws IOException {
+        org.apache.commons.io.FileUtils.cleanDirectory(directory);
+    }
+
+    @Override
     public void copyDirectory(final File srcDir, final File destDir, final FileFilter filter) throws IOException {
         org.apache.commons.io.FileUtils.copyDirectory(srcDir, destDir, filter);
     }    

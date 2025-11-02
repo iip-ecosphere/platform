@@ -23,9 +23,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -35,6 +37,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -47,6 +50,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
@@ -60,6 +64,7 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.ConfiguredName;
+import de.iip_ecosphere.platform.support.Filter;
 import de.iip_ecosphere.platform.support.Ignore;
 import de.iip_ecosphere.platform.support.IgnoreProperties;
 import de.iip_ecosphere.platform.support.Include;
@@ -425,24 +430,24 @@ public class JsonUtils {
      * Configures the given class for through the abstracted annotations.
      * 
      * @param mapper the mapper to be configured
+     * @param introspector the current introspector, may be <b>null</b>
      * @param cls the class to be configured
-     * @return {@code mapper}
+     * @return the configuring annotation introspector
      */
-    public static ObjectMapper configureFor(ObjectMapper mapper, Class<?> cls) {
+    public static OktoAnnotationIntrospector configureFor(ObjectMapper mapper, 
+        OktoAnnotationIntrospector introspector, Class<?> cls) {
         IgnoreProperties annIgnoreProp = cls.getAnnotation(IgnoreProperties.class);
         JsonIgnoreProperties jsonIgnoreProp = cls.getAnnotation(JsonIgnoreProperties.class);
-        Set<String> ignores = new HashSet<>();
         Map<String, String> renames = new HashMap<>();
         Set<String> nonNullInclude = new HashSet<>();
-        boolean ignoreCls = false;
         if (null != annIgnoreProp && annIgnoreProp.ignoreUnknown()) {
-            ignoreCls = true;
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         }
         if (null != jsonIgnoreProp && jsonIgnoreProp.ignoreUnknown()) {
-            ignoreCls = true;
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         }
         for (Field f : cls.getDeclaredFields()) {
-            handleAnnotations(f.getName(), f, ignores, renames, nonNullInclude);
+            handleAnnotations(f.getName(), f, renames, nonNullInclude);
         }
         for (Method m : cls.getDeclaredMethods()) {
             String name = m.getName();
@@ -450,16 +455,11 @@ public class JsonUtils {
                 name = name.substring(3);
             }
             name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
-            handleAnnotations(name, m, ignores, renames, nonNullInclude);
+            handleAnnotations(name, m, renames, nonNullInclude);
         }
-        if (ignoreCls || ignores.size() > 0 || nonNullInclude.size() > 0) {
+        if (nonNullInclude.size() > 0) {
             SimpleModule module = new SimpleModule();
-            if (ignoreCls || ignores.size() > 0) {
-                ignores = ignores.isEmpty() ? null : ignores; // ignore all
-                module.setSerializerModifier(new CustomPropertyExclusionModifier(cls, ignores));
-            } else {
-                module.setSerializerModifier(new CustomPropertyInclusionModifier(cls, nonNullInclude));
-            }
+            module.setSerializerModifier(new CustomPropertyInclusionModifier(cls, nonNullInclude));
             mapper.registerModule(module);
         }
         if (!renames.isEmpty()) {
@@ -474,40 +474,130 @@ public class JsonUtils {
             }
             cpns.addMapping(cls, renames);
         }
-        return mapper;
+        return setAnnotationIntrospector(mapper, introspector, null);
     }
     
     /**
-     * Handles supported annotations ({@link ConfiguredName}, {@link Ignore}, {@link IgnoreProperties}, 
-     * {@link JsonIgnore}, {@link JsonProperty}) on an accessible object.
+     * Basic annotation introspector for abstracting oktoflow data annotations, in particular {@link ConfiguredName} 
+     * and {@link Ignore}.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class OktoAnnotationIntrospector extends JacksonAnnotationIntrospector {
+
+        private static final long serialVersionUID = -1021095562978855964L;
+        private Set<String> exclusions;
+        private Set<Object> ignore;
+
+        @Override
+        public boolean hasIgnoreMarker(AnnotatedMember member) {
+            Ignore ignoreAnn = member.getAnnotation(Ignore.class);
+            if (null != ignoreAnn) {
+                return ignoreAnn.value();
+            }
+            JsonIgnore jsonIgnore = member.getAnnotation(JsonIgnore.class); // TODO remove
+            if (null != jsonIgnore) {
+                return jsonIgnore.value();
+            }
+            if (exclusions != null) {
+                boolean exclude = exclusions.contains(member.getName());
+                if (!exclude) {
+                    ConfiguredName cfgName = member.getAnnotation(ConfiguredName.class);
+                    if (null != cfgName && cfgName.value() != null) {
+                        exclude = exclusions.contains(cfgName.value());
+                    }
+                }
+                if (!exclude) {
+                    JsonProperty jsonProp = member.getAnnotation(JsonProperty.class);
+                    if (null != jsonProp && jsonProp.value() != null) {
+                        exclude = exclusions.contains(jsonProp.value());
+                    }
+                }
+                return exclude;
+            }
+            if (null != ignore) {
+                return ignore.contains(member.getType().getRawClass()) || ignore.contains(member.getMember());
+            }
+            return super.hasIgnoreMarker(member);
+        }
+        
+        @Override
+        public PropertyName findNameForDeserialization(Annotated member) {
+            ConfiguredName cfgName = member.getAnnotation(ConfiguredName.class);
+            if (cfgName != null) {
+                return PropertyName.construct(cfgName.value());
+            } else {                
+                return super.findNameForDeserialization(member);
+            }
+        }
+    
+        @Override
+        public PropertyName findNameForSerialization(Annotated member) {
+            ConfiguredName cfgName = member.getAnnotation(ConfiguredName.class);
+            if (cfgName != null) {
+                return PropertyName.construct(cfgName.value());
+            } else {                
+                return super.findNameForSerialization(member);
+            }
+        }
+        
+        @Override
+        public JsonIgnoreProperties.Value findPropertyIgnorals(Annotated member) {
+            IgnoreProperties ignoreProp = member.getAnnotation(IgnoreProperties.class);
+            if (ignoreProp == null) {
+                return JsonIgnoreProperties.Value.empty();
+            }
+            return super.findPropertyIgnorals(member);
+        }
+        
+        @Override
+        public Object findFilterId(Annotated member) {
+            Filter filter = member.getAnnotation(Filter.class);
+            if (filter != null) {
+                String id = filter.value();
+                // Empty String is same as not having annotation, to allow overrides
+                if (id.length() > 0) {
+                    return id;
+                }
+            }
+            return super.findFilterId(member);
+        }
+        
+    }
+    
+    /**
+     * Collects data on supported annotations ({@link ConfiguredName}, {@link JsonProperty} {@link Include}) for an 
+     * accessible object.
      * 
      * @param propName the property name
      * @param obj the accessible object
-     * @param ignores the properties to ignore
      * @param renames the property renamings (original name, new name)
      * @param nonNullInclude the properties to not include if their value is <b>null</b>
      */
-    private static void handleAnnotations(String propName, AccessibleObject obj, Set<String> ignores, 
-        Map<String, String> renames, Set<String> nonNullInclude) {
+    private static void handleAnnotations(String propName, AccessibleObject obj, Map<String, String> renames, 
+        Set<String> nonNullInclude) {
         ConfiguredName cfgName = obj.getAnnotation(ConfiguredName.class);
-        Ignore annIgnore = obj.getAnnotation(Ignore.class);
-        JsonIgnore jsonIgnore = obj.getAnnotation(JsonIgnore.class);
         JsonProperty annProp = obj.getAnnotation(JsonProperty.class);
         Include annIncl = obj.getAnnotation(Include.class);
-        if (null != annIgnore && annIgnore.value()) {
-            ignores.add(propName);
-        }
-        if (null != jsonIgnore && jsonIgnore.value()) {
-            ignores.add(propName);
-        }
-        if (null != cfgName && cfgName.value() != null && cfgName.value().length() > 0) {
+        if (null != cfgName && isRename(cfgName.value(), propName)) {
             renames.put(propName, cfgName.value());
-        } else if (null != annProp && annProp.value() != null && annProp.value().length() > 0) {
+        } else if (null != annProp && isRename(annProp.value(), propName)) {
             renames.put(propName, annProp.value());
         }
         if (null != annIncl && annIncl.value() == Include.Type.NON_NULL) {
             nonNullInclude.add(propName);
         }
+    }
+
+    /**
+     * Returns whether the specified configured name {@code cfgName} represents a renaming of {@code propName}.
+     * 
+     * @param cfgName the configured name
+     * @param propName the property name
+     * @return {@code true} for renaming, {@code false} for no renaming
+     */
+    private static boolean isRename(String cfgName, String propName) {
+        return cfgName != null && cfgName.length() > 0 && !propName.equals(cfgName);
     }
     
     /**
@@ -554,50 +644,38 @@ public class JsonUtils {
     }
     
     /**
+     * Sets the annotation introspector on {@code mapper}.
+     * 
+     * @param mapper the mapper; the introspector is only set if {@code introspector} was <b>null</b> before, else
+     *    the already set introspector may be reconfigured through {@code configurer}
+     * @param introspector the actual introspector, may be <b>null</b>
+     * @param configurer the configurer function, may be <b>null</b> for none
+     * @return the actual introspector (new if <b>null</b> before or reconfigured)
+     */
+    private static OktoAnnotationIntrospector setAnnotationIntrospector(ObjectMapper mapper, 
+        OktoAnnotationIntrospector introspector, Consumer<OktoAnnotationIntrospector> configurer) {
+        if (null == introspector) {
+            introspector = new OktoAnnotationIntrospector();
+            mapper.setAnnotationIntrospector(introspector);
+        }
+        if (null != configurer) {
+            configurer.accept(introspector);
+        }
+        return introspector;
+    }
+    
+    /**
      * Returns an object writer for a mapper that applies a filter on {@code fieldNames} to be excluded.
      * 
      * @param mapper the mapper
+     * @param introspector the current introspector, may be <b>null</b>
      * @param fieldNames the field names
-     * @return the object writer
+     * @return the actual introspector (new if <b>null</b> before or reconfigured)
      */
-    public static ObjectMapper exceptFields(ObjectMapper mapper, String... fieldNames) {
+    public static OktoAnnotationIntrospector exceptFields(ObjectMapper mapper, OktoAnnotationIntrospector introspector,
+        String... fieldNames) {
         final Set<String> exclusions = CollectionUtils.addAll(new HashSet<String>(), fieldNames);
-        mapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
-
-            private static final long serialVersionUID = -6485293464445674590L;
-
-            @Override
-            public boolean hasIgnoreMarker(final AnnotatedMember member) {
-                boolean excludesByName = exclusions.contains(member.getName()) || super.hasIgnoreMarker(member);
-                if (!excludesByName) {
-                    ConfiguredName cfgName = member.getAnnotation(ConfiguredName.class);
-                    if (null != cfgName && cfgName.value() != null) {
-                        excludesByName = exclusions.contains(cfgName.value());
-                    }
-                }
-                if (!excludesByName) {
-                    Ignore ignore = member.getAnnotation(Ignore.class);
-                    if (null != ignore) {
-                        excludesByName = ignore.value();
-                    }
-                }
-                if (!excludesByName) {
-                    JsonIgnore jsonIgnore = member.getAnnotation(JsonIgnore.class);
-                    if (null != jsonIgnore) {
-                        excludesByName = jsonIgnore.value();
-                    }
-                }
-                if (!excludesByName) {
-                    JsonProperty jsonProp = member.getAnnotation(JsonProperty.class);
-                    if (null != jsonProp && jsonProp.value() != null) {
-                        excludesByName = exclusions.contains(jsonProp.value());
-                    }
-                }
-                return excludesByName;
-            }
-        });
-        
-        return mapper;
+        return setAnnotationIntrospector(mapper, introspector, i -> i.exclusions = exclusions);
     }
     
     /**
@@ -731,28 +809,22 @@ public class JsonUtils {
      * Configures the given mapper for lazy serialization ignoring given classes and members.
      * 
      * @param mapper the mapper to configure
+     * @param introspector the current introspector, may be <b>null</b>
      * @param ignore, classes (also as return types) and (reflection) fields that shall be ignored
-     * @return the object mapper
+     * @return the actual introspector (new if <b>null</b> before or reconfigured)
      */
-    public static ObjectMapper configureLazy(ObjectMapper mapper, Set<Object> ignore) {
+    public static OktoAnnotationIntrospector configureLazy(ObjectMapper mapper, 
+        OktoAnnotationIntrospector introspector, Set<Object> ignore) {
+        OktoAnnotationIntrospector result = introspector;
         mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false); // may become empty through ignores
         mapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance,
             ObjectMapper.DefaultTyping.NON_FINAL, 
             JsonTypeInfo.As.WRAPPER_ARRAY);
         if (!ignore.isEmpty()) {
-            mapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
-    
-                private static final long serialVersionUID = 7445592829151624983L;
-    
-                @Override
-                public boolean hasIgnoreMarker(final AnnotatedMember member) {
-                    return ignore.contains(member.getType().getRawClass()) || ignore.contains(member.getMember()) 
-                        || super.hasIgnoreMarker(member); 
-                }
-            });
+            result = setAnnotationIntrospector(mapper, result, i -> i.ignore = ignore);
         }
-        return mapper;
+        return result;
     }
 
     /**

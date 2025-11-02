@@ -438,6 +438,15 @@ public abstract class Commons {
     public abstract String readFileToString(final File file, final Charset charset) throws IOException;
 
     /**
+     * Cleans a directory recursively.
+     *
+     * @param directory directory to delete
+     * @throws IOException              in case deletion is unsuccessful
+     * @throws IllegalArgumentException if {@code directory} is not a directory
+     */
+    public abstract void cleanDirectory(final File directory) throws IOException;
+    
+    /**
      * Deletes a directory recursively.
      *
      * @param directory directory to delete

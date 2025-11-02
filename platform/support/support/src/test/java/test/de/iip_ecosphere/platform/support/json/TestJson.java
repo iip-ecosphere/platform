@@ -26,6 +26,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
@@ -38,6 +39,7 @@ import de.iip_ecosphere.platform.support.json.JsonObject;
 import de.iip_ecosphere.platform.support.json.JsonObjectBuilder;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.support.json.JsonUtils.JacksonEnumMapping;
+import de.iip_ecosphere.platform.support.json.JsonUtils.OktoAnnotationIntrospector;
 
 /**
  * Implements the JSON interface by Jackson.
@@ -137,6 +139,7 @@ public class TestJson extends de.iip_ecosphere.platform.support.json.Json {
     
     private ObjectMapper mapper = new ObjectMapper();
     private ObjectWriter writer; 
+    private OktoAnnotationIntrospector introspector;
     
     @Override
     public Json createInstanceImpl(boolean considerAnnotations) {
@@ -251,7 +254,7 @@ public class TestJson extends de.iip_ecosphere.platform.support.json.Json {
 
     @Override
     public Json configureFor(Class<?> cls) {
-        mapper = JsonUtils.configureFor(mapper, cls);
+        introspector = JsonUtils.configureFor(mapper, introspector, cls);
         return this;
     }
 
@@ -275,9 +278,19 @@ public class TestJson extends de.iip_ecosphere.platform.support.json.Json {
     
     @Override
     public Json exceptFields(String... fieldNames) {
-        mapper = JsonUtils.exceptFields(mapper, fieldNames);
+        introspector = JsonUtils.exceptFields(mapper, introspector, fieldNames);
         return this;
     }
+    
+    @Override
+    public Json configureExceptFieldsFilter(String filterId, String... fieldNames) {
+        SimpleBeanPropertyFilter theFilter = SimpleBeanPropertyFilter
+            .serializeAllExcept(fieldNames);
+        FilterProvider filters = new SimpleFilterProvider()
+            .addFilter(filterId, theFilter);
+        writer = mapper.writer(filters);
+        return this;
+    }    
     
     @Override
     public Json filterAllExceptFields(String... fieldNames) {
@@ -313,7 +326,7 @@ public class TestJson extends de.iip_ecosphere.platform.support.json.Json {
     
     @Override
     public Json configureLazy(Set<Object> ignore) { 
-        JsonUtils.configureLazy(mapper, ignore);
+        introspector = JsonUtils.configureLazy(mapper, introspector, ignore);
         return this;
     }
     
