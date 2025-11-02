@@ -12,15 +12,15 @@
 
 package test.de.iip_ecosphere.platform.support.iip_aas;
 
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
+import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
 import iip.datatypes.Abc;
 import iip.datatypes.AbcImpl;
@@ -103,35 +103,32 @@ public class JsonUtilsTest {
     @Test
     public void testOptionals() {
         String data = "{\"intValue\":\"1\"}";
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonUtils.defineOptionals(objectMapper, Data.class, "stringValue");
+        Json objectMapper = Json.createInstance4All().defineOptionals(Data.class, "stringValue");
         try {
             Data obj = objectMapper.readValue(data, Data.class);
             Assert.assertEquals(1, obj.getIntValue());
             Assert.assertNull(obj.getStringValue());
-        } catch (JsonProcessingException e) {
+        } catch (IOException e) {
             Assert.fail("Shall not occur");
         }
 
         data = "{\"stringValue\":\"xyz\"}";
-        objectMapper = new ObjectMapper();
-        JsonUtils.defineOptionals(objectMapper, Data.class, "intValue");
+        objectMapper = Json.createInstance4All().defineOptionals(Data.class, "intValue");
         try {
             Data obj = objectMapper.readValue(data, Data.class);
             Assert.assertEquals(0, obj.getIntValue());
             Assert.assertEquals("xyz", obj.getStringValue());
-        } catch (JsonProcessingException e) {
+        } catch (IOException e) {
             Assert.fail("Shall not occur");
         }
 
         data = "{}";
-        objectMapper = new ObjectMapper();
-        JsonUtils.defineOptionals(objectMapper, Data.class, "stringValue", "intValue");
+        objectMapper = Json.createInstance4All().defineOptionals(Data.class, "stringValue", "intValue");
         try {
             Data obj = objectMapper.readValue(data, Data.class);
             Assert.assertEquals(0, obj.getIntValue());
             Assert.assertNull(obj.getStringValue());
-        } catch (JsonProcessingException e) {
+        } catch (IOException e) {
             Assert.fail("Shall not occur");
         }
     }
@@ -197,16 +194,16 @@ public class JsonUtilsTest {
     /**
      * Tests {@link JsonUtils#handleIipDataClasses(ObjectMapper)}.
      * 
-     * @throws JsonProcessingException shall not occur
+     * @throws IOException shall not occur
      */
     @Test
-    public void testIipTypes() throws JsonProcessingException {
+    public void testIipTypes() throws IOException {
         Abc abc = new AbcImpl();
         abc.setValue(42);
-        ObjectMapper objectMapper = new ObjectMapper();
+        Json objectMapper = Json.createInstance4All();
         String str = objectMapper.writeValueAsString(abc);
 
-        JsonUtils.handleIipDataClasses(objectMapper);
+        objectMapper.handleIipDataClasses();
         Abc test = objectMapper.readValue(str, Abc.class);
         Assert.assertNotNull(test);
         Assert.assertEquals(abc.getValue(), test.getValue());
@@ -255,13 +252,13 @@ public class JsonUtilsTest {
     /**
      * Tests the mapping property naming strategy.
      * 
-     * @throws JsonProcessingException shall not occur
+     * @throws IOException shall not occur
      */
     @Test
-    public void testPropertyNaming() throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
+    public void testPropertyNaming() throws IOException {
+        Json objectMapper = Json.createInstance4All();
         String str = "{\"INTVALUE\":1, \"stringVAlue\":\"abba\"}";
-        JsonUtils.defineFields(objectMapper, "INTVALUE", "stringVAlue");
+        objectMapper.defineFields("INTVALUE", "stringVAlue");
         PropertyData test = objectMapper.readValue(str, PropertyData.class);
         Assert.assertNotNull(test);
         Assert.assertEquals(1, test.getINTVALUE());
@@ -269,16 +266,15 @@ public class JsonUtilsTest {
     }
     
     /**
-     * Tests {@link JsonUtils#exceptFields(ObjectMapper, String...)} 
-     * and {@link JsonUtils#toJson(ObjectMapper, Object)}.
+     * Tests {@link Json#exceptFields(String...)} and {@link Json#toJsonQuiet(Object)}.
      */
     @Test
-    public void testExceptFields() {
+    public void testExceptFields() throws IOException {
         PropertyData data = new PropertyData();
         data.setStringVAlue("abba");
-        ObjectMapper mapper = JsonUtils.exceptFields(new ObjectMapper(), "stringVAlue");
-        Assert.assertEquals("", JsonUtils.toJson(mapper, null));
-        String json = JsonUtils.toJson(mapper, data);
+        Json mapper = Json.createInstance4All().exceptFields("stringVAlue");
+        Assert.assertEquals("", mapper.toJsonQuiet(null));
+        String json = mapper.toJsonQuiet(data);
         Assert.assertTrue(json.contains("intvalue")); // no define fields, standard conventions
         Assert.assertFalse(json.contains("stringVAlue"));
     }
