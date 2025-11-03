@@ -21,9 +21,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import com.fasterxml.jackson.annotation.JsonFilter; // keep until migration is complete
-
-import de.iip_ecosphere.platform.support.Filter;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.bytecode.Bytecode;
 import de.iip_ecosphere.platform.support.json.IOIterator;
@@ -99,19 +96,12 @@ public class DataMapper {
         Class<? extends T> result = Bytecode.getInstance().createClassBuilder(
             "iip.mock." + cls.getSimpleName() + "Mock", cls, MockingConnectorServiceWrapper.class.getClassLoader())
             .implement(BaseDataUnitFunctions.class)
-            .annotate(JsonFilter.class)
-                .define("value", "iipFilter")
-                .build()
-            .annotate(Filter.class)
-                .define("value", "iipFilter")
-                .build()
             .defineProperty("$period", Integer.TYPE)
                 .build()
             .defineProperty("$repeats", Integer.TYPE)
                 .build()
             .build();
-        
-        // and we need an ad-hoch serializer that represents the new type and behaves as the existing type
+        // and we need an ad-hoc serializer that represents the new type and behaves as the existing type
         final Serializer<T> ser = SerializerRegistry.getSerializer(cls);
         if (null != ser) {
             Serializer<T> newSer = new Serializer<T>() {
@@ -119,6 +109,7 @@ public class DataMapper {
                 @Override
                 public T from(byte[] data) throws IOException {
                     Json objectMapper = Json.createInstance4All()
+                        .failOnUnknownProperties(false)
                         .handleIipDataClasses(); // only if nested?
                     return objectMapper.readValue(data, cls);
                 }
@@ -126,7 +117,7 @@ public class DataMapper {
                 @Override
                 public byte[] to(T source) throws IOException {
                     Json objectMapper = Json.createInstance4All()
-                        .configureExceptFieldsFilter("iipFilter", "$period", "$repeats");
+                        .exceptFields("$period", "$repeats");
                     return objectMapper.writeValueAsBytes(source);
                 }
 

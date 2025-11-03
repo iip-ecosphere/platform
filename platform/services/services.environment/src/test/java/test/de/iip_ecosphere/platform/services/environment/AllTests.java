@@ -38,7 +38,6 @@ import test.de.iip_ecosphere.platform.services.environment.metricsProvider.Metri
     PythonProcessServiceTest.class,
     AbstractRestProcessServiceTest.class,
     ServiceSelectorTest.class,
-    IipStringStyleTest.class,
     ProcessSupportTest.class,
     DataMapperTest.class,
     MonitoringServiceTest.class,

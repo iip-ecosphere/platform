@@ -24,8 +24,14 @@ import de.iip_ecosphere.platform.services.environment.DataMapper;
 import de.iip_ecosphere.platform.services.environment.DataMapper.BaseDataUnitFunctions;
 import de.iip_ecosphere.platform.services.environment.DataMapper.MappingConsumer;
 import de.iip_ecosphere.platform.support.StringUtils;
+import de.iip_ecosphere.platform.support.json.IOIterator;
+import de.iip_ecosphere.platform.support.json.Json;
+import de.iip_ecosphere.platform.support.json.JsonObject;
 import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
+import de.iip_ecosphere.platform.transport.serialization.GenericJsonSerializer;
+import de.iip_ecosphere.platform.transport.serialization.Serializer;
+import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 
 import org.junit.Assert;
 
@@ -285,6 +291,93 @@ public class DataMapperTest {
             | NoSuchMethodException | SecurityException | ClassCastException e) {
             Assert.fail("Shall not occur: " + e.getMessage());
         }
+    }
+    
+    /**
+     * A test class.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class DataUnitTest {
+        
+        private int value;
+
+        /**
+         * Returns the value.
+         * 
+         * @return the value
+         */
+        public int getValue() {
+            return value;
+        }
+
+        /**
+         * Changes the value.
+         * 
+         * @param value the new value
+         */
+        public void setValue(int value) {
+            this.value = value;
+        }
+        
+    }
+
+    /**
+     * Tests serialization/deserialization for base data units. Replays part of the mocking connector wrappers.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testBaseDataUnitSerialization() throws IOException {
+        SerializerRegistry.registerSerializer(new GenericJsonSerializer<DataUnitTest>(DataUnitTest.class));
+        Class<? extends DataUnitTest> baseCls = DataMapper.createBaseDataUnitClass(DataUnitTest.class);
+        String txt = Json.createObjectBuilder()
+            .add("value", 126)
+            .add("$period", 1)
+            .add("$repeats", 5)
+            .build().toString();
+        ByteArrayInputStream bais = new ByteArrayInputStream(txt.getBytes());
+        IOIterator<? extends DataUnitTest> iter = DataMapper.mapJsonDataToIterator(bais, baseCls);
+        Serializer<? extends DataUnitTest> baseSer = SerializerRegistry.getSerializer(baseCls);
+        while (iter.hasNext()) {
+            DataUnitTest data = iter.next();
+            BaseDataUnitFunctions bduf = (BaseDataUnitFunctions) data;
+            Assert.assertEquals(1, bduf.get$period());
+            Assert.assertEquals(5, bduf.get$repeats());
+            Assert.assertEquals(126, data.getValue());
+            
+            // generic serialization
+            JsonObject obj = Json.createObject(serialize(data));
+            Assert.assertEquals(data.getValue(), obj.getInt("value"));
+            Assert.assertFalse(obj.containsKey("$period"));
+            Assert.assertFalse(obj.containsKey("$repeats"));
+        }
+        
+        // direct deserialization
+        DataUnitTest obj = baseSer.from(txt.getBytes());
+        Assert.assertNotNull(obj);
+        Assert.assertEquals(126, obj.getValue());
+    }
+    
+    /**
+     * Dynamically select a serializer (adapted from AbtractTransportConnector).
+     * 
+     * @param <T>    the type of the data
+     * @param data   the data to serialize
+     * @return the serialized bytes
+     * @throws IOException in case that problems occur during serialization
+     */
+    protected <T> byte[] serialize(T data) throws IOException {
+        byte[] result;
+        @SuppressWarnings("unchecked")
+        Class<T> cls = (Class<T>) data.getClass();
+        Serializer<T> serializer = SerializerRegistry.getSerializer(cls);
+        if (null != serializer) {
+            result = serializer.to(data);
+        } else {
+            result = new byte[0];
+        }
+        return result;
     }
 
 }

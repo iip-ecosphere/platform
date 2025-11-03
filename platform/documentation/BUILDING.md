@@ -33,6 +33,7 @@ Currently the goals `generateInterfaces`, `generateAppsNoDeps` and `generateApps
 The meta-model is not automatically updated. This allows the owner to declide when potential upgrades to own code shall be applied. This may be needed when platform interface changes occur (seldom), i.e., suddely compile errors appear in your application, which are compensated by a matching configuration meta model.
 
   * To update/upgrade the model, call `mvn -P EasyGen -U generate-sources -Dunpack.force=true`
+  * Some apps/platform components are built without Maven profiles, where then usually `mvn -U generate-sources -Dunpack.force=true` is the right call. Please consulte the respective `README.md` file
   
 As a side effect, also this command creates the application templates.
 
