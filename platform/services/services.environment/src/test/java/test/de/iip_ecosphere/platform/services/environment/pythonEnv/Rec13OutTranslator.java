@@ -1,9 +1,9 @@
 package test.de.iip_ecosphere.platform.services.environment.pythonEnv;
 
 import java.io.IOException;
+
+import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.transport.serialization.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * JSON transport serializer for Rec13.
@@ -13,22 +13,14 @@ public class Rec13OutTranslator implements TypeTranslator<String, Rec13> {
 
     @Override             
     public Rec13 to(String data) throws IOException {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(data, Rec13Impl.class);
-        } catch (JsonProcessingException e) {
-            throw new IOException(e);
-        }
+        Json objectMapper = Json.createInstance(Rec13.class, Rec13Impl.class);
+        return objectMapper.readValue(data, Rec13Impl.class);
     }
 
     @Override    
     public String from(Rec13 source) throws IOException {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.writeValueAsString(source);
-        } catch (JsonProcessingException e) {
-            throw new IOException(e);
-        }
+        Json objectMapper = Json.createInstance(Rec13.class, Rec13Impl.class);
+        return objectMapper.writeValueAsString(source);
     }
 
 }

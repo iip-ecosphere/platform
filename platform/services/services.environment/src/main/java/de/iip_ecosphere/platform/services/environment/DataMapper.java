@@ -21,18 +21,13 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import com.fasterxml.jackson.annotation.JsonFilter;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ser.FilterProvider;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.annotation.JsonFilter; // keep until migration is complete
 
+import de.iip_ecosphere.platform.support.Filter;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.bytecode.Bytecode;
 import de.iip_ecosphere.platform.support.json.IOIterator;
-import de.iip_ecosphere.platform.support.json.JsonUtils;
+import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
@@ -107,6 +102,9 @@ public class DataMapper {
             .annotate(JsonFilter.class)
                 .define("value", "iipFilter")
                 .build()
+            .annotate(Filter.class)
+                .define("value", "iipFilter")
+                .build()
             .defineProperty("$period", Integer.TYPE)
                 .build()
             .defineProperty("$repeats", Integer.TYPE)
@@ -120,27 +118,16 @@ public class DataMapper {
 
                 @Override
                 public T from(byte[] data) throws IOException {
-                    try {
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        JsonUtils.handleIipDataClasses(objectMapper); // only if nested?
-                        return objectMapper.readValue(data, cls);
-                    } catch (JsonProcessingException e) {
-                        throw new IOException(e);
-                    }
+                    Json objectMapper = Json.createInstance4All()
+                        .handleIipDataClasses(); // only if nested?
+                    return objectMapper.readValue(data, cls);
                 }
 
                 @Override
                 public byte[] to(T source) throws IOException {
-                    try {
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        SimpleBeanPropertyFilter theFilter = SimpleBeanPropertyFilter
-                            .serializeAllExcept("$period", "$repeats");
-                        FilterProvider filters = new SimpleFilterProvider()
-                            .addFilter("iipFilter", theFilter);
-                        return objectMapper.writer(filters).writeValueAsBytes(source);
-                    } catch (JsonProcessingException e) {
-                        throw new IOException(e);
-                    }
+                    Json objectMapper = Json.createInstance4All()
+                        .configureExceptFieldsFilter("$period", "$repeats");
+                    return objectMapper.writeValueAsBytes(source);
                 }
 
                 @Override
@@ -426,8 +413,6 @@ public class DataMapper {
             while (iter.hasNext() && (null == continueFunction || continueFunction.get())) {
                 cons.accept(iter.next());
             }
-        } catch (JsonProcessingException e) {
-            throw new IOException(e);
         } finally {
             if (null != stream) {
                 stream.close();
@@ -464,14 +449,13 @@ public class DataMapper {
     public static <T> IOIterator<T> mapJsonDataToIterator(InputStream stream, Class<T> cls, 
         boolean failOnUnknownProperties) throws IOException {
 
-        ObjectMapper objectMapper = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, failOnUnknownProperties);
-        JsonUtils.handleIipDataClasses(objectMapper);
-
+        Json objectMapper = Json.createInstance4All()
+            .failOnUnknownProperties(failOnUnknownProperties)
+            .handleIipDataClasses();
         if (null == stream) {
             LoggerFactory.getLogger(DataMapper.class).error("No stream found, is file/resource name correct?");
         }
-        return JsonUtils.createIterator(objectMapper, stream, cls);
+        return objectMapper.createIterator(stream, cls);
     }
 
 }
