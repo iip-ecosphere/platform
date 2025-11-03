@@ -126,7 +126,7 @@ public class DataMapper {
                 @Override
                 public byte[] to(T source) throws IOException {
                     Json objectMapper = Json.createInstance4All()
-                        .configureExceptFieldsFilter("$period", "$repeats");
+                        .configureExceptFieldsFilter("iipFilter", "$period", "$repeats");
                     return objectMapper.writeValueAsBytes(source);
                 }
 
