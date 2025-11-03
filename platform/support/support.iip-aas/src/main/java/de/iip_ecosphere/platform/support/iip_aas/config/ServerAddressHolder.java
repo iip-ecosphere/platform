@@ -1,12 +1,14 @@
 package de.iip_ecosphere.platform.support.iip_aas.config;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 
+import com.fasterxml.jackson.annotation.JsonIgnore; // keep for migration
+
+import de.iip_ecosphere.platform.support.Ignore;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.json.Json;
 
 /**
  * A proxy for {@link ServerAddress} as we do not want to have setters there.
@@ -15,7 +17,7 @@ import de.iip_ecosphere.platform.support.ServerAddress;
  */
 public class ServerAddressHolder {
     
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final Json MAPPER = Json.createInstance4All();
     private int port; // negative leads to ephemerial
     private String host;
     private Schema schema = Schema.IGNORE;
@@ -96,6 +98,7 @@ public class ServerAddressHolder {
      * 
      * @return {@code true} for ephemeral, {@code false} else
      */
+    @Ignore
     @JsonIgnore
     public boolean isEphmemeral() {
         return port < 0;
@@ -151,6 +154,7 @@ public class ServerAddressHolder {
      * 
      * @return the server address
      */
+    @Ignore
     @JsonIgnore
     public ServerAddress getServerAddress() {
         if (getPort() < 0) {
@@ -172,7 +176,7 @@ public class ServerAddressHolder {
             try {
                 ServerAddressHolder tmp = MAPPER.readValue(json.toString(), ServerAddressHolder.class);
                 result = new ServerAddress(tmp.getSchema(), tmp.getHost(), tmp.getPort());
-            } catch (JsonProcessingException e) {
+            } catch (IOException e) {
                 // result = null;
             }
         }
@@ -192,7 +196,7 @@ public class ServerAddressHolder {
             try {
                 ServerAddressHolder tmp = new ServerAddressHolder(address);
                 result = MAPPER.writeValueAsString(tmp);
-            } catch (JsonProcessingException e) {
+            } catch (IOException e) {
                 // handled by default value
             }
         } 

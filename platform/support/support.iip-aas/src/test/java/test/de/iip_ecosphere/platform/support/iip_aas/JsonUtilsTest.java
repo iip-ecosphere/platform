@@ -156,7 +156,7 @@ public class JsonUtilsTest {
     @Test
     public void testServerAddress() {
         ServerAddress addr = null;
-        String json = JsonUtils.toJson(addr);
+        String json = ServerAddressHolder.toJson(addr);
         ServerAddress tmp = ServerAddressHolder.serverAddressFromJson(json);
         Assert.assertNull(tmp);
         
