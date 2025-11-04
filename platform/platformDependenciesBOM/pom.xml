@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>platformDependenciesBOM</artifactId>
+  <packaging>pom</packaging>
+  <name>platformDependencies with basic dependencies (BOM)</name>
+  <description>The basic managed dependencies (BOM).</description>
+  
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependencies</artifactId>
+     <version>0.7.1-SNAPSHOT</version>
+     <relativePath/>
+  </parent>
+  
+  <dependencyManagement>
+    <dependencies>
+    
+      <!-- Logging, preliminary (see UKL); Shall be at least consistent with BaSyx/Spring! -->
+      
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${org.slf4j.version}</version>
+      </dependency>
+      <!-- Also tests must be able to use the logging. However, this is optional as bindings may come through 
+           BaSyx/Spring and may then require specific configuration! -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>${org.slf4j.version}</version>
+        <optional>true</optional>
+        <scope>test</scope>
+      </dependency>
+      
+      <!-- Due to sudden conflicts in testing -->
+      
+      <!--<dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${com.google.guava.version}</version>
+      </dependency>-->
+    
+      <!-- Commons stuff -->
+
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>${apache.commons.io.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
+        <version>${apache.commons.lang.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-text</artifactId>
+        <version>${apache.commons.text.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>${apache.commons.lang3.version}</version>
+      </dependency>
+    
+      <!-- Serialization  -->
+      
+      <dependency>
+        <groupId>com.google.protobuf</groupId>
+        <artifactId>protobuf-java</artifactId>
+        <version>${protobuf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.googlecode.json-simple</groupId>
+        <artifactId>json-simple</artifactId>
+        <version>${com.googlecode.json-simple.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish</groupId>
+        <artifactId>javax.json</artifactId>
+        <version>${org.glassfish.javax.json.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.jsoniter</groupId>
+        <artifactId>jsoniter</artifactId>
+        <version>${com.jsoniter.version}</version>
+      </dependency>
+      
+      <!-- MQTT -->
+      
+      <dependency>
+        <groupId>org.eclipse.paho</groupId>
+        <artifactId>org.eclipse.paho.mqttv5.client</artifactId>
+        <version>${eclipse.paho.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.paho</groupId>
+        <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+        <version>${eclipse.paho.version}</version>
+      </dependency>
+      <!-- for testing -->
+      <dependency>
+        <groupId>io.moquette</groupId>
+        <artifactId>moquette-broker</artifactId>
+        <version>${io.moquette.version}</version>
+      </dependency>
+      <dependency>
+       <groupId>org.apache.qpid</groupId>
+       <artifactId>qpid-broker</artifactId>
+       <version>${org.apache.qpid.version}</version>
+       <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.hivemq</groupId>
+        <artifactId>hivemq-community-edition-embedded</artifactId>
+        <version>${com.hivemq.version}</version>
+      </dependency>
+      
+      <!-- AMQP -->
+      
+      <dependency>
+        <!-- Apache Public License 2.0 or Mozilla Public License 2.0 -->
+        <groupId>com.rabbitmq</groupId>
+        <artifactId>amqp-client</artifactId>
+        <version>${rabbitmq.version}</version>
+        <optional>true</optional>
+      </dependency>
+    
+      <!-- OPC-UA -->
+    
+      <dependency>
+        <groupId>org.eclipse.milo</groupId>
+        <artifactId>sdk-client</artifactId>
+        <version>${eclipse.milo.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.milo</groupId>
+        <artifactId>sdk-server</artifactId>
+        <version>${eclipse.milo.version}</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.yaml</groupId>
+        <artifactId>snakeyaml</artifactId>
+        <version>${org.yaml.snakeyaml.version}</version> <!-- shall match spring -->
+      </dependency>      
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${com.fasterxml.jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${com.fasterxml.jackson.version}</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>${org.apache.httpcomponents.httpclient.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.micrometer</groupId>
+        <artifactId>micrometer-core</artifactId>
+        <version>${io.micrometer.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.squareup.okhttp3</groupId>
+        <artifactId>okhttp</artifactId>
+        <version>${com.squareup.okhttp3.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-bom</artifactId>
+        <type>pom</type>
+        <version>${io.netty.version}</version>
+        <scope>import</scope>
+      </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-pool2</artifactId>
+      <version>${org.apache.commons.commons-pool2.version}</version>
+    </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey</groupId>
+        <artifactId>jersey-bom</artifactId>
+        <version>${org.glassfish.jersey.jersey.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    <dependency>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy</artifactId>
+      <version>${net.bytebuddy.byte-buddy.version}</version>
+    </dependency>
+      <dependency>
+        <groupId>javax.annotation</groupId>
+        <artifactId>javax.annotation-api</artifactId>
+        <version>${javax-annotation.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>${com.google.code.gson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>${com.fasterxml.jackson.jackson-bom.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish</groupId>
+        <artifactId>jakarta.el</artifactId>
+        <version>${org.glassfish.jakarta.el.version}</version>
+      </dependency>      
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.2.3</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-core</artifactId>
+        <version>1.2.3</version>
+      </dependency>
+      
+      <!-- Spring see platformDependenciesSpring, only required transitive spring dependencies declared here -->
+      
+      <dependency>
+        <groupId>javax.activation</groupId>
+        <artifactId>javax.activation-api</artifactId>
+        <version>1.2.0</version>
+      </dependency>
+    
+      <!-- basic testing dependencies -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  
+</project>
