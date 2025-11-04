@@ -15,10 +15,10 @@
   
   <dependencyManagement>
     <dependencies>
-    <dependency> <!-- required for xtext -->
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>[33.2.0-jre]</version>
+      <version>[${com.google.guava.version}]</version>
     </dependency>    
     </dependencies>
   </dependencyManagement>
