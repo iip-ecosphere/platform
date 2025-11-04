@@ -10,7 +10,7 @@ This folder contains the documentation of the okotflow platform.
 
 ## Technical Guidelines
 * The technical requirements are documented in [PREREQUISITES](PREREQUISITES.md).
-* There is an overall **architecture** described in the (**platform handbook**)[PlatformHandbook.pdf]. Please consult the architecture first to understand how existing and new parts are related.
+* The overall **architecture** described in the (**platform handbook**)[PlatformHandbook.pdf] as well as the rules and constraints to be considered when developing platform components. Please consult the architecture first to understand how existing and new parts are related and which rules do apply.
 * Please consider the [guideline on how to open the code projects and setup the environment](Guideline.pdf?raw=true).
 * Please note that special characters like whitespaces in folder names (in particular on Windows) may cause the installation, platform installation or examples to fail.  
 * **Java projects** are created with Eclipse. Import ``iipCodeFormatter.xml`` from ``platformDependencies`` as formatter settings. Set text editor print margin to 120 characters. For Python development, please install the `PyDev` Eclipse plugin, which is supported by our generated application templates.
