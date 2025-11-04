@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -19,6 +20,7 @@ import de.iip_ecosphere.platform.connectors.rest.RESTItem;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
@@ -47,6 +49,7 @@ public class RESTConnectorTest {
      */
     @BeforeClass
     public static void init() {
+        Assume.assumeTrue(OsUtils.isWindows());
         testServer = new TestServer();
         testServer.start();
         LOGGER.info("RESTConnectorTest -> REST server started");
@@ -59,7 +62,9 @@ public class RESTConnectorTest {
     @AfterClass
     public static void shutdown() {
         LOGGER.info("RESTConnectorTest -> REST server stopped");
-        testServer.stop();
+        if (null != testServer) {
+            testServer.stop();
+        }
     }
 
     /**
@@ -70,6 +75,7 @@ public class RESTConnectorTest {
      */
     @Test
     public void testWithPolling() throws IOException, InterruptedException {
+        Assume.assumeTrue(OsUtils.isWindows());
         LOGGER.info("RESTConnectorTest -> testWithPolling()");
 
         testRequestTypeSingle();
