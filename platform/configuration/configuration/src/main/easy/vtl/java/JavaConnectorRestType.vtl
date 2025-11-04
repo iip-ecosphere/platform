@@ -20,7 +20,7 @@ template JavaConnectorRestType(Configuration config, JavaCodeArtifact target, Re
         String clsName = typeName + "RestType";
 
         JavaCodeClass mainCls = codeCreateClass(target, pkg, clsName, 'Rest type for the application data type ${typeName}');
-        mainCls.addAnnotation("com.fasterxml.jackson.annotation.JsonIgnoreProperties").addArgument("ignoreUnknown", true);
+        mainCls.addAnnotation("de.iip_ecosphere.platform.support.IgnoreProperties").addArgument("ignoreUnknown", true);
         mainCls.implements("de.iip_ecosphere.platform.connectors.rest.Convertable");
 
         String getValueToWrite = "null";
@@ -30,7 +30,7 @@ template JavaConnectorRestType(Configuration config, JavaCodeArtifact target, Re
                     getValueToWrite = attr.getName(); 
                 }
                 if (not(f.type.isKindOf(RecordType))) {
-                    attr.addAnnotation("com.fasterxml.jackson.annotation.JsonProperty").addStringArgument(f.name);
+                    attr.addAnnotation("de.iip_ecosphere.platform.support.ConfiguredName").addStringArgument(f.name);
                 }
                 mainCls.addGetter(attr);
                 mainCls.addSetter(attr, "value");

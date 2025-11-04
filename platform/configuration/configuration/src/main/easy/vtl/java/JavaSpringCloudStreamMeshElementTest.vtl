@@ -53,7 +53,7 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
                 String attributeName = firstToLowerCase(toTypeName(in));
                 c.addAttribute(implTypeName, attributeName).(a|{
                     a.addGetter(true);
-                    a.addSetter(true).addToJavadocComment(" [required by Jackson]");
+                    a.addSetter(true).addToJavadocComment(" [required by JSON]");
                 });
             }
             addReflectiveToString(c);

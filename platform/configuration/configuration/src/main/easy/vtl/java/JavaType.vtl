@@ -214,7 +214,7 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
         } else {
             method.addOverrideAnnotation();
         }
-        method.addAnnotation("com.fasterxml.jackson.annotation.JsonIgnore"); // unconditional -> service integrations
+        method.addAnnotation("de.iip_ecosphere.platform.support.Ignore");
     }
 
     // added v2->v3
@@ -267,7 +267,6 @@ template JavaType(Configuration config, JavaCodeArtifact target, RecordType type
         for (Field f: type.fields) {
             mainCls.createAttribute(getTypeName(f), asMethodFieldIdentifier(f.name), not(interface)).(attr|{
                 if (not(interface)) {
-                    attr.addAnnotation("com.fasterxml.jackson.annotation.JsonProperty").addStringArgument(f.name); // unconditional -> service integrations
                     attr.addAnnotation("de.iip_ecosphere.platform.support.ConfiguredName").addStringArgument(f.name);        
                 }
                 configureGetterSetter(mainCls.addGetter(attr), true, f);

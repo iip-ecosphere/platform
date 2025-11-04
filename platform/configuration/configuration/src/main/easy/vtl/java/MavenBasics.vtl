@@ -512,7 +512,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
     // append some common base dependencies to avoid repetition
     def appendIipBaseDependencies(XmlElement parent, Boolean forAas=true, Boolean includeJUnit=true) {
         // this may require some JDK exclusions
-        appendDependency(parent, "javax.activation", "javax.activation-api");
+        appendDependency(parent, "javax.activation", "javax.activation-api", "1.2.0");
         if (includeJUnit) {
             appendDependency(parent, "junit", "junit", "4.12", scope="test");
         }

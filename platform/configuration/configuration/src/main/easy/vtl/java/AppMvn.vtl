@@ -70,7 +70,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         for (String art : artifacts.asSequence()->sortedBy(a|a)) { // sortedBy for testing
             appendArtifact(dep, art, projectVersion);
         }
-        d = appendDependency(dep, "org.glassfish", "jakarta.el");
+        d = appendDependency(dep, "org.glassfish", "jakarta.el", ver="\\${org.glassfish.jakarta.el.version}");
         new XmlElement(d, "optional", "false");
 
         if (!ifArtifact) {

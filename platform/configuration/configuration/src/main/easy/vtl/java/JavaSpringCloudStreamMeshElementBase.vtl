@@ -648,11 +648,8 @@ block;
                     m.throws("java.io.IOException");
                     m.param(type, "source");
                     m.override();
-                    m.try().(b|{
-                        b.var("com.fasterxml.jackson.databind.ObjectMapper", "objectMapper").addNew("ObjectMapper");
-                        b.return(new JavaCodeMethodCall("objectMapper.writeValueAsString").arg("source"));
-                        b.catch("com.fasterxml.jackson.core.JsonProcessingException", "e").addThrow("new IOException(e)");
-                    });
+                    m.var("de.iip_ecosphere.platform.support.json.Json", "objectMapper").initializer("Json.createInstance4All()");
+                    m.return(new JavaCodeMethodCall("objectMapper.writeValueAsString").arg("source"));
                 });
             });
         }
@@ -672,12 +669,9 @@ block;
                     m.param("String", "source");
                     m.override();
                     m.throws("java.io.IOException");
-                    m.try().(b|{
-                        b.var("com.fasterxml.jackson.databind.ObjectMapper", "objectMapper").addNew("ObjectMapper");
-                        b.callQualified("de.iip_ecosphere.platform.support.json.JsonUtils.handleIipDataClasses").arg("objectMapper"); // only if nested?
-                        b.return(new JavaCodeMethodCall("objectMapper.readValue").arg("source").classArg(qType + getTypeAdd()));
-                        b.catch("com.fasterxml.jackson.core.JsonProcessingException", "e").addThrow("new IOException(e)");
-                    });
+                    m.var("de.iip_ecosphere.platform.support.json.Json", "objectMapper").initializer("Json.createInstance4All()");
+                    m.call("objectMapper.handleIipDataClasses"); // only if nested?
+                    m.return(new JavaCodeMethodCall("objectMapper.readValue").arg("source").classArg(qType + getTypeAdd()));
                 });
             });
         }
