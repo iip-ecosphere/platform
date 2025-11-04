@@ -31,7 +31,7 @@ import test.de.iip_ecosphere.platform.configuration.easyProducer.opcua.DomParser
     //IvmlSerializerConfig1Tests.class, // -> examples to allow for platform/mangementUi build before
     IvmlSerializerConfig1OldTests.class,
     IvmlRoutingTestTests.class,
-    IvmlContainerTests.class,
+    //IvmlContainerTests.class,     // -> examples to allow for platform/mangementUi build before
     //IvmlContainerLxcTests.class,  // -> examples to allow for platform/mangementUi build before
     IvmlApiTests.class,
     

@@ -243,7 +243,11 @@ public class PlatformInstantiator {
                 easySetup.setIvmlMetaModelFolder(metaModelFolder);
             }
             if (cleanOutputFolder()) {
+                LoggerFactory.getLogger(this).info("Deleting {} ...", outputFolder);
+                long start = System.currentTimeMillis();
                 FileUtils.deleteQuietly(outputFolder);
+                LoggerFactory.getLogger(this).info("Deleted {} in {} ms", outputFolder, 
+                    System.currentTimeMillis() - start);
                 outputFolder.mkdirs();
             }
             easySetup.setGenTarget(outputFolder);    

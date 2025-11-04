@@ -198,7 +198,7 @@ public abstract class AbstractIvmlTests {
                 ivmlMetaModelFolder = tgt;
             } catch (IOException e) {
                 Assert.fail("Cannot copy IVML meta model from " + src + " to " + tgt + ": " 
-                    + e.getMessage());
+                    + e.getClass().getSimpleName() + " " + e.getMessage());
             }
             File commonIvml = relocateTestModel(new File(modelFolder.getParentFile(), "common"));
             if (commonIvml.exists()) {
