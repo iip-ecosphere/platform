@@ -18,6 +18,16 @@
 	    <powermock.version>2.0.9</powermock.version>
 	    <argLine>--add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED</argLine>
 	</properties>
+	
+	<dependencyManagement>
+	  <dependencies>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>3.14.9</version>
+        </dependency>
+	  </dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
