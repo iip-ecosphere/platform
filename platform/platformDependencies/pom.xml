@@ -168,6 +168,7 @@
     
     <iip.version>0.7.1-SNAPSHOT</iip.version> <!-- project.version is always narrowest version -> plugins -->
 
+    <org.slf4j.version>1.7.25</org.slf4j.version>
     <com.googlecode.json-simple.version>1.1.1</com.googlecode.json-simple.version>
     <apache.commons.io.version>2.18.0</apache.commons.io.version>    
     <apache.commons.lang.version>2.6</apache.commons.lang.version>    
@@ -182,8 +183,24 @@
     <io.moquette.version>0.13</io.moquette.version>
     <org.apache.qpid.version>9.0.0</org.apache.qpid.version>
     <com.google.guava.version>33.2.0-jre</com.google.guava.version>
+    <com.fasterxml.jackson.jackson-bom.version>2.11.4</com.fasterxml.jackson.jackson-bom.version>
+    <com.fasterxml.jackson.version>2.11.4</com.fasterxml.jackson.version>
+    <org.glassfish.jersey.jersey.version>2.32</org.glassfish.jersey.jersey.version>
+    <io.netty.version>4.1.59.Final</io.netty.version>
+    <com.squareup.okhttp3.version>3.14.9</com.squareup.okhttp3.version>
+    <com.google.code.gson.version>2.8.6</com.google.code.gson.version>
+    <net.bytebuddy.byte-buddy.version>1.10.20</net.bytebuddy.byte-buddy.version>
+    <eclipse.milo.version>0.6.4</eclipse.milo.version>
+    <eclipse.paho.version>1.2.5</eclipse.paho.version>
+    <org.apache.httpcomponents.httpclient.version>4.5.13</org.apache.httpcomponents.httpclient.version>
+    <org.yaml.snakeyaml.version>1.27</org.yaml.snakeyaml.version>
+    <javax-annotation.version>1.3.2</javax-annotation.version>
+    <com.jsoniter.version>0.9.23</com.jsoniter.version>
+    <io.micrometer.version>1.6.4</io.micrometer.version>
+    <org.apache.commons.commons-pool2.version>2.9.0</org.apache.commons.commons-pool2.version>
     
     <!-- When updating spring (cloud streams), please check whether the BinderFix in transport.spring is still needed -->
+    <org.glassfish.javax.json.version>1.1.4</org.glassfish.javax.json.version>
     <org.glassfish.jakarta.el.version>3.0.4</org.glassfish.jakarta.el.version>
     <org.springframework.boot.version>2.4.3</org.springframework.boot.version>
     <org.springframework.cloud.version>3.1.1</org.springframework.cloud.version>
