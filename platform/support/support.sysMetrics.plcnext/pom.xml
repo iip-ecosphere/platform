@@ -34,6 +34,11 @@
         <artifactId>guava</artifactId>
         <version>[${com.google.guava.version}]</version>
       </dependency>    
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>${protobuf.version}</version><!--$NO-MVN-MAN-VER$-->
+        </dependency>  
     </dependencies>
   </dependencyManagement>
 
@@ -46,7 +51,7 @@
 	<dependency>
 	    <groupId>com.google.protobuf</groupId>
 	    <artifactId>protobuf-java</artifactId>
-	    <version>3.14.0</version><!--$NO-MVN-MAN-VER$-->
+	    <version>${protobuf.version}</version>
 	</dependency>  
 	<dependency>
       <groupId>io.grpc</groupId>
