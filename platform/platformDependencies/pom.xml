@@ -181,6 +181,7 @@
     <com.hivemq.version>2024.6</com.hivemq.version>
     <io.moquette.version>0.13</io.moquette.version>
     <org.apache.qpid.version>9.0.0</org.apache.qpid.version>
+    <com.google.guava.version>33.2.0-jre</com.google.guava.version>
     
     <!-- When updating spring (cloud streams), please check whether the BinderFix in transport.spring is still needed -->
     <org.glassfish.jakarta.el.version>3.0.4</org.glassfish.jakarta.el.version>
