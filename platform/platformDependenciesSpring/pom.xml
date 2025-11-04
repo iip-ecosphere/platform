@@ -12,6 +12,14 @@
      <version>0.7.1-SNAPSHOT</version>
      <relativePath/>
   </parent>
+  
+  <properties>
+    <!-- When updating spring (cloud streams), please check whether the BinderFix in transport.spring is still needed -->
+    <org.glassfish.jakarta.el.version>3.0.4</org.glassfish.jakarta.el.version>
+    <org.springframework.boot.version>2.4.3</org.springframework.boot.version>
+    <org.springframework.cloud.version>3.1.1</org.springframework.cloud.version>
+    <org.springframework.spring-test.version>5.3.3</org.springframework.spring-test.version>
+  </properties>
 
   <dependencyManagement>
     <dependencies>
