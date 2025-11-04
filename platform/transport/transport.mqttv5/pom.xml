@@ -8,22 +8,10 @@
     
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>platformDependencies</artifactId>
+     <artifactId>platformDependenciesBOM</artifactId>
      <version>0.7.1-SNAPSHOT</version>
      <relativePath/>
   </parent>
-  
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>io.netty</groupId>
-        <artifactId>netty-bom</artifactId>
-        <type>pom</type>
-        <version>4.1.59.Final</version>
-        <scope>import</scope>
-      </dependency>    
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
       <dependency>

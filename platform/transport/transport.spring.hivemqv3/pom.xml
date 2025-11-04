@@ -13,16 +13,6 @@
      <relativePath/>
   </parent>
   
-  <dependencyManagement>
-    <dependencies>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>[${com.google.guava.version}]</version>
-    </dependency>    
-    </dependencies>
-  </dependencyManagement>
-  
   <dependencies>
     <dependency>
         <groupId>org.jctools</groupId>

@@ -9,20 +9,10 @@
 
 	<parent>
 		<groupId>de.iip-ecosphere.platform</groupId>
-		<artifactId>platformDependencies</artifactId>
+		<artifactId>platformDependenciesBOM</artifactId>
 		<version>0.7.1-SNAPSHOT</version>
 		<relativePath/>
 	</parent>
-	
-	<dependencyManagement>
-	  <dependencies>
-          <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.25</version>
-          </dependency>
-	  </dependencies>
-	</dependencyManagement>
 
 	<dependencies>
 		<dependency> <!-- for server  -->

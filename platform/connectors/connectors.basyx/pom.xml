@@ -8,26 +8,11 @@
 
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>platformDependencies</artifactId>
+     <artifactId>platformDependenciesBOM</artifactId>
      <version>0.7.1-SNAPSHOT</version>
      <relativePath/>
   </parent>
   
-  <dependencyManagement>
-    <dependencies>
-        <dependency>
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-classic</artifactId>
-          <version>1.2.3</version>
-        </dependency>    
-        <dependency>
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-core</artifactId>
-          <version>1.2.3</version>
-        </dependency>    
-     </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>

@@ -8,7 +8,7 @@
 
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>platformDependencies</artifactId>
+     <artifactId>platformDependenciesBOM</artifactId>
      <version>0.7.1-SNAPSHOT</version>
      <relativePath/>
   </parent>
@@ -19,28 +19,6 @@
     <grpc.version>1.36.2</grpc.version>
     <protoc.version>3.9.0</protoc.version>
   </properties>
-  
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>io.netty</groupId>
-        <artifactId>netty-bom</artifactId>
-        <type>pom</type>
-        <version>4.1.59.Final</version>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>[${com.google.guava.version}]</version>
-      </dependency>    
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <version>${protobuf.version}</version><!--$NO-MVN-MAN-VER$-->
-        </dependency>  
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <dependency>

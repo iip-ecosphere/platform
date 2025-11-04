@@ -12,16 +12,6 @@
      <version>0.7.1-SNAPSHOT</version>
      <relativePath/>
   </parent>
- 
-   <dependencyManagement>
-    <dependencies>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>[${com.google.guava.version}]</version>
-    </dependency>    
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <dependency>

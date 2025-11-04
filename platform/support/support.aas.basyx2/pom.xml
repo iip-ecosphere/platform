@@ -7,7 +7,7 @@
 
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>platformDependencies</artifactId>
+     <artifactId>platformDependenciesBOM</artifactId>
      <version>0.7.1-SNAPSHOT</version>
      <relativePath/>
   </parent>
@@ -25,36 +25,6 @@
          <type>pom</type>
          <scope>import</scope>
        </dependency>
-        <dependency>
-          <groupId>commons-io</groupId>
-          <artifactId>commons-io</artifactId>
-          <version>${apache.commons.io.version}</version>
-        </dependency>    
-        <dependency>
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-classic</artifactId>
-          <version>1.5.6</version>
-        </dependency>    
-        <dependency>
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-core</artifactId>
-          <version>1.5.6</version>
-        </dependency>    
-        <dependency>
-             <groupId>com.google.guava</groupId>
-             <artifactId>guava</artifactId>    
-             <version>${com.google.guava.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>io.moquette</groupId>
-          <artifactId>moquette-broker</artifactId>
-          <version>${io.moquette.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>net.bytebuddy</groupId>
-          <artifactId>byte-buddy</artifactId>
-          <version>1.10.20</version>
-        </dependency>        
      </dependencies>
   </dependencyManagement>
   
