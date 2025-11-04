@@ -213,7 +213,8 @@ public class NetworkManagerAas implements AasContributor {
         ManagedServerAddress result = null;
         if (null != json) {
             try {
-                ManagedServerAddressHolder tmp = Json.fromJsonDflt(json.toString(), ManagedServerAddressHolder.class);
+                Json mapper = Json.createInstance(ManagedServerAddressHolder.class);
+                ManagedServerAddressHolder tmp = mapper.fromJson(json.toString(), ManagedServerAddressHolder.class);
                 result = new ManagedServerAddress(tmp.getSchema(), tmp.getHost(), tmp.getPort(), tmp.isNew());
             } catch (IOException e) {
                 //result = null;

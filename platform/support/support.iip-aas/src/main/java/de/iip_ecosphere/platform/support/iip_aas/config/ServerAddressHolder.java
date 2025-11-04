@@ -2,8 +2,6 @@ package de.iip_ecosphere.platform.support.iip_aas.config;
 
 import java.io.IOException;
 
-import com.fasterxml.jackson.annotation.JsonIgnore; // keep for migration
-
 import de.iip_ecosphere.platform.support.Ignore;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
@@ -99,7 +97,6 @@ public class ServerAddressHolder {
      * @return {@code true} for ephemeral, {@code false} else
      */
     @Ignore
-    @JsonIgnore
     public boolean isEphmemeral() {
         return port < 0;
     }    
@@ -155,7 +152,6 @@ public class ServerAddressHolder {
      * @return the server address
      */
     @Ignore
-    @JsonIgnore
     public ServerAddress getServerAddress() {
         if (getPort() < 0) {
             setPort(NetUtils.getEphemeralPort());

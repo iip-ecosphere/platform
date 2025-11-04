@@ -24,8 +24,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import com.fasterxml.jackson.annotation.JsonIgnore; // keep for migration
-
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Ignore;
 import de.iip_ecosphere.platform.support.NetUtils;
@@ -278,7 +276,6 @@ public class AasPartRegistry {
          * @return the AAS server information as endpoint
          */
         @Ignore
-        @JsonIgnore
         public Endpoint getServerEndpoint() {
             return server.getEndpoint();
         }
@@ -289,7 +286,6 @@ public class AasPartRegistry {
          * @return the registry server information as endpoint
          */
         @Ignore
-        @JsonIgnore
         public Endpoint getRegistryEndpoint() {
             return registry.getEndpoint();
         }
@@ -300,7 +296,6 @@ public class AasPartRegistry {
          * @return the implementation server information as server address
          */
         @Ignore
-        @JsonIgnore
         public ServerAddress getImplementationServer() {
             return implementation.getServerAddress();
         }
@@ -311,7 +306,6 @@ public class AasPartRegistry {
          * @return the implementation protocol (see {@link AasFactory})
          */
         @Ignore
-        @JsonIgnore
         public String getImplementationProtocol() {
             return implementation.getProtocol();
         }
@@ -535,7 +529,6 @@ public class AasPartRegistry {
          * @return the local ephemeral setup
          */
         @Ignore
-        @JsonIgnore
         public static AasSetup createLocalEphemeralSetup() {
             return createLocalEphemeralSetup(null, true);
         }
@@ -548,7 +541,6 @@ public class AasPartRegistry {
          * @return the local ephemeral setup
          */
         @Ignore
-        @JsonIgnore
         public static AasSetup createLocalEphemeralSetup(AasSetup setup, boolean regPortSame) {
             return createLocalEphemeralSetup(setup, regPortSame, () -> new AasSetup());
         }
@@ -564,7 +556,6 @@ public class AasPartRegistry {
          * @see AasFactory#supportsSamePorts()
          */
         @Ignore
-        @JsonIgnore
         public static <A extends AasSetup> A createLocalEphemeralSetup(A setup, boolean regPortSame, 
             Supplier<A> supplier) {
             A result = setup;
@@ -633,7 +624,6 @@ public class AasPartRegistry {
         
         @Override
         @Ignore
-        @JsonIgnore
         public String getAssetServerProtocol() {
             return implementation.getProtocol();
         }
@@ -656,7 +646,6 @@ public class AasPartRegistry {
 
         @Override
         @Ignore
-        @JsonIgnore
         public ComponentSetup getSetup(AasComponent component) {
             return setups.get(component);
         }

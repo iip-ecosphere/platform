@@ -1,7 +1,5 @@
 package de.iip_ecosphere.platform.support.iip_aas.config;
 
-import com.fasterxml.jackson.annotation.JsonIgnore; // keep for migration
-
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Ignore;
 import de.iip_ecosphere.platform.support.Schema;
@@ -134,7 +132,6 @@ public class EndpointHolder extends TlsServerAddressHolder {
      * @return the endpoint
      */
     @Ignore
-    @JsonIgnore
     public Endpoint getEndpoint() {
         return new Endpoint(getServerAddress(), getPath());
     }
