@@ -19,6 +19,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,6 +28,9 @@ import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
 /**
  * Json interface. Requires an implementing plugin of type {@link Json} or an active {@link JsonProviderDescriptor}.
+ * The default instances, e.g., for {@link #toJsonDflt(Object)} does not necessarily consider annotations. For 
+ * annotations, please create a configured instance, e.g., via {@link #createInstance(Class)} 
+ * or {@link #createInstance4All()}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -173,6 +177,18 @@ public abstract class Json {
      * @throws IOException if reading fails
      */
     public abstract <T> T readValue(String src, Class<T> cls) throws IOException;
+
+    /**
+     * Reads a value from a string using the default instance.
+     * 
+     * @param <T> the result type
+     * @param src the value as string
+     * @param cls the value type
+     * @throws IOException if reading fails
+     */
+    public static <T> T readValueDflt(String src, Class<T> cls) throws IOException {
+        return prototype.readValue(src, cls);
+    }
     
     /**
      * Reads a value from a byte array.
@@ -183,6 +199,18 @@ public abstract class Json {
      * @throws IOException if reading fails
      */
     public abstract <T> T readValue(byte[] src, Class<T> cls) throws IOException;
+
+    /**
+     * Reads a value from a byte array using the default instance.
+     * 
+     * @param <T> the result type
+     * @param src the value as byte array
+     * @param cls the value type
+     * @throws IOException if reading fails
+     */
+    public static <T> T readValueDflt(byte[] src, Class<T> cls) throws IOException {
+        return prototype.readValue(src, cls);
+    }
 
     /**
      * Writes a given values into a byte array representation.
@@ -387,6 +415,7 @@ public abstract class Json {
     /**
      * Creates a mapping specification, with no mapping, for incremental creation.
      * 
+     * @param <T> the (enum) type
      * @param type the type to map
      */
     public <T> EnumMapping<T> createEnumMapping(Class<T> type) {
@@ -396,11 +425,22 @@ public abstract class Json {
     /**
      * Creates a mapping specification, with mapping.
      * 
+     * @param <T> the (enum) type
      * @param type the type to map
      * @param mapping the mapping of values
      */
     public abstract <T> EnumMapping<T> createEnumMapping(Class<T> type, Map<String, T> mapping);
-    
+
+    /**
+     * Creates a mapping specification based on {@link #createEnumValueMap(Class)}.
+     * 
+     * @param <T> the enum type
+     * @param type the enum to map
+     */
+    public <T extends Enum<T>> EnumMapping<T> createEnumValueMapping(Class<T> type) {
+        return createEnumMapping(type, createEnumValueMap(type));
+    }
+
     /**
      * Declares enums and their mappings.
      * 
@@ -409,6 +449,23 @@ public abstract class Json {
      */
     public abstract Json declareEnums(EnumMapping<?>... mappings);
 
+    /**
+     * Creates a default value mapping for the given enum.
+     * 
+     * @param <T> the enum type
+     * @param enm the enum to map/take values from
+     * @return the name-value map for {@code enum}
+     */
+    public static <T extends Enum<T>> Map<String, T> createEnumValueMap(Class<? extends T> enm) {
+        Map<String, T> result = new HashMap<>();
+        if (enm.isEnum()) {
+            for (T c : enm.getEnumConstants()) {
+                result.put(c.name(), c);
+            }
+        }
+        return result;
+    }
+    
     /**
      * Configures this instance for lazy serialization ignoring given classes and members.
      * 
