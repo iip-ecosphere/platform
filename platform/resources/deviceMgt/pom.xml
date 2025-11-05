@@ -12,6 +12,16 @@
      <version>0.7.1-SNAPSHOT</version>
      <relativePath/>
   </parent>
+  
+  <dependencyManagement> <!-- jenkins and its wget problems -->
+    <dependencies>
+        <dependency>
+          <groupId>net.bytebuddy</groupId>
+          <artifactId>byte-buddy</artifactId>
+          <version>${net.bytebuddy.byte-buddy.version}</version>
+        </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
