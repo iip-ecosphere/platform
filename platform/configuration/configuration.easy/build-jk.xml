@@ -27,7 +27,6 @@
         <ant dir="${genFolderTests}/SimpleMesh/ApplicationInterfaces" antfile="build-jk.xml" />
         <ant dir="${genFolderTests}/SimpleMesh3/ApplicationInterfaces" antfile="build-jk.xml" />
         <ant dir="${genFolderTests}/KodexMesh/ApplicationInterfaces" antfile="build-jk.xml" />
-        <ant dir="${genFolderTests}/ContainerCreation/ApplicationInterfaces" antfile="build-jk.xml" />
         <ant dir="${genFolderTests}/RoutingTest/ApplicationInterfaces" antfile="build-jk.xml" />
 	
 		<mvnDeployResolveArtifact folderName="IIP-test.configuration.easy" pomFile="test.configuration.configuration/pom.xml" jarFolder="test.configuration.configuration/target" artifactPattern="apps.ServiceImpl-*.*.*.jar" />
