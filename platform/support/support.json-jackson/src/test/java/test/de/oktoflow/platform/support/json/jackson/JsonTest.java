@@ -517,4 +517,61 @@ public class JsonTest {
         Assert.assertFalse(obj.containsKey("sValue")); // excluded based on annotation, but not in other tests
     }
 
+    /**
+     * Am enum for enum testing.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public enum MyEnum {
+        VAL_1,
+        VAL_2
+    }
+    
+    /**
+     * A data class for enum testing.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class EnumTest {
+        
+        private MyEnum eVal;
+
+        /**
+         * Returns eVal.
+         * 
+         * @return eVal
+         */
+        public MyEnum geteVal() {
+            return eVal;
+        }
+
+        /**
+         * Changes eVal.
+         * 
+         * @param eVal the new value
+         */
+        public void seteVal(MyEnum eVal) {
+            this.eVal = eVal;
+        }
+        
+    }
+
+    /**
+     * Tests declaring, serializing and deserializing enums.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testEnums() throws IOException {
+        Json mapper = Json.createInstance4All();
+        mapper.declareEnums(mapper.createEnumValueMapping(MyEnum.class));
+        EnumTest obj = new EnumTest();
+        obj.seteVal(MyEnum.VAL_1);
+        String txt = mapper.toJson(obj);
+        EnumTest obj2 = mapper.fromJson(txt, EnumTest.class);
+        Assert.assertNotNull(obj2);
+        Assert.assertEquals(obj.geteVal(), obj2.geteVal());
+        Assert.assertTrue(obj.geteVal() == obj2.geteVal());
+    }
+
 }
