@@ -20,7 +20,7 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
             artifactId = "platform.exec";
             createMavenProjectAttributes(project, artifactId, "ConfiguredPlatformInstance", "Configured platform instance");
         }
-        createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
+        createMavenParent(project, iipGroup, "platformDependenciesBOM", "${config.iipVer}");
         
         XmlElement dep = createDependencies(project);
         appendDependency(dep, iipGroup, "support", projectVersion); 
