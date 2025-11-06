@@ -15,11 +15,11 @@ package de.iip_ecosphere.platform.services.environment.spring;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-
-import org.apache.commons.text.StringTokenizer;
+import java.util.StringTokenizer;
 
 import de.iip_ecosphere.platform.support.yaml.YamlFile;
 import de.iip_ecosphere.platform.support.yaml.Yaml;
+import de.iip_ecosphere.platform.support.StringUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
@@ -127,7 +127,7 @@ public class YamlSetup {
                 if (pos > 0) {
                     String key = a.substring(2, pos);
                     String val = a.substring(pos + 1);
-                    String[] keys = new StringTokenizer(key, ".").getTokenArray();
+                    String[] keys = StringUtils.toTokenArray(new StringTokenizer(key, "."));
                     if (keys.length > 1) {
                         String[] path = new String[keys.length - 1];
                         System.arraycopy(keys, 0, path, 0, path.length);
