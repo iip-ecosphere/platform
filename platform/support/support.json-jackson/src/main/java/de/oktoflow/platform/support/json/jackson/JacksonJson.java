@@ -41,9 +41,8 @@ import de.iip_ecosphere.platform.support.json.JsonGenerator;
 import de.iip_ecosphere.platform.support.json.JsonIterator;
 import de.iip_ecosphere.platform.support.json.JsonObject;
 import de.iip_ecosphere.platform.support.json.JsonObjectBuilder;
-import de.iip_ecosphere.platform.support.json.JsonUtils;
-import de.iip_ecosphere.platform.support.json.JsonUtils.JacksonEnumMapping;
-import de.iip_ecosphere.platform.support.json.JsonUtils.OktoAnnotationIntrospector;
+import de.oktoflow.platform.support.json.jackson.JsonUtils.OktoAnnotationIntrospector;
+import de.oktoflow.platform.support.json.jackson.JsonUtils.JacksonEnumMapping;
 
 /**
  * Implements the JSON interface by Jackson.

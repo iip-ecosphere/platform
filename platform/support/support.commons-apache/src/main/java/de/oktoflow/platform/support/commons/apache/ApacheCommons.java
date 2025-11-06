@@ -19,6 +19,8 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
@@ -27,9 +29,11 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.JavaVersion;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -39,6 +43,11 @@ import org.joda.time.DateTime;
 
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.TimeUtils.AbstractDateConverter;
+import de.iip_ecosphere.platform.support.commons.FileAlterationListener;
+import de.iip_ecosphere.platform.support.commons.FileAlterationMonitor;
+import de.iip_ecosphere.platform.support.commons.FileAlterationObserver;
+import de.iip_ecosphere.platform.support.commons.Tailer;
+import de.iip_ecosphere.platform.support.commons.TailerListener;
 
 /**
  * Implements the Commons interface by Apache.
@@ -216,6 +225,11 @@ public class ApacheCommons extends de.iip_ecosphere.platform.support.commons.Com
     public boolean isJava1_8() {
         return SystemUtils.IS_JAVA_1_8;
     }
+    
+    @Override
+    public boolean isAtLeastJava9() {
+        return SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_9);
+    }
 
     @Override
     public File getJavaHome() {
@@ -248,6 +262,11 @@ public class ApacheCommons extends de.iip_ecosphere.platform.support.commons.Com
         } catch (UncheckedIOException e) {
             throw new IOException(e);
         }
+    }
+    
+    @Override
+    public byte[] toByteArray(InputStream inputStream) throws IOException {
+        return IOUtils.toByteArray(inputStream);
     }
     
     // File
@@ -413,5 +432,148 @@ public class ApacheCommons extends de.iip_ecosphere.platform.support.commons.Com
             
         });
     }
+    
+    // tailer
+
+    @Override
+    public Tailer createTailer(File file, TailerListener listener, Duration delayDuration, boolean fromEnd) {
+        org.apache.commons.io.input.Tailer tailer = org.apache.commons.io.input.Tailer.builder()
+            .setFile(file)
+            .setTailerListener(new org.apache.commons.io.input.TailerListenerAdapter() {
+
+                @Override
+                public void handle(final String line) {
+                    listener.handle(line);
+                }
+                
+                @Override
+                public void fileRotated() {
+                    listener.fileRotated();
+                }
+                
+                @Override
+                public void endOfFileReached() {
+                    listener.endOfFileReached();
+                }
+
+                @Override
+                public void fileNotFound() {
+                    listener.fileNotFound();
+                }    
+                
+            })
+            .setDelayDuration(delayDuration)
+            .setTailFromEnd(fromEnd)
+            .get();
+        return new Tailer() {
+
+            @Override
+            public void close() throws IOException {
+                tailer.close();
+            }
+            
+        };
+    }
+    
+    @Override
+   public FileAlterationObserver createFileAlterationObserver(final String directory, final FileFilter fileFilter) {
+        @SuppressWarnings("deprecation")
+        org.apache.commons.io.monitor.FileAlterationObserver observer 
+            = new org.apache.commons.io.monitor.FileAlterationObserver(directory, fileFilter);
+        return new ApacheFileAlterationObserver(observer);
+    }
+
+    /**
+     * A wrapping file alteration observer.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private class ApacheFileAlterationObserver implements FileAlterationObserver {
+        
+        private org.apache.commons.io.monitor.FileAlterationObserver observer;
+
+        /**
+         * Creates a wrapping file alteration observer.
+         * 
+         * @param observer the observer to wrap
+         */
+        private ApacheFileAlterationObserver(org.apache.commons.io.monitor.FileAlterationObserver observer) {
+            this.observer = observer;
+        }
+
+        @Override
+        public void addListener(FileAlterationListener listener) {
+            observer.addListener(new org.apache.commons.io.monitor.FileAlterationListenerAdaptor() {
+
+                @Override
+                public void onDirectoryChange(File directory) {
+                    listener.onDirectoryChange(directory);
+                }
+
+                @Override
+                public void onDirectoryCreate(File directory) {
+                    listener.onDirectoryCreate(directory);
+                }
+
+                @Override
+                public void onDirectoryDelete(File directory) {
+                    listener.onDirectoryDelete(directory);
+                }
+
+                @Override
+                public void onFileChange(File file) {
+                    listener.onFileChange(file);
+                }
+
+                @Override
+                public void onFileCreate(File file) {
+                    listener.onFileCreate(file);
+                }
+
+                @Override
+                public void onFileDelete(File file) {
+                    listener.onFileDelete(file);
+                }
+                
+            });
+        }
+
+    }
+
+    // checkstyle: stop exception type check
+
+    @Override
+    public FileAlterationMonitor createFileAlterationMonitor(long interval, FileAlterationObserver... observers) {
+        List<org.apache.commons.io.monitor.FileAlterationObserver> obs = new ArrayList<>();
+        for (FileAlterationObserver o: observers) {
+            if (o instanceof ApacheFileAlterationObserver) {
+                obs.add(((ApacheFileAlterationObserver) o).observer);
+            }
+        }
+        org.apache.commons.io.monitor.FileAlterationMonitor monitor 
+            = new org.apache.commons.io.monitor.FileAlterationMonitor(interval, obs);
+        return new FileAlterationMonitor() {
+            
+            @Override
+            public void stop() throws ExecutionException {
+                try {
+                    monitor.stop();
+                } catch (Exception e) {
+                    throw new ExecutionException(e);
+                }
+            }
+            
+            @Override
+            public void start() throws ExecutionException {
+                try {
+                    monitor.start();
+                } catch (Exception e) {
+                    throw new ExecutionException(e);
+                }
+            }
+        };
+    }
+
+    // checkstyle: resume exception type check
 
 }

@@ -15,8 +15,7 @@ package de.oktoflow.platform.support.ssh.sshd;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.lang3.SystemUtils;
-
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.ssh.Ssh;
@@ -67,7 +66,7 @@ public class SshdSsh extends Ssh {
                 server.setPasswordAuthenticator((username, password, session)
                         -> null != authenticator && authenticator.authenticate(username, password));
                 // only works for Linux-like environments
-                if (SystemUtils.IS_OS_WINDOWS) {
+                if (OsUtils.isWindows()) {
                     LoggerFactory.getLogger(SshdSsh.class).error("Cannot start SSH server on Windows.");
                     server = null;
                     return null;
