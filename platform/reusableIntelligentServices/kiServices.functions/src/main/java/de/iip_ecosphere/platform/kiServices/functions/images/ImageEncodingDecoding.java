@@ -24,7 +24,7 @@ import java.util.Base64;
 
 import javax.imageio.ImageIO;
 
-import org.apache.commons.io.IOUtils;
+import de.iip_ecosphere.platform.support.IOUtils;
 
 /**
  * Image decoding functionality.
