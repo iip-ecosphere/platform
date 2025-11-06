@@ -41,6 +41,11 @@
       <groupId>de.iip-ecosphere.platform</groupId>
       <version>${project.version}</version>
     </dependency> 
+    <dependency> <!-- exception, this is a standalone program -->
+      <artifactId>support.commons-apache</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+    </dependency> 
     
     <dependency>
       <groupId>junit</groupId>
