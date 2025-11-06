@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Stream;
 
-import org.apache.commons.validator.routines.InetAddressValidator;
+import de.iip_ecosphere.platform.support.commons.Commons;
 
 /**
  * Some network utilities.
@@ -299,7 +299,7 @@ public class NetUtils {
      * @return {@code true} for a valid address, {@code false} else
      */
     public static boolean isIpV4Addess(String address) {
-        return InetAddressValidator.getInstance().isValidInet4Address(address);
+        return Commons.getInstance().isIpV4Addess(address);
     }
     
     /**

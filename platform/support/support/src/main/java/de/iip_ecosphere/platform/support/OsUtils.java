@@ -12,7 +12,9 @@
 
 package de.iip_ecosphere.platform.support;
 
-import org.apache.commons.lang3.SystemUtils;
+import java.io.File;
+
+import de.iip_ecosphere.platform.support.commons.Commons;
 
 /**
  * Access to static operating system level information.
@@ -20,6 +22,16 @@ import org.apache.commons.lang3.SystemUtils;
  * @author Holger Eichelberger, SSE
  */
 public class OsUtils {
+
+    /**
+     * The System property key for the Java home directory.
+     */
+    public static final String PROP_JAVA_HOME = Commons.PROP_JAVA_HOME;    
+    
+    /**
+     * The System property key for the user home directory.
+     */
+    public static final String PROP_USER_HOME = Commons.PROP_USER_HOME;     
     
     /**
      * Preventing external creation.
@@ -31,7 +43,7 @@ public class OsUtils {
      * Returns the {@code user.home} System Property. User's home directory.
      */
     public static final String getUserHome() {
-        return SystemUtils.USER_HOME;
+        return Commons.getInstance().getUserHome();
     }
     
     /**
@@ -40,9 +52,27 @@ public class OsUtils {
      * @return the operating system name
      */
     public static final String getOsName() {
-        // preliminary, may use org.apache.commons.lang3.SystemUtils
-        return System.getProperty("os.name", "");
+        return Commons.getInstance().getOsName();
     }
+    
+    /**
+     * Gets the Java home directory as a {@code File}.
+     *
+     * @return a directory
+     * @throws SecurityException if a security manager exists and its {@code checkPropertyAccess} method doesn't allow
+     * access to the specified system property.
+     */
+    public static File getJavaHome() {
+        return Commons.getInstance().getJavaHome();
+    }
+    
+    /**
+     * The Java Runtime Environment specification version.
+     */
+    public static String getJavaSpecificationVersion() {
+        return Commons.getInstance().getJavaSpecificationVersion();
+    }
+
     
     /**
      * Returns the operating system architecture.
@@ -50,8 +80,7 @@ public class OsUtils {
      * @return the operating system architecture.
      */
     public static final String getOsArch() {
-        // preliminary, may use org.apache.commons.lang3.SystemUtils
-        return System.getProperty("os.arch", "");
+        return Commons.getInstance().getOsArch();
     }
     
     /**
@@ -126,7 +155,7 @@ public class OsUtils {
      * @return {@code true} for windows, {@code false} else
      */
     public static boolean isWindows() {
-        return SystemUtils.IS_OS_WINDOWS;
+        return Commons.getInstance().isWindows();
     }
 
     /**
@@ -135,7 +164,7 @@ public class OsUtils {
      * @return {@code true} for Linux, {@code false} else
      */
     public static boolean isLinux() {
-        return SystemUtils.IS_OS_LINUX;
+        return Commons.getInstance().isLinux();
     }
 
     /**
@@ -144,7 +173,7 @@ public class OsUtils {
      * @return {@code true} for Unix, {@code false} else
      */
     public static boolean isUnix() {
-        return SystemUtils.IS_OS_UNIX;
+        return Commons.getInstance().isUnix();
     }
 
     /**
@@ -153,7 +182,7 @@ public class OsUtils {
      * @return {@code true} for Mac, {@code false} else
      */
     public static boolean isMac() {
-        return SystemUtils.IS_OS_MAC;
+        return Commons.getInstance().isMac();
     }
     
     /**
@@ -162,7 +191,16 @@ public class OsUtils {
      * @return {@code true} for Java 1.8, {@code false} else
      */
     public static boolean isJava1_8() {
-        return SystemUtils.IS_JAVA_1_8;
+        return Commons.getInstance().isJava1_8();
+    }
+    
+    /**
+     * Returns whether we are running on Java 9 or newer.
+     * 
+     * @return {@code true} for Java 9 nor newer, {@code false} else
+     */
+    public static boolean isAtLeastJava9() {
+        return Commons.getInstance().isAtLeastJava9();
     }
 
 }

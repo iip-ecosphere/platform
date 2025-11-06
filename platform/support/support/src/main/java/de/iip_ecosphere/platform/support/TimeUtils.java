@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import org.joda.time.DateTime;
+import de.iip_ecosphere.platform.support.commons.Commons;
 
 /**
  * Test utilities.
@@ -128,14 +128,7 @@ public class TimeUtils {
             }
             
         });
-        registerConverter(new AbstractDateConverter<DateTime>(DateTime.class) {
-
-            @Override
-            public Date toDate(DateTime data) {
-                return data.toDate();
-            }
-            
-        });
+        Commons.getInstance().registerDateConverters();
         registerConverter(new AbstractDateConverter<LocalDateTime>(LocalDateTime.class) {
 
             @Override

@@ -19,17 +19,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.Iterator;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.io.filefilter.TrueFileFilter;
+import de.iip_ecosphere.platform.support.commons.Commons;
 
 /**
- * Basic file functionality, partly warpping/in style of {@code org.apache.commons.io.FileUtils}. 
+ * Basic file functionality. 
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -72,6 +72,8 @@ public class FileUtils {
         return result;
     }
     
+    // checkstyle: stop exception type check 
+    
     /**
      * Deletes a file or directory, not throwing an exception. If file is a directory, delete it and all 
      * sub-directories. [convenience]
@@ -79,9 +81,53 @@ public class FileUtils {
      * @param file file or directory to delete, may be {@code null}
      * @return {@code true} if {@code file} was deleted, otherwise {@code false}
      */
-    public static boolean deleteQuietly(File file) {
-        return org.apache.commons.io.FileUtils.deleteQuietly(file);        
+    public static boolean deleteQuietly(File file) { // required by test broker
+        if (file == null) {
+            return false;
+        }
+        try {
+            if (file.isDirectory()) {
+                cleanDirectory(file);
+            }
+        } catch (Exception ignored) {
+            // ignore
+        }
+
+        try {
+            return file.delete();
+        } catch (Exception ignored) {
+            return false;
+        }
     }
+
+    // checkstyle: resume exception type check 
+
+    /**
+     * Recursively deletes all files and subdirectories within a given directory.
+     *
+     * @param directory The directory to clean.
+     * @throws IOException if deleting/cleaning fails
+     */
+    public static void cleanDirectory(File directory) throws IOException { // required by test broker
+        try (Stream<Path> paths = Files.walk(directory.toPath())) {
+            paths.sorted(Comparator.reverseOrder())
+                .map(Path::toFile)
+                .forEach(File::delete);
+        }        
+        /*if (directory.isDirectory()) {
+            File[] files = directory.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        cleanDirectory(file);
+                    }
+                    if (!file.delete()) {
+                        throw new IOException("Failed to delete " + file.getAbsolutePath());
+                    }
+                }
+            }
+        }*/
+    }    
     
     /**
      * Deletes a file or directory. For a directory, delete it and all subdirectories.
@@ -91,7 +137,7 @@ public class FileUtils {
      * @throws IOException           in case deletion is unsuccessful
      */
     public static void forceDelete(final File file) throws IOException {
-        org.apache.commons.io.FileUtils.forceDelete(file);
+        Commons.getInstance().forceDelete(file);
     }
     
     /**
@@ -101,12 +147,7 @@ public class FileUtils {
      * @param file file or directory to delete, may be {@code null}
      */
     public static void deleteOnExit(File file) {
-        try {
-            if (null != file) {
-                org.apache.commons.io.FileUtils.forceDeleteOnExit(file);
-            }
-        } catch (IOException e) {
-        }
+        Commons.getInstance().deleteOnExit(file);
     }
 
     /**
@@ -115,7 +156,7 @@ public class FileUtils {
      * @return the path to the system temporary directory.
      */
     public static String getTempDirectoryPath() {
-        return org.apache.commons.io.FileUtils.getTempDirectoryPath();
+        return System.getProperty("java.io.tmpdir"); // required by test broker
     }
 
     /**
@@ -124,7 +165,7 @@ public class FileUtils {
      * @return the system temporary directory.
      */
     public static File getTempDirectory() {
-        return org.apache.commons.io.FileUtils.getTempDirectory();
+        return new File(getTempDirectoryPath()); // required by test broker
     }
     
     /**
@@ -133,7 +174,7 @@ public class FileUtils {
      * @return the user's home directory.
      */
     public static File getUserDirectory() {
-        return org.apache.commons.io.FileUtils.getUserDirectory();
+        return Commons.getInstance().getUserDirectory();
     }
 
     /**
@@ -142,9 +183,8 @@ public class FileUtils {
      * @return the path to the user's home directory.
      */
     public static String getUserDirectoryPath() {
-        return org.apache.commons.io.FileUtils.getUserDirectoryPath();
+        return Commons.getInstance().getUserDirectoryPath();
     }
-    
 
     /**
      * Closes a closable quietly.
@@ -226,8 +266,7 @@ public class FileUtils {
      * @throws IOException if {@code file} cannot be read
      */
     public static String fileToBase64(File file) throws IOException {
-        byte[] fileContent = org.apache.commons.io.FileUtils.readFileToByteArray(file);
-        return Base64.getEncoder().encodeToString(fileContent);        
+        return Commons.getInstance().fileToBase64(file);
     }
 
     /**
@@ -238,8 +277,7 @@ public class FileUtils {
      * @throws IOException if {@code file} cannot be written
      */
     public static void base64ToFile(String string, File file) throws IOException {
-        byte[] decodedBytes = Base64.getDecoder().decode(string);
-        org.apache.commons.io.FileUtils.writeByteArrayToFile(file, decodedBytes);   
+        Commons.getInstance().base64ToFile(string, file);
     }
     
     /**
@@ -273,17 +311,7 @@ public class FileUtils {
      * @return the found file or <b>null</b> for none
      */
     public static File findFile(File folder, String name) {
-        Collection<File> tmp = org.apache.commons.io.FileUtils.listFiles(folder, 
-            FileFilterUtils.nameFileFilter(name), 
-            TrueFileFilter.INSTANCE);
-        Iterator<File> iter = tmp.iterator();
-        File result;
-        if (iter.hasNext()) {
-            result = iter.next();
-        } else {
-            result = null;
-        }
-        return result;
+        return Commons.getInstance().findFile(folder, name);
     }
     
     /**
@@ -327,7 +355,7 @@ public class FileUtils {
      * @throws IOException in case of an I/O error
      */
     public static void write(final File file, final CharSequence data, final Charset charset) throws IOException {
-        org.apache.commons.io.FileUtils.write(file, data, charset);
+        Commons.getInstance().write(file, data, charset);
     }
 
     /**
@@ -339,7 +367,7 @@ public class FileUtils {
      *         regular file, or for some other reason why the file cannot be opened for reading.
      */
     public static String readFileToString(final File file) throws IOException {
-        return org.apache.commons.io.FileUtils.readFileToString(file, Charset.defaultCharset());
+        return Commons.getInstance().readFileToString(file, Charset.defaultCharset());
     }
 
     /**
@@ -352,7 +380,7 @@ public class FileUtils {
      *         regular file, or for some other reason why the file cannot be opened for reading.
      */
     public static String readFileToString(final File file, final Charset charset) throws IOException {
-        return org.apache.commons.io.FileUtils.readFileToString(file, charset);
+        return Commons.getInstance().readFileToString(file, charset);
     }
 
     /**
@@ -363,7 +391,7 @@ public class FileUtils {
      * @throws IllegalArgumentException if {@code directory} is not a directory
      */
     public static void deleteDirectory(final File directory) throws IOException {
-        org.apache.commons.io.FileUtils.deleteDirectory(directory);
+        Commons.getInstance().deleteDirectory(directory);
     }
 
     /**
@@ -383,7 +411,7 @@ public class FileUtils {
      */
     public static void copyDirectory(final File srcDir, final File destDir, final FileFilter filter)
         throws IOException {
-        org.apache.commons.io.FileUtils.copyDirectory(srcDir, destDir, filter);
+        Commons.getInstance().copyDirectory(srcDir, destDir, filter);
     }    
 
     /**
@@ -403,7 +431,7 @@ public class FileUtils {
      */
     public static void copyDirectory(final File srcDir, final File destDir, final FileFilter filter, 
         final boolean preserveFileDate) throws IOException {
-        org.apache.commons.io.FileUtils.copyDirectory(srcDir, destDir, filter, preserveFileDate);
+        Commons.getInstance().copyDirectory(srcDir, destDir, filter, preserveFileDate);
     }
     
     /**
@@ -423,7 +451,7 @@ public class FileUtils {
      * didn't succeed
      */
     public static void copyDirectory(final File srcDir, final File destDir) throws IOException {
-        org.apache.commons.io.FileUtils.copyDirectory(srcDir, destDir);
+        Commons.getInstance().copyDirectory(srcDir, destDir);
     }
     
     /**
@@ -438,7 +466,7 @@ public class FileUtils {
      * didn't succeed, if the output file length is not the same as the input file length after the copy completes
      */
     public static void copyFile(final File srcFile, final File destFile) throws IOException {
-        org.apache.commons.io.FileUtils.copyFile(srcFile, destFile);
+        Commons.getInstance().copyFile(srcFile, destFile);
     }
     
     /**
@@ -451,7 +479,7 @@ public class FileUtils {
      * @throws java.io.UnsupportedEncodingException if the encoding is not supported by the VM
      */
     public static void writeStringToFile(final File file, final String data) throws IOException {
-        org.apache.commons.io.FileUtils.writeStringToFile(file, data, Charset.defaultCharset());
+        Commons.getInstance().writeStringToFile(file, data, Charset.defaultCharset());
     }    
     
     /**
@@ -465,7 +493,7 @@ public class FileUtils {
      * @throws java.io.UnsupportedEncodingException if the encoding is not supported by the VM
      */
     public static void writeStringToFile(final File file, final String data, final Charset charset) throws IOException {
-        org.apache.commons.io.FileUtils.writeStringToFile(file, data, charset);
+        Commons.getInstance().writeStringToFile(file, data, charset);
     }
 
     /**
@@ -478,7 +506,7 @@ public class FileUtils {
      *         regular file, or for some other reason why the file cannot be opened for reading.
      */
     public static byte[] readFileToByteArray(final File file) throws IOException {
-        return org.apache.commons.io.FileUtils.readFileToByteArray(file);
+        return Commons.getInstance().readFileToByteArray(file);
     }
     
     /**
@@ -490,7 +518,7 @@ public class FileUtils {
      * @throws IOException in case of an I/O error
      */
     public static void writeByteArrayToFile(final File file, final byte[] data) throws IOException {
-        org.apache.commons.io.FileUtils.writeByteArrayToFile(file, data);
+        Commons.getInstance().writeByteArrayToFile(file, data);
     }
     
     /**
@@ -504,7 +532,7 @@ public class FileUtils {
      */
     public static void writeByteArrayToFile(final File file, final byte[] data, final boolean append) 
         throws IOException {
-        org.apache.commons.io.FileUtils.writeByteArrayToFile(file, data, append);
+        Commons.getInstance().writeByteArrayToFile(file, data, append);
     }
 
     /**
@@ -519,7 +547,7 @@ public class FileUtils {
      *     {@code destination} needs creating but can't be, if an IO error occurs during copying
      */
     public static void copyInputStreamToFile(final InputStream source, final File destination) throws IOException {
-        org.apache.commons.io.FileUtils.copyInputStreamToFile(source, destination);
+        Commons.getInstance().copyInputStreamToFile(source, destination);
     }
 
     /**
@@ -534,7 +562,7 @@ public class FileUtils {
      * @throws IOException If an I/O error occurs.
      */
     public static boolean contentEquals(final File file1, final File file2) throws IOException {
-        return org.apache.commons.io.FileUtils.contentEquals(file1, file2);
+        return Commons.getInstance().contentEquals(file1, file2);
     }
 
 }

@@ -12,14 +12,18 @@
 
 package de.iip_ecosphere.platform.support;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import de.iip_ecosphere.platform.support.commons.Commons;
 
 /**
- * I/O utilities in the style of {@code org.apache.commons.io.IOUtils}.
+ * I/O utilities.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -47,11 +51,10 @@ public class IOUtils {
      * @throws IOException if an I/O error occurs
      */
     public static List<String> readLines(InputStream in, Charset charset) throws IOException {
-        try {
-            return org.apache.commons.io.IOUtils.readLines(in, charset);
-        } catch (UncheckedIOException e) {
-            throw new IOException(e);
-        }
+        // needed by plugin management
+        InputStreamReader inputStreamReader = new InputStreamReader(in, charset);
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+        return bufferedReader.lines().collect(Collectors.toList());
     }
     
     /**
@@ -76,7 +79,19 @@ public class IOUtils {
      * @throws IOException if an I/O error occurs
      */
     public static String toString(InputStream in, Charset charset) throws IOException {
-        return org.apache.commons.io.IOUtils.toString(in, charset);
+        return Commons.getInstance().toString(in, charset);
+    }
+    
+    /**
+     * Gets the contents of an {@link InputStream} as a {@code byte[]}.
+     *
+     * @param inputStream the {@link InputStream} to read.
+     * @return the requested byte array.
+     * @throws NullPointerException if the InputStream is {@code null}.
+     * @throws IOException if an I/O error occurs or reading more than {@link Integer#MAX_VALUE} occurs.
+     */
+    public static byte[] toByteArray(InputStream inputStream) throws IOException {
+        return Commons.getInstance().toByteArray(inputStream);
     }
 
 }

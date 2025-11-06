@@ -12,21 +12,18 @@
 
 package de.iip_ecosphere.platform.support;
 
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-import org.apache.commons.text.StringEscapeUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
+import de.iip_ecosphere.platform.support.commons.Commons;
 
 /**
- * String utility functions, partially wrapping {@code org.apache.commons.text}.
+ * String utility functions.
  * 
  * @author Holger Eichelberger, SSE
  */
 public class StringUtils {
-    
-    /**
-     * Short prefix style with limited string output.
-     */
-    static final ToStringStyle SHORT_STRING_STYLE = new ShortStringToStringStyle(); 
     
     /**
      * Escapes the characters in a {@code String} using Java String rules.
@@ -35,8 +32,8 @@ public class StringUtils {
      * @param input  String to escape values in, may be <b>null</b>
      * @return String with escaped values, <b>null</b> if <b>null</b> string input
      */
-    public static final String escapeJava(final String input) {
-        return StringEscapeUtils.escapeJava(input);
+    public static String escapeJava(final String input) {
+        return Commons.getInstance().escapeJava(input);
     }
 
     /**
@@ -45,8 +42,8 @@ public class StringUtils {
      * @param input  the {@code String} to unescape, may be <b>null</b>
      * @return a new unescaped {@code String}, <b>null</b> if <b>null</b> string input
      */
-    public static final String unescapeJava(final String input) {
-        return StringEscapeUtils.unescapeJava(input);
+    public static String unescapeJava(final String input) {
+        return Commons.getInstance().unescapeJava(input);
     }
     
     /**
@@ -57,8 +54,8 @@ public class StringUtils {
      * @param input  String to escape values in, may be <b>null</b>
      * @return String with escaped values, <b>null</b> if null string input
      */
-    public static final String escapeJson(final String input) {
-        return StringEscapeUtils.escapeJson(input);
+    public static String escapeJson(final String input) {
+        return Commons.getInstance().escapeJson(input);
     }
 
     /**
@@ -67,8 +64,8 @@ public class StringUtils {
      * @param input  the {@code String} to unescape, may be <b>null</b>
      * @return A new unescaped {@code String}, <b>null</b> if null string input
      */
-    public static final String unescapeJson(final String input) {
-        return StringEscapeUtils.unescapeJson(input);
+    public static String unescapeJson(final String input) {
+        return Commons.getInstance().unescapeJson(input);
     }
     
     /**
@@ -82,7 +79,7 @@ public class StringUtils {
      * @return the passed in CharSequence, or the default
      */
     public static <T extends CharSequence> T defaultIfBlank(final T str, final T defaultStr) {
-        return org.apache.commons.lang3.StringUtils.defaultIfBlank(str, defaultStr);
+        return Commons.getInstance().defaultIfBlank(str, defaultStr);
     }
 
     /**
@@ -96,7 +93,18 @@ public class StringUtils {
      * @return the passed in CharSequence, or the default
      */
     public static <T extends CharSequence> T defaultIfEmpty(final T str, final T defaultStr) {
-        return org.apache.commons.lang3.StringUtils.defaultIfEmpty(str, defaultStr);
+        return Commons.getInstance().defaultIfEmpty(str, defaultStr);
+    }
+    
+    /**
+     * Gets a CharSequence length or {@code 0} if the CharSequence is
+     * {@code null}.
+     *
+     * @param cs a CharSequence, may be <b>null</b>
+     * @return CharSequence length or {@code 0} if the CharSequence is <b>null</b>.
+     */
+    public static int length(final CharSequence cs) {
+        return cs == null ? 0 : cs.length();
     }
 
     /**
@@ -106,7 +114,16 @@ public class StringUtils {
      * @return {@code true} if the CharSequence is <b>null</b>, empty or whitespace only
      */
     public static boolean isBlank(final CharSequence cs) {
-        return org.apache.commons.lang3.StringUtils.isBlank(cs);
+        final int strLen = length(cs);
+        if (strLen == 0) {
+            return true;
+        }
+        for (int i = 0; i < strLen; i++) {
+            if (!Character.isWhitespace(cs.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -117,7 +134,7 @@ public class StringUtils {
      *  not empty and not null and not whitespace only
      */
     public static boolean isNotBlank(final CharSequence cs) {
-        return org.apache.commons.lang3.StringUtils.isNotBlank(cs);
+        return !isBlank(cs);
     }
     
     /**
@@ -130,7 +147,7 @@ public class StringUtils {
      *  <b>null</b> if null String input
      */
     public static String replaceOnce(final String text, final String searchString, final String replacement) {
-        return org.apache.commons.lang3.StringUtils.replaceOnce(text, searchString, replacement);
+        return Commons.getInstance().replaceOnce(text, searchString, replacement);
     }
 
     /**
@@ -140,7 +157,7 @@ public class StringUtils {
      * @return {@code true} if the CharSequence is empty or <b>null</b>
      */
     public static boolean isEmpty(final CharSequence cs) {
-        return org.apache.commons.lang3.StringUtils.isEmpty(cs);
+        return cs == null || cs.length() == 0;
     }
     
     /**
@@ -151,50 +168,9 @@ public class StringUtils {
      * @return the string representation
      */
     public static String toString(Object obj) {
-        return ReflectionToStringBuilder.toString(obj);
+        return Commons.getInstance().toString(obj);
     }
     
-    /**
-     * Short prefix style with limited string output.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static final class ShortStringToStringStyle extends ToStringStyle {
-        
-        private static final long serialVersionUID = 1L;
-
-        /**
-         * <p>Constructor.</p>
-         *
-         * <p>Use the static constant rather than instantiating.</p>
-         */
-        ShortStringToStringStyle() {
-            super();
-            this.setUseShortClassName(true);
-            this.setUseIdentityHashCode(false);
-        }
-        
-        @Override
-        public void append(StringBuffer buffer, String fieldName, Object value, Boolean fullDetail) {
-            if (value instanceof String) { // in particular base64 images
-                String sVal = (String) value;
-                if (sVal.length() > 20) {
-                    value = sVal.substring(0, 20) + "...";
-                }
-            }
-            super.append(buffer, fieldName, value, fullDetail);
-        }
-
-        /**
-         * <p>Ensure singleton after serialization.</p>
-         * @return the singleton
-         */
-        private Object readResolve() {
-            return SHORT_STRING_STYLE;
-        }
-        
-    }
-
     /**
      * Turns an object to an readable string, usually using reflection. Uses oktoflow short style.
      * 
@@ -202,7 +178,7 @@ public class StringUtils {
      * @return the string representation
      */
     public static String toStringShortStyle(Object obj) {
-        return ReflectionToStringBuilder.toString(obj, SHORT_STRING_STYLE);
+        return Commons.getInstance().toStringShortStyle(obj);
     }
     
     /**
@@ -215,7 +191,7 @@ public class StringUtils {
      *  <b>null</b> if <b>null</b> String input
      */
     public static String removeStart(String str, String remove) {
-        return org.apache.commons.lang3.StringUtils.removeStart(str, remove);
+        return Commons.getInstance().removeStart(str, remove);
     }
     
     /**
@@ -228,7 +204,41 @@ public class StringUtils {
      *  <b>null</b> if <b>null</b> String input
      */
     public static String removeEnd(String str, String remove) {
-        return org.apache.commons.lang3.StringUtils.removeEnd(str, remove);
+        return Commons.getInstance().removeEnd(str, remove);
+    }
+    
+    /**
+     * Turns the tokens of the given tokenizer into a list.
+     * 
+     * @param tokenizer the tokenizer
+     * @return the list
+     */
+    public static List<String> toTokenList(StringTokenizer tokenizer) {
+        List<String> result = new ArrayList<>();
+        while (tokenizer.hasMoreTokens()) {
+            result.add(tokenizer.nextToken());
+        }
+        return result;
+    }
+
+    /**
+     * Turns a string list to an array.
+     * 
+     * @param list the list, may be <b>null</b>
+     * @return the corresponding array, also <b>null</b> if {@code list} is <b>null</b>
+     */
+    public static String[] toArray(List<String> list) {
+        return null == list ? null : list.toArray(new String[list.size()]);
+    }
+
+    /**
+     * Turns the tokens of the given tokenizer into an array.
+     * 
+     * @param tokenizer the tokenizer
+     * @return the array
+     */
+    public static String[] toTokenArray(StringTokenizer tokenizer) {
+        return toArray(toTokenList(tokenizer));
     }
 
 }
