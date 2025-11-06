@@ -205,7 +205,7 @@ project Services {
            OktoVersion ver;
        }
        assign (uiGroup = UiOptionalGroup1) to {
-        Boolean deployable;
+        Boolean deployable = true;
         setOf(String) artifacts = {};
        }
    }

@@ -110,7 +110,7 @@ export class InputRefSelectComponent extends Utils implements OnInit {
         this.isSetOf = true;
       }
       if (DataUtils.isIvmlRefTo(type)) {
-        this.refTo = DataUtils.stripGenericType(type);
+        this.refTo = DataUtils.stripGenericType(DataUtils.isIvmlCollection(type) ? DataUtils.stripGenericType(type) : type);
         await this.getConfigurationType(this.refTo);
         this.activeTextinput = false;
       }

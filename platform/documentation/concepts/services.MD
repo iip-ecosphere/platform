@@ -49,7 +49,7 @@ The common fields (some fields are detailed below) of all service types defined 
 | plugins | References to plugins used/required, e.g., to use the AAS factory from the specified plugin instead of the default factory. | {}  |
 | description |  Mandatory textual description for the service, e.g., to be included into documentation. May be empty. |     |
 | ver |  Mandatory version of the service |     |
-| deployable |  Mandatory flag for central or remotely deployable service. |     |
+| deployable |  Mandatory flag for central or remotely deployable service. | True |
 | artifacts | Optional set of names of file names in the artifact that shall be unpacked with this service. |     |
 
 Forward entries in `input` and `output` are matched pairwise, i.e., the first type in `input` is the input type for producing an instance of the first type in `output`. Non-forward (broadcast) entries are treated separately.

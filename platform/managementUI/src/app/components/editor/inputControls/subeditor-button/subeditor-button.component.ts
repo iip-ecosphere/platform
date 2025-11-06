@@ -132,7 +132,10 @@ export interface SaveEvent {
 
 function getFieldType(type: string, selectedType: Resource | undefined): string {
   if (selectedType && selectedType.idShort?.includes("Field")) {
-    return type.replace("Field", selectedType.idShort);
-  }
+    let innerType = DataUtils.stripGenericType(type)
+    if (innerType !== selectedType) {
+      return type.replace(innerType, selectedType.idShort);
+    }
+  } 
   return type
 }
