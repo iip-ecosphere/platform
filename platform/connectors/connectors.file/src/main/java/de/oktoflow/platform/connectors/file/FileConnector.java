@@ -26,11 +26,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
-import org.apache.commons.text.StringTokenizer;
 
 import de.iip_ecosphere.platform.connectors.AbstractChannelConnector;
 import de.iip_ecosphere.platform.connectors.AbstractPluginChannelConnectorDescriptor;
@@ -148,7 +147,7 @@ public class FileConnector<CO, CI> extends AbstractChannelConnector<byte[], byte
         String inFiles = params.getSpecificStringSetting(SETTING_READ_FILES);
         if (null != inFiles) {
             StringTokenizer tokens = new StringTokenizer(inFiles, ";:");
-            while (tokens.hasNext()) {
+            while (tokens.hasMoreTokens()) {
                 String token = tokens.nextToken();
                 File f = new File(token);
                 File[] tmp = null;
