@@ -440,7 +440,8 @@ public class DataMapper {
     public static <T> IOIterator<T> mapJsonDataToIterator(InputStream stream, Class<T> cls, 
         boolean failOnUnknownProperties) throws IOException {
 
-        Json objectMapper = Json.createInstance4All()
+        Json objectMapper = Json.createInstance()
+            .configureFor(cls)
             .failOnUnknownProperties(failOnUnknownProperties)
             .handleIipDataClasses();
         if (null == stream) {
