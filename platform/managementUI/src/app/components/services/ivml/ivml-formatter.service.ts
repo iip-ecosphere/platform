@@ -120,7 +120,7 @@ export class IvmlFormatterService extends UtilsService {
         if (elemt.hasOwnProperty('_type')) { // IVML "value" or primitive
           result += this.toIvml(elemt);
         } else {
-          result += elemt;
+          result += DataUtils.isIvmlRefTo(DataUtils.stripGenericType(value._type)) ? `refBy(${elemt})` : elemt;
         }
         first = false;
       }
@@ -576,7 +576,7 @@ export class IvmlFormatterService extends UtilsService {
                 editorInput.multipleInputs = true;
               }
               editorInput.defaultValue = DataUtils.getPropertyValue(input.value, MT_metaDefault);
-              let ivmlValue = type?.value || editorInput.defaultValue || "";
+              let ivmlValue = (type?.value?.length ? type.value : editorInput.defaultValue) || "";
               if (selMetaTypeKind === MTK_compound && this.isArray(ivmlValue)) {
                 ivmlValue = DataUtils.getPropertyValue(ivmlValue, input.idShort);
               }

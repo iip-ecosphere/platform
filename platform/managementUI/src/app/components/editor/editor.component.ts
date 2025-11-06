@@ -179,7 +179,7 @@ export class EditorComponent extends Utils implements OnInit {
    */
   public saveEventHandler(event: SaveEvent) {
     let prop; // sub-level editor comes from an existing property, shall exist
-    if (this.type) {
+    if (this.type && this.type.value) {
       prop = DataUtils.getProperty(this.type?.value, event.idShort);
     } else {
       prop = DataUtils.getEditorInputByName(this.uiGroups, event.idShort);
@@ -189,6 +189,11 @@ export class EditorComponent extends Utils implements OnInit {
       host = { value: [] };
     } else {
       host = prop;
+      if (event.value && typeof event.value === 'object') {
+        if (!host.value || typeof host.value !== 'object') {
+          host.value = {};
+        }
+      }
     }
     let resultProp: any = {};
     for (let entry in event.value) {
@@ -199,7 +204,7 @@ export class EditorComponent extends Utils implements OnInit {
         if (this.isArray(host.value)) {
           resultProp[entry] = src;
         } else {
-          host.value[entry] = src.value;
+          host.value[entry] = src;
         }
       }
     }

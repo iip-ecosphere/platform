@@ -330,7 +330,7 @@ export class DataUtils {
    * @returns true for a reference, false else
    */
   public static isIvmlRefTo(value: any) {
-    return DataUtils.startsWith(value,'refTo(');
+    return DataUtils.startsWith(this.isIvmlCollection(value) ? this.stripGenericType(value) : value,'refTo(');
   }
 
   /**
