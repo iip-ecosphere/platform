@@ -23,16 +23,17 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
-import org.apache.commons.io.monitor.FileAlterationMonitor;
-import org.apache.commons.io.monitor.FileAlterationObserver;
+import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.ecsRuntime.BasicContainerDescriptor;
 import de.iip_ecosphere.platform.platform.cli.ServiceDeploymentPlan;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.ZipUtils;
+import de.iip_ecosphere.platform.support.commons.Commons;
+import de.iip_ecosphere.platform.support.commons.FileAlterationListener;
+import de.iip_ecosphere.platform.support.commons.FileAlterationMonitor;
+import de.iip_ecosphere.platform.support.commons.FileAlterationObserver;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
@@ -322,7 +323,7 @@ public class ArtifactsManager {
      * 
      * @author Holger Eichelberger, SSE
      */
-    private static class ArtifactWatcher extends FileAlterationListenerAdaptor {
+    private static class ArtifactWatcher implements FileAlterationListener {
         
         @Override
         public void onFileCreate(File file) {
@@ -368,8 +369,6 @@ public class ArtifactsManager {
         }
     }
     
-    // checkstyle: stop exception type check
-    
     /**
      * Starts watching for new artifacts.
      */
@@ -380,13 +379,14 @@ public class ArtifactsManager {
             LoggerFactory.getLogger(ArtifactsManager.class)
                 .info("Watching artifacts folder {}", artifactsFolder.getAbsolutePath());
             INSTANCE.scan(artifactsFolder.toPath());
-            FileAlterationObserver observer = new FileAlterationObserver(artifactsFolder.getAbsolutePath(), 
+            FileAlterationObserver observer = Commons.getInstance().createFileAlterationObserver(
+                artifactsFolder.getAbsolutePath(), 
                 f -> !f.getParentFile().getName().equals("DeviceDockerfiles"));
             observer.addListener(new ArtifactWatcher());
-            monitor = new FileAlterationMonitor(1000, observer);
+            monitor = Commons.getInstance().createFileAlterationMonitor(1000, observer);
             try {
                 monitor.start();
-            } catch (Exception e) {
+            } catch (ExecutionException e) {
                 LoggerFactory.getLogger(ArtifactsManager.class)
                     .error("While starting file monitor for artifacts: {} Will not monitor artifacts", e.getMessage());
             }        
@@ -404,15 +404,13 @@ public class ArtifactsManager {
         if (null != monitor) {
             try {
                 monitor.stop();
-            } catch (Exception e) {
+            } catch (ExecutionException e) {
                 LoggerFactory.getLogger(ArtifactsManager.class)
                     .error("While stopping file monitor for artifacts: {}", e.getMessage());
             }        
             monitor = null;
         }
     }
-
-    // checkstyle: resume exception type check
 
     /**
      * Informs the manager that an artifact was created. Called while watching the 

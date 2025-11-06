@@ -187,7 +187,7 @@ public class PlatformTest extends TestWithQpid {
         FileUtils.copyFile(
             new File("src/test/resources/service3.jar"), 
             new File("src/test/resources/artifacts/service3.jar"));
-        TimeUtils.sleep(1000); // wait for watcher
+        TimeUtils.sleep(1500); // wait for watcher
         Assert.assertEquals(5, mgr.getArtifactCount());
         
         sc = new SubmodelElementsCollectionClient(PlatformAas.NAME_SUBMODEL_ARTIFACTS, 
