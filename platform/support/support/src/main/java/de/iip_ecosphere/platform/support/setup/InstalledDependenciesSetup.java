@@ -19,8 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.commons.lang3.SystemUtils;
-
 import de.iip_ecosphere.platform.support.resources.FolderResourceResolver;
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
@@ -88,7 +86,7 @@ public class InstalledDependenciesSetup extends AbstractSetup {
         if (OsUtils.isWindows()) {
             exeSuffix = ".exe";
         }
-        File javaPath = new File(SystemUtils.getJavaHome(), "bin/java" + exeSuffix);
+        File javaPath = new File(OsUtils.getJavaHome(), "bin/java" + exeSuffix);
         addDefaultEntry(getJavaKey(), javaPath);
         addDefaultEntry(KEY_PREFIX_JAVA, javaPath);
         addDefaultEntry(KEY_PREFIX_PYTHON, new File("python")); // generic python in path
@@ -113,7 +111,7 @@ public class InstalledDependenciesSetup extends AbstractSetup {
      * @return the key
      */
     public static String getJavaKey() {
-        String ver = SystemUtils.JAVA_SPECIFICATION_VERSION;
+        String ver = OsUtils.getJavaSpecificationVersion();
         if (ver.startsWith("1.")) {
             ver = ver.substring(2);
         }

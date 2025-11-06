@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
@@ -27,9 +28,11 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.JavaVersion;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -40,6 +43,10 @@ import org.joda.time.DateTime;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.TimeUtils.AbstractDateConverter;
 import de.iip_ecosphere.platform.support.commons.Commons;
+import de.iip_ecosphere.platform.support.commons.FileAlterationMonitor;
+import de.iip_ecosphere.platform.support.commons.FileAlterationObserver;
+import de.iip_ecosphere.platform.support.commons.Tailer;
+import de.iip_ecosphere.platform.support.commons.TailerListener;
 
 /**
  * Preliminary test implementation for commons.
@@ -220,6 +227,11 @@ public class TestCommons extends Commons {
     }
     
     @Override
+    public boolean isAtLeastJava9() {
+        return SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_9);
+    }
+    
+    @Override
     public File getJavaHome() {
         return SystemUtils.getJavaHome();
     }
@@ -250,6 +262,11 @@ public class TestCommons extends Commons {
         } catch (UncheckedIOException e) {
             throw new IOException(e);
         }
+    }
+
+    @Override
+    public byte[] toByteArray(InputStream inputStream) throws IOException {
+        return IOUtils.toByteArray(inputStream);
     }
 
     // File
@@ -414,4 +431,56 @@ public class TestCommons extends Commons {
         });
     }
 
+    // tailer
+
+    @Override
+    public Tailer createTailer(File file, TailerListener listener, Duration delayDuration, boolean fromEnd) {
+        org.apache.commons.io.input.Tailer tailer = org.apache.commons.io.input.Tailer.builder()
+            .setFile(file)
+            .setTailerListener(new org.apache.commons.io.input.TailerListenerAdapter() {
+
+                @Override
+                public void handle(final String line) {
+                    listener.handle(line);
+                }
+                
+                @Override
+                public void fileRotated() {
+                    listener.fileRotated();
+                }
+                
+                @Override
+                public void endOfFileReached() {
+                    listener.endOfFileReached();
+                }
+
+                @Override
+                public void fileNotFound() {
+                    listener.fileNotFound();
+                }    
+                
+            })
+            .setDelayDuration(delayDuration)
+            .setTailFromEnd(fromEnd)
+            .get();
+        return new Tailer() {
+
+            @Override
+            public void close() throws IOException {
+                tailer.close();
+            }
+            
+        };
+    }
+
+    @Override
+    public FileAlterationObserver createFileAlterationObserver(String directory, FileFilter fileFilter) {
+        return null;
+    }
+
+    @Override
+    public FileAlterationMonitor createFileAlterationMonitor(long interval, FileAlterationObserver... observers) {
+        return null;
+    }
+    
 }

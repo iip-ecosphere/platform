@@ -18,6 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -30,6 +31,31 @@ import de.iip_ecosphere.platform.support.plugins.PluginManager;
  */
 public abstract class Commons {
 
+    /**
+     * The System property key for the Java home directory.
+     */
+    public static final String PROP_JAVA_HOME = "java.home";    
+    
+    /**
+     * The System property key for the user home directory.
+     */
+    public static final String PROP_USER_HOME = "user.home";    
+    
+    /**
+     * The System property key for the name of the operating system.
+     */
+    public static final String PROP_OS_NAME = "os.name";
+    
+    /**
+     * The System property key for the architecture name of the operating system.
+     */
+    public static final String PROP_OS_ARCH = "os.arch";
+    
+    /**
+     * The System property key for the Java Runtime Environment specification version.
+     */
+    public static final String PROP_JAVA_SPEC_VER = "java.specification.version";
+    
     private static Commons instance; 
 
     static {
@@ -218,7 +244,9 @@ public abstract class Commons {
     /**
      * Returns the {@code user.home} System Property. User's home directory.
      */
-    public abstract String getUserHome();
+    public String getUserHome() {
+        return System.getProperty(PROP_USER_HOME);
+    }
 
     /**
      * Returns whether we are running on windows.
@@ -256,13 +284,19 @@ public abstract class Commons {
     public abstract boolean isJava1_8();
 
     /**
+     * Returns whether we are running on Java 9 or newer.
+     * 
+     * @return {@code true} for Java 9 nor newer, {@code false} else
+     */
+    public abstract boolean isAtLeastJava9();
+    
+    /**
      * Returns the operating system name.
      * 
      * @return the operating system name
      */
     public String getOsName() {
-        // preliminary, may delegate to implementation
-        return System.getProperty("os.name", "");
+        return System.getProperty(PROP_OS_NAME, "");
     }
     
     /**
@@ -271,8 +305,7 @@ public abstract class Commons {
      * @return the operating system architecture.
      */
     public String getOsArch() {
-        // preliminary, may delegate to implementation
-        return System.getProperty("os.arch", "");
+        return System.getProperty(PROP_OS_ARCH, "");
     }
     
     /**
@@ -282,12 +315,18 @@ public abstract class Commons {
      * @throws SecurityException if a security manager exists and its {@code checkPropertyAccess} method doesn't allow
      * access to the specified system property.
      */
-    public abstract File getJavaHome();
+    public File getJavaHome() {
+        return new File(System.getProperty(PROP_JAVA_HOME));
+    }
     
     /**
-     * The Java Runtime Environment specification version.
+     * Returns the Java Runtime Environment specification version.
+     * 
+     * @return the specification version
      */
-    public abstract String getJavaSpecificationVersion();
+    public String getJavaSpecificationVersion() {
+        return System.getProperty(PROP_JAVA_SPEC_VER);
+    }
     
     // Net
     
@@ -323,6 +362,16 @@ public abstract class Commons {
      */
     public abstract List<String> readLines(InputStream in, Charset charset) throws IOException;
 
+    /**
+     * Gets the contents of an {@link InputStream} as a {@code byte[]}.
+     *
+     * @param inputStream the {@link InputStream} to read.
+     * @return the requested byte array.
+     * @throws NullPointerException if the InputStream is {@code null}.
+     * @throws IOException if an I/O error occurs or reading more than {@link Integer#MAX_VALUE} occurs.
+     */
+    public abstract byte[] toByteArray(InputStream inputStream) throws IOException;
+    
     // File
     
     /**
@@ -611,5 +660,37 @@ public abstract class Commons {
      * Registers plugin-supplied date-time converters that shall be registered with the platform.
      */
     public abstract void registerDateConverters();
+    
+    // tailer, file observation
+
+    /**
+     * Creates a tailer on a file, i.e., an instance that returns the tail of the file also when new lines are appended.
+     * 
+     * @param file the file to tail
+     * @param listener the listener being informed on events and new lines
+     * @param delayDuration the duration between two checks, <b>null</b> leads to a check every second
+     * @param fromEnd defines where to start tailing, {@code true} for the end of the file, {@code false} beginning
+     * @return the tailer instance
+     */
+    public abstract Tailer createTailer(File file, TailerListener listener, Duration delayDuration, boolean fromEnd);
+
+    /**
+     * Creates a file alteration observer.
+     * 
+     * @param directory the name of the directory to observe
+     * @param fileFilter the file filter or null if none
+     * @return the alteration observer
+     */
+    public abstract FileAlterationObserver createFileAlterationObserver(String directory, FileFilter fileFilter);
+
+    /**
+     * Creates a file alteration monitor with given file alteration observers.
+     * 
+     * @param interval the observation interval in ms
+     * @param observers the observers to apply
+     * @return the file alteration monitor
+     */
+    public abstract FileAlterationMonitor createFileAlterationMonitor(long interval, 
+        FileAlterationObserver... observers);
     
 }
