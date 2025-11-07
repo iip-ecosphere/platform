@@ -96,11 +96,6 @@
     </dependency>               
 
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-text</artifactId>
-      <version>${apache.commons.text.version}</version>
-    </dependency>
-    <dependency>
        <groupId>de.iip-ecosphere.platform</groupId>
        <artifactId>dependency-plugin</artifactId>
        <version>${project.version}</version>
@@ -131,6 +126,11 @@
       <artifactId>support.iip-aas</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <artifactId>support.commons-apache</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <version>${project.version}</version>
+    </dependency> 
     <dependency>
       <artifactId>support.json-jackson</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
