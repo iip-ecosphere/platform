@@ -29,7 +29,6 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.input.Tailer;
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 import org.springframework.cloud.deployer.spi.app.AppInstanceStatus;
 import org.springframework.cloud.deployer.spi.app.AppStatus;
@@ -56,6 +55,8 @@ import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.LifecycleHandler;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.commons.Commons;
+import de.iip_ecosphere.platform.support.commons.Tailer;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.Id;
 import de.iip_ecosphere.platform.support.iip_aas.NetworkManagerAasClient;
@@ -141,6 +142,11 @@ public class SpringCloudServiceManager
         @Override
         public TransportSetup getTransport() {
             return null != SpringInstances.getConfig() ? SpringInstances.getConfig().getTransport() : null;
+        }
+        
+        @Override
+        public Class<? extends ServiceSetup> getSetupClass() {
+            return SpringCloudServiceSetup.class;
         }
         
     }
@@ -987,12 +993,8 @@ public class SpringCloudServiceManager
                 SpringCloudServiceSetup setup = SpringInstances.getConfig();
                 LogTailerListener listener = new LogTailerListener(setup.getAas(), setup.getTransport(), 
                     desc.getId().replace(ServiceBase.APPLICATION_SEPARATOR, "/") + "/" + field);
-                Tailer tailer = Tailer.builder()
-                        .setFile(file)
-                        .setTailerListener(listener)
-                        .setDelayDuration(Duration.ofMillis(300))
-                        .setTailFromEnd(mode == StreamLogMode.TAIL)
-                        .get();
+                Tailer tailer = Commons.getInstance().createTailer(file, listener, Duration.ofMillis(300), 
+                    mode == StreamLogMode.TAIL);
                 listener.attachTailer(tailer);
                 desc.attachCloseable(field + "_" + inst.getId(), listener);
                 URI uri = listener.getURI();

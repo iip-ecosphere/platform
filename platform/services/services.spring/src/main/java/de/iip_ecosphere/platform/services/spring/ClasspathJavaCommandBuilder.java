@@ -28,8 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.commons.lang3.JavaVersion;
-import org.apache.commons.lang3.SystemUtils;
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
 import org.springframework.cloud.deployer.spi.core.AppDeploymentRequest;
 import org.springframework.cloud.deployer.spi.local.AbstractLocalDeployerSupport;
@@ -39,6 +37,7 @@ import org.springframework.cloud.deployer.spi.local.LocalDeployerProperties;
 import org.springframework.core.io.Resource;
 
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
@@ -225,7 +224,7 @@ public class ClasspathJavaCommandBuilder extends JavaCommandBuilder {
                 propZipClasspath = true;
             }
         }
-        if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_9) && propZipClasspath) {
+        if (OsUtils.isAtLeastJava9() && propZipClasspath) {
             try {
                 String classpath = FileUtils.readFileToString(cpFile, StandardCharsets.UTF_8);
                 String mainJars = "";

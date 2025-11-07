@@ -16,11 +16,10 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
 
-import org.apache.commons.io.input.Tailer;
-import org.apache.commons.io.input.TailerListenerAdapter;
-
 import de.iip_ecosphere.platform.services.environment.services.Sender;
 import de.iip_ecosphere.platform.services.environment.services.TransportConverterFactory;
+import de.iip_ecosphere.platform.support.commons.Tailer;
+import de.iip_ecosphere.platform.support.commons.TailerListener;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
@@ -30,7 +29,7 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
  * 
  * @author Holger Eichelberger, SSE
  */
-class LogTailerListener extends TailerListenerAdapter implements Closeable {
+class LogTailerListener implements TailerListener, Closeable {
     
     private Sender<String> sender;
     private Tailer tailer;

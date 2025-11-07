@@ -17,9 +17,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
-import org.apache.commons.text.StringTokenizer;
 import org.springframework.core.env.PropertySource;
 
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
@@ -79,14 +79,14 @@ public class YamlPropertySource extends PropertySource<String> {
         if (!ignore.contains(name)) {
             Map<String, Object> prop = properties;
             StringTokenizer parts = new StringTokenizer(name, ".");
-            while (parts.hasNext()) {
-                String key = parts.next();
+            while (parts.hasMoreTokens()) {
+                String key = parts.nextToken();
                 Object tmp = prop.get(key);
                 if (tmp == null) {
                     key = kebabPattern.matcher(key).replaceAll(mr -> mr.group(1).toUpperCase());
                     tmp = prop.get(key);
                 }
-                if (parts.hasNext()) {
+                if (parts.hasMoreTokens()) {
                     if (tmp instanceof Map) {
                         prop = (Map<String, Object>) tmp;
                     } else {
