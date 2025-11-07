@@ -75,4 +75,13 @@ public interface ServiceFactoryDescriptor {
         return result;
     }
     
+    /**
+     * Returns the type of the setup class as fallback.
+     * 
+     * @return the type, by default {@link ServiceSetup}
+     */
+    public default Class<? extends ServiceSetup> getSetupClass() {
+        return ServiceSetup.class;
+    }
+    
 }

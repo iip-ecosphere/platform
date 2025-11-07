@@ -15,6 +15,9 @@ package de.iip_ecosphere.platform.services;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
@@ -62,7 +65,8 @@ public class ServiceFactory {
                 desc = plugin.getInstance();
             }
             if (null == desc) {
-                ServiceLoader<ServiceFactoryDescriptor> loader = ServiceLoader.load(ServiceFactoryDescriptor.class);
+                ServiceLoader<ServiceFactoryDescriptor> loader = ServiceLoaderUtils.load(
+                    ServiceFactoryDescriptor.class);
                 Optional<ServiceFactoryDescriptor> first = ServiceLoaderUtils.findFirst(loader);
                 if (first.isPresent()) {
                     desc = first.get();
@@ -91,7 +95,15 @@ public class ServiceFactory {
         return manager;
     }
     
-    // TODO unify, simplify
+    /**
+     * Returns the service setup class.
+     * 
+     * @return the service setup class, either from the descriptor or {@link ServiceSetup}
+     */
+    public static Class<? extends ServiceSetup> getSetupClass() {
+        init();
+        return null == desc ? ServiceSetup.class : desc.getSetupClass();
+    }
 
     /**
      * Returns the actual service setup for the implementing service manager.
@@ -99,23 +111,8 @@ public class ServiceFactory {
      * @return the service setup
      */
     public static ServiceSetup getSetup() {
-        if (null == service) {
-            init();
-            if (null != desc) {
-                service = desc.getSetup();
-            }
-            if (null == service) {
-                try {
-                    service = AbstractSetup.readFromYamlWithPath(ServiceSetup.class, yamlPath);
-                } catch (IOException e) {
-                    LoggerFactory.getLogger(ServiceFactory.class).warn("Cannot read setup: " + e.getMessage());
-                }
-                if (null == service) {
-                    service = new ServiceSetup();
-                }
-            }
-        }
-        return service;
+        return getFromSetup(service, d -> d.getSetup(), s -> s, 
+            () -> new ServiceSetup(), t -> service = t);
     }
 
     /**
@@ -124,24 +121,8 @@ public class ServiceFactory {
      * @return the AAS setup
      */
     public static AasSetup getAasSetup() {
-        if (null == setup) {
-            init();
-            if (null != desc) {
-                setup = desc.getAasSetup();
-            }
-            if (null == setup) {
-                try {
-                    ServiceSetup cfg = AbstractSetup.readFromYamlWithPath(ServiceSetup.class, yamlPath);
-                    setup = cfg.getAas();
-                } catch (IOException e) {
-                    LoggerFactory.getLogger(ServiceFactory.class).warn("Cannot read setup: " + e.getMessage());
-                }
-                if (null == setup) {
-                    setup = new AasSetup();
-                }
-            }
-        }
-        return setup;
+        return getFromSetup(setup, d -> d.getAasSetup(), s -> s.getAas(), 
+            () -> new AasSetup(), t -> setup = t);
     }
     
     /**
@@ -150,19 +131,8 @@ public class ServiceFactory {
      * @return the network manager setup
      */
     public static NetworkManagerSetup getNetworkManagerSetup() {
-        if (null == netwMgrSetup) {
-            init();
-            try {
-                ServiceSetup cfg = AbstractSetup.readFromYamlWithPath(ServiceSetup.class, yamlPath);
-                netwMgrSetup = cfg.getNetMgr();
-            } catch (IOException e) {
-                LoggerFactory.getLogger(ServiceFactory.class).warn("Cannot read setup: " + e.getMessage());
-            }
-            if (null == setup) {
-                netwMgrSetup = new NetworkManagerSetup();
-            }
-        } 
-        return netwMgrSetup;
+        return getFromSetup(netwMgrSetup, d -> null, s -> s.getNetMgr(), 
+            () -> new NetworkManagerSetup(), t -> netwMgrSetup = t);
     }
 
     /**
@@ -171,24 +141,45 @@ public class ServiceFactory {
      * @return the AAS setup
      */
     public static TransportSetup getTransport() {
-        if (null == transport) {
+        return getFromSetup(transport, d -> d.getTransport(), s -> s.getTransport(), 
+            () -> new TransportSetup(), t -> transport = t);
+    }
+    
+    /**
+     * Returns an object from setup. If not anyway present, calls {@code #init()}, then first tries to get the object
+     * from the descriptor via {@code fromDesc}, then by directly loading the setup via {@link #getSetupClass()} and 
+     * {@link #yamlPath}, and finally via {@code constructor}.
+     * 
+     * @param <T> the type of object to read
+     * @param object the actual value, returned if not <b>null</b>
+     * @param fromDesc the projection from the descriptor
+     * @param fromSetup the projection from a freshly read setup as first fallback
+     * @param constructor the constructor as second fallback
+     * @param setter if a new object is obtained, store it for future use
+     * @return the {@code object} or if <b>null</b> from descriptor, setup or constructor
+     */
+    private static <T> T getFromSetup(T object, Function<ServiceFactoryDescriptor, T> fromDesc, 
+        Function<ServiceSetup, T> fromSetup, Supplier<T> constructor, Consumer<T> setter) {
+        T result = object;
+        if (null == result) {
             init();
             if (null != desc) {
-                transport = desc.getTransport();
+                result = fromDesc.apply(desc);
             }
-            if (null == transport) {
+            if (null == result) { // fallback
                 try {
-                    ServiceSetup cfg = AbstractSetup.readFromYamlWithPath(ServiceSetup.class, yamlPath);
-                    transport = cfg.getTransport();
+                    ServiceSetup cfg = AbstractSetup.readFromYamlWithPath(getSetupClass(), yamlPath);
+                    result = fromSetup.apply(cfg);
                 } catch (IOException e) {
                     LoggerFactory.getLogger(ServiceFactory.class).warn("Cannot read setup: " + e.getMessage());
                 }
-                if (null == transport) {
-                    transport = new TransportSetup();
+                if (null == result) { // second fallback
+                    result = constructor.get();
                 }
             }
+            setter.accept(result);
         }
-        return transport;
+        return result;
     }
 
     /**
