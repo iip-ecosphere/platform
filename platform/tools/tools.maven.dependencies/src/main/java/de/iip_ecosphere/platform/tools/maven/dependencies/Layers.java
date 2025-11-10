@@ -37,6 +37,7 @@ public class Layers {
         "deviceMgt",
         "ecsRuntime",
         "monitoring",
+        "configuration.interface",
         "configuration",
         "platform"
     };
