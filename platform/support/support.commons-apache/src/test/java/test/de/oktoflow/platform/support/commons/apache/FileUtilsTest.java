@@ -1,27 +1,171 @@
-/**
- * ******************************************************************************
- * Copyright (c) {2025} The original author or authors
- *
- * All rights reserved. This program and the accompanying materials are made 
- * available under the terms of the Eclipse Public License 2.0 which is available 
- * at http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
- * which is available at https://www.apache.org/licenses/LICENSE-2.0.
- *
- * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
- ********************************************************************************/
-
 package test.de.oktoflow.platform.support.commons.apache;
 
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import de.iip_ecosphere.platform.support.FileUtils;
+
 /**
- * Adjusted/customized files utils test.
+ * Tests {@link FileUtils}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class FileUtilsTest extends test.de.iip_ecosphere.platform.support.FileUtilsTest {
+public class FileUtilsTest {
     
-    static {
-        setNumberTestFiles(2);
-        setNumberTestNotServiceFiles(2);
+    private static int numberTestFiles = 2;
+    private static int numberTestNotServiceFiles = 2;
+
+    /**
+     * Sets the number of test files to be found.
+     * 
+     * @param number the number
+     */
+    protected static void setNumberTestFiles(int number) {
+        numberTestFiles = number;
+    }
+
+    /**
+     * Sets the number of not service files to be found.
+     * 
+     * @param number the number
+     */
+    protected static void setNumberTestNotServiceFiles(int number) {
+        numberTestNotServiceFiles = number;
+    }
+
+    /**
+     * Tests the temporary directory access.
+     */
+    @Test
+    public void testTempDir() {
+        Assert.assertNotNull(FileUtils.getTempDirectoryPath());
+        Assert.assertNotNull(FileUtils.getTempDirectory());
+    }
+
+    /**
+     * Tests creating a temporary folder.
+     */
+    @Test
+    public void testCreateTmpFolder() {
+        String tmp = FileUtils.getTempDirectoryPath();
+        File created = FileUtils.createTmpFolder("support.test");
+        Assert.assertTrue(created.toString().startsWith(tmp));
+        Assert.assertTrue(created.exists());
+        Assert.assertTrue(created.canRead());
+        Assert.assertTrue(created.canWrite());
+        FileUtils.deleteQuietly(created);
+    }
+    
+    /**
+     * Tests closing quietly.
+     */
+    @Test 
+    public void testCloseQuietly() {
+        FileUtils.closeQuietly(null);
+        Closeable cl = new Closeable() {
+
+            @Override
+            public void close() throws IOException {
+                throw new IOException();
+            }
+            
+        };
+        FileUtils.closeQuietly(cl);
+    }
+    
+    /**
+     * Tests {@link FileUtils#listFiles(File, java.util.function.Predicate, java.util.function.Consumer)}.
+     */
+    @Test
+    public void testListFiles() {
+        File f = new File("src/test/resources");
+        AtomicInteger fileCount = new AtomicInteger();
+        
+        FileUtils.listFiles(f, g -> true, g -> {
+            fileCount.incrementAndGet();
+        });
+        
+        Assert.assertEquals(numberTestFiles, fileCount.get());
+        fileCount.set(0);
+
+        FileUtils.listFiles(f, g -> !g.getName().equals("services"), g -> {
+            fileCount.incrementAndGet();
+        });
+
+        Assert.assertEquals(numberTestNotServiceFiles, fileCount.get());
+    }
+    
+    /**
+     * Tests file resolution methods.
+     */
+    @Test
+    public void testResolution() {
+        Assert.assertNotNull(FileUtils.getResolvedFile(new File(".")));
+        Assert.assertNotNull(FileUtils.getResolvedPath(new File("."), ""));
+        Assert.assertNotNull(FileUtils.getResolvedPath(new File("."), "test.txt"));
+    }
+
+    /**
+     * Tests the base64 functions.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testBase64() throws IOException {
+        File src = new File("src/test/resources/Logo.jpg");
+        File tgt = new File(FileUtils.getTempDirectory(), "base64.tst");
+        tgt.delete();
+        String enc = FileUtils.fileToBase64(src);
+        FileUtils.base64ToFile(enc, tgt);
+        Assert.assertTrue(FileUtils.contentEquals(src, tgt));
+        tgt.delete();
+    }
+    
+    /**
+     * Tests sanitizing file names.
+     */
+    @Test
+    public void testSanitize() {
+        Assert.assertEquals("a", FileUtils.sanitizeFileName("a"));
+        Assert.assertEquals("a", FileUtils.sanitizeFileName("a", false));
+        Assert.assertTrue(FileUtils.sanitizeFileName("a", true).startsWith("a"));
+    }
+
+    /**
+     * Tests {@link FileUtils#deleteOnExit(File)}.
+     * 
+     * @throws IOException shall not occur
+     */
+    public void testDeleteOnExit() throws IOException {
+        File f = File.createTempFile("iip-test", null);
+        FileUtils.deleteOnExit(f);
+    }
+    
+    /**
+     * Tests {@link FileUtils#findFile(File, String)}.
+     */
+    @Test
+    public void testFindFile() {
+        File f = FileUtils.findFile(new File("."), "identityStore.yml");
+        Assert.assertNotNull(f);
+        Assert.assertEquals("identityStore.yml", f.getName());
+        f = FileUtils.findFile(new File("."), "identityStoreNotThere.yml");
+        Assert.assertNull(f);
+    }
+
+    /**
+     * Tests {@link FileUtils#getSystemRoot()}.
+     */
+    @Test
+    public void testSystemRoot() {
+        File f = FileUtils.getSystemRoot();
+        Assert.assertNotNull(f);
+        Assert.assertTrue(f.toString().length() > 0);
     }
 
 }

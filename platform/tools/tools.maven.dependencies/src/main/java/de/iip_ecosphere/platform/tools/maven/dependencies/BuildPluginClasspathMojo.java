@@ -116,7 +116,7 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
             if (addTestArtifact || asTest) {
                 includeScope = "test";
             } else {
-                includeScope = "runtime";
+                includeScope = "compile";
             }
         }
         List<String> prepends = new ArrayList<>();

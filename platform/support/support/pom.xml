@@ -21,6 +21,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>support.boot</artifactId>
+      <version>${iip.version}</version>
+    </dependency>
+    <dependency>
 	  <groupId>de.iip-ecosphere.platform</groupId>
 	  <artifactId>maven-python</artifactId>
 	  <version>${iip.version}</version>
@@ -46,7 +51,7 @@
       <scope>test</scope>
     </dependency>
     <!-- begin preliminary commons -->
-    <dependency>
+    <!--<dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>${apache.commons.io.version}</version>
@@ -75,14 +80,14 @@
       <artifactId>joda-time</artifactId>
       <version>2.11.2</version>
       <scope>test</scope>
-    </dependency>
+    </dependency>-->
     <!-- end preliminary commons -->
-    <dependency> <!-- preliminary -->
+    <!--<dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
       <scope>test</scope>
       <version>1.27</version>
-    </dependency>
+    </dependency>-->
     <!--<dependency> 
         <groupId>com.sparkjava</groupId>
         <artifactId>spark-core</artifactId>
@@ -96,7 +101,7 @@
       <version>1.1.4</version>
     </dependency>   -->
     <!-- begin preliminary json-jackson -->
-    <dependency> 
+    <!--<dependency> 
       <groupId>org.glassfish</groupId>
       <artifactId>javax.json</artifactId>
       <scope>test</scope>
@@ -113,8 +118,33 @@
       <artifactId>jackson-databind</artifactId>
       <version>2.11.4</version>
       <scope>test</scope>
-    </dependency>
+    </dependency>-->
     <!-- end preliminary json-jackson -->
+
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>support.log-slf4j-simple</artifactId>
+      <version>${iip.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>support.commons-apache</artifactId>
+      <version>${iip.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>support.yaml-snakeyaml</artifactId>
+      <version>${iip.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>support.json-jackson</artifactId>
+      <version>${iip.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   
   <build>

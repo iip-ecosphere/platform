@@ -23,10 +23,7 @@ import test.de.iip_ecosphere.platform.support.logging.LoggerFactoryTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    ClassLoaderUtilsTest.class,
-    ServiceLoaderUtilsTest.class,
     CollectionUtilsTest.class,
-    NoOpServerTest.class,
     FileFormatTest.class,
     VersionTest.class,
     AbstractSetupTest.class,
@@ -42,11 +39,7 @@ import test.de.iip_ecosphere.platform.support.logging.LoggerFactoryTest;
     PythonUtilsTest.class,
     NetUtilsTest.class,
     SchemaServerEndpointTest.class,
-    ServerTest.class,
     InstalledDependenciesSetupTest.class,
-    YamlTest.class,
-    YamlFileTest.class,
-    JsonTest.class,
     RestTest.class,
     HttpTest.class,
     MetricsTest.class,
@@ -56,10 +49,6 @@ import test.de.iip_ecosphere.platform.support.logging.LoggerFactoryTest;
     SshTest.class,
     TaskRegistryTests.class,
     CollectorTest.class,
-    PluginManagerTest.class,
-    AtomicDoubleTest.class,
-    CommonsTest.class,
-    ObjectUtilsTest.class,
     
     FallbackLoggerTest.class,
     LoggerFactoryTest.class

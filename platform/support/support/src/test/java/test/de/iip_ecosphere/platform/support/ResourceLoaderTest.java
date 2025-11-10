@@ -78,7 +78,7 @@ public class ResourceLoaderTest {
         is.close();
         
         // via classloader
-        Assert.assertTrue(myResolverCalled > 0);
+        Assert.assertTrue(myResolverCalled > 0); // other tests
         Assert.assertTrue(myResolver2Called == 0);
         
         // does not exist

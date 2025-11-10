@@ -26,6 +26,7 @@ public class Layers {
     public static final String DEFAULT_UNPACK_MODE = "jars"; // -> "resolve"
     
     private static final String[] LAYERS = {
+        "support.boot",
         "support", 
         "support.aas", 
         "support.iip-aas", 
@@ -74,19 +75,35 @@ public class Layers {
                 result2 = "support, support.aas, support.iip-aas, transport, services.environment, services, deviceMgt";
             } // further cases
             log.info("CP " + result2);*/
+            result = append(result, "maven-python"); // through support
         }
         if (asTest) {
-            if (result == null) {
-                result = "";
-            }
-            if (result.length() > 0) {
-                result += ", ";
-            }
-            result += "junit, junit-jupiter-api, junit-jupiter-engine, junit-jupiter-params, junit-platform-commons, "
-                + "junit-platform-engine";
+            result = append(result, "junit", "junit-jupiter-api", "junit-jupiter-engine", "junit-jupiter-params", 
+                "junit-platform-commons", "junit-platform-engine");
         }
         if (log != null && result != null && result.length() > 0) {
             log.info("Using excludeArtifactIds: " + result);
+        }
+        return result;
+    }
+
+    /**
+     * Appends {@code addition} to {@code text} using "," as separator.
+     * 
+     * @param text
+     * @param addition
+     * @return
+     */
+    private static String append(String text, String... addition) {
+        String result = text;
+        if (result == null) {
+            result = "";
+        }
+        for (String a: addition) {
+            if (result.length() > 0) {
+                result += ", ";
+            }
+            result += a;
         }
         return result;
     }

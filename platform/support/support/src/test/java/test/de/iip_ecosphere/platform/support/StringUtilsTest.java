@@ -44,7 +44,7 @@ public class StringUtilsTest {
         Assert.assertNull(StringUtils.escapeJson(null));
         Assert.assertNull(StringUtils.unescapeJson(null));
 
-        Assert.assertEquals("\t", StringUtils.unescapeJava(StringUtils.escapeJava("\t")));
+        Assert.assertEquals("\t", StringUtils.unescapeJson(StringUtils.escapeJson("\t")));
     }
     
     /**

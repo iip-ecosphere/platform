@@ -14,14 +14,6 @@ package test.de.oktoflow.platform.support.commons.apache;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import test.de.iip_ecosphere.platform.support.CollectionUtilsTest;
-import test.de.iip_ecosphere.platform.support.IOUtilsTest;
-import test.de.iip_ecosphere.platform.support.NetUtilsTest;
-import test.de.iip_ecosphere.platform.support.ObjectUtilsTest;
-import test.de.iip_ecosphere.platform.support.OsUtilsTest;
-import test.de.iip_ecosphere.platform.support.StringUtilsTest;
-import test.de.iip_ecosphere.platform.support.TimeUtilsTest;
-
 /**
  * Defines the tests to be executed.
  * 

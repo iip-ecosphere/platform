@@ -6,11 +6,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.commons.Commons;
-import de.iip_ecosphere.platform.support.http.Http;
 import de.oktoflow.platform.support.commons.apache.ApacheCommons;
 
 /**
- * Tests {@link Http}.
+ * Tests {@link Commons}.
  * 
  * @author Holger Eichelberger, SSE
  */

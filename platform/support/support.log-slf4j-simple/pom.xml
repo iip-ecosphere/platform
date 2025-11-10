@@ -21,7 +21,7 @@
   <dependencies>
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>support</artifactId>
+     <artifactId>support.boot</artifactId>
      <version>${project.version}</version>
     </dependency>
     <dependency>

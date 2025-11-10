@@ -13,6 +13,7 @@
   <modules>
      <!-- platform dependencies first -->
      <module>platformDependencies</module>
+     <module>support/support.boot</module>
      <module>support/support</module>
      <module>support/libs.ads</module>
      <module>support.log-slf4j-simple</module>

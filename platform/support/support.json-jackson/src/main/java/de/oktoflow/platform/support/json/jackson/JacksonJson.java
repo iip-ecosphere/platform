@@ -107,7 +107,7 @@ public class JacksonJson extends de.iip_ecosphere.platform.support.json.Json {
         }
         
         @Override
-        public <K, V> Map<K, V> mapFromJson(Object json, Class<K> keyCls, Class<K> valueCls) {
+        public <K, V> Map<K, V> mapFromJson(Object json, Class<K> keyCls, Class<V> valueCls) {
             return super.mapFromJson(json, cfg(keyCls), cfg(valueCls));
         }
         
@@ -193,7 +193,7 @@ public class JacksonJson extends de.iip_ecosphere.platform.support.json.Json {
     }
 
     @Override
-    public <K, V> Map<K, V> mapFromJson(Object json, Class<K> keyCls, Class<K> valueCls) {
+    public <K, V> Map<K, V> mapFromJson(Object json, Class<K> keyCls, Class<V> valueCls) {
         Map<K, V> result = null;
         if (null != json) {
             try {

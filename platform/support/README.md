@@ -1,6 +1,7 @@
 # oktoflow platform: Support Layer
 
 Basic functionality for the oktoflow platform in terms of:
+  * Basic interfaces, service loading and plugin mechanism in [support,boot](support.boot/README.md)
   * Basic [support functions](support/README.md)
   * [Logging plugin](support.log-slf4j-simple/README.md)
   * [Commons plugin](support.commons-apache/README.md)
