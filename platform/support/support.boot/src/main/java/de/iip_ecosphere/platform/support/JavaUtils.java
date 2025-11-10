@@ -13,7 +13,6 @@
 package de.iip_ecosphere.platform.support;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
@@ -37,6 +36,8 @@ public class JavaUtils {
         }
         return result;
     }
+
+    // checkstyle: stop exception type check
 
     /**
      * Returns the path to the running Java binary.
@@ -71,11 +72,12 @@ public class JavaUtils {
                     result = jp.get();
                 }
             }
-        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException 
-            | IllegalAccessException e) {
+        } catch (Throwable e) { // all typical reflection, including add-opens stuff by recent JDK
         }
         return result;
     }
+    
+    // checkstyle: resume exception type check
     
     /**
      * Returns the path to the running JVM bin folder.
