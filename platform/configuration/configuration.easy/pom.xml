@@ -249,6 +249,55 @@
                   </execution>
                 </executions>
               </plugin>
+               <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-assembly-plugin</artifactId>
+                 <version>3.1.1</version>
+                 <executions>
+                     <execution>
+                         <id>easy</id>
+                         <phase>package</phase>
+                         <goals>
+                             <goal>single</goal>
+                         </goals>
+                         <configuration>
+                             <descriptors>
+                                 <descriptor>src/main/assembly/easy.xml</descriptor>
+                             </descriptors>
+                             <outputDirectory>${project.build.directory}</outputDirectory>
+                             <attach>true</attach>
+                         </configuration>
+                      </execution>
+                     <execution>
+                         <id>easy-template</id>
+                         <phase>package</phase>
+                         <goals>
+                             <goal>single</goal>
+                         </goals>
+                         <configuration>
+                             <descriptors>
+                                 <descriptor>src/main/assembly/easy-template.xml</descriptor>
+                             </descriptors>
+                             <outputDirectory>${project.build.directory}</outputDirectory>
+                             <attach>true</attach>
+                         </configuration>
+                      </execution>
+                     <execution>
+                         <id>easy-test</id>
+                         <phase>package</phase>
+                         <goals>
+                             <goal>single</goal>
+                         </goals>
+                         <configuration>
+                             <descriptors>
+                                 <descriptor>src/test/assembly/easy-test.xml</descriptor>
+                             </descriptors>
+                             <outputDirectory>${project.build.directory}</outputDirectory>
+                             <attach>true</attach>
+                         </configuration>
+                      </execution>
+                 </executions>
+                </plugin>
               <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>

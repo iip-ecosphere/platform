@@ -1,0 +1,8 @@
+# IIP-Ecosphere platform: Configuration model (top-level)
+
+The configuration model is written in the languages of EASy-Producer, namely Integrated Variability Modeling Language (IVML), Variability Instantiation Language (VIL) and Variability Template/Asset Language (VTL). On this level, three main files are provided:
+
+* `IIPEcosphere.ivml`: Top-level configuration project that imports the submodels in [`meta`](src/main/easy/meta) and defines decision variables for top-level decisions.  It is important to note that the model does not contain a platform/application configuration itself, it rather serves as basis to define own configurations on top. Some example configurations used for testing are in `src/main/test/easy`.
+* `IIPEcosphere.text`: These `text` files are used to assign internationalized explanations to decision variables/types in the model. Not all text files are currently completely defined, but aim at providing textual information for upcoming user interfaces.
+* `IIPEcosphere.vil`: The definition of the instantiation process for platform components and IIoT applications running on top of the platform. The VIL process utilizes the various VTL templates defined in [`vtl`](src/main/easy/vtl). The VIL file executes and controls in particular the packaging of the platform components based on Maven artifacts.
+* Modules needed to specify a configuration managed by the platform itself including default setup in [`cfg`](src/main/easy/cfg).

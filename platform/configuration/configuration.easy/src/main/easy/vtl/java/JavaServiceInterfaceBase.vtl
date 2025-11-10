@@ -1,0 +1,50 @@
+import Basics;
+import JavaBasics;
+import ServiceBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template JavaServiceInterfaceBase(Configuration config, FileArtifact target, ServiceBase service, String pkg) extends ServiceBasics {
+
+    JavaCodeClass mainCls;
+
+    // called via produceForInputTypes/produceForOutputTypes
+    def produceAsyncProcessorBody(IOType type) {
+        String t = toTypeName(type);
+        mainCls.addMethod("", "process" + t.firstToUpperCase(), 'Processes a data item of type "${t}" asynchronously. Use the respective ingestor for the return type to pass back the result of processing.')
+            .addParameter(toQualifiedTypeName(t), "data", "the data item to be processed");
+    }
+    
+    // called via produceForInputTypes/produceForOutputTypes
+    def produceSyncProcessorBody(IOType returnType, IOType dataType) {
+        String t = toTypeName(dataType);
+        mainCls.addMethod(toQualifiedTypeName(returnType), "transform" + t.firstToUpperCase(), 'Processes/transforms a data item of type "${t}" synchronously.', 'the result of processing (must not be <b>null</b>)')
+            .addParameter(toQualifiedTypeName(dataType), "data", "the data item to be processed");
+    }
+    
+    // called via produceForInputTypes/produceForOutputTypes
+    def produceIngestorBody(IOType type) {
+        String t = toTypeName(type);
+        mainCls.addMethod("", "attach" + t.firstToUpperCase() + "Ingestor", 'Attaches a return value ingestor for asynchronous processing.')
+            .addParameter("de.iip_ecosphere.platform.services.environment.DataIngestor<${toQualifiedTypeName(type)}>", "ingestor", "the ingestor instance");
+    }
+    
+    // called via produceForInputTypes/produceForOutputTypes
+    def produceProducerBody(IOType type) {
+        String t = toTypeName(type);
+        mainCls.addMethod(toQualifiedTypeName(type), "produce" + t.firstToUpperCase(), 'Synchronous source method, called to produce data items of type "${t}".', 'the data value to be ingested');
+    }
+    
+    def memberIdConsts(ServiceBase service) {
+    }
+
+    def memberIdConsts(ServiceFamily family) {
+        for (Service s: family.members) {
+            mainCls.addAttribute("String", "MEMBER_" + asIdentifier(s.id).toUpperCase()).addStringInitializer(s.id).setPublicStaticFinal();
+        }
+    }
+    
+    def producerInterfaceRest(ServiceBase service) {
+    }
+    
+}

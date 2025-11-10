@@ -1,0 +1,45 @@
+import Basics;
+import JavaBasics;
+import DockerBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template InstalledDependencies(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Integer isPython) {
+
+    // this is just a listing of locations where (potentially conflicting) programs have been installed int
+    // the container system, e.g., PYTHON2 (unused) and PYTHON3 or JDK11, JDK13 and JDK8 (RTSA)
+    
+    // if there is a python service, we currently install a python 3 (standard location) and by default JAVA13 (-> RTSA!)
+
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, Integer isPython) {
+        'locations: '
+        if (isPython == 1) {
+            '    PYTHON3: /usr/local/bin/python'
+        }
+        '    JAVA13: /opt/openjdk-13/bin/java'
+        
+        if (not(collectDependencies(elements)->selectByKind(SystemDependency)->select(d|d.key=='JAVA8').isEmpty())) {
+            if (isPython == 1) {
+                '    JAVA8: /usr/lib/jvm/java-8-openjdk-amd64/bin/java'
+            } else {
+                '    JAVA8: /usr/lib/jvm/java-1.8-openjdk/bin/java'
+            }
+        }
+        
+        sequenceOf(PythonService) services = elements -> collect(e|e.impl) -> selectByKind(PythonService);
+        sequenceOf(ServiceFamily) families = elements -> collect(e|e.impl) -> selectByKind(ServiceFamily);
+        for (ServiceFamily family : families) {
+            for (PythonService serviceMember : family.members -> selectByKind(PythonService)) {
+                services.add(serviceMember);
+            }
+        }
+        
+        for (PythonService pyService : services) {
+            String venvName = getStringValueSafe(pyService.venvName, "");
+            if (venvName.trim().length() > 0) {
+                '    ${venvName}:  /app/${venvName}/bin/python'
+            }
+        }
+    }
+    
+}

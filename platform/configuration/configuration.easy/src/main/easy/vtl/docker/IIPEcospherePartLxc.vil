@@ -1,0 +1,82 @@
+import JavaBasics;
+import JavaMapping;
+import Basics;
+import MeshBasics;
+import IIPEcosphereBase;
+
+@advice(IIPEcosphere)
+vilScript IIPEcospherePartLxc (Project source, Configuration config, Project target) extends IIPEcosphereBase {
+
+    String createContainerBuildScript(LxcContainerManager mgr, Application a, sequenceOf(MeshElement) elements, 
+        Path appRoot, ContainerType contType, Integer isPythonService, EcsDevice device) = {
+        String vtlFile;
+        String targetFile;
+        Path df = "${appRoot}/../app.LxcTemplate.yaml";
+		
+        if (contType == ContainerType::Ecs_Svc_App) {
+            if (isPythonService == 0) {
+                // JAVA         
+                vtlFile = "LxcTemplateFile";
+                targetFile = "LxcTemplate.yaml";   
+            } else {
+                // JAVA & PYTHON is currently same as above
+                vtlFile = "LxcTemplateFile";
+                targetFile = "LxcTemplate_Python.yaml";   
+            }
+        }
+                
+        if (contType == ContainerType::EcsSvc_App) {
+             if (isPythonService == 0) {
+                // JAVA         
+                vtlFile = "LxcTemplateFile";
+                targetFile = "LxcTemplate";   
+             } else {
+                // JAVA & PYTHON is currently same as above
+                vtlFile = "LxcTemplateFile";
+                targetFile = "LxcTemplate_Python";   
+            }
+        }   
+
+        if (contType == ContainerType::C1Ecs_C2Svc_App) {
+            if (isPythonService == -1) { // Container with ECS is still Docker
+                vtlFile = "Dockerfile_3_ecs";
+                targetFile = "ecs.Dockerfile";   
+                df = "${appRoot}/../app.Dockerfile.Ecs";
+            } else if (isPythonService == 0) { // Container with ServiceMgr and App
+                // JAVA         
+                vtlFile = "LxcTemplateFile";
+                targetFile = "app.LxcTemplate";   
+            } else { // Container with ServiceMgr and App
+                // JAVA & PYTHON is currently still Docker
+                vtlFile = "LxcTemplate_Python";
+                targetFile = "app.LxcTemplate";   
+            }
+        }
+                
+        vilTemplateProcessor(vtlFile, config, df, elements=elements, app=a, containerType=contType, device=device);
+        df.rename(targetFile);
+        targetFile;
+    }
+    
+    // baseDirectory not recognized no login happening
+    loginContainerRegistry(LxcContainerManager mgr, String user, String password) = {
+        if (isDefined(mgr.baseDirectory) and mgr.baseDirectory <> "") {
+            lxcLogin(mgr.baseDirectory);
+        }
+    }
+    // where tag is the name of the image after build
+    String createContainerImage(LxcContainerManager mgr, Path base, Path buildFile, String registry, String repository, String tag) = {
+        String id = lxcBuildImage(base, buildFile, tag);
+        if (isDefined(mgr.registry) and mgr.registry.length() > 0) {
+            lxcPushImage(tag, mgr.registry, registry + ":" + tag);
+        }
+        id;
+    }
+    
+    //Logout is currently not implemented in LXC Instaniator
+    logoutContainerRegistry(LxcContainerManager mgr) = {
+        if (isDefined(mgr.registry) and mgr.registry <> "") {
+        }
+    }
+
+}

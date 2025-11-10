@@ -1,0 +1,16 @@
+import Basics;
+import JavaBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template JavaPluginSetupDescriptor(Configuration config, JavaCodeArtifact target, String clsName, String plugin, String resource, String pkg) {
+
+    def main(Configuration config, JavaCodeArtifact target, String clsName, String plugin, String resource, String pkg) {
+        JavaCodeClass mainCls = codeCreateClass(target, pkg, "${clsName}PluginSetupDescriptor", 'Plugin setup descriptor for the plugin ${plugin}');
+    	mainCls.addExtends("de.iip_ecosphere.platform.support.plugins.ResourceClasspathPluginSetupDescriptor");
+    	mainCls.addConstructor("Creates an instance")
+    	    .addSuperCall()
+    	        .addStringArgument(resource);
+    }
+    
+}

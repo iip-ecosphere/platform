@@ -1,0 +1,39 @@
+project ServiceStateMachines {
+
+   import MetaConcepts;
+   import Devices;
+   import DevicePart*;
+   import Resources;
+   import Transport;
+   import Nameplate;
+   import DataOperations;
+   
+   annotate BindingTime bindingTime = BindingTime::compile to .;
+   annotate Integer uiGroup = UiMandatoryGroup1 to .;
+   
+   compound State {
+       String id;
+       sequenceOf(String) onEntry; 
+       setOf(refTo(Transition)) transitions;       
+   }
+   
+   compound Event {
+       DataFieldAccess field;
+   }
+      
+   compound Transition {
+       String id;
+       refTo(Event) event;
+       String log; 
+       refTo(State) target;
+       Condition condition;
+       
+   }
+   
+   compound StateMachine {
+       String id;
+       setOf(refTo(State)) states;
+       refTo(RecordType) input;
+   }
+   
+}

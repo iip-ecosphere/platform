@@ -1,0 +1,13 @@
+import JavaBasics;
+import LoggingBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template TemplatesTestLogbackXml(Configuration config, XmlFileArtifact target) {
+
+    def main(Configuration config, XmlFileArtifact target) {
+        XmlElement cfg = createLogbackStdoutXml(target, "info");
+        getLogbackLoggerEntry(cfg, "org.eclipse.basyx.vab.protocol.basyx.server.VABBaSyxTCPInterface", "OFF");
+    }
+    
+}

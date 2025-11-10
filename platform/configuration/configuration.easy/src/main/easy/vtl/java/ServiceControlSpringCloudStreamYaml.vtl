@@ -1,0 +1,40 @@
+import JavaMapping;
+import EcsRuntimeDockerContainerManagerYaml;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(profile="yaml", indentSteps = 2, profileArg_sorting = "INSERT")
+template ServiceControlSpringCloudStreamYaml(IIPEcosphere config, YamlFileArtifact target) {
+
+    def produceServiceControlCfg(IIPEcosphere config, YamlFileArtifact target) {
+        YamlNode n = target.addDocument(true);
+        SpringCloudStream mgr = config.serviceManager;
+        n.addObject("logging").addObject("level").addValue("root", "INFO");
+
+        YamlNode spring = n.addObject("spring");
+        YamlNode springMain = spring.addObject("main");
+        springMain.addValue("banner-mode", "off");
+        springMain.addValue("web-application-type", "none");
+        spring.addObject("cloud").addObject("deployer").addObject("local").addValue("deleteFilesOnExit", mgr.deleteFilesOnExit);
+
+        YamlNode serviceMgr = n.addObject("service-mgr");
+        serviceMgr.addValue("deleteArtifacts", mgr.deleteArtifacts);
+        serviceMgr.addValue("waitingTime", mgr.waitingTime);
+        serviceMgr.addValue("brokerHost", mgr.brokerHost);
+        serviceMgr.addValue("brokerPort", mgr.brokerPort);
+        serviceMgr.addValue("availabilityRetryDelay", mgr.availabilityRetryDelay);
+        serviceMgr.addValue("serviceProtocol", aasProtocolName(config));
+        produceTransport(config, serviceMgr);
+        produceAas(config, serviceMgr, implLocalEphemerial=config.aasImplServer.devicesAsEphemeral);
+        produceNetMgr(config, serviceMgr);
+        producePlugins(config, serviceMgr);
+
+        n.addObject("metricsprovider").addValue("schedulerrate", mgr.monitoringUpdatePeriod);
+        // executables based on target device
+    }
+
+    def main(IIPEcosphere config, YamlFileArtifact target) {
+        produceServiceControlCfg(config, target);
+    }
+
+}

@@ -1,0 +1,29 @@
+import Basics;
+import JavaBasics;
+import JavaConnector;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120, profileArg_eltSorting="CONS")
+template JavaConnectorRestImpl(Configuration config, JavaCodeArtifact target, RestConnector conn, String pkg, setOf(DataType) usedRestTypes) {
+    
+    def main(Configuration config, JavaCodeArtifact target, RestConnector conn, String pkg, setOf(DataType) usedRestTypes) {
+        IIPEcosphere cfg = config;
+    
+        String typeName = asTypeName(conn.name);
+        String clsName = typeName + "Extension";
+
+        JavaCodeClass mainCls = codeCreateClass(target, pkg, clsName, 'Rest connector extension for ${typeName}');
+        mainCls.addExtends("de.iip_ecosphere.platform.connectors.ConnectorExtensionDescriptor.DefaultConnectorExtension<Class<?>[]>");
+
+        String rCls = "";
+        for (DataType t : usedRestTypes->sortedBy(x|x.name)) {
+            rCls = appendWithSeparator(rCls, ", ", "iip.nodes." + asTypeName(t.name) + "RestType.class");
+        }
+        mainCls.addConstructor("Creates an instance. [JSL]").(m|{
+            m.addSuperCall().addStringArgument(conn.name).addArgument("() -> new Class[]{${rCls}}");
+        });
+        
+    }
+    
+}

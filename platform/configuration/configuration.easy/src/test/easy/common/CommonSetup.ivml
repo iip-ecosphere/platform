@@ -1,0 +1,100 @@
+project CommonSetup {
+
+    import IIPEcosphere;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    // ------------ component setup ------------------
+
+    serializer = Serializer::Json;
+    // serviceManager, containerManager are already defined    
+        
+    aasServer = {
+        schema = AasSchema::HTTP,
+        port = 9001,
+        host = "127.0.0.1"
+    };
+    aasRegistryServer = {
+        schema = AasSchema::HTTP,
+        port = 9002,
+        host = "127.0.0.1",
+        path = "registry"
+    };
+    aasImplServer = {
+        port = 9003
+    };
+    aasProtocol = AasProtocolVabTcp{};
+    aasAccessControlAllowOrigin = "*";
+    
+    // ------------------ transport --------------------------
+    
+    transportProtocol = TransportProtocolAMQP {
+        port = 8883,
+        security = { // -> identityStore.yml in src/test/ or src/main depending on use
+            authenticationKey = "amqp"
+        },
+        gatewayPort = -1
+    };
+    
+    serviceProtocol = ServiceProtocolAMQP {};
+    
+    // ------------------ resources/devicemgt ----------------
+    
+    deviceRegistry = BasicDeviceRegistry {
+    };
+    
+    deviceMgtStorage = S3MockDeviceMgtStorage {
+        host = "localhost",
+        port = 8885,
+        region = "local"
+    };
+    
+    // just for testing, this instantiates app rather than platform
+    deviceMgtStorageServer = S3MockDeviceMgtStorageServer{
+        port = 8885
+    };
+    
+    // --------------------- monitoring ---------------------------
+    
+    // current default: no monitoring configured
+    
+    // ------------------------- UI -------------------------------
+    
+    // current default: no UI configured
+    
+    // ------------------------- UI -------------------------------
+    
+    // generation/path setup, not needed for tests but for testing managementUI
+    
+    footprintFolder = "gen/footprints";
+    pidDir = "/run";
+    //no artifactsUriPrefix for local test/devels execution, else "http://127.0.0.1:4200/download";    
+
+    // ------------ freezing ------------------
+    
+    freeze {
+        aas;
+        aasServer;
+        aasRegistryServer;
+        aasImplServer;
+        aasPersistency;
+        aasProtocol;
+        aasAccessControlAllowOrigin;
+        serializer;
+        transportProtocol;
+        serviceManager;
+        serviceProtocol;
+        containerManager;
+        deviceMgtStorageServer;
+        deviceMgtStorage;
+        deviceRegistry;
+        javaModuleOpts;
+        javaOpts;
+        pidDir;
+        artifactsFolder;
+        //artifactsUriPrefix; // use default -> artifacts folder for local test/devel executions
+        footprintFolder;
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}

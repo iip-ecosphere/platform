@@ -1,0 +1,115 @@
+project Resources {
+
+   import MetaConcepts;
+   import DataTypes;
+
+   annotate BindingTime bindingTime = BindingTime::compile to .;
+   annotate String semanticId = "" to .;
+   
+   abstract compound DeviceRegistry {
+   }
+   
+   compound BasicDeviceRegistry refines DeviceRegistry {
+   }
+
+   compound ThingsBoardDeviceRegistry refines DeviceRegistry {
+       // server, port, access
+   }
+
+   DeviceRegistry deviceRegistry = BasicDeviceRegistry {
+   };
+   
+   isDefined(deviceRegistry);
+   
+   compound PackageStore {
+        String bucket;
+        String prefix;
+        String packageDescriptor;
+        String packageFilename;
+   }
+   
+   abstract compound DeviceMgtStorage {
+        NonEmptyString host = "localhost";
+        NonEmptyEphemeralPort port = 8884;
+        NonEmptyString region = "local";
+        String authenticationKey = "";
+        PackageStore runtimeStorage = {
+            bucket = "iip",
+            prefix = "ecs",
+            packageDescriptor = "runtime.yml",
+            packageFilename = "runtime.zip"
+        };
+        PackageStore configStorage = {
+            bucket = "iip",
+            prefix = "config",
+            packageDescriptor = "config.yml",
+            packageFilename = "config.zip"
+        };
+   }
+   
+   compound MinIoDeviceMgtStorage refines DeviceMgtStorage {
+   }
+
+   compound S3MockDeviceMgtStorage refines DeviceMgtStorage {
+   }
+   
+   DeviceMgtStorage deviceMgtStorage = S3MockDeviceMgtStorage {
+   };
+   
+   isDefined(deviceMgtStorage);
+   
+   // only for server side, host above must match this machine
+   abstract compound DeviceMgtStorageServer {
+        NonEmptyEphemeralPort port = 8884;
+        String path = ""; // in memory for now, TODO temporary
+        String authenticationKey = "";
+   }
+   
+   // one default compound to state that there shall be no device mgt server 
+   compound NoDeviceMgtStorageServer refines DeviceMgtStorageServer {
+        NonEmptyEphemeralPort port = -1;
+   }
+   
+   compound S3MockDeviceMgtStorageServer refines DeviceMgtStorageServer {
+       deviceMgtStorage.isKindOf(S3MockDeviceMgtStorage);
+   };
+   
+   DeviceMgtStorageServer deviceMgtStorageServer = S3MockDeviceMgtStorageServer {
+       port = 8884
+   };
+   
+   // -------------------------- monitoring --------------------------------------
+   
+   abstract compound PlatformMonitoring {
+   }
+
+   compound NoPlatformMonitoring refines PlatformMonitoring {
+   }
+   
+   enum PrometheusSchema {HTTP, HTTPS};
+   compound PrometheusPlatformMonitoring refines PlatformMonitoring {
+        PrometheusSchema schema = PrometheusSchema::HTTPS;
+        NonEmptyString host = "127.0.0.1";
+        NonEmptyEphemeralPort port = 9090;
+        Boolean running = false; // running somewhere else, do we have to start it
+        NonEmptyEphemeralPort exporterPort = -1;
+        NonEmptyString exporterHost = "127.0.0.1";
+        Boolean exporterRunning = false; // running somewhere else, do we have to start it
+        NonEmptyEphemeralPort alertMgrPort = 9091;
+        NonEmptyString alertMgrHost = "127.0.0.1";
+        Boolean alertMgrRunning = false; // running somewhere else, do we have to start it
+        assign (semanticId = Eclass_Unit_ms) to {
+            Integer scrapeInterval = 1001;
+            Integer scrapeTimeout = 1000;
+        }
+        
+        scrapeInterval > 50;
+        scrapeTimeout > 50 and scrapeTimeout < scrapeInterval; // required by Prometheus
+   }
+   
+   // TODO monitoring rules, alerting
+   
+   // preliminary
+   PlatformMonitoring platformMonitoring = NoPlatformMonitoring {};
+   
+}

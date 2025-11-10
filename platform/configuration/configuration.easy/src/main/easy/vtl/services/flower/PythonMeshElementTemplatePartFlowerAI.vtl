@@ -1,0 +1,53 @@
+import PythonBasics;
+import MeshBasics;
+import PythonMeshElementTemplateBase;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template PythonMeshElementTemplatePartFlowerAI(Configuration config, FileArtifact target, MeshElement elt, String pkg, PythonService service) {
+
+    @DispatchCase
+    def generateAsyncProcessorInMethodImpl(FlowerFederatedAiService service, Boolean forward, PythonCodeFunction f) {
+        if (forward) {
+            f.addAssign('client', 'Client()');
+            f.add('fl.client.start_numpy_client(server_address=self.IP, client=client)');
+        } else {
+            f.addPass();
+        }
+    } 
+        
+    @DispatchCase
+    def generateSyncProcessorMethodImpl(FlowerFederatedAiService service, PythonCodeFunction f) {
+        f.addAssign('client', 'Client()');
+        f.add('fl.client.start_numpy_client(server_address=self.IP ,client=client)');
+    } 
+    
+    @DispatchCase
+    def generateImports(FlowerFederatedAiService service, PythonCodeArtifact target) {
+        target.addImport("Service", "Service");
+        target.addImport("services.flowers.Client", "Client");
+        target.addImport("services.flowers.Client", "Client");
+        target.addImport("flwr").setAlias("fl");
+    }
+    
+    @DispatchCase
+    def inheritsFrom(String cls) {
+        cls; // may add flower stuff here
+    }
+
+    @DispatchCase
+    def generateFurtherMethods(FlowerFederatedAiService service, PythonCodeClass c) {
+        generateReceiveClientServer(service.server, c);
+    } 
+    
+    @DispatchCase
+    def produceConstructorRest(FlowerFederatedAiService service, PythonCodeFunction f) {
+        FlowerFederatedAiServer server = service.server;
+        f.addAssign('self.IP', 'self.getNetMgtKeyAddress()');
+        f.addIf('self.IP is None').(a|{
+            a.addSLComment('fallback, then server is not relocatable anymore');
+            a.addAssign('self.IP', '"${server.host}:${server.port}"');
+        });
+    }
+
+}

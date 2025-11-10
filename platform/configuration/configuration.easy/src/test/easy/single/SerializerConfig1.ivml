@@ -1,0 +1,465 @@
+project SerializerConfig1 {
+
+    import CommonSetup;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    // ------------ data types ------------------
+    
+    EnumType myTestEnum = EnumType {
+        name = "myTestEnum",
+        literals = {
+            EnumLiteral {
+                name = "Lit1",
+                ordinal = 25
+            }, EnumLiteral {
+                name = "Lit2",
+                ordinal = 100
+            }
+        }
+    };
+    
+    RecordType rec1 = {
+        name = "Rec1",
+        fields = {
+            Field {
+                name = "intField",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "stringField",
+                type = refBy(StringType),
+                optional = true
+            }
+        }
+    };
+    
+    // ------------ individual, reusable services ------------------
+        
+    Service mySourceService = JavaService {
+        id = "mySource",
+        name = "mySource example",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "MySourceImpl",
+        artifact = "",
+        kind = ServiceKind::SOURCE_SERVICE,
+        output = {{type=refBy(StringType)}}
+    };
+    
+    RecordType myConnMachineIn = {
+        name = "myConnMachineIn",
+        fields = {
+            Field {
+                name = "dataField",
+                type = refBy(StringType),
+                optional = true
+            }, Field {
+                name = "axis",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "cmdField",
+                type = refBy(StringType)
+            }, Field {
+                name = "nested",
+                type = refBy(myNestedArrayType)
+            }
+        }        
+    };
+    
+    ArrayType myNestedArrayType = {
+        name = "MyNested[]",
+        type = refBy(myNestedType)
+    }; 
+    
+    RecordType myNestedType = {
+        name = "MyNested",
+        fields = {
+            Field {
+                name = "state",
+                type = refBy(StringType)
+            }
+        }
+    };
+
+    RecordType myConnMachineOut = {
+        name = "myConnMachineOut",
+        fields = {
+            Field {
+                name = "cmdField",
+                type = refBy(StringType)
+            }, Field {
+                name = "nested",
+                type = refBy(myNestedArrayType)
+            }
+        }        
+    };
+    
+    RecordType myConnPltfIn = {
+        name = "myConnPltfIn",
+        fields = {
+            Field {
+                name = "axis",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "dataField",
+                type = refBy(StringType), 
+                readOnly = true
+            }, Field {
+                name = "nested",
+                type = refBy(myNestedArrayType)
+            }
+        }        
+    };
+    
+    RecordType myConnPltfOut = {
+        name = "myConnPltfOut",
+        fields = {
+            Field {
+                name = "cmdField",
+                type = refBy(StringType)
+            }, Field {
+                name = "nested",
+                type = refBy(myNestedArrayType)
+            }
+        }        
+    };
+    
+    
+    OpcUaV1Connector myOpcUaConn = {
+        id = "myOpcConn",
+        name = "myOpcConn example",
+        description = "",
+        ver = "0.1.0",
+        port = 1234, // default localhost
+        
+        input = {{type=refBy(myConnPltfOut)}}, // PRELIMINARY
+        output = {{type=refBy(myConnPltfIn)}},
+        inInterface = {{type=refBy(myConnMachineIn)}},
+        outInterface = {{type=refBy(myConnMachineOut)}}
+    };
+    
+    MqttV3Connector myMqttConn = {
+        id = "myMqttConn",
+        name = "myMqttConnExample",
+        description = "",
+        ver = "0.1.0",
+        port = 4321, // default localhost
+        
+        input = {{type=refBy(myConnPltfOut)}}, 
+        output = {{type=refBy(myConnPltfIn)}},
+        inChannel = "IN",
+        outChannel = "OUT",
+        inInterface = {{type=refBy(myConnMachineIn)}}, 
+        outInterface = {{type=refBy(myConnMachineOut)}},
+        machineFormatter = JavaMachineFormatter{class="de.iip_ecosphere.platform.connectors.formatter.TextLineFormatter", converterClass="de.iip_ecosphere.platform.connectors.formatter.TextLineFormatter.TextLineFormatterConverter", artifact=""},
+        machineParser = JavaMachineParser{class="de.iip_ecosphere.platform.connectors.parser.JsonInputParser", converterClass="de.iip_ecosphere.platform.connectors.parser.JsonInputParser.JsonInputConverter", resultClass="de.iip_ecosphere.platform.connectors.parser.JsonInputParser.JsonParseResult", artifact=""}
+    };
+
+    Service myAnonymizerService = JavaService {
+        id = "myAnonymizer",
+        name = "myAnonymizer example",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "MyAnonymizerImpl",
+        artifact = "",
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(StringType)}, {type=refBy(myConnPltfIn)}},
+        output = {{type=refBy(rec1)}},
+        parameter = {
+          BooleanParameter {
+            name="passThrough", 
+            defaultValue=false,
+            systemProperty="iip.app.sc1.passThrough"
+          }
+        }
+    };
+
+    Service myKiService = JavaService {
+        id = "myKi",
+        name = "myKi example",
+        description = "",
+        ver = "0.1.0",
+        asynchronous = false,
+        deployable = true,
+        class = "MyKiImpl",
+        artifact = "",
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(rec1)}},
+        output = {{type=refBy(RtsaTestInput)}},
+        parameter = {
+          IntegerParameter {
+            name="threshold", 
+            defaultValue=15
+          }
+        }
+    };
+
+    Service myKiService2 = JavaService {
+        id = "myKi2",
+        name = "Alternative myKi example",
+        description = "",
+        ver = "0.1.0",
+        asynchronous = false,
+        deployable = true,
+        class = "MyKi2Impl",
+        artifact = "",
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(rec1)}},
+        output = {{type=refBy(RtsaTestInput)}},
+        parameter = {
+          IntegerParameter {
+            name="threshold", 
+            defaultValue=15
+          }
+        }
+    };
+    
+    ServiceFamily myKiServiceFamily = ServiceFamily {
+        members = {refBy(myKiService), refBy(myKiService2)},
+        selector = ServiceSelectorBasedFamilyMemberSelector{
+            type=refBy(rec1), 
+            artifact="", // does not exist, just for testing
+            class="de.iip_ecosphere.platform.apps.myApp.MyKiServiceFamilySelector"},
+        id = "myKiFamily",
+        name = "KI family example",
+        description = "",
+        asynchronous = false,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(rec1)}},
+        output = {{type=refBy(RtsaTestInput)}},
+        parameter = {
+          IntegerParameter {
+            name="threshold", 
+            defaultValue=15
+          }
+        }
+    };
+    
+    RecordType RtsaTestInput = {
+        name = "RtsaTestInput",
+        fields = {
+            Field {
+                name = "id",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "value1",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "value2",
+                type = refBy(DoubleType)
+            }
+        }
+    };
+
+    // fixed for now, becomes generic with advanced integration    
+    RecordType RtsaTestOutput = {
+        name = "RtsaTestOutput",
+        fields = {
+            Field {
+                name = "id",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "value1",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "value2",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "confidence",
+                type = refBy(DoubleType)
+            }, Field {
+                name = "prediction",
+                type = refBy(BooleanType)
+            }
+        }
+    };    
+    
+    Service myRtsaService = RtsaService {
+        // file name of RTSA is derived from rtsaVer, file name for instance in RTSA is derived from ver and service name
+        id = "myRtsa",
+        name = "myRtsa example",
+        description = "Test RapidMiner RTSA integration",
+        ver = "0.1.0",
+        deployable = true,
+        input = {{type=refBy(RtsaTestInput)}},
+        output = {{type=refBy(RtsaTestOutput)}},
+        path = "iip_basic/score_v1/"
+        // preliminary, no specific data here so far
+    };
+    
+    Service myAasSinkService = TraceToAasService {
+        id = "aasSink",
+        name = "aasSink",
+        description = "Test AAS sink",
+        deployable = true,
+        application = refBy(myApp),
+        input = {{type=refBy(RtsaTestOutput)}}
+    };
+    
+    // --------------------- monitoring ---------------------------
+    
+    // currently: instantiation into own component, not part of "platform" component
+    platformMonitoring = PrometheusPlatformMonitoring {
+        schema = PrometheusSchema::HTTP,
+        host = "127.0.0.1",
+        port = 9090,
+        running = false,
+        exporterPort = -1, // ephemeral
+        exporterHost = "127.0.0.1",
+        exporterRunning = false,
+        alertMgrPort = 9091,
+        alertMgrHost = "127.0.0.1",
+        alertMgrRunning = false,
+        scrapeInterval = 1001,
+        scrapeTimeout = 1000
+    };
+    
+    // ------------------------- UI -------------------------------
+    
+    managementUi = AngularManagementUI {
+        port = 4200
+    };
+
+    // ------------ application and service nets ------------------
+    
+    Application myApp = {
+        id = "myApp",
+        name = "myApp example",
+        ver = "0.1.0",
+        description = "",
+        services = {refBy(myMesh)},
+        servers = {refBy(pyServer)},
+        debug = true,
+        packaging = {AppPackagingSchema::SpringFat, AppPackagingSchema::ZipWithClasspath}, // default is one, test with two
+        nameplateInfo = {
+            manufacturerProductDesignation = "IIP-Ecosphere plattform test application@de",
+            manufacturer = refBy(manufacturer_sse)}
+    };
+    
+    ServiceMesh myMesh = {
+        description = "initial service net",
+        sources = {refBy(mySource), refBy(myOpcConn), refBy(myMqttC)}
+    };
+    
+    MeshSource myOpcConn = {
+       impl = refBy(myOpcUaConn),
+       next = {refBy(myOpcConnMyAnonymizer)}
+    };
+
+    MeshConnector myOpcConnMyAnonymizer = {
+        name = "MyOpcConn->MyAnonymizer",
+        next = refBy(myAnonymizer)
+    };
+
+    MeshSource myMqttC = {
+       impl = refBy(myMqttConn),
+       next = {refBy(myMqttConnMyAnonymizer)}
+    };
+    
+    MeshConnector myMqttConnMyAnonymizer = {
+        name = "MyMqttConn->MyAnonymizer",
+        next = refBy(myAnonymizer)
+    };
+    
+    MeshSource mySource = {
+        impl = refBy(mySourceService),
+        next = {refBy(myConnMySourceMyAnonymizer)}
+    };
+    
+    MeshConnector myConnMySourceMyAnonymizer = {
+        name = "MySource->MyAnonymizer",
+        next = refBy(myAnonymizer)
+    };
+
+    MeshProcessor myAnonymizer = {
+        impl = refBy(myAnonymizerService),
+        next = {refBy(myConnMyAnonymizerMyKi)}
+    };
+
+    MeshConnector myConnMyAnonymizerMyKi = {
+        name = "MyAnonymizer->MyKi",
+        next = refBy(myKi)
+    };
+
+    MeshProcessor myKi = {
+        impl = refBy(myKiServiceFamily),
+        next = {refBy(myConnMyKiMyRtsa)}
+    };
+
+    MeshConnector myConnMyKiMyRtsa = {
+        name = "MyKi->MyRtsa",
+        next = refBy(myRtsa)
+    };
+
+    MeshProcessor myRtsa = {
+        impl = refBy(myRtsaService),
+        next = {refBy(myConnMyRtsaMyAasSink)}
+    };
+
+    MeshConnector myConnMyRtsaMyAasSink = {
+        name = "MyRtsa->AasSink",
+        next = refBy(myAasSink)
+    };
+
+    MeshSink myAasSink = {
+        impl = refBy(myAasSinkService)
+    };
+    
+    DeploymentPlan plan1 = {
+       name = "This is plan1",
+       application = refBy(myApp),
+       id = "plan1",
+       ver = "1.2.3",
+       description = "My Deployment Plan",
+       parallelize = true,
+       onUndeployRemoveArtifact = true,
+       disabled = false,
+       cmdArg="--a=5,--b=6",
+       assignments={
+           NamedServiceAssignment{resource="res1",services={refBy(mySource), refBy(myAnonymizer), refBy(myMqttC), refBy(myOpcConn)}}, 
+           NamedServiceAssignment{resource="res2",services={refBy(myKi), refBy(myRtsa), refBy(myAasSink)}}
+       }, 
+       ensembles={{leader=refBy(mySource), member=refBy(myAnonymizer)}},
+       servers={NamedServerAssignment{server=refBy(pyServer), hostId="res1"}},
+       parameter={ParameterServiceAssignment{service=refBy(myAnonymizerService), parameter={BooleanParameterAssignment{parameter="passThrough", value=true}}}}
+    };
+    
+    PythonServer pyServer = { // avoid flower dependencies in test
+        id="test-pyServer", 
+        host="localhost", 
+        port=9871,
+        transportChannel="MyChannel",
+        description = "Test server",
+        ver = "1.3.0" 
+    };
+    
+    // ---------- generation setup ------------
+    
+    containerGeneration = false;
+    sharedInterfaces = true;
+    // default sharedArtifact, not used in testing
+    modelBaseFolder = "../../.."; // gen/test/SerializerConfig1
+    metaModelFolder = "src/main/easy";
+    configFolder = "src/test/easy";
+    genTarget = ".";
+    modelName = "SerializerConfig1";
+
+    // ------------ freezing ------------------
+    
+    freeze {
+        sharedInterfaces;
+        sharedArtifact;
+        platformMonitoring;
+        managementUi;
+        modelBaseFolder;
+        metaModelFolder;
+        configFolder;
+        genTarget;
+        modelName;
+        containerGeneration;
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}

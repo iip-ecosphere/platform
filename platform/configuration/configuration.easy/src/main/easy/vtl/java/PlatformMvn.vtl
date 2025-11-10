@@ -1,0 +1,71 @@
+import Basics;
+import MavenBasics;
+import JavaMapping;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, Boolean monitoring) {
+
+    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, Boolean monitoring) {
+        String iipGroup = "de.iip-ecosphere.platform";
+        String springGroup = "org.springframework.boot";
+        String projectVersion = "\\${project.version}";
+        String artifactId;
+        
+        XmlElement project = createMavenRoot(target);
+        if (monitoring) {
+            artifactId = "monitoring.exec";
+            createMavenProjectAttributes(project, artifactId, "ConfiguredPlatformMonitoringInstance", "Configured platform monitoring instance");
+        } else {
+            artifactId = "platform.exec";
+            createMavenProjectAttributes(project, artifactId, "ConfiguredPlatformInstance", "Configured platform instance");
+        }
+        createMavenParent(project, iipGroup, "platformDependenciesBOM", "${config.iipVer}");
+        
+        XmlElement dep = createDependencies(project);
+        appendDependency(dep, iipGroup, "support", projectVersion); 
+        appendOktoflowPlugins(dep, projectVersion);
+        appendDependency(dep, iipGroup, "configuration.easy", projectVersion);
+        XmlElement d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
+        if (monitoring) {
+            // conflicts on Linux with Tomcat
+            XmlElement e = new XmlElement(new XmlElement(d, "exclusions"), "exclusion");
+            new XmlElement(e, "groupId", "org.apache.tomcat");
+            new XmlElement(e, "artifactId", "tomcat-catalina");
+        } else {
+            appendDependency(dep, iipGroup, aasServerModule(config), projectVersion);
+        }
+        appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
+        if (monitoring) {
+            if (config.platformMonitoring.isKindOf(PrometheusPlatformMonitoring)) {
+                // does not override somehow in monitoring.prometheus, wrong version occurs here
+                appendDependency(dep, "io.micrometer", "micrometer-registry-prometheus", "1.8.3");
+            }
+            appendDependency(dep, iipGroup, centralMonitoringModule(config), projectVersion);
+            appendDependency(dep, iipGroup, "monitoring", projectVersion);
+        } else {
+            appendDependency(dep, iipGroup, deviceRegistryModule(config), projectVersion);
+            appendDependency(dep, iipGroup, deviceMgtStorageModule(config), projectVersion);
+            appendDependency(dep, iipGroup, "configuration.configuration", projectVersion);
+            appendDependency(dep, iipGroup, "platform", projectVersion);
+            appendDependency(dep, iipGroup, managementUiModule(config), projectVersion);
+        }
+        appendArtifact(dep, deviceIdProviderModule(config));
+        addSemanticIdResolverDependencies(dep, config);
+        appendIipBaseDependencies(dep);
+        
+        XmlElement plugins = createMavenBuildElement(project, "", true);
+        appendMavenJarPlugin(plugins, "2.3", false, main);
+XmlElement dPlug = appendMavenIipDependencyPlugin(plugins);
+XmlElement ex2 = appendExecutionsParent(dPlug);
+appendMavenDependencyPluginCopyDepsExecution(ex2, jarDir="../${dir}", copyOwn=true);
+appendWinLinuxDependencyPluginBuildClasspathExecution(ex2, dir, ownArtifact="${iipGroup}.${artifactId}-${config.iipVer}");
+        appendCompilerPlugin(plugins);
+        appendSurefirePlugin(plugins, tests=tests);
+
+        sequenceOf(String) files = defltOktoResourceFiles();
+        ex2 = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder()+"/software", files, id="sw-res");
+        appendMavenResourcesCopyResourcesExecution(ex2, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder()+"/platform", files, id="platf-res");
+    }
+
+}

@@ -1,0 +1,301 @@
+project Applications {
+
+    import Connectors;
+    import ConnectorsPart*;
+    import DataTypes;
+    import DataTypesPart*;
+    import Nameplate;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    annotate Integer uiGroup = UiMandatoryGroup1 to .;
+    annotate String displayName = "" to .;
+
+    enum AppPackagingSchema {SpringFat, ZipWithClasspath};
+    
+    compound TypeSubstitution {
+        refTo(DataType) fromType;
+        refTo(DataType) toType;
+        
+        Constraint fromTypeGiven = isDefined(fromType) and fromType<>null;
+        Constraint toTypeGiven = isDefined(toType) and toType<>null;
+        Constraint isRefining = isRefining(fromType, toType);
+    }
+    
+    @DispatchBasis
+    def Boolean isRefining(DataType fromType, DataType toType) = 
+        false;
+
+    @DispatchCase
+    def Boolean isRefining(RecordType fromType, RecordType toType) = 
+        createRecordTypeSet(toType)->closure(RecordType t|t.refining).includes(fromType);
+        
+    compound Application refines VersionedElement {
+        Id id;
+        NonEmptyNameString name;
+        assign (uiGroup = UiOptionalGroup1) to {
+            Description description = "";
+            String artifact = "";
+        }
+        assign (displayName = "meshes") to {
+            setOf(refTo(ServiceMesh)) services; // no services is ok, then the artifact must have hand-crafted services
+        }
+        NameplateInfo nameplateInfo;
+        assign (uiGroup = UiOptionalGroup1) to {
+            Boolean createContainer = false;
+            Boolean debug = false;
+            String cmdArg; // for now, comma separated
+            setOf(refTo(Server)) servers = {}; // additional server instances to be started
+            setOf(AppPackagingSchema) packaging = { AppPackagingSchema::SpringFat };
+            setOf(TypeSubstitution) typeSubstitutions = {};
+            sequenceOf(refTo(DisplayRow)) displayRows = {};
+        }
+        assign (uiGroup = UiInvisibleGroup) to {
+            String derivedFrom = null;
+        }
+        
+        Constraint idOk = matches(id, "^[^@]+$");
+        Constraint packagingOk = packaging.size() >= 1;
+    }
+    
+    // deprecated, use mvnVersion from DataTypes instead
+    def String appVersion(Application a) = 
+       mvnVersion(a);
+    
+    Constraint appNamesUnique = allInstances(Application)->isUnique(a|a.name);
+    Constraint appIdUnique = allInstances(Application)->isUnique(a|a.id);
+    
+    compound ServiceMesh {
+        String description;
+        sequenceOf(refTo(MeshSource)) sources;
+
+        Constraint meshElementsUnique = self.sources->closure(refTo(MeshElement) e|nextElts(e))
+            .toSequence()->isUnique(e|e.name);
+    }
+
+    compound SubServiceMesh refines ServiceBase {
+        setOf(refTo(MeshConnector)) sources;
+        MeshSink pseudoSink;
+        Constraint inOk = input == subMeshInput(self);
+        Constraint outOk = output == subMeshOutput(self);
+    } 
+    
+    def sequenceOf(IOType) subMeshInput(SubServiceMesh mesh) =
+        mesh.sources.toSequence()
+        ->collect(c|c.next)
+        ->collectNested(refTo(MeshElement) e|e.impl.input) 
+        ->reject(sequenceOf(IOType) i|i.isEmpty())
+        .flatten();
+    def sequenceOf(refTo(MeshElement)) sinks(SubServiceMesh mesh) = 
+        mesh.sources
+        ->collect(c|c.next)
+        ->closure(refTo(MeshElement) e|nextElts(e))
+        ->reject(refTo(MeshElement) e|e.kind<>ServiceKind.SINK_SERVICE)
+        .toSequence();
+    def sequenceOf(IOType) subMeshOutput(SubServiceMesh mesh) = {}; // sinks(mesh)->collect(s|s.impl.output)->reject(i|i.isEmpty());
+    
+    compound MeshElement {
+        String name; // no specific string, pulled up
+        ServiceKind kind;
+        refTo(ServiceBase) impl; // allow for family or service
+        refTo(MeshElement) ensemble = null; // in same process as referenced, usually not; here not in service to facilitate service reuse
+        assign (bindingTime = BindingTime::runtimeEnact) to {
+            Integer pos_x = -1;
+            Integer pos_y = -1;
+        }
+        
+        Constraint implName = name == impl.name; // propagate
+        Constraint implKind = kind == impl.kind; // propagate
+        Constraint ensembleOk = ensemble <> null implies (ensemble <> refBy(self) and not(ensemble.ensemble <> null)); // no self-loops, max 1-chains
+    }
+
+    @dispatchBasis
+    def setOf(refTo(MeshElement)) nextElts(MeshElement elt) = {};
+    @dispatchCase
+    def setOf(refTo(MeshElement)) nextElts(MeshSource src) = src.next->collect(c|c.next);
+    @dispatchCase
+    def setOf(refTo(MeshElement)) nextElts(MeshInnerElement elt) = elt.next->collect(c|c.next);
+    
+    // hint to requirements!
+    compound MeshConnector refines CConnector {
+        refTo(MeshElement) next;
+    }
+    
+    compound MeshSource refines MeshElement {
+        setOf(refTo(MeshConnector)) next;
+        Integer pollInterval = 1000; //in ms, ignored if negative or asynchronous
+        sequenceOf(IOType) output;
+
+        Constraint sourceOut = output == impl.output;
+        Constraint sourceKind = kind == ServiceKind::SOURCE_SERVICE;
+        Constraint inOutCheck = next->forAll(n|typeCheck(self, n.next));
+    }
+    
+    abstract compound MeshInnerElement refines MeshElement {
+        setOf(refTo(MeshConnector)) next;
+    }
+    
+    compound MeshProcessor refines MeshInnerElement {
+        sequenceOf(IOType) input;
+        sequenceOf(IOType) output;
+
+        Constraint procIn = input == impl.input;
+        Constraint procOut = output == impl.output;
+        Constraint procKind = kind == ServiceKind::TRANSFORMATION_SERVICE or kind == ServiceKind::PROBE_SERVICE;
+        Constraint inOutCheck = next->forAll(n|typeCheck(self, n.next));
+    }
+    
+    compound MeshSink refines MeshInnerElement {
+        sequenceOf(IOType) input;
+        
+        Constraint sinkIn = input == impl.input;
+        Constraint sinkKind = kind == ServiceKind::SINK_SERVICE;
+    }
+    
+    // output-input check, selection via dynamic dispatch, all relevant combinations needed due to type-specific setup 
+    // of i/o above; if not both sides are defined, propagate them along the service mesh; if propagation fails, mesh
+    // is anyway invalid; currently only check for unique type names 
+    
+    @dispatchBasis
+    def Boolean typeCheck(MeshElement start, MeshElement end) = 
+        true;
+    
+    @dispatchCase
+    def Boolean typeCheck(MeshSource start, MeshSink end) =
+        typeCheck(start.output, end.input); 
+    
+    @dispatchCase     
+    def Boolean typeCheck(MeshSource start, MeshProcessor end) =
+        typeCheck(start.output, end.input); 
+    
+    @dispatchCase
+    def Boolean typeCheck(MeshProcessor start, MeshSink end) =
+        typeCheck(start.output, end.input); 
+
+    def Boolean typeCheck(sequenceOf(IOType) start, sequenceOf(IOType) end) = 
+        fwdTypes(start)->collect(IOType t|collectForType(t, t.type)).flatten().overlaps(fwdTypes(end)->collect(IOType t|collectForType(t, t.type)).flatten());
+
+    @dispatchBasis
+    def sequenceOf(String) collectForType(IOType ioType, DataType type) = {ioType.name};
+    @dispatchCase
+    def sequenceOf(String) collectForType(IOType ioType, RecordType type) = type.fields->collect(Field f|f.name + "|" + f.type.name);
+    
+   // ------------------------------ platform trace -> AAS service -------------------
+
+   // data ignored for now, only tracing   
+   compound TraceToAasService refines CompleteService {
+       ServiceKind kind = ServiceKind::SINK_SERVICE;
+       OktoVersion ver = "0.1.0";
+       String artifact = ""; // ships with platform in service environment
+       refTo(Application) application;
+       TraceToAasOutTransport outTransport = null;
+       NameplateInfo nameplateInfo = {
+           manufacturerProductDesignation = "Application AAS with Trace embedding@en",
+           manufacturer = refBy(manufacturer_sse)
+       };
+       Parameters parameter = dfltTraceToAasServiceParameter;
+       Constraint parameterOk = parameter.includesAll(dfltTraceToAasServiceParameter);
+   }
+   
+   Parameters dfltTraceToAasServiceParameter = {
+       LongParameter{name="timeout", defaultValue=3600000}
+   };
+   
+   compound TraceToAasOutTransport {
+       NonEmptyString host;
+       Port port;
+       SecuritySettings security = null;
+   }
+   
+   compound TraceToAasJavaService refines JavaService {
+       TraceToAasOutTransport outTransport = null;
+   }
+   
+   // ------------------------------- deployment --------------------------------------
+   
+   // deployment plan, outside application allowing to keep the plan local while application can be shared
+   // explicit container specification is currently not intended, the artifact is derived
+   compound DeploymentPlan {
+       NonEmptyString name;
+       refTo(Application) application;
+       NonEmptyString id;
+       OktoVersion ver = "0.0.0";
+       String description = "";
+       sequenceOf(ServiceAssignment) assignments = {};
+       sequenceOf(EnsembleSpec) ensembles;
+       Boolean parallelize = false;
+       Boolean onUndeployRemoveArtifact = false;
+       Boolean allowMultiExecution = true;
+       Boolean disabled = false;
+       String cmdArg; // for now, comma separated as in application
+       sequenceOf(ServerAssignment) servers = {};
+       sequenceOf(ParameterServiceAssignment) parameter = {};
+       
+       Constraint hasAssignments = isDefined(self.assignments);
+       Constraint meshCovered = sources(self.application)->closure(refTo(MeshElement) e|nextElts(e)) 
+           == self.assignments->collect(a|a.services).flatten().toSet();
+       Constraint noLoopEnsembles = not(self.ensembles->collect(e|e.member).overlaps(self.ensembles->collect(e|e.leader)));
+       Constraint parameterServicesUnique = parameter->isUnique(a|a.service);
+       Constraint parameterNamesUnique = parameter->forAll(a|a.parameter->isUnique(t|t.parameter));
+   }
+   
+   def setOf(refTo(MeshElement)) sources(Application app) = app.services->collect(m|m.sources).flatten().selectByKind(refTo(MeshElement));
+
+   Constraint deployPlanIdUnique = allInstances(DeploymentPlan)->isUnique(d|d.id);
+   
+   compound EnsembleSpec {
+       refTo(MeshElement) leader;
+       refTo(MeshElement) member;
+   }
+   
+   abstract compound ServerAssignment {
+       refTo(Server) server;
+       //Constraint serverAssignmentServerDefined = isDefined(self.server) and self.server<>null;
+   }
+
+   compound NamedServerAssignment refines ServerAssignment{
+       NonEmptyString hostId;
+   }
+   
+   abstract compound ServiceAssignment {
+       sequenceOf(refTo(MeshElement)) services;
+   }
+   
+   // basic version as for now, future may reference to Resource
+   compound NamedServiceAssignment refines ServiceAssignment {
+       NonEmptyString resource;
+   }
+   
+   compound ParameterServiceAssignment {
+       refTo(Service) service;
+       setOf(ParameterAssignment) parameter = {};
+   }
+   
+   abstract compound ParameterAssignment {
+       NonEmptyString parameter; // currently does not work with reference to parameter in service
+   }
+
+   compound StringParameterAssignment refines ParameterAssignment {
+       String value;
+   }
+
+   compound IntegerParameterAssignment refines ParameterAssignment {
+       Integer value;
+   }
+
+   compound RealParameterAssignment refines ParameterAssignment {
+       Real value;
+   }
+
+   compound BooleanParameterAssignment refines ParameterAssignment {
+       Boolean value;
+   }
+
+   compound LongParameterAssignment refines ParameterAssignment {
+       Integer value;
+   }
+   
+   freeze {
+       dfltTraceToAasServiceParameter;
+   } but (f|f.bindingTime >= BindingTime.runtimeMon);
+   
+}

@@ -1,0 +1,25 @@
+import Basics;
+import JavaBasics;
+import MavenBasics;
+import JavaMapping;
+import MeshBasics;
+import SpringCloudStreamDeploymentDescriptorBase;
+insert SpringCloudStreamDeploymentDescriptorPart*;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(profile="yaml", indentSteps = 4, profileArg_sorting = "INSERT", profileArg_indicatorIndent="2")
+template SpringCloudStreamDeploymentDescriptor(Configuration config, YamlFileArtifact target, Application app, sequenceOf(MeshElement) elements) extends SpringCloudStreamDeploymentDescriptorBase {
+
+    def main(Configuration config, YamlFileArtifact target, Application app, sequenceOf(MeshElement) elements) {
+        YamlNode n = target.addDocument(true);
+        n.addValue("id", app.id);
+        n.addValue("name", app.name);
+        n.addValue("version", app.ver);
+        generateAppSetup(app, n);
+        generateTypes(elements, n);
+        generateServices(elements, n.addList("services"));
+        generateServers(app, n);
+    }
+
+}

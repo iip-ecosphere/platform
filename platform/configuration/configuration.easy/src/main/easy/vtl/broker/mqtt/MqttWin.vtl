@@ -1,0 +1,20 @@
+import MqttBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(lineEnd = "windows")
+template MqttWin(IIPEcosphere config, FileArtifact target, String addJavaOpts="") {
+	
+    def main(IIPEcosphere config, FileArtifact target, String addJavaOpts="") {
+        Integer port = config.transportProtocol.port;
+        String host = getHostOpt(config);
+        '@echo off
+        set PORT=${port}
+        if "%~1"=="" goto blank
+        set PORT=%~1
+        
+        :blank
+        java ${addJavaOpts} -cp "brokerJars/*" ${vmOpt} test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer %PORT% ${host} %*'
+    }
+	
+}

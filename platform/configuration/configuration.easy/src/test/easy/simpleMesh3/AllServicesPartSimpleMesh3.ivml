@@ -1,0 +1,60 @@
+project AllServicesPartSimpleMesh3 {
+
+    import AllTypes; 
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    Service mySourceService = JavaService {
+        id = "SimpleSource3",
+        name = "Simple Data Source3",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = false,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleSource3Impl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::SOURCE_SERVICE,
+        output = {{type=refBy(rec1)}}
+    };
+
+    Service myTransformerService = JavaService {
+        id = "SimpleTransformer3",
+        name = "Simple Data Transformer3",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = false,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleTransformer3Impl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(rec1)}},
+        output = {{type=refBy(rec1)}}
+    };
+    
+    Service myReceiverService = JavaService {
+        id = "SimpleReceiver3",
+        name = "Simple Data Receiver3",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleReceiver3Impl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::SINK_SERVICE,
+        input = {{type=refBy(rec1)}}
+    };
+
+    // just the type for mgtUI testing    
+    Server myServer = JavaServer {
+      id = "myServer",
+      description = "Unneeded server",
+      ver = "0.0.1",
+      host = "localhost",
+      port = 9989,
+      class = "java.lang.Object", // placeholder, will not work -> Server interface
+      cmdArg = "--port=${port}"
+    };
+   
+    freeze {
+        .;
+    }
+}

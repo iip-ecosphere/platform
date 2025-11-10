@@ -45,12 +45,13 @@ public class IvmlKodexMeshTests extends AbstractIvmlTests {
 
         File base = new File(gen, "ApplicationInterfaces");
         File srcMain = new File(base, "src/main");
-        File srcMainPython = new File(srcMain, "python");
+        //File srcMainPython = new File(srcMain, "python");
         File srcMainAssembly = new File(srcMain, "assembly");
 
         assertFile(srcMainAssembly, "pythonInterfaces.xml");
         //assertFile(srcMainAssembly, "javaInterfaces.xml"); // new style
 
+        /* done by Maven build steps
         extractPythonServiceEnv(srcMainPython);
         pythonSourceCodeCheck(srcMainPython, "datatypes/KRec13.py");
         pythonSourceCodeCheck(srcMainPython, "datatypes/KRec13Impl.py");
@@ -58,11 +59,11 @@ public class IvmlKodexMeshTests extends AbstractIvmlTests {
         pythonSourceCodeCheck(srcMainPython, "datatypes/KRec13AnonImpl.py");
         pythonSourceCodeCheck(srcMainPython, "serializers/KRec13Serializer.py");
         pythonSourceCodeCheck(srcMainPython, "serializers/KRec13AnonSerializer.py");
-        pythonSourceCodeCheck(srcMainPython, "interfaces/KodexPythonServiceInterface.py");
+        pythonSourceCodeCheck(srcMainPython, "interfaces/KodexPythonServiceInterface.py");*/
         
         base = new File(gen, "SimpleKodexTestingApp");
         srcMain = new File(base, "src/main");
-        srcMainPython = new File(srcMain, "python");
+        //srcMainPython = new File(srcMain, "python");
         srcMainAssembly = new File(srcMain, "assembly");
         
         assertFile(srcMainAssembly, "kodex_pseudonymizer.xml");

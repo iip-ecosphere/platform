@@ -1,0 +1,52 @@
+import Basics;
+import JavaBasics;
+import MavenBasics;
+import JavaMapping;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template EcsServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, EcsDevice deviceType) {
+
+    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, EcsDevice deviceType) {
+        String iipGroup = "de.iip-ecosphere.platform";
+        String springGroup = "org.springframework.boot";
+        String projectVersion = "\\${project.version}";
+        String artifactId = "ecsServices.exec${getContainerNameInfix(deviceType)}";
+        
+        XmlElement project = createMavenRoot(target);
+        createMavenProjectAttributes(project, artifactId, "ConfiguredEcsServiceControl", "Configured ECS Runtime for small resources, no container manager, but service control");
+        createMavenParent(project, iipGroup, "platformDependenciesSpring", "${config.iipVer}");
+        
+        XmlElement dep = createDependencies(project);
+        appendDependency(dep, iipGroup, "support", projectVersion);
+        appendOktoflowPlugins(dep, projectVersion);
+        appendDependency(dep, iipGroup, "ecsRuntime", projectVersion);
+        appendDependency(dep, iipGroup, "services", projectVersion);
+        appendDependency(dep, iipGroup, serviceManagerModule(config), projectVersion);
+        XmlElement d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
+        XmlElement ex = new XmlElement(new XmlElement(d, "exclusions"), "exclusion");
+        new XmlElement(ex, "groupId", "javax.el");
+        new XmlElement(ex, "artifactId", "el-api");
+        appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
+        appendDependency(dep, springGroup, "spring-boot-starter-web");
+        appendDependency(dep, springGroup, "spring-boot-starter-actuator");
+        appendArtifact(dep, deviceIdProviderModule(config));
+        addSemanticIdResolverDependencies(dep, config);
+        appendIipBaseDependencies(dep);
+        for (String d:deviceType.requiredModules) {
+            appendArtifact(dep, "${d}");
+        }
+        
+        XmlElement plugins = createMavenBuildElement(project, "", true);
+        appendMavenJarPlugin(plugins, "2.3", false, main);
+        XmlElement dPlug = appendMavenIipDependencyPlugin(plugins);
+        XmlElement ex2 = appendExecutionsParent(dPlug);
+        appendMavenDependencyPluginCopyDepsExecution(ex2, jarDir="../${dir}", copyOwn=true);
+        appendWinLinuxDependencyPluginBuildClasspathExecution(ex2, dir, ownArtifact="${iipGroup}.${artifactId}-${config.iipVer}");
+
+        sequenceOf(String) files = defltOktoResourceFiles();
+        ex2 = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder()+"/devices", files, id="dev-res");
+        appendMavenResourcesCopyResourcesExecution(ex2, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder()+"/platform", files, id="platf-res");
+    }
+
+}

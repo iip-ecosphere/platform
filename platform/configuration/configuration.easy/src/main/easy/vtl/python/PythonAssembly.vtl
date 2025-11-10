@@ -1,0 +1,62 @@
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template PythonAssembly(IIPEcosphere config, XmlFileArtifact target, Boolean withServices, String dependency="", String dependency2="") {
+
+    def generateExcludes(Boolean withServices) {
+       if (withServices) {
+           ''
+       } else {
+            '<excludes>
+                <exclude>**/services/*.py</exclude>
+            </excludes>'
+       }
+    }
+    
+    def dependencyInclude(String dependency) {
+        if (length(dependency) > 0) {
+            '<include>${dependency}</include>'
+        } else {
+            ''
+        }
+    }
+    
+    def dependencySet(String dependency, String dependency2) {
+        '<dependencySets>
+            <dependencySet>
+                <includes>
+                    <include>${config.mvnIipGroup}:services.environment:zip:python:${config.iipVer}</include>
+                    ${dependencyInclude(dependency)|e}
+                    ${dependencyInclude(dependency2)|e}
+                </includes>
+                <unpack>true</unpack>
+            </dependencySet>
+        </dependencySets>'
+    }
+
+    def main(IIPEcosphere config, XmlFileArtifact target, Boolean withServices, String dependency, String dependency2="") {
+        '<assembly
+            xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3 http://maven.apache.org/xsd/assembly-1.1.3.xsd">
+            <id>python</id>
+            <formats>
+                <format>zip</format>
+            </formats>
+            <baseDirectory>iip</baseDirectory>
+            <includeBaseDirectory>false</includeBaseDirectory>
+            ${dependencySet(dependency, dependency2)|e}
+            <fileSets>
+                <fileSet>
+                    <directory>\\${project.basedir}/src/main/python</directory>
+                    <outputDirectory/>
+                    <includes>
+                        <include>**/*.*</include>
+                    </includes>
+                    ${generateExcludes(withServices)|e}
+                    <useDefaultExcludes>true</useDefaultExcludes>
+                </fileSet>
+            </fileSets>
+        </assembly>'
+    }
+
+}

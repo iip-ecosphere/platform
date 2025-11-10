@@ -1,0 +1,29 @@
+project ServicePartRtsa {
+
+   import Services;
+   
+   annotate BindingTime bindingTime = BindingTime::compile to .;
+   
+   compound RtsaIOType refines IOType {
+       String rtsaField;
+   }    
+   
+   compound RtsaService refines CompleteService {
+       ServiceKind kind = ServiceKind::TRANSFORMATION_SERVICE;
+       OktoVersion rtsaVer = "0.14.5";
+       Boolean includesRtsa = false;
+       // file name of RTSA is derived from rtsaVer, file name for instance in RTSA is derived from ver and service name
+       String deployment;
+       String artifact = "de.iip-ecosphere.platform:kiServices.rapidminer.rtsa:" + iipVer;
+       setOf(refTo(Dependency)) dependencies = {refBy(JRE8)};
+       NonEmptyString path;
+       NameplateInfo nameplateInfo = {
+           manufacturerProductDesignation = "RTSA AI service@en",
+           manufacturer = refBy(manufacturer_rapidminer)
+       };
+       asynchronous == true; // always
+       Constraint rtsaInputFlat = input->forAll(t|isFlatDataType(t));
+       Constraint rtsaOutputFlat = input->forAll(t|isFlatDataType(t));
+   }
+   
+}

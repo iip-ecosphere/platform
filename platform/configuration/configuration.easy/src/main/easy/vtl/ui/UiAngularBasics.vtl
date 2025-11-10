@@ -1,0 +1,13 @@
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template UiAngularBasics(IIPEcosphere config, FileArtifact target) {
+
+    def Integer port(ManagementUI ui) {
+        4200;
+    }
+    
+    def Integer port(AngularManagementUI ui) {
+        ui.port;
+    }
+	
+}

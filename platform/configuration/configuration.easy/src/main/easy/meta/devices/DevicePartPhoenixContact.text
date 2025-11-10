@@ -1,0 +1,11 @@
+DevicePartPhoenixContact::PhoenixContactDevice::bits = Bit width of CPU architecture. 
+DevicePartPhoenixContact::PhoenixContactDevice::containerType = Type of container to be generated.
+DevicePartPhoenixContact::PhoenixContactDevice::cpu = CPU architecture
+DevicePartPhoenixContact::PhoenixContactDevice::id = Device type identification.
+DevicePartPhoenixContact::PhoenixContactDevice::mainMemory = The memory of the device in MBytes.
+DevicePartPhoenixContact::PhoenixContactDevice::provides = Specific software dependencies provided by the device through its setup.
+DevicePartPhoenixContact::PhoenixContactDevice::requiredModules = Specific software components required by the device to provide services.
+DevicePartPhoenixContact::PhoenixContactDevice::containerArguments = Arguments to be passed to a container on startup through a container descriptor.
+DevicePartPhoenixContact::PhoenixContactDevice::containerName = The symbolic name of the container used as file name infix.
+DevicePartPhoenixContact::plcNextDeviceType = The default PLCnext (here AXC 3152) device type.
+

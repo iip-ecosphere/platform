@@ -1,0 +1,47 @@
+project ServicePartKodex {
+
+   import Services;
+   
+   annotate BindingTime bindingTime = BindingTime::compile to .;
+   
+   // initial, unclear, input missing
+   // https://heykodex.com/docs/actions/pseudonymization
+   enum KodexAction {
+       PseudonymizeMerengue, PseudonymizeHmac, PseudonymizeStructured
+   };
+   
+   // applies KodexAction to field
+   compound KodexFieldAction {
+       refTo(Field) field;
+       KodexAction action;
+       // initial, not nice
+       String type = ""; // for Structured
+       String format = ""; // for Structured
+       Boolean preservePrefixes = false; // for Structured
+       Integer typeIntMin = 0; // for Structured
+       Integer typeIntMax = 0; // for Structured
+   }
+   
+   compound KodexService refines CompleteService {
+       setOf(KodexFieldAction) actions;
+       ServiceKind kind = ServiceKind::TRANSFORMATION_SERVICE;
+       OktoVersion ver = "0.7.0";
+       String artifact = "de.iip-ecosphere.platform:security.services.kodex:" + iipVer;
+       setOf(refTo(Dependency)) dependencies = {refBy(lxLibc6Compat)};
+       NameplateInfo nameplateInfo = {
+           manufacturerProductDesignation = "KODEX anonymizer/pseudonymizer service@en",
+           manufacturer = refBy(manufacturer_kiprotect)
+       };       // asynchronous true
+       // deployable may influcence integration type
+       // integration type: CMD, REST, CENTRAL
+       // TODO constraint all action fields must match input/output fieldsM actions must be defined
+       // TODO #input=#output -> _kip
+       // TODO unclear - multiple types per DataForm, multiple DataForms, prevent same id, nested fields
+   }
+   
+   LinuxSystemDependency lxLibc6Compat = {
+       key = "",
+       name = "libc6-compat"
+   };
+      
+}

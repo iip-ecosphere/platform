@@ -1,0 +1,74 @@
+project IIPEcosphere {
+
+    import UI; 
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    annotate String semanticId = "" to .;
+    
+    String javaModuleOpts = "--add-opens java.base/jdk.internal.misc=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED";
+    String javaOpts = "-Dio.netty.tryReflectionSetAccessible=true -Dlog4j2.formatMsgNoLookups=true";
+    String pidDir = "/run"; // linux only, windows goes to tmp
+    const String instDirDflt = "/opt/iip";
+    String instDir = instDirDflt; // linux/system.d only; values taken as default if not frozen
+    const String javaExeDflt = "/opt/iip/java";
+    String javaExe = javaExeDflt; // symlink in instDir
+    String artifactsFolderDflt = "artifacts";
+    String artifactsFolder = artifactsFolderDflt;
+    String artifactsUriPrefix = "";
+    String uploadFolder; // if not given, same as artifactsFolder
+    String footprintFolderDflt = "target/footprints";
+    String footprintFolder = footprintFolderDflt;
+    String modelBaseFolder = "."; // base folder for metaModel folder and configFolder
+    String metaModelFolder = "src/main/easy";
+    setOf(String) additionalModelFolders;
+    String configFolder = null;
+    String genTarget = "gen";
+    String modelName = "PlatformConfiguration";
+    String pluginsFolderDflt = "plugins";
+    String pluginsFolder = pluginsFolderDflt;
+    Boolean containerGeneration = true; // To generate or skip the creation of all containers.
+    Boolean platformContainerGeneration = true; // To generate or skip the Platform container creation.
+    assign (semanticId = Eclass_Unit_MByte) to {
+        Integer centralMemLimit = 0; // general memory limit for central platform services, e.g., JVM memory limit in MBytes
+        Integer monitoringMemLimit = 256; // general memory limit for central platform services, e.g., JVM memory limit in MBytes
+    }
+    Boolean containerBaseImageMethod = false; // Use container base image method during the container creation.
+    Boolean containerTestingMode = false; // Add more testing software into the containers.
+    Boolean forceContainersCreation = false; // Enforce containers creation regardless of the container's fingerprint.
+    Boolean zipBinaries = false;
+
+    MavenRepository mavenReleaseRepository;
+    MavenRepository mavenSnapshotRepository;
+    MavenDeployType mavenDeployType = MavenDeployType::MAVEN;
+        
+    enum MavenDeployType {
+        MAVEN,
+        NEXUS
+    }; 
+    
+    compound MavenRepository {
+        NonEmptyString id;
+        NonEmptyString name = "oktoflow repository";
+        NonEmptyString url;
+    };
+    
+    // legacy transition (to be removed)
+    Boolean sharedInterfaces = false;
+    String sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfaces:" + iipVer;
+    const Integer deviceHeartbeatTimeoutDflt = 5 * max(containerManager.monitoringUpdatePeriod, serviceManager.monitoringUpdatePeriod);
+    assign (semanticId = Eclass_Unit_ms) to {
+        Integer deviceHeartbeatTimeout = deviceHeartbeatTimeoutDflt;
+    }
+    
+    refTo(SystemDependency) platformPythonDflt = refBy(PYTHON313);
+    refTo(SystemDependency) platformPython = platformPythonDflt;
+ 
+    freeze {
+        instDirDflt;
+        javaExeDflt;
+        artifactsFolderDflt;
+        pluginsFolderDflt;
+        footprintFolderDflt;
+        platformPythonDflt;
+    }
+}

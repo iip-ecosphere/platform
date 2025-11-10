@@ -1,0 +1,15 @@
+ServicePartKodex::KodexFieldAction = Represents a KODEX action
+ServicePartKodex::KodexFieldAction::field = Reference to the field to apply the action to
+ServicePartKodex::KodexFieldAction::action = The actual KODEX action
+ServicePartKodex::KodexFieldAction::type = KODEX type for Structured
+ServicePartKodex::KodexFieldAction::format = KODEX format for Structured
+ServicePartKodex::KodexFieldAction::preservePrefixes = KODEX preserve prefixes setting for Structured
+ServicePartKodex::KodexFieldAction::typeIntMin = KODEX valid minimum integer range for Structured
+ServicePartKodex::KodexFieldAction::typeIntMax = KODEX valid maximum integer range for Structured
+ServicePartKodex::KodexService::actions = KODEX actions to apply
+ServicePartKodex::KodexService::kind = Refined service kind for KODEX
+ServicePartKodex::KodexService::ver = Actual version of KODEX to use
+ServicePartKodex::KodexService::artifact = Refined default artifact for KODEX
+ServicePartKodex::KodexService::nameplateInfo = Refined default nameplate for KODEX
+ServicePartKodex::KodexService::dependencies = Refined default dependencies for KODEX
+ServicePartKodex::lxLibc6Compat = Required Linux library libc6-compat for KODEX

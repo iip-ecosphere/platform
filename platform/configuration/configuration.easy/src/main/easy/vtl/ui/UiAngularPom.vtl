@@ -1,0 +1,91 @@
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template UiAngularPom(IIPEcosphere config, FileArtifact target) {
+	
+    def main(IIPEcosphere config, FileArtifact target) {
+    String ipInConfig = "http://192.168.0.199:9001";
+    EndpointAddress aasServer = config.aasServer;
+    String schema = aasServer.schema.getStringValue();
+    String ipReplacement = "${toLowerCase(schema)}://${aasServer.host}:${aasServer.port}";
+    '<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+        <modelVersion>4.0.0</modelVersion>
+        <artifactId>MgtUi</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${config.iipVer}</version>
+    
+        <dependencies>
+          <dependency>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>managementUi</artifactId>
+            <version>\\${project.version}</version>
+            <type>zip</type>
+            <classifier>bin</classifier>
+          </dependency>
+        </dependencies>
+      
+        <repositories>       
+          <repository>
+            <id>SSE-mvn</id>
+            <name>SSE</name>
+            <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
+            <layout>default</layout>
+          </repository>
+        </repositories>
+    
+        <build>
+          <plugins>
+              <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-dependency-plugin</artifactId>
+                  <version>3.2.0</version>
+                  <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>de.iip-ecosphere.platform</groupId>
+                                    <artifactId>managementUi</artifactId>
+                                    <version>\\${project.version}</version>
+                                    <type>zip</type>
+                                    <classifier>bin</classifier>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>\\${project.basedir}</outputDirectory>
+                                    <destFileName>angularMgtUi.zip</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                  </executions>
+              </plugin>
+              
+              <!-- Somehow, UI does not read IP; replace it in compiled version -->
+              <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                  <execution>
+                    <phase>prepare-package</phase>
+                    <configuration>
+                      <target>
+                        <replace token="${ipInConfig}" value="${ipReplacement}" dir="dist/iipes-web">                                 
+                          <include name="main.*.js"/>
+                        </replace>
+                      </target>
+                    </configuration>
+                    <goals>
+                      <goal>run</goal>
+                    </goals>
+                  </execution>
+                </executions>
+              </plugin>              
+          </plugins>
+        </build>
+      
+    </project>'
+    }
+	
+}

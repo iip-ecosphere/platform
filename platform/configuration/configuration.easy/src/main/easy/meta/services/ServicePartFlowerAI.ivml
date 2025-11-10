@@ -1,0 +1,36 @@
+project ServicePartFlowerAI {
+
+   import Services;
+   import ServerPartFlowerAI;
+   
+   annotate BindingTime bindingTime = BindingTime::compile to .;
+
+   compound FlowerAiClient {
+       setOf(refTo(Dependency)) dependencies;
+   }
+   
+   FlowerAiClient NumpyFlowerAiClient = {
+       dependencies = {refBy(NumPy1220)}
+   };
+   
+   compound FlowerFederatedAiService refines PythonService {
+       ServiceKind kind = ServiceKind::TRANSFORMATION_SERVICE;
+       OktoVersion ver = "1.3.0";
+       refTo(FlowerAiFramework) framework = refBy(TensorFlowFlowerAiFramework);
+       refTo(FlowerAiClient) client = refBy(NumpyFlowerAiClient);
+       refTo(FlowerFederatedAiServer) server;
+       setOf(refTo(Dependency)) dependencies = reqFlowerDependencies.union(framework.dependencies).union(client.dependencies);
+       NameplateInfo nameplateInfo = {
+           manufacturerProductDesignation = "Generic Flower FL AI service@en",
+           manufacturer = refBy(manufacturer_sse)
+       };
+       asynchronous == true; // always
+       Constraint reqDependenciesOk = dependencies.includesAll(reqFlowerDependencies.union(framework.dependencies).union(client.dependencies));
+       Constraint frameworkOk = framework == server.framework;
+   }
+   
+   freeze {
+       NumpyFlowerAiClient;
+   }
+   
+}

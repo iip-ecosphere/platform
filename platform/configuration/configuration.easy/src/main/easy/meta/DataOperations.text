@@ -1,0 +1,16 @@
+DataOperations::TransferAssignmentOperation::field = The target field of the assignment.
+DataOperations::FieldAssignmentOperation::field = The field to assign the resulting value of "operation" to.
+DataOperations::FieldAssignmentOperation::operation = The operation determining the new value of field.
+DataOperations::TransferAssignmentOperation::valueField = The field determining the source value to transfer from.
+DataOperations::TransferAssignmentOperation::nameField = The field determining the name of the source field to transfer from.
+DataOperations::DataFieldAccess::field = The field to access to get a value from.
+DataOperations::IntegerConstantDataOperation::value = Constant integer value.
+DataOperations::StringConstantDataOperation::value = Constant String value.
+DataOperations::BooleanConstantDataOperation::value = Constant Boolean value.
+DataOperations::RealConstantDataOperation::value = Constant real value.
+DataOperations::ParenthesisDataOperation::operation = Operation to be evaluated with precedence.
+DataOperations::FieldNameDataOperation::field = Field determining the name.
+DataOperations::DataTranslationOperation::arguments = Data operations acting as arguments after individual evaluation.
+DataOperations::ModelCallOperation::field = Optional field reference, may be given to indicate that the call shall replace the translation of field.
+DataOperations::ModelCallOperation::name = Name of the model operation to call.
+DataOperations::ModelCallOperation::arguments= Expressions defining the arguments for the call.

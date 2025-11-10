@@ -1,0 +1,175 @@
+import Basics;
+import PythonBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(profile="python")
+template PythonJsonSerializer(Configuration config, PythonCodeArtifact target, RecordType type, Boolean sharedInterfaces) {
+
+    def encoder(String clsName, PythonCodeArtifact target) {
+        PythonCodeClass cls = addPythonClass(target, clsName + "Encoder", 'JSON encoder class for ${clsName}.')
+            .addBase("JSONEncoder");
+        cls.addMethod("default", "Provides access to the attributes in o.").(fn|{
+            fn.addParameter("o", "", "the object to serialize");
+            fn.addAssign("tmp", "dict()");
+            fn.addFor("key", "o.__dict__").(l|{
+                l.addAssign("k", "key[1:]");  
+                l.addAssign("tmp[k]", "o.__dict__[key]");
+            });
+            type.fields->forEach(Field f|genWriteTo(f, f.type, fn));
+            fn.addReturn("tmp", "the attributes as dict");
+        });
+    }
+
+    @DispatchBasis
+    def generateImports(DataType type, Boolean top, PythonCodeArtifact target) {
+    }
+    
+    @DispatchCase
+    def generateImports(ArrayType type, Boolean top, PythonCodeArtifact target) {
+        generateImports(type.type, top, target);
+    }
+    
+    @DispatchBasis
+    def generateImports(RecordType type, Boolean top, PythonCodeArtifact target) {
+        for (Field f: type.fields) {
+            generateImports(f.type, false, target);
+        }
+        if (!top) {
+             String clsName = asTypeName(type.name);
+             addDatatypeImport(clsName, false, target);
+             target.addImport("serializers." + clsName + "Serializer", clsName + "Serializer");
+        }
+    }
+    
+    def generateReadFrom(RecordType type, PythonCodeBlock fn) {
+        type.fields->forEach(Field f| genReadFrom(f, f.type, fn));
+    }
+
+    @DispatchBasis
+    def genReadFrom(Field f, DataType type, PythonCodeBlock fn) {
+    }
+    
+    @DispatchCase
+    def genReadFrom(Field f, RecordType type, PythonCodeBlock fn) {
+        fn.addIf('"_${f.name}" in tmp')
+            .addAssign('tmp["_${f.name}"]', '${asTypeName(type.name)}Serializer.readFrom${asTypeName(type.name)}(tmp["_${f.name}"])');
+    }
+    
+    @DispatchCase
+    def genReadFrom(Field f, ArrayType type, PythonCodeBlock fn) {
+        fn.addIf('"_${f.name}" in tmp').(a|{
+            a.addAssign('tmplist', 'tmp["_${f.name}"]');
+            a.addAssign('tmp["_${f.name}"]', '[]');
+            genReadFrom(f, type.type, true, a.addFor("i", "tmplist"));
+        });
+    }
+    
+    @DispatchBasis
+    def genReadFrom(Field f, RecordType type, Boolean fromArray, PythonCodeBlock b) {
+        b.add('tmp["_${f.name}"].append(${asTypeName(type.name)}Serializer.readFrom${asTypeName(type.name)}(i))');
+    }
+
+    @DispatchCase
+    def genReadFrom(Field f, DataType type, Boolean fromArray, PythonCodeBlock b) {
+        b.add('tmp["_${f.name}"].append(i)');
+    }
+
+    @DispatchBasis
+    def genWriteTo(Field f, DataType type, PythonCodeFunction fn) {
+    }
+
+    @DispatchCase
+    def genWriteTo(Field f, RecordType type, PythonCodeFunction fn) {
+        fn.addIf('"_${f.name}" in tmp')
+            .addAssign('tmp["_${f.name}"]', '${asTypeName(type.name)}Serializer.writeTo${asTypeName(type.name)}(tmp["_${f.name}"])');
+    }
+    
+    def genReadFrom(String clsName, String add, RecordType type, PythonCodeClass cls) {
+        cls.addMethod("readFrom" + clsName, "Turns a dict into an object of type ${clsName} for deep deserialization.").setStatic().(f|{
+            f.addParameter("d", "dict", "dict");
+            f.addReturnType(clsName, "the object, may be None");
+            f.addIf("d is None").(a|{
+                a.addReturn("None");
+            }).addElse().(e|{
+                e.addAssign('tmp', 'dict()');
+                e.addAssign('result', '${clsName}${add}()');
+                e.addFor('key', 'd').(l|{
+                    l.addAssign("k", '"_" + str(key)'); // by generation convention
+                    l.addAssign("tmp[k]", 'd[key]');
+                });
+                generateReadFrom(type, e);
+                e.addAssign('result.__dict__', 'tmp');
+                e.addReturn('result');
+            });
+        });
+    }
+    
+    def genWriteTo(String clsName, PythonCodeClass cls) {
+        cls.addMethod("writeTo" + clsName, "Turns an object of type ${clsName} into a dict for serialization.").setStatic().(f|{
+            f.addParameter("o", clsName, "the object, may be None");
+            f.addReturnType("dict", "the dict, may be None");
+            f.addIf("o is None").(a|{
+                a.addReturn("None");
+            }).addElse().(e|{
+                e.addAssign('result', 'dict()');
+                e.addFor('key', 'o.__dict__').(l|{
+                    l.addAssign('k', 'key[1:]'); // by generation convention
+                    l.addAssign('result[k]', 'o.__dict__[key]'); // by generation convention
+                });
+            });
+        });
+    }
+
+    def main(Configuration config, PythonCodeArtifact target, RecordType type, Boolean sharedInterfaces) {
+        String clsName = asTypeName(type.name);
+        String add = "";
+        if (sharedInterfaces) {
+            add = "Impl";
+        }
+        target.addImport("json", "JSONEncoder");
+        target.addImport("json");
+        target.addImport("datetime", "datetime");
+        target.addImport("TypeTranslatorToString", "TypeTranslatorToString");
+        target.addImport("Registry");
+        addDatatypeImport(clsName, true, target);
+        generateImports(type, true, target);
+        encoder(clsName, target);
+
+        PythonCodeClass cls = addPythonClass(target, clsName + "Serializer", 'JSON transport serializer for ${clsName}.')
+            .addBase("TypeTranslatorToString");
+            
+        cls.addConstructor("Initializes the transformer.").(f|{
+            f.addAssign('Registry.serializers["${clsName}"]', 'self');
+            f.addAssign('Registry.types[${clsName}]', '"${clsName}"');
+            if (sharedInterfaces) {
+                f.addAssign('Registry.serializers["${clsName}Impl"]', 'self'); // there is a serializer for the Impl
+                f.addAssign('Registry.types[${clsName}Impl]', '"${clsName}"'); // the Impl maps back to the type name
+            }
+        });
+        cls.addMethod("readFrom", "Turns bytes into a String.").(f|{
+            f.addParameter("data", "str", "the data string");
+            f.addReturnType(clsName, "the deserialized object");
+            f.addAssign('result', '${clsName}${add}()');
+            f.addAssign('jTmp', 'json.loads(data)');
+            f.addAssign('tmp', 'dict()');
+            f.addFor('key', 'jTmp').(l|{
+                l.addAssign('k', '"_" + str(key)'); // by generation convention
+                l.addAssign('tmp[k]', 'jTmp[key]'); // by generation convention
+            });
+            generateReadFrom(type, f);
+            f.addAssign('result.__dict__', 'tmp');
+            f.addReturn('result');
+        });
+        cls.addMethod("writeTo", "Turns an object into a String.").(f|{
+            f.addParameter("source", clsName, "the object");
+            f.addReturnType("str", "the serialized data string");
+            f.addReturn('${clsName}Encoder().encode(source).encode("UTF-8").decode()');
+        });
+
+        genReadFrom(clsName, add, type, cls);
+        genWriteTo(clsName, cls);
+        target.add('${clsName}Serializer()');
+    }
+    
+}

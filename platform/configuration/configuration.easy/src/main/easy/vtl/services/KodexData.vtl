@@ -1,0 +1,43 @@
+import Basics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template KodexData(Configuration config, FileArtifact target, MeshElement elt) {
+
+    // currently uncustomized as in Kodex test
+
+    // --------------------- main ---------------------------
+
+    def main(Configuration config, FileArtifact target, MeshElement elt) {
+        '# actions and forms for ${elt.name}
+        \\$include:
+          - actions.yml
+          - api.yml
+        # sources that we want to read from
+        sources:
+          - name: stdin
+            type: stdin
+            config:
+              format: json
+              chunk-size: 1
+        # destinations that we want to write to              
+        destinations:
+          - name: stdout
+            type: stdout
+            config: {}
+        streams:
+          - name: default
+            id: abcdef
+            sources:
+              - source: stdin
+            configs:
+              - name: default
+                id: abcdef
+                actions:
+                  - name: protect ${elt.name} data
+                destinations:
+                  - name: stdout
+                    status: active'
+    }
+    
+}

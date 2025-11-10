@@ -1,0 +1,5 @@
+# IIP-Ecosphere platform: Configuration model (Managed Configuration Model Template, 'cfg')
+
+Top-level configuration template files required when the platform manages its own configuration. `PlatformConfiguration` becomes the top-level project importing `TechnicalSetup` (AAS, transport, monitoring, UI, device mgt), `AllTypes` containing the definitions of all used types and `AllServices` containing definitions of all services. Applications go into ApplicationPart*AppName*, importing its ServiceMeshPart*AppName**MeshName* via wildcard imports. In certain situations, e.g., for testing the distributed evaluation/testing environment, `AllTypes` and `AllServices` may define further wild card imports (then `AllTypesPart*Name*` and `AllServicesPart*Name*`).
+
+Files in this folder are meant to be templates, i.e., shall not be copied/unpacked into effectively used versions of the meta model.

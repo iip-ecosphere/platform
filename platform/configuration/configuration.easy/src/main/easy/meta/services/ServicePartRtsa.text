@@ -1,0 +1,11 @@
+ServicePartRtsa::RtsaService::kind = Refined service kind
+ServicePartRtsa::RtsaService::rtsaVer = Refined actual version of RTSA to utilize
+ServicePartRtsa::RtsaService::includesRtsa = RTSA ships as reusable ZIP, RTSA-<ver>.zip (default, false), else within service artifact serviceName-ver.zip
+ServicePartRtsa::RtsaService::artifact = Refined RTSA artifact
+ServicePartRtsa::RtsaService::dependencies = RTSA dependencies, refined to JAVA 8
+ServicePartRtsa::RtsaService::deployment = Name of the deployment jar in resources/rtsa. If not given, composed from service name without whitespaces with "-version.zip" appended.
+ServicePartRtsa::RtsaService::path = URL access postfix to deployment
+ServicePartRtsa::RtsaService::nameplateInfo = Refined nameplate information for RTSA
+ServicePartRtsa::RtsaService::rtsaInputFlat = RTSA input must not contain nested structures.
+ServicePartRtsa::RtsaService::rtsaOutputFlat = RTSA output must not contain nested structures.
+ServicePartRtsa::RtsaIOType::rtsaField = Field name on RTSA deployment side.

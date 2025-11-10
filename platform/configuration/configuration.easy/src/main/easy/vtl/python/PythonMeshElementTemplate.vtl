@@ -1,0 +1,49 @@
+import PythonBasics;
+import MeshBasics;
+import PythonMeshElementTemplateBase;
+insert PythonMeshElementTemplatePart*;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(profile="python")
+template PythonMeshElementTemplate(Configuration config, PythonCodeArtifact target, MeshElement elt, String pkg, PythonService service) extends PythonMeshElementTemplateBase {
+
+    def main(Configuration config, PythonCodeArtifact target, MeshElement elt, String pkg, PythonService service) {
+        enableMeshQualifiedTypes(false);
+        IIPEcosphere cfg = config;
+        initTypeAdd(cfg);
+        String clsName = asTypeName(service.name);
+        String ifName = "${clsName}Interface";
+        target.addImport("iip.Registry");
+        target.addImport("Version", "Version");
+        target.addImport("Service", "ServiceState");
+        target.addImport("Service", "ServiceKind");
+        produceDatatypeImports(elt, service, target);
+        target.addImport("interfaces." + clsName + "Interface", clsName + "Interface");
+        target.addEmptyLine();
+        target.addSLComment("Do not utilise global code here. Place the needed function in the start / end methods.
+        Add methods needed to be run on the start of a service in the start or end methods NOT in init()", true);
+        target.addEmptyLine();
+
+        cls = addPythonClass(target, clsName, 'Template service implementation for ${clsName}');
+        cls.addBase(inheritsFrom(ifName));
+        cls.addConstructor("Initializes the service.").(f|{
+            f.addSuperConstructorCall();
+            produceConstructorRest(service, f);
+        });
+        cls.addFunc("start", "Called when the service shall start.").(f|{
+            produceSetStateStarting(service, f);
+        });
+        cls.addFunc("stop", "Called when the service shall stop.").(f|{
+            produceSetStateStopping(service, f);
+        });
+        
+        produceReconfigure(service, cls);
+        generateDataMethods(elt, true);
+        generateFurtherMethods(service, cls);
+
+        target.addSLComment("registers itself");
+        target.addCall(clsName);
+    }
+    
+}

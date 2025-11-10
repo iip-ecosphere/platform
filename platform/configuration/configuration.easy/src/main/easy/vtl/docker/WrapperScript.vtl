@@ -1,0 +1,55 @@
+import Basics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template WrapperScript(IIPEcosphere config, FileArtifact target, ContainerType containerType) {
+
+    def main(IIPEcosphere config, FileArtifact target, ContainerType containerType) {
+        Integer svcBrokerPort = protocolPort(config.transportProtocol, false);
+        Integer ecsBrokerPort = config.transportProtocol.localEcsPort;
+        '#!/bin/bash'
+        ''
+        if (containerType == ContainerType::Ecs) {
+            'bash ecs.sh >> /var/log/iip.logs &'
+        } else if ((containerType == ContainerType::Ecs_Svc_App) or (containerType == ContainerType::Ecs_Svc_AllApps)) {
+            'bash broker.sh ${svcBrokerPort} >> /var/log/iip.logs &'
+            //'bash broker.sh ${ecsBrokerPort} &'
+            'sleep 4;'
+            'echo "" >> /var/log/iip.logs &'
+            'echo "" >> /var/log/iip.logs &'
+            'bash ecs.sh >> /var/log/iip.logs &'
+            'sleep 7;'
+            'echo "" >> /var/log/iip.logs &'
+            'echo "" >> /var/log/iip.logs &'
+            'bash serviceMgr.sh >> /var/log/iip.logs &'
+        } else if ((containerType == ContainerType::EcsSvc_App) or (containerType == ContainerType::EcsSvc_AllApps)) {
+            'bash broker.sh ${svcBrokerPort} >> /var/log/iip.logs &'
+            //'bash broker.sh ${ecsBrokerPort} &'
+            'sleep 4;'
+            'echo "" >> /var/log/iip.logs &'
+            'echo "" >> /var/log/iip.logs &'
+            'bash ecsServiceMgr.sh >> /var/log/iip.logs &'
+        } else if ((containerType == ContainerType::C1Ecs_C2Svc_App) or (containerType == ContainerType::C1Ecs_C2Svc_AllApps)) {
+            'bash broker.sh ${svcBrokerPort} >> /var/log/iip.logs &'
+            //'bash broker.sh ${ecsBrokerPort} &'
+            'sleep 4;'
+            'echo "" >> /var/log/iip.logs &'
+            'echo "" >> /var/log/iip.logs &'
+            'bash serviceMgr.sh >> /var/log/iip.logs &'
+        } 
+        ''
+        'cleanup() {'
+        if ((containerType == ContainerType::Ecs_Svc_App) or (containerType == ContainerType::Ecs_Svc_AllApps) or (containerType == ContainerType::Ecs)) {
+            '    kill $(cat /run/iip-ecsRuntime.pid)'
+        }
+        if (not(containerType == ContainerType::Ecs)) {
+            '    kill $(cat /run/iip-serviceMgr.pid)'
+        }
+        '    sleep 10'
+        '}'
+        ''
+        'trap "cleanup" SIGTERM'
+        ''
+        'wait "$!"'
+    }
+}

@@ -1,0 +1,650 @@
+import Basics;
+import JavaBasics;
+import ServiceBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template MeshBasics(Configuration config, FileArtifact target) {
+
+    mapOf(String, Boolean) asyncIngestors = {};
+    mapOf(String, String) ingestors = {};
+    Boolean qualifiedTypes = true;
+    
+    def String getClsName(MeshElement elt) {
+        asTypeName(elt.name);
+    }
+    
+    def String outType(MeshElement elt, IOType inType) {
+        "";
+    }
+
+    def String outType(MeshProcessor elt, IOType inType) {
+        String result = "";
+        if (not(elt.impl.asynchronous)) {
+            mapOf(IOType, IOType) tmp = ioPairs(elt);
+            for (IOType i : tmp.keys()) {
+                if (i.type == inType.type) {
+                    result = toTypeName(tmp.get(i));
+                }
+            }
+        }
+        result;
+    }
+    
+    // added v2->v3    
+    def String ioTypeTypeName(IOType type) {
+        DataType typeType = type.type;
+        asTypeName(getTypeName(typeType));
+    }
+    
+    def DataType getFirstType(sequenceOf(IOType) types) {
+        if (types.size() > 0) {
+            IOType t = types.get(0);
+            t.type;
+        }    
+    }
+    
+    def getFirstTypeName(sequenceOf(IOType) types) {
+        getTypeName(getFirstType(types));
+    }
+
+    // added v2->v3
+    def getTypeName(DataType dt) {
+        if (dt <> null) {
+            dt.name;
+        } else {
+            "Object";
+        }
+    }
+    
+    // added v2->v3    
+    def sequenceOf(IOType) reduce(Connector conn, sequenceOf(IOType) types) {
+        Integer maxSize = 1; // TODO take inIf/outIf into account as maximum size
+        sequenceOf(IOType) result = {}; // typically from IVML, i.e., non modifiable container
+        Integer pos = 0;
+        while (result.size() < maxSize and pos < types.size()) {
+            result.add(types.get(pos));
+            pos = pos + 1;
+        }
+        result;
+    }    
+    
+    // added v2->v3    
+    compound ConnectorTypes {
+        Integer pos;
+        IOType inType;
+        IOType outType;
+        IOTypeWithPath ifInType;
+        IOTypeWithPath ifOutType;
+        String inAdapterCls;
+        String outAdapterCls;
+        String inSerializerCls;
+        String outSerializerCls;
+    }
+    
+    // added v2->v3    
+    def sequenceOf(ConnectorTypes) pairTypes(Connector conn) {
+        sequenceOf(ConnectorTypes) result = {};
+        sequenceOf(IOType) inTypes = reduce(conn, conn.input); // IVML collection unmodifiable
+        sequenceOf(IOType) outTypes = reduce(conn, conn.output);
+
+        Integer pos = 0;
+        for (IOType outType : outTypes) {
+            ConnectorTypes ct = new ConnectorTypes();
+            ct.pos = pos;
+            ct.outType = outType;
+            ct.inType = inTypes.get(pos);
+            ct.ifInType = conn.inInterface.get(pos);
+            ct.ifOutType = conn.outInterface.get(pos);
+            ct.inAdapterCls = getStringValueSafe(conn.inAdapterClass, conn.inAdapterClass, pos, "");
+            ct.outAdapterCls = getStringValueSafe(conn.outAdapterClass, conn.outAdapterClass, pos, "");
+            String inSer = "";
+            String outSer = "";
+            if (conn.isKindOf(ChannelConnector)) {
+                ChannelConnector chConn = conn;
+                inSer = getStringValueSafe(chConn.inSerializerClass, chConn.inSerializerClass, pos, "");
+                outSer = getStringValueSafe(chConn.outSerializerClass, chConn.outSerializerClass, pos, "");
+            }
+            ct.inSerializerCls = inSer;
+            ct.outSerializerCls = outSer;
+            result.add(ct);
+            pos = pos + 1;
+        }
+        result;
+    }
+    
+    // added v2->v3    
+    def String getStringValueSafe(DecisionVariable var, sequenceOf(String) seq, Integer pos, String dflt) {
+        String result = dflt;
+        if (isDefined(var)) {
+            if (pos < seq.size()) {
+                result = seq.get(pos);
+            }
+        }
+        result;
+    }    
+
+    // added v2->v3    
+    def getParserSerializerClassName(Connector conn, IOType outType) {
+        asTypeName(conn.name) + ioTypeTypeName(outType) + "ParserSerializer";
+    }
+
+    // added v2->v3    
+    def getFormatterSerializerClassName(Connector conn, IOType outType) {
+        asTypeName(conn.name) + ioTypeTypeName(outType) + "FormatterSerializer";
+    }
+    
+    // added v2->v3    
+    def getReceptionCallbackClassName(Connector conn, IOType outType) {
+        ioTypeTypeName(outType) + "ReceptionCallback";
+    }
+    
+    // added v2->v3    
+    def getInputTranslatorClassName(Connector conn, IOType inType, IOType outType) {
+        ioTypeTypeName(inType) + "InputTranslator";
+    }
+
+    // added v2->v3    
+    def getOutputTranslatorClassName(Connector conn, IOType inType, IOType outType) {
+        ioTypeTypeName(outType) + "OutputTranslator";
+    }
+    
+    // added v2->v3    
+    def getAdapterCreationMethodName(Connector conn, IOType inType, IOType outType, Integer pairIdx) {
+        String add = "";        
+        if (pairIdx > 0) {
+            add = getTypeName(inType.type) + getTypeName(outType.type);
+        }
+        "createConnectorAdapter" + add;
+    }
+    
+    // -------------------------------------------- suffixes -------------------------------
+
+    def String getOutName(MeshElement elt, String inType) {
+        String outName = "";
+        if (not(elt.impl.asynchronous)) {
+            mapOf(IOType, IOType) pairs = ioPairs(elt);
+            for (IOType t: pairs.keys()) {
+                if (toTypeName(t) == inType) {
+                    outName = toTypeName(pairs.get(t));
+                }
+            }
+        }
+        outName;
+    }
+
+    def String getMethodSuffix(MeshElement elt, String type, String outType) {
+        "";
+    }
+
+    def String getMethodSuffix(MeshSource elt, String type, String outType) {
+        "create" + type.firstToUpperCase();
+    }
+
+    def String getMethodSuffix(MeshProcessor elt, String type, String outType) {
+        if (elt.impl.asynchronous) {
+            "process" + type.firstToUpperCase();
+        } else {
+            "transform" + type.firstToUpperCase() + outType.firstToUpperCase();
+        }
+    }
+
+    def String getMethodSuffix(MeshSink elt, String type, String outType) {
+        "receive" + type.firstToUpperCase();
+    }
+
+    def String getServiceIdSuffix(ServiceBase base) {
+        "_" + toIdentifier(base.id);
+    }
+    
+    def String getServiceIdSuffix(MeshElement elt) {
+        getServiceIdSuffix(elt.impl);
+    }
+    
+    def String getMethodSuffixId(String methodSuffix, String serviceId) {
+        methodSuffix + serviceId;
+    }
+
+    def String getMethodSuffixId(String methodSuffix, MeshElement elt) {
+        methodSuffix + getServiceIdSuffix(elt);
+    }
+
+    // -------------------------------------------------------------------------------------
+    
+    def String getDeploymentDescriptorPath() {
+        "deployment.yml";
+    }
+
+    def getYamlServiceFragment(String varName, String clsName, String serviceId, JavaCodeBlockInterface m, String artifactVarName="art", String appVar="") {
+        m.addVariable("de.iip_ecosphere.platform.services.environment.YamlArtifact", artifactVarName).addCall("YamlArtifact.readFromYamlSafe")
+            .addCallArgument("de.iip_ecosphere.platform.support.resources.ResourceLoader.getResourceAsStream", JavaCodeImportScope.METHOD_CLASS_IMPORT).addStringArgument(getDeploymentDescriptorPath());
+        if (appVar.length() > 0) {
+            m.addVariable("de.iip_ecosphere.platform.support.iip_aas.ApplicationSetup", appVar, new JavaCodeMethodCall("getApplication").qualifiedBy(artifactVarName));
+        }
+        m.addVariable("de.iip_ecosphere.platform.services.environment.YamlService", varName, 
+            new JavaCodeMethodCall("getServiceSafe").qualifiedBy(artifactVarName).addStringArgument(serviceId));
+    }
+
+    def generateDataMethods(MeshElement elt, Boolean filter) {
+    }
+    
+    def Boolean recordSourceIngestor(MeshSource elt, IOType type) {
+        true;
+    }
+    
+    def sequenceOf(IOType) getSourceOutput(ServiceBase impl) {
+        impl.output;
+    }
+
+    def sequenceOf(IOType) getSourceOutput(Connector impl) {
+        impl.input;
+    }
+
+    def sequenceOf(IOType) getSourceInput(ServiceBase impl) {
+        impl.input;
+    }
+
+    def sequenceOf(IOType) getSourceInput(Connector impl) {
+        impl.output;
+    }
+    
+    def enableMeshQualifiedTypes(boolean enable) {
+        qualifiedTypes = enable;
+    }
+    
+    def String toDataMethodsTypeName(DataType type) {
+        if (qualifiedTypes) {
+            toQualifiedTypeName(type);
+        } else {
+            toTypeName(type);
+        }
+    }
+
+    def generateDataMethods(MeshSource elt, Boolean filter) {
+        generateAsyncDataMethods(filterBackward(getSourceInput(elt.impl), filter), 
+            filterBackward(getSourceOutput(elt.impl), filter), elt);
+        String serviceId = "_" + toIdentifier(elt.impl.id);
+        for (IOType out : getSourceOutput(elt.impl)) {
+            String type = toDataMethodsTypeName(out.type);
+            String simpleType = toSimpleName(type);
+            String methodSuffix = "create" + simpleType.firstToUpperCase();
+            String methodSuffixId = methodSuffix + serviceId;
+            if (recordSourceIngestor(elt, out)) {
+                ingestors.add(methodSuffixId, simpleType);
+                asyncIngestors.add(methodSuffixId, elt.impl.asynchronous);
+            }
+            notifyTypeUse(elt, false, out, methodSuffix, methodSuffixId, true);
+            generateSourceMethod(elt, type, methodSuffix, methodSuffixId);
+        }
+    }
+
+    def Boolean recordAsyncProcessorIngestor(MeshElement elt, IOType type) {
+        true;
+    }
+
+    def Boolean recordAsyncProcessorIngestor(MeshProcessor elt, IOType type) {
+        true;
+    }
+
+    def Boolean recordSyncProcessorIngestor(MeshProcessor elt, IOType type) {
+        true;
+    }
+
+    def generateDataMethods(MeshProcessor elt, Boolean filter) {
+        String serviceId = "_" + toIdentifier(elt.impl.id);
+        if (elt.impl.asynchronous) {
+            generateAsyncDataMethods(elt.input, elt.output, elt);
+        } else {
+            generateAsyncDataMethods(filterBackward(elt.input, filter), filterBackward(elt.output, filter), elt);
+            Integer p = 0;
+            sequenceOf(IOType) inFwd = forward(elt.input);
+            sequenceOf(IOType) outFwd = forward(elt.output);
+            Integer maxP = min(inFwd.size(), outFwd.size()); // must be equal -> constraint syncEqualIO
+            while (p < maxP) {
+                IOType in = inFwd[p];
+                IOType out = outFwd[p];
+                p = p + 1;
+                String inType = toDataMethodsTypeName(in.type);
+                String outType = toDataMethodsTypeName(out.type);
+                String methodSuffix = "transform" + toSimpleName(inType).firstToUpperCase() + toSimpleName(outType).firstToUpperCase();
+                String methodSuffixId = methodSuffix + serviceId;
+                if (recordSyncProcessorIngestor(elt, out)) {
+                    ingestors.add(methodSuffixId, outType);
+                    asyncIngestors.add(methodSuffixId, false);
+                }
+                notifyTypeUse(elt, true, in, methodSuffix, methodSuffixId, true);
+                generateSyncProcessorMethod(elt, inType, outType, methodSuffix, methodSuffixId);
+            }
+            // there are no remaining -> constraint syncEqualIO
+        }
+    }
+    
+    def generateAsyncDataMethods(sequenceOf(IOType) input, sequenceOf(IOType) output, MeshElement elt) {
+        String serviceId = "_" + toIdentifier(elt.impl.id);
+        for (IOType out : output) {
+            String type = toDataMethodsTypeName(out.type);
+            String simpleType = toSimpleName(type);
+            String methodSuffix = "process" + simpleType.firstToUpperCase();
+            String methodSuffixId = methodSuffix + serviceId;
+            if (recordAsyncProcessorIngestor(elt, out)) {
+                ingestors.add(methodSuffixId, simpleType);
+                asyncIngestors.add(methodSuffixId, true);
+            }
+            notifyTypeUse(elt, false, out, methodSuffix, methodSuffixId, false);
+        }
+        for (IOType in : input) {
+            String type = toDataMethodsTypeName(in.type);
+            String simpleType = toSimpleName(type);
+            String methodSuffix = "process" + simpleType.firstToUpperCase();
+            String methodSuffixId = methodSuffix + serviceId;
+            /*if (recordAsyncProcessorIngestor(elt, in)) {
+                ingestors.add(methodSuffixId, simpleType);
+                asyncIngestors.add(methodSuffixId, true);
+            }*/
+            notifyTypeUse(elt, true, in, methodSuffix, methodSuffixId, true);
+            generateAsyncProcessorInMethod(elt, type, methodSuffix, methodSuffixId);
+        }    
+    }
+        
+    def generateDataMethods(MeshSink elt, Boolean filter) {
+        generateAsyncDataMethods(filterBackward(elt.input, filter), filterBackward(elt.impl.output, filter), elt);
+        String serviceId = "_" + toIdentifier(elt.impl.id);
+        for (IOType in : elt.input) {
+            String type = toDataMethodsTypeName(in.type);
+            String methodSuffix = "receive" + toSimpleName(type).firstToUpperCase();
+            String methodSuffixId = methodSuffix + serviceId;
+            notifyTypeUse(elt, true, in, methodSuffix, methodSuffixId, true);
+            generateSinkMethod(elt, type, methodSuffix, methodSuffixId);
+        }
+    }
+    
+    def notifyTypeUse(MeshElement elt, Boolean inType, IOType type, String methodSuffix, String methodSuffixWithServiceId, Boolean beforeGen) {
+    }
+
+    def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    } 
+
+    def generateAsyncProcessorInMethod(MeshElement elt, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    } 
+
+    def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    } 
+
+    def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
+    } 
+    
+    def generateSinkMethod(MeshSink sink, String type, String methodSuffix, String methodSuffixWithServiceId) {
+    } 
+    
+    // --------------------------------- collecting record types ---------------------------------------------
+
+    def mapOf(IOType, IOType) ioPairs(MeshElement elt) {
+        mapOf(IOType, IOType) tmp = {};
+        tmp;
+    }
+    
+    def mapOf(IOType, IOType) ioPairs(MeshProcessor elt) {
+        ioPairs(elt.input, elt.output);
+    }
+
+    def setOf(RecordType) collectRecordTypes(MeshElement elt) {
+        setOf(RecordType) types = {};
+        collectRecordTypesImpl(elt, types);
+        types;
+    }
+    
+    def collectRecordTypesImpl(MeshElement elt, setOf(RecordType) types) {
+        // nothing, dispatch base
+    } 
+
+    def collectRecordTypesImpl(MeshSource source, setOf(RecordType) types) {
+        collectRecordTypesFromSet(source.output, types);
+    }
+    
+    def collectRecordTypesImpl(MeshProcessor processor, setOf(RecordType) types) {
+        collectRecordTypesFromSet(processor.input, types);
+        collectRecordTypesFromSet(processor.output, types);
+    }
+    
+    def collectRecordTypesImpl(MeshSink sink, setOf(RecordType) types) {
+        collectRecordTypesFromSet(sink.input, types);
+    }
+    
+    def setOf(MeshConnector) nextConnectors(MeshElement elt) {
+        setOf(MeshConnector) res = {};
+        res;
+    }
+
+    def setOf(MeshConnector) nextConnectors(MeshSource source) {
+        source.next;
+    }
+
+    def setOf(MeshConnector) nextConnectors(MeshInnerElement elt) {
+        elt.next;
+    }
+    
+    // --------------------------------- iterating ingestors ---------------------------------------------
+
+    compound IngestorInfo {
+        JavaCodeBlock block;
+        setOf(String) conns;
+    }
+ 
+    def addIngestor(mapOf(String, IngestorInfo) ingestors, JavaCodeBlock ingestor, String conn) {
+        IngestorInfo info;
+        setOf(String) conns;
+        String ingCode = ingestor.toCode();
+        if (not(ingestors.containsKey(ingCode))) {
+            info = new IngestorInfo();
+            info.conns = {};
+            info.block = ingestor;
+            ingestors.add(ingCode, info);
+        } else {
+            info = ingestors.get(ingCode);
+        }
+        info.conns.add(conn);
+    }
+    
+     // requires generateDataMethods to be called before
+     def processIngestors(MeshElement elt, ServiceBase base, setOf(MeshElement) nodes, String connPlaceHolder, Boolean genSend, Boolean genReceive, JavaCodeBlockInterface block) {
+         setOf(String) conns = {};
+         mapOf(String, IngestorInfo) ings = {};
+         if (not(base.isKindOf(Connector)) and genSend) { 
+             setOf(DataType) outBack = {}; // are we allowed to send/ingest this?
+             for (IOType t: backward(base.output)) {
+                 outBack.add(t.type);
+             }
+             for (String methodSuffix : ingestors.getKeys()) {
+                 // automatic serialization fails (sometimes) in spring cloud stream 3.1.1 when connected to consumer
+                 if (asyncIngestors.containsKey(methodSuffix)) {
+                     if (asyncIngestors.get(methodSuffix)) { // if it is asynchronous
+                         String type = ingestors.get(methodSuffix);
+                         setOf(MeshElement) done = {};
+                         for (MeshConnector c: nextConnectors(elt)) {                     
+                             MeshElement target = c.next;
+                             done.add(target);
+                             String outName = getOutName(target, type);
+                             String conn = getMethodSuffixId(getMethodSuffix(target, type, outName), target);
+                             JavaCodeBlock ingCode = new JavaCodeBlock();
+                             generateIngestor(base, methodSuffix, conn, type, "in", target.impl, connPlaceHolder, ingCode);
+                             addIngestor(ings, ingCode, conn + "-in-0");
+                             conns.add(conn); // TODO still needed?
+                             conns.add(type); // TODO still needed?
+                         }
+                         for (MeshElement target: nodes->sortedBy(n|n.name).toSequence()) { // sortedBy for testing
+                            if (not(done.includes(target))) {
+                                sequenceOf(IOType) types;
+                                for (IOType t : backward(target.impl.input)) {
+                                    if (outBack.includes(t.type)) {
+                                        type = toTypeName(t.type);
+                                        String outName = getOutName(target, type);
+                                        String conn = getMethodSuffixId(getMethodSuffix(target, type, outName), target);
+                                        if (target.isTypeOf(MeshSource) and conn.startsWith("create")) {
+                                            conn = "process" + conn.substring(6);
+                                        }
+                                        if (conn.startsWith("process")) {
+                                            JavaCodeBlock ingCode = new JavaCodeBlock();
+                                            generateIngestor(base, methodSuffix, conn, type, "in", target.impl, connPlaceHolder, ingCode);
+                                            addIngestor(ings, ingCode, conn + "-in-0");
+                                            conns.add(type); // TODO still needed?
+                                            conns.add(conn); // TODO still needed?
+                                        }
+                                    }
+                                }
+                            }
+                         } 
+                     }
+                 }
+             }
+         }
+ 
+          // emit collected ingestors  
+         for (String ing : ings.keys()->sortedBy(i|i)) {
+            IngestorInfo info = ings.get(ing);
+            JavaCodeBlock ingCode = info.block;
+            if (connPlaceHolder <> "") {
+                String conns = "";
+                for (String c: info.conns->sortedBy(n|n)) {
+                    conns = appendWithSeparator(conns, ",", "\"${c}\"");
+                }
+                ingCode.replaceVariable(connPlaceHolder, conns);
+            }
+            block.addAll(ingCode);
+         }
+ 
+         // go over all possibilities, in particular for backward
+         if (genReceive) {
+             Boolean first = true;
+             for (MeshElement n: nodes->sortedBy(n|n.name).toSequence()) { // sortedBy for testing
+                 if (n != elt) {
+                     for (IOType out : n.impl.output) {
+                         for (IOType in: base.input) {
+                             // if types are equal and both are backward, n is async or n is a connector sending to elt
+                             if (in.type == out.type and ( 
+                                 (not(in.forward) and not(out.forward)) or // anyway ingest/transport
+                                 (n.impl.asynchronous and nextConnectors(n)->collect(c|c.next).includes(elt) and base.asynchronous) or
+                                 (not(elt.impl.isKindOf(Connector)) and n.impl.isKindOf(Connector)))) { // special for connectors
+    
+                                 String conn = toTypeName(in) + "_" + n.impl.id + "_" + elt.impl.id; // TODO also above
+                                 if (not(conns.includes(conn))) {
+                                     generateCreateReceptionCallback(n, in, elt, first, block);
+                                     first = false;
+                                     conns.add(conn);
+                                 }
+                             }
+                         }
+                     }
+                 }
+             }
+         }
+    }
+    
+    def generateCreateReceptionCallback(MeshElement source, IOType sourceType, MeshElement receiver, boolean first, JavaCodeBlockInterface block) {
+    }
+    
+    def generateIngestor(ServiceBase base, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder, JavaCodeBlockInterface block) {
+    }
+
+    def processOutput(MeshElement elt, ServiceBase base, setOf(MeshElement) nodes, JavaCodeBlockInterface block) {
+        for (IOType eltOut : base.output) {
+            String conn = getMethodSuffixId(getMethodSuffix(elt, toTypeName(eltOut), outType(elt, eltOut)), elt);
+            for (MeshConnector c: nextConnectors(elt)) {                     
+                MeshElement target = c.next;
+                for (IOType cOut: target.impl.input) {
+                    // if types are equal and both are backward, n is async or n is a connector sending to elt
+                    if (eltOut.type == cOut.type) {
+                        String type = toTypeName(eltOut.type);
+                        String methodSuffix = getMethodSuffix(target, toTypeName(cOut), outType(target, cOut));
+                        //"receive" + type.firstToUpperCase();
+                        generateIngestor(base, methodSuffix, conn, type, "out", target.impl, "", block);
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+    * Composes the given connection/method id and the application (id) to a destination string.
+    */
+    def composeDestination(String connId, Application app) {
+        "data_${connId}_${app.id}"; // string value here
+    }
+    
+    /**
+    * Composes a destination String expression. If given, appending the value of instanceIdVar assuming to contain
+    * a separator character and the actual application instance identifier or being empty. 
+    */
+    def composeDestination(String connId, Application app, String instanceIdVar) {
+        //connId; // before app-specific destinations
+        String result = '"${composeDestination(connId, app)}"'; // expression, turn into String constant
+        if (instanceIdVar.length() > 0) {
+            result = result + " + " + instanceIdVar; // expression, String append
+        }
+        result;
+    }  
+    
+    // ------------------------------ testing data format --------------------------------------
+    
+    def needsDataUnitJson(ServiceBase service) {
+        service.input.size() > 0;
+    }
+    
+    def getDataUnitJson(ServiceBase service, String typeAdd) {
+        String result = "{";
+        for (IOType in: service.input) {
+            if (result.length() > 1) {
+                 result = result + ", ";
+            }
+            String typeName = toTypeName(in);
+            String implTypeName = toImplTypeName(in, typeAdd);
+            String attributeName = firstToLowerCase(toTypeName(in));
+            result = result + '"${attributeName}": ${getDataTypeJson(in.type)}';
+        }
+        result + ', "\\$period": p, "\\$repeats": r}';
+    }
+    
+    protected def getDataUnitJson(Connector conn, String typeAdd) {
+        DataType outType = getFirstType(conn.output);
+        getDataTypeJson(outType);
+    }
+    
+    protected def getDataTypeJson(DataType type) {
+        "";
+    }
+    
+    protected def getDataTypeJson(RecordType type) {
+        String result = "{";
+        for (Field f: type.fields) {
+            if (result.length() > 1) {
+                 result = result + ", ";
+            }
+            result = result + '"${f.name}": ${getFieldValueJson(f.type, f)}';
+        }
+        result + "}";
+    }
+    
+    protected def getFieldValueJson(DataType type, Field f) {
+        if (f.optional) {
+            'o';
+        } else {
+            'm';
+        }
+    }
+    
+    protected def getFieldValueJson(RecordType type, Field f) {
+        getDataTypeJson(type);
+    }
+    
+    protected def toImplTypeName(IOType type, String typeAdd) {
+        toImplTypeName(type.type, typeAdd);
+    }
+    
+    protected def toImplTypeName(DataType type, String typeAdd) {
+        toTypeName(type);
+    }
+
+    protected def toImplTypeName(RecordType type, String typeAdd) {
+        "iip.datatypes." + toTypeName(type) + typeAdd;
+    }
+    
+}

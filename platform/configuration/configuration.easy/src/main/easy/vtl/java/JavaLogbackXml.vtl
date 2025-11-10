@@ -1,0 +1,14 @@
+import JavaBasics;
+import LoggingBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template JavaLogbackXml(Configuration config, XmlFileArtifact target) {
+
+    def main(Configuration config, XmlFileArtifact target) {
+        XmlElement cfg = createLogbackStdoutXml(target, "info");
+        getLogbackLoggerEntry(cfg, "org.eclipse.basyx.vab.protocol.basyx.server.VABBaSyxTCPInterface", "INFO");
+        getLogbackLoggerEntry(cfg, "de.iip_ecosphere.platform.support.iip_aas.AasUtils", "OFF");
+    }
+    
+}

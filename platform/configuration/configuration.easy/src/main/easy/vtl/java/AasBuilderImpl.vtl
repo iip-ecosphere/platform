@@ -1,0 +1,752 @@
+import Basics;
+import JavaBasics;
+import AasBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120, charset="UTF-8")
+template AasBuilderImpl(Configuration config, JavaCodeArtifact target, AasSubmodelType type, String pkg) {
+
+    setOf(String) done = {};
+    setOf(String) doneEnum = {};
+    setOf(String) doneMethods = {};
+
+    /**
+    * Produces the code for setting the semantic id on the actual object.
+    */
+    def produceSetSemanticId(DecisionVariable var, boolean multiId, JavaCodeCallElement mth) {
+        JavaCodeCallElement result = mth;
+        JavaCodeExpression semanticIdEx = getSemanticIdExpr(var);
+        if (multiId) {
+            if (!semanticIdEx.isEmpty()) {
+                semanticIdEx = new JavaCodeTernaryExpression('semanticId != null && semanticId.length() > 0', "semanticId", semanticIdEx);
+            } else {
+                semanticIdEx = new JavaCodeVariableExpression("semanticId");
+            }
+        }
+        if (!semanticIdEx.isEmpty()) {
+            result = mth.addCall("setSemanticId").addArgument(semanticIdEx);
+        }
+        result;
+    }
+    
+    // ------------------------------- produce fields --------------------------------------------
+    
+    /**
+    * Produces declarations for the given fields (selecting those that prequire a presence recording).
+    */
+    def produceFields(AasFields fields, JavaCodeClass cls) {
+        for (AasField field: fields) {
+            if (notSkip(field)) {
+                if (isFieldCounting(field) or field.minimumInstances >= 0 or field.maximumInstances >= 0) {
+                    cls.addAttribute("int", getFieldNameCounterIdentifier(field)).addInitializer(0);
+                }
+            }
+       }
+    }
+
+
+    // ------------------------------- produce methods -------------------------------------------
+
+    // mode == 0: full method code
+    // mode == 1: inner method code
+    // mode == 2: Java type
+
+    @DispatchBasis    
+    def produceMethods(DataType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        if (type == AasGenericSubmodelElementCollection) {
+            AasElementType t = type;
+            produceElementMethods(t, class, field, grouped, mode, cls);
+        } else if (type == AasGenericSubmodelElementList) {
+            AasElementType t = type;
+            produceElementMethods(t, class, field, grouped, mode, cls);
+        } else if (type == AasGenericEntityType) {
+            AasElementType t = type;
+            produceElementMethods(t, class, field, grouped, mode, cls);
+        } else {
+            cls.addSLComment(' TODO unconsidered type in produceMethods: ${type}');
+        }
+    }
+    
+    @DispatchCase
+    def produceMethods(StringTypeType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        produceSetter(field, class, "String", "STRING", grouped, mode, cls, meth);
+    }
+
+    @DispatchCase
+    def produceMethods(IntegerTypeType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        produceSetter(field, class, "int", "INTEGER", grouped, mode, cls, meth);
+    }
+
+    @DispatchCase
+    def produceMethods(LongTypeType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        produceSetter(field, class, "long", "INT64", grouped, mode, cls, meth);
+    }
+    
+    @DispatchCase
+    def produceMethods(UnsignedInteger64TypeType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        produceSetter(field, class, "java.math.BigInteger", "UINT64", grouped, mode, cls, meth);
+    }    
+    
+    @DispatchCase
+    def produceMethods(FloatTypeType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        produceSetter(field, class, "float", "FLOAT", grouped, mode, cls, meth);
+    }
+
+    @DispatchCase
+    def produceMethods(DoubleTypeType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        produceSetter(field, class, "double", "DOUBLE", grouped, mode, cls, meth);
+    }
+
+    @DispatchCase
+    def produceMethods(BooleanTypeType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        produceSetter(field, class, "boolean", "BOOLEAN", grouped, mode, cls, meth);
+    }
+
+    @DispatchCase
+    def produceMethods(DateTimeTypeType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        produceSetter(field, class, "java.util.Date", "DATE_TIME", grouped, mode, cls, meth);
+    }
+    
+    @DispatchCase
+    def produceMethods(AasAnyURITypeType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        produceSetter(field, class, "String", "ANY_URI", grouped, mode, cls, meth);
+    }
+
+    @DispatchCase
+    def produceMethods(AasBlobTypeType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        produceSetter(field, class, "de.iip_ecosphere.platform.support.aas.BlobDataElement", "", grouped, mode, cls, meth);
+    }
+
+    @DispatchCase
+    def produceMethods(AasEnumType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        produceSetter(field, class, asTypeName(type.name), "STRING", grouped, mode, cls, meth);
+    }
+    
+    // AasLangStringType
+
+    @DispatchCase
+    def produceMethods(AasFileResourceTypeType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        produceSetter(field, class, "de.iip_ecosphere.platform.support.aas.FileDataElement", "", grouped, mode, cls, meth);
+    }
+    
+    @DispatchCase
+    def produceMethods(AasRangeTypeType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        produceSetter(field, class, "de.iip_ecosphere.platform.support.aas.Range", "", grouped, mode, cls, meth);
+    }
+
+    @DispatchCase
+    def produceMethods(AasRelationTypeType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        produceSetter(field, class, "de.iip_ecosphere.platform.support.aas.RelationshipElement", "", grouped, mode, cls, meth);
+    }
+    
+    @DispatchCase
+    def produceMethods(AasReferenceTypeType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        produceSetter(field, class, "de.iip_ecosphere.platform.support.aas.ReferenceElement", "", grouped, mode, cls, meth);
+    }
+
+    @DispatchCase
+    def produceMethods(AasMultiLangStringTypeType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        // specific call used, no aasType needed
+        produceSetter(field, class, "de.iip_ecosphere.platform.support.aas.LangString...", "", grouped, mode, cls, meth);
+    }
+
+    def produceSetter(AasField field, String class, String type, String aasType, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        String result = "";
+        if (notSkip(field)) {
+            if (mode == 0) {
+                String fldName = validateName(field.name);
+                sequenceOf(AasField) params = {};
+                params.add(field);
+                for (AasField p: grouped->reject(AasField f|f.type.isKindOf(AasMultiLangStringTypeType))) {
+                    params.add(p);
+                }
+                for (AasField p: grouped->select(AasField f|f.type.isKindOf(AasMultiLangStringTypeType))) { // varargs, must be last
+                    params.add(p);
+                }
+
+                String comment = getStringValueSafe(field.description, "");
+                if (comment.length() > 0) {
+                    comment = "Changes " + quoteComment(comment.firstToLower());
+                } else {
+                    comment = "Defines the value of ${field.name}";
+                }
+                JavaCodeMethod m = cls.addMethod(class, "set${fldName.firstToUpper()}", comment);
+                m.getJavadocComment().addReturnComment("<b>this</b> (builder style)");
+                
+                String paramList = "";
+                String addComment = "";
+                if (field.isGeneric) {
+                    m.addParameter("String", "idShort", "the actual idShort");
+                }
+                JavaCodeMethod tmp = new JavaCodeMethod();
+                for (AasField p : params) {
+                    String pType = produceMethods(stripMultiListType(p), class, p, grouped, 2, cls, tmp);
+                    produceParameter(p.type, pType, getFieldNameIdentifier(p), p, m);
+                }
+                String commentSemId = "";
+                if (hasMultiSemId(field)) {
+                    m.addParameter("String", "semanticId", "the actual semantic ID");
+                }
+                for (AasField p : params) {
+                    produceMethods(stripMultiListType(p), class, p, params, 1, cls, m);
+                }
+                m.addReturn("this");
+            } else if (mode == 1) {
+                produceSetterInner(field.type, field, aasType, meth);
+            } else {
+                result = type;
+            }
+        }
+        result;
+    }
+
+    @DispatchBasis    
+    def valueAccessExpression(DataType type, AasField field) {
+        validateName(getFieldNameIdentifier(field));
+    }
+    
+    @DispatchBasis
+    def produceParameter(DataType type, String paramType, String paramName, AasField field, JavaCodeMethod m) {
+        m.addParameter(paramType, validateName(paramName), "the value for ${field.name}");
+    }
+
+    @DispatchCase
+    def valueAccessExpression(AasEnumType type, AasField field) {
+        '${getFieldNameIdentifier(field)}.getValue()';
+    }
+    
+    @DispatchCase
+    def produceParameter(AasEnumType type, String paramType, String paramName, AasField field, JavaCodeMethod m) {
+        String prefix = "";
+        if (type.isOpen) {
+            prefix = "I";
+        }
+        m.addParameter(prefix + paramType, validateName(paramName), "the value for ${field.name}");
+    }
+    
+    def getFieldNameEx(AasField field) {
+        String override = "";
+        if (field.isGeneric) {
+            override = "idShort";
+        }
+        getFieldNameEx(field, "++${getFieldNameCounterIdentifier(field)}", override);
+    }
+    
+    @DispatchBasis
+    def produceSetterInner(DataType type, AasField field, String aasType, JavaCodeMethod mth) {
+        produceFieldMarker(field, mth);
+        JavaCodeMethodCall c = mth.addCall("createPropertyBuilder");
+        c.addArgument(getFieldNameEx(field));
+        c = produceSetSemanticId(field.semanticId, hasMultiSemId(field), c);
+        c = c.addCall("setValue");
+        mth.addImport("de.iip_ecosphere.platform.support.aas.Type");
+        c.addArgument("Type.${aasType}");
+        c.addArgument(valueAccessExpression(type, field));
+        c.addCall("build");
+    }
+    
+    // AasFileResourceTypeType
+    
+    @DispatchCase
+    def produceSetterInner(AasFileResourceTypeType type, AasField field, String aasType, JavaCodeMethod mth) {
+        produceFieldMarker(field, mth);
+        JavaCodeMethodCall c = mth.addCall("createFileDataElementBuilder");
+        c.addArgument(getFieldNameEx(field));
+        c.addArgument("file");
+        c.addArgument("mimeType");
+        c = produceSetSemanticId(field.semanticId, hasMultiSemId(field), c);
+        c.addCall("build");
+    }
+    
+    @DispatchCase
+    def produceParameter(AasFileResourceTypeType type, String paramType, String paramName, AasField field, JavaCodeMethod m) {
+        m.addParameter("String", "file", "the relative or absolute file name with extension");
+        m.addParameter("String", "mimeType", "the mime type of the file");
+    }
+    
+    // AasRangeTypeType
+    
+    @DispatchCase
+    def produceSetterInner(AasRangeTypeType type, AasField field, String aasType, JavaCodeMethod mth) {
+        produceFieldMarker(field, mth);
+        JavaCodeMethodCall c = mth.addCall("createRangeBuilder");
+        c.addArgument(getFieldNameEx(field));
+        c.addArgument("type");
+        c.addArgument("min");
+        c.addArgument("max");
+        c = produceSetSemanticId(field.semanticId, hasMultiSemId(field), c);
+        c.addCall("build");
+    }
+    
+    @DispatchCase
+    def produceParameter(AasRangeTypeType type, String paramType, String paramName, AasField field, JavaCodeMethod m) {
+        m.addParameter("de.iip_ecosphere.platform.support.aas.Type", "type", "the value type of the range");
+        m.addParameter("Object", "min", "the minimum value");
+        m.addParameter("Object", "max", "the maximum value");
+    }    
+
+    // AasBlobTypeType
+    
+    @DispatchCase
+    def produceSetterInner(AasBlobTypeType type, AasField field, String aasType, JavaCodeMethod mth) {
+        produceFieldMarker(field, mth);
+        JavaCodeMethodCall c = mth.addCall("createBlobDataElementBuilder");
+        c.addArgument(getFieldNameEx(field));
+        c.addArgument("file");
+        c.addArgument("mimeType");
+        c = produceSetSemanticId(field.semanticId, hasMultiSemId(field), c);
+        c.addCall("build");
+    }
+    
+    @DispatchCase
+    def produceParameter(AasBlobTypeType type, String paramType, String paramName, AasField field, JavaCodeMethod m) {
+        m.addParameter("String", "file", "the relative or absolute file name with extension");
+        m.addParameter("String", "mimeType", "the mime type of the file");
+    }
+
+    // AasReferenceType
+
+    @DispatchCase
+    def produceSetterInner(AasReferenceTypeType type, AasField field, String aasType, JavaCodeMethod mth) {
+        produceFieldMarker(field, mth);
+        JavaCodeMethodCall c = mth.addCall("createReferenceElementBuilder");
+        c.addArgument(getFieldNameEx(field));
+        c = produceSetSemanticId(field.semanticId, hasMultiSemId(field), c);
+        c = c.addCall("setValue");
+        c.addArgument("reference");
+        c.addCall("build");
+    }
+
+    @DispatchCase
+    def produceParameter(AasReferenceTypeType type, String paramType, String paramName, AasField field, JavaCodeMethod m) {
+        m.addParameter("de.iip_ecosphere.platform.support.aas.Reference", "reference", "the target reference");
+    }
+    
+    // AasRelationType
+    
+    @DispatchCase
+    def produceSetterInner(AasRelationTypeType type, AasField field, String aasType, JavaCodeMethod mth) {
+        produceFieldMarker(field, mth);
+        JavaCodeMethodCall c = mth.addCall("createRelationshipElementBuilder");
+        c.addArgument(getFieldNameEx(field));
+        c.addArgument("first");
+        c.addArgument("second");
+        c = produceSetSemanticId(field.semanticId, hasMultiSemId(field), c);
+        c.addCall("build");
+    }
+
+    @DispatchCase
+    def produceParameter(AasRelationTypeType type, String paramType, String paramName, AasField field, JavaCodeMethod m) {
+        m.addParameter("de.iip_ecosphere.platform.support.aas.Reference", "first", "the reference in the relation");
+        m.addParameter("de.iip_ecosphere.platform.support.aas.Reference", "second", "the second reference in the relation");
+    }
+    
+    @DispatchCase
+    def produceSetterInner(AasMultiLangStringTypeType type, AasField field, String aasType, JavaCodeMethod mth) {
+        if (hasCardinality(field) and !isFieldCounting(field)) { // counting: ++ when constructing the idShort
+            mth.addIf("${getFieldNameIdentifier(field)}.length > 0")
+              .addPostfixIncrement(getFieldNameCounterIdentifier(field));
+        }
+        mth.addCall("createMultiLanguageProperty").addCallArgumentNoArg("getDelegate").addArgument("createMultiLanguageProperties")
+            .addArgument(getFieldNameEx(field)).addArgument(getSemanticIdExpr(field.semanticId)).addArgument(getFieldNameIdentifier(field));
+    }
+
+    def produceFieldMarker(AasField field, JavaCodeMethod meth) {
+        if (hasCardinality(field) and !isFieldCounting(field)) { // counting: ++ when constructing the idShort
+            if (field.countInstanceOnValue and field.type.isTypeOf(BooleanTypeType)) {
+                meth.addIf(getFieldNameIdentifier(field))
+                    .addPostfixIncrement(getFieldNameCounterIdentifier(field));
+            } else {
+                meth.addPostfixIncrement(getFieldNameCounterIdentifier(field));
+            }        
+        } else {
+            if (isFieldCounting(field)) {
+                meth.addSLComment("counting -> composition of idShort");
+            } else {
+                meth.addSLComment("not mandatory");
+            }
+        }
+    }
+
+    @DispatchCase
+    def produceMethods(AasSubmodelElementCollectionType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        if (doneMethods.excludes(type.name)) {
+            doneMethods.add(type.name);
+            produceElementMethods(type, class, field, grouped, mode, cls);
+            doneMethods.remove(type.name);
+        }
+    }
+    
+    @DispatchCase
+    def produceMethods(AasEntityType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        if (doneMethods.excludes(type.name)) {
+            doneMethods.add(type.name);
+            produceElementMethods(type, class, field, grouped, mode, cls);
+            doneMethods.remove(type.name);
+        }
+    }
+    
+    @DispatchCase
+    def produceMethods(AasSubmodelType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls, JavaCodeMethod meth) {
+        // TODO unconsidered submodel ${type}
+        /*// unclear, rolls it out
+        if (doneMethods.excludes(type.name)) {
+            doneMethods.add(type.name);
+            produceMethodsForFields(type.fields, class, cls);
+            doneMethods.remove(type.name);
+        } else {
+            produceElementMethods(type, class, field, grouped, mode, cls);
+        }*/
+    }
+    
+    def produceElementMethods(AasElementType type, String class, AasField field, sequenceOf(AasField) grouped, Integer mode, JavaCodeClass cls) {
+        if (mode == 0 and notSkip(field)) {
+            String clsName = asTypeName(type.name);
+            String fldName = asTypeName(field.name);
+            String pkg = "";
+            if (clsName == "SubmodelElementCollection") {
+                pkg = "de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.";
+            }
+            String idEx = '"${field.name}"';
+            String counterEx = "";
+            JavaCodeMethod m = cls.addMethod(qualifyAasCls("${clsName}Builder"), "create${fldName}Builder", "Creates a builder for ${field.name}.");
+            if (isFieldCounting(field)) {
+                counterEx = "++${getFieldNameCounterIdentifier(field)}";
+                idEx = "getCountingIdShort(${idEx}, ${counterEx})";
+                counterEx = ", " + counterEx;            
+            }
+            String semIdParamEx = "";
+            Boolean hasTypeMultiSemId = hasMultiSemId(type); 
+            if (hasTypeMultiSemId) {
+                semIdParamEx = ", semanticId";
+            }
+            String genericParam = "";
+            if (type.isGeneric or field.isGeneric) {
+                m.addParameter("String", "idShort", "the actual idShort");
+                idEx = "idShort";
+                genericParam = "idShort, ";
+            }
+            String builderEx = 'new ${clsName}Builder(${genericParam}this${counterEx}${semIdParamEx})';
+            if (type == AasGenericSubmodelElementCollection) {
+                builderEx = 'super.createSubmodelElementCollectionBuilder(${idEx})';
+            } else if (type == AasGenericEntityType) {
+                m.addParameter("de.iip_ecosphere.platform.support.aas.Entity.EntityType", "type", "the entity type");
+                builderEx = 'super.createEntityBuilder(${idEx}, type, null)';
+            }
+            if (hasMultiSemId(field) or hasTypeMultiSemId) {
+                m.addParameter("String", "semanticId", "the actual semantic id");
+                if (not(hasTypeMultiSemId)) {
+                    builderEx = builderEx + ".setSemanticId(semanticId)";
+                }
+            }
+            produceFieldMarker(field, m);
+            m.addReturn(builderEx, "the builder instance, {@link Builder#build()} must be called");
+        }
+    }    
+
+    def produceMethodsForFields(AasFields fields, String class, JavaCodeClass cls) {
+        setOf(String) inGrouping = {};
+        for (AasField field: fields->select(AasField f | f.groupWith <> null)) {
+            inGrouping.add(field.name);
+        }
+        JavaCodeMethod tmp = new JavaCodeMethod();
+        for (AasField field: fields) {
+            if (!inGrouping.includes(field.name)) {
+                sequenceOf(AasField) grouped = fields->select(AasField f | f.groupWith == field.name);
+                produceMethods(stripMultiListType(field), class, field, grouped, 0, cls, tmp);
+            }
+        }
+    }
+    
+    def produceBuildMethod(AasFields fields, String returnType, JavaCodeClass cls) {
+        Integer count = 0;  // select does not work??
+        for (AasField f : fields) {
+            if (hasCardinality(f)) {
+                count = count + 1;
+            }
+        }
+        if (count > 0) {
+            JavaCodeMethod m = cls.addMethod(returnType, "build");
+            m.addOverrideAnnotation();
+            for (AasField field : fields) { // select does not work??
+                if (hasCardinality(field) and notSkip(field)) {
+                    String fieldName = getFieldNameIdentifier(field);
+                    String condition = "";
+                    String text = "";
+                    if (field.minimumInstances >= 0 and field.maximumInstances == field.minimumInstances) {
+                        condition = "${getFieldNameCounterIdentifier(field)} == ${field.minimumInstances}";
+                        text = "equal ${field.minimumInstances}";
+                    } else {
+                        if (field.minimumInstances >= 0) {
+                            condition = "${field.minimumInstances} <= ${getFieldNameCounterIdentifier(field)}";
+                            text = "greater or equal ${field.minimumInstances}";
+                        }
+                        if (field.maximumInstances >= 0) {
+                            condition = appendWithSeparator(condition, " && ", "${getFieldNameCounterIdentifier(field)} <= ${field.maximumInstances}");
+                            text = appendWithSeparator(text, " and ", "less or equal ${field.maximumInstances}");
+                        }
+                    }
+                    m.add('assertThat(${condition}, "Cardinality {} of ${field.name} must be ${text}.", ${getFieldNameCounterIdentifier(field)});');
+                }
+            }
+            m.addReturn("super.build()");
+        }
+    }
+    
+    def hasCardinality(AasField field) {
+        field.minimumInstances >= 0 or field.maximumInstances >= 0;
+    }
+    
+    def getFieldNameIdentifier(AasField field) {
+        asIdentifier(field.name).firstToLower();
+    }
+
+    def getFieldNameCounterIdentifier(AasField field) {
+        "${getFieldNameIdentifier(field)}Counter";
+    }
+
+    def getFieldNamePresenceIdentifier(AasField field) {
+        "${getFieldNameIdentifier(field)}Present";
+    }
+    
+    // ------------------------------- produce classes -------------------------------------------
+
+    @DispatchBasis    
+    def produceClasses(DataType type, Boolean counting, Boolean top, AasField field, JavaCodeClass cls) {
+    }
+
+    @DispatchCase
+    def produceClasses(AasSubmodelElementCollectionType type, Boolean counting, Boolean top, AasField field, JavaCodeClass cls) {
+        produceClasses(type, counting, top, field, "DelegatingSubmodelElementCollectionBuilder", "createSubmodelElementCollectionBuilder", "", "SubmodelElementCollection", "Collection", cls);
+    }
+
+    @DispatchCase // added during AAS v2->v3 transition
+    def produceClasses(AasSubmodelElementListType type, Boolean counting, Boolean top, AasField field, JavaCodeClass cls) {  // added v2->v3
+        produceClasses(type, counting, top, field, "DelegatingSubmodelElementListBuilder", "createSubmodelElementListBuilder", "", "SubmodelElementList", "List", cls);
+    }
+
+    def produceClasses(AasElementType type, Boolean counting, Boolean top, AasField field, String delegationType, String createMethod, String createParam, String targetType, String clsComment, JavaCodeClass cls) { // added v2->v3
+        String clsName = asTypeName(type.name);
+        if (!done.includes(type.name) and !isImplementedByAPI(type) and notSkip(type)) {
+            done.add(type.name);
+            String basicIdShortEx = '"${getIdShort(type)}"';
+            String idShortEx = 'getCountingIdShort("${getIdShort(type)}", nr)';
+            if (type.isGeneric or field.isGeneric) {
+                basicIdShortEx = "idShort";
+                idShortEx = 'getCountingIdShort(idShort, nr)';
+            }
+            
+            JavaCodeClass c = cls.addClass("${clsName}Builder", getClassComment(type.description, "Builder", clsComment + " Builder implementation", false)).setPublic();
+            c.addExtends("de.iip_ecosphere.platform.support.aas.types.common." + delegationType);
+            produceFields(type.fields, c);
+            
+            JavaCodeMethod m = c.addConstructor("Creates a builder instance for ${getIdShort(type)}.").setProtected();
+            setupInnerConstructor(type, field, top, false, m);
+            m.add("super(smBuilder.${createMethod}(${basicIdShortEx}${createParam}), smBuilder);");
+            produceSetSemanticId(type.semanticId, hasMultiSemId(type), m);
+
+            m = c.addConstructor("Creates a builder instance for ${getIdShort(type)}.").setProtected();
+            setupInnerConstructor(type, field, top, true, m);
+            m.add("super(smBuilder.${createMethod}(${idShortEx}${createParam}), smBuilder);");
+            produceSetSemanticId(type.semanticId, hasMultiSemId(type), m);
+            
+            produceMethodsForFields(type.fields, "${clsName}Builder", c);
+            produceBuildMethod(type.fields, "de.iip_ecosphere.platform.support.aas." + targetType, c);
+
+            produceClassesForFields(type.fields, false, cls);
+        }
+    }
+
+    @DispatchCase
+    def produceClasses(AasEntityType type, Boolean counting, Boolean top, AasField field, JavaCodeClass cls) {
+        produceClasses(type, counting, top, field, "DelegatingEntityBuilder", "createEntityBuilder", ", Entity.EntityType.${type.type}, null", "Entity", "Entity", cls);
+    }
+
+    def setupInnerConstructor(AasElementType type, AasField field, Boolean top, Boolean addNrParam, JavaCodeMethod cons) {
+        if (type.isGeneric or field.isGeneric) {
+            cons.addParameter("String", "idShort", "the actual idShort");
+        }
+        if (top) {
+            cons.addParameter("de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodelBuilder", "smBuilder", "the parent submodel builder");
+        } else {
+            cons.addParameter("de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodelElementContainerBuilder", "smBuilder", "the parent submodel element container builder");
+        }
+        if (addNrParam) {
+            cons.addParameter("int", "nr", "the structure number");
+        }
+        if (hasMultiSemId(type)) {
+            cons.addParameter("String", "semanticId", "the actual semantic ID");
+        }
+    }
+    
+    @DispatchCase
+    def produceClasses(AasSubmodelType type, Boolean counting, Boolean top, AasField field, JavaCodeClass cls) {
+        cls.addSLComment('TODO unconsidered submodel ${type}');
+        //produceClassesForFields(type.fields, true, cls);
+    }
+
+    def produceClassesForFields(AasFields fields, Boolean top, JavaCodeClass cls) {
+        for (AasField field: fields) {
+            produceClasses(field.type, isFieldCounting(field), top, field, cls);
+        }
+    }
+
+    // ------------------------------- produce enums ------------------------------------------
+
+    /**
+    * Produces enum declarations for the given fields (selecting those that use an enum type).
+    */
+    def produceEnumsForFields(Fields fields, JavaCodeClass cls) {
+        for (Field field: fields) {
+            produceEnumForField(field, cls);
+        }
+    }
+
+    /**
+    * Dispatch basis for producing an enum declaration for the given field.
+    */
+    @DispatchBasis    
+    def produceEnumForField(Field field, JavaCodeClass cls) {
+    }
+
+    /**
+    * Produces an enum declaration for the given AAS field.
+    */
+    @DispatchBasis    
+    def produceEnumForField(AasField field, JavaCodeClass cls) {
+        produceEnum(field.type, cls);
+    }
+
+    /**
+    * Dispatch basis for producing an enum declaration for the given Enumeration type.
+    */
+    @DispatchBasis
+    def produceEnum(DataType type, JavaCodeClass cls) {
+    }
+
+    /**
+    * Produces an enum declaration for the given record type by processing the declared fields.
+    */
+    @DispatchCase
+    def produceEnum(RecordType type, JavaCodeClass cls) {
+        if (doneEnum.excludes(type.name)) {
+            doneEnum.add(type.name);
+            produceEnumsForFields(type.fields, cls);
+        }
+    }
+
+    /**
+    * Produces an enum declaration for the given AAS Enumeration type.
+    */
+    @DispatchCase
+    def produceEnum(AasEnumType type, JavaCodeClass cls) {
+        String clsName = asTypeName(type.name);
+        if (!done.includes(type.name)) {
+            done.add(type.name);
+            String implements = "";
+            if (getBooleanValueSafe(type.isOpen, false)) {
+               implements = "I${clsName}"; 
+            
+               cls.addClass("I" + clsName, getClassComment(type.description, "Interface", 
+                   "AAS enumeration interface", false)).asInterface().setPublic().(iface|{
+                   iface.addMethod("int", "getValueId", "Returns the value id/given ordinal.", "the value id/given ordinal");
+                   iface.addMethod("String", "getSemanticId", "Returns the semantic id.", "the semantic id");
+                   iface.addMethod("String", "getValue", "Returns the value to be used in the AAS.", "the value to be used in the AAS");
+               });
+            }
+            cls.addEnum(clsName, getClassComment(type.description, "Enumeration", 
+                "AAS enumeration implementation", false)).(enm|{
+                enm.addInterface(implements); // ignored if empty
+                for (EnumLiteral literal: type.literals) {
+                    produceLiteral(literal, enm);
+                }
+    
+                JavaCodeAttribute enmValueId = enm.addAttribute("int", "valueId");
+                JavaCodeAttribute enmSemanticId = enm.addAttribute("String", "semanticId");
+                JavaCodeAttribute enmValue = enm.addAttribute("String", "value");
+                
+                enm.addConstructor("Creates a constant.").(m|{
+                    m.addParameter("int", "valueId", "the value id/given ordinal");
+                    m.addParameter("String", "semanticId", "the semantic id");
+                    m.addParameter("String", "value", "the value");
+                    m.addAssignment("this.valueId", "valueId");
+                    m.addAssignment("this.semanticId", "semanticId");
+                    m.addAssignment("this.value", "value");
+                });
+                
+                genEnumGetter(type, enmValueId, "(optional) value id/given ordinal", enm);
+                genEnumGetter(type, enmSemanticId, "(optional) semantic id", enm);
+                genEnumGetter(type, enmValue, "value to be used in the AAS", enm);
+            });
+        }
+    }
+
+    def genEnumGetter(AasEnumType type, JavaCodeAttribute att, String commentText, JavaCodeEnum enm) {
+        JavaCodeMethod getter = enm.addGetter(att);
+        if (type.isOpen) {
+            getter.addOverrideAnnotation();
+        }
+        getter.getJavadocComment().setComment("Returns the ${commentText}.");
+        getter.getJavadocComment().addReturnComment("the ${commentText}");
+    }
+
+    /**
+    * Dispatch basis for producing constant declaration code for an Enumeration literal.
+    */
+    @DispatchBasis
+    def produceLiteral(EnumLiteral literal, JavaCodeEnum enm) {
+    }
+
+    /**
+    * Produces constant declaration code for an AAS Enumeration literal.
+    */
+    @DispatchCase
+    def produceLiteral(AasEnumLiteral literal, JavaCodeEnum enm) {
+        String name = getStringValueSafe(literal.identifier, literal.name);
+        name = name.replace(" ", "_").toUpperCase();
+        Integer valueId = getIntegerValueSafe(literal.ordinal, 0);
+        String value = getStringValueSafe(literal.value, literal.name);
+        JavaCodeExpression semanticIdExpr = getSemanticIdExpr(literal.semanticId);
+        enm.addLiteral(name).addArgument(valueId).addArgument(semanticIdExpr).addStringArgument(value);
+    }
+
+    // ------------------------------- main -------------------------------------------
+
+    def main(Configuration config, JavaCodeArtifact target, AasSubmodelType type, String pkg) {
+        String clsName = asTypeName(type.name);
+
+        JavaCodeClass mainCls = codeCreateClass(target, pkg, clsName + "Builder", 
+            getClassComment(type.description, "Builder", "AAS Builder implementation", true));
+        mainCls.addImport("de.iip_ecosphere.platform.support.Builder"); // for Javadoc
+        mainCls.addStaticImport("de.iip_ecosphere.platform.support.aas.IdentifierType.*");
+        mainCls.addStaticImport("de.iip_ecosphere.platform.support.aas.types.common.Utils.*");
+        mainCls.addExtends("de.iip_ecosphere.platform.support.aas.types.common.DelegatingSubmodelBuilder");
+        
+        JavaCodeAttribute cmlField = mainCls.addAttribute("boolean", "createMultiLanguageProperties").addInitializer("true");
+        produceFields(type.fields, mainCls);
+        produceEnumsForFields(type.fields, mainCls);
+
+        JavaCodeMethod mth = mainCls.addConstructor('Creates a ${type.name} submodel builder.');
+        mth.addParameter("de.iip_ecosphere.platform.support.aas.Aas.AasBuilder", "aasBuilder", "the parent AAS builder");
+        mth.addParameter("String", "identifier", "the submodel identifier");
+        mth.addThisCall().addArgument("aasBuilder").addArgument("identifier").addStringArgument(getIdShort(type));
+
+        mth = mainCls.addConstructor('Creates a ${type.name} submodel builder.');
+        mth.setPrivate(type.fixedName);
+        mth.addParameter("de.iip_ecosphere.platform.support.aas.Aas.AasBuilder", "aasBuilder", "the parent AAS builder");
+        mth.addParameter("String", "identifier", "the submodel identifier");
+        mth.addParameter("String", "idShort", "the idShort of the submodel to create");
+        mth.addSuperCall().addArgument("aasBuilder.createSubmodelBuilder(idShort, identifier)");
+        produceSetSemanticId(type.semanticId, hasMultiSemId(type), mth);
+
+        mth = mainCls.addSetter(cmlField);
+        mth.getJavadocComment().setComment("Defines whether multi-language properties shall be created. AASPackageExplorer compliance.");
+        mth.getJavadocComment().addParameterComment("createMultiLanguageProperties", "whether multi-language properties shall be created, taints compliance if {@code false}");
+
+        produceMethodsForFields(type.fields, "${clsName}Builder", mainCls);
+        produceBuildMethod(type.fields, "de.iip_ecosphere.platform.support.aas.Submodel", mainCls);
+        produceClassesForFields(type.fields, true, mainCls);
+    }
+        
+}

@@ -1,0 +1,124 @@
+import Basics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template KodexActions(Configuration config, FileArtifact target, MeshElement elt) {
+
+    def generateFields(MeshElement elt, ServiceBase base) {
+    }
+    
+    def generateFields(MeshProcessor elt, KodexService service) {
+        mapOf(Field, KodexFieldAction) actions = {};
+        for (KodexFieldAction a : service.actions) {
+            actions.add(a.field, a); 
+        }
+        for (IOType in: elt.input) {
+            '${generateField(in.type, actions)}'
+        }
+    }
+    
+    def generateField(DataType type, mapOf(Field, KodexFieldAction) actions) {
+        ''
+    }
+    
+    def generateField(PrimitiveType type, mapOf(Field, KodexFieldAction) actions) {
+        ''
+    }
+    
+    // unclear: nested fields
+    def generateField(RecordType type, mapOf(Field, KodexFieldAction) actions) {
+        for (Field f: type.fields) {
+            if (actions.containsKey(f)) {
+                KodexFieldAction fAction = actions.get(f);
+                KodexAction action = fAction.action;
+                '- name: ${f.name}
+                  validators:
+                    - type: IsAction
+                      config:
+                        type: ${actionType(action)}
+                        config:
+                          method: ${actionMethod(action)}
+                          ${actionParams(fAction)|e}
+                    ${typeValidator(f.type)|e}'
+            } else {
+                '- name: ${f.name}
+                  validators:
+                    ${typeValidator(f.type)|e}'
+            }
+        }
+    }
+    
+    def typeValidator(DataType type) {
+        '- type: CanBeAnything'
+    }
+    
+    def typeValidator(PrimitiveType type) {
+        //https://heykodex.com/docs/actions/form-validation
+        switch(type.name) {
+            "Integer" : 
+                '- type: IsInteger', 
+            "Long" : 
+                '- type: IsInteger', 
+            "String" : 
+                '- type: IsString', 
+            "Boolean" : 
+                '- type: IsBoolean',
+            "Float" : 
+                '- type: IsFloat', 
+            "Double" : 
+                '- type: IsFloat', 
+            default:
+                '- type: CanBeAnything'
+        }
+    }
+    
+    // TODO nested compounds??
+    
+    def String actionType(KodexAction action) {
+        switch (action) {
+            KodexAction::PseudonymizeMerengue: "pseudonymize",
+            KodexAction::PseudonymizeHmac: "pseudonymize",
+            KodexAction::PseudonymizeStructured: "pseudonymize"
+        }
+    }
+
+    def String actionMethod(KodexAction action) {
+        switch (action) {
+            KodexAction::PseudonymizeMerengue: "merengue",
+            KodexAction::PseudonymizeHmac: "hmac",
+            KodexAction::PseudonymizeStructured: "structured"
+        }
+    }
+    
+    def String actionParams(KodexFieldAction action) {
+        if (action.action == KodexAction::PseudonymizeStructured) {
+            if (action.type == "date") {
+                'type: date
+                format: "${action.format}"'
+            } else if (action.type == "ipv4") {
+                'type: ipv4
+                preserve-prefixes: ${action.preservePrefixes}'
+            } else if (action.type == "integer") {
+                'type: integer
+                preserve-prefixes: ${action.preservePrefixes}
+                type-params:
+                   min: ${action.typeIntMin}
+                   max: ${action.typeIntMax}'
+            }
+        }
+    }
+    
+    // --------------------- main ---------------------------
+
+    def main(Configuration config, FileArtifact target, MeshElement elt) {
+        'forms:
+           DataForm: &DataForm
+             fields:
+               ${generateFields(elt, elt.impl)}
+        actions:
+           - name: protect ${elt.name} data
+             type: form
+             config: *DataForm'
+    }
+    
+}

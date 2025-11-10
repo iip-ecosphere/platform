@@ -1,0 +1,16 @@
+project AllConstants {
+
+    import IIPEcosphere; 
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    // unused, just for mgtUI testing
+    const String UNUSED_String = "UNUSED";
+    const Boolean UNUSED_Boolean = true;
+    const Integer UNUSED_Integer = 42;
+    const Real UNUSED_Real = 1.23;
+    
+    freeze {
+        .;
+    }
+}

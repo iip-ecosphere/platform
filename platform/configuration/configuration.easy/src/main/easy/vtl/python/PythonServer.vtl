@@ -1,0 +1,46 @@
+import PythonBasics;
+import MeshBasics;
+import ServiceBasics;
+import PythonServerBase;
+insert PythonServerPart*;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(profile="python")
+template PythonServer(Configuration config, PythonCodeArtifact target, PythonServer server, String pkg) extends PythonServerBase {
+    
+    def main(Configuration config, PythonCodeArtifact target, PythonServer server, String pkg) {
+        enableMeshQualifiedTypes(false);
+        String clsName = asTypeName(server.id);
+        target.addImport("AbstractService", "AbstractService");
+        target.addImport("Registry");
+        target.addImport("Version", "Version");
+        target.addImport("Service", "ServiceState");
+        target.addImport("Service", "ServiceKind");
+        target.addImport("interfaces.${clsName}ServerInterface", "${clsName}ServerInterface");
+        produceImports(server, target);
+        target.addSLComment("Do not utilise global code here. Place the needed function in the start / end methods.\n" 
+            + "Add methods needed to be run on the start of a service in the start or end methods NOT in init()", true);
+        
+        addPythonClass(target, clsName + "Server", 'Partially implemented server for "${server.id}"')
+            .addBase(clsName + "ServerInterface").(cls|{
+            produceFields(server, cls);
+            cls.addConstructor("Initializes the server service.").(f|{
+                f.addSuperConstructorCall();
+                produceSuper(server, f);
+            });
+            cls.addFunc("start", "Called when the server shall start.").(f|{
+                produceSetStateStarting(server, f);
+            });
+            cls.addFunc("stop", "Called when the server shall stop.").(f|{
+                produceSetStateStopping(server, f);
+            });
+            generateReceiveClientServer(server, cls);
+            produceRest(server, cls);
+        });
+        
+        target.addSLComment("registers itself");
+        target.addCall(clsName + "Server");
+    }
+    
+}

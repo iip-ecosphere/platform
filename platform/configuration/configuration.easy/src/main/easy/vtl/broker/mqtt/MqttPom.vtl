@@ -1,0 +1,83 @@
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template MqttPom(IIPEcosphere config, FileArtifact target, String ver) {
+	
+    def main(IIPEcosphere config, FileArtifact target, String ver) {
+    '<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+        <modelVersion>4.0.0</modelVersion>
+        <artifactId>InstallBroker</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${config.iipVer}</version>
+    
+        <dependencies>
+          <dependency>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>test.mqtt.hivemq</artifactId>
+            <version>\\${project.version}</version>
+            <type>test-jar</type>
+          </dependency>
+          <dependency>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>transport</artifactId>
+            <version>\\${project.version}</version>
+            <type>test-jar</type>
+          </dependency>
+          <dependency>
+            <groupId>com.hivemq</groupId>
+            <artifactId>hivemq-community-edition-embedded</artifactId>
+            <version>${ver}</version>
+          </dependency>
+        </dependencies>
+      
+        <repositories>       
+          <repository>
+            <id>SSE-mvn</id> <!-- same ID as in easy-maven-settings.xml -->
+            <name>SSE</name>
+            <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
+            <layout>default</layout>
+          </repository>
+        
+          <repository>
+            <id>bintray</id>
+            <url>https://jcenter.bintray.com</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+                <updatePolicy>never</updatePolicy> <!-- local installs -->
+            </snapshots>
+          </repository>
+        </repositories>
+    
+        <build>
+          <plugins>
+              <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-dependency-plugin</artifactId>
+                  <version>3.2.0</version>
+                  <executions>
+                      <execution>
+                          <id>copy-dependencies</id>
+                          <goals>
+                              <goal>copy-dependencies</goal>
+                          </goals>
+                          <phase>package</phase>
+                          <configuration>
+                              <prependGroupId>true</prependGroupId>
+                              <outputDirectory>brokerJars</outputDirectory>
+                              <overWriteReleases>false</overWriteReleases>
+                              <overWriteSnapshots>true</overWriteSnapshots>
+                              <overWriteIfNewer>true</overWriteIfNewer>
+                          </configuration>
+                      </execution>
+                  </executions>
+              </plugin>
+          </plugins>
+        </build>
+      
+    </project>'
+    }
+	
+}

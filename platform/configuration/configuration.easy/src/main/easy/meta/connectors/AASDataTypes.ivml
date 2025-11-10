@@ -1,0 +1,185 @@
+project AASDataTypes {
+
+    import DataTypes;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    typedef LangString String;
+    
+    compound AasLangStringTypeType refines StringTypeType {
+    }
+    AliasType AasLangStringType = {
+        name = "AasLangString",
+        represents = refBy(StringType)
+    };
+
+    compound AasReferenceTypeType refines AliasType {
+    }
+    
+    AasReferenceTypeType AasReferenceType = {
+        name = "AasReference",
+        represents = refBy(StringType)
+    };
+
+    compound AasRelationTypeType refines AliasType {
+    }
+
+    AasRelationTypeType AasRelationType = {
+        name = "AasRelation",
+        represents = refBy(StringType)
+    };
+
+    compound AasFileResourceTypeType refines AliasType {
+    }
+
+    AasFileResourceTypeType AasFileResourceType = {
+        name = "FileResource",
+        represents = refBy(StringType)
+    };
+
+    compound AasBlobTypeType refines AliasType {
+    }
+
+    AasBlobTypeType AasBlobType = {
+        name = "BlobResource",
+        represents = refBy(StringType)
+    };
+
+    compound AasAnyURITypeType refines AliasType {
+    }
+
+    AasAnyURITypeType AasAnyURIType = {
+        name = "AnyURI",
+        represents = refBy(StringType)
+    };
+
+    compound AasRangeTypeType refines AliasType {
+    }
+
+    AasRangeTypeType AasRangeType = {
+        name = "Range",
+        represents = refBy(StringType)
+    };
+    
+    compound AasMultiLangStringTypeType refines AliasType {
+    }
+    
+    AasMultiLangStringTypeType AasMultiLangStringType = {
+    	name = "LangStrings",
+        represents = refBy(StringType)
+    };
+
+    compound AasEnumLiteral refines EnumLiteral {
+        String semanticId;
+        String value;
+        String identifier;
+        String description;
+    }
+    
+    compound AasEnumType refines EnumType {
+        sequenceOf(AasEnumLiteral) literals;
+        String description;
+        String versionIdentifier;
+        Boolean isOpen = false;
+        String semanticId;
+    }
+
+    typedef AasFields sequenceOf(AasField) with (AasFields->select(f|isRelevant(f))->collect(f|f.name).hasDuplicates() == false);
+    
+    abstract compound AasElementType refines RecordType {
+        String idShort;
+        String semanticId;
+        Boolean multiSemanticIds = false;        
+        String description;
+        Boolean fixedName = false;
+        Boolean isGeneric = false;
+        String versionIdentifier;
+    }
+    
+    @DispatchBasis
+    def Boolean isNameOk(AasElementType t) = 
+        matches(t.name, "^[\\w <>\\{\\}\\[\\]\\-\\Q$_\\E]+$");
+
+    compound AasSubmodelType refines AasElementType {
+        AasFields fields;
+    }
+
+    abstract compound AasSubmodelElementContainerType refines AasElementType {
+    }
+    
+    compound AasSubmodelElementCollectionType refines AasSubmodelElementContainerType {
+        AasFields fields;
+        Boolean ordered = false;
+        Boolean allowDuplicates = false;
+    }
+    
+    // preliminary, as long as platform is not based on BaSyx 2; also not part of metamodel v3
+    // TODO change refinement, remove ordered/allowDuplicates
+    compound AasSubmodelListType refines AasSubmodelElementCollectionType {
+        Boolean ordered = true;
+        Boolean allowDuplicates = true;
+    }
+
+    // preliminary, as long as platform is not based on BaSyx 2
+    compound AasSubmodelElementListType refines AasSubmodelElementCollectionType {
+        Boolean ordered = true;
+        Boolean allowDuplicates = true;
+    }
+    
+    enum AasEntityKind { COMANAGEDENTITY, SELFMANAGEDENTITY }; // same name as in code, kind as AasEntityType is used
+    
+    compound AasEntityType refines AasElementType {
+        AasFields fields;
+        AasEntityKind type = AasEntityKind::SELFMANAGEDENTITY;
+    }
+    
+    compound AasField refines Field {
+        String semanticId;
+        Boolean multiSemanticIds = false;        
+        String description;
+        String groupWith = null;
+        Boolean counting = false;
+        Boolean countInstanceOnValue = false;
+        Integer minimumInstances = -1;
+        Integer maximumInstances = -1;
+        setOf(String) examples;
+        Boolean isGeneric = false;
+        String aspect = null;
+        String displayName = null;
+        //Constraint isCountingTypeOk = counting or maximumInstances > 1 or (minimumInstances >= 0 and maximumInstances < 0) implies refBy(type).isKindOf(ListType);
+    }
+
+    @DispatchCase    
+    def Boolean isRelevant(AasField f) = 
+        not(f.isGeneric) and not(f.counting);
+
+    @DispatchCase
+    def Boolean isNameOk(AasField f) = 
+        f.isGeneric or matches(f.name, "^[\\w <>\\{\\}\\[\\]\\-\\Q$_\\E]+$");    
+
+    // generic -> VIL, getRecordTypes()
+
+    AasSubmodelElementCollectionType AasGenericSubmodelElementCollection = {
+        name = "SubmodelElementCollection",
+        fields = {
+        }
+    };
+
+    AasSubmodelElementCollectionType AasGenericSubmodelElementList = {
+        name = "SubmodelElementList",
+        fields = {
+        }
+    };
+    
+    AasEntityType AasGenericEntityType = {
+        name = "Entity", 
+        fields = {
+        }
+    };
+        
+    // freeze all variables
+    freeze {
+    	.;
+    };
+    
+}

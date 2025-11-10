@@ -1,0 +1,15 @@
+ServerPartFlowerAI::FlowerFederatedAiServer::framework = The AI framework to be used in the generated implementation template.
+ServerPartFlowerAI::FlowerFederatedAiServer::transportChannel = Refined name of transport channel.
+ServerPartFlowerAI::FlowerFederatedAiServer::description = Refined description of the server.
+ServerPartFlowerAI::FlowerFederatedAiServer::ver = Refined version of the server.
+ServerPartFlowerAI::FlowerFederatedAiServer::dependencies = Refined dependencies for Flower.
+ServerPartFlowerAI::FlowerFederatedAiServer::reqDependenciesOk = The minimum required dependencies for Flower must be specified.
+ServerPartFlowerAI::FlowerFederatedAiServer::numServerClients = Number of server clients.
+ServerPartFlowerAI::FlowerFederatedAiServer::numServerRounds = Number of server rounds.
+ServerPartFlowerAI::FlowerFederatedAiServer::numFlClients = Number of FL clients.
+ServerPartFlowerAI::FlowerFederatedAiServer::numFlRounds = Number of FL rounds.
+ServerPartFlowerAI::reqFlowerDependencies = Minimum required dependencies for Flower.
+ServerPartFlowerAI::flowrDependency = Required (re-usable) flower dependency.
+ServerPartFlowerAI::FlowerAiFramework::dependencies = dependencies for flower framework
+ServerPartFlowerAI::PyTorchFlowerAiFramework = pre-defined Flower framework based on pyTorch
+ServerPartFlowerAI::TensorFlowFlowerAiFramework = pre-defined Flower framework based on tensorflow

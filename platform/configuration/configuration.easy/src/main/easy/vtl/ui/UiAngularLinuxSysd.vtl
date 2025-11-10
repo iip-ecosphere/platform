@@ -1,0 +1,41 @@
+import JavaOsBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template UiAngularLinuxSysd(Configuration config, FileArtifact target, String requires="", String after="") {
+	
+    def main(Configuration config, FileArtifact target, String requires="", String after="") {
+        IIPEcosphere cfg = config;
+        String instDir = cfg.instDirDflt;
+        if (isDefined(cfg.instDir)) {
+            instDir = cfg.instDir;
+        }
+        
+        '[Unit]
+        Description=IIP-Ecosphere Management Web UI
+        ${after(after)|e}
+        ${requires(requires)|e}
+        
+        [Service]
+        WorkingDirectory=${instDir}/gen
+        Type=simple
+        Restart=on-failure
+        ExecStart=/usr/bin/bash ./mgtUi.sh
+        
+        [Install]
+        WantedBy=multi-user.target'
+    }
+
+    def requires(String requires) {
+        if (requires.length() > 0) {
+            'Requires=${requires}'
+        }
+    }
+
+    def after(String after) {
+        if (after.length() > 0) {
+            'After=${after}'
+        }
+    }
+    
+}

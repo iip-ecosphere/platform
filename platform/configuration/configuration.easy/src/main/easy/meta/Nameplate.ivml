@@ -1,0 +1,38 @@
+/*
+ * Basic AAS nameplates for manufacturers in IIP-Ecosphere (preliminary).
+ */
+project Nameplate {
+
+    import NameplateBase;
+    import NameplatePart*;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    Manufacturer manufacturer_sse = {
+        manufacturerName = "Universitaet Hildesheim@de",
+        manufacturerLogo = "SSE-Logo.png",
+        address = {
+            department = "Software Systems Engineering@de",
+            street = "Universitaetsplatz 1@de",
+            zipCode = "31141@de",
+            cityTown = "Hildesheim@de"
+        }
+    };
+
+    Manufacturer manufacturer_l3s = {
+        manufacturerName = "Universitaet Hannover@de",
+        manufacturerLogo = "L3S-Logo.png",
+        address = {
+            department = "Forschungszentrum L3S@de",
+            street = "Appelstraße 9a@de",
+            zipCode = "30167@de",
+            cityTown = "Hannover@de"
+        }
+    };
+        
+    // unconditional for all IIP vendors
+    freeze {
+      .;
+    };
+    
+}

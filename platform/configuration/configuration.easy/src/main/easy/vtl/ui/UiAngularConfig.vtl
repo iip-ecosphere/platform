@@ -1,0 +1,35 @@
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template UiAngularConfig(IIPEcosphere config, FileArtifact target) {
+	
+    def String aasVersion(IIPEcosphere cfg) {
+        switch (cfg.aas) {
+            AasImpl::BaSyx : "v2",
+            AasImpl::BaSyx2 : "v3",
+            default: ""
+        }
+    }	
+	
+    def main(IIPEcosphere config, FileArtifact target) {
+        EndpointAddress aasServer = config.aasServer;
+        String schema = aasServer.schema.getStringValue();
+        String ip = "${toLowerCase(schema)}://${aasServer.host}:${aasServer.port}";
+        String smIp = "";
+        boolean requireAuthentication = isDefined(aasServer.security) and aasServer.security <> null;
+        if (isDefined(config.smServer) and config.smServer <> null) {
+            EndpointAddress smServer = config.smServer;
+            String smSchema = smServer.schema.getStringValue();
+            smIp = "${toLowerCase(smSchema)}://${smServer.host}:${smServer.port}";
+            requireAuthentication = requireAuthentication or (isDefined(smServer.security) and smServer.security <> null);
+        } // TODO -> JsonArtifact
+        '{
+          "ip": "${ip}",
+          "urn": "urn%3A%3A%3AAAS%3A%3A%3AiipEcosphere%23",
+          "smIp" : "${smIp}",
+          "metaModelVersion" : "${aasVersion(config)}",
+          "requireAuthentication" : ${requireAuthentication},
+          "httpTimeout" : 1000
+        }'
+    }
+	
+}

@@ -1,0 +1,104 @@
+import Basics;
+import JavaMapping;
+import EcsRuntimeDockerContainerManagerYaml;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(profile="yaml", indentSteps = 2, profileArg_sorting = "INSERT")
+template PlatformYaml(IIPEcosphere config, YamlFileArtifact target, String modelName) {
+
+    def produceDevMgtServer(IIPEcosphere config, YamlNode node) {
+        DeviceMgtStorageServer s = config.deviceMgtStorageServer; 
+        if (s.port > 0) {
+            YamlNode sServer = node.addObject("storageServer");
+            sServer.addValue("port", s.port);
+            sServer.addValueNotEmpty("path", s.path); // default null, considered
+            sServer.addValueNotEmpty("authenticationKey", s.authenticationKey); // default null, considered
+        } 
+    }
+    
+    def produceDeviceMgtStorage(String topKey, DeviceMgtStorage s, PackageStore p, YamlNode node) {
+        YamlNode kNode = node.addObject(topKey);
+        kNode.addValue("endpoint", "http://${s.host}:${s.port}");
+        kNode.addValue("region", s.region);
+        kNode.addValueNotEmpty("authenticationKey", s.authenticationKey);  // default null, considered
+        kNode.addValue("bucket", p.bucket);
+        kNode.addValue("prefix", p.prefix);
+        kNode.addValue("packageDescriptor", p.packageDescriptor);
+        kNode.addValue("packageFilename", p.packageFilename);
+    }
+
+    def produceDevMgt(IIPEcosphere config, YamlNode node) {
+        produceDeviceMgtStorage("runtimeStorage", config.deviceMgtStorage, config.deviceMgtStorage.runtimeStorage, node);
+        produceDeviceMgtStorage("configStorage", config.deviceMgtStorage, config.deviceMgtStorage.configStorage, node);
+        produceDevMgtServer(config, node);
+    }
+
+    @DispatchBasis    
+    def produceCentralMonitoring(PlatformMonitoring mon, YamlNode node) {
+    }
+
+    @DispatchCase
+    def produceCentralMonitoring(PrometheusPlatformMonitoring mon, YamlNode node) {
+        // we assume a common schema for now
+        YamlNode prom = node.addObject("prometheus");
+        produceMonServer(prom, "server", mon.schema, mon.host, mon.port, mon.running);
+        produceMonServer(prom, "exporter", mon.schema, mon.exporterHost, mon.exporterPort, mon.exporterRunning);
+        produceMonServer(prom, "alertMgr", mon.schema, mon.alertMgrHost, mon.alertMgrPort, mon.alertMgrRunning);
+        prom.addValue("scrapeInterval", mon.scrapeInterval);
+        prom.addValue("scrapeTimeout", mon.scrapeTimeout);
+    }
+    
+    def produceMonServer(YamlNode node, String kind, DecisionVariable schema, String host, Integer port, Boolean running) {
+        YamlNode s = node.addObject(kind);
+        s.addValue("schema", schema);
+        s.addValue("host", host);
+        s.addValue("port", port);
+        s.addValue("running", running);
+    }
+    
+    def produceEasy(IIPEcosphere config, String modelName, YamlNode node) {
+        YamlNode ep = node.addObject("easyProducer");
+        ep.addValue("ivmlModelName", modelName);
+        String base = ".";
+        if (config.modelBaseFolder <> null) {
+            base = config.modelBaseFolder;
+        }
+        ep.addValue("base", base);
+        String genTarget = "gen";
+        if (config.genTarget <> null) {
+            genTarget = config.genTarget;
+        }
+        ep.addValue("genTarget", genTarget);
+        String metaModelFolder = "src/main/easy";
+        if (config.metaModelFolder <> null) {
+            metaModelFolder = config.metaModelFolder;
+        }
+        ep.addValue("ivmlMetaModelFolder", "${base}/${metaModelFolder}");
+        String configFolder = "";
+        if (config.configFolder <> null) {
+            configFolder = config.configFolder;
+        }
+        ep.addValue("ivmlConfigFolder", "${base}/${configFolder}");
+        if (isDefined(config.additionalModelFolders) and config.additionalModelFolders <> null and config.additionalModelFolders.size() > 0) {
+            ep.addList("additionalIvmlFolders", config.additionalModelFolders->sortedBy(s|s).asSequence());
+        }
+    }
+
+    def main(IIPEcosphere config, YamlFileArtifact target, String modelName) {
+        String pers = "${config.aasPersistency}";
+        YamlNode n = target.addDocument(true);
+        produceTransport(config, n);
+        produceAas(config, n, pers, false);
+        produceNetMgr(config, n);
+        produceDevMgt(config, n);
+        produceCentralMonitoring(config.platformMonitoring, n);
+        produceEasy(config, modelName, n);
+        n.addValue("artifactsFolder", config.artifactsFolder);
+        n.addValue("artifactsUriPrefix", config.artifactsUriPrefix);
+        n.addValueNotEmpty("uploadFolder", getStringValueSafe(config.uploadFolder, ""));
+        n.addValue("aasHeartbeatTimeout", getIntegerValueSafe(config.deviceHeartbeatTimeout, config.deviceHeartbeatTimeoutDflt));
+        producePlugins(config, n);
+    }
+
+}

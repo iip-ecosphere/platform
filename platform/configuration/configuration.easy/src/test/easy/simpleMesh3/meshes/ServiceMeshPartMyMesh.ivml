@@ -1,0 +1,41 @@
+project ServiceMeshPartMyMesh {
+
+    import AllServices;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    ServiceMesh myMesh = {
+        description = "initial service net",
+        sources = {refBy(mySource)}
+    };
+    
+    MeshSource mySource = {
+        pollInterval = 800, // only if source is synchronous
+        impl = refBy(mySourceService),
+        next = {refBy(myConnMySourceMyTransformer)}
+    };
+    
+    MeshConnector myConnMySourceMyTransformer = {
+        name = "Source->Transformer",
+        next = refBy(myTransformer)
+    };
+
+    MeshProcessor myTransformer = {
+        impl = refBy(myTransformerService),
+        next = {refBy(myConnMyTransformerMyReceiver)}
+    };
+
+    MeshConnector myConnMyTransformerMyReceiver = {
+        name = "Transformer->Receiver",
+        next = refBy(myReceiver)
+    };
+
+    MeshSink myReceiver = {
+        impl = refBy(myReceiverService)
+    };
+
+    freeze {
+        .;
+    }
+
+}

@@ -1,0 +1,14 @@
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template TemplatesFlowerConfig(IIPEcosphere config, FileArtifact target, FlowerFederatedAiServer server) {
+	
+	def main(IIPEcosphere config, FileArtifact target, FlowerFederatedAiServer server) {
+	'[server]
+rounds=${server.numServerRounds}
+clients=${server.numServerClients}
+[fl]
+rounds=${server.numFlRounds}
+clients=${server.numFlClients}'
+	}
+	
+}

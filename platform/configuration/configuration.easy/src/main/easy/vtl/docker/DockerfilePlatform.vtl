@@ -1,0 +1,57 @@
+import Basics;
+import JavaBasics;
+import DockerBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template DockerfilePlatform(IIPEcosphere config, FileArtifact target) {
+	
+    def main(IIPEcosphere config, FileArtifact target) {
+
+        SystemDependency platformPythonVersion = getPlatformPythonValueSafe(config);
+        
+        '${getPythonBaseImage(platformPythonVersion.key)}'
+        ''
+        'RUN apt-get update -y && apt install wget -y && wget https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.deb && dpkg -i jdk-21_linux-x64_bin.deb'
+
+        'COPY requirements.txt requirements.txt'
+        'RUN python3 -m pip install -r requirements.txt'
+
+        '# Installed dependencies (shall be in /)'
+        'COPY installedDependencies.yml installedDependencies.yml'
+        ''
+        '${genTestingMode(config, "Python")}'
+        ''
+        'WORKDIR /app'
+        ''
+        '# Broker'
+        'COPY broker/brokerJars/ brokerJars'
+        'COPY broker/src/ src'
+        'COPY broker/broker.sh broker.sh'
+        ''
+        '# Platform'
+        'COPY plJars/ plJars'
+        'COPY common/ common'
+        'COPY platform.sh platform.sh'
+        ''
+        if (hasUI(config)) {
+            '# mgtUi'
+            'RUN apt update && apt install -y curl gnupg && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && apt install -y nodejs && npm install -g @angular/cli@19.2.5'
+            'COPY mgtUi/ mgtUi'
+            'COPY common/ common'
+            'COPY mgtUi.sh mgtUi.sh'
+            ''
+        }
+        if (hasMonitoring(config)) {
+            '# monitoring'
+            'COPY monJars/ monJars'
+            'COPY common/ common'
+            'COPY monitoring.sh monitoring.sh'
+            ''
+        }
+        ''
+        'COPY wrapper_script_platform.sh wrapper_script_platform.sh'
+        'RUN chmod 777 wrapper_script_platform.sh'
+        'ENTRYPOINT ["./wrapper_script_platform.sh"]'
+    }
+}

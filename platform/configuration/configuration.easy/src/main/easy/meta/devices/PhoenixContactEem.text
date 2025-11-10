@@ -1,0 +1,14 @@
+PhoenixContactEem::phoenixEem370_rw_Day = MODUBUS/TCP (EEM, RW): Day of occurrence of the voltage dip (UTC)
+PhoenixContactEem::phoenixEem370_rw_Month = MODUBUS/TCP (EEM, RW): Month of occurrence of the voltage dip (UTC)
+PhoenixContactEem::phoenixEem370_rw_Year = MODUBUS/TCP (EEM, RW): Year of occurrence of the voltage dip (UTC)
+PhoenixContactEem::phoenixEem370_U12 = MODUBUS/TCP (EEM, R): Effective value voltage U12
+PhoenixContactEem::phoenixEem370_U23 = MODUBUS/TCP (EEM, R): Effective value voltage U23
+PhoenixContactEem::phoenixEem370_U31 = MODUBUS/TCP (EEM, R): Effective value voltage U31
+PhoenixContactEem::phoenixEem370_U1 = MODUBUS/TCP (EEM, R): Effective value voltage U1
+PhoenixContactEem::phoenixEem370_U2 = MODUBUS/TCP (EEM, R): Effective value voltage U2
+PhoenixContactEem::phoenixEem370_U3 = MODUBUS/TCP (EEM, R): Effective value voltage U3
+PhoenixContactEem::phoenixEem370_frequency = MODUBUS/TCP (EEM, R): Frequency
+PhoenixContactEem::phoenixEem370_I1 = MODUBUS/TCP (EEM, R): Effective value current I1
+PhoenixContactEem::phoenixEem370_I2 = MODUBUS/TCP (EEM, R): Effective value current I2
+PhoenixContactEem::phoenixEem370_I3 = MODUBUS/TCP (EEM, R): Effective value current I3
+PhoenixContactEem::phoenixEem370_totalActivePower = MODUBUS/TCP (EEM): Total active power.

@@ -1,0 +1,20 @@
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template AppAnt(IIPEcosphere config, FileArtifact target, String artifactPrefix, String srvFolderName) {
+
+    def main(IIPEcosphere config, FileArtifact target, String artifactPrefix, String srvFolderName) {
+        '<?xml version="1.0" encoding="UTF-8"?>
+            <project name="configuration.configuration" default="maven" basedir=".">
+            <!-- import of the global SSE Jenkins properties -->
+            <property file="\\${user.home}/global-build.properties"/>
+            <property file="\\${user.home}/qualimaster-build.properties"/>
+            <include file="\\${user.home}/macros.xml"/>
+    
+            <!-- deploy to SSE Mvn repo -->
+            <target name="maven"> 
+                <mvnDeployResolveArtifact folderName="${srvFolderName}" pomFile="pom.xml" jarFolder="target" artifactPattern="${artifactPrefix}-*.*.*.jar" />
+            </target>
+        </project>'
+    }
+
+}

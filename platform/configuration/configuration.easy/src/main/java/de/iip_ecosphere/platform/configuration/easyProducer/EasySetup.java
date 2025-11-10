@@ -36,10 +36,19 @@ public class EasySetup {
     /**
      * Returns the folder for testing EASy models. 
      * 
-     * @return the folder, per default "../configuration", or the value in "-Dokto.test.easy.model.parent"
+     * @return the folder, per default ".", or the value in "-Dokto.test.easy.model.parent"
      */
     public static String getTestingEasyModelParent() {
-        return System.getProperty(PROP_TEST_MODEL_PARENT, "../configuration");
+        String result = "."; // this directory
+        final String cfgEasy = "configuration.easy";
+        File current = new File("");
+        if (current.getName().equals(cfgEasy)) { // for local testing it's convenient to not re-deploy the model
+            File easy = new File("..", cfgEasy);
+            if (easy.isDirectory()) {
+                result = easy.toString();
+            }
+        }
+        return result; //System.getProperty(PROP_TEST_MODEL_PARENT, "../configuration");
     }
     
     /**

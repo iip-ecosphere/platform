@@ -1,0 +1,28 @@
+/*
+ * AAS nameplate for RapidMiner.
+ * Although IIP-Ecosphere partner, factored out for demonstration and due to commercial license of RTSA (see license 
+ * limitations in platform handbook).
+ */
+project NameplatePartRapidminer {
+
+    import NameplateBase;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    Manufacturer manufacturer_rapidminer = {
+        manufacturerName = "RapidMiner Germany@de",
+        manufacturerLogo = "",
+        address = {
+            department = "RapidMiner GmbH@de",
+            street = "Westfalendamm 87@de",
+            zipCode = "44141@de",
+            cityTown = "Dortmund@de"
+        }
+    };
+    
+    // unconditional "constant" freeze
+    freeze {
+      .;
+    };
+    
+}

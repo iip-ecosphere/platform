@@ -1,0 +1,68 @@
+project Transport {
+
+    import Aas;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    annotate String semanticId = "" to .;
+    
+    // enum for now
+    enum Serializer { Json, ProtoBuf };
+    Serializer serializer = Serializer::Json;
+    Constraint serializerDefined = isDefined(serializer);
+
+    // ----------------------------------------------
+    
+    enum ProtocolType { Mqttv3, Mqttv5, Amqp };
+    
+    abstract compound TransportProtocol {
+    	ProtocolType type;
+    	String globalHost = "localhost"; // ignored for local, only for global
+    	Port port = 8883; // preliminary, needed for AMQP tests
+    	Port localPort = port; // by default, we run the local brokers on the same port, but this may be overridden
+    	Port localEcsPort = 8889; // the local broker port for ECS containers  
+        SecuritySettings security = null;
+        assign(semanticId = Eclass_Property_swVersion) to {
+            String brokerVer = ""; // Maven version of the (instantiated default) broker to use
+        }
+        assign (semanticId = Eclass_Unit_ms) to {
+            Integer actionTimeout = 1000;
+        }
+        assign (semanticId = Eclass_Unit_MByte) to {
+            Integer memLimit = 440; // e.g., JVM memory limit in MBytes
+        }
+        EphemeralPort gatewayPort = 10000;
+        String netmask = "";
+        //Constraint actionTimeoutValid = isDefined(actionTimeout) and actionTimeout > 0; // currently NPE in EAYs
+    };
+    
+    compound TransportProtocolAMQP refines TransportProtocol {
+    	ProtocolType type = ProtocolType::Amqp;
+    	OktoVersion brokerVer = "8.0.2"; // of Apache QPID-J, still on JDK 8 to keep JDK 8 test process, use 9.0.0 for bug fixes and JDK 11
+    };
+    
+    compound TransportProtocolMQTTv3 refines TransportProtocol { // min actionTimeout done by VTL
+    	ProtocolType type = ProtocolType::Mqttv3;
+        String brokerVer = "2020.4"; // of hivemq
+    };
+    
+    compound TransportProtocolMQTTv5 refines TransportProtocol { // min actionTimeout done by VTL
+    	ProtocolType type = ProtocolType::Mqttv5;
+        String brokerVer = "2020.4"; // of hivemq
+    };    
+    
+    TransportProtocol transportProtocol = TransportProtocolAMQP {
+    };
+
+    // TODO separate local and global?
+    
+    isDefined(transportProtocol);
+    
+    // TODO 
+    // - transport protocol payload limitation
+    
+    freeze {
+        // prevent later changes of constraint but make it referencable to .text
+        serializerDefined;
+    };
+    
+}

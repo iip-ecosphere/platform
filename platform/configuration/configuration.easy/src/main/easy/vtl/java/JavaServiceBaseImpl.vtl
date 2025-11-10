@@ -1,0 +1,218 @@
+import Basics;
+import JavaBasics;
+import ServiceBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120)
+template JavaServiceBaseImpl(Configuration config, JavaCodeArtifact target, ServiceBase service, String pkg) extends ServiceBasics {
+
+    setOf(JavaCodeMethodCall) regs = {};
+    setOf(String) ingestorTypes = {};
+    JavaCodeClass mainCls;
+
+    def String attributeName(Parameter p) {
+        p.name.firstToLower();
+    }
+    
+    def String attributeMethodSuffix(Parameter p) {
+        p.name.firstToUpper();
+    }
+    
+    // ---------------------------------- configurers -------------------------
+    
+    def registerParameter(Parameter p, String cls, String typeTranslator) {
+        String suffix = attributeMethodSuffix(p);
+        mainCls.addImport("de.iip_ecosphere.platform.transport.serialization.TypeTranslators"); // as used below
+        new JavaCodeMethodCall("de.iip_ecosphere.platform.services.environment.AbstractService.addConfigurer", JavaCodeImportScope.METHOD_CLASS_IMPORT).(c|{
+            c.addArgument("paramConfigurers").addStringArgument(p.name).addArgument(cls).addArgument(typeTranslator);
+            c.addArgument("v -> setParameter${suffix}(v)").addArgument("() -> getParameter${suffix}()").addStringArgumentNotEmpty(getStringValueSafe(p.systemProperty, ""));
+            regs.add(c);
+        });
+    }
+    
+    // ---------------------------------- attributes ----------------------------
+
+    // called via produceForParameterAttributes(service)
+    def produceParameterAttribute(StringParameter p) {
+        registerParameter(p, "String.class", "TypeTranslators.JSON_STRING");
+        mainCls.addAttribute("String", attributeName(p)).addStringInitializer(p.defaultValue);
+    }
+
+    // called via produceForParameterAttributes(service)
+    def produceParameterAttribute(IntegerParameter p) {
+        registerParameter(p, "Integer.class", "TypeTranslators.INTEGER");
+        mainCls.addAttribute("int", attributeName(p)).addInitializer(p.defaultValue);
+    }
+
+    // called via produceForParameterAttributes(service)
+    def produceParameterAttribute(LongParameter p) {
+        registerParameter(p, "Long.class", "TypeTranslators.LONG");
+        mainCls.addAttribute("long", attributeName(p)).addInitializer(p.defaultValue);
+    }
+
+    // called via produceForParameterAttributes(service)
+    def produceParameterAttribute(BooleanParameter p) {
+        registerParameter(p, "Boolean.class", "TypeTranslators.BOOLEAN");
+        mainCls.addAttribute("boolean", attributeName(p)).addInitializer(p.defaultValue);
+    }
+
+    // called via produceForParameterAttributes(service)
+    def produceParameterAttribute(RealParameter p) {
+        registerParameter(p, "Double.class", "TypeTranslators.DOUBLE");
+        mainCls.addAttribute("double", attributeName(p)).addInitializer(p.defaultValue);
+    }
+    
+    def produceIngestorBody(IOType type) {
+        ingestorTypes.add(toQualifiedTypeName(type));
+    }
+    
+    // ---------------------------------- accessors ----------------------------
+    
+    def produceAccessors(Parameter p, String type) {
+        mainCls.addMethod("", "setParameter" + attributeMethodSuffix(p), 'Changes the service parameter "${p.name}".').(m|{
+            m.addParameter(type, attributeName(p), "the parameter value");
+            m.addException("java.util.concurrent.ExecutionException", "if setting the value fails, e.g., as the service is in the wrong state such as startup vs. runtime");
+            m.addAssignment("this." + attributeName(p), attributeName(p));
+        });
+        mainCls.addMethod(type, "getParameter" + attributeMethodSuffix(p), 'Returns the service parameter "${p.name}".').(m|{
+            m.addReturn("this." + attributeName(p), "the value of the parameter");
+        });
+    }
+    
+    // called via produceForParameter(service)
+    def produceParameterBody(StringParameter p) {
+        produceAccessors(p, "String");
+    }
+
+    // called via produceForParameter(service)
+    def produceParameterBody(IntegerParameter p) {
+        produceAccessors(p, "int");
+    }
+
+    // called via produceForParameter(service)
+    def produceParameterBody(LongParameter p) {
+        produceAccessors(p, "long");
+    }
+
+    // called via produceForParameter(service)
+    def produceParameterBody(BooleanParameter p) {
+        produceAccessors(p, "boolean");
+    }
+
+    // called via produceForParameter(service)
+    def produceParameterBody(RealParameter p) {
+        produceAccessors(p, "double");
+    }
+
+    def createFallbackConstructor(JavaCodeClass cls, boolean withId, boolean withCode) {
+        cls.addConstructor('Fallback constructor setting most fields to "empty" default values.').(m|{
+            m.setProtected();
+            new JavaCodeMethodCall("super").(c|{
+                if (withId) {
+                    c.addArgument(m.addParameter("String", "serviceId", "the id of the service"));
+                }
+                c.addArgument(m.addParameter("de.iip_ecosphere.platform.services.environment.ServiceKind", "kind", "the service kind"));
+                m.add(c);
+            });
+            if (withCode) {
+                m.addCall("registerParameterConfigurers");
+            }
+        });
+    }
+    
+    def createYamlConstructor(JavaCodeClass cls, boolean withId, boolean withCode) {
+        cls.addConstructor('Creates a service instance from YAML information.').(m|{
+            m.setProtected();
+            new JavaCodeMethodCall("super").(c|{
+                if (withId) {
+                    m.getJavadocComment().setComment("Creates a service instance from a service id and a YAML artifact.");
+                    c.addArgument(m.addParameter("String", "serviceId", "the id of the service"));
+                    c.addArgument(m.addParameter("java.io.InputStream", "ymlFile", "the YML file containing the YAML artifact with the service descriptor"));
+                } else {
+                    c.addArgument(m.addParameter("de.iip_ecosphere.platform.services.environment.YamlService", "yaml", "the service information as read from YAML"));
+                }
+                m.add(c);
+            });
+            if (withCode) {
+                m.addCall("registerParameterConfigurers");
+            }
+        });
+    }
+    
+    def main(Configuration config, JavaCodeArtifact target, ServiceBase service, String pkg) {
+        String clsName = asTypeName(service.name);
+        // produceForInputTypes/produceForOutputTypes shall not produce something rather than collect the ingestors
+        produceForInputTypes(service);
+        produceForOutputTypes(service);
+
+        mainCls = codeCreateClass(target, pkg, clsName + "Impl", "IIP-Ecosphere supporting service implementation for \'${service.name}\'");
+        mainCls.setAbstract();
+        mainCls.addExtends("de.iip_ecosphere.platform.services.environment.DefaultServiceImpl");
+        mainCls.addInterface("iip.interfaces." + clsName + "Interface");
+        produceForParameterAttributes(service);
+        for (String t : ingestorTypes->sortedBy(n|n)) {
+             mainCls.addAttribute("java.util.List<de.iip_ecosphere.platform.services.environment.DataIngestor<$t>>", toSimpleName(t).firstToLowerCase() + "Ingestors").addNew("java.util.ArrayList<>");
+        }
+        mainCls.addAttribute("java.util.Map<String, de.iip_ecosphere.platform.services.environment.ParameterConfigurer<?>>", "paramConfigurers").addNew("java.util.HashMap<>");
+
+        createFallbackConstructor(mainCls, false, true);
+        createFallbackConstructor(mainCls, true, true);
+        createYamlConstructor(mainCls, false, true);
+        createYamlConstructor(mainCls, true, true);
+        
+        mainCls.addMethod("de.iip_ecosphere.platform.services.environment.ParameterConfigurer<?>", "getParameterConfigurer").(m|{
+            m.param("String", "paramName");
+            m.override();
+            m.addReturn("paramConfigurers.get(paramName)");
+        });
+        mainCls.addMethod("java.util.Set<String>", "getParameterNames").(m|{
+            m.override();
+            m.addReturn("paramConfigurers.keySet()");
+        });
+        mainCls.addMethod("", "registerParameterConfigurers", "Registers the configurers.").setProtected().(m|{
+            regs->forEach(JavaCodeMethodCall r|m.add(r));
+        });
+        produceForParameter(service);
+
+        for (String t : ingestorTypes->sortedBy(n|n)) {
+            String sT = toSimpleName(t);
+            String mNameInfix = sT.firstToUpperCase() + "Ingestor";
+            String att = sT.firstToLowerCase() + "Ingestors";
+            mainCls.addMethod("", "attach" + mNameInfix).(m|{
+                m.override();
+                m.param("de.iip_ecosphere.platform.services.environment.DataIngestor<${t}>", "ingestor");
+                m.addIf("ingestor != null").addCall("add").qualifiedBy(att).addArgument("ingestor");
+            });
+            mainCls.addMethod("boolean", "has" + mNameInfix, "Returns whether there are registered ${sT} ingestors.").setProtected().(m|{
+                m.addReturn(att + ".size() > 0", "{@code true} if there are ${sT} ingestors, {@code false} else");
+            });
+            mainCls.addMethod("int", "has" + mNameInfix + "Count", "Returns the number of registered ${sT} ingestors.").setProtected().(m|{
+                m.addReturn(att + ".size()", "the number of ${sT} ingestors");
+            });
+            mainCls.addMethod("", "ingest" + sT.firstToUpperCase(), "Sends {@code data} to all registered ${sT} ingestors.").setProtected().(m|{
+                m.param(t, "data", "the data to be sent");
+                m.addForLoop("int", "i", "0", "i < ${att}.size()", "i++").(f|{
+                    f.addCall("get").qualifiedBy(att).addArgument("i").addCall("ingest").addArgument("data");
+                });
+            });
+        }
+
+        // added v2->v3  
+        IIPEcosphere cfg = config;
+        String add = "";
+        if (cfg.sharedInterfaces) {
+            add = "Impl";
+        }
+        for (IOType t: service.output) {
+            if (resolveType(t).isTypeOf(RecordType)) {
+                String type = toTypeName(t);
+                String qType = toQualifiedTypeName(t);
+                mainCls.method(qType, "create${type}", "Creates an actual instance of the output type ${type}.")
+                    .return(new JavaCodeMethodCall("createType").classArg(type)
+                        .arg(new JavaCodeLambdaExpression().expr(new JavaCodeConstructorCall(qType + add))));
+            }
+        }
+    }
+    
+}

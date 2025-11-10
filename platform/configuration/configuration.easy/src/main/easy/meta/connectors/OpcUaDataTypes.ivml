@@ -1,0 +1,130 @@
+project OpcUaDataTypes {
+
+    import DataTypes;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+
+    enum NodeClass {UAObject, UAObjectType, UAVariable, UAVariableType, UADataType, UAMethod};
+    
+    compound NodeId {
+		Integer nameSpaceIndex;
+		Integer identifier;
+    }
+    
+    typedef OpcLocalizedText String;
+    
+    compound OpcUnknownDataTypeType refines ObjectTypeType {
+    }
+    OpcUnknownDataTypeType opcUnknownDataType = {
+		name = "UnknownDataType"
+    };
+
+    compound UnsignedIntegerTypeType refines IntegerTypeType {
+    }
+    UnsignedIntegerTypeType opcUnsignedIntegerType = {
+		name = "UnsignedInteger"
+    };
+    
+    compound UABaseType refines RecordType {
+        self.isTypeOf(UABaseType) implies fields.size() == 0;
+        NodeId nodeId;
+		NodeClass nodeClass;
+		String browseName;
+		String displayName;
+		OpcLocalizedText description;
+		Boolean optional;
+    }
+
+    compound UAObjectType refines UABaseType {
+		refTo(DataType) typeDefinition;
+		UAObjectFields fields;
+    }
+
+    compound UARootObjectType refines UAObjectType {
+		refTo(DataType) rootParent;
+    }
+    
+    compound UAMethodType refines UABaseType {
+    	UAMethodFields fields;
+    }
+    
+    compound UARootMethodType refines UAMethodType {
+    	refTo(DataType) rootParent;
+    }
+    
+    compound UARootVariableType refines UABaseType {
+    	refTo(DataType) type;
+    	refTo(DataType) typeDefinition;
+    	refTo(DataType) rootParent;
+		Integer accessLevel;
+		Integer valueRank;
+		Integer arrayDimensions;
+    }
+
+    compound UAObjectTypeType refines UABaseType {
+		String documentation;
+		optional = false;
+    }
+
+    compound UAVariableTypeType refines UABaseType {
+		String documentation;
+		optional = false;
+		refTo(DataType) type;
+    }
+    
+    compound UADataType refines UABaseType {
+    	String documentation;
+    	optional = false;
+	    sequenceOf(DataLiteral) literals;
+		Constraint dataLiteralNamesUnique = literals->isUnique(l|l.name);
+    }
+    
+    compound DataLiteral {
+        NonEmptyNameString name;
+        refTo(DataType) type;
+        String description = "";
+    }
+
+    compound UAFieldType refines Field {
+		NodeId nodeId;
+		NodeClass nodeClass;
+		String browseName;
+		String displayName;
+    }
+    
+    compound UAFieldObjectType refines UAFieldType {
+    	OpcLocalizedText description;
+    }
+
+    compound UAFieldVariableType refines UAFieldType {
+    	OpcLocalizedText description;
+    	refTo(DataType) typeDefinition;
+		Integer accessLevel;
+		Integer valueRank;
+		Integer arrayDimensions;
+    }
+    
+    compound UAFieldMethodType refines UAFieldType {
+    }
+
+    compound UAEnumType refines EnumType {
+		NodeId nodeId;
+		NodeClass nodeClass;
+		String browseName;
+		String displayName;
+		OpcLocalizedText description;
+		String documentation;
+    }
+
+    typedef UAObjectFields sequenceOf(UAFieldType) with (UAObjectFields->collect(f|f.name).hasDuplicates() == false);
+	typedef UAMethodFields sequenceOf(UAFieldType) with (UAMethodFields->collect(f|f.name).hasDuplicates() == false);
+
+    
+    // freeze all primitives
+    freeze {
+		opcUnsignedIntegerType;
+		opcUnknownDataType;
+    };
+    
+}

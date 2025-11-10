@@ -1,0 +1,12 @@
+project AllServices {
+
+    import AllServicesPart*; 
+    
+    // unusual for managed model structure but required for reuse in testing/evaluation environment
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    freeze {
+        .;
+    }
+}

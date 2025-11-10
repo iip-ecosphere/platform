@@ -1,0 +1,32 @@
+project DevicePartPhoenixContact {
+
+    import Devices;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    compound PhoenixContactDevice refines EcsDevice {
+        String id = "PhoenixContact PLCnext";
+        setOf(String) requiredModules = {"de.iip-ecosphere.platform:support.metrics.plcNext:" + iipVer};
+        String containerName = "plcNext";
+        Integer mainMemory = 2 * 1024;
+        CpuArchitecture cpu = CpuArchitecture::x86;
+        CpuBits bits = CpuBits::bit64; // TODO check
+        ContainerType containerType = ContainerType::EcsSvc_AllApps;
+        setOf(refTo(Dependency)) provides = {refBy(tensorflowNoVersion)}; // Tensorflow
+        // see https://github.com/iip-ecosphere/platform/tree/main/platform/support/support.sysMetrics.plcnext, 
+        // might also be /run/plcnext/grpc.sock:/run/plcnext/grpc.sock
+        setOf(ContainerArgument) containerArguments = {
+            MountVolumeContainerArgument{ 
+              hostPath="/run/plcnext/",
+              containerPath="/run/plcnext/"
+            }
+        };
+    }
+    
+    PhoenixContactDevice plcNextDeviceType = {};
+    
+    freeze {
+        plcNextDeviceType;
+    };
+    
+}

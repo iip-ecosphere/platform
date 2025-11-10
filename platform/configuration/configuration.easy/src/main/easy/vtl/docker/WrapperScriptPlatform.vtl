@@ -1,0 +1,54 @@
+import Basics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template WrapperScriptPlatform(IIPEcosphere config, FileArtifact target) {
+
+    def main(IIPEcosphere config, FileArtifact target) {
+        Integer BrokerPort = config.transportProtocol.port;
+        '#!/bin/bash'
+        ''
+        'bash broker.sh ${BrokerPort} >> /var/log/iip.broker.logs &'
+        'brokerReady=\\$(cat /var/log/iip.broker.logs | grep "Broker Ready")'
+        'echo "Waiting Broker to be Ready"'
+        'while [ -z "\\$brokerReady" ]; do'
+        '  brokerReady=\\$(cat /var/log/iip.broker.logs | grep "Broker Ready")'
+        '  sleep 3'
+        'done'
+        'echo "Broker is Ready"'
+        ''
+        'bash platform.sh >> /var/log/iip.platform.logs &'
+        'platformReady=\\$(cat /var/log/iip.platform.logs | grep "Startup completed")'
+        'echo "Waiting platform to be Ready"'
+        'while [ -z "\\$platformReady" ]; do'
+        '  platformReady=\\$(cat /var/log/iip.platform.logs | grep "Startup completed")'
+        '  sleep 3'
+        'done'
+        'echo "Platform is Ready"'
+        ''
+        if (hasUI(config)) {
+            'bash mgtUi.sh >> /var/log/iip.mgtUi.logs &'
+            'mgtUiReady=\\$(cat /var/log/iip.mgtUi.logs | grep "Server listening on port 4200")'
+            'echo "Waiting mgtUi to be Ready"'
+            'while [ -z "\\$mgtUiReady" ]; do'
+            '  mgtUiReady=\\$(cat /var/log/iip.mgtUi.logs | grep "Server listening on port 4200")'
+            '  sleep 3'
+            'done'
+            'echo "MgtUi is Ready"'
+            ''
+        }
+        if (hasMonitoring(config)) {
+            'bash monitoring.sh >> /var/log/iip.monitoring.logs &'
+            'monitoringReady=\\$(cat /var/log/iip.monitoring.logs | grep "Startup completed")'
+            'echo "Waiting monitoring to be Ready"'
+            'while [ -z "\\$monitoringReady" ]; do'
+            '  monitoringReady=\\$(cat /var/log/iip.monitoring.logs | grep "Startup completed")'
+            '  sleep 3'
+            'done'
+            'echo "monitoring is Ready"'
+            ''
+        }
+        
+        'tail -f /dev/null'
+    }
+}

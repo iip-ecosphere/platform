@@ -1,0 +1,168 @@
+import Basics;
+import PythonBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(profile="python")
+template PythonType(Configuration config, PythonCodeArtifact target, RecordType type, Boolean interface, Boolean sharedInterfaces) {
+
+    // generates code for the individual attributes
+    def attributes(RecordType type, PythonCodeClass c) {
+        if (not(interface)) {
+            c.addSLComment('Mapped into properties without leading _ below resembling getter/setter\n');
+
+            for (Field f: type.fields) {
+				c.addAttribute('_${asIdentifier(f.name)}', toTypeName(f.type), fieldDefaultValue(f));
+            }
+        }
+    }
+    
+    def String fieldDefaultValue(Field field) {
+        if (field.optional) {
+            "None";
+        } else {
+            defaultValue(field.type);
+        }    
+    }
+    
+    // generates code for the getters
+    def getters(RecordType type, PythonCodeClass c) {
+        for (Field f: type.fields) {
+            String comment = 'Returns the value of ${asIdentifier(f.name)}.${prependIfNotEmpty(" ", f.description)}';
+        	PythonCodeFunction func = c.addFunc("get${asMethodNameSuffix(f.name)}", comment);
+	        func.addReturnType("${toTypeName(f.type)}", "the value of ${f.name}");
+            if (interface) {
+			    func.addRaiseNotImplementedError();
+            } else {
+            	func.addReturn("self._${asIdentifier(f.name)}");
+            }
+        }
+    }
+
+    // generates code for the setters
+    def setters(RecordType type, PythonCodeClass c) {
+        for (Field f: type.fields->select(f|not(getBooleanValueSafe(f.readOnly, false)))) {
+            String comment = 'Changes the value of ${asIdentifier(f.name)}.${prependIfNotEmpty(" ", f.description)}';
+        	PythonCodeFunction func = c.addFunc("set${asMethodNameSuffix(f.name)}", comment);
+            func.addParameter("v", toTypeName(f.type), "the new value of ${f.name}${genSetterParamVDoc(f, f.type)}");
+
+            if (interface) {
+			    func.addRaiseNotImplementedError();
+            } else {
+                genSetterAssignment(f, f.type, func);            
+            }
+        }
+    }
+
+    // generates code for the properties
+    def properties(RecordType type, PythonCodeClass c) {
+        c.addSLComment("Indeed, there are 2.4 decorators for this, but for now we want to have all here: pythonic field access");
+        c.addSLComment("backed by getter/setter and the ability to replace data classes by e.g. projecting or data enhancing");
+        c.addSLComment('functionality (original idea of the "interfaces" with similar naming as in Java. It may be that the ');
+        c.addSLComment("interfaces become superfluous due to the properties, but let's leave them in for now.");
+
+        for (Field f: type.fields) {
+            String set;
+            if (getBooleanValueSafe(f.readOnly, false)) {
+                set = "";
+            } else {
+                set = ", set${asMethodNameSuffix(f.name)}";
+            }
+            c.add('${asIdentifier(f.name)} = property(get${asMethodNameSuffix(f.name)}${set})');
+        }
+    }
+
+    def genSetterAssignment(Field f, DataType type, PythonCodeFunction meth) {
+        meth.addAssign("self._${asIdentifier(f.name)}", "v");
+    }
+
+    def genSetterParamVDoc(Field f, DataType type) {
+        ''
+    }
+    
+    // numpy conversion
+    
+    def genSetterAssignment(Field f, NumericPrimitiveType type, PythonCodeFunction meth) {
+        genNumpyConversion(f, type, meth);
+    }
+    
+    def genSetterAssignment(Field f, BooleanTypeType type, PythonCodeFunction meth) {
+        genNumpyConversion(f, type, meth);
+    }
+
+    def genSetterAssignment(Field f, ArrayType type, PythonCodeFunction meth) {
+         meth.addAssign("tmp", "[]");
+         meth.addFor("e", "v").(fl|{
+             fl.addIf('"numpy" in str(type(e))').(alt|{
+                 alt.addCall("tmp.append").addArgument("e.item()");
+             }).addElse().addCall("tmp.append").addArgument("e");
+		 });
+		 meth.addAssign("self._${asIdentifier(f.name)}", "tmp");
+    }
+ 
+    protected def genNumpyConversion(Field f, DataType type, PythonCodeFunction meth) {
+        meth.addIf('"numpy" in str(type(v))').(alt|{
+            alt.addAssign("self._${asIdentifier(f.name)}", "v.item()");
+        }).addElse().addAssign("self._${asIdentifier(f.name)}", "v");
+    }
+    
+    def genSetterParamVDoc(Field f, NumericPrimitiveType type) {
+        ', may be of type ${toTypeName(f.type)} or the corresponding numpy type'
+    }
+    
+    def genTypeImports(RecordType type, PythonCodeArtifact art) {
+        type.fields->forEach(Field f| genImport(f.type, art));
+    }
+
+    @DispatchBasis    
+    def genImport(DataType type, PythonCodeArtifact art) {
+    }
+
+    @DispatchBasis    
+    def genImport(RecordType type, PythonCodeArtifact art) {
+        addDatatypeImport(asTypeName(type.name), false, art);
+    }
+
+    // added v2->v3
+    def getBase(RecordType type, String add, PythonCodeArtifact target) {
+        String result = "";
+        if (isDefined(type.refining) and type.refining <> null) {
+            result = asTypeName(type.refining.name) + add;  
+            addDatatypeImport(result, false, target);
+        }
+        result;
+    }
+
+    def main(Configuration config, PythonCodeArtifact target, RecordType type, Boolean interface, Boolean sharedInterfaces) {
+        String clsName = asTypeName(type.name);
+        String add = "";
+        String comment;
+        String ext = "";
+        String imp = "";
+        if (sharedInterfaces) {
+            if (interface) {
+                comment = "Interface";
+            } else {
+                add = "Impl";
+                comment = "Implementation";
+                ext = clsName;
+                addDatatypeImport(clsName, false, target);
+            }
+        } else {
+            comment = "Implementation";
+            interface = false;
+        }
+
+        genTypeImports(type, target);
+    	target.addImport("datetime", "datetime");
+    	target.addImport("decimal", "Decimal");
+        String base = getBase(type, add, target);
+    	PythonCodeClass c = addPythonClass(target, "${clsName}${add}", '${comment} of the application data type ${clsName}.');
+    	c.addBase(ext);
+    	c.addBase(base);
+		attributes(type, c);
+		getters(type, c);
+		setters(type, c);
+		properties(type, c);
+    }
+}

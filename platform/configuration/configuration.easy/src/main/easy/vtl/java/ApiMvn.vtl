@@ -1,0 +1,29 @@
+import Basics;
+import MavenBasics;
+import JavaMapping;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template ApiMvn(IIPEcosphere config, XmlFileArtifact target) {
+
+    def main(IIPEcosphere config, XmlFileArtifact target) {
+        String iipGroup = "de.iip-ecosphere.platform";
+        String gId = "${iipGroup}.api";
+        String projectVersion = config.iipVer;
+        
+        XmlElement project = createMavenRoot(target);
+        createMavenProjectAttributes(project, "api", "Generated platform APIs", "Generated platform APIs");
+        new XmlElement(project, "groupId", gId);
+        // app version cannot be used with maven parent, use import??
+        createMavenParent(project, iipGroup, "platformDependencies", "${config.iipVer}");
+        addDistributionManagement(project, config);
+        
+        XmlElement dep = new XmlElement(project, "dependencies");
+        appendDependency(dep, "org.apache.logging.log4j", "log4j-api", "2.15.0"); // override due to CVE-2021-44228
+        appendDependency(dep, "org.apache.logging.log4j", "log4j-core", "2.15.0"); // override due to CVE-2021-44228
+        appendDependency(dep, iipGroup, "support.aas", projectVersion);
+        appendDependency(dep, iipGroup, "support.aas", projectVersion, scope="test", type="test-jar");
+        appendDependency(dep, "junit", "junit", scope="test");
+    }
+
+}

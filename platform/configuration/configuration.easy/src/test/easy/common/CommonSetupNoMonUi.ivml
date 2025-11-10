@@ -1,0 +1,30 @@
+project CommonSetupNoMonUi {
+
+    import CommonSetup;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    // ------------ freezing ------------------
+
+    // managed model, not needed for tests but for testing managementUI
+    
+    metaModelFolder = "../../target/easy";
+    modelBaseFolder = "../../target/easy-test";
+    modelName = "PlatformConfiguration";
+    genTarget = "../../target/gen";
+    configFolder = "../../target/easy-test/simpleMesh";
+    additionalModelFolders = {"../../target/easy-test/common"};
+    
+    freeze {
+        platformMonitoring;
+        managementUi;
+        metaModelFolder;
+        modelBaseFolder;
+        modelName;
+        configFolder;
+        genTarget;
+        additionalModelFolders;
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}

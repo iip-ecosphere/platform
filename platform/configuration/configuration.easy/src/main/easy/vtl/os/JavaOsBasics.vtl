@@ -1,0 +1,22 @@
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template JavaOsBasics(Configuration config, FileArtifact target) {
+	
+    def String javaOpts(IIPEcosphere cfg, Boolean withModuleOpts, String addJavaOpts="") {
+        String result = cfg.javaOpts;
+        if (addJavaOpts.length() > 0) {
+            if (result.length() > 0) {
+                result = result + " ";
+            }
+            result = result + addJavaOpts;
+        }
+        if (withModuleOpts) {
+            if (result.length() > 0) {
+                result = result + " ";
+            }
+            result = result + cfg.javaModuleOpts;
+        }
+        result;
+    }
+	
+}

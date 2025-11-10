@@ -1,0 +1,49 @@
+import Basics;
+import JavaOsBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template LinuxSysd(Configuration config, FileArtifact target, String dir, String main, String description, String pidFile, String requires="", String after="", Boolean withModuleOpts=true, String addJavaOpts="") {
+	
+    def main(Configuration config, FileArtifact target, String dir, String main, String description, String pidFile, String requires="", String after="", Boolean withModuleOpts=true, String addJavaOpts="") {
+        IIPEcosphere cfg = config;
+        String instDir = cfg.instDirDflt;
+        String javaExe = cfg.javaExeDflt;
+        if (isDefined(cfg.instDir)) {
+            instDir = cfg.instDir;
+        }
+        if (isDefined(cfg.javaExe)) {
+            javaExe = cfg.javaExe;
+        }
+
+        // no escaping here, no shell expansion in system.d        
+        '[Unit]
+        Description=${description}
+        ${after(after)|e}
+        ${requires(requires)|e}
+        
+        [Service]
+        WorkingDirectory=${instDir}/gen
+        Type=simple
+        Restart=on-failure
+        KillMode=control-group
+        PIDFile=${cfg.pidDir}/${pidFile}
+        ExecStart=${javaExe} -cp @${dir}/classpath.ux ${javaOpts(cfg, withModuleOpts, addJavaOpts)} -Diip.pid.dir=${cfg.pidDir} "${main}"
+        
+        [Install]
+        WantedBy=multi-user.target'
+    }
+    
+    def requires(String requires) {
+        if (requires.length() > 0) {
+            'Requires=${requires}'
+        }
+    }
+
+    def after(String after) {
+        if (after.length() > 0) {
+            'After=${after}'
+        }
+    }
+	
+}

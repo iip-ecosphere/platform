@@ -1,0 +1,50 @@
+/*
+ * Simplified AAS nameplate information to construct AAS nameplates for software artifacts.
+ */
+project NameplateBase {
+
+    import DataTypes;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    annotate String semanticId = "" to .;
+    
+    typedef AasLocalizedString String; // text@lang
+    typedef AasResource String; // URL or local -> resources
+    
+    compound NameplateInfo {
+        AasResource productImage = ""; // URL or local -> resources
+        AasLocalizedString manufacturerProductDesignation = "";
+        refTo(Manufacturer) manufacturer;
+        
+        productImage.semanticId = "https://admin-shell.io/ZVEI/TechnicalData/ProductImage/1/1";
+        manufacturerProductDesignation.semanticId = "https://admin-shell.io/ZVEI/TechnicalData/ManufacturerProductDesignation/1/1";
+    }
+    
+    // a bit of ZVEI Digital Nameplate for industrial equipment V1.0
+    compound Manufacturer {
+        AasLocalizedString manufacturerName = "";
+        manufacturerName.semanticId = "https://admin-shell.io/ZVEI/TechnicalData/ManufacturerName/1/1";
+        
+        AasResource manufacturerLogo = ""; // URL or local -> resources
+        manufacturerLogo.semanticId = "https://admin-shell.io/ZVEI/TechnicalData/ManufacturerLogo/1/1";
+        
+        ManufacturerAddress address; // ref really needed?
+        address.semanticId = "0173-1#02-AAQ832#005";
+    }
+    
+    // a bit of ZVEI Digital Nameplate for industrial equipment V1.0
+    compound ManufacturerAddress {
+        AasLocalizedString department = "";
+        department.semanticId = "0173-1#02-AAO127#003";
+        
+        AasLocalizedString street = "";
+        street.semanticId = "0173-1#02-AAO128#002";
+        
+        AasLocalizedString zipCode = "";
+        zipCode.semanticId = "0173-1#02-AAO129#002";
+        
+        AasLocalizedString cityTown = "";
+        cityTown.semanticId = "0173-1#02-AAO132#002";
+    }
+   
+}

@@ -1,0 +1,108 @@
+import Basics;
+import PythonBasics;
+import MeshBasics;
+import ServiceBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(profile="python")
+template PythonServiceInterface(Configuration config, PythonCodeArtifact target, ServiceBase service, String pkg) extends ServiceBasics {
+
+    setOf(String) reg = {};
+    PythonCodeClass cls;
+    
+    def registerMethod(String kind, String type, String funcName) {
+        reg.add("Registry.${kind}['${service.id}_${type}'] = self.${funcName}");
+    }
+    
+    @Override
+    def produceAsyncProcessorBody(IOType type) {
+        String t = toTypeName(type);
+        String funcName = "process${t.firstToUpperCase()}";
+        registerMethod("asyncTransformers", t, funcName);
+        cls.addFunc(funcName, "Asynchronous data processing method. Use self.ingest(data) to pass the result back to the data stream. ${generatePossibleOutputTypes(service, config)}")
+            .addParameter("data", t, "the data to process")
+            .addRaiseNotImplementedError();
+    }
+    
+    @Override
+    def produceSyncProcessorBody(IOType returnType, IOType dataType) {
+        String r = toTypeName(returnType);
+        String t = toTypeName(dataType);
+        String funcName = "transform${t.firstToUpperCase()}";
+        registerMethod("syncTransformers", t, funcName);
+        cls.addFunc(funcName, "Synchronous data processing/transformation method.")
+            .addParameter("data", t, "the data to process").addReturnType(t, "the processed data (not None)")
+            .addRaiseNotImplementedError();
+    }
+    
+    @Override
+    def produceProducerBody(IOType type) {
+        String t = toTypeName(type);
+        String funcName = "produce${t.firstToUpperCase()}";
+        registerMethod("senders", t, funcName);
+        cls.addFunc(funcName, "Synchronous data generator for source classes.")
+            .addReturnType(t, "the created data").addRaiseNotImplementedError();
+    }
+    
+    @DispatchBasis
+    def produceSuper(ServiceBase base, PythonCodeFunction f) {
+    } 
+    
+    @DispatchCase
+    def produceSuper(PythonService service, PythonCodeFunction f) {
+        String sId = "'${service.id}'";
+        f.add('super().__init__("${service.id}", "${service.name}", Version("${service.ver}"), "${service.description}", ${toBoolean(service.deployable)}, ServiceKind.${service.kind})');
+        f.addAssign('Registry.services[${sId}]', 'self');
+    }
+    
+    def main(Configuration config, PythonCodeArtifact target, ServiceBase service, String pkg) {
+        String clsName = asTypeName(service.name);
+        target.addImport("AbstractService", "AbstractService");
+        target.addImport("Registry");
+        target.addImport("Version", "Version");
+        target.addImport("Service", "ServiceState");
+        target.addImport("Service", "ServiceKind");
+        setOf(RecordType) types = collectRecordTypes(service);
+        types->forEach(RecordType t|addDatatypeImport(t.name, false, target));
+        target.addImport("decimal", "Decimal");
+        target.addEmptyLine();
+
+        cls = addPythonClass(target, clsName + "Interface", 'Partially implemented service interface for "${service.name}"')
+            .addBase("AbstractService");
+        cls.addAttribute("ingestor", "None");
+        produceParameterFields(service.parameter, cls);
+        cls.addConstructor("Initializes the service.").(f|{
+            produceSuper(service, f);
+            f.addCall("self.registerMethods");
+        });
+        addAttachIngestor(cls);
+        addAttachIngest(cls);
+        addSetStateStartStop(cls, "service");
+        produceReconfigure(service.parameter, cls);
+        produceForInputTypes(service);
+        produceForOutputTypes(service);
+        cls.addFunc("registerMethods").(f|{
+            reg->forEach(s|f.add(s));
+        });
+
+        // added v2->v3  
+        IIPEcosphere cfg = config;
+        String add = "";
+        if (cfg.sharedInterfaces) {
+            add = "Impl";
+        }      
+        for (IOType t: service.output) {
+            if (resolveType(t).isTypeOf(RecordType)) {
+                String type = toTypeName(t);
+                String implType = "${type}${add}";
+                addDatatypeImport(implType, false, target, true);
+                cls.addMethod("create${type}", "Creates an actual instance of the output type ${type}.").(m|{
+                    m.addRetType(type);
+                    m.addReturn('AbstractService.createDataInstance("${type}", lambda : ${implType}())', "the instance");
+                });
+            }
+        }
+    }
+    
+}

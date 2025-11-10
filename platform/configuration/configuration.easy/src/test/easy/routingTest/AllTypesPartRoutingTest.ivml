@@ -1,0 +1,56 @@
+project AllTypesPartRoutingTest {
+
+    import IIPEcosphere; 
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    RecordType rec1 = {
+        name = "RoutingTestData",
+        fields = {
+            Field {
+                name = "serNr",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "stringField",
+                type = refBy(StringType)
+            }
+        }
+    };
+
+    RecordType connIn = {
+        name = "RoutingConnIn",
+        fields = {
+            Field {
+                name = "intField",
+                type = refBy(IntegerType)
+            }
+        }
+    };
+
+    RecordType connOut = {
+        name = "RoutingConnOut",
+        fields = {
+            Field {
+                name = "serNr",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "data",
+                type = refBy(StringType)
+            }
+        }
+    };
+    
+    RecordType command = {
+        name = "RoutingCommand",
+        fields = {
+            Field {
+                name = "cmd",
+                type = refBy(StringType)
+            }
+        }
+    };
+
+    freeze {
+        .;
+    }
+}

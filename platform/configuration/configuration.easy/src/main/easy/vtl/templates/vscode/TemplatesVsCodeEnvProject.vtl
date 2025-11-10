@@ -1,0 +1,12 @@
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template TemplatesVsCodeEnvProject(IIPEcosphere config, FileArtifact target) {
+	
+    def main(IIPEcosphere config, FileArtifact target) {
+        String sep = target.getPathSeparator();
+        '{
+             "python.pythonPath": "\\${PYTHONPATH}${sep}\\${workspaceRoot}/target/pyEnv/iip${sep}\\${workspaceRoot}/target/pySrc"
+        }'
+    }
+	
+}

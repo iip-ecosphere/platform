@@ -1,0 +1,94 @@
+import Basics;
+import JavaBasics;
+import SpringBasics;
+import SpringCloudStreamBasics;
+import MeshBasics;
+import JavaConnector;
+import ServiceBasics;
+import JavaSpringCloudStreamMeshElementBase;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template JavaSpringCloudStreamMeshElementPartTraceToAas(Configuration config, FileArtifact target, MeshElement elt, String pkg, 
+    Application app, Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes) {
+    
+    def initialService(MeshElement elt, TraceToAasService service, setOf(String) serviceVars, JavaCodeMethod m) {
+        String clsName = "TraceToAasService";
+        serviceVars.add("service");
+        getYamlServiceFragment("serviceData", clsName, "${service.id}", m, appVar="app");
+        m.addAssignment("service", new JavaCodeConstructorCall("TraceToAasService").addArgument("app").addArgument("serviceData"));
+        if (isDefined(service.outTransport) and service.outTransport <> null) {
+            generateOutTransport(service.outTransport, m);
+        }
+    }
+
+    def initialServiceRest(TraceToAasJavaService service, JavaCodeMethod m) {
+        if (isDefined(service.outTransport) and service.outTransport <> null) {
+            generateOutTransport(service.outTransport, m);
+        }
+    }
+
+    @DispatchCase
+    def generateClassRest(MeshElement elt, TraceToAasJavaService service, JavaCodeClass c) {
+        if (isDefined(service.outTransport) and service.outTransport <> null) {
+            JavaCodeMethod m = c.addMethod("de.iip_ecosphere.platform.transport.connectors.TransportParameter", "createOutTransportParameter", "Returns the configured transport parameter.").setStatic();
+            TraceToAasOutTransport outTransport = service.outTransport;
+            String outTpHost = getStringValueSafe(outTransport.host, "");
+            Integer outTpPort = getIntegerValueSafe(outTransport.port, 0);
+            String return = "null";
+            if (outTpHost <> "" and outTpPort <> "") {
+                m.addVariable("de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder", "tpBuilder", 'TransportParameterBuilder.newBuilder("${outTpHost}", ${outTpPort})');
+                if (isDefined(outTransport.security) and outTransport.security <> null) {
+                    SecuritySettings outTpSec = outTransport.security;
+                    m.addCall("tpBuilder.setAuthenticationKey").stringArg(outTpSec.authenticationKey);
+                    if (isDefined(outTpSec.keystoreKey) and outTpSec.keystoreKey <> "") {
+                        m.addCall("tpBuilder.setKeystoreKey").stringArg(outTpSec.keystoreKey);
+                    }
+                    if (isDefined(outTpSec.keyAlias) and outTpSec.keyAlias <> "") {
+                        m.addCall("tpBuilder.setKeyAlias").stringArg(outTpSec.keyAlias);
+                    }
+                    if (isDefined(outTpSec.hostNameVerification)) {
+                        m.addCall("tpBuilder.setHostnameVerification").arg(outTpSec.hostNameVerification);
+                    }
+                }
+                return = "tpBuilder.build()";
+            }
+            m.addReturn(return, "the transport parameter instance (may be <b>null</b>)");
+        }
+    }
+
+    def generateOutTransport(TraceToAasOutTransport outTransport, JavaCodeMethod m) {
+        String outTpHost = getStringValueSafe(outTransport.host, "");
+        Integer outTpPort = getIntegerValueSafe(outTransport.port, 0);
+        if (outTpHost <> "" and outTpPort <> "") {
+            m.addCall("service.setTransportParameter").addArgument(new JavaCodeMethodCall("createOutTransportParameter"));
+        }
+    }
+    
+    def generateServiceAttribute(MeshElement elt, TraceToAasService service, JavaCodeClass c) {
+        c.addAttribute("de.iip_ecosphere.platform.services.environment.services.TraceToAasService", "service");
+    }
+    
+    def getServiceType(MeshElement elt, TraceToAasService service) {
+        "de.iip_ecosphere.platform.services.environment.services.TraceToAasService";
+    }
+
+    def generateAsyncProcessorBody(MeshElement proc, TraceToAasService service, String methodSuffix, String methodSuffixWithServiceId, String type, JavaCodeMethod m) {
+        m.addReturn("data -> {}"); // ignore, shall not be called'
+    }
+    
+    def generateSyncProcessorBody(MeshProcessor proc, TraceToAasService service, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType, JavaCodeMethod m) {
+        m.addReturn("data -> null"); // ignore, shall not be called
+    }
+
+    def genIngestor(TraceToAasService service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder, JavaCodeBlockInterface block) {
+    }
+
+    def generateReceptionCallback(MeshProcessor elt, TraceToAasService service, JavaCodeClass c) {
+    }
+    
+    def generateSinkMethodBody(MeshSink snk, TraceToAasService service, String methodName, String methodSuffixWithServiceId, String type, JavaCodeMethod m) {
+        m.addReturn("data -> {}"); // ignore
+    }
+    
+}

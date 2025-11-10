@@ -1,0 +1,117 @@
+import PythonBasics;
+import MeshBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template PythonMeshElementTemplateBase(Configuration config, FileArtifact target, MeshElement elt, String pkg, PythonService service) extends MeshBasics {
+
+    String typeAdd = "";
+    PythonCodeClass cls;
+
+    // called via MeshBasics.generateDataMethods for MeshSource
+    def generateSourceMethod(MeshSource src, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        if (!src.impl.asynchronous) {
+            addSourceMethod(src, type, methodSuffix, methodSuffixWithServiceId, cls).(f|{
+                f.addAssign('result', '${type}${typeAdd}()');
+                generateSourceMethodImpl(src.impl, f);
+                f.addReturn("result");
+            });
+        }
+    } 
+    
+    @DispatchBasis
+    def generateSourceMethodImpl(ServiceBase service, PythonCodeFunction f) {
+        f.addSLComment("TODO add your code here");
+    }
+
+    // called via MeshBasics.generateDataMethods for asynch MeshProcessor
+    def generateAsyncProcessorInMethod(MeshProcessor proc, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        boolean forward = true;
+        for (IOType t: proc.input) {
+            if (toTypeName(t) == type) {
+                forward = t.forward;
+            }
+        }
+        addAsyncProcessorInMethod(proc, type, methodSuffix, methodSuffixWithServiceId, cls).(f|{
+            f.getComment().(c|{
+                c.setComment("${c.getComment()}
+                    ${generatePossibleOutputTypes(service, config)|e}");
+            });
+            generateAsyncProcessorInMethodImpl(proc.impl, forward, f);
+        });
+    }
+    
+    @DispatchBasis
+    def generateAsyncProcessorInMethodImpl(ServiceBase service, Boolean forward, PythonCodeFunction f) {
+        f.addSLComment("create result instance and call self.ingest(data)");
+        f.addRaiseNotImplementedError();
+    } 
+
+    // called via MeshBasics.generateDataMethods for synch MeshProcessor
+    def generateSyncProcessorMethod(MeshProcessor proc, String inType, String outType, String methodSuffix, String methodSuffixWithServiceId) {
+        addSyncProcessorMethod(proc, inType, outType, methodSuffix, methodSuffixWithServiceId, cls).(f|{
+            f.addAssign('result', '${outType}${typeAdd}()');
+            generateSyncProcessorMethodImpl(proc.impl, f);
+            f.addReturn('result');
+        });
+    }
+    
+    @DispatchBasis
+    def generateSyncProcessorMethodImpl(ServiceBase service, PythonCodeFunction f) {
+        f.addSLComment('TODO add your code here');
+    } 
+    
+    // called via MeshBasics.generateDataMethods for MeshSink
+    def generateSinkMethod(MeshSink snk, String type, String methodSuffix, String methodSuffixWithServiceId) {
+        addSinkMethod(snk, type, methodSuffix, methodSuffixWithServiceId, cls).(f|{
+            generateSinkMethodImpl(snk.impl, f);
+        });
+    }
+    
+    @DispatchBasis
+    def generateSinkMethodImpl(ServiceBase service, PythonCodeFunction f) {
+        'raise NotImplementedError'
+    }
+    
+    def produceDatatypeImports(MeshElement elt, ServiceBase service, PythonCodeArtifact target) {
+        generateImports(service, target);
+        setOf(RecordType) types = collectRecordTypes(elt);
+        types->forEach(RecordType t| addDatatypeImport(t.name, true, target));
+    } 
+
+    @DispatchBasis
+    def generateImports(ServiceBase service, PythonCodeArtifact target) {
+    }
+    
+    @DispatchBasis
+    def inheritsFrom(String cls) {
+        cls;
+    }
+    
+    def initTypeAdd(IIPEcosphere cfg) {
+        if (cfg.sharedInterfaces) {
+            typeAdd = "Impl";
+        } else {
+            typeAdd = "";
+        }    
+    }
+    
+    def produceReconfigure(ServiceBase service, PythonCodeClass c) {
+        if (service.parameter.size() > 0) {
+            c.addFunc("notifyReconfigured", "Called to inform the implementing class that a parameter reconfiguration happened.")
+                .addParameter("values", "dict", "the new param names/values")
+                .addSLComment("if you want to react on parameter changes, you may add code here")
+                .addSLComment("if you are not interested in parameter changes, feel free to delete this method")
+                .addPass();
+        }
+    }
+    
+    @DispatchBasis
+    def generateFurtherMethods(ServiceBase service, PythonCodeClass c) {
+    } 
+    
+    @DispatchBasis
+    def produceConstructorRest(ServiceBase service, PythonCodeFunction f) {
+    }    
+    
+}

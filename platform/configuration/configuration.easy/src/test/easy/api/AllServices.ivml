@@ -1,0 +1,36 @@
+project AllServices {
+
+    import AllServicesPart*; 
+    import IDTA_02002_ContactInformations with (IDTA_02002_ContactInformations.version == v1.0);
+    import IDTA_02001_ModuleTypePackage with (IDTA_02001_ModuleTypePackage.version == v1.0);
+    import IDTA_02003_TechnicalData with (IDTA_02003_TechnicalData.version == v1.2);
+    import IDTA_02004_HandoverDocumentation with (IDTA_02004_HandoverDocumentation.version == v1.2);
+    import IDTA_02005_SimulationModels with (IDTA_02005_SimulationModels.version == v1.0); // requires 02002
+    import IDTA_02006_Nameplate with (IDTA_02006_Nameplate.version == v2.0); // requires 02002
+    import IDTA_02007_SoftwareNameplate with (IDTA_02007_SoftwareNameplate.version == v1.0); // requires 02002
+    import IDTA_02008_TimeSeries with (IDTA_02008_TimeSeries.version == v1.1);
+    import IDTA_02010_ServiceRequestNotification with (IDTA_02010_ServiceRequestNotification.version == v1.0); // requires 02002 
+    import IDTA_02011_HierarchicalStructures with (IDTA_02011_HierarchicalStructures.version == v1.0);
+    import IDTA_02012_DEXPI with (IDTA_02012_DEXPI.version == v1.0);
+    import IDTA_02013_Reliability with (IDTA_02013_Reliability.version == v1.0);
+    import IDTA_02014_FunctionalSafety with (IDTA_02014_FunctionalSafety.version == v1.0);
+    import IDTA_02015_ControlComponentType with (IDTA_02015_ControlComponentType.version == v1.0);
+    import IDTA_02016_ControlComponentInstance with (IDTA_02016_ControlComponentInstance.version == v1.0);
+    import IDTA_02017_AssetInterfacesDescription with (IDTA_02017_AssetInterfacesDescription.version == v1.0);
+    import IDTA_02021_PowerDriveTrainSizing with (IDTA_02021_PowerDriveTrainSizing.version == v1.0);
+    import IDTA_02023_CarbonFootprint with (IDTA_02023_CarbonFootprint.version == v0.9);
+    import IDTA_0000_CarbonFootprint; // draft
+    import IDTA_02022_WirelessCommunication with (IDTA_02022_WirelessCommunication.version == v1.0);
+    import IDTA_02026_Models3D with (IDTA_02026_Models3D.version == v1.0);
+    import IDTA_02027_AssetInterfacesMappingConfiguration with (IDTA_02027_AssetInterfacesMappingConfiguration.version == v1.0);
+    import IDTA_02034_BackendSpecificMaterialInformation with (IDTA_02034_BackendSpecificMaterialInformation.version == v1.0);
+    import IDTA_02045_AssetLocation with (IDTA_02045_AssetLocation.version == v1.0);
+    import IDTA_02046_WorkstationWorkerMatchingData with (IDTA_02046_WorkstationWorkerMatchingData.version == v1.0);
+    import IDTA_02056_DataRetentionPolicies with (IDTA_02056_DataRetentionPolicies.version == v1.0);
+        
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    freeze {
+        .;
+    }
+}

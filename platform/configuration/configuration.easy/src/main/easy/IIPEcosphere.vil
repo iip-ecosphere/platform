@@ -1,0 +1,2611 @@
+import JavaBasics;
+import JavaMapping;
+import Basics;
+import MeshBasics;
+import IIPEcosphereBase;
+insert IIPEcospherePart*;
+
+@advice(IIPEcosphere)
+vilScript IIPEcosphere (Project source, Configuration config, Project target) extends IIPEcosphereBase {
+
+    // Paths now in IIPEcosphereBase
+    
+    Boolean tests = true;
+    Boolean platformInstantiation = false;
+    setOf(String) usedServiceTypes = {};
+    Integer currentStep = -1;
+    Integer maxSteps = 0;
+    mapOf(String, sequenceOf(String)) appJsl = {};
+    
+    main(Project source, Configuration config, Project target) = {
+        platformInstantiation = true;
+        setMaxSteps(config, true, 1, 7);
+        generatePlatform(source, config, target); // first for container
+        generateApps(source, config, target);
+    }
+    
+    // called from Platform Instantiator, don't change signature
+    mainCli(Project source, Configuration config, Project target) = {
+        platformInstantiation = true;
+        tests = false;
+        setMaxSteps(config, true, 1, 7);
+        generatePlatform(source, config, target); // first for container
+        generateApps(source, config, target);
+    }
+    
+    // ------------------------------------------ progress reporting -------------------------------------
+    
+    setMaxSteps(IIPEcosphere cfg, Boolean genApps, Integer furtherAppSteps, Integer platformSteps) = {
+        if (maxSteps == 0) { // if call from multiple entry points, take the first call
+            currentStep = -1;
+            // platformSteps usually 7 // broker, ecs, ecsSvc, svc, monitoring, ui, platform
+            if (platformInstantiation) {
+                maxSteps = maxSteps + platformSteps; 
+            }
+            if (genApps) {
+                if (cfg.sharedInterfaces) {
+                    maxSteps = maxSteps + 1;
+                }
+                if (getProperty("iip.easy.impl", "") <> "") {
+                    maxSteps = maxSteps + 1;
+                }
+                Integer appCount = getApplications().size();
+                Integer appSteps = 1 + 1 + furtherAppSteps; // interfaces, templates, app
+                maxSteps = maxSteps + appSteps * appCount;
+            }
+            // TODO container?
+            notifyProgress(currentStep, maxSteps, "Platform/App instantiation");
+        }
+    }
+    
+    advanceProgress(String description) = {
+        currentStep = currentStep + 1;
+        notifyProgress(currentStep, maxSteps, description);
+    }
+    
+    // ---------------------------------------- generating AAS impls -------------------------------------
+    
+    protected generateAasImpl(Project source, Configuration config, Project target) = {
+        Path appRoot = "${target}/api";
+        appRoot.mkdir();
+        setOf(AasSubmodelType) submodelTypes = AasSubmodelType.allInstances();
+        String javaAasPackage = "de.iip_ecosphere.platform.support.aas.types"; // TODO package name
+        String javaAasTestPackage = javaAasPackage;
+        Path javaSrc = "${appRoot}/src/main/java";
+        Path javaTestSrc = "${appRoot}/src/test/java";
+        Path javaAasSrc = "${javaSrc}/${toPath(javaAasPackage)}";
+        Path javaAasTestSrc = "${javaTestSrc}/${toPath(javaAasPackage)}";
+        setOf(String) tests = {};
+        for (AasSubmodelType sm : submodelTypes->sortedBy(s|s.name)) { // sortedBy for testing
+            String clsName = asTypeName(sm.name);
+            vilTemplateProcessor("AasBuilderImpl", config, "${javaAasSrc}/${clsName}Builder.java", type=sm, 
+                pkg=javaAasPackage);
+            vilTemplateProcessor("AasAccessorImpl", config, "${javaAasSrc}/${clsName}.java", type=sm, 
+                pkg=javaAasPackage);
+            String testClsName = "${clsName}BuilderTest";
+            vilTemplateProcessor("AasImplTest", config, "${javaAasTestSrc}/${testClsName}.java", type=sm, 
+                apiPkg=javaAasPackage, pkg=javaAasTestPackage);
+            tests.add(javaAasTestPackage + "." + testClsName);
+        }
+        vilTemplateProcessor("JavaAllTestsTemplate", config, "${javaAasTestSrc}/AllTests.java", javaTests=tests, 
+            pkg=javaAasTestPackage);
+        vilTemplateProcessor("ApiMvn", config, "${appRoot}/pom.xml");
+        mvn(appRoot);
+    }
+    
+    // called from tests/platform instantiator, don't change signature
+    generateApi(Project source, Configuration config, Project target) = {
+        generateAasImpl(source, config, target);
+    }
+
+    // ------------------------------------------ generating apps ----------------------------------------
+
+    // called from tests/platform instantiator, don't change signature
+    generateInterfaces(Project source, Configuration config, Project target) = {
+        setMaxSteps(config, true, 0, 7);
+        generateApps(source, config, target, false, false);
+    }
+
+    // called from tests/platform instantiator, don't change signature
+    generateApps(Project source, Configuration config, Project target) = {
+        setMaxSteps(config, true, 1, 7);
+        generateApps(source, config, target, true, false);
+    }
+
+    // called from tests/platform instantiator, don't change signature
+    generateAppsNoDeps(Project source, Configuration config, Project target) = {
+        setMaxSteps(config, true, 1, 7);
+        generateApps(source, config, target, true, true);
+    }
+    
+    protected generateApps(Project source, Configuration config, Project target, Boolean apps, Boolean noDeps) = {
+        IIPEcosphere cfg = config;
+        setOf(RecordType) recordTypes = getRecordTypes();
+        setOf(Application) applications = getApplications();
+        sequenceOf(MeshElement) allElements = {};
+        sequenceOf(MeshElement) allAppsContainersElements = {};
+        initUsedServiceTypes(applications);
+        
+        setOf(String) javaSerializersShared = {};
+        setOf(String) artifactsShared = {};
+        if (cfg.sharedInterfaces) {
+            advanceProgress("Instantiating shared interfaces");
+            generateSharedInterfaces(config, target, javaSerializersShared, artifactsShared);
+        }
+        
+        for (Application a : applications->sortedBy(a|a.id)) { // sortedBy for testing
+            advanceProgress("Instantiating app interfaces '" + a.name + "'");
+
+            // shared serializers/artifacts shall remain "immutable"
+            setOf(String) javaSerializers = {};
+            javaSerializers = javaSerializers.union(javaSerializersShared);
+            setOf(String) artifacts = {};
+            artifacts = artifacts.union(artifactsShared);
+        
+            String appName = getAppMvnName(a);
+            Path appRoot = "${target}/${appName}";
+            appRoot.mkdir();
+            Path javaSrc = "${appRoot}/src/main/java";
+            Path javaTestSrc = "${appRoot}/src/test/java";
+            Path pySrc = "${appRoot}/src/main/python";
+            Path resourcesSrc = "${appRoot}/src/main/resources";
+            Path assemblySrc = "${appRoot}/${assemblyRel}";
+            Path javaDatatypesSrc = "${javaSrc}/${toPath(javaDatatypesPackage)}";
+            Path javaSerializersSrc = "${javaSrc}/${toPath(javaSerializersPackage)}";
+            Path javaInterfacesSrc = "${javaSrc}/${toPath(javaInterfacesPackage)}";
+            Path javaNodesSrc = "${javaSrc}/${toPath(javaNodesPackage)}";
+            Path javaNodesTestSrc = "${javaTestSrc}/${toPath(javaNodesPackage)}";
+
+            assemblySrc.mkdir();
+            // generate data classes and serializers
+            if (not(cfg.sharedInterfaces)) {
+                javaDatatypesSrc.mkdir();
+                javaSerializersSrc.mkdir();
+                generateEnums(javaDatatypesSrc, pySrc);    
+                for (RecordType r : recordTypes) {
+                    // generate for all languages and according to serializer settings
+                    String clsName = asTypeName(r.name);
+                    vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, 
+                        pkg=javaDatatypesPackage, interface=false, sharedInterfaces=false, impl=true);
+                    vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", 
+                        type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage, sharedInterfaces=false);
+                    javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
+                    if (isPythonUsed(usedServiceTypes)) {
+                        vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r, interface=false, 
+                            sharedInterfaces=false);
+                        vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/serializers/${clsName}Serializer.py", 
+                            type=r, sharedInterfaces=false);
+                    }
+                };
+            }
+
+            if (apps) {
+                buildServices(a, target);
+                advanceProgress("Instantiating app '" + a.name + "'");
+                // generate service classes and service integration
+                setOf(DependencyArtifact) bins = {}; 
+                setOf(Plugin) plugins = {};
+                setOf(AssemblyInfo) assemblies = {}; 
+                setOf(ResourceInfo) resources = {}; 
+                sequenceOf(MeshElement) elements = {};
+                artifacts.add(a.artifact);
+                mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
+                // TODO filter according to assigned resources, allow for later instantiation
+                for (ServiceMesh n : a.services) {
+                    setOf(MeshElement) nodes = n.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
+                    setOf(MeshElement) nodes2 = {}; // just a copy, it seems that using the iterable below fails
+                    nodes2 = nodes2.including(nodes);
+                    for (MeshElement no : nodes) {
+                        ServiceBase impl = no.impl;
+                        String clsName = asTypeName(no.name);
+                        generateServiceElements(appRoot, config, artifacts, no, no.impl);
+                        // connector gen references connector impl, in case of non-specific connector may not yet be there
+                        Boolean genElt = not(noDeps) or (noDeps and not(no.impl.isTypeOf(Connector)));
+                        if (genElt) {
+                            vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, 
+                                "${javaNodesSrc}/${clsName}.java", 
+                                elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, 
+                                familyInterface="", familyMember=no.impl, nodes=nodes2);
+                        }
+                        if (not(noDeps)) {
+                            vilTemplateProcessor("JavaSpringCloudStreamMeshElementTest", config, 
+                                "${javaNodesTestSrc}/${clsName}Test.java", 
+                                elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, 
+                                familyInterface="", familyMember=no.impl, nodes=nodes2, serializers=javaSerializers);
+                        }
+                        setOf(Service) mbs = {};
+                        generateNestedServices(no, no.impl, javaNodesSrc, javaNodesTestSrc, clsName, javaNodesPackage, 
+                            a, artifacts, noDeps, mbs, nodes2, javaSerializers);
+                        elements.add(no);
+                        generateServiceResources(no, no.impl, appRoot, bins, assemblies, resources, artifacts, noDeps);
+                        for (Service m: mbs) {
+                            generateServiceResources(no, m, appRoot, bins, assemblies, resources, artifacts, noDeps);
+                        }
+                        for (Dependency d: impl.dependencies) {
+                            collectMavenDependencies(d, artifacts);
+                        }
+                        for (Plugin plugin: impl.plugins) {
+                            plugins.add(plugin);
+                        }
+                    };
+                    
+                    for (Server ser: a.servers) {
+                        generateServer(config, ser, appRoot, noDeps, assemblies, artifacts);
+                        addArtifacts(ser.artifacts, ser.artifact, bins, noDeps);                        
+                    }
+                };
+                // processes the appJSL entries to individual files
+                for (String k: appJsl.getKeys()) {
+                  vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/${k}", descriptors=appJsl.get(k));
+                }
+                sequenceOf(String) pluginDescriptors = {};
+                for (Plugin plugin: plugins->sortedBy(p|p.id)) {
+                    sequenceOf(String) tmp = plugin.artifact.split(":");
+                    String fName = tmp[1]+"-"+tmp[2]+".zip";
+                    addDependencyArtifact(bins, plugin.artifact, "plugin", "${mvnProjectBuildDir}/classes", fName, "zip", "copy");
+                    String clsName = asIdentifier(tmp[1]).firstToUpper();
+                    vilTemplateProcessor("JavaPluginSetupDescriptor", config, "${javaSrc}/de/oktoflow/plugins/${clsName}PluginSetupDescriptor.java", 
+                        clsName=clsName, plugin=plugin.id, resource="${fName}", pkg="de.oktoflow.plugins");
+                    pluginDescriptors.add('de.oktoflow.plugins.${clsName}PluginSetupDescriptor');
+                }
+                vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/de.iip_ecosphere.platform.support.plugins.PluginSetupDescriptor", descriptors=pluginDescriptors);
+                
+                elements = elements->sortedBy(n|n.name).toSequence(); // for testing
+                
+                vilTemplateProcessor("JavaSpringCloudStreamStarter", config, "${javaSrc}/iip/Starter.java", pkg="iip", serializers=javaSerializers);
+    
+                vilTemplateProcessor("JavaSpringCloudStreamYaml", config, "${resourcesSrc}/application.yml", mappedMesh=mappedMesh, nodes=elements, app=a);
+                vilTemplateProcessor("SpringCloudStreamDeploymentDescriptor", config, "${resourcesSrc}/deployment.yml", app=a, elements=elements);
+                if (enablesPackaging(a, AppPackagingSchema::ZipWithClasspath)) {
+                    vilTemplateProcessor("JavaSpringCloudStreamAssembly", config, "${assemblySrc}/spring.xml");
+                    addAssemblyInfo(assemblies, "spring", "${assemblyRel}/spring.xml", "package", mvnProjectBuildDir);
+                }
+                vilTemplateProcessor("JavaLogbackXml", config, "${resourcesSrc}/logback.xml");
+                identityStoreJsl(resourcesSrc, cfg);
+                deviceIdProviderJsl(resourcesSrc, cfg);
+    
+                if (not(cfg.sharedInterfaces)) {
+                    vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
+                    addAssemblyInfo(assemblies, "interfaces", "${assemblyRel}/javaInterfaces.xml", "package", mvnProjectBuildDir);
+
+                    if (isPythonUsed(usedServiceTypes)) {
+                        vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
+                        addAssemblyInfo(assemblies, "python", "${assemblyRel}/pythonInterfaces.xml", "package", mvnProjectBuildDir);
+                    }
+                }
+                
+                Boolean copyDependencies = enablesPackaging(a, AppPackagingSchema::ZipWithClasspath); // may be more...
+                // partition according to container strategy
+                String appVersion = getAppMvnVersion(a);
+                vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, 
+                    starterCls=appStarterCls, appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests, copyRuntimeDependencies=copyDependencies);
+                vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
+                generatePlugins(cfg, appRoot);
+                mvn(appRoot);
+
+                String appArtifact;
+                if (platformInstantiation) {
+                    appArtifact = generateServiceContainer(appRoot, cfg, a, elements);
+                }
+                
+                if (appArtifact == null or appArtifact.length() == 0) {
+                    appArtifact = appName + "-" + appVersion + "-bin.jar"; // currently not other packaging
+                }
+                generateDeploymentPlans(appRoot, cfg, a, elements, appArtifact);
+                allElements = allElements.union(elements);
+                
+                if (a.createContainer) {
+                    allAppsContainersElements = allAppsContainersElements.union(elements);
+                }
+            }
+            
+            Boolean withTemplate = true; // preliminary
+            if (withTemplate) {
+                advanceProgress("Instantiating app template '" + a.name + "'");
+                appRoot = "${target}/templates/eclipse/impl.${appName}";
+                appRoot.mkdir();
+                javaSrc = "${appRoot}/src/main/java";
+                javaSrc.mkdir();
+                javaTestSrc = "${appRoot}/src/test/java";
+                javaTestSrc.mkdir();
+                pySrc = "${appRoot}/src/main/python";
+                resourcesSrc = "${appRoot}/src/main/resources";
+                resourcesSrc.mkdir();
+                Path testResourcesSrc = "${appRoot}/src/test/resources";
+                testResourcesSrc.mkdir();
+                
+                vilTemplateProcessor("TemplatesEclipseProject", config, "${appRoot}/.project", appName="impl." + appName);
+                vilTemplateProcessor("TemplatesEclipseClasspath", config, "${appRoot}/.classpath", appName="impl." + appName);
+                vilTemplateProcessor("TemplatesEclipsePyDevProject", config, "${appRoot}/.pydevproject", appName=appName);
+                vilTemplateProcessor("TemplatesEclipseGitignore", config, "${appRoot}/.gitignore", appName=appName);
+                vilTemplateProcessor("TemplatesEasyProducer", config, "${appRoot}/.EASyProducer", appName=appName);
+                // currently no separate templates
+                Path vsCodeSettings = "${appRoot}/.vscode";
+                vsCodeSettings.mkdir();
+                vilTemplateProcessor("TemplatesVsCodeEnvProject", config, "${vsCodeSettings}/settings.json");
+
+                setOf(AssemblyInfo) assemblies = {}; 
+                mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
+                sequenceOf(MeshElement) elements = {};
+                setOf(String) javaTests = {};
+                for (ServiceMesh n : a.services) {
+                    setOf(MeshElement) nodes = n.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
+                    for (MeshElement no : nodes) {
+                        generateTemplateElements(appRoot, config, no, no.impl, assemblies, javaTests);
+                        elements.add(no);
+                    }
+                }
+                
+                mapOf(Server, setOf(ServiceBase)) serverServices = {};
+                for (ServiceBase s : getServiceTypes()) {
+                    if (isDefined(s.server) and s.server <> null) {
+                        setOf(ServiceBase) sb = serverServices.getOrAdd(s, {});
+                        sb.add(s);
+                    }
+                }
+                for (Server s : a.servers) {
+                    setOf(ServiceBase) services = serverServices.get(s, {});
+                    generateTemplateElements(appRoot, config, s, assemblies, services);
+                }
+                
+                if (assemblies->select(a|a.id.startsWith("art_")).size() > 0) {
+                    vilTemplateProcessor("TemplatesArtifactsAssembly", config, "${appRoot}/${assemblyRel}/artifacts.xml");
+                    addAssemblyInfo(assemblies, "artifacts", "${mvnProjectBaseDir}/${assemblyRel}/artifacts.xml", "package", mvnProjectBuildDir);
+                }
+                
+                elements = elements->sortedBy(n|n.name).toSequence(); // for testing
+                sequenceOf(MeshElement) pythonElements = elements->select(e|e.impl.isKindOf(PythonService));
+
+                if (javaTests.size() > 0) {
+                    vilTemplateProcessor("JavaAllTestsTemplate", config, "${appRoot}/src/test/java/AllTests.java", javaTests=javaTests, pkg="");
+                }
+                
+                vilTemplateProcessor("TemplatesEclipseReadme", config, "${appRoot}/README.md", appName="impl." + appName, nodes=elements);
+
+                String appVersion = getAppMvnVersion(a);
+                vilTemplateProcessor("AppMvnTest", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, assemblies=assemblies, nodes=elements, appName=appName, appVersion=appVersion, appDescription="Implementation of ${a.name}", tests=tests);
+                vilTemplateProcessor("TemplatesIdentityStoreYaml", config, "${resourcesSrc}/identityStore.yml", appName=appName);
+                vilTemplateProcessor("TemplatesTestLogbackXml", config, "${testResourcesSrc}/logback.xml");
+                identityStoreJsl(testResourcesSrc, cfg);
+                
+                zip(appRoot, appRoot, "${target}/templates/eclipse/impl.${appName}.zip");
+            }
+        };
+        if (platformInstantiation) {
+            generateAllAppsContainers(config, target, allAppsContainersElements);
+        }
+    }
+
+    // currently only one, no naming of apps    
+    buildServices(Application app, Project target) = {
+        String impl = getProperty("iip.easy.impl", "");
+        if (impl <> "") {
+            advanceProgress("Compiling and installing implementation");
+            Path implRoot = "${target}/svcImpl";
+            if (implRoot.exists()) {
+                implRoot.delete();
+            }
+            unzip(impl, implRoot);
+            // ZIP upload convention, either all in root or a single folder with same name as file
+            Path implPath = "${impl}";
+            impl = implPath.getName();
+            impl = impl.substring(0, impl.length() - 4);
+            Path eclipsePath = "${implRoot}/${impl}";
+            if (eclipsePath.exists()) {
+                implRoot = eclipsePath;
+            }
+            mvn(implRoot, "-DskipTests");
+        }
+    }
+    
+    // EASy bug, enums not identical in set
+    Boolean enablesPackaging(Application app, AppPackagingSchema packaging) = {
+        Boolean result = false;
+        for (AppPackagingSchema aps : app.packaging) {
+            if (aps == packaging and result == false) {
+                result = true;
+            }
+        }        
+        result;
+    }
+
+    @DispatchBasis
+    collectMavenDependencies(Dependency d, setOf(String) artifacts) = {
+    }
+
+    @DispatchCase
+    collectMavenDependencies(MavenDependency d, setOf(String) artifacts) = {
+        artifacts.add(d.artifact);
+    }    
+    
+    // dispatch basis
+    generateServer(Configuration config, Server server, Path appRoot, Boolean noDeps, setOf(AssemblyInfo) assemblies, setOf(String) artifacts) = {
+        if (not(noDeps) and isDefined(server.artifact) and server.artifact.length() > 0) {
+            artifacts.add(server.artifact);
+        }
+    }
+    
+    generateServer(Configuration config, PythonServer server, Path appRoot, Boolean noDeps, setOf(AssemblyInfo) assemblies, setOf(String) artifacts) = {
+        IIPEcosphere cfg = config; // from global
+        String serverFolderName = toFolderName(server.id);
+        Path javaSrc = "${appRoot}/src/main/java";
+        Path javaServerSrc = "${javaSrc}/${toPath(javaServerPackage)}";
+        String clsName = asTypeName(server.id);
+        Path assemblySrc = "${appRoot}/${assemblyRel}";
+        
+        vilTemplateProcessor("JavaServer", config, "${javaServerSrc}/${clsName}Server.java", server=server, pkg=javaServerPackage);
+        //vilTemplateProcessor("PythonServer", config, "${appRoot}/src/main/python/services/${clsName}Server.py", server=server, pkg="services");
+        vilTemplateProcessor("PythonServerInterface", config, "${appRoot}/src/main/python/interfaces/${clsName}ServerInterface.py", server=server, pkg="interfaces");
+        if (not(noDeps) and isDefined(server.artifact) and server.artifact.length() > 0) { // artifact available after user services build, only for full app build
+            artifacts.add(server.artifact);
+            sequenceOf(String) tmp = server.artifact.split(":");
+            String artifact = tmp[0]+":"+tmp[1]+":zip:python:"+tmp[2];
+            vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serverFolderName}.xml", withServices=true, dependency=artifact);
+            addAssemblyInfo(assemblies, "python_${serverFolderName}", "${assemblyRel}/python_${serverFolderName}.xml", "prepare-package", "${mvnProjectBuildDir}/classes", finalName="python_${serverFolderName}");
+        }
+    }
+
+    // dispatch basis
+    generateServerInterface(Configuration config, Server server, Path appRoot) = {
+    }
+    
+    generateServerInterface(Configuration config, PythonServer server, Path appRoot) = {
+    	String clsName = asTypeName(server.id);
+	    vilTemplateProcessor("PythonServerInterface", config, "${appRoot}/src/main/python/interfaces/${clsName}ServerInterface.py", server=server, pkg="interfaces");	
+    }
+    
+    /*
+    * Collects all IVML types of services used in all applications and stores them globally to usedServiceTypes.
+    * usedServiceTypes.includes(PythonService) tells you whether the application employs Python services.
+    */    
+    initUsedServiceTypes(setOf(Application) applications) = {
+        for (Application a: applications) {
+            for (ServiceMesh n : a.services) {
+                mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
+                setOf(MeshElement) nodes = n.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
+                for (MeshElement elt: nodes) {
+                    initUsedServiceType(elt.impl);
+                }        
+            }
+        }
+    }
+    
+    // dispatch basis, default
+    initUsedServiceType(ServiceBase service) = {
+        initUsedServiceTypeImpl(service);
+    }
+
+    initUsedServiceTypeImpl(ServiceBase service) = {
+        String name = service.getType(); // converts to strings, VIL/VTL types are not hash-compatible 
+        usedServiceTypes.add(name);
+        if (service.isKindOf(JavaService)) { // keep basic types
+            usedServiceTypes.add("JavaService");
+        } else if (service.isKindOf(PythonService)) { // keep basic types
+            usedServiceTypes.add("PythonService");
+        }
+    }
+
+    initUsedServiceType(ServiceFamily family) = {
+        initUsedServiceTypeImpl(family);
+        for (Service m: family.members) {
+            initUsedServiceType(m); // recurse
+        }
+    }
+
+    // ------------------------------------------ generating apps: generating template code -----------------------------------
+
+    /**
+    * Creates template elements for a certain mesh element/service.
+    */ 
+    @DispatchBasis
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, ServiceBase service, setOf(AssemblyInfo) assemblies, setOf(String) javaTests) = {
+    }
+
+    @DispatchCase
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, CompleteService service, setOf(AssemblyInfo) assemblies, setOf(String) javaTests) = {
+        // do nothing, everything is here already generically in place
+    }
+
+    /**
+    * Creates template files for a server.
+    */
+    @DispatchBasis
+    generateTemplateElements(Path appRoot, Configuration config, Server server, setOf(AssemblyInfo) assemblies, setOf(ServiceBase) services) = {
+        // do nothing, everything is here already generically in place
+    }
+    
+    /**
+    * Creates template files for a Python server.
+    */
+    @DispatchCase
+    generateTemplateElements(Path appRoot, Configuration config, PythonServer server, setOf(AssemblyInfo) assemblies, setOf(ServiceBase) services) = {
+        generateTemplateArtifacts(appRoot, server.artifacts, assemblies);
+        String srvName = asTypeName(server.id);
+        if (services.isEmpty()) {
+            vilTemplateProcessor("PythonServerTestTemplate", config, "${appRoot}/src/test/python/${srvName}Test.py", pythonElements=null, pythonServer=server);
+        } else {
+            for (ServiceBase s: services) {
+                PythonService ps = s;
+                String clsName = asTypeName(ps.name);
+                vilTemplateProcessor("PythonServerTestTemplate", config, "${appRoot}/src/test/python/${srvName}${clsName}Test.py", pythonElements=ps, pythonServer=server);
+            }
+        }
+    }
+    
+    @DispatchCase
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, Connector conn, setOf(AssemblyInfo) assemblies, setOf(String) javaTests) = {
+        Path javaTestSrc = "${appRoot}/src/test/java";
+        Path javaConnSrc = "${javaTestSrc}/${toPath(javaConnectivityPackage)}";
+        String clsName = asTypeName(conn.name);
+        vilTemplateProcessor("JavaConnectorConnectivityTest", config, "${javaConnSrc}/${clsName}Test.java", conn=conn, pkg=javaConnectivityPackage); 
+        Path testResourcesSrc = "${appRoot}/resources/software";
+        String outName = asTypeName(getFirstTypeName(conn.output));
+        JavaPath connClassFqn = conn.class;
+        clsName = connClassFqn.getName();
+        vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${clsName}-${outName}.json.tmpl", elt=no);
+    }
+
+    @DispatchCase
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, JavaService service, setOf(AssemblyInfo) assemblies, setOf(String) javaTests) = {
+        if (service.class <> "") {
+            String clsName = asTypeName(service.name);
+            JavaPath jp = service.class;
+            Path p = appRoot + "/src/main/java/" + jp.getPathSegments().toPath();
+            p.mkdir();
+            vilTemplateProcessor("JavaMeshElementTemplate", config, "${p}/${jp.getName()}.java", elt=no, pkg=jp.getPathSegments(), name=jp.getName());
+            if (needsDataUnitJson(service)) {
+                Path testResourcesSrc = "${appRoot}/src/test/resources";
+                vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${clsName}.json.tmpl", elt=no);
+            }
+            p = appRoot + "/src/test/java/" + jp.getPathSegments().toPath();
+            vilTemplateProcessor("JavaServiceTestTemplate", config, "${p}/${jp.getName()}Test.java", service=service, pkg=jp.getPathSegments());
+            javaTests.add(service.class + "Test");
+            generateTemplateArtifacts(appRoot, service.artifacts, assemblies);
+        }
+    }
+
+    @DispatchCase
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, PythonService service, setOf(AssemblyInfo) assemblies, setOf(String) javaTests) = {
+        String clsName = asTypeName(service.name);
+        vilTemplateProcessor("PythonMeshElementTemplate", config, "${appRoot}/src/main/python/services/${clsName}.py", elt=no, pkg="services", service=service);
+        Path assemblyPath = "${appRoot}/src/main/assembly";
+        assemblyPath.mkdir();
+        vilTemplateProcessor("PythonAssemblyTemplate", config, "${assemblyPath}/python.xml");
+        addAssemblyInfo(assemblies, "python", "${mvnProjectBaseDir}/${assemblyRel}/python.xml", "package", "${mvnProjectBuildDir}/classes");
+        if (needsDataUnitJson(service)) {
+            Path testResourcesSrc = "${appRoot}/src/test/resources";
+            vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${clsName}.json.tmpl", elt=no);
+        }
+        //Path p = appRoot + "/src/test/python/";
+        vilTemplateProcessor("PythonTestTemplate", config, "${appRoot}/src/test/python/${clsName}Test.py", pythonElements=service);
+        //javaTests.add(service.class + "Test");
+        generateTemplateArtifacts(appRoot, service.artifacts, assemblies);
+    }
+    
+    @DispatchCase
+    generateTemplateElements(Path appRoot, Configuration config, MeshElement no, ServiceFamily family, setOf(AssemblyInfo) assemblies, setOf(String) javaTests) = {
+        for (Service m: family.members) {
+            generateTemplateElements(appRoot, config, no, m, assemblies, javaTests);
+        }
+    }
+    
+    /**
+    * Creates artifact descriptor templates for artifacts to attached to services. The
+    * artifacts go to target/artifacts. The packaging artifact with classifier "artifacts"
+    * must be created by the caller.
+    *
+    * @param appRoot root folder/path  of the application
+    * @param arts the artifacts to create the templates for, may be empty
+    * @param assemblies the assemblies built/collected so far (may be modified as a side effect)
+    */
+    generateTemplateArtifacts(Path appRoot, setOf(String) arts, setOf(AssemblyInfo) assemblies) = {
+        Path assemblyPath = "${appRoot}/src/main/assembly";
+        for (String art : arts) {
+            String a = "${art}"; // EASy, whyever, seems to contain a container value instead of the value itself
+            String format = a.substring(a.length() - 3);
+            String id = "art_" + toIdentifier(a.substring(0, a.length() - 4));
+            vilTemplateProcessor("TemplatesArtifactAssemblyTemplate", config, "${assemblyPath}/${id}.xml", id=id, format=format);
+            addAssemblyInfo(assemblies, id, "${mvnProjectBaseDir}/${assemblyRel}/${id}.xml", "package", "${mvnProjectBuildDir}/artifacts", finalName=id, attach=false);
+        }
+    }
+    
+    // ------------------------------------------ generating apps: generating service-specific code artifacts -----------------------------------
+    
+    @DispatchBasis
+    generateServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, ServiceBase service) = {
+        generateJavaServiceElements(appRoot, config, artifacts, no, service);
+    }
+    
+    generateJavaServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, ServiceBase service) = {
+        IIPEcosphere cfg = config;
+        String clsName = asTypeName(no.name);
+        Path javaSrc = "${appRoot}/src/main/java";
+        Path javaInterfacesSrc = "${javaSrc}/${toPath(javaInterfacesPackage)}";
+        if (not(cfg.sharedInterfaces)) {
+            vilTemplateProcessor("JavaMeshElementInterface", config, "${javaInterfacesSrc}/${clsName}Service.java", elt=no, 
+                pkg=javaInterfacesPackage);
+        }
+    }
+    
+    @DispatchCase
+    generateServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, CompleteService service) = {
+        // do nothing, everything is here already generically in place
+    }
+    
+    // Python (preliminary in here)
+    @DispatchCase
+    generateServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, PythonService service) = {
+        IIPEcosphere cfg = config;
+        String clsName = asTypeName(no.name);
+        Path pySrc = "${appRoot}/src/main/python";
+        Path pyInterfacesSrc = "${pySrc}/interfaces"; // default name of ServiceEnvironment.py
+        if (not(cfg.sharedInterfaces)) {
+            vilTemplateProcessor("PythonMeshElementInterface", config, "${pyInterfacesSrc}/${clsName}Interface.py", 
+                elt=no, pkg="interfaces");
+        }
+    }
+
+    @DispatchCase
+    generateServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, Connector conn) = {
+        //generateJavaServiceElements(appRoot, config, artifacts, no, conn);
+    }
+
+    @DispatchCase
+    generateServiceElements(Path appRoot, Configuration config, setOf(String) artifacts, MeshElement no, ChannelConnector conn) = {
+        //generateJavaServiceElements(appRoot, config, artifacts, no, conn);
+        IIPEcosphere cfg = config;
+        Path javaSrc = "${appRoot}/src/main/java";
+        Path javaNodesSrc = "${javaSrc}/${toPath(javaNodesPackage)}";
+        
+        sequenceOf(ConnectorTypes) cTypes = pairTypes(conn);
+        for (ConnectorTypes cType : cTypes) {
+            DataType platfIn = cType.outType.type;
+            DataType platfOut = cType.inType.type;
+            Boolean sharedIf = cfg.sharedInterfaces;
+            String connName = asTypeName(conn.name);
+            
+            if (isConfigured(conn.machineParser) and conn.machineParser <> null) {
+                String parserName = getParserSerializerClassName(conn, cType.inType);
+                vilTemplateProcessor("JavaConnectorSerializer", config, "${javaNodesSrc}/${parserName}.java", imType=cType.ifOutType.type,
+                    path=getPath(cType.ifOutType), pltfType=platfIn, pkg=javaNodesPackage, typePkg=javaDatatypesPackage, 
+                    sharedInterfaces=sharedIf, impl=false, formatter=null, parser=conn.machineParser, className=parserName, 
+                    assng=conn.operations);
+                determineArtifacts(artifacts, conn.machineParser);
+            }
+    
+            if (isConfigured(conn.machineFormatter) and conn.machineFormatter <> null) {
+                String formatterName = getFormatterSerializerClassName(conn, cType.outType);
+                vilTemplateProcessor("JavaConnectorSerializer", config, "${javaNodesSrc}/${formatterName}.java", imType=cType.ifInType.type,
+                    path=getPath(cType.ifInType), pltfType=platfOut, pkg=javaNodesPackage, typePkg=javaDatatypesPackage, 
+                    sharedInterfaces=sharedIf, impl=false, formatter=conn.machineFormatter, parser=null, className=formatterName, 
+                    assng=conn.operations);
+                determineArtifacts(artifacts, conn.machineFormatter);
+            }
+        }
+    }
+    
+    determineArtifacts(setOf(String) artifacts, MachineFormatter formatter) = {
+    }
+
+    determineArtifacts(setOf(String) artifacts, JavaMachineFormatter formatter) = {
+        if (isDefined(formatter.artifact) and formatter.artifact.length() > 0) {
+            artifacts.add(formatter.artifact);
+        }
+    }
+
+    determineArtifacts(setOf(String) artifacts, MachineParser parser) = {
+    }
+
+    determineArtifacts(setOf(String) artifacts, JavaMachineParser parser) = {
+        if (isDefined(parser.artifact) and parser.artifact.length() > 0) {
+            artifacts.add(parser.artifact);
+        }
+    }
+    
+    // ------------------------------------------ generating apps: generating app-specific containers --------------------------------------------
+
+    String getArtifactsFolder(Path appRoot, IIPEcosphere config) = {
+        String artifactsFolder = config.artifactsFolder;
+        if (artifactsFolder == config.artifactsFolderDflt) { // default is in appRoot
+            artifactsFolder = "${appRoot}/../${artifactsFolder}";
+        }
+        artifactsFolder;
+    }
+
+    generateDeploymentPlans(Path appRoot, IIPEcosphere config, Application a, sequenceOf(MeshElement) elements, String artifact) = {
+        String artifactsFolder = getArtifactsFolder(appRoot, config);
+        setOf(DeploymentPlan) plans = DeploymentPlan.allInstances();
+        for (DeploymentPlan p: plans) {
+            String fileName = toIdentifier(a.id + "_" + p.id);
+            vilTemplateProcessor("DeploymentPlan", config, "${artifactsFolder}/${fileName}.yml", plan=p, app=a, artifact=artifact);
+        }
+    }
+    
+    // creates containers depending on container strategies
+    setOf(EcsDevice) ecsDeviceGenerated = {};
+    String generateServiceContainer(Path appRoot, IIPEcosphere config, Application a, sequenceOf(MeshElement) elements) = {
+        String appImageId = "";
+        String artifactsFolder = getArtifactsFolder(appRoot, config);
+        Integer baseImageCreated = 0; // 0 - Not base images, 1 - commen dependencies base image, 2 - All and commen dependencies base images 
+        Integer checkBaseImageRecreation = 0; // 0 - Not Need, 1 - common dep base image recreation, 2 - All dep base image recreation, 3 - Both base image recreation
+        Boolean baseImageMethod = getContainerBaseImageMethodSafe(config.containerBaseImageMethod); 
+        Boolean newChangeOnContainerFiles = false;
+        Boolean newChangeJarFiles = false;
+        String fpFolder = getStringValueSafe(config.footprintFolder, config.footprintFolderDflt);
+        String dfName;
+
+        ContainerManager mgr = config.containerManager;
+        if (a.createContainer and getContainerGenerationSafe(config.containerGeneration)) {
+            String regUser = getProperty("iip.container.user." + mgr.authenticationKey, "");
+            String regPwd = getProperty("iip.container.password." + mgr.authenticationKey, "");
+            Boolean authenticate = regUser <> "" and regPwd <> "";
+            if (authenticate) {
+                loginContainerRegistry(mgr, regUser, regPwd);
+            }
+            
+            // Checking if there is any PythonService in app
+            Integer isPythonService = 0;        // 0 - false, 1 - true, -1 below ECS only (containerType == C1Ecs_C2Svc_App)
+            for (MeshElement elem : elements) {
+                if (elem.impl.isKindOf(ServiceFamily)) {
+                    ServiceFamily family = elem.impl;
+                    for (Service serviceMember: family.members) {
+                        if (serviceMember.isTypeOf(PythonService)) {
+                            isPythonService = 1;
+                        }
+                    }
+                } else {
+                    Service service = elem.impl;
+                    if (service.isTypeOf(PythonService)) {
+                        isPythonService = 1;
+                    }
+               }
+            }
+
+            sequenceOf(PythonService) pyServices = elements -> collect(e|e.impl) -> selectByKind(PythonService);
+            sequenceOf(ServiceFamily) families = elements -> collect(e|e.impl) -> selectByKind(ServiceFamily);
+            for (ServiceFamily family : families) {
+                for (PythonService serviceMember : family.members -> selectByKind(PythonService)) {
+                    pyServices.add(serviceMember);
+                }
+            }
+                    
+            String appName = a.name.toIdentifier();
+            setOf(EcsDevice) devices = EcsDevice.allInstances();
+
+            setOf(Dependency) dependencies = {};
+            Boolean isContainerForOneApp = false;
+            for (EcsDevice device : devices->sortedBy(d|d.id)) {
+                setOf(Dependency) deviceDependencies = device.provides -> selectByType(PythonDependency);
+                ContainerType cntType = device.containerType;
+                for (PythonDependency dependency : deviceDependencies) {
+                    dependencies.add(dependency);
+                }
+
+                if (not(isAllAppsContainer(cntType))){
+                    isContainerForOneApp = true;
+                }
+            }
+
+            if ((isContainerForOneApp) and (baseImageMethod)){
+                Boolean justCommenDep = true;
+                newChangeOnContainerFiles = false;
+                Path deviceBaseDf = "${fpFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_CommenDepBase";
+
+                if (isPythonService == 1) {
+                    Path req = "${appRoot}/../requirements.txt";
+                    // TODO #130 consider server dependencies here
+                    vilTemplateProcessor("PythonBaseReq", config, req, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep, envName="");
+                    Path lastReq = "${deviceBaseDf}/requirements.txt";
+                    if (not(sameMd5HashFiles(req, lastReq))){
+                        newChangeOnContainerFiles = true;
+                    }
+                    
+                    for (PythonService py: pyServices) {
+                        String condaEnv = getStringValueSafe(py.condaEnv, "");
+                        String venvName = getStringValueSafe(py.venvName, "");
+                        if (condaEnv.trim().length() > 0) {
+                            Path condaReq = "${appRoot}/../conda.${condaEnv}.requirements.txt";
+                            vilTemplateProcessor("PythonBaseReq", config, condaReq, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep, envName=condaEnv);
+                            Path lastCondaReq = "${deviceBaseDf}/conda.${condaEnv}.requirements.txt";
+                            if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
+                                newChangeOnContainerFiles = true; 
+                            }
+                        }
+                        if (venvName.trim().length() > 0) {
+                            Path venvReq = "${appRoot}/../venv.${venvName}.requirements.txt";
+                            vilTemplateProcessor("PythonBaseReq", config, venvReq, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep, envName=venvName);
+                            Path lastVenvReq = "${deviceBaseDf}/venv.${venvName}.requirements.txt";
+                            if (not(sameMd5HashFiles(venvReq, lastVenvReq))){
+                                newChangeOnContainerFiles = true;
+                            }
+                        }
+                    }
+                }
+
+                Path instDep = "${appRoot}/../installedDependencies.yml";
+                vilTemplateProcessor("InstalledDependencies", config, instDep, elements=elements, isPython=isPythonService);
+                Path lastInstDep = "${deviceBaseDf}/installedDependencies.yml";
+                if (not(sameMd5HashFiles(instDep, lastInstDep))){
+                    newChangeOnContainerFiles = true;
+                }
+            
+                Path devicesPath = getResourcesFolder() + "/devices";
+                Path devicesGenPath = "${appRoot}/../resources/devices";
+                copy(devicesPath, devicesGenPath);
+                Path lastDevicesPath = "${deviceBaseDf}/resources/devices";
+                if (not(sameMd5HashFolders(devicesPath, lastDevicesPath))){
+                    newChangeOnContainerFiles = true;
+                }
+                
+                Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
+                if (not(identityStorePath.exists())) {
+                    identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
+                }
+                Path identityStoreGenPath = "${appRoot}/../resources";
+                Path lastIdentityStoreFilePath = "${deviceBaseDf}/resources/identityStore.yml";
+                if (not(sameMd5HashFiles(identityStorePath, lastIdentityStoreFilePath))){
+                    Path lastIdentityStorePath = "${deviceBaseDf}/resources";
+                    newChangeOnContainerFiles = true;
+                }
+                
+                dfName = createContainerBuildBaseScript(mgr, a, elements, appRoot, isPythonService, justCommenDep);
+
+                // Create image 
+                Path b = "${appRoot}/../";
+                Path d = "${appRoot}/../" + dfName;
+                Path lastDockerfile = "${deviceBaseDf}/${dfName}";
+                if (not(sameMd5HashFiles(d, lastDockerfile))){
+                    newChangeOnContainerFiles = true;
+                }
+                
+                if ((newChangeOnContainerFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
+                    appImageId = createContainerImage(mgr, b, d, appName, "appCommenDepBaseImage", "0.1.0");
+                    checkBaseImageRecreation = 1;
+                }
+
+                baseImageCreated = 1;
+                justCommenDep = false;
+                if (isPythonService == 1) {
+                    Path req = "${appRoot}/../requirements.txt";
+                    // TODO #130 consider server dependencies here
+                    vilTemplateProcessor("PythonBaseReq", config, req, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep, envName="");
+
+                    Path commenDepRequirements = "${deviceBaseDf}/requirements.txt";
+                    Path allDepRequirements = "${appRoot}/../requirements.txt";
+                    Boolean checkDepRequirements = checkFilesEquality(allDepRequirements, commenDepRequirements);
+                    
+                    for (PythonService py: pyServices) { 
+                        String condaEnv = getStringValueSafe(py.condaEnv, "");
+                        String venvName = getStringValueSafe(py.venvName, "");
+                        if (condaEnv.trim().length() > 0) {
+                            Path condaReq = "${appRoot}/../conda.${condaEnv}.requirements.txt";
+                            vilTemplateProcessor("PythonBaseReq", config, condaReq, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep, envName=condaEnv);
+                            Path commenDepCondaReq = "${deviceBaseDf}/conda.${condaEnv}.requirements.txt";
+                            Path allDepCondaReq = "${appRoot}/../conda.${condaEnv}.requirements.txt";
+                            if (not(checkFilesEquality(allDepCondaReq, commenDepCondaReq))) {
+                                checkDepRequirements = false;
+                            }
+                        }
+                        if (venvName.trim().length() > 0) {
+                            Path venvReq = "${appRoot}/../venv.${venvName}.requirements.txt";
+                            vilTemplateProcessor("PythonBaseReq", config, venvReq, elements=elements, dependencies=dependencies, justCommenDep=justCommenDep, envName=venvName);
+                            Path commenDepVenvReq = "${deviceBaseDf}/Venv.${venvName}.requirements.txt";
+                            Path allDepVenvReq = "${appRoot}/../Venv.${venvName}.requirements.txt";
+                            if (not(checkFilesEquality(allDepVenvReq, commenDepVenvReq))) {
+                                checkDepRequirements = false;
+                            }
+                        }                
+                    }
+
+                    if (not(checkDepRequirements)){
+                        newChangeOnContainerFiles = false;
+                        deviceBaseDf = "${fpFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_AllDepBase";
+                        dfName = createContainerBuildBaseScript(mgr, a, elements, appRoot, isPythonService, justCommenDep);
+                        Path lastAllDepRequirements = "${deviceBaseDf}/requirements.txt";
+                        if (not(sameMd5HashFiles(allDepRequirements, lastAllDepRequirements))){
+                            newChangeOnContainerFiles = true;
+                        }
+
+                        for (PythonService py: pyServices) {
+                            String condaEnv = getStringValueSafe(py.condaEnv, "");
+                            String venvName = getStringValueSafe(py.venvName, "");
+                            if (condaEnv.trim().length() > 0) {
+                                Path lastAllDepCondaReq = "${deviceBaseDf}/conda.${condaEnv}.requirements.txt";       
+                                Path allDepCondaReq = "${appRoot}/../conda.${condaEnv}.requirements.txt";
+                                if (not(checkFilesEquality(allDepCondaReq, lastAllDepCondaReq))) {
+                                    newChangeOnContainerFiles = true;
+                                }
+                            }
+                            if (venvName.trim().length() > 0) {
+                                Path lastAllDepVenvReq = "${deviceBaseDf}/venv.${venvName}.requirements.txt";       
+                                Path allDepVenvReq = "${appRoot}/../venv.${venvName}.requirements.txt";
+                                if (not(checkFilesEquality(allDepVenvReq, lastAllDepVenvReq))) {
+                                    newChangeOnContainerFiles = true;
+                                }
+                            }  
+                        }
+
+                        Path b = "${appRoot}/../";
+                        Path d = "${appRoot}/../" + dfName;
+                        Path lastDockerfile = "${deviceBaseDf}/${dfName}";
+                        if (not(sameMd5HashFiles(d, lastDockerfile))){
+                            newChangeOnContainerFiles = true;
+                        }
+                    
+                        if (checkBaseImageRecreation == 1) {
+                            newChangeOnContainerFiles = true;
+                        } 
+                        
+                        if ((newChangeOnContainerFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
+                            appImageId = createContainerImage(mgr, b, d, appName, "appAllDepBaseImage", "0.1.0");
+                            if (checkBaseImageRecreation == 0) {
+                                checkBaseImageRecreation = 2;
+                            } else if (checkBaseImageRecreation == 1) {
+                                checkBaseImageRecreation = 3;
+                            }
+                        }
+                    
+                        baseImageCreated = 2;
+                    }
+                }
+            }
+
+            for (EcsDevice device : devices->sortedBy(d|d.id)) {
+                ContainerType cntType = device.containerType;
+                String deviceName = getContainerNameDflt(device).toIdentifier();
+                String filePrefix = "${appName}_${deviceName}_";
+                Path deviceDf = "${fpFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_${deviceName}";
+
+                if (not(isAllAppsContainer(cntType))) {
+
+                    setOf(Dependency) deviceDependencies = device.provides -> selectByType(PythonDependency);
+                    String dfName;
+
+                    String deviceSpec = device.containerName;
+                    String tmpFolderName = "";
+                    if (deviceSpec.length() > 0) {
+                        deviceSpec = "-" + deviceSpec;
+                    } 
+                    if (deviceSpec.length() == 0) {
+                        tmpFolderName = "-dflt";
+                    }
+    
+                    setOf(String) srcJarsPaths = {"ecsRuntime", "serviceMgr", "ecsServiceMgr", "ecsJars", "ecsSvcJars", "svcJars"};
+        
+                    for (String srcJarsPath : srcJarsPaths) {
+                        Path newDevicePath = "";
+                        Path lastDevicePath = "";
+                        
+                        if (srcJarsPath.endsWith("Jars")) {
+                            Path deviceSourcesDf = "${deviceDf}/Jars";
+                            newDevicePath = "${appRoot}/../${srcJarsPath}${deviceSpec}";
+                            lastDevicePath = "${deviceSourcesDf}/${srcJarsPath}${deviceSpec}";
+                            if (newDevicePath.exists()) {
+                                newDevicePath.rename("${srcJarsPath}${deviceSpec}${tmpFolderName}");
+                                if (not(sameMd5HashJarsFolders(newDevicePath, lastDevicePath))){
+                                    newChangeJarFiles = true;
+                                }
+                                newDevicePath.rename("${srcJarsPath}${deviceSpec}");
+                            }
+                        } else {
+                            Path deviceSourcesDf = "${deviceDf}/sources";
+                            newDevicePath = "${appRoot}/../${srcJarsPath}${deviceSpec}/src";
+                            lastDevicePath = "${deviceSourcesDf}/${srcJarsPath}${deviceSpec}/src";     
+                            
+                            if (newDevicePath.exists()) {
+                                if (not(sameMd5HashFolders(newDevicePath, lastDevicePath))){
+                                    if ((cntType == ContainerType::EcsSvc_App) and (srcJarsPath == "ecsServiceMgr")) {
+                                        newChangeJarFiles = true;
+                                    } else if ((cntType == ContainerType::Ecs_Svc_App) and ((srcJarsPath == "ecsRuntime") or (srcJarsPath == "serviceMgr"))) {
+                                        newChangeJarFiles = true;
+                                    } else if ((cntType == ContainerType::C1Ecs_C2Svc_App) and ((srcJarsPath == "ecsRuntime") or (srcJarsPath == "serviceMgr"))) {
+                                        newChangeJarFiles = true;
+                                    }
+                                }
+
+                                Path pomFileDf = "${deviceSourcesDf}/${srcJarsPath}${deviceSpec}/";
+                                Path pomFile = "${appRoot}/../${srcJarsPath}${deviceSpec}/pom.xml";
+                                Path lastPomFile = "${pomFileDf}/pom.xml";
+                                if (not(sameMd5HashFiles(pomFile, lastPomFile))){
+                                    newChangeJarFiles = true;
+                                }
+                            }
+                        }
+                    }
+
+                    setOf(String) scriptFiles = {"ecs.bat", "ecs.sh", "ecsServiceMgr.bat", "ecsServiceMgr.sh", "serviceMgr.bat", "serviceMgr.sh"};
+
+                    for (String scriptFile : scriptFiles) {
+                        Path scriptFileDf = "${deviceDf}/scriptFiles";
+                        Path newScriptFile = "${appRoot}/../${scriptFile}";
+                        Path lastScriptFile = "${scriptFileDf}/${scriptFile}";
+                        if (not(sameMd5HashFiles(newScriptFile, lastScriptFile))){
+                            if ((cntType == ContainerType::EcsSvc_App) and (scriptFile.startsWith("ecsServiceMgr"))) {
+                                newChangeJarFiles = true;
+                            } else if ((cntType == ContainerType::Ecs_Svc_App) and ((scriptFile.startsWith("ecs")) or (scriptFile.startsWith("serviceMgr")))) {
+                                newChangeJarFiles = true;
+                            } else if ((cntType == ContainerType::C1Ecs_C2Svc_App) and ((scriptFile.startsWith("ecs")) or (scriptFile.startsWith("serviceMgr")))) {
+                                newChangeJarFiles = true;
+                            }
+                        }
+                    }
+				    
+                    Path brokerDf = "${deviceDf}/broker/src";
+                    Path brokerPath = "${appRoot}/../broker/src";
+                    if (not(sameMd5HashFolders(brokerPath, brokerDf))){
+                        newChangeJarFiles = true;
+                    }
+
+                    setOf(String) brokerFiles = {"broker.bat", "broker.sh", "iip-broker.service", "pom.xml"};
+
+                    for (String brokerFile : brokerFiles) {
+                        Path brokerFilesDf = "${deviceDf}/broker/";
+                        Path newBrokerFile = "${appRoot}/../broker/${brokerFile}";
+                        Path lastBrokerFile = "${brokerFilesDf}/${brokerFile}";
+                        if (not(sameMd5HashFiles(newBrokerFile, lastBrokerFile))){
+                            newChangeJarFiles = true;
+                        }
+                    }
+
+                    Path lastBrokerJars = "${deviceDf}/broker/brokerJars";
+                    Path newBrokerJars = "${target}/broker/brokerJars";
+                    if (not(sameMd5HashJarsFolders(newBrokerJars, lastBrokerJars))){
+                        newChangeJarFiles = true;
+                    }
+
+                    newChangeOnContainerFiles = false;
+                    if (baseImageCreated <> 0){
+                        if (deviceDependencies.size() > 0) {
+                            if (isPythonService == 1) {
+                                Path req = "${appRoot}/../requirements.txt";
+                                // TODO #130 consider server dependencies here
+                                vilTemplateProcessor("PythonReq", config, req, elements=elements, device=device, envName="");
+                                Path lastReq = "${deviceDf}/requirements.txt";
+                                if (not(sameMd5HashFiles(req, lastReq)) and (baseImageCreated == 2)){
+                                    newChangeOnContainerFiles = true;
+                                }
+                                
+                                for (PythonService py: pyServices) {
+                                    String condaEnv = getStringValueSafe(py.condaEnv, "");
+                                    String venvName = getStringValueSafe(py.venvName, "");
+                                    if (condaEnv.trim().length() > 0) {
+                                        Path condaReq = "${appRoot}/../conda.${condaEnv}.requirements.txt";
+                                        vilTemplateProcessor("PythonReq", config, condaReq, elements=elements, device=device, envName=condaEnv);
+                                        Path lastCondaReq = "${deviceDf}/conda.${condaEnv}.requirements.txt";
+                                        if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
+                                            newChangeOnContainerFiles = true;
+                                        }
+                                    }
+                                    if (venvName.trim().length() > 0) {
+                                        Path venvReq = "${appRoot}/../venv.${venvName}.requirements.txt";
+                                        vilTemplateProcessor("PythonReq", config, venvReq, elements=elements, device=device, envName=venvName);
+                                        Path lastVenvReq = "${deviceDf}/venv.${venvName}.requirements.txt";
+                                        if (not(sameMd5HashFiles(venvReq, lastVenvReq))){
+                                            newChangeOnContainerFiles = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        dfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, isPythonService, device, baseImageCreated);
+                    } else {
+                        if (isPythonService == 1) {
+                            Path req = "${appRoot}/../requirements.txt";
+                            // TODO #130 consider server dependencies here
+                            vilTemplateProcessor("PythonReq", config, req, elements=elements, device=device, envName="");
+                            Path lastReq = "${deviceDf}/requirements.txt";
+                            if (not(sameMd5HashFiles(req, lastReq))){
+                                newChangeOnContainerFiles = true;
+                            }
+                            
+                            for (PythonService py: pyServices) {
+                                String condaEnv = getStringValueSafe(py.condaEnv, "");
+                                String venvName = getStringValueSafe(py.venvName, "");
+                                if (condaEnv.trim().length() > 0) {
+                                    Path condaReq = "${appRoot}/../conda.${condaEnv}.requirements.txt";
+                                    vilTemplateProcessor("PythonReq", config, condaReq, elements=elements, device=device, envName=condaEnv);
+                                    Path lastCondaReq = "${deviceDf}/conda.${condaEnv}.requirements.txt";
+                                    if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
+                                        newChangeOnContainerFiles = true;
+                                    }
+                                }
+                                if (venvName.trim().length() > 0) {
+                                    Path venvReq = "${appRoot}/../venv.${venvName}.requirements.txt";
+                                    vilTemplateProcessor("PythonReq", config, venvReq, elements=elements, device=device, envName=venvName);
+                                    Path lastVenvReq = "${deviceDf}/venv.${venvName}.requirements.txt";
+                                    if (not(sameMd5HashFiles(venvReq, lastVenvReq))){
+                                        newChangeOnContainerFiles = true;
+                                    }
+                                }
+                            }
+                        }
+
+                        Path instDep = "${appRoot}/../installedDependencies.yml";
+                        vilTemplateProcessor("InstalledDependencies", config, instDep, elements=elements, isPython=isPythonService, baseImageExist=baseImageCreated);
+                        Path lastInstDep = "${deviceDf}/installedDependencies.yml";
+                        if (not(sameMd5HashFiles(instDep, lastInstDep))){
+                            newChangeOnContainerFiles = true;
+                        }
+                
+                        Path devicesPath = getResourcesFolder() + "/devices";
+                        Path devicesGenPath = "${appRoot}/../resources/devices";
+                        copy(devicesPath, devicesGenPath);
+                        Path lastDevicesPath = "${deviceDf}/resources/devices";
+                        if (not(sameMd5HashFolders(devicesPath, lastDevicesPath))){
+                            newChangeOnContainerFiles = true;
+                        }
+
+                        Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
+                        if (not(identityStorePath.exists())) {
+                            identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
+                        }
+                        Path identityStoreGenPath = "${appRoot}/../resources";
+                        Path lastIdentityStoreFilePath = "${deviceDf}/resources/identityStore.yml";
+                        if (not(sameMd5HashFiles(identityStorePath, lastIdentityStoreFilePath))){
+                            Path lastIdentityStorePath = "${deviceDf}/resources";
+                            newChangeOnContainerFiles = true;
+                        }
+
+                        dfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, isPythonService, device, baseImageCreated);
+                    }
+
+                    // Wrapper-Skript 
+                    Path ws = "${appRoot}/../wrapper_script.sh";
+                    vilTemplateProcessor("WrapperScript", config, ws, containerType=cntType); 
+                    Path lastWs = "${deviceDf}/wrapper_script.sh";
+                    if (not(sameMd5HashFiles(ws, lastWs))){
+                        newChangeOnContainerFiles = true;
+                    }
+                      
+                    // Create image 
+                    Path b = "${appRoot}/../";
+                    Path d = "${appRoot}/../" + dfName;
+                    Path lastDockerfile = "${deviceDf}/${dfName}";
+                    if (not(sameMd5HashFiles(d, lastDockerfile))){
+                        newChangeOnContainerFiles = true;
+                    }
+
+                    if ((checkBaseImageRecreation == 1) or (checkBaseImageRecreation == 3)) {
+                        newChangeOnContainerFiles = true;
+                    } else if ((checkBaseImageRecreation == 2) and (deviceDependencies.size() == 0)) {
+                        newChangeOnContainerFiles = true;
+                    }
+
+                    if ((newChangeOnContainerFiles) or (newChangeJarFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
+                        appImageId = createContainerImage(mgr, b, d, a.name.toIdentifier(), deviceName, a.ver);
+                        Path containerRunScript = "${appRoot}/../${a.name.toIdentifier()}.${deviceName}.sh";
+                        vilTemplateProcessor("ContainerRunScript", config, containerRunScript, app=a, containerType=cntType, device=device);
+                        FileArtifact f = containerRunScript;
+                        f.setExecutable(true);
+                    }
+                      
+                    // Mesh-Info, Container-Descriptor
+                    Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
+                    vilTemplateProcessor("MeshInfo", config, meshInfo, app=a, containerType=cntType, device=device);
+                
+                    if (cntType == ContainerType::C1Ecs_C2Svc_App) {
+                        // Container with ECS
+                        Integer isEcs = 0;        // Is a "Ecs" image already generated?: 0 - false, 1 - true
+                        for (EcsDevice generatedDevice : ecsDeviceGenerated->sortedBy(d|d.id)) {
+                            if (device.id == generatedDevice.id) {
+                                isEcs = 1;
+                            }
+                        }
+                        if (isEcs == 0) {
+                            String ecsDfName = createContainerBuildScript(mgr, a, elements, appRoot, cntType, -1, device, baseImageCreated);
+                            newChangeOnContainerFiles = false;
+                            
+                            Path ecs_ws = "${appRoot}/../ecs.wrapper_script.sh";
+                            vilTemplateProcessor("WrapperScript", config, ecs_ws, containerType=ContainerType::Ecs);
+                            Path lastEcs_Ws = "${deviceDf}/wrapper_script.sh";
+                            if (not(sameMd5HashFiles(ecs_ws, lastEcs_Ws))){
+                                newChangeOnContainerFiles = true;
+                            }                            
+                     
+                            Path ecsB = "${appRoot}/../";
+                            Path ecsD = "${appRoot}/../" + ecsDfName;
+                            Path lastDockerEcsfile = "${deviceDf}/${ecsDfName}";
+                            if (not(sameMd5HashFiles(ecsD, lastDockerEcsfile))){
+                                newChangeOnContainerFiles = true;
+                            }
+                            
+                            if ((newChangeOnContainerFiles) or (newChangeJarFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
+                                String ecs_imageId = createContainerImage(mgr, ecsB, ecsD, a.name.toIdentifier(), "${deviceName}.ecs", a.ver);
+                                Path containerRunScript = "${appRoot}/../${a.name.toIdentifier()}.${deviceName}.ecs.sh";
+                                vilTemplateProcessor("ContainerRunScript", config, containerRunScript, app=a, containerType=ContainerType::Ecs, device=device);
+                                FileArtifact f = containerRunScript;
+                                f.setExecutable(true);
+                            }
+                            
+                            // Mesh-Info, Container-Descriptor
+                            Path meshInfoEcs = "${artifactsFolder}/${filePrefix}mesh-info-ecs.yml";
+                            vilTemplateProcessor("MeshInfo", config, meshInfoEcs, app=a, containerType=ContainerType::Ecs, device=device);
+
+                            isEcs = isEcs + 1;
+                            ecsDeviceGenerated.add(device);               
+                        } 
+                    
+                    }
+
+                }
+            }
+            if (authenticate) {
+                logoutContainerRegistry(mgr);
+            }
+        }
+        appImageId;
+    }
+
+    generateAllAppsContainers(IIPEcosphere config, Project target, sequenceOf(MeshElement) allElements) = {
+        String artifactsFolder = getArtifactsFolder(target.getPath(), config);
+        ContainerManager mgr = config.containerManager;
+        setOf(EcsDevice) devices = EcsDevice.allInstances();
+        String appName = "allApps";
+        int count = 1;
+        String dfName;
+        Integer baseImageCreated = 0; // 0 - Not base images, 1 - common dependencies base image, 2 - All and commen dependencies base images 
+        Integer checkBaseImageRecreation = 0; // 0 - Not Need, 1 - common dep base image recreation, 2 - All dep base image recreation, 3 - Both base image recreation
+        Boolean baseImageMethod = getContainerBaseImageMethodSafe(config.containerBaseImageMethod);
+        Boolean newChangeOnContainerFiles = false;
+        Boolean newChangeJarFiles = false;
+        String fpFolder = getStringValueSafe(config.footprintFolder, config.footprintFolderDflt);
+        
+        if (allElements.size() > 1 and getContainerGenerationSafe(config.containerGeneration)) {
+
+            // Checking if there is any PythonService in app
+            Integer isPythonService = 0;        // 0 - false, 1 - true, -1 below ECS only (containerType == C1Ecs_C2Svc_App)
+            for (MeshElement elem : allElements) {
+                if (elem.impl.isKindOf(ServiceFamily)) {
+                    ServiceFamily family = elem.impl;
+                    for (Service serviceMember: family.members) {
+                        if (serviceMember.isTypeOf(PythonService)) {
+                            isPythonService = 1;
+                        }
+                    }
+                } else {
+                    Service service = elem.impl;
+                    if (service.isTypeOf(PythonService)) {
+                        isPythonService = 1;
+                    }
+               }
+            }
+            
+            sequenceOf(PythonService) pyServices = allElements -> collect(e|e.impl) -> selectByKind(PythonService);
+            sequenceOf(ServiceFamily) families = allElements -> collect(e|e.impl) -> selectByKind(ServiceFamily);
+            for (ServiceFamily family : families) {
+                for (PythonService serviceMember : family.members -> selectByKind(PythonService)) {
+                    pyServices.add(serviceMember);
+                }
+            }
+
+            setOf(Application) applications = getApplications();
+
+            setOf(Dependency) dependencies = {};
+            Boolean isContainerForAllApps = false;
+            for (EcsDevice device : devices->sortedBy(d|d.id)) {
+                setOf(Dependency) deviceDependencies = device.provides -> selectByType(PythonDependency);
+                ContainerType cntType = device.containerType;
+                for (PythonDependency dependency : deviceDependencies) {
+                    dependencies.add(dependency);
+                }
+
+                if (isAllAppsContainer(cntType)){
+                    isContainerForAllApps = true;
+                }
+            }
+
+            if ((isContainerForAllApps) and (baseImageMethod)){
+                String appImageId;
+                Boolean justCommenDep = true;
+                Path deviceBaseDf = "${fpFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_CommenDepBase";
+
+                if (isPythonService == 1) {
+                    Path req = "${target}/requirements.txt";
+                    // TODO #130 consider server dependencies here
+                    vilTemplateProcessor("PythonBaseReq", config, req, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep, envName="");
+                    Path lastReq = "${deviceBaseDf}/requirements.txt";
+                    if (not(sameMd5HashFiles(req, lastReq))){
+                        newChangeOnContainerFiles = true;
+                    }
+                    
+                    for (PythonService py: pyServices) {
+                        String condaEnv = getStringValueSafe(py.condaEnv, "");
+                        String venvName = getStringValueSafe(py.venvName, "");
+                        if (condaEnv.trim().length() > 0) {
+                            Path condaReq = "${target}/conda.${condaEnv}.requirements.txt";
+                            vilTemplateProcessor("PythonBaseReq", config, condaReq, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep, envName=condaEnv);
+                            Path lastCondaReq = "${deviceBaseDf}/conda.${condaEnv}.requirements.txt";
+                            if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
+                                newChangeOnContainerFiles = true;
+                            }
+                        }  
+                        if (venvName.trim().length() > 0) {
+                            Path venvReq = "${target}/venv.${venvName}.requirements.txt";
+                            vilTemplateProcessor("PythonBaseReq", config, venvReq, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep, envName=venvName);
+                            Path lastVenvReq = "${deviceBaseDf}/venv.${venvName}.requirements.txt";
+                            if (not(sameMd5HashFiles(venvReq, lastVenvReq))){
+                                newChangeOnContainerFiles = true;
+                            }
+                        }                  
+                    }
+                }
+
+                Path instDep = "${target}/installedDependencies.yml";
+                vilTemplateProcessor("InstalledDependencies", config, instDep, elements=allElements, isPython=isPythonService);
+                Path lastInstDep = "${deviceBaseDf}/installedDependencies.yml";
+                if (not(sameMd5HashFiles(instDep, lastInstDep))){
+                    newChangeOnContainerFiles = true;
+                }
+            
+                Path devicesPath = getResourcesFolder() + "/devices";
+                Path devicesGenPath = "${target}/resources/devices";
+                copy(devicesPath, devicesGenPath);
+                Path lastDevicesPath = "${deviceBaseDf}/resources/devices";
+                if (not(sameMd5HashFolders(devicesPath, lastDevicesPath))){
+                    newChangeOnContainerFiles = true;
+                }
+
+                Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
+                if (not(identityStorePath.exists())) {
+                    identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
+                }
+                Path identityStoreGenPath = "${target}/resources";
+                copy(identityStorePath, identityStoreGenPath);
+                Path lastIdentityStoreFilePath = "${deviceBaseDf}/resources/identityStore.yml";
+                if (not(sameMd5HashFiles(identityStorePath, lastIdentityStoreFilePath))){
+                    Path lastIdentityStorePath = "${deviceBaseDf}/resources";
+                    newChangeOnContainerFiles = true;
+                }
+                
+                dfName = createContainerBuildBaseScriptAllApps(mgr, applications, allElements, target, isPythonService, justCommenDep);
+
+                // Create image 
+                Path b = "${target}/";
+                Path d = "${target}/" + dfName;
+                Path lastDockerfile = "${deviceBaseDf}/${dfName}";
+                if (not(sameMd5HashFiles(d, lastDockerfile))){
+                    newChangeOnContainerFiles = true;
+                }
+
+                if ((newChangeOnContainerFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
+                    appImageId = createContainerImage(mgr, b, d, appName, "appCommenDepBaseImage", "0.1.0");
+                    checkBaseImageRecreation = 1;
+                }
+                
+                baseImageCreated = 1;
+                justCommenDep = false;
+                if (isPythonService == 1) {
+                    Path req = "${target}/requirements.txt";
+                    // TODO #130 consider server dependencies here
+                    vilTemplateProcessor("PythonBaseReq", config, req, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep, envName="");
+
+                    Path commenDepRequirements = "${deviceBaseDf}/requirements.txt";
+                    Path allDepRequirements = "${target}/requirements.txt";
+                    Boolean checkDepRequirements = checkFilesEquality(allDepRequirements, commenDepRequirements);
+                    
+                    for (PythonService py: pyServices) {
+                        String condaEnv = getStringValueSafe(py.condaEnv, "");
+                        String venvName = getStringValueSafe(py.venvName, "");
+                        if (condaEnv.trim().length() > 0) {
+                            Path condaReq = "${target}/conda.${condaEnv}.requirements.txt";
+                            vilTemplateProcessor("PythonBaseReq", config, condaReq, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep, envName=condaEnv);
+                            Path commenDepCondaReq = "${deviceBaseDf}/conda.${condaEnv}.requirements.txt";
+                            Path allDepCondaReq = "${target}/conda.${condaEnv}.requirements.txt";
+                            if (not(checkFilesEquality(allDepCondaReq, commenDepCondaReq))) {
+                                checkDepRequirements = false;
+                            }
+                        }
+                        if (venvName.trim().length() > 0) {
+                            Path venvReq = "${target}/venv.${venvName}.requirements.txt";
+                            vilTemplateProcessor("PythonBaseReq", config, venvReq, elements=allElements, dependencies=dependencies, justCommenDep=justCommenDep, envName=venvName);
+                            Path commenDepVenvReq = "${deviceBaseDf}/venv.${venvName}.requirements.txt";
+                            Path allDepVenvReq = "${target}/venv.${venvName}.requirements.txt";
+                            if (not(checkFilesEquality(allDepVenvReq, commenDepVenvReq))) {
+                                checkDepRequirements = false;
+                            }
+                        }               
+                    }
+
+                    if (not(checkDepRequirements)){
+                        deviceBaseDf = "${fpFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_AllDepBase";
+                        dfName = createContainerBuildBaseScriptAllApps(mgr, applications, allElements, target, isPythonService, justCommenDep);
+                        Path lastAllDepRequirements = "${deviceBaseDf}/requirements.txt";
+                        if (not(sameMd5HashFiles(allDepRequirements, lastAllDepRequirements))){
+                            newChangeOnContainerFiles = true;
+                        }
+
+                        for (PythonService py: pyServices) {
+                            String condaEnv = getStringValueSafe(py.condaEnv, "");
+                            String venvName = getStringValueSafe(py.venvName, "");
+                            if (condaEnv.trim().length() > 0) {
+                                Path lastAllDepCondaReq = "${deviceBaseDf}/conda.${condaEnv}.requirements.txt";       
+                                Path allDepCondaReq = "${target}/conda.${condaEnv}.requirements.txt";
+                                if (not(checkFilesEquality(allDepCondaReq, lastAllDepCondaReq))) {
+                                    newChangeOnContainerFiles = true;
+                                }
+                            }
+                            if (venvName.trim().length() > 0) {
+                                Path lastAllDepVenvReq = "${deviceBaseDf}/venv.${venvName}.requirements.txt";       
+                                Path allDepVenvReq = "${target}/venv.${venvName}.requirements.txt";
+                                if (not(checkFilesEquality(allDepVenvReq, lastAllDepVenvReq))) {
+                                    newChangeOnContainerFiles = true;
+                                }
+                            }                 
+                        }
+                        
+                        Path b = "${target}/";
+                        Path d = "${target}/" + dfName;
+                        Path lastDockerfile = "${deviceBaseDf}/${dfName}";
+                        if (not(sameMd5HashFiles(d, lastDockerfile))){
+                            newChangeOnContainerFiles = true;
+                        }
+
+                        if (checkBaseImageRecreation == 1) {
+                            newChangeOnContainerFiles = true;
+                        } 
+                        
+                        if ((newChangeOnContainerFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
+                            appImageId = createContainerImage(mgr, b, d, appName, "appAllDepBaseImage", "0.1.0");
+                            if (checkBaseImageRecreation == 0) {
+                                checkBaseImageRecreation = 2;
+                            } else if (checkBaseImageRecreation == 1) {
+                                checkBaseImageRecreation = 3;
+                            }
+                        }
+                    
+                        baseImageCreated = 2;
+                    }
+                }
+                
+            }
+            
+            for (EcsDevice device : devices->sortedBy(d|d.id)) {
+                if (!inTesting or (inTesting and count < 2)) { // inTesting, just produce the first one -> CI roundtrip time
+                    ContainerType cntType = device.containerType;
+                    String deviceName = getContainerNameDflt(device).toIdentifier();
+                    String filePrefix = "${appName}_${deviceName}_";
+                    Path deviceDf = "${fpFolder}/DeviceDockerfiles/${appName}/DeviceDockerfile_${deviceName}";
+
+                    if (isAllAppsContainer(cntType)){
+                        String regUser = getProperty("iip.container.user." + mgr.authenticationKey, "");
+                        String regPwd = getProperty("iip.container.password." + mgr.authenticationKey, "");
+                        Boolean authenticate = regUser <> "" and regPwd <> "";
+                        if (authenticate) {
+                            loginContainerRegistry(mgr, regUser, regPwd);
+                        }
+                        
+                        setOf(Dependency) deviceDependencies = device.provides -> selectByType(PythonDependency);
+						
+						String deviceSpec = device.containerName;
+                        String tmpFolderName = "";
+                        if (deviceSpec.length() > 0) {
+                            deviceSpec = "-" + deviceSpec;
+                        } 
+                        if (deviceSpec.length() == 0) {
+                            tmpFolderName = "-dflt";
+                        }
+                        
+                        setOf(String) srcJarsPaths = {"ecsRuntime", "serviceMgr", "ecsServiceMgr", "ecsJars", "ecsSvcJars", "svcJars"};
+				        
+                        for (String srcJarsPath : srcJarsPaths) {
+                            Path newDevicePath = "";
+                            Path lastDevicePath = "";
+                            
+                            if (srcJarsPath.endsWith("Jars")) {
+                                Path deviceSourcesDf = "${deviceDf}/Jars";
+                                newDevicePath = "${target}/${srcJarsPath}${deviceSpec}";
+                                lastDevicePath = "${deviceSourcesDf}/${srcJarsPath}${deviceSpec}";
+                                if (newDevicePath.exists()) {
+                                    newDevicePath.rename("${srcJarsPath}${deviceSpec}${tmpFolderName}");
+                                    if (not(sameMd5HashJarsFolders(newDevicePath, lastDevicePath))){
+                                        newChangeJarFiles = true;
+                                    }
+                                    newDevicePath.rename("${srcJarsPath}${deviceSpec}");
+                                }
+                            } else {
+                                Path deviceSourcesDf = "${deviceDf}/sources";
+                                newDevicePath = "${target}/${srcJarsPath}${deviceSpec}/src";
+                                lastDevicePath = "${deviceSourcesDf}/${srcJarsPath}${deviceSpec}/src";     
+                                
+                                if (newDevicePath.exists()) {
+                                    if (not(sameMd5HashFolders(newDevicePath, lastDevicePath))){
+                                        if ((cntType == ContainerType::EcsSvc_App) and (srcJarsPath == "ecsServiceMgr")) {
+                                            newChangeJarFiles = true;
+                                        } else if ((cntType == ContainerType::Ecs_Svc_App) and ((srcJarsPath == "ecsRuntime") or (srcJarsPath == "serviceMgr"))) {
+                                            newChangeJarFiles = true;
+                                        } else if ((cntType == ContainerType::C1Ecs_C2Svc_App) and ((srcJarsPath == "ecsRuntime") or (srcJarsPath == "serviceMgr"))) {
+                                            newChangeJarFiles = true;
+                                        }
+                                    }
+
+                                    Path pomFileDf = "${deviceSourcesDf}/${srcJarsPath}${deviceSpec}/";
+                                    Path pomFile = "${target}/${srcJarsPath}${deviceSpec}/pom.xml";
+                                    Path lastPomFile = "${pomFileDf}/pom.xml";
+                                    if (not(sameMd5HashFiles(pomFile, lastPomFile))){
+                                        newChangeJarFiles = true;
+                                    }
+                                }
+                            }						
+                        }
+						
+                        setOf(String) scriptFiles = {"ecs.bat", "ecs.sh", "ecsServiceMgr.bat", "ecsServiceMgr.sh", "serviceMgr.bat", "serviceMgr.sh"};
+
+                        for (String scriptFile : scriptFiles) {
+                            Path scriptFileDf = "${deviceDf}/scriptFiles";
+                            Path newScriptFile = "${target}/${scriptFile}";
+                            Path lastScriptFile = "${scriptFileDf}/${scriptFile}";
+                            if (not(sameMd5HashFiles(newScriptFile, lastScriptFile))){
+                                if ((cntType == ContainerType::EcsSvc_App) and (scriptFile.startsWith("ecsServiceMgr"))) {
+                                    newChangeJarFiles = true;
+                                } else if ((cntType == ContainerType::Ecs_Svc_App) and ((scriptFile.startsWith("ecs")) or (scriptFile.startsWith("serviceMgr")))) {
+                                    newChangeJarFiles = true;
+                                } else if ((cntType == ContainerType::C1Ecs_C2Svc_App) and ((scriptFile.startsWith("ecs")) or (scriptFile.startsWith("serviceMgr")))) {
+                                    newChangeJarFiles = true;
+                                }
+                            }
+                        }		
+                        				
+                        Path brokerDf = "${deviceDf}/broker/src";
+                        Path brokerPath = "${target}/broker/src";
+                        if (not(sameMd5HashFolders(brokerPath, brokerDf))){
+                            newChangeJarFiles = true;
+                        }
+                        
+                        setOf(String) brokerFiles = {"broker.bat", "broker.sh", "iip-broker.service", "pom.xml"};
+        
+                        for (String brokerFile : brokerFiles) {
+                            Path brokerFilesDf = "${deviceDf}/broker/";
+                            Path newBrokerFile = "${target}broker/${brokerFile}";
+                            Path lastBrokerFile = "${brokerFilesDf}/${brokerFile}";
+                            if (not(sameMd5HashFiles(newBrokerFile, lastBrokerFile))){
+                                newChangeJarFiles = true;
+                            }
+                        }
+
+                        Path lastBrokerJars = "${deviceDf}/broker/brokerJars";
+                        Path newBrokerJars = "${target}/broker/brokerJars";
+                        if (not(sameMd5HashJarsFolders(newBrokerJars, lastBrokerJars))){
+                            newChangeJarFiles = true;
+                        }						
+												
+						newChangeOnContainerFiles = false;
+                        if (baseImageCreated <> 0){
+                            if (deviceDependencies.size() > 0) {
+                                if (isPythonService == 1) {
+                                    Path req = "${target}/requirements.txt";
+                                    // TODO #130 consider server dependencies here
+                                    vilTemplateProcessor("PythonReq", config, req, elements=allElements, device=device, envName="");
+                                    Path lastReq = "${deviceDf}/requirements.txt";
+                                    if (not(sameMd5HashFiles(req, lastReq)) and (baseImageCreated == 2)){
+                                        newChangeOnContainerFiles = true;
+                                    }
+                                    
+                                    for (PythonService py: pyServices) { 
+                                        String condaEnv = getStringValueSafe(py.condaEnv, ""); 
+                                        String venvName = getStringValueSafe(py.venvName, ""); 
+                                        if (condaEnv.trim().length() > 0) {
+                                            Path condaReq = "${target}/conda.${condaEnv}.requirements.txt";
+                                            vilTemplateProcessor("PythonReq", config, condaReq, elements=allElements, device=device, envName=condaEnv);
+                                            Path lastCondaReq = "${deviceDf}/conda.${condaEnv}.requirements.txt";
+                                            if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
+                                                newChangeOnContainerFiles = true;
+                                            }
+                                        }
+                                        if (venvName.trim().length() > 0) {
+                                            Path venvReq = "${target}/venv.${venvName}.requirements.txt";
+                                            vilTemplateProcessor("PythonReq", config, venvReq, elements=allElements, device=device, envName=venvName);
+                                            Path lastVenvReq = "${deviceDf}/venv.${venvName}.requirements.txt";
+                                            if (not(sameMd5HashFiles(venvReq, lastVenvReq))){
+                                                newChangeOnContainerFiles = true;
+                                            }
+                                        }
+                                    }
+                                }
+                            } 
+
+                            dfName = createContainerBuildScriptAllApps(mgr, applications, allElements, target, cntType, isPythonService, device, baseImageCreated);
+                        } else {
+
+                            if (isPythonService == 1) {
+                                Path req = "${target}/requirements.txt";
+                                // TODO #130 consider server dependencies here
+                                vilTemplateProcessor("PythonReq", config, req, elements=allElements, device=device, envName="");
+                                Path lastReq = "${deviceDf}/requirements.txt";
+                                if (not(sameMd5HashFiles(req, lastReq))){
+                                    newChangeOnContainerFiles = true;
+                                }
+                                
+                                for (PythonService py: pyServices) {
+                                    String condaEnv = getStringValueSafe(py.condaEnv, ""); 
+                                    String venvName = getStringValueSafe(py.venvName, ""); 
+                                    if (condaEnv.trim().length() > 0) {
+                                        Path condaReq = "${target}/conda.${condaEnv}.requirements.txt";
+                                        vilTemplateProcessor("PythonReq", config, condaReq, elements=allElements, device=device, envName=condaEnv);
+                                        Path lastCondaReq = "${deviceDf}/conda.${condaEnv}.requirements.txt";
+                                        if (not(sameMd5HashFiles(condaReq, lastCondaReq))){
+                                            newChangeOnContainerFiles = true;
+                                        }
+                                    }
+                                    if (venvName.trim().length() > 0) {
+                                        Path venvReq = "${target}/venv.${venvName}.requirements.txt";
+                                        vilTemplateProcessor("PythonReq", config, venvReq, elements=allElements, device=device, envName=venvName);
+                                        Path lastVenvReq = "${deviceDf}/venv.${venvName}.requirements.txt";
+                                        if (not(sameMd5HashFiles(venvReq, lastVenvReq))){
+                                            newChangeOnContainerFiles = true;
+                                        }
+                                    }
+                                }
+                            }
+        
+                            Path instDep = "${target}/installedDependencies.yml";
+                            vilTemplateProcessor("InstalledDependencies", config, instDep, elements=allElements, isPython=isPythonService);
+                            Path lastInstDep = "${deviceDf}/installedDependencies.yml";
+                            if (not(sameMd5HashFiles(instDep, lastInstDep))){
+                                newChangeOnContainerFiles = true;
+                            }
+
+                            Path devicesPath = getResourcesFolder() + "/devices";
+                            Path devicesGenPath = "${target}/resources/devices";
+                            copy(devicesPath, devicesGenPath);
+                            Path lastDevicesPath = "${deviceDf}/resources/devices";
+                            if (not(sameMd5HashFolders(devicesPath, lastDevicesPath))){
+                                newChangeOnContainerFiles = true;
+                            }                            
+	                    
+                            Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
+                            if (not(identityStorePath.exists())) {
+                                identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
+                            }
+                            Path identityStoreGenPath = "${target}/resources";
+                            copy(identityStorePath, identityStoreGenPath);
+                            Path lastIdentityStoreFilePath = "${deviceDf}/resources/identityStore.yml";
+                            if (not(sameMd5HashFiles(identityStorePath, lastIdentityStoreFilePath))){
+                                newChangeOnContainerFiles = true;
+                            }
+
+                            dfName = createContainerBuildScriptAllApps(mgr, applications, allElements, target, cntType, isPythonService, device, baseImageCreated);
+                        }
+
+                        // Wrapper-Skript 
+                        Path ws = "${target}/wrapper_script.sh";
+                        vilTemplateProcessor("WrapperScript", config, ws, containerType=cntType); 
+                        Path lastWs = "${deviceDf}/wrapper_script.sh";
+                        if (not(sameMd5HashFiles(ws, lastWs))){
+                            newChangeOnContainerFiles = true;
+                        }
+                        
+                        // Create image 
+                        Path b = "${target}/";
+                        Path d = "${target}/" + dfName;
+                        Path lastDockerfile = "${deviceDf}/${dfName}";
+                        if (not(sameMd5HashFiles(d, lastDockerfile))){
+                            newChangeOnContainerFiles = true;
+                        }
+
+                        if ((checkBaseImageRecreation == 1) or (checkBaseImageRecreation == 3)) {
+                            newChangeOnContainerFiles = true;
+                        } else if ((checkBaseImageRecreation == 2) and (deviceDependencies.size() == 0)) {
+                            newChangeOnContainerFiles = true;
+                        }
+
+                        if ((newChangeOnContainerFiles) or (newChangeJarFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
+                            String appImageId = createContainerImage(mgr, b, d, appName, deviceName, "0.1.0");
+                            Path containerRunScript = "${target}/${appName}.${deviceName}.sh";
+                            vilTemplateProcessor("ContainerRunScriptAllApps", config, containerRunScript, containerType=cntType, device=device);
+                            FileArtifact f = containerRunScript;
+                            f.setExecutable(true);
+                        }
+                    
+                        // Mesh-Info, Container-Descriptor
+                        Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
+                        vilTemplateProcessor("MeshInfoAllApps", config, meshInfo, containerType=cntType, device=device);
+
+                        if (cntType == ContainerType::C1Ecs_C2Svc_AllApps) {
+                            String ecsDfName = createContainerBuildScriptAllApps(mgr, applications, allElements, target, cntType, -1, device, baseImageCreated);
+                            newChangeOnContainerFiles = false;
+                            
+                            Path ecs_ws = "${target}/ecs.wrapper_script.sh";
+                            vilTemplateProcessor("WrapperScript", config, ecs_ws, containerType=ContainerType::Ecs);
+                            Path lastEcs_Ws = "${deviceDf}/wrapper_script.sh";
+                            if (not(sameMd5HashFiles(ecs_ws, lastEcs_Ws))){
+                                newChangeOnContainerFiles = true;
+                            }    
+
+                            Path ecsB = "${target}/";
+                            Path ecsD = "${target}/" + ecsDfName;
+                            Path lastDockerEcsfile = "${deviceDf}/${ecsDfName}";
+                            if (not(sameMd5HashFiles(ecsD, lastDockerEcsfile))){
+                                newChangeOnContainerFiles = true;
+                            }
+                            
+                            if ((newChangeOnContainerFiles) or (newChangeJarFiles) or (getForceContainersCreationSafe(config.forceContainersCreation))) {
+                                String ecs_imageId = createContainerImage(mgr, ecsB, ecsD, appName, "${deviceName}.ecs", "0.1.0");
+                                Path containerRunScript = "${target}/${appName}.${deviceName}.ecs.sh";
+                                vilTemplateProcessor("ContainerRunScriptAllApps", config, containerRunScript, containerType=ContainerType::Ecs, device=device);
+                                FileArtifact f = containerRunScript;
+                                f.setExecutable(true);
+                            }
+                    
+                            // Mesh-Info, Container-Descriptor
+                            Path meshInfoEcs = "${artifactsFolder}/${filePrefix}mesh-info-ecs.yml";
+                            vilTemplateProcessor("MeshInfoAllApps", config, meshInfoEcs, containerType=ContainerType::Ecs, device=device);
+                        } 
+        
+                        if (authenticate) {
+                            logoutContainerRegistry(mgr);
+                        }
+                        count = count + 1;
+					    
+                    }
+                }
+            }
+        }
+    }
+
+    Boolean checkFilesEquality(Path pathFile1, Path pathFile2) = { 
+        FileArtifact pathFile1Artifact = pathFile1;
+        FileArtifact pathFile2Artifact = pathFile2;
+        pathFile1Artifact.hasSameContent(pathFile2Artifact);
+    }
+
+    storeMd5Hash(JsonFileArtifact target, Path path) = { 
+        FileArtifact fileArtifact = path; 
+        String fileArtifactMd5 = fileArtifact.getMd5Hash(); 
+        
+        JsonNode data = target.getData(); 
+        data.addValue(path, fileArtifactMd5);
+    }
+    
+    Boolean sameMd5HashFiles(Path newFilePath, Path lastFilePath) = { 
+        Boolean result = true;
+        JsonFileArtifact jfa = "${lastFilePath}.json";
+        JsonNode data = jfa.getData();
+
+        if (not(data.has(newFilePath)) or not(newFilePath.exists())){
+            result = false;
+        } else {
+            FileArtifact newFilePathArtifact = newFilePath; // must exist!
+            String lastFilePathMd5 = data.getValue(newFilePath); // must exist!
+            
+            if (not(newFilePathArtifact.getMd5Hash() == lastFilePathMd5)){
+                result = false;
+            }
+        }
+        if (not(result)){
+            storeMd5Hash(jfa, newFilePath);
+        }
+        
+        result;
+    }
+    
+    Boolean sameMd5HashJarsFolders(Path newFilePath, Path lastFilePath) = { 
+        setOf(FileArtifact) newPathArtifactsSet = newFilePath.selectAll();
+
+        Boolean result = true;
+        JsonFileArtifact jfa = "${lastFilePath}.json";
+        JsonNode data = jfa.getData();
+        
+        for (FileArtifact file : newPathArtifactsSet){
+            if (not((file.getName().startsWith("de.iip-ecosphere.platform")) and (file.getName().find(".exec-") != -1))) {
+                Boolean fileResult = true;
+            
+                if (data.has(file.getPath())){
+                    if (not(file.getMd5Hash() == data.getValue(file.getPath()))){
+                        fileResult = false;
+                    }
+                } else {
+                	fileResult = false;
+                }
+            	
+                if (not(fileResult)){
+                 	result = false;
+            		storeMd5Hash(jfa, file.getPath());
+       			}
+            }
+        }
+        
+        result;
+    }
+    
+    Boolean sameMd5HashFolders(Path newFilePath, Path lastFilePath) = { 
+        setOf(FileArtifact) newPathArtifactsSet = newFilePath.selectAll();
+
+        Boolean result = true;
+        JsonFileArtifact jfa = "${lastFilePath}.json";
+        JsonNode data = jfa.getData();
+        
+        for (FileArtifact file : newPathArtifactsSet){
+            Boolean fileResult = true;
+            
+            if (data.has(file.getPath())){
+            	if (not(file.getMd5Hash() == data.getValue(file.getPath()))){
+                    fileResult = false;
+                }
+            } else {
+            	fileResult = false;
+            }
+            
+            if (not(fileResult)){
+                result = false;
+        		storeMd5Hash(jfa, file.getPath());
+   			}
+        }
+        
+        result;
+    }
+
+    Boolean isAllAppsContainer(ContainerType cntType) = { 
+	Boolean isAllApps=false;
+        if (cntType == ContainerType::Ecs_Svc_AllApps){
+            isAllApps=true;
+        }   
+        if (cntType == ContainerType::EcsSvc_AllApps){
+            isAllApps=true;
+        } 
+        if (cntType == ContainerType::C1Ecs_C2Svc_AllApps){
+            isAllApps=true;
+        } 
+        isAllApps;
+    }
+
+    generatePlatformContainers(IIPEcosphere config, Project target) = {
+        String artifactsFolder = getArtifactsFolder(target.getPath(), config);
+        ContainerManager mgr = config.containerManager;
+        String deviceName = "platform";
+        String appName = "platform";
+        String filePrefix = "${appName}_${deviceName}_";
+        String regUser = getProperty("iip.container.user." + mgr.authenticationKey, "");
+        String regPwd = getProperty("iip.container.password." + mgr.authenticationKey, "");
+        Path deviceDf = "${getStringValueSafe(config.footprintFolder, config.footprintFolderDflt)}/DeviceDockerfiles/${appName}";
+        Boolean newChangeOnContainerFiles = false;
+        Boolean newChangeJarFiles = false;
+
+        Boolean authenticate = regUser <> "" and regPwd <> "";
+        if (authenticate) {
+            loginContainerRegistry(mgr, regUser, regPwd);
+        }
+        
+        setOf(String) srcJarsPaths = {"platform", "plJars"};
+        setOf(String) scriptFiles = {"platform.bat", "platform.sh"};
+        if (hasMonitoring(config)) {
+            scriptFiles.add("monitoring.bat");
+            scriptFiles.add("monitoring.sh");
+            srcJarsPaths.add("monitoring");
+            srcJarsPaths.add("monJars");
+        }
+        if (hasUI(config)) {
+            scriptFiles.add("mgtUi.bat");
+            scriptFiles.add("mgtUi.sh");
+            srcJarsPaths.add("mgtUi");
+        }
+        
+        for (String srcJarsPath : srcJarsPaths) {
+            Path newDevicePath = "";
+            Path lastDevicePath = "";
+            
+            if (srcJarsPath.endsWith("Jars")) {
+                Path deviceSourcesDf = "${deviceDf}/Jars";
+                newDevicePath = "${target}/${srcJarsPath}";
+                lastDevicePath = "${deviceSourcesDf}/${srcJarsPath}";
+                if (newDevicePath.exists()) {
+                    if (not(sameMd5HashJarsFolders(newDevicePath, lastDevicePath))){
+                        newChangeJarFiles = true;
+                    }
+                }
+            } else {
+                Path deviceSourcesDf = "${deviceDf}/sources";
+        
+                if (srcJarsPath == "mgtUi") {
+                    newDevicePath = "${target}/${srcJarsPath}/dist";
+                    lastDevicePath = "${deviceSourcesDf}/${srcJarsPath}/dist";
+                } else {
+                    newDevicePath = "${target}/${srcJarsPath}/src";
+                    lastDevicePath = "${deviceSourcesDf}/${srcJarsPath}/src";
+                }
+                
+                if (newDevicePath.exists()) {
+                    if (not(sameMd5HashFolders(newDevicePath, lastDevicePath))){
+                        newChangeJarFiles = true;
+                    }
+        
+                    Path pomFileDf = "${deviceSourcesDf}/${srcJarsPath}/";
+                    Path pomFile = "${target}/${srcJarsPath}/pom.xml";
+                    Path lastPomFile = "${pomFileDf}/pom.xml";
+                    if (not(sameMd5HashFiles(pomFile, lastPomFile))){
+                        newChangeJarFiles = true;
+                    }
+                    
+                    if (srcJarsPath == "mgtUi") {
+                        Path serverJsDf = "${deviceSourcesDf}/${srcJarsPath}/";
+                        Path newServerJs = "${target}/${srcJarsPath}/server.js";
+                        Path lastserverJs = "${serverJsDf}/server.js";
+                        if (not(sameMd5HashFiles(newServerJs, lastserverJs))){
+                            newChangeJarFiles = true;
+                        }
+                    }
+                }
+            }
+        }
+        
+        for (String scriptFile : scriptFiles) {
+            Path scriptFileDf = "${deviceDf}/scriptFiles";
+            Path newScriptFile = "${target}/${scriptFile}";
+            Path lastScriptFile = "${scriptFileDf}/${scriptFile}";
+            if (not(sameMd5HashFiles(newScriptFile, lastScriptFile))){
+                newChangeJarFiles = true;
+            }
+        }
+        
+        Path brokerDf = "${deviceDf}/broker/src";
+        Path brokerPath = "${target}/broker/src";
+        if (not(sameMd5HashFolders(brokerPath, brokerDf))){
+            newChangeJarFiles = true;
+        }
+        
+        setOf(String) brokerFiles = {"broker.bat", "broker.sh", "iip-broker.service", "pom.xml"};
+        
+        for (String brokerFile : brokerFiles) {
+            Path brokerFilesDf = "${deviceDf}/broker/";
+            Path newBrokerFile = "${target}/broker/${brokerFile}";
+            Path lastBrokerFile = "${brokerFilesDf}/${brokerFile}";
+            if (not(sameMd5HashFiles(newBrokerFile, lastBrokerFile))){
+                newChangeJarFiles = true;
+            }
+        }
+        
+        Path lastBrokerJars = "${deviceDf}/broker/brokerJars";
+        Path newBrokerJars = "${target}/broker/brokerJars";
+        if (not(sameMd5HashJarsFolders(newBrokerJars, lastBrokerJars))){
+            newChangeJarFiles = true;
+        }
+        
+        Path req = "${target}/requirements.txt";
+        // reading from requirements.txt is not bad but assumes usage of install package
+        // better to have them in a list in the model similar to #143
+        Path requirements = "${target}/../platformDependencies/requirements.txt";
+        FileArtifact requirementsArtifact = requirements;
+        Text requirementsText = requirementsArtifact.getText();
+
+        vilTemplateProcessor("PythonReqPlatform", config, req, text=requirementsText );
+        Path lastReq = "${deviceDf}/requirements.txt";
+        if (not(sameMd5HashFiles(req, lastReq))){
+            newChangeOnContainerFiles = true;
+        }
+
+        Integer isPythonService = 1;
+        sequenceOf(MeshElement) allElements = {};
+
+        Path instDep = "${target}/installedDependencies.yml";
+        vilTemplateProcessor("InstalledDependencies", config, instDep, elements=allElements, isPython=isPythonService);
+        Path lastInstDep = "${deviceDf}/installedDependencies.yml";
+        if (not(sameMd5HashFiles(instDep, lastInstDep))){
+            newChangeOnContainerFiles = true;
+        }
+
+        String dfName = createContainerBuildScriptPlatform(mgr, target);
+
+        // Wrapper-Skript 
+        Path ws = "${target}/wrapper_script_platform.sh";
+        vilTemplateProcessor("WrapperScriptPlatform", config, ws); 
+        Path lastWs = "${deviceDf}/wrapper_script_platform.sh";
+        if (not(sameMd5HashFiles(ws, lastWs))){
+            newChangeOnContainerFiles = true;
+        }
+
+        Path devicesPath = getResourcesFolder() + "/devices";
+        Path devicesGenPath = "${target}/resources/devices";
+        copy(devicesPath, devicesGenPath);
+        Path lastDevicesPath = "${deviceDf}/resources/devices";
+        if (not(sameMd5HashFolders(devicesPath, lastDevicesPath))){
+            newChangeOnContainerFiles = true;
+        }                            
+	    
+        Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
+        if (not(identityStorePath.exists())) {
+            identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
+        }
+        Path identityStoreGenPath = "${target}/resources";
+        copy(identityStorePath, identityStoreGenPath);
+        Path lastIdentityStoreFilePath = "${deviceDf}/resources/identityStore.yml";
+        if (not(sameMd5HashFiles(identityStorePath, lastIdentityStoreFilePath))){
+            newChangeOnContainerFiles = true;
+        }
+        
+        // Create image 
+        Path b = "${target}/";
+        Path d = "${target}/" + dfName;
+        Path lastDockerfile = "${deviceDf}/${dfName}";
+        if (not(sameMd5HashFiles(d, lastDockerfile))){
+            newChangeOnContainerFiles = true;
+        }
+
+        if ((newChangeOnContainerFiles) or (newChangeJarFiles)) {
+            String appImageId = createContainerImage(mgr, b, d, "Platform", deviceName, "0.1.0");
+        }
+        
+        // Mesh-Info, Container-Descriptor
+        //Path meshInfo = "${artifactsFolder}/${filePrefix}mesh-info.yml";
+        //vilTemplateProcessor("MeshInfoPlatform", config, meshInfo);
+
+        if (authenticate) {
+            logoutContainerRegistry(mgr);
+        }
+
+    }
+        
+    // ------------------------------------------ generating apps: nested, e.g., family ----------------------------------------------------------
+
+    // dispatch basis
+    generateNestedServices(MeshElement no, ServiceBase family, Path javaNodesSrc, Path javaNodesTestSrc, String clsName, 
+        String javaNodesPackage, Application a, setOf(String) artifacts, Boolean noDeps, setOf(Service) mbs, 
+        setOf(MeshElement) nodes, setOf(String) javaSerializers) = {
+    }
+
+    generateNestedServices(MeshElement no, ServiceFamily family, Path javaNodesSrc, Path javaNodesTestSrc, String clsName, 
+        String javaNodesPackage, Application a, setOf(String) artifacts, Boolean noDeps, setOf(Service) mbs, 
+        setOf(MeshElement) nodes, setOf(String) javaSerializers) = {
+        
+        IIPEcosphere cfg = config;
+        String familyInterface = familyInterfaceName(clsName);
+        vilTemplateProcessor("JavaSpringCloudFamilyInterface", config, "${javaNodesSrc}/${familyInterface}.java", 
+            elt=no, pkg=javaNodesPackage, app=a);
+        Boolean sharedIf = cfg.sharedInterfaces;
+        for (Service m: family.members) {
+            String memberClsName = familyMemberName(asTypeName(m.name), familyInterface);
+            vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, "${javaNodesSrc}/${memberClsName}.java", 
+                 elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=sharedIf, familyInterface=familyInterface, familyMember=m, nodes=nodes);
+            /*if (not(noDeps)) {
+                vilTemplateProcessor("JavaSpringCloudStreamMeshElementTest", config, "${javaNodesTestSrc}/${memberClsName}Test.java", 
+                     elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=sharedIf, familyInterface=familyInterface, familyMember=m, 
+                     nodes=nodes, serializers=javaSerializers);
+            }*/
+            mbs.add(m);
+        }
+        if (not(noDeps) and isDefined(family.selector) and family.selector <> null) {
+            artifacts.add(getSelectorArtifact(family.selector));
+        }
+    }
+
+    // ------------------------------------------ generating apps: generating/handling services resources ----------------------------------------
+
+    @DispatchBasis
+    generateServiceResources(MeshElement no, ServiceBase base, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
+        if (not(noDeps)) {
+            artifacts.add(getArtifact(no));
+        }
+    }
+
+    @DispatchCase
+    generateServiceResources(MeshElement no, Connector conn, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
+        artifacts.add(getArtifact(conn)); // connectors are (currently) platform-supplied
+        if (not(noDeps)) { // application resources
+            if (conn.inputHandlers <> null and conn.inputHandlers.size() > 0) {
+                for (ConnectorInputHandler h: conn.inputHandlers) {
+                    if (h.artifact <> null and h.artifact <> "") {
+                        artifacts.add(h.artifact);
+                    }
+                }
+            }
+            if (conn.dataTimeDiffProvider <> null) {
+                addArtifact(conn.dataTimeDiffProvider, artifacts);
+            }
+        }
+    }
+    
+    @DispatchBasis
+    addArtifact(DataTimeDiffProvider provider, setOf(String) artifacts) = {
+    }
+
+    @DispatchCase
+    addArtifact(JavaDataTimeDiffProvider provider, setOf(String) artifacts) = {
+        artifacts.add(provider.artifact);
+    }
+
+    @DispatchCase
+    generateServiceResources(MeshElement no, ModbusTcpV1Connector conn, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
+        artifacts.add(getArtifact(conn)); // connectors are (currently) platform-supplied
+        Path resourcesSrc = "${appRoot}/src/main/resources";
+        String connectorName = toIdentifier(conn.name);
+        vilTemplateProcessor("ConnectorResource", config, "${resourcesSrc}/${connectorName}.server", conn=conn);
+    }
+
+    @DispatchCase
+    generateServiceResources(MeshElement no, RestConnector conn, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
+        artifacts.add(getArtifact(conn)); // connectors are (currently) platform-supplied
+        Path javaSrc = "${appRoot}/src/main/java";
+        Path javaNodesSrc = "${javaSrc}/${toPath(javaNodesPackage)}";
+        String typeName = asTypeName(conn.name);
+        setOf(RecordType) types = {};
+        setOf(RecordType) outTypes = {};
+        setOf(RecordType) usedTypes = {};
+        conn.inInterface->forEach(t|collectRestTypes(t.type, types, usedTypes));
+        conn.outInterface->forEach(t|collectRestTypes(t.type, outTypes, usedTypes));
+        types = types.including(outTypes);
+        vilTemplateProcessor("JavaConnectorRestImpl", config, "${javaNodesSrc}/${typeName}Extension.java", conn=conn, pkg=javaNodesPackage, usedRestTypes=usedTypes);
+        addAppJsl("de.iip_ecosphere.platform.connectors.ConnectorExtensionDescriptor", "${javaNodesPackage}.${typeName}Extension");
+        for (RecordType t: types) {
+            typeName = toTypeName(t);
+            vilTemplateProcessor("JavaConnectorRestType", config, "${javaNodesSrc}/${typeName}RestType.java", type=t, pkg=javaNodesPackage);
+        }
+        Path resourcesSrc = "${appRoot}/src/main/resources";
+        String connectorName = toIdentifier(conn.name);
+        vilTemplateProcessor("ConnectorResource", config, "${resourcesSrc}/${connectorName}.server", conn=conn);
+    }
+    
+    /**
+     * Collects information on the JSL files for the application. One file may contain multiple implementations.
+     * 
+     * @param descriptor qualified class name of the descriptor / file name
+     * @param impl qualified class name of the implementation to load
+     */
+    addAppJsl(String descriptor, String impl) = {
+        sequenceOf(String) impls;
+        if (!appJsl.containsKey(descriptor)) {
+            sequenceOf(String) implsTmp = {};
+            impls = implsTmp;
+            appJsl.add(descriptor, impls);
+        } else {
+            impls = appJsl.get(descriptor);
+        }
+        impls.add(impl);
+    }
+    
+    @DispatchBasis
+    collectRestTypes(DataType type, setOf(RecordType) result, setOf(RecordType) used) = {
+    }
+
+    @DispatchCase
+    collectRestTypes(RecordType type, setOf(RecordType) result, setOf(RecordType) used) = {
+        result.add(type);
+        for (Field f : type.fields) {
+            addUsedType(f, result, used);
+        }
+    }
+
+    @DispatchCase
+    collectRestTypes(ArrayType type, setOf(RecordType) result, setOf(RecordType) used) = {
+        collectRestTypes(type.type, result, used);
+    }
+
+    @DispatchBasis
+    addUsedType(Field field, setOf(RecordType) result, setOf(RecordType) used) = {
+        collectRestTypes(field.type, result, used);
+    }
+
+    @DispatchCase
+    addUsedType(RestField field, setOf(RecordType) result, setOf(RecordType) used) = {
+        addToSet(field.type, used);
+        collectRestTypes(field.type, result, used);
+    }
+    
+    addToSet(DataType type, setOf(RecordType) used) = {
+        if (type.isKindOf(RecordType)) {
+            RecordType rt = type;
+            used.add(rt);
+        }
+    }
+            
+    @DispatchCase
+    generateServiceResources(MeshElement no, JavaService service, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
+        if (not(noDeps)) {
+            artifacts.add(getArtifact(no));
+            addArtifacts(service.artifacts, service.artifact, bins, noDeps);
+        }
+    }
+
+    @DispatchCase
+    generateServiceResources(MeshElement no, PythonService service, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
+        IIPEcosphere cfg = config; // from global
+        String serviceFolderName = toFolderName(service.id);
+        Path assemblySrc = "${appRoot}/${assemblyRel}";
+        sequenceOf(String) tmp = service.artifact.split(":");
+        String artifact = tmp[0]+":"+tmp[1]+":zip:python:"+tmp[2];
+        String shArtifact = "";
+        if (not(noDeps)) { // artifact available after user services build, only for full app build
+            if (cfg.sharedInterfaces) {
+                //addPythonDependencyArtifact(bins, cfg.sharedArtifact, mvnProjectPySrcDir);
+                //addPythonDependencyArtifact(bins, tmp[0]+":"+tmp[1]+":"+tmp[2], mvnProjectPySrcDir);
+                artifacts.add("${cfg.mvnIipGroup}:services.environment:zip:python:${cfg.iipVer}");
+                sequenceOf(String) sTmp = cfg.sharedArtifact.split(":");
+                shArtifact = sTmp[0]+":"+sTmp[1]+":zip:python:"+sTmp[2];
+                artifacts.add(shArtifact);
+            }
+            artifacts.add(artifact);
+        }
+        vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serviceFolderName}.xml", withServices=true, dependency=artifact, dependency2=shArtifact);
+        if (not(noDeps)) {
+            addAssemblyInfo(assemblies, "python_${serviceFolderName}", "${assemblyRel}/python_${serviceFolderName}.xml", "prepare-package", "${mvnProjectBuildDir}/classes", finalName="python_${serviceFolderName}");
+            artifacts.add(getArtifact(service));
+            addArtifacts(service.artifacts, service.artifact, bins, noDeps);
+        }
+    }
+
+    addArtifacts(setOf(String) artifacts, String artifact, setOf(DependencyArtifact) bins, Boolean noDeps) = {
+        if (not(noDeps) and artifacts.size() > 0) {
+            addDependencyArtifact(bins, artifact, "artifacts", "${mvnProjectBuildDir}/classes", "artifacts.zip", "zip", "unpack");
+        }
+    }
+    
+    // ------------------------------------------- generating shared interfaces/classes ------------------------------------------------------------
+    
+    generateSharedInterfaces(Configuration config, Project target, setOf(String) javaSerializers, setOf(String) artifacts) = {
+        IIPEcosphere cfg = config;
+        setOf(Application) applications = Application.allInstances(); // do not prune here, keep interfaces stable
+        initUsedServiceTypes(applications);        
+        Path appRoot = "${target}/ApplicationInterfaces";
+        appRoot.mkdir();
+
+        setOf(RecordType) recordTypes = getRecordTypes();
+        setOf(ServiceBase) serviceTypes = getServiceTypes();
+        setOf(Server) serverTypes = getServerTypes();
+        Path javaSrc = "${appRoot}/src/main/java";
+        Path pySrc = "${appRoot}/src/main/python";
+        Path resourcesSrc = "${appRoot}/src/main/resources";
+        Path assemblySrc = "${appRoot}/${assemblyRel}";
+        Path javaDatatypesSrc = "${javaSrc}/${toPath(javaDatatypesPackage)}";
+        Path javaSerializersSrc = "${javaSrc}/${toPath(javaSerializersPackage)}";
+        Path javaInterfacesSrc = "${javaSrc}/${toPath(javaInterfacesPackage)}";
+
+        javaDatatypesSrc.mkdir();
+        javaInterfacesSrc.mkdir();
+        javaSerializersSrc.mkdir();
+        assemblySrc.mkdir();
+        
+        setOf(String) bins = {}; 
+        setOf(AssemblyInfo) assemblies = {}; 
+        setOf(String) resources = {}; 
+        sequenceOf(MeshElement) elements = {};
+        generateEnums(javaDatatypesSrc, pySrc);    
+        for (RecordType r : recordTypes) {
+            // generate for all languages and according to serializer settings
+            String clsName = asTypeName(r.name);
+            vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, 
+                pkg=javaDatatypesPackage, interface=true, sharedInterfaces=true, impl=true);
+            vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}Impl.java", type=r, 
+                pkg=javaDatatypesPackage, interface=false, sharedInterfaces=true, impl=true);
+            vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", type=r, 
+                pkg=javaSerializersPackage, typePkg=javaDatatypesPackage, sharedInterfaces=true, impl=false);
+            javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
+            vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}ImplSerializer.java", 
+                type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage, sharedInterfaces=true, impl=true);
+            javaSerializers.add("${javaSerializersPackage}.${clsName}ImplSerializer");
+            if (isPythonUsed(usedServiceTypes)) {
+                vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r, interface=true, 
+                    sharedInterfaces=true);
+                vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}Impl.py", type=r, interface=false, 
+                    sharedInterfaces=true);
+                vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/serializers/${clsName}Serializer.py", type=r, 
+                    sharedInterfaces=true);
+            }
+        };
+        
+        for (ServiceBase s : serviceTypes) {
+            generateServiceInterfaces(appRoot, config, s);
+        }
+		
+		for (Server s : serverTypes) {
+			generateServerInterface(config, s, appRoot);
+		}
+
+        
+        //vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
+        //addAssemblyInfo(assemblies, "interfaces", "${assemblyRel}/javaInterfaces.xml", "package", mvnProjectBuildDir);
+        if (isPythonUsed(usedServiceTypes)) {
+            vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
+            addAssemblyInfo(assemblies, "python", "${assemblyRel}/pythonInterfaces.xml", "package", mvnProjectBuildDir);
+        }
+        
+        // partition according to container strategy
+        
+        sequenceOf(String) artList = cfg.sharedArtifact.split(":");
+        vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls=appStarterCls, 
+            appName=artList[1], appVersion=artList[2], appDescription="Shared application interfaces", tests=tests, springPackaging=false, groupId=artList[0], ifArtifact=true);
+        vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=artList[1], srvFolderName="IIP-apps-${artList[1]}");
+            
+        mvn(appRoot);
+        zip(appRoot, appRoot, "${target}/ApplicationInterfaces.zip");
+
+        artifacts.add(cfg.sharedArtifact);
+    }
+    
+    generateEnums(Path javaDatatypesSrc, Path pySrc) = {
+        setOf(EnumType) enumTypes = EnumType.allInstances();
+        for (EnumType e: enumTypes) {
+            String clsName = asTypeName(e.name);
+            vilTemplateProcessor("JavaEnum", config, "${javaDatatypesSrc}/${clsName}.java", type=e, 
+                pkg=javaDatatypesPackage);
+            if (isPythonUsed(usedServiceTypes)) {
+                vilTemplateProcessor("PythonEnum", config, "${pySrc}/datatypes/${clsName}.py", type=e);
+            }
+        }
+    }
+    
+    // ------------------------------------------ gen interfaces: service interfaces ---------------------------------------------------------
+
+    @DispatchBasis
+    generateServiceInterfaces(Path appRoot, Configuration config, ServiceBase service) = {
+        generateJavaServiceInterfaces(appRoot, config, service);
+    }
+    
+    generateJavaServiceInterfaces(Path appRoot, Configuration config, ServiceBase service) = {
+        String clsName = asTypeName(service.name);
+        Path javaSrc = "${appRoot}/src/main/java";
+        Path javaInterfacesSrc = "${javaSrc}/${toPath(javaInterfacesPackage)}";
+        Path javaServiceImplSrc = "${javaSrc}/${toPath(javaImplPackage)}";
+        vilTemplateProcessor("JavaServiceInterface", config, "${javaInterfacesSrc}/${clsName}Interface.java", service=service, pkg=javaInterfacesPackage);
+        vilTemplateProcessor("JavaServiceBaseImpl", config, "${javaServiceImplSrc}/${clsName}Impl.java", service=service, pkg=javaImplPackage);
+    }
+
+    @DispatchCase
+    generateServiceInterfaces(Path appRoot, Configuration config, Connector connector) = {
+        // do nothing, connectors have different interfaces
+    }
+    
+    @DispatchCase
+    generateServiceInterfaces(Path appRoot, Configuration config, CompleteService service) = {
+        // do nothing, everything is here already generically in place
+    }
+    
+    @DispatchCase
+    generateServiceInterfaces(Path appRoot, Configuration config, JavaService service) = {
+        generateJavaServiceInterfaces(appRoot, config, service);
+        if (isDefined(service.stateMachine) and service.stateMachine <> null) {
+            String clsName = asTypeName(service.name);
+            Path javaSrc = "${appRoot}/src/main/java";
+            Path javaServiceImplSrc = "${javaSrc}/${toPath(javaImplPackage)}";
+            vilTemplateProcessor("JavaServiceImplStateMachine", config, "${javaServiceImplSrc}/${clsName}.java", 
+                pkg=javaImplPackage, service=service);
+        }
+    }
+    
+    // Python (preliminary in here)
+    @DispatchCase
+    generateServiceInterfaces(Path appRoot, Configuration config, PythonService service) = {
+        String clsName = asTypeName(service.name);
+        Path pySrc = "${appRoot}/src/main/python";
+        Path pyInterfacesSrc = "${pySrc}/interfaces"; // default name of ServiceEnvironment.py
+        vilTemplateProcessor("PythonServiceInterface", config, "${pyInterfacesSrc}/${clsName}Interface.py", service=service, pkg="interfaces");
+    }
+    
+    // ------------------------------------------ generating instantiated platform artifacts -------------------------------------------------------
+
+    generateBroker(Project source, Configuration config, Project target) = {
+        setMaxSteps(config, false, 0, 1);
+        IIPEcosphere cfg = config;
+
+        if (brokerRoot.exists()) {
+            brokerRoot.delete();
+        }
+        brokerRoot.mkdir();
+        generateBrokerScripts(cfg, cfg.transportProtocol);
+
+        if (getBooleanValueSafe(cfg.zipBinaries, false)) {
+          zip("${target}", "${brokerRoot}/brokerJars", "${target}/broker-bin.zip");
+          zip("${target}", "${brokerRoot}/broker.*", "${target}/broker-bin.zip");
+          zip("${target}", "${brokerRoot}/iip-broker.service", "${target}/broker-bin.zip");
+        }
+    }
+    
+    generateEcsRuntime(Path path, Configuration config, EcsDevice deviceType) = {
+        IIPEcosphere cfg = config;
+        path.mkdir();
+        Path p = "${path}/src/main/resources";
+        p.mkdir();
+        generatePlugins(cfg, path);
+        vilTemplateProcessor("EcsRuntimeDockerContainerManagerYaml", config, "${p}/iipecosphere.yml", deviceType=deviceType);
+        vilTemplateProcessor("JavaYamlTest", config, "${path}/src/test/java/test/iip/AllTests.java", pkg="test.iip", fqnCls=containerManagerCfgClass(config), cfgFile="src/main/resources/iipecosphere.yml");
+        vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
+        vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
+        vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.LifecycleDescriptor", descriptor="de.iip_ecosphere.platform.ecsRuntime.EcsCmdLineLifecycleDescriptor");
+        deviceIdProviderJsl(p, cfg);
+        identityStoreJsl(p, cfg);
+        aasSemanticIdResolverJsl(p, cfg);
+        String cInfix = getContainerNameInfix(deviceType);
+        vilTemplateProcessor("EcsRuntimeMvn", config, "${path}/pom.xml", dir="ecsJars${cInfix}", main=dfltMain, tests=tests, deviceType=deviceType);
+        mvn(path);
+        if (deviceType == defaultDeviceType) {
+            Integer svcMemLimit = getIntegerValueSafe(cfg.serviceManager.memLimit, 0);
+            Integer cntMgmLimit = getIntegerValueSafe(cfg.containerManager.memLimit, 0);
+            generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain, "IIP-Ecosphere ECSRuntime", "iip-ecsRuntime", "iip-platform.service", addJavaOpts=toJvmMemLimitOpt(max(svcMemLimit, cntMgmLimit)), sysd="${target}/iip-ecs");
+
+            if (getBooleanValueSafe(cfg.zipBinaries, false)) {
+              zip("${target}", "${target}/ecsJars", "${target}/ecs-bin.zip");
+              zip("${target}", "${target}/ecs.*", "${target}/ecs-bin.zip");
+              zip("${target}", "${target}/iip-ecs.service", "${target}/ecs-bin.zip");
+            }
+        }
+    }
+    
+    generateEcsSvcMgr(Path path, Configuration config, EcsDevice deviceType) = {
+        IIPEcosphere cfg = config;
+        path.mkdir();
+        Path p = "${path}/src/main/resources";
+        p.mkdir();
+        generatePlugins(cfg, path);
+        vilTemplateProcessor("EcsServiceControlSpringCloudStreamYaml", config, "${p}/iipecosphere.yml", deviceType=deviceType);
+        // cfg test requires spring
+        vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
+        vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
+        vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.LifecycleDescriptor", descriptor="de.iip_ecosphere.platform.ecsRuntime.EcsCmdLineLifecycleDescriptor");
+        deviceIdProviderJsl(p, cfg);
+        identityStoreJsl(p, cfg);
+        aasSemanticIdResolverJsl(p, cfg);
+        String cInfix = getContainerNameInfix(deviceType);
+        vilTemplateProcessor("EcsServiceControlMvn", config, "${path}/pom.xml", dir="ecsSvcJars${cInfix}", main=dfltMain, tests=tests, deviceType=deviceType);
+        mvn(path);
+        if (deviceType == defaultDeviceType) {
+          generateOsScripts(config, "${target}/ecsServiceMgr", "ecsSvcJars", dfltMain, "IIP-Ecosphere Ecs Runtime/Service Manager", "iip-ecsServiceMgr", "", 
+            addJavaOpts=toJvmMemLimitOpt(cfg.serviceManager.memLimit), sysd="${target}/iip-ecsServiceMgr");
+
+          if (getBooleanValueSafe(cfg.zipBinaries, false)) {
+            zip("${target}", "${target}/ecsSvcJars", "${target}/ecsSvcMgr-bin.zip");
+            zip("${target}", "${target}/ecsServiceMgr.*", "${target}/ecsSvcMgr-bin.zip");
+            zip("${target}", "${target}/iip-ecsServiceMgr.service", "${target}/ecsSvcMgr-bin.zip");
+          }
+        }
+    }
+    
+    // called from tests, don't change signature
+    generatePlatform(Project source, Configuration config, Project target) = {
+        IIPEcosphere cfg = config;
+        advanceProgress("Instantiating broker");
+        generateBroker(source, config, target);
+        
+        advanceProgress("Instantiating ECS-Runtime");
+        generateEcsRuntime(ecsRuntimeRoot, config, defaultDeviceType);
+        advanceProgress("generating ECS-Runtime + service manager");
+        generateEcsSvcMgr(ecsServiceMgrRoot, config, defaultDeviceType);
+        setOf(EcsDevice) ecsDevices = EcsDevice.allInstances();
+        for (EcsDevice dev: ecsDevices->reject(d|d==defaultDeviceType)->sortedBy(d|d.id)) {
+            String fileInfix = getContainerNameDflt(dev);
+            generateEcsRuntime("${ecsRuntimeRoot}-${fileInfix}", config, dev);
+            generateEcsSvcMgr("${ecsServiceMgrRoot}-${fileInfix}", config, dev);
+        }
+        
+        advanceProgress("Instantiating service manager");
+        serviceMgrRoot.mkdir();
+        Path p = "${serviceMgrRoot}/src/main/resources";
+        p.mkdir();
+        generatePlugins(cfg, serviceMgrRoot);
+        vilTemplateProcessor("ServiceControlSpringCloudStreamYaml", config, "${p}/iipecosphere.yml");
+        // cfg test requires spring
+        vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
+        vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
+        deviceIdProviderJsl(p, cfg);
+        identityStoreJsl(p, cfg);
+        aasSemanticIdResolverJsl(p, cfg);
+        vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml", dir="svcJars", main=dfltMain, tests=tests);
+        mvn(serviceMgrRoot);
+        generateOsScripts(config, "${target}/serviceMgr", "svcJars", dfltMain, "IIP-Ecosphere Service Manager", "iip-serviceMgr", "iip-ecs.service", 
+            addJavaOpts=toJvmMemLimitOpt(cfg.serviceManager.memLimit), sysd="${target}/iip-serviceMgr");
+        if (getBooleanValueSafe(cfg.zipBinaries, false)) {
+          zip("${target}", "${target}/svcJars", "${target}/svcMgr-bin.zip");
+          zip("${target}", "${target}/serviceMgr.*", "${target}/svcMgr-bin.zip");
+          zip("${target}", "${target}/iip-serviceMgr*.service", "${target}/svcMgr-bin.zip");
+        }
+        
+        advanceProgress("Instantiating platform central services");
+        platformRoot.mkdir();
+        p = "${platformRoot}/src/main/resources";
+        p.mkdir();
+        generatePlugins(cfg, platformRoot);
+        vilTemplateProcessor("PlatformYaml", config, "${p}/iipecosphere.yml", modelName=getName(config));
+        vilTemplateProcessor("JavaYamlTest", config, "${platformRoot}/src/test/java/test/iip/AllTests.java", pkg="test.iip", fqnCls="de.iip_ecosphere.platform.platform.PlatformSetup", cfgFile="src/main/resources/iipecosphere.yml");
+        vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
+        vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
+        deviceIdProviderJsl(p, cfg);
+        identityStoreJsl(p, cfg);
+        aasSemanticIdResolverJsl(p, cfg);
+        vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain, tests=tests, monitoring=false);
+        mvn(platformRoot);
+        generateOsScripts(config, "${target}/platform", "plJars", dfltMain, "IIP-Ecosphere Platform Services", "iip-platform", "iip-broker.service", 
+            sysd="${target}/iip-platform", addJavaOpts=toJvmMemLimitOpt(cfg.centralMemLimit));
+        generateOsScripts(config, "${target}/cli", "plJars", "de.iip_ecosphere.platform.platform.Cli", "", "", "");
+
+        advanceProgress("Instantiating platform monitoring");
+        // preliminary, as long as BaSyx conflicts with Tomcat
+        monitoringRoot.mkdir();
+        p = "${monitoringRoot}/src/main/resources";
+        p.mkdir();
+        generatePlugins(cfg, monitoringRoot);
+        vilTemplateProcessor("PlatformYaml", config, "${p}/iipecosphere.yml");
+        vilTemplateProcessor("JavaYamlTest", config, "${monitoringRoot}/src/test/java/test/iip/AllTests.java", pkg="test.iip", fqnCls="de.iip_ecosphere.platform.monitoring.MonitoringSetup", cfgFile="src/main/resources/iipecosphere.yml");
+        vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
+        vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.net.LocalNetworkManagerImpl$"+"Descriptor");
+        deviceIdProviderJsl(p, cfg);
+        identityStoreJsl(p, cfg);
+        aasSemanticIdResolverJsl(p, cfg);
+        vilTemplateProcessor("PlatformMvn", config, "${monitoringRoot}/pom.xml", dir="monJars", main=dfltMain, tests=tests, monitoring=true);
+        mvn(monitoringRoot);
+        generateOsScripts(config, "${target}/monitoring", "monJars", dfltMain, "IIP-Ecosphere Platform Monitoring Services", "iip-monitoring", "iip-platform.service", 
+            sysd="${target}/iip-monitoring", addJavaOpts=toJvmMemLimitOpt(cfg.monitoringMemLimit));
+ 
+        artifactsRoot.mkdir();
+        commonRoot.mkdir();
+
+        generateManagementUi(config, cfg.managementUi);
+        
+        vilTemplateProcessor("Readme", config, "${target}/README.txt");
+        if ((getContainerGenerationSafe(cfg.containerGeneration)) and getPlatformContainerGenerationSafe(cfg.platformContainerGeneration)){
+            generatePlatformContainers(config, target);
+        }
+    }
+    
+    @DispatchBasis
+    generateManagementUi(Configuration config, ManagementUI mgtUi) = {
+    }
+
+    @DispatchCase
+    generateManagementUi(Configuration config, AngularManagementUI mgtUi) = {
+        advanceProgress("Instantiating Angular management UI");
+        mgtUiRoot.mkdir();
+        vilTemplateProcessor("UiAngularWin", config, "${target}/mgtUi.bat");
+        vilTemplateProcessor("UiAngularLinuxSysd", config, "${target}/iip-mgtUi.service", 
+            requires="iip-platform.service", after="iip-platform.service");
+        vilTemplateProcessor("UiAngularLinux", config, "${target}/mgtUi.sh");
+        FileArtifact f = "${target}/mgtUi.sh";
+        f.setExecutable(false);
+        vilTemplateProcessor("UiAngularExpress", config, "${mgtUiRoot}/server.js");
+        vilTemplateProcessor("UiAngularPom", config, "${mgtUiRoot}/pom.xml");
+        mvn(mgtUiRoot);
+        Path p = "${mgtUiRoot}/dist/iipes-web/assets/config";
+        p.mkdir();
+        vilTemplateProcessor("UiAngularConfig", config, "${p}/config.json");
+    }
+    
+    generatePlugins(IIPEcosphere cfg, Path componentRoot) = {
+        // app only for now
+        /*sequenceOf(Plugin) plugins = Plugin.allInstances()->sortedBy(p|p.id).toSequence();
+        for (Plugin plugin: plugins) {
+            String pl = "${plugin.artifact}";
+            String clsName = pluginToClassName(pl);
+            vilTemplateProcessor("JavaPluginSetupDescriptor", config, "${componentRoot}/src/main/java/de/oktoflow/plugins/${clsName}PluginSetupDescriptor.java", 
+                clsName=clsName, plugin=pl, resource="${clsName}.plugin", pkg="de.oktoflow.plugins");
+            // TODO plugin JSLs
+        }*/
+    }    
+    
+    generateBrokerScripts(Configuration config, TransportProtocol protocol) = {
+        vilTemplateProcessor("NoBroker", config, "${brokerRoot}/README.txt");
+    }
+    
+    generateBrokerScripts(Configuration config, TransportProtocolAMQP protocol) = {
+        String addJavaOpts = toJvmMemLimitOpt(protocol.memLimit);
+        vilTemplateProcessor("AmqpPom", config, "${brokerRoot}/pom.xml", ver=getStringValueSafe(protocol.brokerVer, "8.0.2"));
+        vilTemplateProcessor("AmqpLinuxSysd", config, "${brokerRoot}/iip-broker.service", addJavaOpts=addJavaOpts);
+        vilTemplateProcessor("AmqpLinux", config, "${brokerRoot}/broker.sh", addJavaOpts=addJavaOpts);
+        FileArtifact f = "${brokerRoot}/broker.sh";
+        f.setExecutable(false);
+        vilTemplateProcessor("AmqpWin", config, "${brokerRoot}/broker.bat", addJavaOpts=addJavaOpts);
+        Path c = "${brokerRoot}/src/test";
+        c.mkdir();
+        vilTemplateProcessor("AmqpConf", config, "${c}/config.json");
+        mvn(brokerRoot);
+    }
+
+    generateBrokerScripts(Configuration config, TransportProtocolMQTTv3 protocol) = {
+        generateBrokerScriptsHiveMq(config, getStringValueSafe(protocol.brokerVer, "2020.4"), protocol);
+    }
+
+    generateBrokerScripts(Configuration config, TransportProtocolMQTTv5 protocol) = {
+        generateBrokerScriptsHiveMq(config, getStringValueSafe(protocol.brokerVer, "2020.4"), protocol);
+    }
+    
+    generateBrokerScriptsHiveMq(Configuration config, String brokerVer, TransportProtocol protocol) = {
+        String addJavaOpts = toJvmMemLimitOpt(protocol.memLimit);
+        vilTemplateProcessor("MqttPom", config, "${brokerRoot}/pom.xml", ver=brokerVer);
+        vilTemplateProcessor("MqttLinuxSysd", config, "${brokerRoot}/iip-broker.service", addJavaOpts=addJavaOpts);
+        vilTemplateProcessor("MqttLinux", config, "${brokerRoot}/broker.sh", addJavaOpts=addJavaOpts);
+        FileArtifact f = "${brokerRoot}/broker.sh";
+        f.setExecutable(false);
+        vilTemplateProcessor("MqttWin", config, "${brokerRoot}/broker.bat", addJavaOpts=addJavaOpts);
+        Path c = "${brokerRoot}/src/test";
+        c.mkdir();
+        vilTemplateProcessor("MqttConf", config, "${c}/config.xml");
+        c = "${c}/extensions";
+        c.mkdir();
+        mvn(brokerRoot);
+    }
+
+}

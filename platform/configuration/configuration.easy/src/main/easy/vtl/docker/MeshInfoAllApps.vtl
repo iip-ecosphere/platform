@@ -1,0 +1,67 @@
+import Basics;
+import JavaBasics;
+import DockerBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template MeshInfoAllApps(IIPEcosphere config, FileArtifact target, ContainerType containerType, EcsDevice device) {
+	
+    def main(IIPEcosphere config, FileArtifact target, ContainerType containerType, EcsDevice device) {
+        String appName = "allApps";
+        String appVer = "0.1.0";
+        String deviceName = getContainerNameDflt(device).toIdentifier();
+        if (deviceName.length() == 0) {
+            deviceName = "dflt";
+        }
+        ContainerManager mgr = config.containerManager;
+        String registryName = getRegistryName(mgr);
+        if (containerType == ContainerType::Ecs) {
+            'id: ECS'
+            'name: ECS'
+            'version: ${appVer}'
+            'dockerImageName: ${registryName}${toDockerImageName(appName, deviceName + "." + "ecs", appVer)}'
+            'dockerImageZipfile: ECS:${appVer}.zip'
+            'dood: true'
+            setOf(ContainerArgument) containerGpusArguments = device.containerArguments -> selectByType(GpusContainerArgument);
+            for (GpusContainerArgument arguments : containerGpusArguments) {
+                'gpus: ${arguments.gpuDevice}'
+            }
+        } else if (containerType == ContainerType::C1Ecs_C2Svc_App) {
+            'id: ${appName}_${deviceName}_NoECS'
+            'name: ${appName}_${deviceName}'
+            'version: ${appVer}'
+            'dockerImageName: ${registryName}${toDockerImageName(appName, deviceName, appVer)}'
+            'dockerImageZipfile: ${appName}_${deviceName}:${appVer}.zip'
+            'dood: false'
+        } else {
+            'id: ${appName}_${deviceName}_ECS'
+            'name: ${appName}_${deviceName}'
+            'version: ${appVer}'
+            'dockerImageName: ${registryName}${toDockerImageName(appName, deviceName, appVer)}'
+            'dockerImageZipfile: ${appName}_${deviceName}:${appVer}.zip'
+            'dood: true'
+            setOf(ContainerArgument) containerGpusArguments = device.containerArguments -> selectByType(GpusContainerArgument);
+            for (GpusContainerArgument arguments : containerGpusArguments) {
+                'gpus: ${arguments.gpuDevice}'
+            }
+        }
+        Boolean useEphemeralPort = not(useFixedPort(config, device));
+        if (useEphemeralPort) { // else instantiated into Dockerfile
+            'env:'
+            '    - iip.port=\\${port}'
+            if (containerType == ContainerType::Ecs_Svc_App) {
+                '    - iip.port.svgMgr=\\${port_1}'
+            }
+        }
+        'exposedPorts:'
+        if (useEphemeralPort) {
+            '    - \\${port}/TCP'
+            if (containerType == ContainerType::Ecs_Svc_App) {
+                '    - iip.port.svgMgr=\\${port_1}'
+            }
+        }
+        '    - 22/UDP'
+        'networkMode: host'
+    }
+    
+}

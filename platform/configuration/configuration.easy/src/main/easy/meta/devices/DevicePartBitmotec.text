@@ -1,0 +1,10 @@
+DevicePartBitmotec::BitmotecDevice::bits = Bit width of CPU architecture. 
+DevicePartBitmotec::BitmotecDevice::containerType = Type of container to be generated.
+DevicePartBitmotec::BitmotecDevice::cpu = CPU architecture
+DevicePartBitmotec::BitmotecDevice::id = Device type identification.
+DevicePartBitmotec::BitmotecDevice::mainMemory = The memory of the device in MBytes.
+DevicePartBitmotec::BitmotecDevice::provides = Specific software dependencies provided by the device through its setup.
+DevicePartBitmotec::BitmotecDevice::requiredModules = Specific software components required by the device to provide services.
+DevicePartBitmotec::BitmotecDevice::containerArguments = Arguments to be passed to a container on startup through a container descriptor.
+DevicePartBitmotec::BitmotecDevice::containerName = The symbolic name of the container used as file name infix.
+DevicePartBitmotec::bitmotecDeviceType = The default Bitmotec device type.

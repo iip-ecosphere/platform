@@ -1,0 +1,456 @@
+project Devices {
+
+    import MetaConcepts;
+    import DataTypes;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    annotate String semanticId = "" to .;
+        
+    abstract compound ContainerManager {
+       assign (semanticId = Eclass_Unit_MByte) to {
+           Integer memLimit = 440; // e.g., JVM memory limit in MBytes
+       }
+       String authenticationKey;
+         // - globally allocated hosts/ports
+         // - global AAS location/URN/URI
+       assign (semanticId = Eclass_Unit_ms) to {
+           Integer monitoringUpdatePeriod = 2000;
+       }
+    };
+    
+    compound DockerContainerManager refines ContainerManager {
+        NonEmptyString dockerHost;
+        NonEmptyString dockerImageYamlFilename = "image-info.yml";
+        Boolean deleteWhenUndeployed = false;
+        String registry = "";
+        String authenticationKey = "docker";
+    };
+
+    compound LxcContainerManager refines ContainerManager {
+        // so far, code is copied from LXC; open, unclear what is missing -> cf. Devices.text!
+        NonEmptyString dockerHost = "localhost:8443";
+        NonEmptyString lxcImageYamlFilename = "image-info.yml";
+        Boolean deleteWhenUndeployed = false;
+        String registry = "";
+        String baseDirectory = "";
+        String authenticationKey = "lxc";
+    };
+    
+    ContainerManager containerManager = DockerContainerManager {
+        dockerHost = "unix:///var/run/docker.sock"
+    };
+    isDefined(containerManager);
+    
+    // --------------- Dependencies -------------------------
+    
+    abstract compound Dependency {
+    }
+   
+    // must be installed on system level
+    // Instantiation shall create installedDependencies.yml with this key and install path!
+    compound SystemDependency refines Dependency {
+        String key; 
+        String version = "";
+        setOf(refTo(Dependency)) dependencies = {};
+    }
+    
+    compound LinuxSystemDependency refines SystemDependency {
+        String name;
+    }
+
+    // preliminary, to record that
+    compound LinuxCommandBasedSystemDependency refines SystemDependency {
+        sequenceOf(String) downloads = {}; // something to download before
+        sequenceOf(String) installCommands = {}; // plain shell commands
+        sequenceOf(String) bashSetups = {}; // like source some file to get the env right before
+    }
+
+    enum JavaVersion {jdk8, jdk11, jdk16, jdk17, jdk21}; 
+
+    SystemDependency JRE8 = {
+        key = "JAVA8",
+        version = "8"
+    };
+   
+    SystemDependency JDK8 = {
+        key = "JAVA8",
+        version = "8"
+    };
+
+    SystemDependency JRE11 = {
+        key = "JAVA11",
+        version = "11"
+    };
+
+    SystemDependency JDK11 = {
+        key = "JAVA11",
+        version = "11"
+    };
+
+    SystemDependency JDK17 = {
+        key = "JAVA17",
+        version = "17.0.10"
+    };
+
+    SystemDependency JDK21 = {
+        key = "JAVA21",
+        version = "21.0.2"
+    };
+    
+    SystemDependency PYTHON2 = { // TODO remove if not needed
+        key = "PYTHON2",
+        dependencies = {refBy(pyyamlNoVersion), refBy(pyflakesNoVersion), refBy(websocketsNoVersion)},
+        version = "2"
+    };
+
+    SystemDependency CONDA = { // symbolic, we use a matching version of the respective Python
+        key = "CONDA"
+    };
+
+    SystemDependency VENV = { // symbolic, we use a matching version of the respective Python
+        key = "VENV"
+    };
+    
+    SystemDependency PYTHON3 = { // TODO remove if not needed
+        key = "PYTHON3",
+        dependencies = {refBy(pyyamlNoVersion), refBy(pyflakesNoVersion), refBy(websocketsNoVersion)},
+        version = "11"
+    };
+
+    SystemDependency PYTHON38 = {
+        key = "PYTHON38",
+        dependencies = {refBy(pyyaml60), refBy(pyflakes250), refBy(websockets1102), refBy(pyzbar019), refBy(OpenCVPython45564), refBy(NumPy1201), refBy(Pillow910)},
+        version = "3.8.10"
+    };
+    
+    SystemDependency PYTHON39 = {
+        key = "PYTHON39",
+        dependencies = {refBy(pyyaml60), refBy(pyflakes250), refBy(websockets1102), refBy(pyzbar019), refBy(OpenCVPython45564), refBy(NumPy1201), refBy(Pillow910)}, // TODO please adjust
+        version = "3.9.21" // TODO please adjust if needed
+    };
+    
+    SystemDependency PYTHON313 = {
+        key = "PYTHON313",
+        dependencies = {refBy(pyyaml602), refBy(pyflakes340), refBy(websockets1501), refBy(pyzbar019), refBy(OpenCVPython412088), refBy(NumPy224), refBy(Pillow1130)}, // TODO please adjust
+        version = "3.13.5" // TODO please adjust if needed
+    };
+   
+    compound PythonDependency refines Dependency {      //e.g. numpy 1.21.5
+        String name;
+        String version;
+        setOf(refTo(Dependency)) dependencies = {};
+    }
+    
+    compound MavenDependency refines Dependency {
+        ArtifactString artifact;
+    }
+
+    MavenDependency mvnDefaultLib = {
+        artifact = mvnIipGroup + ":configuration.defaultLib:" + iipVer
+    };
+
+    // ------------------------ typical AI dependencies for all ------------------
+    
+    PythonDependency NumPy1220 = {
+       name = "numpy",
+       version = "1.22.0"
+    };
+    
+    PythonDependency tensorflow280 = {
+       name = "tensorflow",
+       version = "2.8.0"
+    };
+
+    PythonDependency tensorflow290 = {
+       name = "tensorflow",
+       version = "2.9.0"
+    };
+
+    PythonDependency tensorflowNoVersion = {
+       name = "tensorflow",
+       version = ""
+    };
+        
+    PythonDependency keras290 = {
+       name = "keras",
+       version = "2.9.0"
+    };
+    
+    PythonDependency pytorch201 = {
+       name = "torch",
+       version = "2.0.1"
+    };
+
+    PythonDependency pickle4_001 = {
+       name = "pickle4",
+       version = "0.0.1"
+    };
+
+    setOf(refTo(Dependency)) linuxTestingSoftware = {refBy(linuxTestingMaven)};
+
+    SystemDependency linuxTestingMaven = {
+        key = "mvn"
+    };
+    
+    setOf(refTo(Dependency)) linuxTestingDependencies = {refBy(linuxTestingNetworkUtilsRoute), refBy(linuxTestingNetworkUtilsTraceroute), refBy(linuxTestingNetworkUtilsPing), refBy(linuxTestingNetworkUtilsWget), refBy(linuxTestingFileUtilsLess), refBy(linuxTestingFileUtilsNano), refBy(linuxTestingFileUtilsTail), refBy(linuxTestingProcessUtilsProcps)};
+
+    LinuxSystemDependency linuxTestingNetworkUtilsRoute = {
+       name = "net-tools"
+    };
+
+    LinuxSystemDependency linuxTestingNetworkUtilsTraceroute = {
+       name = "traceroute"
+    };
+
+    LinuxSystemDependency linuxTestingNetworkUtilsPing = {
+       name = "iputils-ping"
+    };
+
+    LinuxSystemDependency linuxTestingNetworkUtilsWget = {
+       name = "wget"
+    };
+
+    LinuxSystemDependency linuxTestingFileUtilsLess = {
+       name = "less"
+    };
+
+    LinuxSystemDependency linuxTestingFileUtilsNano = {
+       name = "nano"
+    };
+
+    LinuxSystemDependency linuxTestingFileUtilsTail = {
+       name = "coreutils"
+    };
+
+    LinuxSystemDependency linuxTestingProcessUtilsProcps = {
+       name = "procps"
+    };  
+   
+    setOf(refTo(Dependency)) basicPlatformDependencies = {refBy(pyyamlNoVersion), refBy(pyflakesNoVersion), refBy(websocketsNoVersion)}; // TODO use dependencies of PYTHONXX instead and remove
+
+    PythonDependency pyyamlNoVersion = {
+       name = "pyyaml",
+       version = ""
+    };
+
+    PythonDependency pyyaml60 = {
+       name = "pyyaml",
+       version = "6.0"
+    };
+    
+    PythonDependency pyyaml602 = {
+       name = "pyyaml",
+       version = "6.0.2"
+    };
+
+    PythonDependency pyflakesNoVersion = {
+       name = "pyflakes",
+       version = ""
+    };
+
+    PythonDependency pyflakes250 = {
+       name = "pyflakes",
+       version = "2.5.0"
+    };
+
+    PythonDependency pyflakes340 = {
+       name = "pyflakes",
+       version = "3.4.0"
+    };
+
+    PythonDependency websocketsNoVersion = {
+       name = "websockets",
+       version = ""
+    };
+
+    PythonDependency websockets1102 = {
+       name = "websockets",
+       version = "11.0.2"
+    };
+
+    PythonDependency websockets1501 = {
+       name = "websockets",
+       version = "15.0.1"
+    };
+
+    PythonDependency pyzbar019 = {
+       name = "pyzbar",
+       version = "0.1.9"
+    };
+
+    PythonDependency OpenCVPython45564 = {
+       name = "opencv-python",
+       version = "4.5.5.64"
+    };
+
+    PythonDependency OpenCVPython412088 = {
+       name = "opencv-python",
+       version = "4.12.0.88"
+    };
+
+    LinuxCommandBasedSystemDependency SysPythonNative = {
+        installCommands = {"apk add make automake gcc g++ subversion python3-dev"}
+    };
+
+    PythonDependency NumPy1201 = { 
+       name = "numpy",
+       version = "1.20.1", 
+       dependencies = {refBy(SysPythonNative)}
+    };
+
+    PythonDependency NumPy224 = {
+       name = "numpy",
+       version = "2.2.4"
+    };
+    
+    PythonDependency Pillow910 = {
+       name = "Pillow",
+       version = "9.1.0"
+    };
+
+    PythonDependency Pillow1110 = {
+       name = "Pillow",
+       version = "11.1.0"
+    };
+
+    PythonDependency Pillow1130 = {
+       name = "Pillow",
+       version = "11.3.0"
+    };
+
+    // ------------------ DeviceId --------------------------- 
+    
+    abstract compound DeviceIdProvider {
+        NonEmptyString class;
+        ArtifactString artifact = ""; // built in
+    }
+    
+    compound MacDeviceIdProvider refines DeviceIdProvider {
+        NonEmptyString class = "de.iip_ecosphere.platform.support.iip_aas.MacIdProvider$MacIdProviderDescriptor";
+    }
+
+    compound HostnameDeviceIdProvider refines DeviceIdProvider {
+        NonEmptyString class = "de.iip_ecosphere.platform.support.iip_aas.HostnameIdProvider$HostnameIdProviderDescriptor";
+    }
+    
+    DeviceIdProvider deviceIdProvider = MacDeviceIdProvider{}; // default if null
+
+    // ------------------ Devices --------------------------- 
+    
+    enum CpuArchitecture {x86, ARM};
+    enum CpuBits {bit32, bit64};
+    
+    // container types:
+    enum ContainerType {
+        Ecs, // 0 - just ecs (used only internally, prevent by constraint)
+        Ecs_Svc_App,     // 1 - one container: ecs + svc + app
+        EcsSvc_App,      // 2 - one container: ecsSvc + app
+        C1Ecs_C2Svc_App, // 3 - 1st container: ecs, 2nd container: svc + app
+        Ecs_Svc_AllApps, // * - one container: ecs + svc + all apps
+        EcsSvc_AllApps,  // * - one container: ecsSvc + all apps
+        C1Ecs_C2Svc_AllApps   // * - one container: ecs, 2nd container: svc + all apps
+    };
+    
+    compound EcsDevice refines CComputer {
+        String id; // currently, we are a bit more open here; may be restricted in future
+        EphemeralPort aasImplPort; // for container; if given, "override" port from transport
+        Integer mainMemory; // in MBytes
+        CpuArchitecture cpu;
+        CpuBits bits;
+        setOf(refTo(Dependency)) provides = {};
+        setOf(String) requiredModules = {}; // mvn coordinates, assuming they come with own JLS descriptor
+        ContainerType containerType = ContainerType::Ecs_Svc_AllApps;
+        setOf(ContainerArgument) containerArguments = {};
+        Constraint noInternalContainerType = containerType <> ContainerType::Ecs; // internal
+
+        // TODO device may not support all container managers -> container generation, selection for device-specific ecs runtime; currently docker assumed
+        String containerName = ""; // the default containers without device-specific adjustments; TODO: add to device-specific ECS setup as artifactInfix
+        Constraint noInternalContainerName = containerName <> "ecs";
+        Constraint containerNameForm = containerName.matches("\\w*");
+    }
+    
+    abstract compound ContainerArgument {
+    }
+
+    compound MountVolumeContainerArgument refines ContainerArgument {
+        NonEmptyString hostPath;
+        NonEmptyString containerPath;
+    }
+    
+    compound GpusContainerArgument refines ContainerArgument {
+        NonEmptyString gpuDevice;
+    }
+    
+    // there may be more relevant, e.g., --gpu
+
+    // for future    
+    compound EcsDeviceInstance refines CComputer {
+        NonEmptyString id;
+        refTo(EcsDevice) type;
+    }
+    
+    EcsDevice defaultDeviceType = {
+        id = "default/x86/64 bit",
+        containerName = "",
+        cpu = CpuArchitecture::x86,
+        bits = CpuBits::bit64,
+        provides = {},
+        requiredModules = {},
+        containerType = ContainerType::Ecs_Svc_AllApps, // let's see
+        containerArguments = {},
+        containerName = ""
+    };
+    
+    Constraint ecsDeviceNamesUnique = allInstances(EcsDevice)->isUnique(d|d.id);
+    Constraint ecsDeviceContainerNamesUnique = allInstances(EcsDevice)->isUnique(d|d.containerName);
+    Constraint ecsDeviceInstanceNamesUnique = allInstances(EcsDeviceInstance)->isUnique(d|d.id);
+    // container names unique does currently not work as the same can be used in various instances
+    
+    // --------------- constant freezes --------------------
+    
+    freeze {
+        JRE8;
+        JDK8;
+        JRE11;
+        JDK11;
+        PYTHON2;
+        CONDA;
+        PYTHON3;
+        PYTHON38;
+        PYTHON39;
+        PYTHON313;
+        mvnDefaultLib;        
+        tensorflow280;
+        tensorflow290;
+        keras290;
+        tensorflowNoVersion;
+        defaultDeviceType;
+        linuxTestingSoftware;
+        linuxTestingDependencies;
+        basicPlatformDependencies;
+        linuxTestingMaven;
+        linuxTestingNetworkUtilsRoute;
+        linuxTestingNetworkUtilsTraceroute;
+        linuxTestingNetworkUtilsPing;
+        linuxTestingNetworkUtilsWget;
+        linuxTestingFileUtilsLess;
+        linuxTestingFileUtilsNano;
+        linuxTestingFileUtilsTail;
+        linuxTestingProcessUtilsProcps;
+        pyyamlNoVersion;
+        pyflakesNoVersion;
+        websocketsNoVersion;
+        pyyaml60;
+        pyflakes250;
+        websockets1102;
+        pyzbar019;
+        OpenCVPython45564;
+        SysPythonNative;
+        NumPy1201;
+        Pillow910;
+        pyyaml602;
+        NumPy224;
+        Pillow1110;
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}

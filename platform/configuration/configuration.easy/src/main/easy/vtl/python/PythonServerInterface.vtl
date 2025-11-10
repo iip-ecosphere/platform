@@ -1,0 +1,37 @@
+import PythonBasics;
+import MeshBasics;
+import ServiceBasics;
+import PythonServerBase;
+insert PythonServerPart*;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(profile="python")
+template PythonServerInterface(Configuration config, PythonCodeArtifact target, PythonServer server, String pkg) extends PythonServerBase {
+    
+    def main(Configuration config, PythonCodeArtifact target, PythonServer server, String pkg) {
+        String clsName = asTypeName(server.id);
+        target.addImport("AbstractService", "AbstractService");
+        target.addImport("Registry");
+        target.addImport("Version", "Version");
+        target.addImport("Service", "ServiceState");
+        target.addImport("Service", "ServiceKind");
+        
+        addPythonClass(target, clsName + "ServerInterface", 'Interface for server "${server.id}"')
+            .addBase("AbstractService").(cls|{
+            cls.addAttribute('ingestor', "None");
+            produceParameterFields(server.parameter, cls);
+            cls.addConstructor("Initializes the server service.").(f|{
+                String sId = "'${server.id}'";
+                f.addSuperConstructorCall().addStringArgument("${server.id}").addStringArgument("${server.id}").addArgument('Version("${server.ver}")').addStringArgument("${server.description}").addArgument(true).addArgument("ServiceKind.SERVER");
+                f.addAssign('Registry.services[${sId}]', 'self');
+            });
+            addAttachIngestor(cls);
+            addAttachIngest(cls);
+            produceReconfigure(server.parameter, cls);
+            addSetStateStartStop(cls, "server");
+            generateReceiveClientServer(server, cls);
+        });
+     }
+    
+}

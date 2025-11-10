@@ -1,0 +1,56 @@
+import JavaBasics;
+import JavaSerializerBase;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120, profileArg_eltSorting="CONS")
+template JavaJsonSerializer(IIPEcosphere config, JavaCodeArtifact target, RecordType type, String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl) extends JavaSerializerBase {
+
+    @Override
+    def String getProtocolName() {
+        "JSON";
+    }
+
+    @Override
+    def genClsInit(IIPEcosphere config, JavaCodeClass mainCls, String typeName) {
+        mainCls.addAttribute("de.iip_ecosphere.platform.support.json.Json", "MAPPER")
+            .addInitializer("Json.createInstance4All()")
+            .setStatic()
+            .setFinal();
+        JavaCodeBlock init = mainCls.addInitializer(true);
+        defineJacksonOptionals(type, "MAPPER", typeName, init);
+        defineJacksonTypeMapper(config, "MAPPER", init);
+        mainCls.removeIfEmpty(init); // if dynamically empty
+    }
+    
+    def defineJacksonOptionals(RecordType type, String objectMapperVar, String typeName, JavaCodeBlock block) {
+        sequenceOf(Field) fields = collectFields(type);
+        sequenceOf(String) fieldNames = fields->select(f|f.optional)->collect(f|f.name);
+        if (fieldNames.size() > 0) {
+            JavaCodeMethodCall call = block.addCall("${objectMapperVar}.defineOptionals")
+                .addClassArgument(typeName);
+            fieldNames->forEach(n|call.addStringArgument(n));
+        }
+    }
+
+    def defineJacksonTypeMapper(IIPEcosphere config, String varName, JavaCodeBlock block) {
+        if (config.sharedInterfaces) {
+             block.addCall("${varName}.handleIipDataClasses");
+        }
+    }
+
+    @Override
+    def genFrom(IIPEcosphere config, RecordType type, JavaCodeMethod from, String paramName, String dataType) {
+        from.addReturn("MAPPER.readValue(${paramName}, ${dataType}.class)");
+    }
+
+    @Override
+    def genTo(IIPEcosphere config, RecordType type, JavaCodeMethod to, String paramName, String dataType) {
+        to.addReturn("MAPPER.writeValueAsBytes(${paramName})");
+    }
+
+    def main(IIPEcosphere config, JavaCodeArtifact target, RecordType type, String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl) {
+        genCls(config, target, type, pkg, typePkg, sharedInterfaces, impl);
+    }
+    
+}

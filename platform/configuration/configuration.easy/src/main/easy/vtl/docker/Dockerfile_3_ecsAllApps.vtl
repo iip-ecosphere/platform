@@ -1,0 +1,40 @@
+import Basics;
+import JavaBasics;
+import DockerBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template Dockerfile_3_ecsAllApps(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Application) apps, ContainerType containerType, EcsDevice device, Integer baseImageExist) {
+	
+    def main(IIPEcosphere config, FileArtifact target, sequenceOf(MeshElement) elements, setOf(Application) apps, ContainerType containerType, EcsDevice device, Integer baseImageExist) {
+    	
+    	'FROM docker:24-cli' 
+    	'${containerSettings(config, containerType, device)}'
+    	'ENV IIP_INCONTAINER=true'
+    	''
+        'RUN apk add bash'
+        'RUN apk add openjdk21'
+    	''
+        '# Installed dependencies (shall be in /)'
+        'COPY installedDependencies.yml installedDependencies.yml'
+    	''
+        ''
+        '${genTestingMode(config, "Docker")}'
+        ''
+        String deviceSpec = device.containerName;
+        if (deviceSpec.length() > 0) {
+            deviceSpec = "-" + deviceSpec;
+        }
+
+    	'# ECS and Service Manager'
+    	'COPY ecsJars${deviceSpec}/ ecsJars'
+    	'COPY common/ common'
+    	'COPY ecs.sh ecs.sh'
+    	''		
+        '# Running the script'
+        'COPY ecs.wrapper_script.sh wrapper_script.sh'
+        'RUN chmod 777 wrapper_script.sh'
+        'ENTRYPOINT ["./wrapper_script.sh"]'
+
+    }	
+}

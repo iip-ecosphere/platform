@@ -1,0 +1,11 @@
+ServicePartFlowerAI::FlowerFederatedAiService::framework = The AI framework to be used in the generated implementation template.
+ServicePartFlowerAI::FlowerFederatedAiService::client = The client type to be used in the generated implementation template.
+ServicePartFlowerAI::FlowerFederatedAiService::server = The declaration of the federated learning server.
+ServicePartFlowerAI::FlowerFederatedAiService::nameplateInfo = AAS nameplate information of this services.
+ServicePartFlowerAI::FlowerFederatedAiService::dependencies = Refined dependencies for Flower.
+ServicePartFlowerAI::FlowerFederatedAiService::reqDependenciesOk = The minimum required dependencies for Flower and selected framework/client must be specified.
+ServicePartFlowerAI::FlowerFederatedAiService::frameworkOk = Client framework must match server framework.
+ServicePartFlowerAI::FlowerAiClient::dependencies = Dependencies for a flower AI client.
+ServicePartFlowerAI::NumpyFlowerAiClient = Flower Client for NumPy.
+ServicePartFlowerAI::FlowerFederatedAiService::kind = the service kind 
+ServicePartFlowerAI::FlowerFederatedAiService::ver = the service version

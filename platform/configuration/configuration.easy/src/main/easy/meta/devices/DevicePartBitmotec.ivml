@@ -1,0 +1,31 @@
+project DevicePartBitmotec {
+
+    import Devices;
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    compound BitmotecDevice refines EcsDevice {
+        String id = "Bitmotec";
+        setOf(String) requiredModules = {"de.iip-ecosphere.platform:support.metrics.bitmotec:" + iipVer};
+        String containerName = "bitmotec";
+        CpuArchitecture cpu = CpuArchitecture::x86;
+        CpuBits bits = CpuBits::bit64; // TODO check
+        ContainerType containerType = ContainerType::EcsSvc_AllApps;
+        setOf(ContainerArgument) containerArguments = {
+            MountVolumeContainerArgument{ 
+              hostPath="/home/gpu/os-release-bitmo",
+              containerPath="/etc/os-release-bitmo"
+            },
+            GpusContainerArgument{
+              gpuDevice="all"
+            }
+        };
+    }
+    
+    BitmotecDevice bitmotecDeviceType = {};
+    
+    freeze {
+        bitmotecDeviceType;
+    };
+    
+}

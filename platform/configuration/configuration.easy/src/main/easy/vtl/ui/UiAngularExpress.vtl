@@ -1,0 +1,45 @@
+import UiAngularBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template UiAngularExpress(IIPEcosphere config, FileArtifact target) {
+    
+    def main(IIPEcosphere config, FileArtifact target) {
+        Integer port = port(config.managementUi);
+        'const express = require("express");
+        const path = require("path");
+        const cors = require("cors");
+        const fs = require("fs");
+        const app = express(),
+              bodyParser = require("body-parser");
+              port = ${port};
+
+        app.use(bodyParser.json());
+        app.use(express.static(process.cwd()+"/dist/iipes-web/"));
+        app.use(cors());
+
+        app.get(/^(\\/download)/, (req, res) => {
+          var pathSuffix = req.originalUrl.replace(/^(\\/download)/, "");
+          var file;
+          if (path.isAbsolute(`${config.artifactsFolder}`)) {
+               file = path.join(`${config.artifactsFolder}`, pathSuffix);
+          } else {
+               file = path.join(__dirname, `${config.artifactsFolder}`, pathSuffix);
+               // we start this in mgtUI, line above is legacy
+               if (!fs.existsSync(file)) {
+                   file = path.join(__dirname, `..`, `${config.artifactsFolder}`, pathSuffix);
+               }               
+          }
+          res.download(file);
+        });
+
+        app.get(/^\\//, (req, res) => {
+          res.sendFile(process.cwd()+"/dist/iipes-web/index.html")
+        });
+
+        app.listen(port, () => {
+          console.log("Server listening on port ${port}");
+        });'
+    }
+    
+}

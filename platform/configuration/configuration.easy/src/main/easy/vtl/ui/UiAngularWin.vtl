@@ -1,0 +1,24 @@
+import UiAngularBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template UiAngularWin(IIPEcosphere config, FileArtifact target) {
+    
+    def main(IIPEcosphere config, FileArtifact target) {
+        Integer port = port(config.managementUi);
+        '@echo off
+        REM starts the management UI, install nodejs before
+        
+        cd mgtUi
+        call npm list express
+        if errorlevel 1 (
+            call npm install express
+        )
+        call npm list cors
+        if errorlevel 1 (
+            call npm install cors
+        )
+        node server.js %*'
+    }
+    
+}

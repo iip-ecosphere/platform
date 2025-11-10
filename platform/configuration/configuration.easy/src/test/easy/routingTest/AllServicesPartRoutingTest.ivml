@@ -1,0 +1,117 @@
+project AllServicesPartRoutingTest {
+
+    import AllTypes; 
+    
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+    
+    Service mySourceService = JavaService {
+        id = "myRoutingSource",
+        name = "myRoutingSource",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = false,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.SourceImpl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::SOURCE_SERVICE,
+        input = {{type=refBy(command), forward=false}},
+        output = {{type=refBy(rec1)}}
+    };
+    
+    // own connector for testing
+    Connector myConnector = {
+        id = "myRoutingConnector",
+        name = "myRoutingConnector",
+        description = "",
+        ver = "0.1.0",
+        port = 1234, 
+        samplingPeriod = 500,
+
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.ConnectorImpl",
+        artifact ="de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        nameplateInfo = {
+           manufacturerProductDesignation = "Routing test connector@en",
+           manufacturer = refBy(manufacturer_sse)
+        },
+        
+        input = {{type=refBy(connIn)}, {type=refBy(command), forward=false}},
+        output = {{type=refBy(connOut)}},
+        inInterface = {{type=refBy(connIn)}},
+        outInterface = {{type=refBy(connOut)}},
+        inputHandlers = {{
+          type=refBy(command), 
+          class="de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.ConnectorCommandEventHandler", 
+          artifact=""} // same artifact as connector -> not specified
+        } 
+    };
+    
+    Service myProcessorService = JavaService {
+        id = "RoutingProcessor",
+        name = "RoutingProcessor",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.ProcessorImpl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(rec1)}, {type=refBy(connOut)}, {type=refBy(command), forward=false}}, 
+        output = {{type=refBy(rec1)}}
+    };
+
+    Service myProcessorP1Service = JavaService {
+        id = "ParallelRoutingProcessor1",
+        name = "ParallelRoutingProcessor1",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.ProcessorP1Impl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(rec1)}, {type=refBy(command), forward=false}}, 
+        output = {{type=refBy(rec1)}}
+    };
+
+    Service myProcessorP2Service = JavaService {
+        id = "ParallelRoutingProcessor2",
+        name = "ParallelRoutingProcessor2",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.ProcessorP2Impl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(rec1)}, {type=refBy(command), forward=false}}, 
+        output = {{type=refBy(rec1)}}
+    };
+
+    Service myProcessorP3Service = JavaService {
+        id = "ParallelRoutingProcessor3",
+        name = "ParallelRoutingProcessor3",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        asynchronous = false,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.ProcessorP3Impl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::TRANSFORMATION_SERVICE,
+        input = {{type=refBy(rec1)}, {type=refBy(command), forward=false}}, 
+        output = {{type=refBy(rec1)}}
+    };
+    
+    Service mySinkService = JavaService {
+        id = "RoutingSink",
+        name = "RoutingSink",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.SinkImpl",
+        artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
+        kind = ServiceKind::SINK_SERVICE,
+        input = {{type=refBy(rec1)}},
+        output = {{type=refBy(command), forward=false}}
+    };
+    
+    freeze {
+        .;
+    }
+}

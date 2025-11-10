@@ -1,0 +1,30 @@
+import MeshBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template TemplatesTestDataJson(IIPEcosphere config, FileArtifact target, MeshElement elt) {
+	
+    def main(IIPEcosphere config, FileArtifact target, MeshElement elt) {
+        String typeAdd;
+        IIPEcosphere cfg = config;
+        if (cfg.sharedInterfaces) {
+            typeAdd = "Impl";
+        } else {
+            typeAdd = "";
+        }
+    
+        'This file represents service/connector test input data. To use it, rename this file from .json.tmpl to .json and 
+        delete these trailing lines until the JSON structure and add your own input data structures following the 
+        example JSON. A structure contains at least one input data item named according to the type as configured for 
+        the service/connector in the configuration model. Multiple input data items of different types are ingested in 
+        the same step. The sub-structure of the input data item corresponds to the respective data structure in the 
+        configuration model. No specific values are given rather than "m" for mandatory and "o" for optional. Further, 
+        meta attributes on top-level allow controlling the input behavior. Currently we support:
+          - \\$period: p ms to wait until ingestion of that line
+          - \\$repeats: r repetitions of that line; 0 = emit once, no repetitions, positive = number of repetitions, 
+            negative = endless
+        
+        ${getDataUnitJson(elt.impl, typeAdd)}'
+    }
+	
+}

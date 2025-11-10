@@ -1,0 +1,18 @@
+import Basics;
+import JavaBasics;
+import ServiceBasics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120)
+template JavaAllTestsTemplate(Configuration config, JavaCodeArtifact target, setOf(String) javaTests, String pkg) {
+    
+    def main(Configuration config, JavaCodeArtifact target, setOf(String) javaTests, String pkg) {
+        JavaCodeClass mainCls = codeCreateClass(target, pkg, "AllTests", "Service jUnit test suite");
+        mainCls.addAnnotation("org.junit.runner.RunWith")
+            .addArgument("Suite.class");
+        mainCls.addAnnotation("org.junit.runners.Suite", "SuiteClasses")
+            .addArgument(javaTests->collect(n|n+".class")->sortedBy(n|n).toSequence(), true, false); // sortedBy for testing
+    }
+    
+}
