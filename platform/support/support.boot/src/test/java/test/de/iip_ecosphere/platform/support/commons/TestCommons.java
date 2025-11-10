@@ -12,16 +12,21 @@
 
 package test.de.iip_ecosphere.platform.support.commons;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import de.iip_ecosphere.platform.support.commons.Commons;
 import de.iip_ecosphere.platform.support.commons.FileAlterationMonitor;
@@ -170,7 +175,10 @@ public class TestCommons extends Commons {
     
     @Override
     public String toString(InputStream in, Charset charset) throws IOException {
-        return new String(in.readAllBytes(), charset);
+        return new BufferedReader(
+            new InputStreamReader(in, charset))
+              .lines()
+              .collect(Collectors.joining("\n"));
     }
 
     @Override
@@ -207,7 +215,9 @@ public class TestCommons extends Commons {
     @Override
     public void base64ToFile(String string, File file) throws IOException {
         String txt = Base64.getEncoder().encodeToString(string.getBytes());
-        Files.writeString(file.toPath(), txt);
+        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+        writer.write(txt);
+        writer.close();
     }
 
     @Override

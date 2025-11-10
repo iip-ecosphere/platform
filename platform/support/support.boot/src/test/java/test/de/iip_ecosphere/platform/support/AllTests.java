@@ -49,7 +49,10 @@ import test.de.iip_ecosphere.platform.support.logging.LoggerFactoryTest;
     SchemaServerTest.class,
     DelegatingInputStreamTest.class,
     JavaUtilsTest.class,
-    StreamGobblerTest.class
+    StreamGobblerTest.class,
+    ObjectUtilsTest.class,
+    ClassLoaderUtilsTest.class,
+    AtomicDoubleTest.class
 })
 public class AllTests {
 }

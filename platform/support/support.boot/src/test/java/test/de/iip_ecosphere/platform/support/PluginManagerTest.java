@@ -174,7 +174,7 @@ public class PluginManagerTest {
         plServer.start();
         plServer.stop(false);
         
-        ClassLoader loader = ClassLoader.getPlatformClassLoader();
+        ClassLoader loader = ClassLoader.getSystemClassLoader();
         PluginBasedSetupDescriptor pDesc = new PluginBasedSetupDescriptor(id);
         Assert.assertTrue(PluginManagerTest.class.getClassLoader() == pDesc.createClassLoader(loader));
         pDesc = new PluginBasedSetupDescriptor(Server.class);
@@ -217,7 +217,7 @@ public class PluginManagerTest {
         SingletonPluginDescriptor<Object> pd = new SingletonPluginDescriptor<>("id", null, Object.class, 
             p -> new Object());
         Assert.assertNull(pd.getFurtherIds());
-        List<String> fIds = List.of("id-a", "id-b");
+        List<String> fIds = CollectionUtils.toList("id-a", "id-b");
         pd = new SingletonPluginDescriptor<>("id", fIds, Object.class, 
             p -> new Object());
         Assert.assertEquals("id", pd.getId());

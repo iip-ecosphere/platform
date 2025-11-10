@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.support;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Optional;
 
 /**
@@ -43,11 +45,32 @@ public class JavaUtils {
      */
     public static String getJavaBinaryPath() {
         String result = null;
-        Optional<String> jp = ProcessHandle.current()
-            .info()
-            .command();
-        if (jp.isPresent()) {
-            result = jp.get();
+        try {
+            Class<?> cls = Class.forName("java.lang.ProcessHandle");
+            /*
+                Optional<String> jp = ProcessHandle.current()
+                    .info()
+                    .command();
+             */
+            Method m = cls.getDeclaredMethod("current");
+            Object tmp = m.invoke(null);
+            if (null != tmp) {
+                m = tmp.getClass().getDeclaredMethod("info");
+                tmp = m.invoke(tmp);
+                if (tmp != null) {
+                    m = tmp.getClass().getDeclaredMethod("command");
+                    tmp = m.invoke(tmp);
+                }
+            }
+            if (tmp instanceof Optional) {
+                @SuppressWarnings("unchecked")
+                Optional<String> jp = (Optional<String>) tmp;
+                if (jp.isPresent()) {
+                    result = jp.get();
+                }
+            }
+        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException 
+            | IllegalAccessException e) {
         }
         return result;
     }
