@@ -89,8 +89,8 @@ public class SplitClasspathMojo extends AbstractMojo {
                 mainPatterns = new ArrayList<>();
             }
             if (mainPatterns.isEmpty()) {
-                Collections.addAll(mainPatterns, "transport-", "support-", "support.aas-", "support.iip-aas-", 
-                    "connectors-", "services.environment-", "services.spring.loader-");
+                Collections.addAll(mainPatterns, "transport-", "support-", "support.boot-", "support.aas-", 
+                    "support.iip-aas-", "connectors-", "services.environment-", "services.spring.loader-");
                 // preliminary, to become plugins
                 Collections.addAll(mainPatterns, "commons-io", "commons-lang3", "jackson-", "joda-", "jsoniter");
             }
