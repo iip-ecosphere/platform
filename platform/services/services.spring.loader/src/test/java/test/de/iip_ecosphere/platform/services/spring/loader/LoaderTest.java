@@ -3,6 +3,7 @@ package test.de.iip_ecosphere.platform.services.spring.loader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -90,7 +91,8 @@ public class LoaderTest {
         ZipUtils.extractZip(new FileInputStream(zip), extracted.toPath());
         if (OsUtils.isWindows()) {
             File cl = new File(extracted, "classpath");
-            FileUtils.writeStringToFile(cl, FileUtils.readFileToString(cl).replace("/", "\\").replace(":", ";"));
+            String cpContents = Files.readString(cl.toPath()).replace("/", "\\").replace(":", ";");
+            Files.writeString(cl.toPath(), cpContents);
         }
 
         List<String> cmd = new ArrayList<>();
