@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>support.boot</artifactId>
+  <packaging>jar</packaging>
+  <name>Basic support layer (support.boot)</name>
+  <description>Basic support layer including plugin, JSL mechanisms, logging, JSON and YAML interfaces.</description>
+
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependencies</artifactId>
+     <version>0.7.1-SNAPSHOT</version>
+     <relativePath/>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${com.fasterxml.jackson.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${com.fasterxml.jackson.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <plugins>
+       <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-antrun-plugin</artifactId>
+         <version>1.8</version>
+         <executions>
+            <execution>
+                <id>test-plugin</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                    <goal>run</goal>
+                </goals>         
+                <configuration>
+                  <target>
+                    <jar destfile="target/pluginTest.jar">
+                        <fileset dir="target/test-classes" includes="test/de/iip_ecosphere/platform/support/plugins/*.class"/>
+                        <fileset dir="src/test/plugins/resources"/>
+                    </jar>
+                    <delete dir="target/test-classes/test/iip_ecosphere/platform/support/plugins"/>
+                  </target>
+                </configuration>
+            </execution>
+         </executions>
+       </plugin>
+    </plugins>
+  </build>
+
+</project>

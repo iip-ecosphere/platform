@@ -1,0 +1,5 @@
+# sequenceNr: 1
+# prefix: target
+# unpackMode: jars
+# setupDescriptor: FolderClasspath
+../../../target/pluginTest.jar
