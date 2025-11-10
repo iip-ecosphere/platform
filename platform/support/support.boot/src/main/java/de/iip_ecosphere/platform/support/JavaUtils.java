@@ -56,9 +56,11 @@ public class JavaUtils {
             Object tmp = m.invoke(null);
             if (null != tmp) {
                 m = tmp.getClass().getDeclaredMethod("info");
+                m.setAccessible(true);
                 tmp = m.invoke(tmp);
                 if (tmp != null) {
                     m = tmp.getClass().getDeclaredMethod("command");
+                    m.setAccessible(true);
                     tmp = m.invoke(tmp);
                 }
             }
