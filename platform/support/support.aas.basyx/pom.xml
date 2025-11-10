@@ -169,6 +169,18 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <artifactId>support.yaml-snakeyaml</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <artifactId>support.json-jackson</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.eclipse.basyx</groupId>
       <artifactId>basyx.sdk</artifactId>
       <version>${basyx.version}</version>
