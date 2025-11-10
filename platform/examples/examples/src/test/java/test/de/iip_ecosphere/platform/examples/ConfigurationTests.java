@@ -114,7 +114,7 @@ public class ConfigurationTests extends TestWithQpid {
             "../../configuration/configuration.easy/" + base)); // git
         if (!cfg.exists()) {
             cfg = new File( // jenkins path, as preliminary fallback
-                "../../../../IIP_configuration.configuration/platform/configuration/configuration.easy/" + base);
+                "../../../../IIP_configuration.easy/platform/configuration/configuration.easy/" + base);
         }
         System.out.println("Using folder " + cfg.getAbsolutePath());
         Assert.assertTrue("configuration.easy must be built before", cfg.exists());
