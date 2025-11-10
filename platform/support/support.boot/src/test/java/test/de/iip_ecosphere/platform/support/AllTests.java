@@ -36,6 +36,7 @@ import test.de.iip_ecosphere.platform.support.logging.LoggerFactoryTest;
     ResourceLoaderTest.class,
     NetUtilsTest.class,
     ServerTest.class,
+    NoOpServerTest.class,
     YamlTest.class,
     YamlFileTest.class,
     JsonTest.class,
