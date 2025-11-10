@@ -1,2 +1,0 @@
-constraints collection
-  - ensemble -> no overlaps, no graph

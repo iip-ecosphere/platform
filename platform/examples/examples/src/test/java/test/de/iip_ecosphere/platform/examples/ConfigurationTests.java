@@ -32,7 +32,7 @@ import test.de.iip_ecosphere.platform.configuration.easyProducer.AbstractIvmlTes
 import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 /**
- * Executes tests on runnable configuration.configuration examples.
+ * Executes tests on runnable configuration.easy examples.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -110,13 +110,14 @@ public class ConfigurationTests extends TestWithQpid {
         throws IOException {
         String base = AbstractIvmlTests.stripTestingEasyModelParent(AbstractIvmlTests.TEST_BASE_FOLDER);
         long start = System.currentTimeMillis();
-        File cfg = new File(System.getProperty("test.genFolder", "../../configuration/configuration/" + base)); // git
+        File cfg = new File(System.getProperty("test.genFolder", 
+            "../../configuration/configuration.easy/" + base)); // git
         if (!cfg.exists()) {
-            cfg = new File( // jenkins path, property does not work so far
-                "../../../../IIP_configuration.configuration/platform/configuration/configuration/" + base);
+            cfg = new File( // jenkins path, as preliminary fallback
+                "../../../../IIP_configuration.configuration/platform/configuration/configuration.easy/" + base);
         }
         System.out.println("Using folder " + cfg.getAbsolutePath());
-        Assert.assertTrue("configuration.configuration must be built before", cfg.exists());
+        Assert.assertTrue("configuration.easy must be built before", cfg.exists());
         File f = new File(cfg, folder + "/" + appName + "/target/" + appName + "-0.1.0-SNAPSHOT-bin.jar");
         File res = File.createTempFile("examples-test-" + appName, ".out");
         SpringStartup.start(f, false, p -> configureProcess(p, res), 
@@ -128,7 +129,7 @@ public class ConfigurationTests extends TestWithQpid {
     }
 
     /**
-     * Tests the simple mesh example from configuration.configuration.
+     * Tests the simple mesh example from configuration.easy.
      * 
      * @throws IOException if any I/O problem occurs
      */
@@ -138,7 +139,7 @@ public class ConfigurationTests extends TestWithQpid {
     }
 
     /**
-     * Tests the simple mesh 3 example from configuration.configuration.
+     * Tests the simple mesh 3 example from configuration.easy.
      * 
      * @throws IOException if any I/O problem occurs
      */
@@ -148,7 +149,7 @@ public class ConfigurationTests extends TestWithQpid {
     }
     
     /**
-     * Tests the routing test from configuration.configuration.
+     * Tests the routing test from configuration.easy.
      * 
      * @throws IOException if any I/O problem occurs
      */

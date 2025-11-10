@@ -1,82 +1,12 @@
 # oktoflow platform: Configuration Component and Configuration Model
 
-We aim at an encompassing and consistent configuration of the whole platform in order to enable model-based platform instantiation, i.e., to include relevant parts and to exclude unwanted parts. This is the point in the platform where optional components such as transport protocols, connectors, service execution managers, container managers, service chains and applications etc. are combined, configured, validated and ultimately turned into instantiated code and installable artifacts. 
+We aim at an encompassing and consistent configuration of the whole platform in order to enable model-driven platform instantiation, i.e., to include relevant parts and to exclude unwanted parts. This is the point in the platform where optional components such as transport protocols, connectors, service execution managers, container managers, service chains and applications etc. are combined, configured, validated and ultimately turned into instantiated code and installable artifacts. 
 
-This component realizes the embedding and the configuration model. The graphical user interface is in [managementUi](../../managementUi) which is located one layer above this component, i.e., uses the interfaces the component provides. The default configuration plugin is [EASy-Producer](../configuration.easy). This plugin relies on its model being located in `src/main/easy` and `src/test/easy`. Alternative implementations may demand similar folders, for which, however, the assembly packaging must be adjusted.
+This component realizes the integration of the configuration plugin and (potentially various) configuration models. In the future, generic AAS abilities from `configuration.easy` may be migrated here.
 
 The setup also may contain a `serviceArtifactStorage`and a `containerImageStorage` PackageStorageSetup specification from [deviceMgt](../../resources/deviceMgt/README.md), which are currently not used.
-
-## Configuration meta-model
-
-The configuration meta-model and its instantiation are written in the languages of EASy-Producer, namely Integrated Variability Modeling Language (IVML), Variability Instantiation Language (VIL) and Variability Template/Asset Language (VTL). EASy-Producer is open source on [github](https://github.com/SSEHUB/EASyProducer), also the most [recent specifications of IVML, VIL and VTL](https://github.com/SSEHUB/EASyProducer/tree/master/doc/web/docPreview). The [configuration model](/src/main/easy) is also explained/documented.
-
-The regression tests are based on IVML models. Some just serve for structural purposes and regression testing within this component. Some are executable and part of the regression tests in [examples](../../examples/README.md). Implementation components stem from [test.configuration.configuration](../../tests/test.configuration.configuration/README.md), which is built through the ANT build file within this project. Tests that involve the components for the [management UI](../../managmementUI) and [platform services](../../platform) are defined here, packaged as test-easy artifact and executed in [examples](../../examples/examples). For a graphical documentation of the test cases, see [test case slides](src/test/easy/summary.pdf).
-
-## Meta-model extensions
-
-The platform meta-model ships with various extensions. Some are loaded into the meta-model by default, others must be imported explicity.
-
-* PhoenixContact devices
-* Bitmotec devices
-* Federated learning based on Flower
-* KIProtect KODEX
-* Rapidminer RTSA
-* Example connector models for MIP magentic sensors and NovoAI AVA.
-
-In addition, the meta-model contains two specialized type models for OPC UA (companion specifications) and AAS IDTA specifications. The configuration project contains specialized parsers/model-translators for OPC XML to IVML as well as IDTA (PDF/AASX) to IVML. 
-
-The IDTA tools are meant to be proof-of-context implementations as the specifications/formats allow for many variations. The IDTA tools also contain a program to structurally compare models as well as a program to load AASX files via multiple versions of BaSyx.
-
-## The resources folder
-
-The resources directory contains files that shall be packaged into platform jars or into an application artifact during platform/application instantiation. It is split into
-
-- `devices`: resources for devices such as nameplate information to be packaged with the ECS runtime
-- `platform`: resources for all platform components such as central services, monitoring, ECS runtime, service manager
-- `software`: resources for software services to be packaged into the service artifacts
-- `rtsa`: additional resources for RapidMiner RTSA, e.g., a licensed version replacing our fake RTSA or actual deployments
-
-So far, multiple resources folders may exist. Typically, resources is given and committed with resources that are not IPR protected. In contrast `resources.ipr` is the typical name of a local folder that must not be committed with mirrored files and those replaced that contain IPR content. So far, mirroring is required but replacement of resources.ipr over a basic version in resources would be desirable.
-
-Applications projects containing the configuration model of the application typically do have their own resources folder, usually with subfolders `software` and if required `rtsa`.
-
-## Prerequisites
-
-Tracing for tests is set to `TOP` since version 0.7.0. Tracing can be enabled via the system property `iip.easy.tracing` using the values `ALL`, `FUNC` or `TOP`.
-
-For running the tests locally, you need a Python 3.9 with all required Python dependencies (see [Prerequisites](../../documentation/PREREQUISITES.md) and [Install Package](../../tools/Install)) installed. 
-
-For running the container tests, you need Docker and LXC (Linux only). To bypass the container creation in either case, use `-Deasy.docker.failOnError=false` to disable failure reporting during Docker instantiator execution or `-Deasy.lxc.failOnError=false` to disable failure reporting for the LXC instantiator. The instantiation process shall then run anyway and produce the related artifacts, e.g., Dockerfiles or LXC templates, but no container images are created/deployed.
-
-Some of the test models include the RapidMiner RTSA integration. As RTSA is an IPR-protected commercial production, we cannot package it with its integration and must integrate its artifacts here. For this purpose, the folder `resources` contains resources that shall be packaged during platform/application installation. The RTSA files committed there contain fake RTSA implementation for testing built by the RTSA integration package. However, if you have a real RTSA at hands, create a similar directory called resources.ipr with the actual files and the instantiation will take it up.
-
-**Hint:** If tests are failing on your side due to a missing Docker installation, you may prevent this by `-Deasy.docker.failOnError=false`.
 
 ## Tests
 
 Tests are now in configuration.easy which relies on the files in src/main/easy, src/test/easy and generates into target/gen.
 
-## Docker base images for Python (Using Digest)
-
-Sometimes, the base images used to create container images for the platform and applications gets updated (outside of the platform), which might cause errors during container image creation. To avoid that, we used the digest of the base images to always get the exact same image (Digest is a cryptographic hash, specifically a SHA256 hash, that uniquely identifies the contents of a container image).
-
-To get the digest for an image (e.g. `python:3.8.20-slim-bullseye`) use the command:
-```
-docker inspect --format='{{index .RepoDigests 0}}' python:3.8.20-slim-bullseye
-```
-The result should be something like 
-```
-Result: python@sha256:e191a71397fd61fbddb6712cd43ef9a2c17df0b5e7ba67607128554cd6bff267
-```
-Then update the FROM in the dockerfile to 
-```
-FROM python@sha256:e191a71397fd61fbddb6712cd43ef9a2c17df0b5e7ba67607128554cd6bff267
-```
-To find the Python version from a specific SHA256 hash - this command will pull the image
-```
-docker run --rm python@sha256:e191a71397fd61fbddb6712cd43ef9a2c17df0b5e7ba67607128554cd6bff267 python --version
-```
-The result should be something like 
-```
-Python 3.8.20
-```

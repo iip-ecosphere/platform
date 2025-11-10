@@ -114,7 +114,7 @@
                <artifactItems>
                  <artifactItem>
                    <groupId>de.iip-ecosphere.platform</groupId>
-                   <artifactId>configuration.configuration</artifactId>
+                   <artifactId>configuration.easy</artifactId>
                    <version>${project.version}</version>
                    <classifier>easy</classifier>
                    <type>zip</type>

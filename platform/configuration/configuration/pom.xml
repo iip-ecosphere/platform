@@ -162,62 +162,77 @@
               <outputDirectory>${project.build.directory}/python</outputDirectory>
               <destFileName>services.environment-python.zip</destFileName>
             </artifactItem>
+            <!-- if there would be more models, we might download them here and integrate them into joint artifacts -->
+            <artifactItem>
+              <groupId>de.iip-ecosphere.platform</groupId>
+              <artifactId>configuration.easy</artifactId>
+              <version>${project.version}</version>
+              <classifier>easy</classifier>
+              <type>zip</type>
+              <overWrite>true</overWrite>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+              <destFileName>${project.artifactId}-${project.version}-easy.zip</destFileName>
+            </artifactItem>
+            <artifactItem>
+              <groupId>de.iip-ecosphere.platform</groupId>
+              <artifactId>configuration.easy</artifactId>
+              <version>${project.version}</version>
+              <classifier>easy-test</classifier>
+              <type>zip</type>
+              <overWrite>true</overWrite>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+              <destFileName>${project.artifactId}-${project.version}-easy-test.zip</destFileName>
+            </artifactItem>
+            <artifactItem>
+              <groupId>de.iip-ecosphere.platform</groupId>
+              <artifactId>configuration.easy</artifactId>
+              <version>${project.version}</version>
+              <classifier>template</classifier>
+              <type>zip</type>
+              <overWrite>true</overWrite>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+              <destFileName>${project.artifactId}-${project.version}-template.zip</destFileName>
+            </artifactItem>
           </artifactItems>
           <outputDirectory>${project.build.directory}</outputDirectory>
           <overWriteReleases>false</overWriteReleases>
           <overWriteSnapshots>true</overWriteSnapshots>
         </configuration>
       </plugin>
-       <plugin>
-         <groupId>org.apache.maven.plugins</groupId>
-         <artifactId>maven-assembly-plugin</artifactId>
-         <version>3.1.1</version>
-         <executions>
-             <execution>
-                 <id>easy</id>
-                 <phase>package</phase>
-                 <goals>
-                     <goal>single</goal>
-                 </goals>
-                 <configuration>
-                     <descriptors>
-                         <descriptor>src/main/assembly/easy.xml</descriptor>
-                     </descriptors>
-                     <outputDirectory>${project.build.directory}</outputDirectory>
-                     <attach>true</attach>
-                 </configuration>
-              </execution>
-             <execution>
-                 <id>easy-template</id>
-                 <phase>package</phase>
-                 <goals>
-                     <goal>single</goal>
-                 </goals>
-                 <configuration>
-                     <descriptors>
-                         <descriptor>src/main/assembly/easy-template.xml</descriptor>
-                     </descriptors>
-                     <outputDirectory>${project.build.directory}</outputDirectory>
-                     <attach>true</attach>
-                 </configuration>
-              </execution>
-             <execution>
-                 <id>easy-test</id>
-                 <phase>package</phase>
-                 <goals>
-                     <goal>single</goal>
-                 </goals>
-                 <configuration>
-                     <descriptors>
-                         <descriptor>src/test/assembly/easy-test.xml</descriptor>
-                     </descriptors>
-                     <outputDirectory>${project.build.directory}</outputDirectory>
-                     <attach>true</attach>
-                 </configuration>
-              </execution>
-         </executions>
-        </plugin>
-
+      <!-- explicitly attach the collected model artifacts for deployment -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.4.0</version>
+        <executions>
+          <execution>
+            <id>attach-artifacts</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>${project.build.directory}/${project.build.finalName}-easy.zip</file>
+                  <type>zip</type>
+                  <classifier>easy</classifier>
+                </artifact>
+                <artifact>
+                  <file>${project.build.directory}/${project.build.finalName}-easy-test.zip</file>
+                  <type>zip</type>
+                  <classifier>easy-test</classifier>
+                </artifact>
+                <artifact>
+                  <file>${project.build.directory}/${project.build.finalName}-template.zip</file>
+                  <type>zip</type>
+                  <classifier>template</classifier>
+                </artifact>
+              </artifacts>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
