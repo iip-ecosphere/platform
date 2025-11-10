@@ -31,6 +31,7 @@ import test.de.iip_ecosphere.platform.support.logging.LoggerFactoryTest;
     ZipUtilsTest.class,
     IOUtilsTest.class,
     OsUtilsTest.class,
+    StringUtilsTest.class,
     TimeUtilsTest.class,
     ResourceLoaderTest.class,
     NetUtilsTest.class,
