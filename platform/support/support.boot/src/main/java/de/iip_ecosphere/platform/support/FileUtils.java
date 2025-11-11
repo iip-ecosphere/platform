@@ -165,7 +165,7 @@ public class FileUtils {
      * @return the system temporary directory.
      */
     public static File getTempDirectory() {
-        return new File(getUserDirectoryPath()); // required by test broker
+        return new File(getTempDirectoryPath()); // required by test broker
     }
     
     /**
