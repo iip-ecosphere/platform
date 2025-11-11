@@ -20,6 +20,12 @@
         <artifactId>transport</artifactId>
         <version>${project.version}</version>
       </dependency>
+        <dependency>
+          <artifactId>support.commons-apache</artifactId>
+          <groupId>de.iip-ecosphere.platform</groupId>
+          <version>${project.version}</version>
+          <scope>test</scope>
+        </dependency>
 
       <!-- tests -->
 

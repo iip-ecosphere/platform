@@ -30,6 +30,12 @@
         <type>test-jar</type>
         <scope>test</scope>
       </dependency>
+        <dependency>
+          <artifactId>support.commons-apache</artifactId>
+          <groupId>de.iip-ecosphere.platform</groupId>
+          <version>${project.version}</version>
+          <scope>test</scope>
+        </dependency>
       <dependency>
         <groupId>io.moquette</groupId>
         <artifactId>moquette-broker</artifactId>
