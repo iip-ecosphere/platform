@@ -411,7 +411,7 @@ public abstract class Commons {
      * @return the path to the system temporary directory.
      */
     public String getTempDirectoryPath() {
-        return System.getProperty(PROP_TMP_DIR); // required by test broker        
+        return System.getProperty(PROP_TMP_DIR); // required by test broker, service starter        
     }
 
     /**
@@ -420,7 +420,7 @@ public abstract class Commons {
      * @return the system temporary directory.
      */
     public File getTempDirectory() {
-        return new File(getUserDirectoryPath()); // required by test broker
+        return new File(getUserDirectoryPath()); // required by test broker, service starter
     }
     
     /**

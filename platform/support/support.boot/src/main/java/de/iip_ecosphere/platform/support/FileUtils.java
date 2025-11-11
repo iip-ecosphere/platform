@@ -156,7 +156,7 @@ public class FileUtils {
      * @return the path to the system temporary directory.
      */
     public static String getTempDirectoryPath() {
-        return Commons.getInstance().getTempDirectoryPath();
+        return System.getProperty(Commons.PROP_TMP_DIR); // required by test broker        
     }
 
     /**
@@ -165,7 +165,7 @@ public class FileUtils {
      * @return the system temporary directory.
      */
     public static File getTempDirectory() {
-        return Commons.getInstance().getTempDirectory();
+        return new File(getUserDirectoryPath()); // required by test broker
     }
     
     /**
