@@ -420,7 +420,7 @@ public abstract class Commons {
      * @return the system temporary directory.
      */
     public File getTempDirectory() {
-        return new File(getUserDirectoryPath()); // required by test broker, service starter
+        return new File(getTempDirectoryPath()); // required by test broker, service starter
     }
     
     /**
