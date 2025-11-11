@@ -13,8 +13,10 @@
 package de.iip_ecosphere.platform.support;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.util.Optional;
+import java.util.function.Supplier;
+
+import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 
 /**
  * Java utils with based on more recent JDK libraries.
@@ -22,6 +24,8 @@ import java.util.Optional;
  * @author Holger Eichelberger, SSE
  */
 public class JavaUtils {
+    
+    private static Supplier<String> binaryPathSupplier;
 
     /**
      * Returns the path to the running Java binary.
@@ -36,48 +40,23 @@ public class JavaUtils {
         }
         return result;
     }
-
-    // checkstyle: stop exception type check
-
+    
     /**
      * Returns the path to the running Java binary.
      * 
      * @return the path, may be <b>null</b> for unknown
      */
     public static String getJavaBinaryPath() {
-        String result = null;
-        try {
-            Class<?> cls = Class.forName("java.lang.ProcessHandle");
-            /*
-                Optional<String> jp = ProcessHandle.current()
-                    .info()
-                    .command();
-             */
-            Method m = cls.getDeclaredMethod("current");
-            Object tmp = m.invoke(null);
-            if (null != tmp) {
-                m = tmp.getClass().getDeclaredMethod("info");
-                m.setAccessible(true);
-                tmp = m.invoke(tmp);
-                if (tmp != null) {
-                    m = tmp.getClass().getDeclaredMethod("command");
-                    m.setAccessible(true);
-                    tmp = m.invoke(tmp);
-                }
+        if (null == binaryPathSupplier) {
+            Optional<JavaBinaryPathDescriptor> desc = ServiceLoaderUtils.findFirst(JavaBinaryPathDescriptor.class);
+            if (desc.isPresent()) {
+                binaryPathSupplier = desc.get().createSupplier();
+            } else {
+                binaryPathSupplier = () -> null;
             }
-            if (tmp instanceof Optional) {
-                @SuppressWarnings("unchecked")
-                Optional<String> jp = (Optional<String>) tmp;
-                if (jp.isPresent()) {
-                    result = jp.get();
-                }
-            }
-        } catch (Throwable e) { // all typical reflection, including add-opens stuff by recent JDK
         }
-        return result;
+        return binaryPathSupplier.get();
     }
-    
-    // checkstyle: resume exception type check
     
     /**
      * Returns the path to the running JVM bin folder.

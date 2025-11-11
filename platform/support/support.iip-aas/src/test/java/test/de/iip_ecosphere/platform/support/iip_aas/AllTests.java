@@ -31,7 +31,8 @@ import org.junit.runners.Suite;
     PlatformAasTest.class,
     YamlSemanticIdResolverDescriptorTest.class,
     NameplateSetupTest.class,
-    AasLifecycleTest.class
+    AasLifecycleTest.class,
+    JavaUtilsTest.class
 })
 public class AllTests {
 
