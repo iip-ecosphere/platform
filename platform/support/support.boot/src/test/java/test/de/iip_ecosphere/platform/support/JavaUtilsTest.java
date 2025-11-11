@@ -16,7 +16,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.JavaUtils;
-import de.iip_ecosphere.platform.support.OsUtils;
 
 /**
  * Tests {@link JavaUtils}.
@@ -33,12 +32,7 @@ public class JavaUtilsTest {
     public void testJavaPaths() {
         Assert.assertNotNull(JavaUtils.getJavaPath());
         Assert.assertTrue(JavaUtils.getJavaPath().length() > 0);
-        if (OsUtils.getJavaSpecificationVersion().startsWith("1.")) {
-            Assert.assertNull(JavaUtils.getJavaBinaryPath());
-        } else {
-            Assert.assertNotNull(JavaUtils.getJavaBinaryPath());
-            Assert.assertTrue(JavaUtils.getJavaBinaryPath().length() > 0);
-        }
+        Assert.assertNull(JavaUtils.getJavaBinaryPath()); // no descriptor
         Assert.assertNotNull(JavaUtils.getJavaBinaryPath("java"));
         Assert.assertTrue(JavaUtils.getJavaBinaryPath("java").length() > 0);
     }
