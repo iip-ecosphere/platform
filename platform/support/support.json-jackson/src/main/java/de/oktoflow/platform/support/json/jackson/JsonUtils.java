@@ -70,8 +70,6 @@ import de.iip_ecosphere.platform.support.IgnoreProperties;
 import de.iip_ecosphere.platform.support.Include;
 import de.iip_ecosphere.platform.support.json.IOIterator;
 import de.iip_ecosphere.platform.support.json.Json.EnumMapping;
-import de.iip_ecosphere.platform.support.json.JsonIgnore;
-import de.iip_ecosphere.platform.support.json.JsonProperty;
 
 /**
  * Some JSON utility methods, also reading/writing of specific types.
@@ -306,22 +304,12 @@ public class JsonUtils {
             if (null != ignoreAnn) {
                 return ignoreAnn.value();
             }
-            JsonIgnore jsonIgnore = member.getAnnotation(JsonIgnore.class); // TODO remove
-            if (null != jsonIgnore) {
-                return jsonIgnore.value();
-            }
             if (exclusions != null) {
                 boolean exclude = exclusions.contains(member.getName());
                 if (!exclude) {
                     ConfiguredName cfgName = member.getAnnotation(ConfiguredName.class);
                     if (null != cfgName && cfgName.value() != null) {
                         exclude = exclusions.contains(cfgName.value());
-                    }
-                }
-                if (!exclude) {
-                    JsonProperty jsonProp = member.getAnnotation(JsonProperty.class);
-                    if (null != jsonProp && jsonProp.value() != null) {
-                        exclude = exclusions.contains(jsonProp.value());
                     }
                 }
                 return exclude;
@@ -388,12 +376,9 @@ public class JsonUtils {
     private static void handleAnnotations(String propName, AccessibleObject obj, Map<String, String> renames, 
         Set<String> nonNullInclude) {
         ConfiguredName cfgName = obj.getAnnotation(ConfiguredName.class);
-        JsonProperty annProp = obj.getAnnotation(JsonProperty.class);
         Include annIncl = obj.getAnnotation(Include.class);
         if (null != cfgName && isRename(cfgName.value(), propName)) {
             renames.put(propName, cfgName.value());
-        } else if (null != annProp && isRename(annProp.value(), propName)) {
-            renames.put(propName, annProp.value());
         }
         if (null != annIncl && annIncl.value() == Include.Type.NON_NULL) {
             nonNullInclude.add(propName);

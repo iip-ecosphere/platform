@@ -6,8 +6,6 @@ import de.iip_ecosphere.platform.support.ConfiguredName;
 import de.iip_ecosphere.platform.support.IgnoreProperties;
 import de.iip_ecosphere.platform.support.bytecode.Bytecode;
 import de.iip_ecosphere.platform.support.bytecode.Bytecode.ClassBuilder;
-import de.iip_ecosphere.platform.support.json.JsonIgnoreProperties;
-import de.iip_ecosphere.platform.support.json.JsonProperty;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -129,25 +127,18 @@ public class BytecodeTest {
         builder.annotate(IgnoreProperties.class)
             .define("ignoreUnknown", true)
             .build();
-        builder.annotate(JsonIgnoreProperties.class)
-            .define("ignoreUnknown", true)
-            .build();
         builder.defineProperty("$period", Integer.TYPE)
             .annotate(ConfiguredName.class)
                 .define("value", "abc")
                 .build()
-            .annotate(JsonProperty.class)
-                .define("value", "abc")
-                .build()
             .build();
         builder.defineProperty("$repeats", Integer.TYPE)
-            .annotate(JsonProperty.class).build()
             .build();
         Class<? extends Data> cls = builder.build();
 
         Assert.assertNotNull(cls);
         Assert.assertEquals("iip.mock.Mock", cls.getName());
-        JsonIgnoreProperties a1 = cls.getAnnotation(JsonIgnoreProperties.class);
+        IgnoreProperties a1 = cls.getAnnotation(IgnoreProperties.class);
         Assert.assertNotNull(a1);
         Assert.assertEquals(true, a1.ignoreUnknown());
         Data d = cls.getConstructor().newInstance();
@@ -156,7 +147,7 @@ public class BytecodeTest {
         Field f = cls.getDeclaredField("$period");
         Assert.assertEquals(Integer.TYPE, f.getType());
         Assert.assertTrue(Modifier.isPrivate(f.getModifiers()));
-        JsonProperty p = f.getAnnotation(JsonProperty.class);
+        ConfiguredName p = f.getAnnotation(ConfiguredName.class);
         Assert.assertEquals("abc", p.value());
 
         Method m = cls.getDeclaredMethod("set$repeats", Integer.TYPE);
@@ -193,9 +184,6 @@ public class BytecodeTest {
                 .annotate(ConfiguredName.class)
                     .define("value", "bce")
                     .build()
-                .annotate(JsonProperty.class)
-                    .define("value", "bce")
-                    .build()
                 .build()
             .definePublicField("stringField", String.class).build()
             .build();
@@ -206,14 +194,14 @@ public class BytecodeTest {
         Field f = cls.getDeclaredField("intField");
         Assert.assertEquals(Integer.TYPE, f.getType());
         Assert.assertTrue(Modifier.isPublic(f.getModifiers()));
-        JsonProperty p = f.getAnnotation(JsonProperty.class);
+        ConfiguredName p = f.getAnnotation(ConfiguredName.class);
         Assert.assertNotNull(p);
         Assert.assertEquals("bce", p.value());
 
         f = cls.getDeclaredField("stringField");
         Assert.assertEquals(String.class, f.getType());
         Assert.assertTrue(Modifier.isPublic(f.getModifiers()));
-        p = f.getAnnotation(JsonProperty.class);
+        p = f.getAnnotation(ConfiguredName.class);
         Assert.assertNull(p);
     }
 
