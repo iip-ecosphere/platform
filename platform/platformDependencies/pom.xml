@@ -421,7 +421,6 @@
           <includes> <!-- suites only, allow for multiple suites (Spring binders)  -->
             <include>**/AllTests*.class</include>
           </includes>
-          <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
           <forkedProcessTimeoutInSeconds>3600</forkedProcessTimeoutInSeconds>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
         </configuration>
