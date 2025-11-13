@@ -23,7 +23,6 @@ import java.util.List;
 public class EasySetup {
 
     public static final String PLATFORM_META_MODEL_NAME = "IIPEcosphere";
-    public static final String PROP_TEST_MODEL_PARENT = "okto.test.easy.model.parent";
 
     private File base;
     private File genTarget;
@@ -48,7 +47,7 @@ public class EasySetup {
                 result = easy.toString();
             }
         }
-        return result; //System.getProperty(PROP_TEST_MODEL_PARENT, "../configuration");
+        return result;
     }
     
     /**

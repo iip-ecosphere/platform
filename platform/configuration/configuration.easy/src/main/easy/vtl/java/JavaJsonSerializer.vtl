@@ -12,9 +12,15 @@ template JavaJsonSerializer(IIPEcosphere config, JavaCodeArtifact target, Record
     }
 
     @Override
-    def genClsInit(IIPEcosphere config, JavaCodeClass mainCls, String typeName) {
+    def genClsInit(IIPEcosphere config, JavaCodeClass mainCls, String origTypeName, String typeName) {
+        JavaCodeMethodCall initEx = new JavaCodeMethodCall("Json.createInstance")
+            .classArg(origTypeName);
+        if (origTypeName <> typeName) {
+            initEx.classArg(typeName);
+        }
+            
         mainCls.addAttribute("de.iip_ecosphere.platform.support.json.Json", "MAPPER")
-            .addInitializer("Json.createInstance4All()")
+            .addInitializer(initEx)
             .setStatic()
             .setFinal();
         JavaCodeBlock init = mainCls.addInitializer(true);

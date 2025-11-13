@@ -5,7 +5,7 @@ import JavaBasics;
 @format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120, profileArg_eltSorting="CONS")
 template JavaSerializerBase(IIPEcosphere config, JavaCodeArtifact target, RecordType type, String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl) {
 
-    def genClsInit(IIPEcosphere config, JavaCodeClass mainCls, String typeName) {
+    def genClsInit(IIPEcosphere config, JavaCodeClass mainCls, String origTypeName, String typeName) {
     }
 
     def genFrom(IIPEcosphere config, RecordType type, JavaCodeMethod from, String paramName, String dataType) {
@@ -30,6 +30,7 @@ template JavaSerializerBase(IIPEcosphere config, JavaCodeArtifact target, Record
     def genCls(IIPEcosphere config, JavaCodeArtifact target, RecordType type, String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl) {
         String clsName = asTypeName(type.name);
         String typeName = clsName;
+        String origTypeName = typeName;
         String add = "";
         if (sharedInterfaces) {
             add = "Impl";
@@ -43,7 +44,7 @@ template JavaSerializerBase(IIPEcosphere config, JavaCodeArtifact target, Record
             mainCls.addImport("${typePkg}.*");
         }
         mainCls.implements("de.iip_ecosphere.platform.transport.serialization.Serializer<${typeName}>");
-        genClsInit(config, mainCls, typeName);
+        genClsInit(config, mainCls, origTypeName, typeName);
         
         JavaCodeMethod from = mainCls.addMethod(typeName, "from", "").(from|{
             from.addParameter("byte[]", "data");
