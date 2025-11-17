@@ -30,6 +30,8 @@ import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.Version;
 import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
+import de.iip_ecosphere.platform.support.plugins.Plugin;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.resources.FolderResourceResolver;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
@@ -212,68 +214,134 @@ public abstract class AbstractService implements Service {
      */
     public static <S extends Service> S createInstance(ClassLoader loader, String className, Class<S> cls, 
         String serviceId, String deploymentDescFile) {
-        S result = null;
-        try {
-            Class<?> serviceClass = loader.loadClass(className);
-            Object instance = null;
-            if (null != serviceId && null != deploymentDescFile) {
-                try {
-                    Constructor<?> cons = serviceClass.getConstructor(String.class, InputStream.class);
-                    InputStream desc = getResourceAsStream(loader, deploymentDescFile);
-                    instance = cons.newInstance(serviceId, desc);
-                    if (null != desc) {
-                        desc.close();
+        S result = createInstanceByPlugin(className, false, serviceId, deploymentDescFile);
+        if (null == result) {
+            try {
+                Class<?> serviceClass = loader.loadClass(className);
+                Object instance = null;
+                if (null != serviceId && null != deploymentDescFile) {
+                    try {
+                        Constructor<?> cons = serviceClass.getConstructor(String.class, InputStream.class);
+                        InputStream desc = getResourceAsStream(loader, deploymentDescFile);
+                        instance = cons.newInstance(serviceId, desc);
+                        if (null != desc) {
+                            desc.close();
+                        }
+                    } catch (NoSuchMethodException e) {
+                        // see null == instance
+                    } catch (InvocationTargetException e) {
+                        LoggerFactory.getLogger(AbstractService.class).error("While instantiating " + className + ": " 
+                            + e.getMessage() + ", falling back to default constructor", e);
+                    } catch (IOException e) {
+                        LoggerFactory.getLogger(AbstractService.class).error("While instantiating " + className 
+                            + " here " + "loading descriptor " + deploymentDescFile + ": " + e.getMessage() 
+                            + ", falling back to default constructor");
                     }
-                } catch (NoSuchMethodException e) {
-                    // see null == instance
-                } catch (InvocationTargetException e) {
-                    LoggerFactory.getLogger(AbstractService.class).error("While instantiating " + className + ": " 
-                        + e.getMessage() + ", falling back to default constructor", e);
-                } catch (IOException e) {
-                    LoggerFactory.getLogger(AbstractService.class).error("While instantiating " + className + " here "
-                        + "loading descriptor " + deploymentDescFile + ": " + e.getMessage() + ", falling back to "
-                        + "default constructor");
                 }
-            }
-            if (null == instance && null != serviceId) {
-                try {
-                    Constructor<?> cons = serviceClass.getConstructor(String.class);
-                    instance = cons.newInstance(serviceId);
-                } catch (NoSuchMethodException e) {
-                    // see null == instance
-                } catch (InvocationTargetException e) {
-                    LoggerFactory.getLogger(AbstractService.class).error("While instantiating " + className + ": " 
-                        + e.getMessage() + ", falling back to default constructor");
+                if (null == instance && null != serviceId) {
+                    try {
+                        Constructor<?> cons = serviceClass.getConstructor(String.class);
+                        instance = cons.newInstance(serviceId);
+                    } catch (NoSuchMethodException e) {
+                        // see null == instance
+                    } catch (InvocationTargetException e) {
+                        LoggerFactory.getLogger(AbstractService.class).error("While instantiating " + className + ": " 
+                            + e.getMessage() + ", falling back to default constructor");
+                    }
                 }
-            }
-            
-            if (null == instance) {
-                instance = serviceClass.getConstructor().newInstance();
-            }
-            result = cls.cast(instance);
-        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException 
-            | IllegalAccessException | ClassCastException e) {
-            String loaders = "";
-            ClassLoader l = loader;
-            while (null != l) {
-                if (loaders.length() > 0) {
-                    loaders += " -> ";
+                
+                if (null == instance) {
+                    instance = serviceClass.getConstructor().newInstance();
                 }
-                loaders += l.getClass().getSimpleName();
-                l = l.getParent();
-            }
-            // not automatically error - if multiple services are available, Spring may load all but only one 
-            // is correctly bound
-            LoggerFactory.getLogger(AbstractService.class).warn("Cannot instantiate service of type '" 
-                + className + " via " + loaders + "': " + e.getClass().getSimpleName() + " " + e.getMessage() 
-                + ". Service '" + serviceId + "' will not be functional!");
-            if (e.getCause() != null) {
-                LoggerFactory.getLogger(AbstractService.class).warn("Cause: {}", e.getMessage(), e.getCause());
-                e.getCause().printStackTrace(System.out); // preliminary
+                result = cls.cast(instance);
+            } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException 
+                | InstantiationException | IllegalAccessException | ClassCastException e) {
+                String loaders = "";
+                ClassLoader l = loader;
+                while (null != l) {
+                    if (loaders.length() > 0) {
+                        loaders += " -> ";
+                    }
+                    loaders += l.getClass().getSimpleName();
+                    l = l.getParent();
+                }
+                // not automatically error - if multiple services are available, Spring may load all but only one 
+                // is correctly bound
+                LoggerFactory.getLogger(AbstractService.class).warn("Cannot instantiate service of type '" 
+                    + className + " via " + loaders + "': " + e.getClass().getSimpleName() + " " + e.getMessage() 
+                    + ". Service '" + serviceId + "' will not be functional!");
+                if (e.getCause() != null) {
+                    LoggerFactory.getLogger(AbstractService.class).warn("Cause: {}", e.getMessage(), e.getCause());
+                    e.getCause().printStackTrace(System.out); // preliminary
+                }
             }
         }
         return result;
     }
+    
+    /**
+     * Creates a service instance from a plugin.
+     * 
+     * @param <S> the service type
+     * @param pluginId the plugin id
+     * @param log emit log information when the plugin is not registered
+     * @param serviceId the id of the service as given in {@code deploymentDescFile} (may be <b>null</b>, then the 
+     *     default constructor is invoked)
+     * @param deploymentDescFile the resource name of the deployment descriptor containing a YAML artifact with the 
+     *     service description (may be <b>null</b>, then the default constructor is invoked)
+     * @return a new service instance or <b>null</b> if the service cannot be created/the plugin is not registered
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static <S extends Service> S createInstanceByPlugin(String pluginId, boolean log, String serviceId, 
+        String deploymentDescFile) {
+        S result = null;
+        Plugin<ServiceDescriptor> plugin = PluginManager.getPlugin(pluginId, ServiceDescriptor.class);
+        if (null == plugin) {
+            if (log) {
+                LoggerFactory.getLogger(AbstractService.class).error("Cannot create service, there is no plugin for "
+                    + "id '{}' registered", pluginId);
+            }
+        } else {
+            ServiceDescriptor<S> sd = (ServiceDescriptor<S>) plugin.getInstance();
+            InputStream desc = getResourceAsStream(loader, deploymentDescFile);
+            result = sd.createService(serviceId, desc);
+            if (null == result) {
+                result = sd.createService(serviceId);
+            }
+            if (null == result) {
+                result = sd.createService();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Creates a service instance from a plugin via {@link ServiceDescriptor#createService(YamlService, Object...)}.
+     * 
+     * @param <S> the service type
+     * @param pluginId the plugin id
+     * @param log emit log information when the plugin is not registered
+     * @param yaml the service description
+     * @param args the optional service creation arguments
+     * @return a new service instance or <b>null</b> if the service cannot be created/the plugin is not registered
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static <S extends Service> S createInstanceByPlugin(String pluginId, boolean log, YamlService yaml, 
+        Object... args) {
+        S result = null;
+        Plugin<ServiceDescriptor> plugin = PluginManager.getPlugin(pluginId, ServiceDescriptor.class);
+        if (null == plugin) {
+            if (log) {
+                LoggerFactory.getLogger(AbstractService.class).error("Cannot create service, there is no plugin for "
+                    + "id '{}' registered", pluginId);
+            }
+        } else {
+            ServiceDescriptor<S> sd = (ServiceDescriptor<S>) plugin.getInstance();
+            result = sd.createService(yaml, args);
+        }
+        return result;
+    }
+    
 
     @Override
     public String getId() {
