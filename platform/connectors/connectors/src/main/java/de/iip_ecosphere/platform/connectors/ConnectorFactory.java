@@ -77,7 +77,7 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
      * @param <CO> the output type of the connector
      * @param <CI> the input type of the connector
      * @param <A> the adapter type
-     * @param cls the class of the connector or of the connector factory indirectly creating 
+     * @param cls the class or plugin id of the connector or of the connector factory indirectly creating 
      *    the connector. Connectors must have at least a one-arg public constructor taking {@code adapters}
      * @param params the connector parameters supplier
      * @param adapter the protocol adapters to create the connector for
@@ -87,40 +87,41 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
     @SafeVarargs
     public static <O, I, CO, CI, A extends ProtocolAdapter<O, I, CO, CI>> 
         Connector<O, I, CO, CI> createConnector(String cls, Supplier<ConnectorParameter> params, A... adapter) {
-        Connector<O, I, CO, CI> result = null;
-        try {
-            Class<?> fClass = Class.forName(cls);
-            if (ConnectorFactory.class.isAssignableFrom(fClass)) {
-                ConnectorFactory<O, I, CO, CI, A> factory = 
-                    (ConnectorFactory<O, I, CO, CI, A>) fClass.getConstructor().newInstance();
-                result = factory.createConnector(params.get(), adapter);
-            } else if (Connector.class.isAssignableFrom(fClass)) {
-                Constructor<?> cons = null;
-                for (Constructor<?> c: fClass.getDeclaredConstructors()) {
-                    if (1 == c.getParameterCount()) {
-                        Class<?> p = c.getParameters()[0].getType();
-                        if (p.isArray()) { // array type
-                            cons = c;
+        Connector<O, I, CO, CI> result = createConnectorByPlugin(cls, false, params, null, adapter);
+        if (null == result) {
+            try {
+                Class<?> fClass = Class.forName(cls);
+                if (ConnectorFactory.class.isAssignableFrom(fClass)) {
+                    ConnectorFactory<O, I, CO, CI, A> factory = 
+                        (ConnectorFactory<O, I, CO, CI, A>) fClass.getConstructor().newInstance();
+                    result = factory.createConnector(params.get(), adapter);
+                } else if (Connector.class.isAssignableFrom(fClass)) {
+                    Constructor<?> cons = null;
+                    for (Constructor<?> c: fClass.getDeclaredConstructors()) {
+                        if (1 == c.getParameterCount()) {
+                            Class<?> p = c.getParameters()[0].getType();
+                            if (p.isArray()) { // array type
+                                cons = c;
+                            }
                         }
                     }
+                    if (null == cons) {
+                        throw new NoSuchMethodException();
+                    }
+                    result = (Connector<O, I, CO, CI>) cons.newInstance((Object) adapter);
                 }
-                if (null == cons) {
-                    throw new NoSuchMethodException();
-                }
-                result = (Connector<O, I, CO, CI>) cons.newInstance((Object) adapter);
+            } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException 
+                | IllegalAccessException | InstantiationException e) {
+                LoggerFactory.getLogger(ConnectorFactory.class).error("Cannot create connector/factory {}: {}", 
+                    cls, e.getMessage());
             }
-        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException 
-            | IllegalAccessException | InstantiationException e) {
-            LoggerFactory.getLogger(ConnectorFactory.class).error("Cannot create connector/factory {}: {}", 
-                cls, e.getMessage());
         }
-        
         return result;
     }
 
     /**
      * Creates a connector instance from a plugin of type {@link ConnectorDescriptor}, 
-     * see also {@link AbstractPluginConnectorDescriptor}.
+     * see also {@link AbstractPluginConnectorDescriptor}. Logs errors.
      * 
      * @param <O> the output type from the underlying machine/platform
      * @param <I> the input type to the underlying machine/platform
@@ -136,7 +137,7 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
     public static <O, I, CO, CI, A extends ProtocolAdapter<O, I, CO, CI>> 
         Connector<O, I, CO, CI> createConnectorByPlugin(String pluginId, Supplier<ConnectorParameter> params, 
         A... adapter) {
-        return createConnectorByPlugin(pluginId, params, null, adapter);
+        return createConnectorByPlugin(pluginId, true, params, null, adapter);
     }    
 
     /**
@@ -150,6 +151,7 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
      * @param <S> the selector type
      * @param <A> the adapter type
      * @param pluginId the plugin id 
+     * @param log shall plugin errors be logged
      * @param params the connector parameters supplier
      * @param selector the adapter selector, may be <b>null</b> for none
      * @param adapter the protocol adapters to create the connector for
@@ -157,13 +159,15 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
      */
     @SuppressWarnings("unchecked")
     public static <O, I, CO, CI, S extends AdapterSelector <O, I, CO, CI>, A extends ProtocolAdapter<O, I, CO, CI>> 
-        Connector<O, I, CO, CI> createConnectorByPlugin(String pluginId, Supplier<ConnectorParameter> params, 
-        S selector, A... adapter) {
+        Connector<O, I, CO, CI> createConnectorByPlugin(String pluginId, boolean log, 
+        Supplier<ConnectorParameter> params, S selector, A... adapter) {
         Connector<O, I, CO, CI> result = null;
         Plugin<ConnectorDescriptor> plugin = PluginManager.getPlugin(pluginId, ConnectorDescriptor.class);
         if (null == plugin) {
-            LoggerFactory.getLogger(ConnectorFactory.class).error("Cannot create connector, there is no plugin for "
-                    + "plugin id '{}' registered", pluginId);
+            if (log) {
+                LoggerFactory.getLogger(ConnectorFactory.class).error("Cannot create connector, there is no plugin for "
+                    + "id '{}' registered", pluginId);
+            }
         } else {
             result = plugin.getInstance().createConnector(selector, params, adapter);
         }
