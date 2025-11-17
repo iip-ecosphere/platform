@@ -54,12 +54,13 @@ public class DefaultPluginDescriptor<T> implements PluginDescriptor<T> {
         PluginSupplier<T> pluginSupplier) {
         this.id = initId(id);
         this.ids = initIds(ids);
-        this.pluginClass = pluginClass;
+        this.pluginClass = initPluginClass(pluginClass);
         this.pluginSupplier = initPluginSupplier(pluginSupplier);
     }
     
     /**
-     * Returns the plugin supplier upon creation.
+     * Returns the plugin supplier upon creation. May override the provided supplier, in particular if the 
+     * result refers to <b>this</b>, which is not available in the super call of a constructor.
      * 
      * @param pluginSupplier the supplied supplier
      * @return {@code pluginSupplier}
@@ -69,7 +70,18 @@ public class DefaultPluginDescriptor<T> implements PluginDescriptor<T> {
     }
 
     /**
-     * Returns the plugin id upon creation.
+     * Returns the plugin class upon creation. May override the provided class, in particular if the 
+     * result refers to <b>this</b> or {@link #getClass()}, which is not available in the super call of a constructor.
+     * 
+     * @param pluginSupplier the supplied supplier
+     * @return {@code pluginSupplier}
+     */
+    protected Class<T> initPluginClass(Class<T> pluginClass) {
+        return pluginClass;
+    }
+
+    /**
+     * Returns the plugin id upon creation. May override the provided id.
      * 
      * @param id the supplied plugin id
      * @return {@code id}
