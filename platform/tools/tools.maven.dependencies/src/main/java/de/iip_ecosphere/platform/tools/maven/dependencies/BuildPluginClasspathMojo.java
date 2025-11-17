@@ -14,7 +14,9 @@ package de.iip_ecosphere.platform.tools.maven.dependencies;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -58,6 +60,9 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
 
     @Parameter( defaultValue = "${project.build.directory}", readonly = true )
     private File targetDirectory;
+
+    @Parameter( property = "mdep.validateJsl", defaultValue = "true" )
+    private boolean validateJsl;
 
     /**
      * Returns the relative target directory.
@@ -127,8 +132,68 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
         setPrepends(prepends);
         composeBefores(null);
         super.doExecute();
+        if (validateJsl) {
+            validateJsl();
+        }
     }
     
+    /**
+     * Validates whether JSL descriptor files have their counterparts in classes. Must be executed after class and 
+     * test class compilation.
+     */
+    private void validateJsl() {
+        File classes = new File(targetDirectory, "classes");
+        File testClasses = new File(targetDirectory, "test-classes");
+        validateJsl(new File("src/main/resources"), classes);
+        validateJsl(new File("src/test/resources"), classes, testClasses);
+    }
+    
+    /**
+     * Validates whether JSL descriptor files in {@link descParent} have their counterparts in classes compiled to 
+     * {@link classDir}.
+     * 
+     * @param descParent, usually a resource folder where {@code META-INF/services} is located within
+     * @param classDir the parent folders to search classes within
+     */
+    private void validateJsl(File descParent, File... classDir) {
+        List<File> classDirList = new ArrayList<>();
+        Collections.addAll(classDirList, classDir);
+        File jslDir = new File(descParent, "META-INF/services");
+        if (jslDir.isDirectory()) {
+            File[] descs = jslDir.listFiles(f -> f.isFile());
+            if (null != descs) {
+                for (File desc : descs) {
+                    try {
+                        List<String> lines = Files.readAllLines(desc.toPath());
+                        for (String line: lines) {
+                            validateJsl(desc, line, classDirList);
+                        }
+                    } catch (IOException e) {
+                        getLog().warn("Cannot read JSL descriptor " + desc + ": " + e.getMessage());
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Validates whether a JSL descriptor file in {@link descParent} has counterparts in classes compiled to 
+     * {@link classDirList}.
+     * 
+     * @param desc the descriptor file
+     * @param descClass the class name within {@code desc} to validate
+     * @param classDirList the parent folders to search classes within
+     */
+    private void validateJsl(File desc, String descClass, List<File> classDirList) {
+        for (File cDir : classDirList) {
+            File clsFile = new File(cDir, descClass.replace(".", "/") + ".class");
+            if (!clsFile.isFile()) {
+                getLog().warn("Class '" + descClass + "' (" + clsFile + ") in JSL descriptor " + desc 
+                    + " not found in " + classDirList);
+            }
+        }
+    }
+
     @Override
     public void adjustTo(Function<String, String> func) {
         composeBefores(func);

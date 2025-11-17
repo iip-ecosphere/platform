@@ -164,6 +164,7 @@ Specialized goal to build a plugin classpath file. Based on the refined ``build-
 - `unpackMode` (default `jars`, user property `mdep.unpackMode`) specifies how unpacking shall happen, i.e., whether jars are included in the plugin artifact (`jars`) or whether they shall be resolved (`resolve`)
 - `setupDescriptor` (default `FolderClasspath`, user property `mdep.setupDescriptor`) specifies the descriptor implementation that shall be announced to the plugin manager, may be a shortcut for platform supplied descriptors (`FolderClasspath`, `CurrentClassloader`, ``PluginBased`, `Process`), a qualified classname assuming a non-arg constructor, or empty for no loading through the class loader (rather than appending during unpack).
 - `pluginIds` (default empty, user property `mdep.pluginIds`) specifies pluginIds for the `PluginBased` setup descriptor (comma separated, only first considered by now), may also be used with others whereby then the plugin is also announced by `PluginBased`
+- `validateJsl` (default `true`, user property `mdep.validateJsl`) specifies whether classes listed in JSL files shall be validated for their counterparts in `target`, leads to warnings if classes do not exist
 
 The inherited setting ``excludeArtifactIds`` shall be configured in a way that prerequiste platform layers are excluded. Usually, the plugin detects and determins the respective artifact ids automatically.
 
