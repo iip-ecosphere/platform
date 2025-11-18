@@ -6,10 +6,11 @@ In this section, we summarize procedures for some tasks that you may want to per
 
 1. Adjust your platform configuration and define a new service.
 2. Execute the platform instantiation with `configuration:generateAppsNoDeps` so that the service interfaces artifact is generated and installed.
-3. Import the generated template (`gen/templates`) as project into Eclipse and add only required components as dependencies, in particular your configured application interfaces (see step 1). Alternative and optional components such as AAS implementations or protocols may be added as dependencies in the test scope.
+3. Import the generated code template (`gen/templates`) as project into Eclipse and add only required components as dependencies, in particular your configured application interfaces (see step 1). Alternative and optional components such as AAS implementations or protocols may be added as dependencies in the test scope.
 4. Realize the service, e.g., as Java class(es) in src/main/java or Python class(es) in src/main/python/services implementing the new interface(s).
     1. **Java:** For automated creation of instances, services must have two constructors, one taking the serviceId and an InputStream containing the deployment descriptor YAML as well as a no-argument fallback constructor.
     2. **Python:** The service must be a class implementing the generated base service, which carries the service identification, description, etc. At the end of your class, the service must instantiate itself to register with the service environment. Further, a Maven artifact descriptor is required to correctly package and deploy the Python sources.
+5. Test your service through jUnit test cases.
 
 For all supported programming languages, we recommend using the generated application templates, which contain programming frames for Java and Python services, frames for Java and Python tests, testing resources, an example identity store file, required packaging descriptors, and a matching build process.
 
@@ -18,9 +19,47 @@ For all supported programming languages, we recommend using the generated applic
 3. Deploy the artifacts to your installation devices, start the platform and try out your service.
 4. Let is know about your work. In case of a potential open source component, please consider contributing it to the platform.
 
+If the service shall be loaded as plugin, e.g., it's dependencies are conflicting with other application templates:
+
+1. Create a plugin descriptor inheriting from `de.iip_ecosphere.platform.services.environment.AbstractSpecificServicePluginDescriptor`
+2. Enter the fully qualified name of your descriptor in `src/main/resources/META-INF/services/de.iip_ecosphere.platform.support.plugins.PluginDescriptor` (one class name per line, create the file if it does not exist) 
+
+## Defining an own generic (platform-supplied) service
+
+Generic services do not operate on specific rather than generic data. The glue code for binding such services with the application is generated automatically. Typically, generic services shall be able to handle multiple application data types. A generic service consists of its implementation and a related extension of the configuration model. As example, please look into `kiServices.rapidminer.rtsa` as well as the related model parts in `configuration.easy/src/main/easy/meta/services`.
+
+1. Create a project for the service by copying/adjusting `tools/basicMaven`.
+2. Implement the service for a single type by implementing one of the service base classes from `services.environment`, e.g., 
+   - `AbstractRestProcessService` for REST-based services that run an own process, 
+   - `AbstractProcessService` for services that run an own process, 
+   - `AbstractService` for plain Java services or 
+   - `AbstractPythonProcessService` for Python-based services.
+3. Implement a service wrapper that handles multiple types by inheriting `AbstractDelegatingMultiService`.
+4. Create a plugin descriptor inheriting from `de.iip_ecosphere.platform.services.environment.AbstractGenericServicePluginDescriptor`
+5. Enter the fully qualified name of your descriptor in `src/main/resources/META-INF/services/de.iip_ecosphere.platform.support.plugins.PluginDescriptor` (one class name per line, create the file if it does not exist) 
+6. Test your service through jUnit test cases.
+7. Adjust the build process so that the goals `copy-plugin-dependencies`, `build-plugin-classpath` and `assemble-plugin` from oktoflow's `dependency-plugin`are executed.
+
+Extend the configuration model by a `ServicePart*.ivml` and a `ServicePart*.text` file (`configuration.easy/src/main/easy/meta/services`) and, if needed, the generation process by a `JavaSpringCloudStreamMeshElementPart*.vtl` file (`configuration.easy/src/main/easy/vtl/services`).
+
+## Defining an own generic (platform-supplied) connector
+
+Decide first whether your connector operates with multiple channels (passing on binary data) or whether it operates on a structured, potentially hierarchical model.
+
+1. Create a project for the service by copying/adjusting `tools/basicMaven`.
+2. Implement the connector, as basis 
+   - for a channel connector use `AbstractChannelConnector` as basis
+   - for a model connector `AbstractConnector` or in case of parallel read/write accesses `AbstractThreadedConnector`
+3. All connector classes contain an inner descriptor class, which is also the plugin descriptor. This fully qualified name of the descriptor must be listed in two JSL files in `src/main/resources/META-INF/services`, namely in `de.iip_ecosphere.platform.connectors.ConnectorDescriptor` and `de.iip_ecosphere.platform.support.plugins.PluginDescriptor` (one class name per line, create the file if it does not exist). 
+4. Test your service through jUnit test cases.
+5. Adjust the build process so that the goals `copy-plugin-dependencies`, `build-plugin-classpath` and `assemble-plugin` from oktoflow's `dependency-plugin`are executed.
+
+Extend the configuration model by a `ConnectorsPart*.ivml` and a `ConnectorsPart*.text` file (`configuration.easy/src/main/easy/meta/services`) and, if needed, the generation process by a `JavaSpringCloudStreamMeshElementPart*.vtl` file (`configuration.easy/src/main/easy/vtl/services`).
+Currently, a connector also needs modifications to `JavaConnector.vtl` in `configuration.easy/src/main/easy/vtl/java`.
+
 ## Defining an AAS for a device
 
-Nowadays, AAS is still a rather new approach and devices may not be equipped with their own AAS, although first experimental device plugins do exist, e.g., for Phoenix Contact PLCnext. Currently, the platform allows for two ways of defining an own AAS, in particular to provide a nameplate with device/vendor information or, if desired, a specification of the provided device services.
+Devices may not be equipped with their own AAS. Currently, the platform allows for two ways of defining an own AAS, in particular to provide a nameplate with device/vendor information or, if desired, a specification of the provided device services.
 
 1. The first approach is to pragmatically state the AAS in a specific Yaml-Format, which is turned into an AAS.
 2. The second approach is to provide an AASX package, which makes up the device AAS.
