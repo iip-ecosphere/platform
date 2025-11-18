@@ -1,1 +1,3 @@
 de.iip_ecosphere.platform.security.services.kodex.MultiKodexRestServicePluginDescriptor
+de.iip_ecosphere.platform.security.services.kodex.KodexServicePluginDescriptor
+de.iip_ecosphere.platform.security.services.kodex.KodexRestServicePluginDescriptor

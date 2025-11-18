@@ -12,27 +12,30 @@
 
 package de.iip_ecosphere.platform.security.services.kodex;
 
-import de.iip_ecosphere.platform.services.environment.AbstractGenericMultiServicePluginDescriptor;
+import de.iip_ecosphere.platform.services.environment.AbstractGenericServicePluginDescriptor;
 import de.iip_ecosphere.platform.services.environment.YamlService;
+import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
- * The plugin descriptor for {@link MultiKodexRestService}.
+ * The plugin descriptor for {@link KodexService}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class MultiKodexRestServicePluginDescriptor 
-    extends AbstractGenericMultiServicePluginDescriptor<MultiKodexRestService> {
+public class KodexServicePluginDescriptor 
+    extends AbstractGenericServicePluginDescriptor<KodexService<?, ?>> {
 
     /**
      * Creates the instance for JSL.
      */
-    public MultiKodexRestServicePluginDescriptor() {
-        super(PLUGIN_ID_PREFIX + "kodex", MultiKodexRestService.class);
+    public KodexServicePluginDescriptor() {
+        super(PLUGIN_ID_PREFIX + "kodex-single-cmd", KodexService.class);
     }
 
     @Override
-    public MultiKodexRestService createService(YamlService yaml, Object... args) {
-        return new MultiKodexRestService(yaml, args);
+    public <I, O> KodexService<I, O> createService(TypeTranslator<I, String> inTrans,
+        TypeTranslator<String, O> outTrans, ReceptionCallback<O> callback, YamlService yaml, Object... args) {
+        return new KodexService<>(inTrans, outTrans, callback, yaml, args);
     }
 
 }

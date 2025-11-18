@@ -6,3 +6,11 @@ Files are from https://github.com/kiprotect/kodex releases and renamed according
 For testing on CI, please do not forget `git update-index --chmod=+x kodex-0.0.8-linux64`.
 
 type ..\..\test\resources\data.json |  kodex-0.0.7-win64.exe --level debug run ..\..\test\resources\example-data.yml
+
+## Plugins
+
+| id | secondary Ids  | Description |
+| --- |  --- | --- |
+| kodex |  `de.iip_ecosphere.platform.security.services.kodex.MultiKodexRestService` | Multi-type REST-based KODEX service |
+| kodex-single |  `de.iip_ecosphere.platform.security.services.kodex.KodexRestService` | Single-type REST-based KODEX service (legacy) |
+| kodex-single-cmd |  `de.iip_ecosphere.platform.security.services.kodex.KodexService` | Single-type command-line streams-based KODEX service (legacy) |

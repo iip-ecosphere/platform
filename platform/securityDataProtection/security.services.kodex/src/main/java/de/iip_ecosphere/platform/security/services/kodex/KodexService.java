@@ -22,6 +22,7 @@ import java.util.concurrent.ExecutionException;
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.OsUtils;
+import de.iip_ecosphere.platform.services.environment.AbstractService;
 import de.iip_ecosphere.platform.services.environment.AbstractStringProcessService;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.YamlProcess;
@@ -40,13 +41,14 @@ public class KodexService<I, O> extends AbstractStringProcessService<I, O>  {
     public static final int WAITING_TIME_WIN = 100; // preliminary
     public static final int WAITING_TIME_OTHER = 100; // preliminary
     public static final String VERSION = "0.1.6";
+    public static final String DFLT_DATA_SPEC = "data.yml";
     private static final boolean DEBUG = false;
     
     private String dataSpec;
 
     /**
      * Creates an instance of the service with the required type translators to/from JSON. Data file is 
-     * "data.yml".
+     * "{@value #DFLT_DATA_SPEC}.
      * 
      * @param inTrans the input translator
      * @param outTrans the output translator
@@ -55,7 +57,22 @@ public class KodexService<I, O> extends AbstractStringProcessService<I, O>  {
      */
     public KodexService(TypeTranslator<I, String> inTrans, TypeTranslator<String, O> outTrans, 
         ReceptionCallback<O> callback, YamlService yaml) {
-        this(inTrans, outTrans, callback, yaml, "data.yml");
+        this(inTrans, outTrans, callback, yaml, DFLT_DATA_SPEC);
+    }
+    
+    /**
+     * Creates an instance of the service with the required type translators to/from JSON.
+     * 
+     * @param inTrans the input translator
+     * @param outTrans the output translator
+     * @param callback called when a processed item is received from the service
+     * @param yaml the service description
+     * @param args the first argument shall be the name of the data spec file (within the process home path) to pass 
+     *     to KODEX; related files such as api or actions must be there as well and referenced from the data spec file 
+     */
+    public KodexService(TypeTranslator<I, String> inTrans, TypeTranslator<String, O> outTrans, 
+        ReceptionCallback<O> callback, YamlService yaml, Object... args) {
+        this(inTrans, outTrans, callback, yaml, getDataSpecArg(args));
     }
     
     /**
@@ -72,6 +89,13 @@ public class KodexService<I, O> extends AbstractStringProcessService<I, O>  {
         ReceptionCallback<O> callback, YamlService yaml, String dataSpec) {
         super(inTrans, outTrans, callback, yaml);
         this.dataSpec = dataSpec;
+    }
+    
+    /**
+     * Extracts the first argument from {@code args} with default {@link #DFLT_DATA_SPEC}.
+     */
+    static String getDataSpecArg(Object[] args) {
+        return AbstractService.getStringArg(0, args, DFLT_DATA_SPEC);
     }
     
     /**

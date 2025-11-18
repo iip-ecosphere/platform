@@ -83,6 +83,17 @@ public class MultiKodexRestService extends AbstractDelegatingMultiService<KodexR
      * Creates an instance.
      * 
      * @param yaml the service description YAML
+     * @param args the first argument shall be the name of the data spec file (within the process home path) to pass 
+     *     to KODEX; related files such as api or actions must be there as well and referenced from the data spec file 
+     */
+    public MultiKodexRestService(YamlService yaml, Object... args) {
+        this(yaml, KodexService.getDataSpecArg(args));
+    }
+
+    /**
+     * Creates an instance.
+     * 
+     * @param yaml the service description YAML
      * @param dataSpec name of the data spec file (within the process home path) to pass to KODEX; related files such 
      *     as api or actions must be there as well and referenced from the data spec file 
      */

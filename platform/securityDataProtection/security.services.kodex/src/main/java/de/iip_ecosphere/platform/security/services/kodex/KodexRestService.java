@@ -55,7 +55,7 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
 
     /**
      * Creates an instance of the service with the required type translators to/from JSON. Data file is 
-     * "data.yml".
+     * "{@value KodexService#DFLT_DATA_SPEC}".
      * 
      * @param inTrans the input translator
      * @param outTrans the output translator
@@ -64,9 +64,24 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
      */
     public KodexRestService(TypeTranslator<I, String> inTrans, TypeTranslator<String, O> outTrans, 
         ReceptionCallback<O> callback, YamlService yaml) {
-        this(inTrans, outTrans, callback, yaml, "data.yml");
+        this(inTrans, outTrans, callback, yaml, KodexService.DFLT_DATA_SPEC);
     }
-    
+
+    /**
+     * Creates an instance of the service with the required type translators to/from JSON.
+     * 
+     * @param inTrans the input translator
+     * @param outTrans the output translator
+     * @param callback called when a processed item is received from the service
+     * @param yaml the service description
+     * @param args the first value shall be the name of the data spec file (within the process home path) to pass to 
+     *     KODEX; related files such as api or actions must be there as well and referenced from the data spec file 
+     */
+    public KodexRestService(TypeTranslator<I, String> inTrans, TypeTranslator<String, O> outTrans, 
+        ReceptionCallback<O> callback, YamlService yaml, Object... args) {
+        this(inTrans, outTrans, callback, yaml, KodexService.getDataSpecArg(args));
+    }
+
     /**
      * Creates an instance of the service with the required type translators to/from JSON.
      * 

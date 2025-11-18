@@ -12,29 +12,30 @@
 
 package de.iip_ecosphere.platform.kiServices.rapidminer.rtsa;
 
-import java.util.List;
-
-import de.iip_ecosphere.platform.services.environment.AbstractGenericMultiServicePluginDescriptor;
+import de.iip_ecosphere.platform.services.environment.AbstractGenericServicePluginDescriptor;
 import de.iip_ecosphere.platform.services.environment.YamlService;
+import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
  * The plugin descriptor for {@link MultiRtsaRestService}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class MultiRtsaRestServicePluginDescriptor
-    extends AbstractGenericMultiServicePluginDescriptor<MultiRtsaRestService> {
+public class RtsaRestServicePluginDescriptor
+    extends AbstractGenericServicePluginDescriptor<RtsaRestService<?, ?>> {
 
     /**
      * Creates the instance for JSL.
      */
-    public MultiRtsaRestServicePluginDescriptor() {
-        super(PLUGIN_ID_PREFIX + "rtsa", List.of(MultiRtsaRestService.class.getName()));
+    public RtsaRestServicePluginDescriptor() {
+        super(PLUGIN_ID_PREFIX + "rtsa-single", RtsaRestService.class);
     }
 
     @Override
-    public MultiRtsaRestService createService(YamlService yaml, Object... args) {
-        return new MultiRtsaRestService(yaml);
+    public <I, O> RtsaRestService<I, O> createService(TypeTranslator<I, String> inTrans,
+        TypeTranslator<String, O> outTrans, ReceptionCallback<O> callback, YamlService yaml, Object... args) {
+        return new RtsaRestService<I, O>(inTrans, outTrans, callback, yaml);
     }
 
 }
