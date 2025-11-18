@@ -16,16 +16,8 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * A basic implementation of the {@link ServicePluginDescriptor} delegating to the {@link ServiceDescriptor}.
- * 
- * The {@link #create()} method contains a convenience/default implementation by reflection through an assumed
- * no-arg constructor that must anyway exist for JSL. May be overridden if needed. 
- * 
- * All creation methods are implemented with <b>null</b> return value so that implementing descriptor classes need to
- * declare less methods. However, if you describe a generic service, implement 
- * {@link #createService(YamlService, Object...)} and if you describe a specific service implement 
- * {@link #createService(String, InputStream)} as well as the fallbacks 
- * {@link #createService(String)} and {@link #createService()}.
+ * A basic implementation of the {@link ServicePluginDescriptor} delegating to the {@link ServiceDescriptor} for 
+ * SISO generic services (legacy).
  * 
  * @param <S> the actual type of service being created
  * @author Holger Eichelberger, SSE
@@ -43,6 +35,26 @@ public abstract class AbstractGenericServicePluginDescriptor<S extends Service>
         super(id, ids);
     }
 
+    /**
+     * Creates an instance with a single secondary id.
+     * 
+     * @param id the plugin id
+     * @param secId the secondary id
+     */
+    public AbstractGenericServicePluginDescriptor(String id, String secId) {
+        super(id, List.of(secId));
+    }
+
+    /**
+     * Creates an instance with a class determining the single secondary id.
+     * 
+     * @param id the plugin id
+     * @param secCls the class determining the secondary id (by its qualified name)
+     */
+    public AbstractGenericServicePluginDescriptor(String id, Class<?> secCls) {
+        this(id, secCls.getName());
+    }
+
     @Override
     public S createService(String serviceId, InputStream ymlFile) {
         return null;
@@ -55,6 +67,11 @@ public abstract class AbstractGenericServicePluginDescriptor<S extends Service>
 
     @Override
     public S createService() {
+        return null;
+    }
+    
+    @Override
+    public S createService(YamlService yaml, Object... args) {
         return null;
     }
     

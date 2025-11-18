@@ -35,6 +35,7 @@ import de.iip_ecosphere.platform.support.plugins.PluginManager;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.resources.FolderResourceResolver;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
+import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
@@ -314,9 +315,92 @@ public abstract class AbstractService implements Service {
         }
         return result;
     }
+    
+    /**
+     * Returns the i-th argument.
+     * 
+     * @param index the index of the argument to return
+     * @param args the arguments
+     * @param dflt the default value if accessing the argument fails
+     * @return the argument or {@code dflt}
+     */
+    public static Object getArg(int index, Object[] args, Object dflt) {
+        return args == null || index < 0  || index >= args.length ? dflt : args[index];
+    }
 
     /**
-     * Creates a service instance from a plugin via {@link ServiceDescriptor#createService(YamlService, Object...)}.
+     * Returns the i-th argument as String.
+     * 
+     * @param index the index of the argument to return
+     * @param args the arguments
+     * @param dflt the default value if accessing the argument fails
+     * @return the argument as String or {@code dflt}
+     */
+    public static String getStringArg(int index, Object[] args, String dflt) {
+        String result = dflt;
+        Object tmp = getArg(index, args, dflt);
+        if (tmp instanceof String) {
+            result = (String) tmp;
+        } else if (null != tmp) {
+            result = tmp.toString();
+        }
+        return result;
+    }
+
+    /**
+     * Creates a service instance from a plugin via the 
+     * {@link AbstractDelegatingMultiService#AbstractDelegatingMultiService(YamlService)} 
+     * or the extended constructor with second parameter {@code String... args}.
+     * 
+     * @param <S> the service type
+     * @param loader the class loader to load the class with
+     * @param className the name of the service class (must implement {@link Service} and provide a no-argument 
+     *     constructor)
+     * @param cls the class to cast to
+     * @param yaml the service description
+     * @param args the optional service creation arguments
+     * @return a new service instance or <b>null</b> if the service cannot be created
+     */
+    public static <S extends Service> S createGenericMultiInstance(ClassLoader loader, String className, Class<S> cls, 
+        YamlService yaml, Object... args) {
+        S result = createGenericMultiInstanceByPlugin(className, false, yaml, args);
+        if (null == result) {
+            Object instance = null;
+            try {
+                Class<?> serviceClass = loader.loadClass(className);
+                try {
+                    Constructor<?> cons = serviceClass.getConstructor(YamlService.class);
+                    instance = cons.newInstance(yaml);
+                    result = cls.cast(instance);
+                } catch (NoSuchMethodException e) {
+                    // see null == instance
+                } catch (IllegalAccessException | InstantiationException | InvocationTargetException 
+                            | ClassCastException e) {
+                    LoggerFactory.getLogger(AbstractService.class).error("While instantiating " + className + ": " 
+                        + e.getMessage(), e);
+                } 
+                try {
+                    Constructor<?> cons = serviceClass.getConstructor(YamlService.class, String[].class);
+                    instance = cons.newInstance(yaml, args);
+                    result = cls.cast(instance);
+                } catch (NoSuchMethodException e) {
+                    // see null == instance
+                } catch (IllegalAccessException | InstantiationException | InvocationTargetException 
+                    | ClassCastException e) {
+                    LoggerFactory.getLogger(AbstractService.class).error("While instantiating " + className + ": " 
+                        + e.getMessage(), e);
+                } 
+            } catch (ClassNotFoundException e) {
+                LoggerFactory.getLogger(AbstractService.class).error("While instantiating " + className 
+                    + ": Cannot find class", e);
+            } 
+        }
+        return result;
+    }    
+    
+    /**
+     * Creates a generic service instance from a plugin via 
+     * {@link ServiceDescriptor#createService(YamlService, Object...)}.
      * 
      * @param <S> the service type
      * @param pluginId the plugin id
@@ -326,8 +410,8 @@ public abstract class AbstractService implements Service {
      * @return a new service instance or <b>null</b> if the service cannot be created/the plugin is not registered
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public static <S extends Service> S createInstanceByPlugin(String pluginId, boolean log, YamlService yaml, 
-        Object... args) {
+    public static <S extends Service> S createGenericMultiInstanceByPlugin(String pluginId, boolean log, 
+        YamlService yaml, Object... args) {
         S result = null;
         Plugin<ServiceDescriptor> plugin = PluginManager.getPlugin(pluginId, ServiceDescriptor.class);
         if (null == plugin) {
@@ -341,7 +425,103 @@ public abstract class AbstractService implements Service {
         }
         return result;
     }
+
+    // checkstyle: stop parameter number check
+
+    /**
+     * Creates a service instance from a plugin via the 
+     * {@link AbstractDelegatingMultiService#AbstractDelegatingMultiService(YamlService)} 
+     * or the extended constructor with second parameter {@code String... args}.
+     * 
+     * @param <S> the service type
+     * @param <I> input type
+     * @param <O> output type
+     * @param loader the class loader to load the class with
+     * @param className the name of the service class (must implement {@link Service} and provide a no-argument 
+     *     constructor)
+     * @param cls the class to cast to
+     * @param inTrans the input translator
+     * @param outTrans the output translator
+     * @param callback called when a processed item is received from the service
+     * @param yaml the service description
+     * @param args the optional service creation arguments
+     * @return a new service instance or <b>null</b> if the service cannot be created
+     */
+    public static <S extends Service, I, O> S createGenericInstance(ClassLoader loader, String className, Class<S> cls,
+        TypeTranslator<I, String> inTrans, TypeTranslator<String, O> outTrans, ReceptionCallback<O> callback, 
+        YamlService yaml, Object... args) {
+        S result = createGenericInstanceByPlugin(className, false, inTrans, outTrans, callback, yaml, args);
+        if (null == result) {
+            Object instance = null;
+            try {
+                Class<?> serviceClass = loader.loadClass(className);
+                try {
+                    Constructor<?> cons = serviceClass.getConstructor(TypeTranslator.class, TypeTranslator.class, 
+                        ReceptionCallback.class, YamlService.class);
+                    instance = cons.newInstance(inTrans, outTrans, callback, yaml);
+                    result = cls.cast(instance);
+                } catch (NoSuchMethodException e) {
+                    // see null == instance
+                } catch (IllegalAccessException | InstantiationException | InvocationTargetException 
+                            | ClassCastException e) {
+                    LoggerFactory.getLogger(AbstractService.class).error("While instantiating " + className + ": " 
+                        + e.getMessage(), e);
+                } 
+                try {
+                    Constructor<?> cons = serviceClass.getConstructor(TypeTranslator.class, TypeTranslator.class, 
+                        ReceptionCallback.class, YamlService.class, String[].class);
+                    instance = cons.newInstance(inTrans, outTrans, callback, yaml, args);
+                    result = cls.cast(instance);
+                } catch (NoSuchMethodException e) {
+                    // see null == instance
+                } catch (IllegalAccessException | InstantiationException | InvocationTargetException 
+                    | ClassCastException e) {
+                    LoggerFactory.getLogger(AbstractService.class).error("While instantiating " + className + ": " 
+                        + e.getMessage(), e);
+                } 
+            } catch (ClassNotFoundException e) {
+                LoggerFactory.getLogger(AbstractService.class).error("While instantiating " + className 
+                    + ": Cannot find class", e);
+            } 
+        }
+        return result;
+    }    
+
+    /**
+     * Creates a generic service instance from a plugin via 
+     * {@link ServiceDescriptor#createService(YamlService, Object...)}.
+     * 
+     * @param <S> the service type
+     * @param <I> input type
+     * @param <O> output type
+     * @param pluginId the plugin id
+     * @param log emit log information when the plugin is not registered
+     * @param inTrans the input translator
+     * @param outTrans the output translator
+     * @param callback called when a processed item is received from the service
+     * @param yaml the service description
+     * @param args the optional service creation arguments
+     * @return a new service instance or <b>null</b> if the service cannot be created/the plugin is not registered
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static <S extends Service, I, O> S createGenericInstanceByPlugin(String pluginId, boolean log, 
+        TypeTranslator<I, String> inTrans, TypeTranslator<String, O> outTrans, ReceptionCallback<O> callback, 
+        YamlService yaml, Object... args) {
+        S result = null;
+        Plugin<ServiceDescriptor> plugin = PluginManager.getPlugin(pluginId, ServiceDescriptor.class);
+        if (null == plugin) {
+            if (log) {
+                LoggerFactory.getLogger(AbstractService.class).error("Cannot create service, there is no plugin for "
+                    + "id '{}' registered", pluginId);
+            }
+        } else {
+            ServiceDescriptor<S> sd = (ServiceDescriptor<S>) plugin.getInstance();
+            result = sd.createService(inTrans, outTrans, callback, yaml, args);
+        }
+        return result;
+    }
     
+    // checkstyle: resume parameter number check
 
     @Override
     public String getId() {

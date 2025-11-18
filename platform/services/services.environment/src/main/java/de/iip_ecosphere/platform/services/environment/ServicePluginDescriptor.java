@@ -24,6 +24,5 @@ public interface ServicePluginDescriptor<S extends Service> extends PluginInstan
 
     public static final String PLUGIN_ID_PREFIX = "service-";
     public static final String PLUGIN_TEST_ID_PREFIX = PLUGIN_ID_PREFIX + "test-";
-
     
 }

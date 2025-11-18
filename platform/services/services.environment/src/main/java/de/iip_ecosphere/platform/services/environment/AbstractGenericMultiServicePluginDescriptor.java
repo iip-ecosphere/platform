@@ -12,18 +12,20 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
+import java.io.InputStream;
 import java.util.List;
 
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 
 /**
- * A basic implementation of the {@link ServicePluginDescriptor} delegating to the {@link ServiceDescriptor}.
+ * A basic implementation of the {@link ServicePluginDescriptor} delegating to the {@link ServiceDescriptor} for MIMO 
+ * generic services.
  * 
  * @param <S> the actual type of service being created
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractSpecificServicePluginDescriptor<S extends Service> 
+public abstract class AbstractGenericMultiServicePluginDescriptor<S extends Service> 
     extends AbstractServicePluginDescriptor<S> {
 
     /**
@@ -32,12 +34,42 @@ public abstract class AbstractSpecificServicePluginDescriptor<S extends Service>
      * @param id the plugin id
      * @param ids optional secondary ids, may be <b>null</b> or empty
      */
-    public AbstractSpecificServicePluginDescriptor(String id, List<String> ids) {
+    public AbstractGenericMultiServicePluginDescriptor(String id, List<String> ids) {
         super(id, ids);
     }
-    
+
+    /**
+     * Creates an instance with a single secondary id.
+     * 
+     * @param id the plugin id
+     * @param secId the secondary id
+     */
+    public AbstractGenericMultiServicePluginDescriptor(String id, String secId) {
+        super(id, List.of(secId));
+    }
+
+    /**
+     * Creates an instance with a class determining the single secondary id.
+     * 
+     * @param id the plugin id
+     * @param secCls the class determining the secondary id (by its qualified name)
+     */
+    public AbstractGenericMultiServicePluginDescriptor(String id, Class<?> secCls) {
+        this(id, secCls.getName());
+    }
+
     @Override
-    public S createService(YamlService yaml, Object... args) {
+    public S createService(String serviceId, InputStream ymlFile) {
+        return null;
+    }
+
+    @Override
+    public S createService(String serviceId) {
+        return null;
+    }
+
+    @Override
+    public S createService() {
         return null;
     }
     

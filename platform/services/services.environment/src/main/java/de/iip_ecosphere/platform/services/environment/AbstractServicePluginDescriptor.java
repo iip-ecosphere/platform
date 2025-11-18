@@ -12,7 +12,6 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
-import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -25,12 +24,6 @@ import de.iip_ecosphere.platform.support.plugins.SingletonPluginDescriptor;
  * 
  * The {@link #create()} method contains a convenience/default implementation by reflection through an assumed
  * no-arg constructor that must anyway exist for JSL. May be overridden if needed. 
- * 
- * All creation methods are implemented with <b>null</b> return value so that implementing descriptor classes need to
- * declare less methods. However, if you describe a generic service, implement 
- * {@link #createService(YamlService, Object...)} and if you describe a specific service implement 
- * {@link #createService(String, InputStream)} as well as the fallbacks 
- * {@link #createService(String)} and {@link #createService()}.
  * 
  * @param <S> the actual type of service being created
  * @author Holger Eichelberger, SSE
@@ -88,37 +81,6 @@ public abstract class AbstractServicePluginDescriptor<S extends Service>
             | InstantiationException e) {
             LoggerFactory.getLogger(this).error("Convenience creation of instance failed. Please override create(). "
                 + "Reason: {}", e.getMessage());
-        }
-        return result;
-    }
-    
-    /**
-     * Returns the i-th argument.
-     * 
-     * @param index the index of the argument to return
-     * @param args the arguments
-     * @param dflt the default value if accessing the argument fails
-     * @return the argument or {@code dflt}
-     */
-    public static Object getArg(int index, Object[] args, Object dflt) {
-        return args == null || index < 0  || index >= args.length ? dflt : args[index];
-    }
-
-    /**
-     * Returns the i-th argument as String.
-     * 
-     * @param index the index of the argument to return
-     * @param args the arguments
-     * @param dflt the default value if accessing the argument fails
-     * @return the argument as String or {@code dflt}
-     */
-    public static String getStringArg(int index, Object[] args, String dflt) {
-        String result = dflt;
-        Object tmp = getArg(index, args, dflt);
-        if (tmp instanceof String) {
-            result = (String) tmp;
-        } else if (null != tmp) {
-            result = tmp.toString();
         }
         return result;
     }

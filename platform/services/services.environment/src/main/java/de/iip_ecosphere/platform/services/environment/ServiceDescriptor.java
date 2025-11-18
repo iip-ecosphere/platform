@@ -14,9 +14,13 @@ package de.iip_ecosphere.platform.services.environment;
 
 import java.io.InputStream;
 
+import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
+
 /**
- * A service creation descriptor, in particular for plugins. If you describe a generic service, implement 
- * {@link #createService(YamlService, Object...)} and if you describe a specific service implement 
+ * A service creation descriptor, in particular for plugins. If you describe a generic MIMO service, implement 
+ * {@link #createService(YamlService, Object...)}, for a generic SISO service {@link #createService(TypeTranslator, 
+ * TypeTranslator, ReceptionCallback, YamlService, Object...)} and if you describe a specific service implement 
  * {@link #createService(String, InputStream)} as well as the fallbacks {@link #createService(String)} and 
  * {@link #createService()}.
  * 
@@ -34,6 +38,21 @@ public interface ServiceDescriptor <S extends Service> {
      */
     public S createService(YamlService yaml, Object... args);
 
+    /**
+     * Creates a generic service (still to be wrapped) from type translators, callback and YAML service description.
+     * 
+     * @param <I> input type
+     * @param <O> output type
+     * @param inTrans the input translator
+     * @param outTrans the output translator
+     * @param callback called when a processed item is received from the service
+     * @param yaml the YAML service description
+     * @param args generic arguments to be passed to and interpreted by the service
+     * @return the service instance, may be <b>null</b> if creation/casting is not possible
+     */
+    public <I, O> S createService(TypeTranslator<I, String> inTrans, TypeTranslator<String, O> outTrans, 
+        ReceptionCallback<O> callback, YamlService yaml, Object... args);
+    
     /**
      * Creates a specific service from a service id and a YAML artifact.
      * 
