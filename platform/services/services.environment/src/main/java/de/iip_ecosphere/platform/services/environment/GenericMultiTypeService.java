@@ -52,6 +52,24 @@ public interface GenericMultiTypeService extends Service {
         TypeTranslator<String, O> outTrans);
 
     /**
+     * Explicitly registers the relation between two type names.
+     *  
+     * @param inTypeName symbolic name of an input type, e.g. from configuration model
+     * @param outTypeName symbolic name of an output type, e.g. from configuration model
+     * @see #registerInOutRelation(String, String)
+     */
+    public void registerInOutRelation(String inTypeName, String outTypeName);
+
+    /**
+     * Returns a registered output type name for a given input type name.
+     * 
+     * @param inTypeName the symbolic input type name
+     * @return the related symbolic output type name, may be <b>null</b> if there is none
+     * @see #registerInOutRelation(String, String)
+     */
+    public String getOutTypeName(String inTypeName);
+
+    /**
      * Attaches an asynchronous result data ingestor.
      * 
      * @param <O> the output data type

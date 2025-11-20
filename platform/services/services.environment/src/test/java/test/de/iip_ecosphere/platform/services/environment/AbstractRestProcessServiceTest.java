@@ -85,7 +85,7 @@ public class AbstractRestProcessServiceTest {
         }
 
         @Override
-        protected String getApiPath() {
+        protected String getApiPath(String inTypeName) {
             return "http://localhost:" + port + PATH;
         }
 

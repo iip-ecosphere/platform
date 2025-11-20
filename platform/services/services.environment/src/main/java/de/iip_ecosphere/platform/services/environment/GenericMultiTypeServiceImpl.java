@@ -29,6 +29,7 @@ public class GenericMultiTypeServiceImpl {
 
     private Map<String, OutTypeInfo<?>> outTypeInfos = new HashMap<>();
     private Map<String, InTypeInfo<?>> inTypeInfos = new HashMap<>();
+    private Map<String, String> inOutTypeRelations = new HashMap<>();
 
     /**
      * Represents an input or output type.
@@ -229,6 +230,28 @@ public class GenericMultiTypeServiceImpl {
     public <I> void registerInputTypeTranslator(Class<I> inCls, String inTypeName, TypeTranslator<I, String> inTrans) {
         InTypeInfo<I> info = obtainInTypeInfo(inCls, inTypeName);
         info.inTranslator = inTrans;
+    }
+    
+    /**
+     * Explicitly registers the relation between two type names.
+     *  
+     * @param inTypeName symbolic name of an input type, e.g. from configuration model
+     * @param outTypeName symbolic name of an output type, e.g. from configuration model
+     * @see #getOutTypeName(String)
+     */
+    public void registerInOutRelation(String inTypeName, String outTypeName) {
+        inOutTypeRelations.put(inTypeName, outTypeName);
+    }
+
+    /**
+     * Returns a registered output type name for a given input type name.
+     * 
+     * @param inTypeName the symbolic input type name
+     * @return the related symbolic output type name, may be <b>null</b> if there is none
+     * @see #registerInOutRelation(String, String)
+     */
+    public String getOutTypeName(String inTypeName) {
+        return inOutTypeRelations.get(inTypeName);
     }
 
     /**

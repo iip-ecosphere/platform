@@ -32,6 +32,7 @@ import de.iip_ecosphere.platform.support.net.ManagedServerAddress;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.support.plugins.Plugin;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
+import de.iip_ecosphere.platform.support.plugins.PluginSetup;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.resources.FolderResourceResolver;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
@@ -52,7 +53,7 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
  */
 public abstract class AbstractService implements Service {
 
-    private static ClassLoader loader = AbstractService.class.getClassLoader();
+    private static ClassLoader loader = PluginSetup.getClassLoader();
     private String id;
     private String name;
     private Version version;
@@ -160,7 +161,7 @@ public abstract class AbstractService implements Service {
      * 
      * @param <S> the service type (parent interface of <code>className</code>)
      * @param className the name of the service class (must implement {@link Service} and provide a no-argument 
-     *     constructor)
+     *     constructor) or the plugin id
      * @param cls the class to cast to
      * @return the service instance (<b>null</b> if the service cannot be found/initialized)
      */
@@ -173,7 +174,7 @@ public abstract class AbstractService implements Service {
      * 
      * @param <S> the service type (parent interface of <code>className</code>)
      * @param className the name of the service class (must implement {@link Service} and provide a no-argument 
-     *     constructor)
+     *     constructor) or the plugin id
      * @param cls the class to cast to
      * @param serviceId the id of the service as given in {@code deploymentDescFile} (may be <b>null</b>, then the 
      *     default constructor is invoked)
@@ -205,7 +206,7 @@ public abstract class AbstractService implements Service {
      * @param <S> the service type (parent interface of <code>className</code>)
      * @param loader the class loader to load the class with
      * @param className the name of the service class (must implement {@link Service} and provide a no-argument 
-     *     constructor)
+     *     constructor) or the plugin id
      * @param cls the class to cast to
      * @param serviceId the id of the service as given in {@code deploymentDescFile} (may be <b>null</b>, then the 
      *     default constructor is invoked)
@@ -353,9 +354,27 @@ public abstract class AbstractService implements Service {
      * or the extended constructor with second parameter {@code String... args}.
      * 
      * @param <S> the service type
+     * @param className the name of the service class (must implement {@link Service} and provide a no-argument 
+     *     constructor) or the plugin id
+     * @param cls the class to cast to
+     * @param yaml the service description
+     * @param args the optional service creation arguments
+     * @return a new service instance or <b>null</b> if the service cannot be created
+     */
+    public static <S extends Service> S createGenericMultiInstance(String className, Class<S> cls, 
+        YamlService yaml, Object... args) {
+        return createGenericMultiInstance(loader, className, cls, yaml, args);
+    }
+
+    /**
+     * Creates a service instance from a plugin via the 
+     * {@link AbstractDelegatingMultiService#AbstractDelegatingMultiService(YamlService)} 
+     * or the extended constructor with second parameter {@code String... args}.
+     * 
+     * @param <S> the service type
      * @param loader the class loader to load the class with
      * @param className the name of the service class (must implement {@link Service} and provide a no-argument 
-     *     constructor)
+     *     constructor) or the plugin id
      * @param cls the class to cast to
      * @param yaml the service description
      * @param args the optional service creation arguments
@@ -436,9 +455,33 @@ public abstract class AbstractService implements Service {
      * @param <S> the service type
      * @param <I> input type
      * @param <O> output type
+     * @param className the name of the service class (must implement {@link Service} and provide a no-argument 
+     *     constructor) or the plugin id
+     * @param cls the class to cast to
+     * @param inTrans the input translator
+     * @param outTrans the output translator
+     * @param callback called when a processed item is received from the service
+     * @param yaml the service description
+     * @param args the optional service creation arguments
+     * @return a new service instance or <b>null</b> if the service cannot be created
+     */
+    public static <S extends Service, I, O> S createGenericInstance(String className, Class<S> cls,
+        TypeTranslator<I, String> inTrans, TypeTranslator<String, O> outTrans, ReceptionCallback<O> callback, 
+        YamlService yaml, Object... args) {
+        return createGenericInstance(loader, className, cls, inTrans, outTrans, callback, yaml, args);
+    }
+
+    /**
+     * Creates a service instance from a plugin via the 
+     * {@link AbstractDelegatingMultiService#AbstractDelegatingMultiService(YamlService)} 
+     * or the extended constructor with second parameter {@code String... args}.
+     * 
+     * @param <S> the service type
+     * @param <I> input type
+     * @param <O> output type
      * @param loader the class loader to load the class with
      * @param className the name of the service class (must implement {@link Service} and provide a no-argument 
-     *     constructor)
+     *     constructor) or the plugin id
      * @param cls the class to cast to
      * @param inTrans the input translator
      * @param outTrans the output translator

@@ -58,7 +58,6 @@ public class AbstractServicePluginDescriptorTest {
     /**
      * A service plugin descriptor for testing.
      * 
-     * @param <S> the service type
      * @author Holger Eichelberger, SSE
      */
     private static class Desc1 extends AbstractServicePluginDescriptor<Service> {
@@ -101,7 +100,6 @@ public class AbstractServicePluginDescriptorTest {
     /**
      * A specific service plugin descriptor for testing.
      * 
-     * @param <S> the service type
      * @author Holger Eichelberger, SSE
      */
     private static class Desc2 extends AbstractSpecificServicePluginDescriptor<Service> {
@@ -133,7 +131,6 @@ public class AbstractServicePluginDescriptorTest {
     /**
      * A generic SISO service plugin descriptor for testing.
      * 
-     * @param <S> the service type
      * @author Holger Eichelberger, SSE
      */
     private static class Desc3 extends AbstractGenericServicePluginDescriptor<Service> {
@@ -156,7 +153,6 @@ public class AbstractServicePluginDescriptorTest {
     /**
      * A generic MIMO service plugin descriptor for testing.
      * 
-     * @param <S> the service type
      * @author Holger Eichelberger, SSE
      */
     private static class Desc4 extends AbstractGenericMultiServicePluginDescriptor<Service> {
@@ -202,6 +198,5 @@ public class AbstractServicePluginDescriptorTest {
         Assert.assertNull(d4.createService("", null));
         Assert.assertNull(d4.createService((TypeTranslator<Object, String>) null, null, null, (YamlService) null));
     }
-    
 
 }

@@ -80,10 +80,20 @@ public abstract class AbstractDelegatingMultiService<S extends Service> extends 
         TypeTranslator<String, O> outTrans) {
         impl.registerOutputTypeTranslator(outCls, outTypeName, outTrans);
     }
-
+    
     @Override
     public <O> void attachIngestor(Class<O> outCls, String outTypeName, DataIngestor<O> ingestor) {
         impl.attachIngestor(outCls, outTypeName, ingestor);
+    }
+
+    @Override
+    public void registerInOutRelation(String inTypeName, String outTypeName) {
+        impl.registerInOutRelation(inTypeName, outTypeName);
+    }
+
+    @Override
+    public String getOutTypeName(String inTypeName) {
+        return impl.getOutTypeName(inTypeName);
     }
 
     @SuppressWarnings("unchecked")

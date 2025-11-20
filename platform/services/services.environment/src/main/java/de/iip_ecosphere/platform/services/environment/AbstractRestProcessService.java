@@ -62,9 +62,11 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
     /**
      * Returns the HTTP/HTTPS path to the REST API.
      * 
+     * @param inTypeName the type name of the input data being processed, may be <b>null</b> or empty to request a 
+     *     default API
      * @return the path
      */
-    protected abstract String getApiPath();
+    protected abstract String getApiPath(String inTypeName);
     
     /**
      * Returns the connection instance.
@@ -90,7 +92,7 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
      */
     protected HttpURLConnection getNewConnectionInstance() throws IOException {
         try {
-            URL url = NetUtils.createURL(getApiPath());
+            URL url = NetUtils.createURL(getApiPath(null));
             connection = (HttpURLConnection) url.openConnection();
             connection.setDoOutput(true);
             connection.setRequestMethod("POST");
@@ -122,7 +124,7 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
         try {
             getNewConnectionInstance();
         } catch (IOException con) {
-            LoggerFactory.getLogger(AbstractRestProcessService.class).warn(con.getMessage() + " " + getApiPath());
+            LoggerFactory.getLogger(AbstractRestProcessService.class).warn(con.getMessage() + " " + getApiPath(null));
             if (changeState) {
                 try {
                     setState(ServiceState.FAILED);
@@ -169,7 +171,7 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
                 try {
                     String bearer = getBearerToken();
                     String input = toSendString(data, inTypeName);
-                    HttpPost post = Http.getInstance().createPost(getApiPath())
+                    HttpPost post = Http.getInstance().createPost(getApiPath(inTypeName))
                         .setEntity(input)
                         .setHeader("Accept", "application/json")
                         .setHeader("Content-type", "application/json")
@@ -177,7 +179,7 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
                     if (client != null) {
                         HttpResponse response = client.execute(post);
                         String output = response.getEntityAsString();
-                        handleReception(output);
+                        handleReception(output, inTypeName);
                     } else {
                         LoggerFactory.getLogger(getClass()).info("Connection not yet open. Cannot process data.");
                     }
@@ -206,8 +208,9 @@ public abstract class AbstractRestProcessService<I, O> extends AbstractProcessSe
      * {@link #getOutputTranslator()} and {@link #notifyCallbacks(Object)}.
      * 
      * @param data the information received from the underlying REST service
+     * @param inTypeName the original type name this reception has been caused by
      */
-    protected void handleReception(String data) {
+    protected void handleReception(String data, String inTypeName) {
         String result = adjustRestResponse(data);
         try {
             notifyCallbacks(getOutputTranslator().to(result));

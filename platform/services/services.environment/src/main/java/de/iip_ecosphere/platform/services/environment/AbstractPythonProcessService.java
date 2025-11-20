@@ -485,6 +485,16 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
     public InTypeInfo<?> getInTypeInfo(String inTypeName) {
         return impl.getInTypeInfo(inTypeName);
     }
+    
+    @Override
+    public void registerInOutRelation(String inTypeName, String outTypeName) {
+        impl.registerInOutRelation(inTypeName, outTypeName);
+    }
+
+    @Override
+    public String getOutTypeName(String inTypeName) {
+        return impl.getOutTypeName(inTypeName);
+    }
 
     /**
      * Returns the output type information object for the given symbolic type name.
