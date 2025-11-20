@@ -23,14 +23,17 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.services.environment.YamlService;
+import de.iip_ecosphere.platform.support.IOUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.OsUtils;
+import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.services.environment.AbstractRestProcessService;
 import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.YamlProcess;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.yaml.Yaml;
 
 /**
@@ -52,6 +55,7 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
     private File home;
     private int port;
     private String host;
+    private Map<String, String> typeMapping;
 
     /**
      * Creates an instance of the service with the required type translators to/from JSON. Data file is 
@@ -97,6 +101,23 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
         super(inTrans, outTrans, callback, yaml);
         this.dataSpec = dataSpec;
         setNetworkDefaults();
+        
+        StringBuilder name = new StringBuilder(yaml.getName());
+        for (int i = name.length() - 1; i >= 0; i--) {
+            if (!Character.isJavaIdentifierPart(name.charAt(i))) {
+                name.deleteCharAt(i);
+            }
+        }
+        String resName = "kodexMapping_" + name + ".json";
+        try {
+            InputStream in =  ResourceLoader.getResourceAsStream(resName);
+            if (in != null) {
+                typeMapping = Json.createInstance().mapFromJson(IOUtils.toString(in), String.class, String.class);
+            }
+        } catch (IOException e) {
+            LoggerFactory.getLogger(this).error("Cannot read {}: {}. Falling back to type names", resName, 
+                e.getMessage());
+        }
     }
     
     /**
@@ -146,8 +167,24 @@ public class KodexRestService<I, O> extends AbstractRestProcessService<I, O>  {
     }
     
     @Override
-    protected String getApiPath() {
-        return "http://" + host + ":" + port + "/v1/configs/abcdef/transform";
+    protected String getApiPath(String inTypeName) {
+        if (null != typeMapping) {
+            String tmp = typeMapping.get(inTypeName);
+            if (null != tmp) {
+                inTypeName = tmp;
+            }
+        }
+        return createApiPath(inTypeName); 
+    }
+    
+    /**
+     * Creates a KODEX API path for a given {@code streamId}.
+     * 
+     * @param streamId the stream id to distinguish different input types
+     * @return the API path
+     */
+    protected String createApiPath(String streamId) {
+        return "http://" + host + ":" + port + "/v1/configs/" + streamId + "/transform"; 
     }
     
     @Override

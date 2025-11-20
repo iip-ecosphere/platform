@@ -48,12 +48,7 @@ public class MultiKodexRestService extends AbstractDelegatingMultiService<KodexR
         }
         
         @Override
-        protected String adjustRestQuery(String input, String inTypeName) {
-            return "{\"" + inTypeName + "\":[" + input + "]}";
-        }
-        
-        @Override
-        protected void handleReception(String data) {
+        protected void handleReception(String data, String inTypeName) {
             // simple approach for now, generically parsing to JSON would be better
             data = data.replace("{\"data\":{\"errors\":[],", "");
             data = data.replace(",\"messages\":[],\"warnings\":[]}}", "");
@@ -61,16 +56,21 @@ public class MultiKodexRestService extends AbstractDelegatingMultiService<KodexR
                 data = data.substring(1, data.length() - 1);
                 int pos = data.indexOf("\"");
                 if (pos > 0) {
-                    String typeName = data.substring(0, pos);
                     data = data.substring(pos + 1);
                     if (data.startsWith(":[")) {
                         data = data.substring(2);
+                        String typeName = inTypeName;
+                        String tmp = getImpl().getOutTypeName(inTypeName);
+                        if (null != tmp) {
+                            typeName = tmp;
+                        }
                         OutTypeInfo<?> info = getImpl().getOutTypeInfo(typeName);
                         if (null != info) {
                             handleResult(info.getType(), data, typeName);
                         } else {
                             LoggerFactory.getLogger(getClass())
-                                .error("No output type translator registered for: {}", typeName);
+                                .error("No corresponding output type translator registered for input type {}/{}", 
+                                    inTypeName, typeName);
                         }
                     }
                 }

@@ -49,7 +49,7 @@ public class MultiRtsaRestService extends AbstractDelegatingMultiService<RtsaRes
         }
         
         @Override
-        protected void handleReception(String data) {
+        protected void handleReception(String data, String inTypeName) {
             if (data.startsWith("{\"") && data.endsWith("]}")) {
                 data = data.substring(2, data.length() - 2);
                 int pos = data.indexOf("\"");

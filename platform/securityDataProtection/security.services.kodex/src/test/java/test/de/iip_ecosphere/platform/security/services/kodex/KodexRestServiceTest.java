@@ -229,7 +229,15 @@ public class KodexRestServiceTest {
         new KodexRestService<>(new InDataJsonTypeTranslator(), new OutDataJsonTypeTranslator(), rcp, sDesc);
         // test implementation
         KodexRestService<InData, OutData> service = new KodexRestService<>(
-            new InDataJsonTypeTranslator(), new OutDataJsonTypeTranslator(), rcp, sDesc, "example-data.yml");
+            new InDataJsonTypeTranslator(), new OutDataJsonTypeTranslator(), rcp, sDesc, "example-data.yml") {
+            
+            @Override
+            protected String getApiPath(String inTypeName) {
+                 // default stream id from tests, sufficient for SISO connectors in test
+                return createApiPath("abcdef"); 
+            }
+            
+        };
         service.setState(ServiceState.STARTING);
         setCount(0);
         setStartTime(System.currentTimeMillis());
