@@ -14,7 +14,6 @@ package de.iip_ecosphere.platform.connectors.mqttv3;
 
 import java.io.IOException;
 import java.util.function.Supplier;
-import java.util.logging.Level;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
