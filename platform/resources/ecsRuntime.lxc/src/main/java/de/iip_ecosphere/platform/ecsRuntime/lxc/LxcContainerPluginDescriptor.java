@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.ecsRuntime.lxc;
 
+import java.util.List;
+
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactoryDescriptor;
 import de.iip_ecosphere.platform.support.plugins.SingletonPluginDescriptor;
 
@@ -26,8 +28,8 @@ public class LxcContainerPluginDescriptor extends SingletonPluginDescriptor<EcsF
      * Creates the instance via JSL.
      */
     public LxcContainerPluginDescriptor() {
-        super(EcsFactoryDescriptor.PLUGIN_ID, null, EcsFactoryDescriptor.class, 
-            p -> new LxcContainerManager.FactoryDescriptor());
+        super(EcsFactoryDescriptor.PLUGIN_ID, List.of(EcsFactoryDescriptor.PLUGIN_ID_PREFIX + "LXC"), 
+            EcsFactoryDescriptor.class, p -> new LxcContainerManager.FactoryDescriptor());
     }
 
 }

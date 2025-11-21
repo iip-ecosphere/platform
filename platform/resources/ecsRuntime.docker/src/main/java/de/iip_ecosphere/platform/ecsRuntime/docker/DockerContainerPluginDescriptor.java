@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.ecsRuntime.docker;
 
+import java.util.List;
+
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactoryDescriptor;
 import de.iip_ecosphere.platform.support.plugins.SingletonPluginDescriptor;
 
@@ -26,8 +28,8 @@ public class DockerContainerPluginDescriptor extends SingletonPluginDescriptor<E
      * Creates the instance via JSL.
      */
     public DockerContainerPluginDescriptor() {
-        super(EcsFactoryDescriptor.PLUGIN_ID, null, EcsFactoryDescriptor.class, 
-            p -> new DockerContainerManager.FactoryDescriptor());
+        super(EcsFactoryDescriptor.PLUGIN_ID, List.of(EcsFactoryDescriptor.PLUGIN_ID_PREFIX + "docker"), 
+            EcsFactoryDescriptor.class, p -> new DockerContainerManager.FactoryDescriptor());
     }
 
 }

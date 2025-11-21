@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.ecsRuntime.kubernetes;
 
+import java.util.List;
+
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactoryDescriptor;
 import de.iip_ecosphere.platform.support.plugins.SingletonPluginDescriptor;
 
@@ -26,8 +28,8 @@ public class KubernetesContainerPluginDescriptor extends SingletonPluginDescript
      * Creates the instance via JSL.
      */
     public KubernetesContainerPluginDescriptor() {
-        super(EcsFactoryDescriptor.PLUGIN_ID, null, EcsFactoryDescriptor.class, 
-            p -> new KubernetesContainerManager.FactoryDescriptor());
+        super(EcsFactoryDescriptor.PLUGIN_ID, List.of(EcsFactoryDescriptor.PLUGIN_ID_PREFIX + "K8S"), 
+            EcsFactoryDescriptor.class, p -> new KubernetesContainerManager.FactoryDescriptor());
     }
 
 }
