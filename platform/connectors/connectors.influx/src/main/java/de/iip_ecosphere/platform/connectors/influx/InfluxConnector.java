@@ -98,8 +98,13 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
         }
         
         @Override
+        protected List<String> additionalIds() {
+            return List.of(PLUGIN_ID_PREFIX + "influx-v2");
+        }
+        
+        @Override
         protected String initId(String id) {
-            return PLUGIN_ID_PREFIX + "influx-v2";
+            return PLUGIN_ID_PREFIX + "influx";
         }        
 
     }

@@ -14,7 +14,6 @@ package de.oktoflow.platform.connectors.serial;
 
 import java.io.IOException;
 import java.util.function.Supplier;
-import java.util.logging.Level;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortDataListenerWithExceptions;

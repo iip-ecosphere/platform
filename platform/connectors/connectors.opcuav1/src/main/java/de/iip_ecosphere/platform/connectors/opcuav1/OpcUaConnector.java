@@ -196,7 +196,12 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
 
         @Override
         protected String initId(String id) {
-            return PLUGIN_ID_PREFIX + "opcua-v1";
+            return PLUGIN_ID_PREFIX + "opcua";
+        }
+        
+        @Override
+        protected List<String> additionalIds() {
+            return List.of(PLUGIN_ID_PREFIX + "opcua-v1");
         }
 
         @SuppressWarnings("unchecked")

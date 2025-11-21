@@ -150,7 +150,7 @@ public class AdsConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         
         @Override
         protected String initId(String id) {
-            return PLUGIN_ID_PREFIX + "influx";
+            return PLUGIN_ID_PREFIX + "ADS";
         }        
         
         @SuppressWarnings("unchecked")
