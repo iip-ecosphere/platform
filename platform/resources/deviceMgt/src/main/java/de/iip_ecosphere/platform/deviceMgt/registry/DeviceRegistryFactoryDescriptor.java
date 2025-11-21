@@ -21,6 +21,7 @@ package de.iip_ecosphere.platform.deviceMgt.registry;
 public interface DeviceRegistryFactoryDescriptor {
     
     public static final String PLUGIN_ID = "deviceMgt";
+    public static final String PLUGIN_ID_PREFIX = PLUGIN_ID + "-";
 
     /**
      * Create a new DeviceRegistry instance.

@@ -20,6 +20,7 @@ package de.iip_ecosphere.platform.deviceMgt.storage;
 public interface StorageFactoryDescriptor {
 
     public static final String PLUGIN_ID = "deviceMgtStorage";
+    public static final String PLUGIN_ID_PREFIX = PLUGIN_ID + "-";
     
     /**
      * Create a package-based storage.
