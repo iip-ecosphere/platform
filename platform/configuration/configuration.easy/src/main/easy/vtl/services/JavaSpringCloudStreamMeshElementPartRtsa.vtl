@@ -12,14 +12,15 @@ import JavaSpringCloudStreamMeshElementBase;
 template JavaSpringCloudStreamMeshElementPartRtsa(Configuration config, FileArtifact target, MeshElement elt, String pkg, 
     Application app, Boolean sharedInterfaces, String familyInterface, ServiceBase familyMember, setOf(MeshElement) nodes) {
     
-    mapOf(String, String) inFieldNames = {};
+    mapOf(String, String) inFieldNames = {};    // TODO unify with kodex in base template
     mapOf(String, String) outFieldNames = {};
     
     def initialService(MeshElement elt, RtsaService service, setOf(String) serviceVars, JavaCodeMethod m) {
-        String clsName = "RtsaRestService";
-        getYamlServiceFragment("serviceData", clsName, "${service.id}", m);
+        getYamlServiceFragment("serviceData", "GenericMultiTypeService", "${service.id}", m);
         serviceVars.add("service");
-        m.addAssignment("service", new JavaCodeConstructorCall("de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.MultiRtsaRestService").addArgument("serviceData"));
+        String serviceType = getServiceType(elt, service);
+        m.addAssignment("service", new JavaCodeMethodCall("de.iip_ecosphere.platform.services.environment.AbstractService.createGenericMultiInstance", JavaCodeImportScope.CLASS)
+            .stringArg("de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.MultiRtsaRestService").classArg("de.iip_ecosphere.platform.services.environment.GenericMultiTypeService").arg("serviceData"));
         for (IOType in: service.input) {
             String inType = toTypeName(in.type);
             String field = getRtsaFieldName(in);
@@ -49,7 +50,7 @@ template JavaSpringCloudStreamMeshElementPartRtsa(Configuration config, FileArti
     }
     
     def generateServiceAttribute(MeshElement elt, RtsaService service, JavaCodeClass c) {
-        c.addAttribute("de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.MultiRtsaRestService", "service");
+        c.addAttribute("de.iip_ecosphere.platform.services.environment.GenericMultiTypeService", "service");
     }
 
     def genIngestor(RtsaService service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder, JavaCodeBlockInterface block) {
@@ -62,7 +63,7 @@ template JavaSpringCloudStreamMeshElementPartRtsa(Configuration config, FileArti
     }
     
     def getServiceType(MeshElement elt, RtsaService service) {
-        "de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.MultiRtsaRestService";
+        "de.iip_ecosphere.platform.services.environment.GenericMultiTypeService";
     }
 
     def isBackward(sequenceOf(IOType) types, String type) {

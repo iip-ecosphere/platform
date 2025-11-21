@@ -107,18 +107,34 @@ template KodexActions(Configuration config, FileArtifact target, MeshElement elt
             }
         }
     }
+
+    def genActions(MeshElement elt) {
+        Service service = elt.impl;
+        for (IOType in: service.input) {
+            String fieldName = in.type.name;
+            "- name: protect ${fieldName} data
+              type: form
+              config: *DataForm${fieldName}"
+        }
+    }
+    
+    def genForms(MeshElement elt) {
+        Service service = elt.impl;
+        for (IOType in: service.input) {
+            String fieldName = in.type.name;
+            "DataForm: &DataForm${fieldName}
+              fields: 
+                ${generateFields(elt, elt.impl)}"
+        }
+    }
     
     // --------------------- main ---------------------------
 
     def main(Configuration config, FileArtifact target, MeshElement elt) {
         'forms:
-           DataForm: &DataForm
-             fields:
-               ${generateFields(elt, elt.impl)}
+          ${genForms(elt)}
         actions:
-           - name: protect ${elt.name} data
-             type: form
-             config: *DataForm'
+          ${genActions(elt)}'
     }
     
 }

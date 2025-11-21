@@ -9,13 +9,23 @@ vilScript IIPEcospherePartKodex (Project source, Configuration config, Project t
 
     generateServiceResources(MeshElement no, KodexService service, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
         IIPEcosphere cfg = config;
+        String clsName = asTypeName(no.name);
         String serviceFolderName = toFolderName(no.impl.id);
         String kodexServiceFolderName = "kodex_" + serviceFolderName;
+        Path resourcesPath = "${appRoot}/src/main/resources";
         Path path = "${appRoot}/${serviceArtifactsRel}";
         path.mkdir();
+        Integer streamId = 11259375; // Kodex wants some "abcdef"-hex-based ids
+        mapOf(String, String) typeMapping = {};
+        for (IOType in: service.input) {
+            String fieldName = in.type.name;
+            typeMapping.add(fieldName, toHexString(streamId));
+            streamId = streamId + 1;
+        }
+        vilTemplateProcessor("KodexMapping", config, "${resourcesPath}/kodexMapping_${clsName}.json", mapping=typeMapping);
         vilTemplateProcessor("KodexActions", config, "${path}/actions.yml", elt=no);
         vilTemplateProcessor("KodexApi", config, "${path}/api.yml", elt=no);
-        vilTemplateProcessor("KodexData", config, "${path}/data.yml", elt=no);
+        vilTemplateProcessor("KodexData", config, "${path}/data.yml", elt=no, mapping=typeMapping);
         vilTemplateProcessor("KodexArtifactsAssembly", config, "${appRoot}/${assemblyRel}/${kodexServiceFolderName}.xml", id=kodexServiceFolderName, dir="${path}");
         addDependencyArtifact(bins, "de.iip-ecosphere.platform:security.services.kodex:" + cfg.iipVer, "bin", "${mvnProjectBuildDir}/classes", "kodex.zip", "zip", "copy");
         addAssemblyInfo(assemblies, "${kodexServiceFolderName}", "${assemblyRel}/${kodexServiceFolderName}.xml", "prepare-package", "${mvnProjectBuildDir}/classes", finalName=kodexServiceFolderName);

@@ -2,13 +2,31 @@ import Basics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template KodexData(Configuration config, FileArtifact target, MeshElement elt) {
+template KodexData(Configuration config, FileArtifact target, MeshElement elt, mapOf(String, String) mapping) {
 
-    // currently uncustomized as in Kodex test
+    def genStreams(MeshElement elt) {
+        Service service = elt.impl;
+        for (IOType in: service.input) {
+            String fieldName = in.type.name;
+            String streamId = mapping.get(fieldName, fieldName);
+            '- name: default
+              id: ${streamId}
+              sources:
+                - source: stdin
+              configs:
+                - name: default
+                  id: ${streamId}
+                  actions:
+                    - name: protect ${fieldName} data
+                  destinations:
+                    - name: stdout
+                      status: active'
+        }
+    }
 
     // --------------------- main ---------------------------
 
-    def main(Configuration config, FileArtifact target, MeshElement elt) {
+    def main(Configuration config, FileArtifact target, MeshElement elt, mapOf(String, String) mapping) {
         '# actions and forms for ${elt.name}
         \\$include:
           - actions.yml
@@ -26,18 +44,7 @@ template KodexData(Configuration config, FileArtifact target, MeshElement elt) {
             type: stdout
             config: {}
         streams:
-          - name: default
-            id: abcdef
-            sources:
-              - source: stdin
-            configs:
-              - name: default
-                id: abcdef
-                actions:
-                  - name: protect ${elt.name} data
-                destinations:
-                  - name: stdout
-                    status: active'
+          ${genStreams(elt)}'
     }
     
 }

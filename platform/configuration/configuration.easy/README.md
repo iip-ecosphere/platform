@@ -108,4 +108,4 @@ Some tests are executed for code generation in this project, the remainder is ex
 
 Some tests are executed in own JVMs to prevent conflicting dependencies with Maven. To update the persisted dependency list, call `mvn prepare-package`. 
 
-To build this component without tests, e.g., to just package a changed model for local tests, run `mvn install -DdisableJavaTests=true`. 
+To build this component without tests, e.g., to just package a changed model for local tests, run `mvn install -DdisableJavaTests=true`. However, as this model is only one of multiple potential models, subsequently the build process of `configuration` must be executed to collect all (alternative) models and to effectively deploy them.

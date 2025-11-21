@@ -1,0 +1,13 @@
+import Basics;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template KodexMapping(Configuration config, JsonFileArtifact target, mapOf(String, String) mapping) {
+
+    // --------------------- main ---------------------------
+
+    def main(Configuration config, JsonFileArtifact target, mapOf(String, String) mapping) {
+        target.addValues(mapping);
+    }
+    
+}
