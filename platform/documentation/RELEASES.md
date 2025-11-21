@@ -5,7 +5,7 @@
 In progress:
 * [#164](https://github.com/iip-ecosphere/platform/issues/164): UI design revision
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
-* [#170](https://github.com/iip-ecosphere/platform/issues/170): Integrate BaSyx2
+* [#170](https://github.com/iip-ecosphere/platform/issues/170): Integrate plugins/BaSyx2
 * [#122](https://github.com/iip-ecosphere/platform/issues/122): Transparent encryption, RBAC on AAS (incl. UI authentication)
 * [#180](https://github.com/iip-ecosphere/platform/issues/180): Add application templates
 
@@ -28,6 +28,7 @@ Improvements:
 * [#178](https://github.com/iip-ecosphere/platform/issues/178): Python console output.
 * [#165](https://github.com/iip-ecosphere/platform/issues/170): Upgrade automated container building/Python
 * [#110](https://github.com/iip-ecosphere/platform/issues/110): UI startup/excution complains (disappeared)
+* [#160](https://github.com/iip-ecosphere/platform/issues/160): Generated multi-type integration for KODEX
 
 New features:
 * [#169](https://github.com/iip-ecosphere/platform/issues/169): File-based connector for CSV, JSON (ReGaP)
