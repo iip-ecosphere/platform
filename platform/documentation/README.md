@@ -6,7 +6,7 @@ This folder contains the documentation of the okotflow platform.
 * [Install information](INSTALL.md) for own installation, Docker containers and for playing with pre-packaged containers.
 * The oktoflow [FAQ](FAQ.md)
 * The oktoflow [HOW-TO](HOWTO.MD)
-* The oktoflow [formats dictionary](FORMATS.md)
+* The oktoflow [formats catalogue](FORMATS.md)
 * The oktoflow [plugins dictionary](PLUGINS.md)
 * The oktoflow [concepts documentation](concepts/concepts.MD)
 
@@ -34,7 +34,6 @@ This folder contains the documentation of the okotflow platform.
 * **Docker deployment**: Currently, basic installation/demonstration/development containers are built and deployed automatically using a github action script. The script can be triggered manually and will be triggered automatically when a new version of the platform is created. Two Docker containers (one including the platform servers and a setup for a resource on the same machine and one for the CLI) are built and deployed automatically with suffix ".latest" to DockerHub, similarly for a Linux development container including EASy-Producer. Docker containers of (intermediate) "milestone" builds shall be achieved on DockerHub with the respective date (see [readme](https://github.com/iip-ecosphere/platform/blob/main/platform/tools/Install/container/readme.txt) in the install package).
 
 ## Further documents 
-* [Catalogue of formats employed by the platform](../documentation/FORMATS.md).
 * [Listing of administrative actions](../documentation/ACTIONS.md).
 * [Guideline on how to create platform releases](../documentation/RELEASE.md)
 * [Guide for adding EASy-Plugin to Eclipse under Linux](../documentation/Guide_Adding_Eclipse-EASy-Plugin_on_Linux.pdf)
