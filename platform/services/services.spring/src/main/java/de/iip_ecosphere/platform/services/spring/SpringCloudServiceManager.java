@@ -113,7 +113,7 @@ public class SpringCloudServiceManager
          * Creates an instance. [JSL]
          */
         public SpringCloudServiceFactoryDescriptor() {
-            super("services-spring", null, ServiceFactoryDescriptor.class, null);
+            super("services", List.of("services-spring"), ServiceFactoryDescriptor.class, null);
             LifecycleHandler.consider(getClass().getClassLoader());
         }
 
