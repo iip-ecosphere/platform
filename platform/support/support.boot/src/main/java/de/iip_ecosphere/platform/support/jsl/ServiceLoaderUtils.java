@@ -20,6 +20,7 @@ import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.stream.Stream;
 
+import de.iip_ecosphere.platform.support.logging.LogLevel;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.plugins.PluginSetup;
 
@@ -93,8 +94,10 @@ public class ServiceLoaderUtils {
             try {
                 result.add(iterator.next());
             } catch (ServiceConfigurationError e) {
-                LoggerFactory.getLogger(ServiceLoaderUtils.class).error(
-                    "Service configuration error: {}", e.getMessage());
+                String msg = e.getMessage();
+                LoggerFactory.getLogger(ServiceLoaderUtils.class).log(
+                    msg.contains("Provider test.") ? LogLevel.DEBUG : LogLevel.ERROR,
+                    "Service configuration issue: {}", e.getMessage());
             }
         }
         return result.stream();
