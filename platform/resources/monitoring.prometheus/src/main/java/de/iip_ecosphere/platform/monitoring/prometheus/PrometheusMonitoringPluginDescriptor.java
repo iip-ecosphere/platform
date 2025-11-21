@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.monitoring.prometheus;
 
+import java.util.List;
+
 import de.iip_ecosphere.platform.monitoring.MonitoringDescriptor;
 import de.iip_ecosphere.platform.support.plugins.SingletonPluginDescriptor;
 
@@ -27,7 +29,8 @@ public class PrometheusMonitoringPluginDescriptor extends SingletonPluginDescrip
      * Creates the descriptor via JSL.
      */
     public PrometheusMonitoringPluginDescriptor() {
-        super("monitoring", null, MonitoringDescriptor.class, p -> new MonitoringDescriptor() { });
+        super("monitoring", List.of("monitoring-prometheus"), MonitoringDescriptor.class, 
+            p -> new MonitoringDescriptor() { });
     }
 
 }
