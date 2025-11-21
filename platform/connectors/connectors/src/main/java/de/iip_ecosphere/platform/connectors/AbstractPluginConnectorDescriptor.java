@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.connectors;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
@@ -19,7 +21,8 @@ import de.iip_ecosphere.platform.support.plugins.SingletonPluginDescriptor;
 
 /**
  * Basic connector descriptor implementation. Concrete implementations must redefine the plugin id. Delegates the 
- * connector creation to potentially adapted output and input types of a typical connector implementation.
+ * connector creation to potentially adapted output and input types of a typical connector implementation. By default,
+ * the additional/secondary plugin id is the qualified class name of {@link #getConnectorType()}.
  * 
  * @param <TO> adapted external output type, shall be taken from implementation
  * @param <TI> adapted external input type, shall be taken from implementation
@@ -44,6 +47,28 @@ public abstract class AbstractPluginConnectorDescriptor<TO, TI> extends Singleto
     
     @Override
     protected abstract String initId(String id);
+
+    @Override
+    protected List<String> initIds(List<String> ids) {
+        List<String> result;
+        List<String> add = additionalIds();
+        if (null != add && !add.isEmpty()) {
+            result = new ArrayList<String>(add);
+            result.add(getConnectorType().getName());
+        } else {
+            result = List.of(getConnectorType().getName());
+        }
+        return result;
+    }
+    
+    /**
+     * Additional ids besides the qualified name of {@link #getConnectorType()}.
+     * 
+     * @return the additional ids, may be <b>null</b> or empty for none
+     */
+    protected List<String> additionalIds() {
+        return null;
+    }
     
     @Override
     @SuppressWarnings("unchecked")
