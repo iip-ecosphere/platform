@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.deviceMgt.basicReg;
 
+import java.util.List;
+
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistry;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryFactoryDescriptor;
 import de.iip_ecosphere.platform.support.plugins.SingletonPluginDescriptor;
@@ -28,7 +30,7 @@ public class BasicRegistryDeviceRegistryFactoryDescriptor
      * Creates the instance via JSL.
      */
     public BasicRegistryDeviceRegistryFactoryDescriptor() {
-        super(PLUGIN_ID, null, DeviceRegistry.class, null);
+        super(PLUGIN_ID, List.of(PLUGIN_ID_PREFIX + "basic"), DeviceRegistry.class, null);
     }
     
     @Override

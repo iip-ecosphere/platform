@@ -4,6 +4,8 @@ import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistry;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryFactoryDescriptor;
 import de.iip_ecosphere.platform.support.plugins.SingletonPluginDescriptor;
 
+import java.util.List;
+
 import org.thingsboard.rest.client.RestClient;
 
 public class ThingsBoardDeviceRegistryFactoryDescriptor extends SingletonPluginDescriptor<DeviceRegistry>
@@ -17,7 +19,7 @@ public class ThingsBoardDeviceRegistryFactoryDescriptor extends SingletonPluginD
      * Creates the instance via JSL.
      */
     public ThingsBoardDeviceRegistryFactoryDescriptor() {
-        super(PLUGIN_ID, null, DeviceRegistry.class, null);
+        super(PLUGIN_ID, List.of(PLUGIN_ID_PREFIX + "thingsboard"), DeviceRegistry.class, null);
     }
     
     @Override

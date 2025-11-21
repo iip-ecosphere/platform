@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.deviceMgt.s3mock;
 
+import java.util.List;
+
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.AnonymousAWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -42,7 +44,7 @@ public class S3StorageFactoryDescriptor extends SingletonPluginDescriptor<Storag
      * Creates the instance via JSL.
      */
     public S3StorageFactoryDescriptor() {
-        super(PLUGIN_ID, null, StorageFactoryDescriptor.class, null);
+        super(PLUGIN_ID, List.of(PLUGIN_ID_PREFIX + "s3mock"), StorageFactoryDescriptor.class, null);
     }
     
     @Override

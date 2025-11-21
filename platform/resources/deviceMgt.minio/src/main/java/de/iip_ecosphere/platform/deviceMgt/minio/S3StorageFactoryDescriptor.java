@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.deviceMgt.minio;
 
+import java.util.List;
+
 import de.iip_ecosphere.platform.deviceMgt.DeviceMgtSetup;
 import de.iip_ecosphere.platform.deviceMgt.storage.PackageStorageSetup;
 import de.iip_ecosphere.platform.deviceMgt.storage.Storage;
@@ -37,7 +39,7 @@ public class S3StorageFactoryDescriptor extends SingletonPluginDescriptor<Storag
      * Creates the instance via JSL.
      */
     public S3StorageFactoryDescriptor() {
-        super(PLUGIN_ID, null, StorageFactoryDescriptor.class, null);
+        super(PLUGIN_ID, List.of(PLUGIN_ID_PREFIX + "minio"), StorageFactoryDescriptor.class, null);
     }
     
     @Override
