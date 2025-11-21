@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.configuration.easyProducer;
 
 import java.io.File;
+import java.util.List;
 import java.util.function.Consumer;
 
 import de.iip_ecosphere.platform.configuration.cfg.AasChanges;
@@ -33,7 +34,7 @@ public class EasyConfigurationFactoryDescriptor extends SingletonPluginDescripto
      * Creates the descriptor.
      */
     public EasyConfigurationFactoryDescriptor() {
-        super("configuration-easyProducer", null, ConfigurationFactoryDescriptor.class, null);
+        super("configuration", List.of("configuration-easyProducer"), ConfigurationFactoryDescriptor.class, null);
     }
 
     @Override

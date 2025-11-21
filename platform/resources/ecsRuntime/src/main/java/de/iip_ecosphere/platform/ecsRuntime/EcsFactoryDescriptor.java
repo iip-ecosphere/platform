@@ -20,6 +20,7 @@ package de.iip_ecosphere.platform.ecsRuntime;
 public interface EcsFactoryDescriptor {
     
     public static final String PLUGIN_ID = "container";
+    public static final String PLUGIN_ID_PREFIX = PLUGIN_ID + "-";
     
     /**
      * Creates the container manager instance.
