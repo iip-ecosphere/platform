@@ -6,8 +6,8 @@ This folder contains the documentation of the okotflow platform.
 * [Install information](INSTALL.md) for own installation, Docker containers and for playing with pre-packaged containers.
 * The oktoflow [FAQ](FAQ.md)
 * The oktoflow [HOW-TO](HOWTO.MD)
-* The oktoflow [formats dictionary](FORMATS.MD)
-* The oktoflow [plugins dictionary](PLUGINS.MD)
+* The oktoflow [formats dictionary](FORMATS.md)
+* The oktoflow [plugins dictionary](PLUGINS.md)
 * The oktoflow [concepts documentation](concepts/concepts.MD)
 
 ## Technical Guidelines
