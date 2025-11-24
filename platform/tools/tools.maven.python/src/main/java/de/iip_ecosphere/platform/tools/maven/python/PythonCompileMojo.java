@@ -99,10 +99,7 @@ public class PythonCompileMojo extends AbstractLoggingMojo {
                     String filteredOutput = "";
                     for (String line : outputs) {
                         boolean addLine = true;
-                        // Unused import are not supposed to fail the build
-                        // are there pyflake options to disable those warnings
-                        if (!line.contains("import") && !line.contains("redefinition") 
-                            && !line.contains("but never used")) {
+                        if (isError(line)) {
                             failure = true;
                             errorLine = line;
                         }
@@ -131,6 +128,24 @@ public class PythonCompileMojo extends AbstractLoggingMojo {
         } else {
             getLog().info("Skipping Python compiler execution");
         }
+    }
+
+    /**
+     * Returns whether the given line seems to indicate an error, not a warning.
+     * 
+     * @param line the output line
+     * @return {@code true} for error, {@code false} for not error/potential warning
+     */
+    private boolean isError(String line) {
+        // Unused import are not supposed to fail the build
+        // are there pyflake options to disable those warnings
+        boolean isError = true;
+        isError &= !line.contains("import");
+        isError &= !line.contains("redefinition");
+        isError &= !line.contains("but never used");
+        isError &= !line.contains("is unused"); // since Nov'25
+        isError &= !line.contains("is never assigned in scope"); // since Nov'25
+        return isError;
     }
     
     /**
