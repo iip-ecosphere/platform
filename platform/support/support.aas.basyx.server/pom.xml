@@ -100,9 +100,6 @@
                      <goals>
                          <goal>build-plugin-classpath</goal>
                      </goals>
-                     <configuration>
-                         <setupDescriptor>None</setupDescriptor> <!-- just an addon -->
-                     </configuration>
                  </execution>
                  <execution>
                      <id>assemble</id>

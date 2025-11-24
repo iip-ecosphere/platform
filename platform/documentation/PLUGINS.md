@@ -41,6 +41,7 @@ Although alternatively used by the platform core (`aas-default`), multiple AAS p
 | primary id | secondary Ids | Description | implementing Interface | Path |
 | --- |  --- | --- | --- | --- |
 | **aas-default** | aas-basyx-1.3 | AAS implementation via BaSyX 1.3 | `de.iip_ecosphere.platform.support.aas.AasFactory` | [support.aas.basyx](../support/support.aas.basyx) |
+| aas.basyx-server | aas.basyx-server-1.3 | Server dependencies for BaSyX 1.3 | `de.iip_ecosphere.platform.support.aas.AasServerRecipeDescriptor` | [support.aas.basyx.server](../support/support.aas.basyx.server) |
 | aas-basyx-1.0 | | AAS implementation via BaSyX 1.0 | `de.iip_ecosphere.platform.support.aas.AasFactory` | [support.aas.basyx1_0](../support/support.aas.basyx1_0) |
 | aas-basyx-1.5 | | AAS implementation via BaSyX 1.5 | `de.iip_ecosphere.platform.support.aas.AasFactory` | [support.aas.basyx1_5](../support/support.aas.basyx1_5) |
 | aas-basyx-2.0 | | AAS implementation via BaSyX 2.0 | `de.iip_ecosphere.platform.support.aas.AasFactory` | [support.aas.basyx2](../support/support.aas.basyx2) |

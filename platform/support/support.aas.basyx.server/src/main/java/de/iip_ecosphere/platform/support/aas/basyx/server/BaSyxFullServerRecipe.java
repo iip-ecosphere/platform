@@ -12,12 +12,15 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx.server;
 
+import java.util.List;
+
 import org.eclipse.basyx.components.aas.configuration.AASServerBackend;
 import org.eclipse.basyx.components.registry.configuration.RegistryBackend;
 
 import de.iip_ecosphere.platform.support.aas.AasServerRecipeDescriptor;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxServerRecipe;
+import de.iip_ecosphere.platform.support.plugins.SingletonPluginDescriptor;
 
 /**
  * Full BaSyx server recipe, hooked in via JSL.
@@ -31,7 +34,21 @@ public class BaSyxFullServerRecipe extends BaSyxServerRecipe {
      * 
      * @author Holger Eichelberger, SSE
      */
-    public static class BaSyxFullServerReceipeDescriptor implements AasServerRecipeDescriptor {
+    public static class BaSyxFullServerReceipeDescriptor extends SingletonPluginDescriptor<AasServerRecipeDescriptor> 
+        implements AasServerRecipeDescriptor {
+
+        /**
+         * Creates an instance via jsL.
+         */
+        public BaSyxFullServerReceipeDescriptor() {
+            super("aas.basyx-server", List.of("aas.basyx-server-1.3"), AasServerRecipeDescriptor.class, null);
+        }
+
+        @Override
+        protected PluginSupplier<AasServerRecipeDescriptor> initPluginSupplier(
+            PluginSupplier<AasServerRecipeDescriptor> pluginSupplier) {
+            return p -> this;
+        }
 
         @Override
         public ServerRecipe createInstance() {
