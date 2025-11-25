@@ -23,6 +23,7 @@ Connectors::Connector::encoding = When transferring text, which encoding shall b
 Connectors::Connector::mapping = Data field mapping to ease translation operations (currently unused).
 Connectors::Connector::class = Class implementing the connector (usually pre-defined by refining connector types).
 Connectors::Connector::artifact = Optional mvn coordinate of the artifact containing the connector implementation (usually pre-defined by refining connector types).
+Connectors::Connector::isPlugin = Whether the connector is realized as a plugin (default true).
 Connectors::Connector::inAdapterClass = Provided programmed input adapter class names to use (may be "*" to use generated transport serializer).
 Connectors::Connector::outAdapterClass = Provided programmed output class names to use (may be "*" to use generated transport serializer).
 Connectors::Connector::inInterface = Provided data input to be mapped into adapter, alternative to adapterClass.

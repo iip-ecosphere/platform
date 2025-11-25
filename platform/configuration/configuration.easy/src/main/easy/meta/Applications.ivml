@@ -185,7 +185,7 @@ project Applications {
    compound TraceToAasService refines CompleteService {
        ServiceKind kind = ServiceKind::SINK_SERVICE;
        OktoVersion ver = "0.1.0";
-       String artifact = ""; // ships with platform in service environment
+       String artifact = ""; // ships with platform in service environment, thus no plugin
        refTo(Application) application;
        TraceToAasOutTransport outTransport = null;
        NameplateInfo nameplateInfo = {

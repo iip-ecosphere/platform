@@ -2,6 +2,7 @@ ServicePartRtsa::RtsaService::kind = Refined service kind
 ServicePartRtsa::RtsaService::rtsaVer = Refined actual version of RTSA to utilize
 ServicePartRtsa::RtsaService::includesRtsa = RTSA ships as reusable ZIP, RTSA-<ver>.zip (default, false), else within service artifact serviceName-ver.zip
 ServicePartRtsa::RtsaService::artifact = Refined RTSA artifact
+ServicePartRtsa::RtsaService::isPlugin = Refined default isPlugin for KODEX (true).
 ServicePartRtsa::RtsaService::dependencies = RTSA dependencies, refined to JAVA 8
 ServicePartRtsa::RtsaService::deployment = Name of the deployment jar in resources/rtsa. If not given, composed from service name without whitespaces with "-version.zip" appended.
 ServicePartRtsa::RtsaService::path = URL access postfix to deployment

@@ -307,6 +307,74 @@ template JavaBasics(Configuration config, FileArtifact target) {
         ser.artifact;
     }
 
+    // added v2->v3
+    @DispatchBasis
+    def Boolean isPlugin(ServiceBase service) {
+        false;
+    } 
+
+    // added v2->v3
+    @DispatchCase
+    def Boolean isPlugin(CompleteService service) {
+        service.isPlugin.getBooleanValue();
+    } 
+
+    // added v2->v3
+    @DispatchCase
+    def Boolean isPlugin(Connector connector) {
+        connector.isPlugin.getBooleanValue();
+    } 
+    
+    // added v2->v3
+    def addArtifact(MeshElement elt, setOf(String) artifacts, sequenceOf(String) oktoPlugins) {
+        addArtifact(elt.impl, artifacts, oktoPlugins);        
+    }
+
+    // added v2->v3
+    def addArtifact(ServiceBase elt, setOf(String) artifacts, sequenceOf(String) oktoPlugins) {
+        String art = getArtifact(elt);
+        if (isPlugin(elt)) {
+            oktoPlugins.add(art);
+        } else {
+            artifacts.add(art);
+        }
+    }
+
+    // added v2->v3
+    def appendPlugin(sequenceOf(String) plugins, String groupId, String artifactId, String ver) {
+        String coord = groupId + ":" + artifactId + ":" + ver;
+        plugins.add(coord);
+    }
+    
+    // added v2->v3
+    def sequenceOf(String) getOktoflowPlugins(IIPEcosphere config, Boolean withLogging=false, Boolean withServices=false) {
+        String projectVersion = config.iipVer;
+        String iipGroup = "de.iip-ecosphere.platform";
+        sequenceOf(String) result = {};
+        if (withLogging) {
+            // later included simple may collide, we run for now with default implementation
+            /*XmlElement dep = appendDependency(dep, iipGroup, "support.log-slf4j-simple", ver);
+            XmlElement excl = appendExclusions(dep);
+            appendExclusion(excl, "org.slf4j", "slf4j-simple");        */
+            appendPlugin(result, iipGroup, "support.log-slf4j-simple", projectVersion);
+        }
+        appendPlugin(result, iipGroup, "support.yaml-snakeyaml", projectVersion);
+        appendPlugin(result, iipGroup, "support.json-jackson", projectVersion);
+        appendPlugin(result, iipGroup, "support.commons-apache", projectVersion);
+        appendPlugin(result, iipGroup, "support.websocket-websocket", projectVersion);
+        appendPlugin(result, iipGroup, "support.rest-spark", projectVersion);
+        appendPlugin(result, iipGroup, "support.processInfo-oshi", projectVersion);
+        appendPlugin(result, iipGroup, "support.bytecode-bytebuddy", projectVersion);
+        appendPlugin(result, iipGroup, "support.http-apache", projectVersion);
+        if (withServices) {
+            setOf(String) artifacts = {}; // throw away
+            for (Service s : Service.allInstances()) {
+                addArtifact(s, artifacts, result);
+            }
+        }
+        result;
+    }
+
     def String getSelectorArtifact(FamilyMemberSelector sel) {
         "";
     }

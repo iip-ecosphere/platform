@@ -4,9 +4,9 @@ import JavaMapping;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, Boolean monitoring) {
+template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, Boolean monitoring, sequenceOf(String) oktoPlugins) {
 
-    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, Boolean monitoring) {
+    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, Boolean monitoring, sequenceOf(String) oktoPlugins) {
         String iipGroup = "de.iip-ecosphere.platform";
         String springGroup = "org.springframework.boot";
         String projectVersion = "\\${project.version}";
@@ -24,7 +24,7 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
         
         XmlElement dep = createDependencies(project);
         appendDependency(dep, iipGroup, "support", projectVersion); 
-        appendOktoflowPlugins(dep, projectVersion);
+        appendDependencies(dep, oktoPlugins, projectVersion, enable=withoutPlugins(config));
         appendDependency(dep, iipGroup, "configuration.easy", projectVersion);
         XmlElement d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
         if (monitoring) {
@@ -56,10 +56,11 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
         appendMavenJarPlugin(plugins, "2.3", false, main);
-XmlElement dPlug = appendMavenIipDependencyPlugin(plugins);
-XmlElement ex2 = appendExecutionsParent(dPlug);
-appendMavenDependencyPluginCopyDepsExecution(ex2, jarDir="../${dir}", copyOwn=true);
-appendWinLinuxDependencyPluginBuildClasspathExecution(ex2, dir, ownArtifact="${iipGroup}.${artifactId}-${config.iipVer}");
+        XmlElement dPlug = appendMavenIipDependencyPlugin(plugins);
+        XmlElement ex2 = appendExecutionsParent(dPlug);
+        appendMavenDependencyPluginCopyDepsExecution(ex2, jarDir="../${dir}", copyOwn=true);
+        appendWinLinuxDependencyPluginBuildClasspathExecution(ex2, dir, ownArtifact="${iipGroup}.${artifactId}-${config.iipVer}");
+        appendMavenIipDependencyPluginUnpackPluginsExecution(ex2, oktoPlugins, projectVersion, enable=withPlugins(config), outputDir="../${dir}Plugins");
         appendCompilerPlugin(plugins);
         appendSurefirePlugin(plugins, tests=tests);
 

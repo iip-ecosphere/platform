@@ -27,6 +27,7 @@ project ServicePartKodex {
        ServiceKind kind = ServiceKind::TRANSFORMATION_SERVICE;
        OktoVersion ver = "0.7.0";
        String artifact = "de.iip-ecosphere.platform:security.services.kodex:" + iipVer;
+       Boolean isPlugin = true;
        setOf(refTo(Dependency)) dependencies = {refBy(lxLibc6Compat)};
        NameplateInfo nameplateInfo = {
            manufacturerProductDesignation = "KODEX anonymizer/pseudonymizer service@en",

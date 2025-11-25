@@ -214,6 +214,7 @@ project Services {
    abstract compound CompleteService refines Service {
        assign (uiGroup = UiOptionalGroup1) to {
            String artifact = ""; // optional maven artifact
+           Boolean isPlugin = false;
        }
    }
       

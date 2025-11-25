@@ -27,6 +27,7 @@ Services::LongParameter::defaultValue = Default/initial value of Long service pa
 Services::RealParameter::defaultValue = Default/initial value of Real service parameter.
 Services::StringParameter::defaultValue = Default/initial value of String service parameter. 
 Services::CompleteService::artifact = Maven coordinate for optional artifact containing the service implementation.
+Services::CompleteService::isPlugin = Whether the service is realized as a plugin (default false).
 Services::IOType::forward = Type will be transported forward to next service. Opposite, backward broadcasting of data.
 Services::IOType::type = The actual implementing data type.
 Services::JavaService::artifact = Maven coordinate for artifact containing the service implementation.

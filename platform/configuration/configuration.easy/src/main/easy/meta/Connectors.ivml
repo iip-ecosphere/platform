@@ -131,6 +131,7 @@ project Connectors {
     compound Connector refines Service { // not abstract, may be implemented in application code
        String class;
        String artifact;
+       Boolean isPlugin = true;
        sequenceOf(IOTypeWithPath) inInterface; // provided data input to be mapped into adapter, alternative to adapterClass
        sequenceOf(IOTypeWithPath) outInterface; // provided data output to be mapped into adapter, alternative to adapterClass
        NonEmptyString host = "localhost";

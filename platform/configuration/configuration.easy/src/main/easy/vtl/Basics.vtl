@@ -351,5 +351,13 @@ template Basics(Configuration config, FileArtifact target) {
     def DataType resolveType(AliasType type) {
         resolveType(type.represents);
     }
+    
+    def Boolean withPlugins(IIPEcosphere config) { // TODO add decision to model
+        false;
+    }
+
+    def Boolean withoutPlugins(IIPEcosphere config) {
+        not(withPlugins(config));
+    }
         
 }

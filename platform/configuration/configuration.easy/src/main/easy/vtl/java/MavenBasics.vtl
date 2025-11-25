@@ -244,7 +244,75 @@ template MavenBasics(Configuration config, FileArtifact target) {
         }
         cfg;
     }
+
+    // with executions in appendMavenIipDependencyPlugin as parent
+    def XmlElement appendMavenIipDependencyPluginUnpackPluginsExecution(XmlElement execs, sequenceOf(String) plugins, String projectVersion, String outputDir="", 
+        String phase="process-resources", Boolean relocate=true, Boolean resolveAndCopy=false, Boolean enable=true) {
+        sequenceOf(String) effPlugins = {};
+        if (enable) {
+            plugins->forEach(p|effPlugins.add(p));
+        } else {
+            for (String p: plugins) {
+                if (p.endsWith("*")) {
+                    effPlugins.add(p);
+                }
+            }
+        }
+        if (enable and effPlugins.size() > 0) {
+            XmlElement exec = new XmlElement(execs, "execution");
+            new XmlElement(exec, "id", "okto plugins");
+            appendGoal(exec, "unpack-plugins");
+            new XmlElement(exec, "phase", phase);
+            XmlElement config = appendConfiguration(exec);
+            XmlElement plgs = new XmlElement(config, "plugins");
+            appendDependencies(plgs, effPlugins, projectVersion, depElt="plugin", includeOptPlugins=true);
+            if (relocate) {
+                new XmlElement(config, "relocate", relocate);
+                new XmlElement(config, "resolveAndCopy", resolveAndCopy);
+                if (outputDir <> "") {
+                    new XmlElement(config, "relocateTarget", outputDir);
+                }
+            }
+        }
+        execs;
+    }
+
+    def XmlElement appendDependencies(XmlElement parent, sequenceOf(String) plugins, String projectVersion, Boolean enable=true, String depElt="", Boolean includeOptPlugins=false) {
+        setOf(String) artifacts = {};
+        appendDependencies(parent, plugins, artifacts, projectVersion, enable=enable, depElt=depElt, includeOptPlugins=includeOptPlugins);
+    }
     
+    def XmlElement appendDependencies(XmlElement parent, sequenceOf(String) plugins, setOf(String) artifacts, String projectVersion, Boolean enable=true, String depElt="", Boolean includeOptPlugins=false) {
+        setOf(String) done = {};
+        if (enable) {
+            for (String p: plugins) {
+                Boolean consider = true;
+                if (p.endsWith("*")) {
+                    p = p.substring(0, p.length() - 1);                    
+                    if (not(includeOptPlugins)) {
+                        consider = false;                        
+                    }
+                }
+                if (!done.includes(p) and consider) {
+                    XmlElement par = parent;
+                    Boolean createDepElt = true;
+                    if (depElt <> "") {
+                        createDepElt = false;
+                        par = new XmlElement(parent, depElt);
+                    }
+                    done.add(p);
+                    artifacts.remove(p); // prevent double naming
+                    if (p.endsWith(":")) {
+                        p = p + projectVersion;
+                    }
+                    appendArtifact(par, p, createDepElt=createDepElt);
+                    done.add(p);
+                    artifacts.remove(p); // prevent double naming
+                }
+            }
+        }
+        parent;
+    }
     
     def XmlElement appendMavenDependencyPluginCopyDeps(XmlElement plugins, String ver="3.2.0", String jarDir="", Boolean copyOwn=false, Boolean prependGroupId=true) {
         XmlElement plugin = appendMavenDependencyPlugin(plugins, ver);
@@ -611,21 +679,5 @@ template MavenBasics(Configuration config, FileArtifact target) {
         sequenceOf(String) res = {"*.yml", "*.png", "*.jpg", "*.json"};
         res;
     } 
-    
-    def appendOktoflowPlugins(XmlElement dep, String ver) { // preliminary -> plugin
-        String iipGroup = "de.iip-ecosphere.platform";
-        appendDependency(dep, iipGroup, "support.yaml-snakeyaml", ver); 
-        appendDependency(dep, iipGroup, "support.json-jackson", ver);
-        // later included simple may collide, we run for now with default implementation
-        /*XmlElement dep = appendDependency(dep, iipGroup, "support.log-slf4j-simple", ver);
-        XmlElement excl = appendExclusions(dep);
-        appendExclusion(excl, "org.slf4j", "slf4j-simple");        */
-        appendDependency(dep, iipGroup, "support.commons-apache", ver);
-        appendDependency(dep, iipGroup, "support.websocket-websocket", ver);
-        appendDependency(dep, iipGroup, "support.rest-spark", ver);
-        appendDependency(dep, iipGroup, "support.processInfo-oshi", ver);
-        appendDependency(dep, iipGroup, "support.bytecode-bytebuddy", ver);
-        appendDependency(dep, iipGroup, "support.http-apache", ver);
-    }
 
 }

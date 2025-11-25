@@ -5,9 +5,9 @@ import JavaMapping;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template EcsServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, EcsDevice deviceType) {
+template EcsServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, EcsDevice deviceType, sequenceOf(String) oktoPlugins) {
 
-    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, EcsDevice deviceType) {
+    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, EcsDevice deviceType, sequenceOf(String) oktoPlugins) {
         String iipGroup = "de.iip-ecosphere.platform";
         String springGroup = "org.springframework.boot";
         String projectVersion = "\\${project.version}";
@@ -19,7 +19,7 @@ template EcsServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, Strin
         
         XmlElement dep = createDependencies(project);
         appendDependency(dep, iipGroup, "support", projectVersion);
-        appendOktoflowPlugins(dep, projectVersion);
+        appendDependencies(dep, oktoPlugins, projectVersion, enable=withoutPlugins(config));
         appendDependency(dep, iipGroup, "ecsRuntime", projectVersion);
         appendDependency(dep, iipGroup, "services", projectVersion);
         appendDependency(dep, iipGroup, serviceManagerModule(config), projectVersion);
@@ -43,6 +43,7 @@ template EcsServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, Strin
         XmlElement ex2 = appendExecutionsParent(dPlug);
         appendMavenDependencyPluginCopyDepsExecution(ex2, jarDir="../${dir}", copyOwn=true);
         appendWinLinuxDependencyPluginBuildClasspathExecution(ex2, dir, ownArtifact="${iipGroup}.${artifactId}-${config.iipVer}");
+        appendMavenIipDependencyPluginUnpackPluginsExecution(ex2, oktoPlugins, projectVersion, enable=withPlugins(config), outputDir="../${dir}Plugins");
 
         sequenceOf(String) files = defltOktoResourceFiles();
         ex2 = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder()+"/devices", files, id="dev-res");

@@ -125,6 +125,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         sequenceOf(MeshElement) allElements = {};
         sequenceOf(MeshElement) allAppsContainersElements = {};
         initUsedServiceTypes(applications);
+        sequenceOf(String) oktoPlugins = {};
         
         setOf(String) javaSerializersShared = {};
         setOf(String) artifactsShared = {};
@@ -191,6 +192,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 artifacts.add(a.artifact);
                 mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
                 // TODO filter according to assigned resources, allow for later instantiation
+                oktoPlugins = getOktoflowPlugins(cfg);     
                 for (ServiceMesh n : a.services) {
                     setOf(MeshElement) nodes = n.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
                     setOf(MeshElement) nodes2 = {}; // just a copy, it seems that using the iterable below fails
@@ -217,15 +219,16 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         generateNestedServices(no, no.impl, javaNodesSrc, javaNodesTestSrc, clsName, javaNodesPackage, 
                             a, artifacts, noDeps, mbs, nodes2, javaSerializers);
                         elements.add(no);
-                        generateServiceResources(no, no.impl, appRoot, bins, assemblies, resources, artifacts, noDeps);
+                        generateServiceResources(no, no.impl, appRoot, bins, assemblies, resources, artifacts, oktoPlugins, noDeps);
                         for (Service m: mbs) {
-                            generateServiceResources(no, m, appRoot, bins, assemblies, resources, artifacts, noDeps);
+                            generateServiceResources(no, m, appRoot, bins, assemblies, resources, artifacts, oktoPlugins, noDeps);
                         }
                         for (Dependency d: impl.dependencies) {
                             collectMavenDependencies(d, artifacts);
                         }
                         for (Plugin plugin: impl.plugins) {
-                            plugins.add(plugin);
+                            oktoPlugins.add(plugin.artifact + "*"); // 'mark' as optional
+//plugins.add(plugin);
                         }
                     };
                     
@@ -238,17 +241,17 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 for (String k: appJsl.getKeys()) {
                   vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/${k}", descriptors=appJsl.get(k));
                 }
-                sequenceOf(String) pluginDescriptors = {};
-                for (Plugin plugin: plugins->sortedBy(p|p.id)) {
-                    sequenceOf(String) tmp = plugin.artifact.split(":");
-                    String fName = tmp[1]+"-"+tmp[2]+".zip";
-                    addDependencyArtifact(bins, plugin.artifact, "plugin", "${mvnProjectBuildDir}/classes", fName, "zip", "copy");
-                    String clsName = asIdentifier(tmp[1]).firstToUpper();
-                    vilTemplateProcessor("JavaPluginSetupDescriptor", config, "${javaSrc}/de/oktoflow/plugins/${clsName}PluginSetupDescriptor.java", 
-                        clsName=clsName, plugin=plugin.id, resource="${fName}", pkg="de.oktoflow.plugins");
-                    pluginDescriptors.add('de.oktoflow.plugins.${clsName}PluginSetupDescriptor');
-                }
-                vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/de.iip_ecosphere.platform.support.plugins.PluginSetupDescriptor", descriptors=pluginDescriptors);
+/*sequenceOf(String) pluginDescriptors = {};
+for (Plugin plugin: plugins->sortedBy(p|p.id)) {
+    sequenceOf(String) tmp = plugin.artifact.split(":");
+    String fName = tmp[1]+"-"+tmp[2]+".zip";
+    addDependencyArtifact(bins, plugin.artifact, "plugin", "${mvnProjectBuildDir}/classes", fName, "zip", "copy");
+    String clsName = asIdentifier(tmp[1]).firstToUpper();
+    vilTemplateProcessor("JavaPluginSetupDescriptor", config, "${javaSrc}/de/oktoflow/plugins/${clsName}PluginSetupDescriptor.java", 
+        clsName=clsName, plugin=plugin.id, resource="${fName}", pkg="de.oktoflow.plugins");
+    pluginDescriptors.add('de.oktoflow.plugins.${clsName}PluginSetupDescriptor');
+}
+vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/de.iip_ecosphere.platform.support.plugins.PluginSetupDescriptor", descriptors=pluginDescriptors);*/
                 
                 elements = elements->sortedBy(n|n.name).toSequence(); // for testing
                 
@@ -277,7 +280,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 Boolean copyDependencies = enablesPackaging(a, AppPackagingSchema::ZipWithClasspath); // may be more...
                 // partition according to container strategy
                 String appVersion = getAppMvnVersion(a);
-                vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, 
+                vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, oktoPlugins=oktoPlugins, bins=bins, assemblies=assemblies, resources=resources, 
                     starterCls=appStarterCls, appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests, copyRuntimeDependencies=copyDependencies);
                 vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
                 generatePlugins(cfg, appRoot);
@@ -363,7 +366,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 vilTemplateProcessor("TemplatesEclipseReadme", config, "${appRoot}/README.md", appName="impl." + appName, nodes=elements);
 
                 String appVersion = getAppMvnVersion(a);
-                vilTemplateProcessor("AppMvnTest", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, assemblies=assemblies, nodes=elements, appName=appName, appVersion=appVersion, appDescription="Implementation of ${a.name}", tests=tests);
+                vilTemplateProcessor("AppMvnTest", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, assemblies=assemblies, oktoPlugins=oktoPlugins, nodes=elements, appName=appName, appVersion=appVersion, appDescription="Implementation of ${a.name}", tests=tests);
                 vilTemplateProcessor("TemplatesIdentityStoreYaml", config, "${resourcesSrc}/identityStore.yml", appName=appName);
                 vilTemplateProcessor("TemplatesTestLogbackXml", config, "${testResourcesSrc}/logback.xml");
                 identityStoreJsl(testResourcesSrc, cfg);
@@ -2070,15 +2073,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     // ------------------------------------------ generating apps: generating/handling services resources ----------------------------------------
 
     @DispatchBasis
-    generateServiceResources(MeshElement no, ServiceBase base, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
+    generateServiceResources(MeshElement no, ServiceBase base, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, sequenceOf(String) oktoPlugins, Boolean noDeps) = {
         if (not(noDeps)) {
-            artifacts.add(getArtifact(no));
+            addArtifact(no, artifacts, oktoPlugins);
         }
     }
 
     @DispatchCase
-    generateServiceResources(MeshElement no, Connector conn, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
-        artifacts.add(getArtifact(conn)); // connectors are (currently) platform-supplied
+    generateServiceResources(MeshElement no, Connector conn, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, sequenceOf(String) oktoPlugins, Boolean noDeps) = {
+        addArtifact(conn, artifacts, oktoPlugins);
         if (not(noDeps)) { // application resources
             if (conn.inputHandlers <> null and conn.inputHandlers.size() > 0) {
                 for (ConnectorInputHandler h: conn.inputHandlers) {
@@ -2103,16 +2106,16 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
 
     @DispatchCase
-    generateServiceResources(MeshElement no, ModbusTcpV1Connector conn, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
-        artifacts.add(getArtifact(conn)); // connectors are (currently) platform-supplied
+    generateServiceResources(MeshElement no, ModbusTcpV1Connector conn, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, sequenceOf(String) oktoPlugins, Boolean noDeps) = {
+        addArtifact(conn, artifacts, oktoPlugins);
         Path resourcesSrc = "${appRoot}/src/main/resources";
         String connectorName = toIdentifier(conn.name);
         vilTemplateProcessor("ConnectorResource", config, "${resourcesSrc}/${connectorName}.server", conn=conn);
     }
 
     @DispatchCase
-    generateServiceResources(MeshElement no, RestConnector conn, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
-        artifacts.add(getArtifact(conn)); // connectors are (currently) platform-supplied
+    generateServiceResources(MeshElement no, RestConnector conn, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, sequenceOf(String) oktoPlugins, Boolean noDeps) = {
+        addArtifact(conn, artifacts, oktoPlugins);
         Path javaSrc = "${appRoot}/src/main/java";
         Path javaNodesSrc = "${javaSrc}/${toPath(javaNodesPackage)}";
         String typeName = asTypeName(conn.name);
@@ -2187,15 +2190,15 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     }
             
     @DispatchCase
-    generateServiceResources(MeshElement no, JavaService service, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
+    generateServiceResources(MeshElement no, JavaService service, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, sequenceOf(String) oktoPlugins, Boolean noDeps) = {
         if (not(noDeps)) {
-            artifacts.add(getArtifact(no));
+            addArtifact(no, artifacts, oktoPlugins);
             addArtifacts(service.artifacts, service.artifact, bins, noDeps);
         }
     }
 
     @DispatchCase
-    generateServiceResources(MeshElement no, PythonService service, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, Boolean noDeps) = {
+    generateServiceResources(MeshElement no, PythonService service, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, sequenceOf(String) oktoPlugins, Boolean noDeps) = {
         IIPEcosphere cfg = config; // from global
         String serviceFolderName = toFolderName(service.id);
         Path assemblySrc = "${appRoot}/${assemblyRel}";
@@ -2216,7 +2219,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serviceFolderName}.xml", withServices=true, dependency=artifact, dependency2=shArtifact);
         if (not(noDeps)) {
             addAssemblyInfo(assemblies, "python_${serviceFolderName}", "${assemblyRel}/python_${serviceFolderName}.xml", "prepare-package", "${mvnProjectBuildDir}/classes", finalName="python_${serviceFolderName}");
-            artifacts.add(getArtifact(service));
+            addArtifact(service, artifacts, oktoPlugins);
             addArtifacts(service.artifacts, service.artifact, bins, noDeps);
         }
     }
@@ -2299,7 +2302,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         // partition according to container strategy
         
         sequenceOf(String) artList = cfg.sharedArtifact.split(":");
-        vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, bins=bins, assemblies=assemblies, resources=resources, starterCls=appStarterCls, 
+sequenceOf(String) oktoPlugins = getOktoflowPlugins(cfg);
+        vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, oktoPlugins=oktoPlugins, bins=bins, assemblies=assemblies, resources=resources, starterCls=appStarterCls, 
             appName=artList[1], appVersion=artList[2], appDescription="Shared application interfaces", tests=tests, springPackaging=false, groupId=artList[0], ifArtifact=true);
         vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=artList[1], srvFolderName="IIP-apps-${artList[1]}");
             
@@ -2402,7 +2406,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         identityStoreJsl(p, cfg);
         aasSemanticIdResolverJsl(p, cfg);
         String cInfix = getContainerNameInfix(deviceType);
-        vilTemplateProcessor("EcsRuntimeMvn", config, "${path}/pom.xml", dir="ecsJars${cInfix}", main=dfltMain, tests=tests, deviceType=deviceType);
+        sequenceOf(String) oktoPlugins = getOktoflowPlugins(cfg);
+        vilTemplateProcessor("EcsRuntimeMvn", config, "${path}/pom.xml", dir="ecsJars${cInfix}", main=dfltMain, tests=tests, deviceType=deviceType, oktoPlugins=oktoPlugins);
         mvn(path);
         if (deviceType == defaultDeviceType) {
             Integer svcMemLimit = getIntegerValueSafe(cfg.serviceManager.memLimit, 0);
@@ -2432,7 +2437,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         identityStoreJsl(p, cfg);
         aasSemanticIdResolverJsl(p, cfg);
         String cInfix = getContainerNameInfix(deviceType);
-        vilTemplateProcessor("EcsServiceControlMvn", config, "${path}/pom.xml", dir="ecsSvcJars${cInfix}", main=dfltMain, tests=tests, deviceType=deviceType);
+sequenceOf(String) oktoPlugins = getOktoflowPlugins(cfg);
+        vilTemplateProcessor("EcsServiceControlMvn", config, "${path}/pom.xml", dir="ecsSvcJars${cInfix}", main=dfltMain, tests=tests, deviceType=deviceType, oktoPlugins=oktoPlugins);
         mvn(path);
         if (deviceType == defaultDeviceType) {
           generateOsScripts(config, "${target}/ecsServiceMgr", "ecsSvcJars", dfltMain, "IIP-Ecosphere Ecs Runtime/Service Manager", "iip-ecsServiceMgr", "", 
@@ -2475,7 +2481,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         deviceIdProviderJsl(p, cfg);
         identityStoreJsl(p, cfg);
         aasSemanticIdResolverJsl(p, cfg);
-        vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml", dir="svcJars", main=dfltMain, tests=tests);
+sequenceOf(String) oktoPlugins = getOktoflowPlugins(cfg);
+        vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml", dir="svcJars", main=dfltMain, tests=tests, oktoPlugins=oktoPlugins);
         mvn(serviceMgrRoot);
         generateOsScripts(config, "${target}/serviceMgr", "svcJars", dfltMain, "IIP-Ecosphere Service Manager", "iip-serviceMgr", "iip-ecs.service", 
             addJavaOpts=toJvmMemLimitOpt(cfg.serviceManager.memLimit), sysd="${target}/iip-serviceMgr");
@@ -2497,7 +2504,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         deviceIdProviderJsl(p, cfg);
         identityStoreJsl(p, cfg);
         aasSemanticIdResolverJsl(p, cfg);
-        vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain, tests=tests, monitoring=false);
+        oktoPlugins = getOktoflowPlugins(cfg);        
+        vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain, tests=tests, monitoring=false, oktoPlugins=oktoPlugins);
         mvn(platformRoot);
         generateOsScripts(config, "${target}/platform", "plJars", dfltMain, "IIP-Ecosphere Platform Services", "iip-platform", "iip-broker.service", 
             sysd="${target}/iip-platform", addJavaOpts=toJvmMemLimitOpt(cfg.centralMemLimit));
@@ -2516,7 +2524,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         deviceIdProviderJsl(p, cfg);
         identityStoreJsl(p, cfg);
         aasSemanticIdResolverJsl(p, cfg);
-        vilTemplateProcessor("PlatformMvn", config, "${monitoringRoot}/pom.xml", dir="monJars", main=dfltMain, tests=tests, monitoring=true);
+oktoPlugins = getOktoflowPlugins(cfg);
+// monitoring
+        vilTemplateProcessor("PlatformMvn", config, "${monitoringRoot}/pom.xml", dir="monJars", main=dfltMain, tests=tests, monitoring=true, oktoPlugins=oktoPlugins);
         mvn(monitoringRoot);
         generateOsScripts(config, "${target}/monitoring", "monJars", dfltMain, "IIP-Ecosphere Platform Monitoring Services", "iip-monitoring", "iip-platform.service", 
             sysd="${target}/iip-monitoring", addJavaOpts=toJvmMemLimitOpt(cfg.monitoringMemLimit));

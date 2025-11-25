@@ -5,9 +5,9 @@ import JavaMapping;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, EcsDevice deviceType) {
+template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, EcsDevice deviceType, sequenceOf(String) oktoPlugins) {
 
-    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, EcsDevice deviceType) {
+    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, EcsDevice deviceType, sequenceOf(String) oktoPlugins) {
         String iipGroup = "de.iip-ecosphere.platform";
         String projectVersion = "\\${project.version}";
         String artifactId = "ecsRuntime.exec${getContainerNameInfix(deviceType)}";
@@ -18,7 +18,7 @@ template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target, String dir, 
 
         XmlElement dep = createDependencies(project);
         appendDependency(dep, iipGroup, "support", projectVersion);
-        appendOktoflowPlugins(dep, projectVersion);
+        appendDependencies(dep, oktoPlugins, projectVersion, enable=withoutPlugins(config));
         appendDependency(dep, iipGroup, "ecsRuntime", projectVersion);
         appendDependency(dep, iipGroup, containerManagerModule(config), projectVersion);
         appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
@@ -32,10 +32,11 @@ template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target, String dir, 
 
         XmlElement plugins = createMavenBuildElement(project, "", true);
         appendMavenJarPlugin(plugins, "2.3", false, main);
-XmlElement dPlug = appendMavenIipDependencyPlugin(plugins);
-XmlElement ex = appendExecutionsParent(dPlug);
-appendMavenDependencyPluginCopyDepsExecution(ex, jarDir="../${dir}", copyOwn=true);
-appendWinLinuxDependencyPluginBuildClasspathExecution(ex, dir, ownArtifact="${iipGroup}.${artifactId}-${config.iipVer}");
+        XmlElement dPlug = appendMavenIipDependencyPlugin(plugins);
+        XmlElement ex = appendExecutionsParent(dPlug);
+        appendMavenDependencyPluginCopyDepsExecution(ex, jarDir="../${dir}", copyOwn=true);
+        appendWinLinuxDependencyPluginBuildClasspathExecution(ex, dir, ownArtifact="${iipGroup}.${artifactId}-${config.iipVer}");
+        appendMavenIipDependencyPluginUnpackPluginsExecution(ex, oktoPlugins, projectVersion, enable=withPlugins(config), outputDir="../${dir}Plugins");
         appendCompilerPlugin(plugins);
         appendSurefirePlugin(plugins, tests=tests);
         sequenceOf(String) files = defltOktoResourceFiles();

@@ -4,9 +4,9 @@ import JavaMapping;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template ServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests) {
+template ServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, sequenceOf(String) oktoPlugins) {
 
-    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests) {
+    def main(IIPEcosphere config, XmlFileArtifact target, String dir, String main, Boolean tests, sequenceOf(String) oktoPlugins) {
         String iipGroup = "de.iip-ecosphere.platform";
         String springGroup = "org.springframework.boot";
         String projectVersion = "\\${project.version}";
@@ -18,7 +18,7 @@ template ServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, String d
         
         XmlElement dep = createDependencies(project);
         appendDependency(dep, iipGroup, "support", projectVersion);
-        appendOktoflowPlugins(dep, projectVersion);
+        appendDependencies(dep, oktoPlugins, projectVersion, enable=withoutPlugins(config));
         appendDependency(dep, iipGroup, "services", projectVersion);
         appendDependency(dep, iipGroup, serviceManagerModule(config), projectVersion);
         XmlElement d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
@@ -38,6 +38,7 @@ template ServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, String d
         ex = appendExecutionsParent(dPlug);
         appendMavenDependencyPluginCopyDepsExecution(ex, jarDir="../${dir}", copyOwn=true);
         appendWinLinuxDependencyPluginBuildClasspathExecution(ex, dir, ownArtifact="${iipGroup}.${artifactId}-${config.iipVer}");
+        appendMavenIipDependencyPluginUnpackPluginsExecution(ex, oktoPlugins, projectVersion, enable=withPlugins(config), outputDir="../${dir}Plugins");
 
         sequenceOf(String) files = defltOktoResourceFiles();
         ex = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder()+"/devices", files, id="dev-res");
