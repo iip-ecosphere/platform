@@ -6,7 +6,7 @@
 	<include file="${user.home}/macros.xml"/>
     <property environment="env"/>
     <property name="iip.build.initial" value="${env.iipbuildinitial}"/>
-    <property name="genFolder" value="${model_parent}/target/gen"/> <!-- must be set in jenkins ANT build step -->
+    <property name="genFolder" value="./target/gen"/>
     <property name="genFolderTests" value="${genFolder}/tests"/>
 	
     <!-- deploy to SSE Mvn repo -->
