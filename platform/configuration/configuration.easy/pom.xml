@@ -230,7 +230,11 @@
      <profile>
         <id>Cfg</id>
         <properties>
-            <okto.test.easy.model.parent>${model.parent}</okto.test.easy.model.parent>
+           <maven.main.skip>false</maven.main.skip>
+           <maven.test.skip>false</maven.test.skip>
+           <python-compile.skip>false</python-compile.skip>
+           <maven.javadoc.skip>false</maven.javadoc.skip>
+           <okto.test.easy.model.parent>${model.parent}</okto.test.easy.model.parent>
         </properties>
           <build>
             <plugins>
