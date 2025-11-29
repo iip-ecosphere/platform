@@ -71,9 +71,38 @@ public class TestWithPlugin {
     }
 
     /**
+     * Adds a new plugin location for full classpath loading; the install folder is either {@code folder} or the suffix 
+     * after the last "{@code .}".
+     * 
+     * @param parent the parent folder (in git workspace, typically a prefix of {@code folder})
+     * @param folder the plugin folder within the parent folder (in git workspace)
+     * @param appends optional plugins to be appended
+     */
+    public static void addPluginLocation(String parent, String folder, String... appends) {
+        addPluginLocation(parent, folder, false, appends);
+    }
+    
+    /**
+     * Adds a new plugin location; the install folder is either {@code folder} or the suffix after the last "{@code .}".
+     * 
+     * @param parent the parent folder (in git workspace, typically a prefix of {@code folder})
+     * @param folder the plugin folder within the parent folder (in git workspace)
+     * @param descriptorOnly shall only be descriptor JARs loaded or the full classpath
+     * @param appends optional plugins to be appended
+     */
+    public static void addPluginLocation(String parent, String folder, boolean descriptorOnly, String... appends) {
+        String installFolder = folder;
+        int pos = installFolder.lastIndexOf('.');
+        if (pos > 0 && !installFolder.endsWith(".")) {
+            installFolder = installFolder.substring(pos + 1);
+        }
+        addPluginLocation(parent, folder, installFolder, descriptorOnly, appends);
+    }
+
+    /**
      * Adds a new plugin location.
      * 
-     * @param parent the parent folder (in git workspace)
+     * @param parent the parent folder (in git workspace, typically a prefix of {@code folder})
      * @param folder the plugin folder within the parent folder (in git workspace)
      * @param installFolder (in unpacked plugins)
      * @param descriptorOnly shall only be descriptor JARs loaded or the full classpath
@@ -156,6 +185,7 @@ public class TestWithPlugin {
                         if (!cpFile.exists()) { // initial style, transition
                             cpFile = new File(installDir + "/" + loc.installFolder);
                         }
+                        loc.installFolder = cpFile.getName();
                         PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(
                             cpFile, loc.descriptorOnly, appends));
                         found = true;
