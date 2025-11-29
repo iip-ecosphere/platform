@@ -35,8 +35,8 @@ import de.iip_ecosphere.platform.support.iip_aas.NameplateSetup.Service;
 public class MqttConnectorFactoryTest extends TestWithPlugin {
     
     static {
-        addPluginLocation("connectors", "connectors.mqttv3", "mqttv3", false);
-        addPluginLocation("support", "connectors.mqttv5", "mqttv5", false);
+        addPluginLocation("connectors", "connectors.mqttv3");
+        addPluginLocation("connectors", "connectors.mqttv5");
     }
     
     /**

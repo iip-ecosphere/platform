@@ -51,7 +51,7 @@ public class BaSyxTest extends AasTest {
 
     @Override
     protected void setupPlugins() {
-        TestWithPlugin.addPluginLocation("support", "support.rest-spark", "rest-spark", false);
+        TestWithPlugin.addPluginLocation("support", "support.rest-spark");
         TestWithPlugin.loadPlugins();
     }
     

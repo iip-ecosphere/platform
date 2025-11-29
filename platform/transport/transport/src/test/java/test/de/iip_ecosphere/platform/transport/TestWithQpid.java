@@ -28,7 +28,7 @@ public class TestWithQpid extends TestWithPlugin {
     protected Server qpid;
 
     static {
-        addPluginLocation("tests", "test.amqp.qpid", "qpid", true);
+        addPluginLocation("tests", "test.amqp.qpid", true);
     }
     
     /**

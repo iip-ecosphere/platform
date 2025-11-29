@@ -43,10 +43,10 @@ public class AssetTest {
      * @param args ignored
      */
     public static void main(String[] args) {
-        TestWithPlugin.addPluginLocation("support", "support.commons-apache", "commons-apache", false);
-        TestWithPlugin.addPluginLocation("support", "support.log-slf4j-simple", "log-slf4j-simple", false);
-        TestWithPlugin.addPluginLocation("support", "support.aas.basyx2", "basyx2", false, "support.log-slf4j-simple");
-        TestWithPlugin.addPluginLocation("support", "support.rest-spark", "rest-spark", false);
+        TestWithPlugin.addPluginLocation("support", "support.commons-apache");
+        TestWithPlugin.addPluginLocation("support", "support.log-slf4j-simple");
+        TestWithPlugin.addPluginLocation("support", "support.aas.basyx2", "support.log-slf4j-simple");
+        TestWithPlugin.addPluginLocation("support", "support.rest-spark");
         TestWithPlugin.addRunAfterLoading(() -> {
             AasFactory.setPluginId(System.getProperty("okto.test.aas.pluginId", "aas.basyx-2.0")); 
         });        

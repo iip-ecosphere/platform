@@ -24,15 +24,15 @@ public class BasicTestWithPlugin extends TestWithQpid {
     static {
         enableLocalPlugins(false); // we need them relocated and appended/mixed
         setInstallDir("target/plugins");
-        addPluginLocation("services", "services.spring", "spring", false, "support.log-slf4j-simple");
-        addPluginLocation("support", "support.log-slf4j-simple", "log-slf4j-simple", false);
-        addPluginLocation("support", "support.processInfo-oshi", "processInfo-oshi", false);
-        addPluginLocation("support", "support.websocket-websocket", "websocket-websocket", false);
-        addPluginLocation("support", "support.yaml-snakeyaml", "yaml-snakeyaml", false);
-        addPluginLocation("support", "support.commons-apache", "commons-apache", false);
-        addPluginLocation("support", "support.bytecode-bytebuddy", "bytecode-bytebuddy", false);
-        addPluginLocation("support", "support.json-jackson", "json-jackson", false);
-        addPluginLocation("transport", "transport.amqp", "transport.amqp", false);
+        addPluginLocation("services", "services.spring", "support.log-slf4j-simple");
+        addPluginLocation("support", "support.log-slf4j-simple");
+        addPluginLocation("support", "support.processInfo-oshi");
+        addPluginLocation("support", "support.websocket-websocket");
+        addPluginLocation("support", "support.yaml-snakeyaml");
+        addPluginLocation("support", "support.commons-apache");
+        addPluginLocation("support", "support.bytecode-bytebuddy");
+        addPluginLocation("support", "support.json-jackson");
+        addPluginLocation("transport", "transport.amqp");
         loadPlugins();
     }
 
