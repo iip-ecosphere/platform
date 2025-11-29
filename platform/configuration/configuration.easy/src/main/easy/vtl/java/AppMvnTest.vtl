@@ -63,7 +63,8 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         }*/
         XmlElement unpackItems = appendMavenDependencyPluginExecution(execs, "unpack", 
             "de.iip-ecosphere.platform:services.environment:" + projectVersion, "python", 
-            "\\${project.build.directory}/pyEnv", "pyEnv.zip", type="zip", id="pythonSources", phase="validate");
+            "\\${project.build.directory}/pyEnv", "pyEnv.zip", type="zip", id="pythonSources", phase="validate", 
+            skipIfNotFound=true, skipIfNotFoundComment="Tolerant resolution for initial build; skipIfNotFound can be removed/set to false when app interfaces are deployed.");
         appendMavenDependencyPluginArtifactItem(unpackItems, config.sharedArtifact, "python", 
             "\\${project.build.directory}/pySrc", "pyIf.zip", type="zip");
         appendMavenIipDependencyPluginUnpackPluginsExecution(execs, oktoPlugins, projectVersion, enable=withPlugins(config));
