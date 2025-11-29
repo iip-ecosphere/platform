@@ -88,7 +88,13 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
     @Parameter( defaultValue = "${project.build.directory}", readonly = true )
     private File targetDirectory;
 
-    private List<String> classpathFiles = new ArrayList<>();
+    @Parameter( property = "mdep.writeResolved", defaultValue = "false")
+    private boolean writeResolved;
+
+    @Parameter( property = "mdep.resolvedFile", defaultValue = "*")
+    private String resolvedFile;
+
+    private List<ClasspathFile> classpathFiles = new ArrayList<>();
     
     @Parameter( defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true )
     private List<ArtifactRepository> remoteArtifactRepositories;
@@ -141,6 +147,73 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
     }
     
     /**
+     * Stores classpath file names with additional information for moving in the file system.
+     */
+    private static class ClasspathFile {
+        
+        private String name;
+        private String origPath;
+        private String pathSuffix;
+        
+        /**
+         * Classpath file without need for moving.
+         * 
+         * @param name the name/path of the file
+         */
+        private ClasspathFile(String name) {
+            this.name = name;
+        }
+
+        /**
+         * Classpath file with need for moving.
+         * 
+         * @param name the name/path of the file
+         * @param origPath the original path the file is located in
+         * @param pathSuffix path addition causing the move
+         */
+        private ClasspathFile(String name, String origPath, String pathSuffix) {
+            this.name = name;
+            this.origPath = origPath;
+            this.pathSuffix = pathSuffix;
+        }
+        
+        /**
+         * The name of the classpath file.
+         * 
+         * @return the name, original before move/processing, modified after
+         */
+        private String getName() {
+            return name;
+        }
+        
+        /**
+         * Preprocesses the file in {@code targetDir}, i.e., moves it if needed. May affect {@link #getName()}.
+         * 
+         * @param targetDir the target directory where the file/paths are located within
+         * @throws MojoFailureException if moving fails
+         */
+        private void preprocess(File targetDir) throws MojoFailureException {
+            if (null != origPath && null != pathSuffix) {
+                File orig = new File(targetDir, origPath);
+                File target = new File(targetDir, origPath + pathSuffix);
+                if (orig.exists() && !target.exists()) { // already renamed, not cleaned
+                    try {
+                        FileUtils.moveDirectory(new File(targetDir, origPath), 
+                            new File(targetDir, origPath + pathSuffix));
+                    } catch (IOException e) {
+                        throw new MojoFailureException("Cannot move unpacked files: " + e.getMessage());
+                    }
+                }
+                int pos = name.lastIndexOf("/"); // or check origPath as prefix
+                if (pos > 0) {
+                    name = name.substring(0, pos) + pathSuffix + name.substring(pos);
+                }
+            }
+        }
+        
+    }
+    
+    /**
      * Used for relocating classpath files, i.e., to rename them with their plugin short (artifactId) name.
      * 
      * @author Holger Eichelberger, SSE
@@ -148,16 +221,20 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
     private class RelocatingFileMapper implements FileMapper {
 
         private String targetName;
+        private String pathSuffix;
         private boolean collectIfNotRelocate;
         
         /**
          * Creates a relocating file mapper.
          * 
          * @param targetName the target name to map to
+         * @param pathSuffix optional path suffix for moving the target directory; underlying maven does not seem to 
+         * consider a changed target path in here
          * @param collectIfNotRelocate collect the file names if we are not relocating
          */
-        private RelocatingFileMapper(String targetName, boolean collectIfNotRelocate) {
+        private RelocatingFileMapper(String targetName, String pathSuffix, boolean collectIfNotRelocate) {
             this.targetName = targetName;
+            this.pathSuffix = pathSuffix;
             this.collectIfNotRelocate = collectIfNotRelocate;
         }
         
@@ -171,10 +248,11 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                     } else {
                         name = targetName + name.substring(NAME_CLASSPATH_FILE.length());
                     }
-                    classpathFiles.add(name);
+                    classpathFiles.add(new ClasspathFile(name));
                 } else { // else just collect with relative path
                     if (collectIfNotRelocate) {
-                        classpathFiles.add(targetName + "/" + name);
+                        classpathFiles.add(new ClasspathFile(targetName + "/" + name, targetName, 
+                            pathSuffix));
                     }
                 }
             }
@@ -183,10 +261,11 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         
     }
     
+    
     @Override
     public void doExecute() throws MojoExecutionException, MojoFailureException {
         resolver = new Resolver(repoSystem, repoSession, remoteRepositories, getLog());
-        File targetDir = relocate ? relocateTarget : new File(targetDirectory, "oktoPlugins");
+        File targetDir = getOutputDir(null);
         setForceCleanup(true);
         FileSet cleanup = new FileSet();
         cleanup.setDirectory(targetDir.toString());
@@ -211,20 +290,11 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         if (plugins != null && plugins.size() > 0) {
             List<ArtifactItem> artifactItems = new ArrayList<>();
             for (PluginItem pl : plugins) {
-                ArtifactItem item = new ArtifactItem();
-                String artId = pl.getArtifactId();
-                if (StringUtils.isBlank(pl.getGroupId())) {
-                    item.setGroupId("de.iip-ecosphere.platform");
-                }
-                item.setArtifactId(artId);
-                item.setVersion(StringUtils.isBlank(version) ? pl.getVersion() : version);
-                item.setType("zip");
-                item.setClassifier("plugin" + (pl.asTest ? "-test" : ""));
-                item.setOverWrite(String.valueOf(true));
-                item.setOutputDirectory(getOutputDir(artId));
+                ArtifactItem item = toArtifactItem(pl);
+                String artId = item.getArtifactId();
                 getLog().info("Configuring plugin '" + artId + "' -> " + item.getOutputDirectory());
-                item.setDestFileName(artId + ".zip");
-                item.setFileMappers(new FileMapper[] {new RelocatingFileMapper(artId, true)}); // pl.hasAppends()
+                item.setFileMappers(new FileMapper[] {
+                    new RelocatingFileMapper(artId, "-" + getActualVersion(pl), true)}); // pl.hasAppends()
                 artifactItems.add(item);
             }
             setArtifactItems(artifactItems);
@@ -241,16 +311,96 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             }
         }
         relocate();
+        storeResolved();
+    }
+    
+    /**
+     * Returns the actual (overridden) version of the given plugin item.
+     * 
+     * @param pl the plugin item
+     * @return the version
+     */
+    private String getActualVersion(PluginItem pl) {
+        return StringUtils.isBlank(version) ? pl.getVersion() : version;
+    }
+    
+    /**
+     * Turns a {@link PluginItem} to a pre-configured {@link ArtifactItem} passed on for resolution/download.
+     * 
+     * @param pl the plugin item to convert
+     * @return the converted artifact item
+     */
+    private ArtifactItem toArtifactItem(PluginItem pl) {
+        ArtifactItem item = new ArtifactItem();
+        String artId = pl.getArtifactId();
+        if (StringUtils.isBlank(pl.getGroupId())) {
+            item.setGroupId("de.iip-ecosphere.platform");
+        }
+        item.setArtifactId(artId);
+        item.setVersion(getActualVersion(pl));
+        item.setType("zip");
+        item.setClassifier("plugin" + (pl.asTest ? "-test" : ""));
+        item.setOverWrite(String.valueOf(true));
+        item.setOutputDirectory(getOutputDir(artId));
+        item.setDestFileName(artId + ".zip");
+        return item;
+    }
+    
+    /**
+     * Stores the resolved dependencies if enabled.
+     * 
+     * @throws MojoExecutionException if obtaining the dependencies fails
+     */
+    private void storeResolved() throws MojoExecutionException {
+        if (writeResolved && plugins != null && plugins.size() > 0) {
+            File file = null;
+            if (resolvedFile == null || resolvedFile.equals("*")) {
+                file = new File(targetDirectory, "classes/resolved");
+            } else if (resolvedFile.length() > 0) {
+                file = new File(resolvedFile);
+            }
+            if (file != null) {
+                Resolver resolver = new Resolver(repoSystem, repoSession, remoteRepositories, getLog());
+                try (PrintStream out = new PrintStream(new FileOutputStream(file))) {
+                    out.println("[");
+                    boolean first = true;
+                    for (PluginItem p : plugins) {
+                        String urlPath = resolver.resolveToUrl(toArtifactItem(p));
+                        if (null != urlPath && urlPath.length() > 0) {
+                            if (!first) {
+                                out.println(",");
+                            }
+                            out.print("  {\"url\":\"" + urlPath + "\", \"name\":\"" + p.getArtifactId() 
+                                + "-" + getActualVersion(p) + "\"}");
+                            first = false;
+                        }
+                    }
+                    if (!first) {
+                        out.println();
+                    }
+                    out.println("]");
+                    getLog().info("Wrote resolution file " + file);
+                } catch (IOException e) {
+                    getLog().error("While writing resolution file " + file + ": " + e.getMessage());
+                }
+            } else {
+                getLog().info("Skipping resolution file as disabled");
+            }
+        }
     }
     
     /**
      * Returns the output directory for a plugin/classpath file name.
      * 
-     * @param name the name
+     * @param name the name, may be <b>null</b> or empty for none/base dir/independent of name
      * @return the output directory
      */
     private File getOutputDir(String name) {
-        return relocate ? relocateTarget : new File(targetDirectory, "oktoPlugins/" + name);
+        String oktoSuffix = "";
+        if (name != null && name.length() > 0) {
+            oktoSuffix = "/" + name;
+        }
+        return relocate ? relocateTarget : new File(targetDirectory, "oktoPlugins" + oktoSuffix);
     }
 
     /**
@@ -465,7 +615,9 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             FileUtils.deleteQuietly(new File(tgtDir, "target"));
         } 
         int seqNr = 1;
-        for (String cpFile : classpathFiles) {
+        for (ClasspathFile cf : classpathFiles) {
+            cf.preprocess(getOutputDir(null));
+            String cpFile = cf.getName();
             File src;
             File tgt;
             if (relocate) {

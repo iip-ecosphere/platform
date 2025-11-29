@@ -164,7 +164,7 @@ Specialized goal to build a plugin classpath file. Based on the refined ``build-
 - `unpackMode` (default `jars`, user property `mdep.unpackMode`) specifies how unpacking shall happen, i.e., whether jars are included in the plugin artifact (`jars`) or whether they shall be resolved (`resolve`)
 - `setupDescriptor` (default `FolderClasspath`, user property `mdep.setupDescriptor`) specifies the descriptor implementation that shall be announced to the plugin manager, may be a shortcut for platform supplied descriptors (`FolderClasspath`, `CurrentClassloader`, ``PluginBased`, `Process`), a qualified classname assuming a non-arg constructor, or empty for no loading through the class loader (rather than appending during unpack).
 - `pluginIds` (default empty, user property `mdep.pluginIds`) specifies pluginIds for the `PluginBased` setup descriptor (comma separated, only first considered by now), may also be used with others whereby then the plugin is also announced by `PluginBased`
-- `validateJsl` (default `true`, user property `mdep.validateJsl`) specifies whether classes listed in JSL files shall be validated for their counterparts in `target`, leads to warnings if classes do not exist
+- `validateJsl` (default `WARN`, user property `mdep.validateJsl`) specifies whether classes listed in JSL files shall be validated for their counterparts in `target`, leads to warnings (`WARN`), information (`INFO`), errors (`ERROR`) or build failures (`FAIL`) if classes do not exist. Can be switched warnings `OFF`.
 
 The inherited setting ``excludeArtifactIds`` shall be configured in a way that prerequiste platform layers are excluded. Usually, the plugin detects and determins the respective artifact ids automatically.
 
@@ -237,6 +237,9 @@ The sequence of the plguins as given in the POM execution configuration is taken
 Moreover, for installations, if `relocate` is enabled, the `outputDirectory` becomes `jars`, all unpacked jars are flattened into that directory and all classpath files are renamed based on the last part of the `artifactId`, stored into `plugins` and relocated to the relocation target folder (`relocateTarget`, user property `unpack.relocateTarget`, default `jars`); if specified, `plugins` becomes a sibling of the relocation target folder. In relocation mode (if dependencies shall be `resolved`) or if `forceResolve` is enabled (default `false`), the plugin classpath is rewritten. Thereby, `resolveAndCopy` determines whether classpath entries shall be copied to the target folder (default `false`) or taken/referenced from the local maven repository.
 
 If we are not in `relocate` mode, the plugin is only enabled, if the relative directories `../../support/support` (for arbitrary platform component) or `../support` (for support component) do not exist, which is the case for builds outside a local git workspace, e.g., on CI.
+
+- `writeResolved` (default `false`, user property `mdep.storeResolvedFile`) specifies whether the original locations of plugins shall be stored in a file
+- `resolvedFile` (default `${project.build.directory}/classes/resolved`, user property `mdep.resolvedFile`) specifies where to store the file for `storeResolved`
 
 ## split-classpath
 

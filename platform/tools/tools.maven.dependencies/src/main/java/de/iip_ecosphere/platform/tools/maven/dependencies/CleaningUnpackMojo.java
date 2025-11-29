@@ -32,6 +32,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.dependency.fromConfiguration.ArtifactItem;
 import org.apache.maven.plugins.dependency.fromConfiguration.UnpackMojo;
 import org.apache.maven.shared.model.fileset.FileSet;
+import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
 
 import de.iip_ecosphere.platform.tools.maven.python.FilesetUtils;
 
@@ -63,6 +64,9 @@ public class CleaningUnpackMojo extends UnpackMojo {
     
     @Parameter( property = "unpack.skipIfExists", required = false, defaultValue = "" )
     private File skipIfExists;
+
+    @Parameter( property = "unpack.skipIfNotFound", required = false, defaultValue = "false" )
+    private boolean skipIfNotFound;
 
     @Parameter( property = "unpack.logCleanup", required = false, defaultValue = "false" )
     private boolean logCleanup;
@@ -176,7 +180,15 @@ public class CleaningUnpackMojo extends UnpackMojo {
             if (!forceCleanup) {
                 FilesetUtils.deletePaths(cleanup, getCleanupLog());
             }
-            super.doExecute();
+            try {
+                super.doExecute();
+            } catch (MojoExecutionException e) {
+                if (skipIfNotFound && e.getCause() instanceof ArtifactResolverException) {
+                    getLog().info("Artifact not found. Skipping execution. (" + e.getMessage() + ")");
+                } else {
+                    throw e;
+                }
+            }
         }
     }
     

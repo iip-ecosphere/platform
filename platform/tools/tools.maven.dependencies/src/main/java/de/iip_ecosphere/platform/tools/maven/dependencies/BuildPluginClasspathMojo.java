@@ -18,13 +18,18 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
 
 /**
  * Specialized mojo for building plugin classpath files.
@@ -54,15 +59,35 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
 
     @Parameter( property = "mdep.pluginIds", defaultValue = "" )
     private List<String> pluginIds;
-    
+
+    @Parameter( property = "mdep.resolvedFile", defaultValue = "*")
+    private String resolvedFile;
+
     @Parameter( required = false )
     private boolean asTest;
 
     @Parameter( defaultValue = "${project.build.directory}", readonly = true )
     private File targetDirectory;
 
-    @Parameter( property = "mdep.validateJsl", defaultValue = "true" )
-    private boolean validateJsl;
+    @Parameter( property = "mdep.validateJsl", defaultValue = "INFO" )
+    private JslMode validateJsl;
+
+    @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
+    private List<RemoteRepository> remoteRepositories;
+
+    @Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
+    private RepositorySystemSession repoSession;
+
+    @Component
+    private RepositorySystem repoSystem;
+    
+    public enum JslMode {
+        OFF,
+        INFO,
+        WARN,
+        ERROR,
+        FAIL
+    }
 
     /**
      * Returns the relative target directory.
@@ -132,30 +157,56 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
         setPrepends(prepends);
         composeBefores(null);
         super.doExecute();
-        if (validateJsl) {
-            validateJsl();
+
+        if (validateJsl != JslMode.OFF) {
+            switch (validateJsl) {
+            case FAIL:
+                if (!validateJsl(s -> getLog().error(s))) {
+                    throw new MojoExecutionException("Cannot validate existence of JSL services. See messages above.");
+                }
+                break;
+            case ERROR:
+                validateJsl(s -> getLog().error(s));
+                break;
+            case WARN:
+                validateJsl(s -> getLog().warn(s));
+                break;
+            case INFO:
+                validateJsl(s -> getLog().info(s));
+                break;
+            default:
+                break;
+            }
         }
     }
     
     /**
      * Validates whether JSL descriptor files have their counterparts in classes. Must be executed after class and 
      * test class compilation.
+     * 
+     * @param logConsumer consumer for logging messages
+     * @return {@code true} if valid, {@code false} if failed
      */
-    private void validateJsl() {
+    private boolean validateJsl(Consumer<String> logConsumer) {
         File classes = new File(targetDirectory, "classes");
         File testClasses = new File(targetDirectory, "test-classes");
-        validateJsl(new File("src/main/resources"), classes);
-        validateJsl(new File("src/test/resources"), classes, testClasses);
+        boolean result = true;
+        result &= validateJsl(new File("src/main/resources"), logConsumer, classes);
+        result &= validateJsl(new File("src/test/resources"), logConsumer, classes, testClasses);
+        return result;
     }
     
     /**
      * Validates whether JSL descriptor files in {@link descParent} have their counterparts in classes compiled to 
      * {@link classDir}.
      * 
+     * @param logConsumer consumer for logging messages
      * @param descParent, usually a resource folder where {@code META-INF/services} is located within
      * @param classDir the parent folders to search classes within
+     * @return {@code true} if valid, {@code false} if failed
      */
-    private void validateJsl(File descParent, File... classDir) {
+    private boolean validateJsl(File descParent, Consumer<String> logConsumer, File... classDir) {
+        boolean result = true;
         List<File> classDirList = new ArrayList<>();
         Collections.addAll(classDirList, classDir);
         File jslDir = new File(descParent, "META-INF/services");
@@ -166,14 +217,16 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
                     try {
                         List<String> lines = Files.readAllLines(desc.toPath());
                         for (String line: lines) {
-                            validateJsl(desc, line, classDirList);
+                            result &= validateJsl(desc, logConsumer, line, classDirList);
                         }
                     } catch (IOException e) {
-                        getLog().warn("Cannot read JSL descriptor " + desc + ": " + e.getMessage());
+                        logConsumer.accept("Cannot read JSL descriptor " + desc + ": " + e.getMessage());
+                        result = false;
                     }
                 }
             }
         }
+        return result;
     }
 
     /**
@@ -181,17 +234,22 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
      * {@link classDirList}.
      * 
      * @param desc the descriptor file
+     * @param logConsumer consumer for logging messages
      * @param descClass the class name within {@code desc} to validate
      * @param classDirList the parent folders to search classes within
+     * @return {@code true} if valid, {@code false} if failed
      */
-    private void validateJsl(File desc, String descClass, List<File> classDirList) {
+    private boolean validateJsl(File desc, Consumer<String> logConsumer, String descClass, List<File> classDirList) {
+        boolean result = true;
         for (File cDir : classDirList) {
             File clsFile = new File(cDir, descClass.replace(".", "/") + ".class");
             if (!clsFile.isFile()) {
-                getLog().warn("Class '" + descClass + "' (" + clsFile + ") in JSL descriptor " + desc 
+                logConsumer.accept("Class '" + descClass + "' (" + clsFile + ") in JSL descriptor " + desc 
                     + " not found in " + classDirList);
+                result = false;
             }
         }
+        return result;
     }
 
     @Override

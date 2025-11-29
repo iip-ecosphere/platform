@@ -142,7 +142,7 @@ public class AssemblePluginMojo extends AbstractMojo {
         boolean done = false;
         File cpFile = new File(dir, "classpath");
         if (cpFile.exists()) {
-            addFile(out, new File(dir, "classpath"), "", false);
+            addFile(out, cpFile, "", false);
             done = true;
             File[] jars = dir.listFiles();
             if (null != jars) {

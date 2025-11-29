@@ -17,11 +17,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.dependency.fromConfiguration.ArtifactItem;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.artifact.Artifact;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
@@ -65,7 +67,18 @@ class Resolver {
         return new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getClassifier(), 
             artifact.getType(), artifact.getVersion());            
     }
-    
+
+    /**
+     * Translates a maven artifact item to an Aether artifact.
+     * 
+     * @param artifact the maven artifact
+     * @return the aether artifact
+     */
+    DefaultArtifact translate(ArtifactItem artifact) {
+        return new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getClassifier(), 
+            artifact.getType(), artifact.getVersion());            
+    }
+
     /**
      * Resolves a single artifact.
      * 
@@ -96,6 +109,73 @@ class Resolver {
         request.setRepositories(remoteRepositories);
         ArtifactResult result = repoSystem.resolveArtifact(repoSession, request);
         return result.getArtifact().getFile();
+    }
+
+    /**
+     * Resolves a single artifact.
+     * 
+     * @param artifact the artifact
+     * @return the resolved path, empty if not resolvable
+     */
+    String resolveToUrl(Artifact artifact) {
+        String result;
+        try {
+            result = resolveToUrl(translate(artifact));
+        } catch (ArtifactResolutionException e) {
+            getLog().warn("Cannot resolve to artifact, ignoring: " + artifact);
+            result = "";
+        }
+        return result;
+    }
+
+    /**
+     * Resolves a single artifact item.
+     * 
+     * @param artifact the artifact
+     * @return the resolved path, empty if not resolvable
+     */
+    String resolveToUrl(ArtifactItem artifact) {
+        String result;
+        try {
+            result = resolveToUrl(translate(artifact));
+        } catch (ArtifactResolutionException e) {
+            getLog().warn("Cannot resolve to artifact, ignoring: " + artifact);
+            result = "";
+        }
+        return result;
+    }
+
+    /**
+     * Resolves an artifact to a download URL.
+     * 
+     * @param artifact the artifact to resolve
+     * @return the download URL, may be <b>null</b> for none
+     * @throws ArtifactResolutionException
+     */
+    String resolveToUrl(DefaultArtifact artifact) throws ArtifactResolutionException {
+        ArtifactRequest request = new ArtifactRequest();
+        request.setArtifact(artifact);
+        request.setRepositories(remoteRepositories);
+        ArtifactResult result = repoSystem.resolveArtifact(repoSession, request);
+        ArtifactRepository repo = result.getRepository();
+        String url = null;
+        if (repo instanceof RemoteRepository) {
+            RemoteRepository r = (RemoteRepository) repo;
+            url = r.getUrl();
+        } // Local and Workspace repo do not need downloads
+        if (null != url) {
+            org.eclipse.aether.artifact.Artifact art = result.getArtifact();
+            url += "/" + art.getGroupId().replace('.', '/') + "/" 
+                + art.getArtifactId() + "/" 
+                + art.getBaseVersion() + "/" 
+                + art.getArtifactId() + "-" 
+                + art.getVersion()
+                + (art.getClassifier() != null && !art.getClassifier().isEmpty()
+                        ? "-" + art.getClassifier()
+                        : "") 
+                + "." + art.getExtension();
+        }
+        return url;
     }
 
     /**
