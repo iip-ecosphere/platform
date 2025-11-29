@@ -17,6 +17,7 @@
                 <include>identityStore.yml</include>
                 <include>deployment*.yml</include>
                 <include>*.zip</include>
+                <include>resolved</include>
             </includes>
             <useDefaultExcludes>true</useDefaultExcludes>
         </fileSet>
