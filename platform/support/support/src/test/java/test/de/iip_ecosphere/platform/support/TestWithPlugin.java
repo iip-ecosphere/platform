@@ -133,12 +133,12 @@ public class TestWithPlugin {
             loaded = true;
             boolean found = false;
             for (PluginLocation loc : locations) {
-                File folder = new File("..", loc.folder); // for platform parts in "support"
+                File folder = findPluginFolder("..", loc.folder); // for platform parts in "support"
                 if (!folder.isDirectory()) { // just in case
-                    folder = new File("../" + loc.parent, loc.folder); 
+                    folder = findPluginFolder("../" + loc.parent, loc.folder); 
                 }
                 if (!folder.isDirectory()) { // usual nesting of platform part in different folder
-                    folder = new File("../../" + loc.parent, loc.folder); 
+                    folder = findPluginFolder("../../" + loc.parent, loc.folder); 
                 }
                 if (enableLocalPlugins && folder.isDirectory()) { // in local git repo
                     LoggerFactory.getLogger(TestWithPlugin.class).info("Loading plugin from {} (development)", folder);
@@ -152,7 +152,7 @@ public class TestWithPlugin {
                         File[] appends = collectAppends(folder, loc.appends);
                         LoggerFactory.getLogger(TestWithPlugin.class).info("Loading plugin from {} "
                             + "(test deployment)", installDir);
-                        File cpFile = new File(installDir + "/" + loc.folder);
+                        File cpFile = findPluginFolder(installDir, loc.folder);
                         if (!cpFile.exists()) { // initial style, transition
                             cpFile = new File(installDir + "/" + loc.installFolder);
                         }
@@ -170,6 +170,31 @@ public class TestWithPlugin {
                 r.run();
             }
         }
+    }
+
+    /**
+     * Tries {@code parent/child} as plugin folder. If it does not exist, search for {@code parent/child-*} 
+     * (appended maven version).
+     * 
+     * @param parent the parent
+     * @param child the child to search for
+     * @return the plugin folder, may not exist
+     */
+    private static File findPluginFolder(String parent, String child) {
+        File result = new File(parent, child);
+        if (!result.isDirectory()) {
+            File par = new File(parent);
+            File[] files = par.listFiles();
+            if (null != files) {
+                for (File f : files) {
+                    if (f.getName().startsWith(child + "-") && f.isDirectory()) {
+                        result = f;
+                        break;
+                    }
+                }
+            }
+        }
+        return result;
     }
     
     /**
