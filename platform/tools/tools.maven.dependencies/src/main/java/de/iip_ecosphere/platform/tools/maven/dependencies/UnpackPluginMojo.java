@@ -335,6 +335,8 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         String artId = pl.getArtifactId();
         if (StringUtils.isBlank(pl.getGroupId())) {
             item.setGroupId("de.iip-ecosphere.platform");
+        } else {
+            item.setGroupId(pl.getGroupId());
         }
         item.setArtifactId(artId);
         item.setVersion(getActualVersion(pl));
