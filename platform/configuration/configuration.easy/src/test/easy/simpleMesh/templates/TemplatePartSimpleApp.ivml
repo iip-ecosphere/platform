@@ -9,8 +9,20 @@ project TemplatePartSimpleApp {
         name = "", // template, for now, may be ifConfigured would help in the underlying constraint; we have to figure out
         ver = "0.1.0",
         description = "",
-        services = {refBy(tplMesh)}        
+        services = {refBy(tplMesh)},
+        identityStore = {
+            includeInApplication = true,
+            identities = {
+                UserPwAppIdentityStoreEntry{
+                    name = "amqp",
+                    userName = "user",
+                    password = "pwd"
+                }
+            }
+        }
     };
+    
+    //tplApp.identityStore.uiGroup = UiMandatoryGroup1;
     
     // --------------------- mesh ------------------
     

@@ -29,6 +29,20 @@ project Applications {
     def Boolean isRefining(RecordType fromType, RecordType toType) = 
         createRecordTypeSet(toType)->closure(RecordType t|t.refining).includes(fromType);
         
+    compound AppIdentityStore {
+        Boolean includeInApplication = false;
+        sequenceOf(AppIdentityStoreEntry) identities;
+    }
+    
+    abstract compound AppIdentityStoreEntry {
+        NonEmptyString name;
+    }
+
+    compound UserPwAppIdentityStoreEntry refines AppIdentityStoreEntry {
+        NonEmptyString userName;
+        NonEmptyString password;
+    }
+        
     compound Application refines VersionedElement {
         Id id;
         NonEmptyNameString name;
@@ -48,6 +62,7 @@ project Applications {
             setOf(AppPackagingSchema) packaging = { AppPackagingSchema::SpringFat };
             setOf(TypeSubstitution) typeSubstitutions = {};
             sequenceOf(refTo(DisplayRow)) displayRows = {};
+            AppIdentityStore identityStore = null; // shall go to UiInvisibleGroup
         }
         assign (uiGroup = UiInvisibleGroup) to {
             String derivedFrom = null;

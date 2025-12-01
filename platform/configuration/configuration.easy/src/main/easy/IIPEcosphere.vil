@@ -228,7 +228,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         }
                         for (Plugin plugin: impl.plugins) {
                             oktoPlugins.add(plugin.artifact + "*"); // 'mark' as optional
-//plugins.add(plugin);
                         }
                     };
                     
@@ -241,17 +240,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 for (String k: appJsl.getKeys()) {
                   vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/${k}", descriptors=appJsl.get(k));
                 }
-/*sequenceOf(String) pluginDescriptors = {};
-for (Plugin plugin: plugins->sortedBy(p|p.id)) {
-    sequenceOf(String) tmp = plugin.artifact.split(":");
-    String fName = tmp[1]+"-"+tmp[2]+".zip";
-    addDependencyArtifact(bins, plugin.artifact, "plugin", "${mvnProjectBuildDir}/classes", fName, "zip", "copy");
-    String clsName = asIdentifier(tmp[1]).firstToUpper();
-    vilTemplateProcessor("JavaPluginSetupDescriptor", config, "${javaSrc}/de/oktoflow/plugins/${clsName}PluginSetupDescriptor.java", 
-        clsName=clsName, plugin=plugin.id, resource="${fName}", pkg="de.oktoflow.plugins");
-    pluginDescriptors.add('de.oktoflow.plugins.${clsName}PluginSetupDescriptor');
-}
-vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/de.iip_ecosphere.platform.support.plugins.PluginSetupDescriptor", descriptors=pluginDescriptors);*/
                 
                 elements = elements->sortedBy(n|n.name).toSequence(); // for testing
                 
@@ -276,6 +264,10 @@ vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/de.
                         addAssemblyInfo(assemblies, "python", "${assemblyRel}/pythonInterfaces.xml", "package", mvnProjectBuildDir);
                     }
                 }
+                if (a.identityStore <> null and a.identityStore.includeInApplication) {
+                    vilTemplateProcessor("TemplatesIdentityStoreYaml", config, "${resourcesSrc}/identityStore.yml", app=a);
+                }
+                
                 
                 Boolean copyDependencies = enablesPackaging(a, AppPackagingSchema::ZipWithClasspath); // may be more...
                 // partition according to container strategy
@@ -367,7 +359,7 @@ vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/de.
 
                 String appVersion = getAppMvnVersion(a);
                 vilTemplateProcessor("AppMvnTest", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, assemblies=assemblies, oktoPlugins=oktoPlugins, nodes=elements, appName=appName, appVersion=appVersion, appDescription="Implementation of ${a.name}", tests=tests);
-                vilTemplateProcessor("TemplatesIdentityStoreYaml", config, "${resourcesSrc}/identityStore.yml", appName=appName);
+                vilTemplateProcessor("TemplatesIdentityStoreYaml", config, "${resourcesSrc}/identityStore.yml", app=a);
                 vilTemplateProcessor("TemplatesTestLogbackXml", config, "${testResourcesSrc}/logback.xml");
                 identityStoreJsl(testResourcesSrc, cfg);
                 

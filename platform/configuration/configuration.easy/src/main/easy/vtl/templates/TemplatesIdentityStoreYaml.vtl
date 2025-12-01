@@ -1,6 +1,10 @@
+import JavaBasics;
+
 @advice(IIPEcosphere)
 @format(profile="yaml", indentSteps = 2, profileArg_sorting = "INSERT")
-template TemplatesIdentityStoreYaml(IIPEcosphere config, FileArtifact target, String appName) {
+template TemplatesIdentityStoreYaml(IIPEcosphere config, FileArtifact target, Application app) {
+
+    Boolean hasAmqp = false;
 
     @DispatchBasis
     def transportProtocolEntry(TransportProtocol proto, YamlNode ids) {
@@ -8,18 +12,42 @@ template TemplatesIdentityStoreYaml(IIPEcosphere config, FileArtifact target, St
 
     @DispatchCase
     def transportProtocolEntry(TransportProtocolAMQP proto, YamlNode ids) {
-        ids.addObject("amqp")
+        if (!hasAmqp) {
+            ids.addObject("amqp")
+              .addValue("type", "USERNAME")
+              .addValue("userName", "user")
+              .addValue("tokenData", "pwd")
+              .addValue("tokenEncryptionAlgorithm", "UTF-8");
+        }
+    }
+    
+    @DispatchBasis
+    def genEntry(AppIdentityStoreEntry entry, YamlNode ids) {
+    }
+
+    @DispatchCase
+    def genEntry(UserPwAppIdentityStoreEntry entry, YamlNode ids) {
+        hasAmqp = entry.name == "amqp";
+        ids.addObject(entry.name)
           .addValue("type", "USERNAME")
-          .addValue("userName", "user")
-          .addValue("tokenData", "pwd")
+          .addValue("userName", entry.userName)
+          .addValue("tokenData", entry.password)
           .addValue("tokenEncryptionAlgorithm", "UTF-8");
     }
     
-    def main(IIPEcosphere config, FileArtifact target, String appName) {
+    def main(IIPEcosphere config, FileArtifact target, Application app) {
+        String appName = getAppMvnName(app);
         YamlFileArtifact art = target;
         YamlNode doc = art.addDocument();
         doc.addValue("name", appName);
         YamlNode ids = doc.addObject("identities");
+        Boolean addAmqp = true;
+        if (app.identityStore <> null) {
+            AppIdentityStore idStore = app.identityStore;
+            for (AppIdentityStoreEntry entry : idStore.identities) {
+                genEntry(entry, ids);        
+            }
+        }
         transportProtocolEntry(config.transportProtocol, ids);
     }
     
