@@ -374,6 +374,11 @@
         <version>${project.version}</version>
     </dependency>    
     <dependency>
+        <artifactId>transport.spring.generic</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>    
+    <dependency>
         <artifactId>transport.spring.amqp</artifactId>
         <groupId>de.iip-ecosphere.platform</groupId>
         <version>${project.version}</version>

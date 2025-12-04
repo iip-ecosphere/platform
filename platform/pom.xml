@@ -53,6 +53,7 @@
      <module>transport/transport.mqttv3</module>
      <module>transport/transport.mqttv5</module>
      <module>transport/transport.spring</module>
+     <module>transport/transport.spring.generic</module>
      <module>transport/transport.spring.amqp</module>
      <module>transport/transport.spring.mqttv3</module>
      <module>transport/transport.spring.mqttv5</module>
