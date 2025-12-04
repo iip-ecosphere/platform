@@ -7,6 +7,10 @@ import MeshBasics;
 @indent(indentation = 4, additional = 0)
 template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(AssemblyInfo) assemblies, sequenceOf(String) oktoPlugins, Boolean springPackaging=true, String groupId="") {
 
+    def Boolean isGlobalPlugin(String plugin) {
+        plugin.find("platform:transport") > 0 or plugin.find("platform:support.aas.basyx:") > 0 or plugin.find("platform:support.aas.basyx2:") > 0;        
+    }
+
     def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(AssemblyInfo) assemblies, sequenceOf(String) oktoPlugins, Boolean springPackaging=true, String groupId="") {
         String iipGroup = "de.iip-ecosphere.platform";
         String gId = groupId;
@@ -20,6 +24,9 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
                 hasPython = true;
             }
         }        
+
+        sequenceOf(String) globalOktoPlugins = oktoPlugins->select(p|isGlobalPlugin(p));
+        oktoPlugins = oktoPlugins->reject(p|isGlobalPlugin(p));
         
         XmlElement project = createMavenRoot(target);
         createMavenProjectAttributes(project, "${appName}Services", "${appName}-services", "${appDescription}");
@@ -125,15 +132,21 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         new XmlComment(dep, "Remaining global dependencies go here."); 
         appendDependency(dep, "junit", "junit", scope="test");
         new XmlComment(dep, "Initially, fixed protocol");
-        appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
+        //appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
         appendDependency(dep, iipGroup, "support", projectVersion);
         appendDependency(dep, iipGroup, "transport", projectVersion, scope="test", type="test-jar");
-        appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
+        appendDependencies(dep, globalOktoPlugins, projectVersion, enable=withoutPlugins(config));
+        //appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
         appendDependency(dep, iipGroup, serviceManagerModule(config), projectVersion, scope="test");
         appendServiceManagerDeps(dep, config.serviceManager);
         new XmlComment(dep, "Remaining test dependencies go here.");
         
-        appendDeploymentPlugins(plugins, config); 
+        appendDeploymentPlugins(plugins, config);
+        if (globalOktoPlugins.size() > 0 and withPlugins(config)) {
+            XmlElement dependencyPlugin = appendMavenIipDependencyPlugin(plugins, ver=projectVersion);
+            XmlElement execs = new XmlElement(dependencyPlugin, "executions");
+            appendMavenIipDependencyPluginUnpackPluginsExecution(execs, globalOktoPlugins, projectVersion, enable=withPlugins(config));
+        }
     }
 
     // dispatch basis

@@ -201,6 +201,19 @@ template JavaMapping(Configuration config, FileArtifact target) {
         }
     }
 
+    def String aasExclusions(IIPEcosphere cfg, Boolean withAasClientExclusions=false, Boolean withAasServerExclusions=false) {
+        String result = "";
+        if (cfg.aas == AasImpl::BaSyx) {
+            if (withAasClientExclusions) {
+                result = result + "/javax.el:el-api";
+            }
+            if (withAasServerExclusions) {
+                result = result + "/org.apache.tomcat:tomcat-catalina";
+            }
+        }
+        result;
+    }
+
     def String aasServerModule(IIPEcosphere cfg) {
         switch (cfg.aas) {
             AasImpl::BaSyx : "support.aas.basyx.server",

@@ -52,18 +52,18 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             appendDependency(dep, iipGroup, serviceLoaderModule(config), projectVersion);
             appendDependency(dep, "org.springframework.boot", "spring-boot-starter-web");
             appendDependency(dep, "org.springframework.boot", "spring-boot-starter-actuator");
-            appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
+            //appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
             appendDependency(dep, iipGroup, serviceProtocolModule(config), projectVersion);
-            appendArtifact(dep, deviceIdProviderModule(config));
-            addSemanticIdResolverDependencies(dep, config);
-            d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
+            //appendArtifact(dep, deviceIdProviderModule(config));
+            //addSemanticIdResolverDependencies(dep, config);
+            /*d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
             XmlElement exs = new XmlElement(d, "exclusions");
             XmlElement ex = new XmlElement(exs, "exclusion");
             new XmlElement(ex, "groupId", "javax.el");
             new XmlElement(ex, "artifactId", "el-api");
             ex = new XmlElement(exs, "exclusion");
             new XmlElement(ex, "groupId", "org.apache.tomcat");
-            new XmlElement(ex, "artifactId", "tomcat-catalina");
+            new XmlElement(ex, "artifactId", "tomcat-catalina");*/
         }
         for (String art : artifacts.asSequence()->sortedBy(a|a)) { // sortedBy for testing
             appendArtifact(dep, art, projectVersion);
@@ -93,7 +93,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         /*if (isPythonUsed(usedServiceTypes)) {
             appendMavenDependencyPluginExecution(execs, "unpack", "${iipGroup}:services.environment:${projectVersion}", "python", "\\${project.basedir}/src/main/python", "pythonEnv.zip", type="zip");
         }*/
-        appendMavenIipDependencyPluginUnpackPluginsExecution(execs, oktoPlugins, projectVersion, enable=withPlugins(config));
+        appendMavenIipDependencyPluginUnpackPluginsExecution(execs, oktoPlugins, projectVersion, enable=withPlugins(config)); // withoutPlugins
         mapOf(String, XmlElement) goalItems = {}; 
         for (DependencyArtifact bin: bins.asSequence()->sortedBy(b|b.artifact)) { // sortedBy for testing
             if (goalItems.containsKey(bin.goal)) {

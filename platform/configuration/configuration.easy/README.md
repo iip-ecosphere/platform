@@ -109,3 +109,5 @@ Some tests are executed for code generation in this project, the remainder is ex
 Some tests are executed in own JVMs to prevent conflicting dependencies with Maven. To update the persisted dependency list, call `mvn prepare-package`. 
 
 To build this component without tests, e.g., to just package a changed model for local tests, run `mvn install -DdisableJavaTests=true`. However, as this model is only one of multiple potential models, subsequently the build process of `configuration` must be executed to collect all (alternative) models and to effectively deploy them.
+
+**Hint:** To shield Maven from the dependencies of EASy-Producer, usually the instantiation is executed in a separated process. However, as the execution relies on the Jar files of this project, changes to the code require mvn install before the process-based execution takes up the new code.

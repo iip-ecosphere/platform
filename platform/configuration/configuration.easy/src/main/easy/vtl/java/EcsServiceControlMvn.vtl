@@ -22,20 +22,20 @@ template EcsServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, Strin
         appendDependencies(dep, oktoPlugins, projectVersion, enable=withoutPlugins(config));
         appendDependency(dep, iipGroup, "ecsRuntime", projectVersion);
         appendDependency(dep, iipGroup, "services", projectVersion);
-        appendDependency(dep, iipGroup, serviceManagerModule(config), projectVersion);
-        XmlElement d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
+        //appendDependency(dep, iipGroup, serviceManagerModule(config), projectVersion);
+        /*XmlElement d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
         XmlElement ex = new XmlElement(new XmlElement(d, "exclusions"), "exclusion");
         new XmlElement(ex, "groupId", "javax.el");
-        new XmlElement(ex, "artifactId", "el-api");
-        appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
+        new XmlElement(ex, "artifactId", "el-api");*/
+        //appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
         appendDependency(dep, springGroup, "spring-boot-starter-web");
         appendDependency(dep, springGroup, "spring-boot-starter-actuator");
-        appendArtifact(dep, deviceIdProviderModule(config));
-        addSemanticIdResolverDependencies(dep, config);
+        //appendArtifact(dep, deviceIdProviderModule(config));
+        //addSemanticIdResolverDependencies(dep, config);
         appendIipBaseDependencies(dep);
-        for (String d:deviceType.requiredModules) {
+        /*for (String d:deviceType.requiredModules) {
             appendArtifact(dep, "${d}");
-        }
+        }*/
         
         XmlElement plugins = createMavenBuildElement(project, "", true);
         appendMavenJarPlugin(plugins, "2.3", false, main);

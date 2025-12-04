@@ -1,4 +1,5 @@
 import Basics;
+import JavaMapping;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
@@ -341,13 +342,19 @@ template JavaBasics(Configuration config, FileArtifact target) {
     }
 
     // added v2->v3
-    def appendPlugin(sequenceOf(String) plugins, String groupId, String artifactId, String ver) {
-        String coord = groupId + ":" + artifactId + ":" + ver;
-        plugins.add(coord);
+    def appendPlugin(sequenceOf(String) plugins, String groupId, String artifactId, String ver, String add="") {
+        if (artifactId <> "") {
+            String coord = groupId + ":" + artifactId + ":" + ver + add;
+            plugins.add(coord);
+        }
     }
     
     // added v2->v3
-    def sequenceOf(String) getOktoflowPlugins(IIPEcosphere config, Boolean withLogging=false, Boolean withServices=false) {
+    def sequenceOf(String) getOktoflowPlugins(IIPEcosphere config, Boolean withLogging=false, Boolean withServices=false, Boolean withAas=true, 
+        Boolean withAasServer=false, Boolean withAasClientExclusions=false, Boolean withAasServerExclusions=false, Boolean withTransportModule=true,
+        Boolean withDeviceIdProviderModule=false, Boolean withSemanticIdResolverModules=false, Boolean withServiceManagerModule=false, 
+        Boolean withCentralMonitoringModule=false, Boolean withDeviceRegistryModules=false, Boolean withContainerManagerModule=false, 
+        Boolean withConfigModule=false) {
         String projectVersion = config.iipVer;
         String iipGroup = "de.iip-ecosphere.platform";
         sequenceOf(String) result = {};
@@ -366,13 +373,86 @@ template JavaBasics(Configuration config, FileArtifact target) {
         appendPlugin(result, iipGroup, "support.processInfo-oshi", projectVersion);
         appendPlugin(result, iipGroup, "support.bytecode-bytebuddy", projectVersion);
         appendPlugin(result, iipGroup, "support.http-apache", projectVersion);
+        if (withAas) {
+            appendPlugin(result, iipGroup, aasClientModule(config), projectVersion, add=aasExclusions(config, withAasClientExclusions=withAasClientExclusions, withAasServerExclusions=withAasServerExclusions));
+            if (withAasServer) {
+                appendPlugin(result, iipGroup, aasServerModule(config), projectVersion);
+            } 
+        }
         if (withServices) {
             setOf(String) artifacts = {}; // throw away
             for (Service s : Service.allInstances()) {
                 addArtifact(s, artifacts, result);
             }
         }
+        if (withTransportModule) {
+            appendPlugin(result, iipGroup, transportProtocolModule(config), projectVersion);
+        }
+        if (withDeviceIdProviderModule) {
+            result.add(deviceIdProviderModule(config)); // full artifact
+        }
+        if (withSemanticIdResolverModules) {
+            if (isDefined(config.aasSemanticIdResolver) and config.aasSemanticIdResolver <> null) {
+                for (AasSemanticIdResolver p: config.aasSemanticIdResolver) {
+                    result.add(p.artifact); // full artifact
+                }        
+            } // use the default builtin
+        }
+        if (withServiceManagerModule) {
+            appendPlugin(result, iipGroup, serviceManagerModule(config), projectVersion);
+        }
+        if (withCentralMonitoringModule) {
+            appendPlugin(result, iipGroup, centralMonitoringModule(config), projectVersion);
+        }
+        if (withDeviceRegistryModules) {
+            appendPlugin(result, iipGroup, deviceRegistryModule(config), projectVersion);
+            appendPlugin(result, iipGroup, deviceMgtStorageModule(config), projectVersion);
+        }
+        if (withContainerManagerModule) {
+            appendPlugin(result, iipGroup, containerManagerModule(config), projectVersion);
+        }
+        if (withConfigModule) {
+            appendPlugin(result, iipGroup, "configuration.easy", projectVersion);
+        }
         result;
+    }
+    
+    // added v2->v3
+    def sequenceOf(String) addDeviceTypePlugins(IIPEcosphere config, sequenceOf(String) plugins, EcsDevice deviceType) {
+        sequenceOf(String) result = {};
+        result = result.union(plugins);
+        for (String d:deviceType.requiredModules) {
+            result.add("${d}");
+        }
+        result;
+    }
+    
+    // added v2->v3
+    def sequenceOf(String) cleanAppTestPlugins(IIPEcosphere config, sequenceOf(String) plugins) {
+        Integer pos = -1;
+        Integer i = 0;
+        String projectVersion = config.iipVer;
+        String iipGroup = "de.iip-ecosphere.platform";
+        String plugin = iipGroup +":" + aasClientModule(config) + ":" + projectVersion;
+        String searchFor = plugin + "/";
+        for (String p : plugins) {
+            if (p.startsWith(searchFor)) {
+                pos = i;
+            }
+            i = i + 1;
+        }
+        if (pos >= 0) {
+            plugins.removeAt(pos);
+            plugins = plugins.insertAt(pos, plugin);
+        }
+        
+        plugins.remove(deviceIdProviderModule(config)); // full artifact
+        if (isDefined(config.aasSemanticIdResolver) and config.aasSemanticIdResolver <> null) {
+            for (AasSemanticIdResolver p: config.aasSemanticIdResolver) {
+                plugins.remove(p.artifact); // full artifact
+            }        
+        }
+        plugins;
     }
 
     def String getSelectorArtifact(FamilyMemberSelector sel) {

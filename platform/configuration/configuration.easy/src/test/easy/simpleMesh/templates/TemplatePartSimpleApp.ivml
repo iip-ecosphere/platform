@@ -3,6 +3,8 @@ project TemplatePartSimpleApp {
     import Applications;
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
+    annotate Integer uiGroup = UiMandatoryGroup1 to .;
+    annotate String displayName = "" to .;
     
     Application tplApp = {
         id = "SimpleApp",
@@ -22,7 +24,7 @@ project TemplatePartSimpleApp {
         }
     };
     
-    //tplApp.identityStore.uiGroup = UiMandatoryGroup1;
+    tplApp.identityStore.uiGroup = UiMandatoryGroup1;
     
     // --------------------- mesh ------------------
     

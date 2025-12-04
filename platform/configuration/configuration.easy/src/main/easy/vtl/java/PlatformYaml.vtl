@@ -80,8 +80,10 @@ template PlatformYaml(IIPEcosphere config, YamlFileArtifact target, String model
             configFolder = config.configFolder;
         }
         ep.addValue("ivmlConfigFolder", "${base}/${configFolder}");
-        if (isDefined(config.additionalModelFolders) and config.additionalModelFolders <> null and config.additionalModelFolders.size() > 0) {
-            ep.addList("additionalIvmlFolders", config.additionalModelFolders->sortedBy(s|s).asSequence());
+        if (isDefined(config.additionalModelFolders) and config.additionalModelFolders <> null) {
+            if (config.additionalModelFolders.size() > 0) {
+                ep.addList("additionalIvmlFolders", config.additionalModelFolders->sortedBy(s|s).asSequence());
+            }
         }
     }
 
@@ -95,7 +97,9 @@ template PlatformYaml(IIPEcosphere config, YamlFileArtifact target, String model
         produceCentralMonitoring(config.platformMonitoring, n);
         produceEasy(config, modelName, n);
         n.addValue("artifactsFolder", config.artifactsFolder);
-        n.addValue("artifactsUriPrefix", config.artifactsUriPrefix);
+        if (isDefined(config.artifactsUriPrefix) and config.artifactsUriPrefix <> null) {
+            n.addValue("artifactsUriPrefix", config.artifactsUriPrefix);
+        }
         n.addValueNotEmpty("uploadFolder", getStringValueSafe(config.uploadFolder, ""));
         n.addValue("aasHeartbeatTimeout", getIntegerValueSafe(config.deviceHeartbeatTimeout, config.deviceHeartbeatTimeoutDflt));
         producePlugins(config, n);

@@ -25,8 +25,8 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
         XmlElement dep = createDependencies(project);
         appendDependency(dep, iipGroup, "support", projectVersion); 
         appendDependencies(dep, oktoPlugins, projectVersion, enable=withoutPlugins(config));
-        appendDependency(dep, iipGroup, "configuration.easy", projectVersion);
-        XmlElement d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
+        //appendDependency(dep, iipGroup, "configuration.easy", projectVersion);
+        /*XmlElement d = appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
         if (monitoring) {
             // conflicts on Linux with Tomcat
             XmlElement e = new XmlElement(new XmlElement(d, "exclusions"), "exclusion");
@@ -34,24 +34,24 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
             new XmlElement(e, "artifactId", "tomcat-catalina");
         } else {
             appendDependency(dep, iipGroup, aasServerModule(config), projectVersion);
-        }
-        appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
+        }*/
+        //appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
         if (monitoring) {
             if (config.platformMonitoring.isKindOf(PrometheusPlatformMonitoring)) {
                 // does not override somehow in monitoring.prometheus, wrong version occurs here
                 appendDependency(dep, "io.micrometer", "micrometer-registry-prometheus", "1.8.3");
             }
-            appendDependency(dep, iipGroup, centralMonitoringModule(config), projectVersion);
+            //appendDependency(dep, iipGroup, centralMonitoringModule(config), projectVersion);
             appendDependency(dep, iipGroup, "monitoring", projectVersion);
         } else {
-            appendDependency(dep, iipGroup, deviceRegistryModule(config), projectVersion);
-            appendDependency(dep, iipGroup, deviceMgtStorageModule(config), projectVersion);
+            //appendDependency(dep, iipGroup, deviceRegistryModule(config), projectVersion);
+            //appendDependency(dep, iipGroup, deviceMgtStorageModule(config), projectVersion);
             appendDependency(dep, iipGroup, "configuration.configuration", projectVersion);
             appendDependency(dep, iipGroup, "platform", projectVersion);
             appendDependency(dep, iipGroup, managementUiModule(config), projectVersion);
         }
-        appendArtifact(dep, deviceIdProviderModule(config));
-        addSemanticIdResolverDependencies(dep, config);
+        //appendArtifact(dep, deviceIdProviderModule(config));
+        //addSemanticIdResolverDependencies(dep, config);
         appendIipBaseDependencies(dep);
         
         XmlElement plugins = createMavenBuildElement(project, "", true);

@@ -264,7 +264,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
                 }
             }
         }
-        if (enable and effPlugins.size() > 0) {
+        if (effPlugins.size() > 0) {
             XmlElement exec = new XmlElement(execs, "execution");
             new XmlElement(exec, "id", "okto plugins");
             appendGoal(exec, "unpack-plugins");
@@ -283,20 +283,24 @@ template MavenBasics(Configuration config, FileArtifact target) {
         execs;
     }
 
+    // added v2->v3
     def XmlElement appendDependencies(XmlElement parent, sequenceOf(String) plugins, String projectVersion, Boolean enable=true, String depElt="", Boolean includeOptPlugins=false) {
         setOf(String) artifacts = {};
         appendDependencies(parent, plugins, artifacts, projectVersion, enable=enable, depElt=depElt, includeOptPlugins=includeOptPlugins);
     }
     
-    def XmlElement appendDependencies(XmlElement parent, sequenceOf(String) plugins, setOf(String) artifacts, String projectVersion, Boolean enable=true, String depElt="", Boolean includeOptPlugins=false) {
+    // added v2->v3
+    def XmlElement appendDependencies(XmlElement parent, sequenceOf(String) plugins, setOf(String) artifacts, String projectVersion, Boolean enable=true, String depElt="", Boolean includeOptPlugins=false, Boolean includeExclusions=true) {
         setOf(String) done = {};
         if (enable) {
             for (String p: plugins) {
+                sequenceOf(String) parts = p.split("/");
+                p = parts.removeFirst();
                 Boolean consider = true;
                 if (p.endsWith("*")) {
                     p = p.substring(0, p.length() - 1);                    
                     if (not(includeOptPlugins)) {
-                        consider = false;                        
+                        consider = false;
                     }
                 }
                 if (!done.includes(p) and consider) {
@@ -311,7 +315,15 @@ template MavenBasics(Configuration config, FileArtifact target) {
                     if (p.endsWith(":")) {
                         p = p + projectVersion;
                     }
-                    appendArtifact(par, p, createDepElt=createDepElt);
+                    XmlElement dep = appendArtifact(par, p, createDepElt=createDepElt);
+                    // exclusions active only for dependencies, not for plugins (they care for that internally)
+                    if (parent.getName() == "dependencies" and parts.size() > 0 and includeExclusions) {
+                        XmlElement excls = new XmlElement(dep, "exclusions");
+                        for (String e : parts) {
+                            XmlElement excl = new XmlElement(excls, "exclusion");
+                            appendArtifact(excl, e, createDepElt=false);
+                        }
+                    }
                     done.add(p);
                     artifacts.remove(p); // prevent double naming
                 }
@@ -320,6 +332,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
         parent;
     }
     
+    // added v2->v3
     def XmlElement appendMavenDependencyPluginCopyDeps(XmlElement plugins, String ver="3.2.0", String jarDir="", Boolean copyOwn=false, Boolean prependGroupId=true) {
         XmlElement plugin = appendMavenDependencyPlugin(plugins, ver);
         XmlElement execs = new XmlElement(plugin, "executions");
@@ -329,6 +342,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
         execs;
     }
     
+    // added v2->v3
     def XmlElement appendMavenDependencyPluginCopyDepsExecution(XmlElement execs, String jarDir="", 
         Boolean copyOwn=false, Boolean prependGroupId=true, String phase="package", String excludeIds="", 
         String includeScope="", String includeIds="", String rootCoords="") {

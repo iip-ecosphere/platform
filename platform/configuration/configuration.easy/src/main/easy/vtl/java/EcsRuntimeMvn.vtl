@@ -20,15 +20,15 @@ template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target, String dir, 
         appendDependency(dep, iipGroup, "support", projectVersion);
         appendDependencies(dep, oktoPlugins, projectVersion, enable=withoutPlugins(config));
         appendDependency(dep, iipGroup, "ecsRuntime", projectVersion);
-        appendDependency(dep, iipGroup, containerManagerModule(config), projectVersion);
-        appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
-        appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
-        appendArtifact(dep, deviceIdProviderModule(config));
-        addSemanticIdResolverDependencies(dep, config);
+        //appendDependency(dep, iipGroup, containerManagerModule(config), projectVersion);
+        //appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
+        //appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
+        //appendArtifact(dep, deviceIdProviderModule(config));
+        //addSemanticIdResolverDependencies(dep, config);
         appendIipBaseDependencies(dep);
-        for (String d:deviceType.requiredModules) {
+        /*for (String d:deviceType.requiredModules) {
             appendArtifact(dep, "${d}");
-        }
+        }*/
 
         XmlElement plugins = createMavenBuildElement(project, "", true);
         appendMavenJarPlugin(plugins, "2.3", false, main);

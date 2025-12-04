@@ -266,6 +266,7 @@ public abstract class AbstractIvmlTests {
          * @return the descriptor
          */
         public ConfigurationLifecycleDescriptor obtainLifecycleDescriptor() {
+            configureLogging();
             return assertLifecycleDescriptor();
         }
         

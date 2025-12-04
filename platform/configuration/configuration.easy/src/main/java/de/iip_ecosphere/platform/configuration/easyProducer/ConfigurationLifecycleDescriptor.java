@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.configuration.easyProducer;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import de.iip_ecosphere.platform.configuration.cfg.StatusCache;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
@@ -35,23 +37,43 @@ import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
  */
 public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
 
+    private static Set<String> noEasyLogging = new HashSet<>();
+
     private ManifestLoader loader;
     private boolean doLogging = true;
     private boolean doFilterLogs = false;
     private ClassLoader classLoader = ConfigurationLifecycleDescriptor.class.getClassLoader();
     
+    static {
+        addNoEasyLogging(net.ssehub.easy.instantiation.core.model.vilTypes.TypeRegistry.class);
+        addNoEasyLogging(net.ssehub.easy.instantiation.core.model.artifactModel.ArtifactFactory.class);
+        noEasyLogging.add("net.ssehub.easy.varModel.management.DefaultImportResolver");
+        addNoEasyLogging(net.ssehub.easy.instantiation.core.model.templateModel.TemplateLangExecution.class);
+        addNoEasyLogging(net.ssehub.easy.instantiation.core.model.templateModel.Template.class);
+        addNoEasyLogging(net.ssehub.easy.instantiation.core.model.buildlangModel.Script.class);
+        addNoEasyLogging(net.ssehub.easy.instantiation.core.model.expressions.ExpressionParserRegistry.class);
+    }
+    
     /**
-     * Defines the basic logging levels in here.
+     * Registers the name of {@code cls} for not-logging EASY-producer logging messages.
+     * 
+     * @param cls the class to register
+     */
+    private static void addNoEasyLogging(Class<?> cls) {
+        noEasyLogging.add(cls.getName());
+    }
+    
+    /**
+     * Defines the basic logging levels in here. Keep sequence/ordinals according to imporance, lowest first.
      * 
      * @author Holger Eichelberger, SSE
      */
     private enum LogLevel {
+        TRACE,
         DEBUG,
         INFO, 
         WARN, 
         ERROR,
-        TRACE,
-        FATAL,
         OFF
     }
     
@@ -137,6 +159,9 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
         boolean emit = doLogging;
         if (doFilterLogs && (LogLevel.ERROR != level && LogLevel.WARN != level)) { // limit main decision override 
             emit = clazz == EasyExecutor.class;
+        }
+        if (emit && level.ordinal() < LogLevel.WARN.ordinal()) { // emit warn/error anyway
+            emit = !noEasyLogging.contains(clazz.getName());
         }
         return emit;
     }
