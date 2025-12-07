@@ -13,7 +13,12 @@
 package de.iip_ecosphere.platform.tools.maven.dependencies;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.maven.plugin.logging.Log;
@@ -157,23 +162,25 @@ class Resolver {
         request.setArtifact(artifact);
         request.setRepositories(remoteRepositories);
         ArtifactResult result = repoSystem.resolveArtifact(repoSession, request);
-        ArtifactRepository repo = result.getRepository();
         String url = null;
-        if (repo instanceof RemoteRepository) {
-            RemoteRepository r = (RemoteRepository) repo;
-            url = r.getUrl();
-        } // Local and Workspace repo do not need downloads
-        if (null != url) {
-            org.eclipse.aether.artifact.Artifact art = result.getArtifact();
-            url += "/" + art.getGroupId().replace('.', '/') + "/" 
-                + art.getArtifactId() + "/" 
-                + art.getBaseVersion() + "/" 
-                + art.getArtifactId() + "-" 
-                + art.getVersion()
-                + (art.getClassifier() != null && !art.getClassifier().isEmpty()
-                        ? "-" + art.getClassifier()
-                        : "") 
-                + "." + art.getExtension();
+        if (null != result) {
+            ArtifactRepository repo = result.getRepository();
+            if (repo instanceof RemoteRepository) {
+                RemoteRepository r = (RemoteRepository) repo;
+                url = r.getUrl();
+            } // Local and Workspace repo do not need downloads
+            if (null != url) {
+                org.eclipse.aether.artifact.Artifact art = result.getArtifact();
+                url += "/" + art.getGroupId().replace('.', '/') + "/" 
+                    + art.getArtifactId() + "/" 
+                    + art.getBaseVersion() + "/" 
+                    + art.getArtifactId() + "-" 
+                    + art.getVersion()
+                    + (art.getClassifier() != null && !art.getClassifier().isEmpty()
+                            ? "-" + art.getClassifier()
+                            : "") 
+                    + "." + art.getExtension();
+            }
         }
         return url;
     }
@@ -212,6 +219,43 @@ class Resolver {
             getLog().error("Cannot find spring version!");
         }
         return result;
+    }
+    
+    /**
+     * Writes the dependency resolution file.
+     * 
+     * @param <T> the type of dependency item
+     * @param file the file to write
+     * @param items the dependency items
+     * @param resolutionProvider resolves an item to its dependency URL (may lead to an empty or <b>null</b> value, 
+     *     ignored then)
+     * @param artifactIdProvider resolves an item to its artifact id
+     * @param versionProvider resolves an item to its version
+     */
+    <T> void writeResolvedFile(File file, Collection<T> items, Function<T, String> resolutionProvider, 
+        Function <T, String> artifactIdProvider, Function <T, String> versionProvider) {
+        try (PrintStream out = new PrintStream(new FileOutputStream(file))) {
+            out.println("[");
+            boolean first = true;
+            for (T p : items) {
+                String urlPath = resolutionProvider.apply(p);
+                if (null != urlPath && urlPath.length() > 0) {
+                    if (!first) {
+                        out.println(",");
+                    }
+                    out.print("  {\"url\":\"" + urlPath + "\", \"name\":\"" + artifactIdProvider.apply(p) 
+                        + "-" + versionProvider.apply(p) + "\"}");
+                    first = false;
+                }
+            }
+            if (!first) {
+                out.println();
+            }
+            out.println("]");
+            getLog().info("Wrote resolution file " + file);
+        } catch (IOException e) {
+            getLog().error("While writing resolution file " + file + ": " + e.getMessage());
+        }
     }
 
     /**

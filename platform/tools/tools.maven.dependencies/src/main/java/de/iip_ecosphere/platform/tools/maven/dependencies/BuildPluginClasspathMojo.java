@@ -18,9 +18,11 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -60,9 +62,6 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
     @Parameter( property = "mdep.pluginIds", defaultValue = "" )
     private List<String> pluginIds;
 
-    @Parameter( property = "mdep.resolvedFile", defaultValue = "*")
-    private String resolvedFile;
-
     @Parameter( required = false )
     private boolean asTest;
 
@@ -72,6 +71,9 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
     @Parameter( property = "mdep.validateJsl", defaultValue = "INFO" )
     private JslMode validateJsl;
 
+    @Parameter( property = "mdep.resolvedFile", defaultValue = "*")
+    private String resolvedFile;
+    
     @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
     private List<RemoteRepository> remoteRepositories;
 
@@ -157,6 +159,23 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
         setPrepends(prepends);
         composeBefores(null);
         super.doExecute();
+
+        File file = null;
+        if (resolvedFile == null || resolvedFile.equals("*")) {
+            file = new File(targetDirectory, "classes/resolved");
+        } else if (resolvedFile.length() > 0) {
+            file = new File(resolvedFile);
+        }
+        if (file != null) {
+            if ("resolve".equalsIgnoreCase(unpackMode)) {
+                Resolver resolver = new Resolver(repoSystem, repoSession, remoteRepositories, getLog());
+                Set<Artifact> artifacts = getResolvedDependencies(true);
+                resolver.writeResolvedFile(file, artifacts, a -> resolver.resolveToUrl(a), 
+                    a -> a.getArtifactId(), a -> a.getVersion());
+            } else {
+                file.delete();
+            }
+        }
 
         if (validateJsl != JslMode.OFF) {
             switch (validateJsl) {

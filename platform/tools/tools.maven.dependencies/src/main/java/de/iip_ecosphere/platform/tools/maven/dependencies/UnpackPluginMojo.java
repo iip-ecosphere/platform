@@ -363,28 +363,8 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             }
             if (file != null) {
                 Resolver resolver = new Resolver(repoSystem, repoSession, remoteRepositories, getLog());
-                try (PrintStream out = new PrintStream(new FileOutputStream(file))) {
-                    out.println("[");
-                    boolean first = true;
-                    for (PluginItem p : plugins) {
-                        String urlPath = resolver.resolveToUrl(toArtifactItem(p));
-                        if (null != urlPath && urlPath.length() > 0) {
-                            if (!first) {
-                                out.println(",");
-                            }
-                            out.print("  {\"url\":\"" + urlPath + "\", \"name\":\"" + p.getArtifactId() 
-                                + "-" + getActualVersion(p) + "\"}");
-                            first = false;
-                        }
-                    }
-                    if (!first) {
-                        out.println();
-                    }
-                    out.println("]");
-                    getLog().info("Wrote resolution file " + file);
-                } catch (IOException e) {
-                    getLog().error("While writing resolution file " + file + ": " + e.getMessage());
-                }
+                resolver.writeResolvedFile(file, plugins, p -> resolver.resolveToUrl(toArtifactItem(p)), 
+                    p -> p.getArtifactId(), p -> getActualVersion(p));
             } else {
                 getLog().info("Skipping resolution file as disabled");
             }

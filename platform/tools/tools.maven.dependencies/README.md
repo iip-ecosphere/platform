@@ -165,6 +165,7 @@ Specialized goal to build a plugin classpath file. Based on the refined ``build-
 - `setupDescriptor` (default `FolderClasspath`, user property `mdep.setupDescriptor`) specifies the descriptor implementation that shall be announced to the plugin manager, may be a shortcut for platform supplied descriptors (`FolderClasspath`, `CurrentClassloader`, ``PluginBased`, `Process`), a qualified classname assuming a non-arg constructor, or empty for no loading through the class loader (rather than appending during unpack).
 - `pluginIds` (default empty, user property `mdep.pluginIds`) specifies pluginIds for the `PluginBased` setup descriptor (comma separated, only first considered by now), may also be used with others whereby then the plugin is also announced by `PluginBased`
 - `validateJsl` (default `WARN`, user property `mdep.validateJsl`) specifies whether classes listed in JSL files shall be validated for their counterparts in `target`, leads to warnings (`WARN`), information (`INFO`), errors (`ERROR`) or build failures (`FAIL`) if classes do not exist. Can be switched warnings `OFF`.
+- `resolvedFile` (default `${project.build.directory}/classes/resolved`, user property `mdep.resolvedFile`) specifies where to store the `resolved` file if `unpackMode` is `resolved`
 
 The inherited setting ``excludeArtifactIds`` shall be configured in a way that prerequiste platform layers are excluded. Usually, the plugin detects and determins the respective artifact ids automatically.
 
@@ -238,7 +239,7 @@ Moreover, for installations, if `relocate` is enabled, the `outputDirectory` bec
 
 If we are not in `relocate` mode, the plugin is only enabled, if the relative directories `../../support/support` (for arbitrary platform component) or `../support` (for support component) do not exist, which is the case for builds outside a local git workspace, e.g., on CI.
 
-- `writeResolved` (default `false`, user property `mdep.storeResolvedFile`) specifies whether the original locations of plugins shall be stored in a file
+- `writeResolved` (default `false`, user property `mdep.writeResolved`) specifies whether the original locations of plugins shall be stored in a file
 - `resolvedFile` (default `${project.build.directory}/classes/resolved`, user property `mdep.resolvedFile`) specifies where to store the file for `storeResolved`
 
 ## split-classpath

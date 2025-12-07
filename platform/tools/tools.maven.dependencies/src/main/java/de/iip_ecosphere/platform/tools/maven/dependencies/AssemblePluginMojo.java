@@ -77,9 +77,14 @@ public class AssemblePluginMojo extends AbstractMojo {
         getLog().info("Building " + outputFile);
         FileUtils.deleteQuietly(outputFile);
         try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outputFile))) {
+            File targetClasses = new File(targetDirectory, "classes");
             if (!addClasspathFiles(out, jarsDir)) { 
                 // initial style
-                addClasspathFiles(out, new File(targetDirectory, "classes"));
+                addClasspathFiles(out, targetClasses);
+            }
+            File resolv = new File(targetClasses, "resolved");
+            if (resolv.exists()) {
+                addFile(out, resolv, "", false);
             }
             if (isJarUnpacking()) {
                 addFile(out, prependGroup(new File(targetDirectory, namePrefix + ".jar")), "target/", false);
