@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
+import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.TransportFactory;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
@@ -41,6 +42,7 @@ public class GenericClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenericMessageBinder.class); // map all to binder
     private static GenericClient lastInstance;
     private TransportConnector connector;
+    private boolean globalInstance = false;
     private GenericConfiguration configuration;
     private Map<String, ReceptionCallback<?>> topics = Collections.synchronizedMap(new HashMap<>());
     
@@ -95,16 +97,22 @@ public class GenericClient {
         if (null == connector) {
             try {
                 configuration = config;
-                connector = TransportFactory.createConnector();
-                LOGGER.info("Generic: Connecting to " + config.getHost() + " " + config.getPort());
-                TransportParameterBuilder pBuilder = TransportParameterBuilder
-                    .newBuilder(config.getHost(), config.getPort())
-                    .setHostnameVerification(config.getHostnameVerification())
-                    .setAuthenticationKey(config.getAuthenticationKey());
-                if (config.useTls()) {
-                    pBuilder.setKeystoreKey(config.getKeystoreKey());
+                if (config.getHost() == null || config.getHost().trim().length() == 0) {
+                    connector = Transport.getGlobalTransport().createConnector();
+                    globalInstance = true;
+                } else {
+                    connector = TransportFactory.createConnector();
+                    LOGGER.info("Generic: Connecting to " + config.getHost() + " " + config.getPort());
+                    TransportParameterBuilder pBuilder = TransportParameterBuilder
+                        .newBuilder(config.getHost(), config.getPort())
+                        .setHostnameVerification(config.getHostnameVerification())
+                        .setAuthenticationKey(config.getAuthenticationKey());
+                    if (config.useTls()) {
+                        pBuilder.setKeystoreKey(config.getKeystoreKey());
+                    }
+                    connector.connect(pBuilder.build());
+                    globalInstance = false;
                 }
-                connector.connect(pBuilder.build());
             } catch (IOException e) {
                 LOGGER.error("Creating generic client: " + e.getMessage(), e);
             }                
@@ -120,7 +128,9 @@ public class GenericClient {
             for (String t: tpcs) {
                 unsubscribeFrom(t);
             }
-            connector.disconnect();
+            if (!globalInstance) {
+                connector.disconnect();
+            }
             topics.clear();
             connector = null;
         } catch (IOException e) {

@@ -40,9 +40,11 @@ import com.rabbitmq.client.ConnectionFactory;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter;
 import de.iip_ecosphere.platform.transport.connectors.TransportParameter.TransportParameterBuilder;
+import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 import de.iip_ecosphere.platform.transport.connectors.rabbitmq.RabbitMqAmqpTransportConnector;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 import de.iip_ecosphere.platform.transport.spring.SerializerMessageConverter;
@@ -67,6 +69,7 @@ public class GenericMessageBinderTest {
     private static TestQpidServer server;
     private static String received;
     private static File secCfg;
+    private static boolean relyOnGlobal = false;
 
     @Autowired
     private TransportParameter params;
@@ -78,6 +81,15 @@ public class GenericMessageBinderTest {
      */
     protected static void setSecCfg(File folder) {
         secCfg = folder;
+    }
+    
+    /**
+     * Rely on global transport rather than an own connector.
+     * 
+     * @param global use global or local
+     */
+    protected static void setRelyOnGlobal(boolean global) {
+        relyOnGlobal = global;
     }
 
     /**
@@ -109,6 +121,11 @@ public class GenericMessageBinderTest {
 
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
+            if (relyOnGlobal) {
+                TestPropertyValues
+                    .of("generic.host=")
+                    .applyTo(applicationContext);
+            }
             TestPropertyValues
                 .of("generic.port=" + addr.getPort())
                 .applyTo(applicationContext);
@@ -133,6 +150,13 @@ public class GenericMessageBinderTest {
         server.start();
         TimeUtils.sleep(1000);
         SerializerRegistry.registerSerializer(StringSerializer.class);
+        if (relyOnGlobal) {
+            TransportSetup setup = new TransportSetup();
+            setup.setHost(addr.getHost());
+            setup.setPort(addr.getPort());
+            setup.setAuthenticationKey("amqp");
+            Transport.getGlobalTransport().setTransportSetup(() -> setup);
+        }
         final RabbitMqAmqpTransportConnector infra = new RabbitMqAmqpTransportConnector() {
             
             protected void configureFactory(ConnectionFactory factory) {
@@ -195,8 +219,10 @@ public class GenericMessageBinderTest {
         Assert.assertEquals("Received value on configuration stream does not match", "config DMG-1 world", received);
         
         Assert.assertNotNull("The autowired transport parameters shall not be null", params);
-        Assert.assertEquals("localhost", params.getHost());
-        //Assert.assertEquals(addr.getPort(), params.getPort()); // may not hold in second round
+        if (!relyOnGlobal) {
+            Assert.assertEquals("localhost", params.getHost());
+            //Assert.assertEquals(addr.getPort(), params.getPort()); // may not hold in second round
+        }
         Assert.assertEquals("", params.getApplicationId()); // no client ids here
     }
     
