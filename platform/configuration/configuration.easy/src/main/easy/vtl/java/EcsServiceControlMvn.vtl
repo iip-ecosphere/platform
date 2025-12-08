@@ -28,8 +28,8 @@ template EcsServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, Strin
         new XmlElement(ex, "groupId", "javax.el");
         new XmlElement(ex, "artifactId", "el-api");*/
         //appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
-        appendDependency(dep, springGroup, "spring-boot-starter-web");
-        appendDependency(dep, springGroup, "spring-boot-starter-actuator");
+        //appendDependency(dep, springGroup, "spring-boot-starter-web");
+        //appendDependency(dep, springGroup, "spring-boot-starter-actuator");
         //appendArtifact(dep, deviceIdProviderModule(config));
         //addSemanticIdResolverDependencies(dep, config);
         appendIipBaseDependencies(dep);

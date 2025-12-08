@@ -51,20 +51,20 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
         "byte[]"; // taken from code
     }
 
-    @DispatchCase
+/*    @DispatchCase
     def String getMachineOutputTypeName(OpcUaV1Connector conn) {
-        "de.iip_ecosphere.platform.connectors.opcuav1.DataItem"; // taken from code
+        "de.iip_ecosphere.platform.connectors.opcuav1.DataItem"; // taken from code, not accessible, go for Object
     }
 
     @DispatchCase
     def String getMachineOutputTypeName(ModbusTcpV1Connector conn) {
-        "de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusItem"; // taken from code
+        "de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusItem"; // taken from code, not accessible, go for Object
     }
 
     @DispatchCase
     def String getMachineOutputTypeName(RestConnector conn) {
-        "de.iip_ecosphere.platform.connectors.rest.RESTItem"; // taken from code
-    }    
+        "de.iip_ecosphere.platform.connectors.rest.RESTItem"; // taken from code, not accessible, go for Object
+    }     */
 
     @DispatchCase
     def String getMachineOutputTypeName(AdsConnector conn) {

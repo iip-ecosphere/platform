@@ -36,17 +36,6 @@ template MeshBasics(Configuration config, FileArtifact target) {
         DataType typeType = type.type;
         asTypeName(getTypeName(typeType));
     }
-    
-    def DataType getFirstType(sequenceOf(IOType) types) {
-        if (types.size() > 0) {
-            IOType t = types.get(0);
-            t.type;
-        }    
-    }
-    
-    def getFirstTypeName(sequenceOf(IOType) types) {
-        getTypeName(getFirstType(types));
-    }
 
     // added v2->v3
     def getTypeName(DataType dt) {
@@ -604,8 +593,16 @@ template MeshBasics(Configuration config, FileArtifact target) {
     }
     
     protected def getDataUnitJson(Connector conn, String typeAdd) {
-        DataType outType = getFirstType(conn.output);
-        getDataTypeJson(outType);
+        sequenceOf(ConnectorTypes) cTypes = pairTypes(conn);
+        String result = "";
+        for (ConnectorTypes cType : cTypes) {
+            IOType outType = cType.outType;
+            if (result.length() > 0) {
+                result = result + "\n";
+            }
+            result = result + getDataTypeJson(outType.type);
+        }
+        result;
     }
     
     protected def getDataTypeJson(DataType type) {

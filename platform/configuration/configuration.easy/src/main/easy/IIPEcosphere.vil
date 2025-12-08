@@ -535,7 +535,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         String clsName = asTypeName(conn.name);
         vilTemplateProcessor("JavaConnectorConnectivityTest", config, "${javaConnSrc}/${clsName}Test.java", conn=conn, pkg=javaConnectivityPackage); 
         Path testResourcesSrc = "${appRoot}/resources/software";
-        String outName = asTypeName(getFirstTypeName(conn.output));
+
+        sequenceOf(ConnectorTypes) cTypes = pairTypes(conn);
+        ConnectorTypes cType = cTypes[0]; // loop over all?
+        IOType outType = cType.outType;
+        DataType outTypeT = outType.type;
+        String outName = asTypeName(getTypeName(outTypeT));
         JavaPath connClassFqn = conn.class;
         clsName = connClassFqn.getName();
         vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${clsName}-${outName}.json.tmpl", elt=no);

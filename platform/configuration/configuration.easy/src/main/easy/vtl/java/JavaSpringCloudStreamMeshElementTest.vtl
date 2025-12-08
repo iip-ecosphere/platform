@@ -250,18 +250,27 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
     }
     
     def genMethods(MeshSource elt, Connector connector, String clsName) {
-        String connGen = getConnectorGenerics(connector, false);
-        String outType = asTypeName(getFirstTypeName(connector.output));
-        
+        sequenceOf(ConnectorTypes) cTypes = pairTypes(connector);
+        ConnectorTypes cType = cTypes[0]; // loop over all?
+
+        IOType outType = cType.outType;
+        IOType inType = cType.inType;
+        DataType outTypeT = outType.type;
+        String outTypeName = asTypeName(getTypeName(outTypeT));
+        String connGen = getConnectorGenerics(connector, inType, outType, true);
         mainCls.addMethod("", "testConnector", "Tests the connector.").setProtected().(m|{
             m.throws("java.io.IOException", "shall not occur");
             m.addParameter("de.iip_ecosphere.platform.connectors.ConnectorParameter", "params", "the connector parameter to use");
-            m.addParameter("de.iip_ecosphere.platform.transport.connectors.ReceptionCallback<${outType}>", "callback", "the callback to attach to the connector");
+            m.addParameter("de.iip_ecosphere.platform.transport.connectors.ReceptionCallback<${outTypeName}>", "callback", "the callback to attach to the connector");
             m.addImport("de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode");
             m.addSLComment("disable AAS connector registration");
             m.addCall("de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.setNotificationMode", JavaCodeImportScope.METHOD_CLASS_IMPORT)
                 .addArgument("NotificationMode.NONE");
-            m.var(connector.class + connGen, "conn").addNew(getConnectorCls(connector) + getConnectorInstanceGenerics(connector)).arg("${clsName}.createConnectorAdapter()");
+            JavaCodeMethodCall init = new JavaCodeMethodCall("de.iip_ecosphere.platform.connectors.ConnectorFactory.createConnector", JavaCodeImportScope.METHOD_CLASS_IMPORT);
+            init.stringArg(getConnectorCls(connector));
+            init.arg("() -> params");
+            init.arg("${clsName}.createConnectorAdapter()");
+            m.var("de.iip_ecosphere.platform.connectors.Connector" + connGen, "conn").initializer(init);
             m.addCall("conn.connect").addArgument("params");
             m.addCall("conn.setReceptionCallback").addArgument("callback");
             m.addCall("conn.request").addArgument(true);
@@ -336,8 +345,12 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
     }
 
     def genTests(MeshSource elt, Connector connector) {
-        DataType oType = getFirstType(connector.output);
-        String outType = toTypeName(oType);
+        sequenceOf(ConnectorTypes) cTypes = pairTypes(connector);
+        ConnectorTypes cType = cTypes[0]; // loop over all?
+
+        IOType outType = cType.outType;
+        DataType oType = outType.type;
+        String outTypeN = toTypeName(oType);
         String outTypeFQ = toQualifiedTypeName(oType);
         mainCls.addMethod("", "testConnector", "Tests the connector, here whether the connector (parameterized by {@link #createConnectorParameter()} delivered any data.").(m|{
             m.addJunitTestAnnotation();
@@ -345,17 +358,17 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
             m.addVariable(mainCls.getName(), "test").addNew(mainCls.getName());
             m.addVariable("java.util.concurrent.atomic.AtomicInteger", "counter").addNew("AtomicInteger").addArgument(0);
             m.addVariable("de.iip_ecosphere.platform.transport.connectors.ReceptionCallback<${outTypeFQ}>", "callback")
-                .addAnonymous("ReceptionCallback<${outType}>").(a|{
+                .addAnonymous("ReceptionCallback<${outTypeN}>").(a|{
                 a.addMethod("", "received").(am|{
                     am.override();
                     am.addParameter(outTypeFQ, "data");
                     am.addCall("counter.incrementAndGet");
                     am.addCall("printReceivedData").addArgument("data");
-                    am.addCall("incrementReceived").addClassArgument(outType);
+                    am.addCall("incrementReceived").addClassArgument(outTypeN);
                 });
-                a.addMethod("Class<${outType}>", "getType").(am|{
+                a.addMethod("Class<${outTypeN}>", "getType").(am|{
                     am.override();
-                    am.addReturn(outType + ".class");
+                    am.addReturn(outTypeN + ".class");
                 });
             });
             m.addCall("test.testConnector").addArgument("test.createConnectorParameter()").addArgument("callback");
@@ -489,22 +502,26 @@ template JavaSpringCloudStreamMeshElementTest(Configuration config, JavaCodeArti
     }
 
     def genMain(MeshSource elt, Connector connector, JavaCodeMethod m) {
-        DataType oType = getFirstType(connector.output);
-        String outType = toTypeName(oType);
+        sequenceOf(ConnectorTypes) cTypes = pairTypes(connector);
+        ConnectorTypes cType = cTypes[0]; // loop over all?
+
+        IOType outType = cType.outType;
+        DataType oType = outType.type;
+        String outTypeN = toTypeName(oType);
         String outTypeFQ = toQualifiedTypeName(oType);
         String clsNameTest = mainCls.getName();
 
         m.addVariable(mainCls.getName(), "test", "").addNew(mainCls.getName());
         m.addVariable("de.iip_ecosphere.platform.transport.connectors.ReceptionCallback<${outTypeFQ}>", "callback")
-            .addAnonymous("ReceptionCallback<${outType}>").(a|{
+            .addAnonymous("ReceptionCallback<${outTypeN}>").(a|{
             a.addMethod("", "received").(am|{
                 am.override();
                 am.addParameter(outTypeFQ, "data");
                 am.addSystemOutPrintlnCall().addArgument("data");
             });
-            a.addMethod("Class<${outType}>", "getType").(am|{
+            a.addMethod("Class<${outTypeN}>", "getType").(am|{
                 am.override();
-                am.addReturn(outType + ".class");
+                am.addReturn(outTypeN + ".class");
             });
         });
         m.addCall("test.testConnector").addArgument("test.createConnectorParameter()").addArgument("callback");

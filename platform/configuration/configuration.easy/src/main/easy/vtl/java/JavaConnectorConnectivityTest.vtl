@@ -53,18 +53,19 @@ template JavaConnectorConnectivityTest(IIPEcosphere config, JavaCodeArtifact tar
             cTypes.removeLast();
         }
         for (ConnectorTypes cType : cTypes) {
+            IOType outType = cType.outType;
+            IOType inType = cType.inType;
             IOTypeWithPath machineInIf = cType.ifInType;
             IOTypeWithPath machineOutIf = cType.ifOutType;
-            DataType platfIn = cType.outType.type;
+            DataType platfIn = outType.type;
             String platfInClsName = toTypeName(platfIn);
-            DataType platfOut = cType.inType.type;
+            DataType platfOut = inType.type;
             String platfOutClsName = toTypeName(platfOut);
             target.addImport("iip.datatypes.${platfOutClsName}");
             target.addImport("iip.datatypes.${platfInClsName}");
             String connFqn = getConnectorCls(conn);
             target.addImport(connFqn);
             JavaPath connFqnPath = connFqn;
-            String connName = connFqnPath.name();
 
             addSerializerRegistration(mainClsMain, platfIn);
             addSerializerRegistration(mainClsMain, platfOut);
@@ -80,9 +81,13 @@ template JavaConnectorConnectivityTest(IIPEcosphere config, JavaCodeArtifact tar
                 "${clsName}.createConnectorParameter()");
             mainClsMain.addEmptyLine();
     
-            mainClsMain.addVariable("${conn.class}<${platfInClsName}, ${platfOutClsName}>", "conn", "")
-                .addNew(connName + getConnectorInstanceGenerics(conn))
-                    .addArgument("${clsName}.createConnectorAdapter()");
+            String connGen = getConnectorGenerics(conn, inType, outType, true);
+            JavaCodeMethodCall init = new JavaCodeMethodCall("de.iip_ecosphere.platform.connectors.ConnectorFactory.createConnector", JavaCodeImportScope.METHOD_CLASS_IMPORT);
+            init.stringArg(connFqn);
+            init.arg("() -> params");
+            init.arg("${clsName}.createConnectorAdapter()");
+            mainClsMain.var("de.iip_ecosphere.platform.connectors.Connector" + connGen, "conn").initializer(init);
+    
             codeAddShutdownHook(mainClsMain, "conn.disconnectSafe()");
             mainClsMain.addCall("conn.connect").addArgument("params");
             mainClsMain.addSLComment("// if polling connector, enable: conn.enableNotifications(false);");
