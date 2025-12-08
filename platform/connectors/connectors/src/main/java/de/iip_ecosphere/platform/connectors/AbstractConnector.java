@@ -504,12 +504,7 @@ public abstract class AbstractConnector<O, I, CO, CI> implements Connector<O, I,
         notificationsChanged(enableNotifications);
     }
 
-    /**
-     * Called when the notifications setting has been changed in
-     * {@link #useNotifications(boolean)}.
-     * 
-     * @param useNotifications the new value after changing
-     */
+    @Override
     public void notificationsChanged(boolean useNotifications) {
         if (useNotifications) {
             uninstallPollTask(); // nothing happens if there is no poll task, otherwise cancel it

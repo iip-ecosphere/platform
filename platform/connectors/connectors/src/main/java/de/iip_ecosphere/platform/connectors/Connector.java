@@ -219,5 +219,14 @@ public interface Connector <O, I, CO, CI> extends EventHandlingConnector {
     public default boolean enableSharedSpace(SharedSpace space) {
         return false;
     }
+    
+    /**
+     * Called when the notifications setting has been changed in
+     * {@link #useNotifications(boolean)}.
+     * 
+     * @param useNotifications the new value after changing
+     */
+    public default void notificationsChanged(boolean useNotifications) {
+    }
 
 }
