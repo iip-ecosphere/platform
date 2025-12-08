@@ -17,7 +17,8 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusTcpIpConnector;
+import de.iip_ecosphere.platform.connectors.Connector;
+import de.iip_ecosphere.platform.connectors.ConnectorFactory;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.LogRunnable;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.support.TimeUtils;
@@ -88,7 +89,7 @@ public class GeneratedConnectorSentron {
 
         };
         
-        ModbusTcpIpConnector<ModbusSiemensSentron, ModbusSiemensRwSentron> conn = createPlatformConnector(cb);
+        Connector<Object, Object, ModbusSiemensSentron, ModbusSiemensRwSentron> conn = createPlatformConnector(cb);
        
         boolean run = true;
         
@@ -145,7 +146,7 @@ public class GeneratedConnectorSentron {
             }
 
         };
-        ModbusTcpIpConnector<ModbusSiemensSentron, ModbusSiemensRwSentron> conn = createPlatformConnector(cb);
+        Connector<Object, Object, ModbusSiemensSentron, ModbusSiemensRwSentron> conn = createPlatformConnector(cb);
        
         for (int i = 0; i < MAX; i++) {
             
@@ -177,11 +178,13 @@ public class GeneratedConnectorSentron {
      * @return the connector instance
      * @throws IOException if creating the connector fails
      */
-    public static ModbusTcpIpConnector<ModbusSiemensSentron, ModbusSiemensRwSentron> createPlatformConnector(
+    public static Connector<Object, Object, ModbusSiemensSentron, ModbusSiemensRwSentron> createPlatformConnector(
             ReceptionCallback<ModbusSiemensSentron> callback) throws IOException {
-        ModbusTcpIpConnector<ModbusSiemensSentron, ModbusSiemensRwSentron> conn = new ModbusTcpIpConnector<>(
-                MyModbusSentronConnExample.createConnectorAdapter(
-                        null, new File("modbusTestGeneratedConnectorSentron.txt")));
+        Connector<Object, Object, ModbusSiemensSentron, ModbusSiemensRwSentron> conn = ConnectorFactory.createConnector(
+            "de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusTcpIpConnector", 
+            () -> MyModbusSentronConnExample.createConnectorParameter(),
+            MyModbusSentronConnExample.createConnectorAdapter(null, 
+                new File("modbusTestGeneratedConnectorSentron.txt")));
         conn.connect(MyModbusSentronConnExample.createConnectorParameter());
         conn.setReceptionCallback(callback);
         return conn;

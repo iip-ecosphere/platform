@@ -17,8 +17,9 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import de.iip_ecosphere.platform.connectors.Connector;
+import de.iip_ecosphere.platform.connectors.ConnectorFactory;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
-import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusTcpIpConnector;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.LogRunnable;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.support.NetUtils;
@@ -93,7 +94,7 @@ public class GeneratedConnector {
             }
 
         };
-        ModbusTcpIpConnector<ModbusPhoenixEEM, ModbusPhoenixRwEEM> conn = createPlatformConnector(cb);
+        Connector<Object, Object, ModbusPhoenixEEM, ModbusPhoenixRwEEM> conn = createPlatformConnector(cb);
 
         boolean run = true;
         
@@ -150,7 +151,7 @@ public class GeneratedConnector {
 
         };
         
-        ModbusTcpIpConnector<ModbusPhoenixEEM, ModbusPhoenixRwEEM> conn = createPlatformConnector(cb);
+        Connector<Object, Object, ModbusPhoenixEEM, ModbusPhoenixRwEEM> conn = createPlatformConnector(cb);
 
         for (int i = 0; i < MAX; i++) {
             
@@ -184,10 +185,12 @@ public class GeneratedConnector {
      * @return the connector instance
      * @throws IOException if creating the connector fails
      */
-    public static ModbusTcpIpConnector<ModbusPhoenixEEM, ModbusPhoenixRwEEM> createPlatformConnector(
+    public static Connector<Object, Object, ModbusPhoenixEEM, ModbusPhoenixRwEEM> createPlatformConnector(
             ReceptionCallback<ModbusPhoenixEEM> callback) throws IOException {
-        ModbusTcpIpConnector<ModbusPhoenixEEM, ModbusPhoenixRwEEM> conn = new ModbusTcpIpConnector<>(
-                MyModbusConnExample.createConnectorAdapter());
+        Connector<Object, Object, ModbusPhoenixEEM, ModbusPhoenixRwEEM> conn = ConnectorFactory.createConnector(
+            "de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusTcpIpConnector", 
+            () -> MyModbusConnExample.createConnectorParameter(),
+            MyModbusConnExample.createConnectorAdapter());
         conn.connect(adjustParameter(MyModbusConnExample.createConnectorParameter(), false));
         conn.setReceptionCallback(callback);
         return conn;

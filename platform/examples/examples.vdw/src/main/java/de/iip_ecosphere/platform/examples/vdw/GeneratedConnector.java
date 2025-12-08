@@ -16,12 +16,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector;
+import de.iip_ecosphere.platform.connectors.Connector;
+import de.iip_ecosphere.platform.connectors.ConnectorFactory;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
-import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import iip.datatypes.OpcIn;
 import iip.datatypes.OpcOut;
@@ -67,7 +67,7 @@ public class GeneratedConnector {
             
             
         };
-        OpcUaConnector<OpcOut, OpcIn> conn = createPlatformConnector(cb);
+        Connector<Object, Object, OpcOut, OpcIn> conn = createPlatformConnector(cb);
         final int maxRequests = 10;
         for (int i = 0; i < maxRequests; i++) {
             System.out.println("REQUEST " + i);
@@ -88,9 +88,11 @@ public class GeneratedConnector {
      * @return the connector instance
      * @throws IOException if creating the connector fails
      */
-    public static OpcUaConnector<OpcOut, OpcIn> createPlatformConnector(
+    public static Connector<Object, Object, OpcOut, OpcIn> createPlatformConnector(
         ReceptionCallback<OpcOut> callback) throws IOException {
-        OpcUaConnector<OpcOut, OpcIn> conn = new OpcUaConnector<>(
+        Connector<Object, Object, OpcOut, OpcIn> conn = ConnectorFactory.createConnector(
+            "de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector", 
+            () -> MyOpcConnExample.createConnectorParameter(), 
             MyOpcConnExample.createConnectorAdapter(metrics, new File("opcTest.txt")));
         conn.connect(MyOpcConnExample.createConnectorParameter());
         conn.setReceptionCallback(callback);
