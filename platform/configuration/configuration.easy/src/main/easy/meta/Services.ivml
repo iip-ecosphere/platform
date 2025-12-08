@@ -65,6 +65,10 @@ project Services {
    compound ServiceProtocolMQTTv5hive refines ServiceProtocol {
    	   ProtocolType type = ProtocolType::Mqttv5;
    };
+
+   compound ServiceProtocolGeneric refines ServiceProtocol {
+       ProtocolType type = transportProtocol.type; // the generic protocol uses the underlying transport protocol
+   };
    
    ServiceProtocol serviceProtocol = ServiceProtocolAMQP {};
    

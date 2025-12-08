@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import de.iip_ecosphere.platform.configuration.cfg.StatusCache;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.collector.Collector;
@@ -328,6 +329,7 @@ public class PlatformInstantiator {
             LoggerFactory.getLogger(ResourceLoader.class).setLevel(LogLevel.OFF);
             LoggerFactory.getLogger(ConfigurationSetup.class).setLevel(LogLevel.OFF);
             LoggerFactory.getLogger(Transport.class).setLevel(LogLevel.OFF);
+            LoggerFactory.getLogger(StatusCache.class).setLevel(LogLevel.OFF);
         }
         
         /**

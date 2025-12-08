@@ -184,6 +184,10 @@ template JavaMapping(Configuration config, FileArtifact target) {
     def String serviceProtocolModuleName(ServiceProtocolMQTTv5hive cfg) {
         "hivemqv5";
     }
+
+    def String serviceProtocolModuleName(ServiceProtocolGeneric cfg) {
+        "generic";
+    }
     
     // --------------------------------------------------------------
 
