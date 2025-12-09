@@ -466,14 +466,14 @@ public class PluginManager {
         }
         
         /**
-         * Creates an instance.
+         * Creates an instance. [public for testing]
          * 
          * @param file the file path to the plugin
          * @param supplier the setup descriptor supplier
          * @param sequenceNr the indicative plugin loading sequence number
          * @param pluginIds the dependent plugin ids to be considered, may be <b>null</b>
          */
-        private PluginInfo(File file, Supplier<PluginSetupDescriptor> supplier, int sequenceNr, 
+        public PluginInfo(File file, Supplier<PluginSetupDescriptor> supplier, int sequenceNr, 
             List<String> pluginIds) {
             this.file = file;
             this.supplier = supplier;
@@ -525,6 +525,35 @@ public class PluginManager {
          */
         public boolean accept(PluginInfo info);
         
+    }
+    
+    /**
+     * Implements a conjunctive (shortcut) plugin filter based on evaluating multiple filters.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class ConjunctivePluginFilter implements PluginFilter {
+
+        private PluginFilter[] filters;
+
+        /**
+         * Creates a conjunctive instance.
+         * 
+         * @param filters the filters to consult, if none is given the final result will be {@code true} (accept)
+         */
+        public ConjunctivePluginFilter(PluginFilter... filters) {
+            this.filters = filters;
+        }
+        
+        @Override
+        public boolean accept(PluginInfo info) {
+            boolean accept = true;
+            for (int f = 0; accept && f < filters.length; f++) {
+                accept &= filters[f].accept(info);
+            }
+            return accept;
+        }
+
     }
 
     /**

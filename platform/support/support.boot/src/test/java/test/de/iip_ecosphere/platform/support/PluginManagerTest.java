@@ -31,6 +31,8 @@ import de.iip_ecosphere.platform.support.plugins.Plugin;
 import de.iip_ecosphere.platform.support.plugins.PluginBasedSetupDescriptor;
 import de.iip_ecosphere.platform.support.plugins.PluginDescriptor;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
+import de.iip_ecosphere.platform.support.plugins.PluginManager.ConjunctivePluginFilter;
+import de.iip_ecosphere.platform.support.plugins.PluginManager.PluginFilter;
 import de.iip_ecosphere.platform.support.plugins.PluginSetup;
 import de.iip_ecosphere.platform.support.plugins.ResourceClasspathPluginSetupDescriptor;
 import de.iip_ecosphere.platform.support.plugins.SingletonPluginDescriptor;
@@ -248,7 +250,7 @@ public class PluginManagerTest {
      * {@link PluginManager#loadAllFrom(File, de.iip_ecosphere.platform.support.plugins.PluginSetupDescriptor...)}.
      */
     @Test
-    public void loadAll() {
+    public void testLoadAll() {
         PluginManager.cleanup();
         Predicate<File> filter = PluginManager.setPluginClasspathFilter(f -> f.getName().endsWith("classpath"));
         PluginManager.loadAllFrom(new File("src/test/resources/plugins"));
@@ -257,6 +259,22 @@ public class PluginManagerTest {
         final String id = "test-plugin";
         Plugin<?> plugin = PluginManager.getPlugin(id); // must not reference class directly!
         Assert.assertNotNull(plugin);
+    }
+    
+    /**
+     * Tests {@link ConjunctivePluginFilter}.
+     */
+    @Test
+    public void testConjunctivePluginFilter() {
+        final PluginFilter trueFilter = p -> true;
+        final PluginFilter falseFilter = p -> false;
+
+        Assert.assertTrue(new ConjunctivePluginFilter().accept(null));
+        Assert.assertTrue(new ConjunctivePluginFilter(trueFilter).accept(null));
+        Assert.assertTrue(new ConjunctivePluginFilter(trueFilter, trueFilter).accept(null));
+        Assert.assertFalse(new ConjunctivePluginFilter(falseFilter).accept(null));
+        Assert.assertFalse(new ConjunctivePluginFilter(falseFilter, trueFilter).accept(null));
+        Assert.assertFalse(new ConjunctivePluginFilter(trueFilter, falseFilter).accept(null));
     }
 
 }
