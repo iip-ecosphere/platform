@@ -62,9 +62,14 @@ public class LxcContainerManager extends AbstractContainerManager<LxcContainerDe
         }
 
         @Override
-        public EcsSetup getConfiguration() {
+        public EcsSetup getSetup() {
             return config;
         }
+        
+        @Override
+        public Class<? extends EcsSetup> getSetupClass() {
+            return LxcSetup.class;
+        }        
 
     }
 

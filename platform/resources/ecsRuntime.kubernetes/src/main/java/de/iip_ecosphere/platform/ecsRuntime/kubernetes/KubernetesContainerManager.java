@@ -49,8 +49,13 @@ public class KubernetesContainerManager extends AbstractContainerManager<Kuberne
         }
         
         @Override
-        public EcsSetup getConfiguration() {
+        public EcsSetup getSetup() {
             return config;
+        }
+        
+        @Override
+        public Class<? extends EcsSetup> getSetupClass() {
+            return KubernetesConfiguration.class;
         }
         
     }

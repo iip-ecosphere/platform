@@ -80,8 +80,13 @@ public class DockerContainerManager extends AbstractContainerManager<DockerConta
         }
         
         @Override
-        public EcsSetup getConfiguration() {
+        public EcsSetup getSetup() {
             return config;
+        }
+
+        @Override
+        public Class<? extends EcsSetup> getSetupClass() {
+            return DockerSetup.class;
         }
         
     }
