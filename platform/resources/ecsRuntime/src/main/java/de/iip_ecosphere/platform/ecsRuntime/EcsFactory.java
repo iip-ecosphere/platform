@@ -34,6 +34,7 @@ public class EcsFactory {
     private static EcsFactoryDescriptor desc;
     private static ContainerManager manager = null;
     private static EcsSetup conf;
+    private static Class<? extends EcsSetup> confClass;
 
     /**
      * Initializes this factory.
@@ -55,7 +56,7 @@ public class EcsFactory {
         }
         if (null == conf) {
             if (null != desc) {
-                conf = desc.getConfiguration();
+                conf = desc.getSetup();
             } else {
                 try {
                     conf = AbstractSetup.readFromYaml(EcsSetup.class);
@@ -63,6 +64,11 @@ public class EcsFactory {
                     conf = new EcsSetup();
                     LOGGER.error("No configuration, falling back to default " + e.getMessage());
                 }
+            }
+        }
+        if (null == confClass) {
+            if (null != desc) {
+                confClass = desc.getSetupClass();
             }
         }
     }
@@ -95,6 +101,18 @@ public class EcsFactory {
             init();
         }
         return conf;
+    }
+    
+    /**
+     * Returns the actual class that may (later) be returned by {@link #getSetup()}.
+     * 
+     * @return the class (may but shall not be <b>null</b> if set up correctly)
+     */
+    public static Class<? extends EcsSetup> getSetupClass() {
+        if (null == confClass) {
+            init();
+        }
+        return confClass;
     }
 
 }

@@ -30,10 +30,17 @@ public interface EcsFactoryDescriptor {
     public ContainerManager createContainerManagerInstance();
     
     /**
-     * Returns the configuration instance.
+     * Returns the setup instance.
      * 
-     * @return the configuration
+     * @return the setup
      */
-    public EcsSetup getConfiguration();
+    public EcsSetup getSetup();
+    
+    /**
+     * Returns the class of {@link #getSetup()}.
+     * 
+     * @return the class
+     */
+    public Class<? extends EcsSetup> getSetupClass();
 
 }

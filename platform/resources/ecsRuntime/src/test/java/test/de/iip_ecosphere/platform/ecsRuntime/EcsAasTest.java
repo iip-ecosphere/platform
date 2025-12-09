@@ -117,6 +117,7 @@ public class EcsAasTest extends TestWithQpid {
      */
     @Test
     public void testAas() throws IOException, ExecutionException, URISyntaxException {
+        Assert.assertNotNull(EcsFactory.getSetupClass());
         NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(EcsAas.class));
         

@@ -34,13 +34,18 @@ public class MyEcsFactoryDescriptor implements EcsFactoryDescriptor {
     }
 
     @Override
-    public EcsSetup getConfiguration() {
+    public EcsSetup getSetup() {
         try {
             return AbstractSetup.readFromYaml(EcsSetup.class);
         } catch (IOException e) {
             LoggerFactory.getLogger(MyEcsFactoryDescriptor.class).error("Cannot load config " + e.getMessage());
             return new EcsSetup();
         }
+    }
+
+    @Override
+    public Class<? extends EcsSetup> getSetupClass() {
+        return EcsSetup.class;
     }
 
 }
