@@ -131,4 +131,14 @@ public abstract class LoggerFactory {
         return getLogger(cls);
     }
 
+    /**
+     * Turns a throwable into its class name and message.
+     * 
+     * @param th the throwable
+     * @return the obtained text
+     */
+    public static String classAndMessage(Throwable th) {
+        return th.getClass().getSimpleName() + " " + th.getMessage();
+    }
+
 }
