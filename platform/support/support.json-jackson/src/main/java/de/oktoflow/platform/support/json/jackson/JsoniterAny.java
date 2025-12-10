@@ -126,7 +126,15 @@ public class JsoniterAny implements JsonIterator {
 
     @Override
     public int size() {
-        return any.size();
+        int size = 0;
+        try {
+            size = any.size();
+        } catch (ArrayIndexOutOfBoundsException e) { // occurs if JSON syntax is erroneous
+            size = 0;
+            LoggerFactory.getLogger(this).warn("Cannot read JSON due to syntax errors: {}", 
+                LoggerFactory.classAndMessage(e)); // ArrayIndexOutOfBoundsException just has the index as message
+        }
+        return size;
     }
 
     @Override
