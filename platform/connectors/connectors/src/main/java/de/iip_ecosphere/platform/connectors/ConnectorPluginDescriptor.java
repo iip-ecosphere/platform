@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.connectors;
 
 import de.iip_ecosphere.platform.support.plugins.PluginInstanceDescriptor;
+import de.iip_ecosphere.platform.support.plugins.PluginManager.PluginFilter;
+import de.iip_ecosphere.platform.support.plugins.PluginManager.PluginInfo;
 
 /**
  * Declares the type of a connector plugin descriptor.
@@ -21,4 +23,23 @@ import de.iip_ecosphere.platform.support.plugins.PluginInstanceDescriptor;
  */
 public interface ConnectorPluginDescriptor extends PluginInstanceDescriptor<ConnectorDescriptor> {
 
+    public static String PLUGIN_ID_PREFIX = ConnectorDescriptor.PLUGIN_ID_PREFIX;
+    public static String PLUGIN_TEST_ID_PREFIX = ConnectorDescriptor.PLUGIN_TEST_ID_PREFIX;
+    
+    /**
+     * Returns a plugin filter for platform components that filters out all connector plugins 
+     * ({@link PLUGIN_ID_PREFIX}).
+     * 
+     * @return the plugin filter
+     */
+    public static PluginFilter getConnectorPluginFilter() {
+        return new PluginFilter() {
+            
+            @Override
+            public boolean accept(PluginInfo info) {
+                return !info.getName().startsWith(ConnectorDescriptor.PLUGIN_ID_PREFIX); 
+            }
+        };
+    }
+    
 }
