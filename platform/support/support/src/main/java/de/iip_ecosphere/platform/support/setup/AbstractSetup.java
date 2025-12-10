@@ -32,7 +32,7 @@ import de.iip_ecosphere.platform.support.yaml.YamlFile;
  * 
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractSetup {
+public abstract class AbstractSetup implements PluginsSetup {
     
     public static final String PARAM_PLUGINS = "iip.plugins";
     
@@ -94,12 +94,7 @@ public abstract class AbstractSetup {
         setPluginsFolder(null == pluginsFolder ? null : pluginsFolder.toString());
     }
 
-    /**
-     * Returns the (parent) folder where the oktoflow plugins are located (the folder itself or by default 
-     * its sub-folders "plugins" or "oktoPlugins").
-     * 
-     * @return the folder, by default taken from {@link #PARAM_PLUGINS} (env or sys property), fallback "plugins"
-     */
+    @Override
     public String getPluginsFolder() {
         return pluginsFolder;
     }
