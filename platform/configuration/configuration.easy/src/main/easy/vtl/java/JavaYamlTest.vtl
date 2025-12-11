@@ -15,9 +15,13 @@ template JavaYamlTest(Configuration config, JavaCodeArtifact target, String pkg,
     	            .addNew("java.io.FileInputStream")
     	                .addNew("java.io.File")
     	                    .addStringArgument(cfgFile);
-            	t.addCall("de.iip_ecosphere.platform.support.setup.AbstractSetup.readFromYaml", JavaCodeImportScope.METHOD)
-    	            .addArgument("${fqnCls}.class")
-    	            .addArgument("fis");
+            	t.addCall("de.iip_ecosphere.platform.support.setup.AbstractSetup.readFromYaml", JavaCodeImportScope.METHOD).(c|{
+            	    if (fqnCls.endsWith("()")) {
+            	        c.addCallArgument(fqnCls.substring(0, fqnCls.length() - 2));
+            	    } else {
+                        c.classArg(fqnCls);
+            	    }
+            	}).addArgument("fis");
             }).addCatch("java.io.IOException", "e")
                .addSLComment("close file and re-throw")
                .addThrow("e");

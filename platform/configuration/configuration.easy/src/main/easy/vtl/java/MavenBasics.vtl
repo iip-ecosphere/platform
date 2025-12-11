@@ -256,7 +256,11 @@ template MavenBasics(Configuration config, FileArtifact target) {
         String phase="process-resources", Boolean relocate=true, Boolean resolveAndCopy=false, Boolean enable=true) {
         sequenceOf(String) effPlugins = {};
         if (enable) {
-            plugins->forEach(p|effPlugins.add(p));
+            for (String p: plugins) {
+                if (p.trim().length() > 0) {
+                    effPlugins.add(p);
+                }
+            }
         } else {
             for (String p: plugins) {
                 if (p.endsWith("*")) {

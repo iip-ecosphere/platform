@@ -16,6 +16,7 @@ Improvements:
 * Build process improvements for multiple Java/Maven installations like CI.
 * [#19](https://github.com/iip-ecosphere/platform/issues/19): Integration of generated IDTA interfaces.
 * Revision of code generation to Java/Python/JSON/YAML artifacts provided by EASy-Producer
+* Code templates contain bash and batch scripts for building the app as well as a python source mapping for VScode
 * [#181](https://github.com/iip-ecosphere/platform/issues/181): Allow MIMO containers
 * [#166](https://github.com/iip-ecosphere/platform/issues/166): Upgrade Angular for UI.
 * [#171](https://github.com/iip-ecosphere/platform/issues/171): Migrate build-jk.xml to maven deployment (where possible).

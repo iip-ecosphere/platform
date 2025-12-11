@@ -60,7 +60,7 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
         XmlElement ex2 = appendExecutionsParent(dPlug);
         appendMavenDependencyPluginCopyDepsExecution(ex2, jarDir="../${dir}", copyOwn=true);
         appendWinLinuxDependencyPluginBuildClasspathExecution(ex2, dir, ownArtifact="${iipGroup}.${artifactId}-${config.iipVer}");
-        appendMavenIipDependencyPluginUnpackPluginsExecution(ex2, oktoPlugins, projectVersion, enable=withPlugins(config), outputDir="../${dir}Plugins");
+        appendMavenIipDependencyPluginUnpackPluginsExecution(ex2, oktoPlugins, projectVersion, enable=withPlugins(config), outputDir="../${dir}/jars");
         appendCompilerPlugin(plugins);
         appendSurefirePlugin(plugins, tests=tests);
 

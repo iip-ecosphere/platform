@@ -25,6 +25,7 @@ The following build steps are automatically executed by an all-in-one example bu
 * Compile and package the application `mvn -P App install` (see [configuration maven plugin](../configuration/configuration.maven) for the detailed build steps associated with `package`)
 * Integrate the application `mvn -P EasyGen package`
 
+The generated code template contains helper scripts for Windows/Linux that call a default variant of the build process (`build.bat`, `build.sh`).
 Sometimes, it makes sense to execute individual steps separately, e.g., `mvn -P EasyGen configuration:generateAppsNoDeps` for a run building all integration code files leaving out all dependencies (no deps). Although this application may not run, the build process creates the application templates in this step.
 Currently the goals `generateInterfaces`, `generateAppsNoDeps` and `generateApps` create as last step the application templates.
 
@@ -35,7 +36,7 @@ The meta-model defines the configuration types as well as the actions for code g
   * To update/upgrade the model, call `mvn -P EasyGen -U generate-sources -Dunpack.force=true`
   * Some apps/platform components are built without Maven profiles, where then usually `mvn -U generate-sources -Dunpack.force=true` is the right call. Please consulte the respective `README.md` file
   
-As a side effect, also this command creates the application templates.
+As a side effect, also this command creates the application code templates. The generated code template contains helper scripts for Windows/Linux (`updateModel.bat`, `updateModel.sh`) that ease the update of the meta model.
 
 ## Platform
 

@@ -275,6 +275,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, oktoPlugins=oktoPlugins, bins=bins, assemblies=assemblies, resources=resources, 
                     starterCls=appStarterCls, appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests, copyRuntimeDependencies=copyDependencies);
                 vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
+                vilTemplateProcessor("TemplatesMvnBash", config, "${appRoot}/build.sh", forBuild=true);
+                vilTemplateProcessor("TemplatesMvnBash", config, "${appRoot}/updateModel.sh", forBuild=false);
+                vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/build.bat", forBuild=true);
+                vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/updateModel.bat", forBuild=false);
                 generatePlugins(cfg, appRoot);
                 mvn(appRoot);
 
@@ -2396,7 +2400,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         p.mkdir();
         generatePlugins(cfg, path);
         vilTemplateProcessor("EcsRuntimeDockerContainerManagerYaml", config, "${p}/iipecosphere.yml", deviceType=deviceType);
-        vilTemplateProcessor("JavaYamlTest", config, "${path}/src/test/java/test/iip/AllTests.java", pkg="test.iip", fqnCls=containerManagerCfgClass(config), cfgFile="src/main/resources/iipecosphere.yml");
+        vilTemplateProcessor("JavaYamlTest", config, "${path}/src/test/java/test/iip/AllTests.java", pkg="test.iip", fqnCls="de.iip_ecosphere.platform.ecsRuntime.EcsFactory.getSetupClass()", cfgFile="src/main/resources/iipecosphere.yml");
         vilTemplateProcessor("JavaLogbackXml", config, "${p}/logback.xml");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.net.NetworkManagerDescriptor", descriptor="de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas");
         vilTemplateProcessor("JavaServices", config, "${p}/META-INF/services/de.iip_ecosphere.platform.support.LifecycleDescriptor", descriptor="de.iip_ecosphere.platform.ecsRuntime.EcsCmdLineLifecycleDescriptor");
@@ -2411,7 +2415,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         if (deviceType == defaultDeviceType) {
             Integer svcMemLimit = getIntegerValueSafe(cfg.serviceManager.memLimit, 0);
             Integer cntMgmLimit = getIntegerValueSafe(cfg.containerManager.memLimit, 0);
-            generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain, "IIP-Ecosphere ECSRuntime", "iip-ecsRuntime", "iip-platform.service", addJavaOpts=toJvmMemLimitOpt(max(svcMemLimit, cntMgmLimit)), sysd="${target}/iip-ecs");
+            generateOsScripts(config, "${target}/ecs", "ecsJars", dfltMain, "IIP-Ecosphere ECSRuntime", "iip-ecsRuntime", "iip-platform.service", 
+                addJavaOpts=pltfJavaOpts(config, "ecsJars/plugins", max(svcMemLimit, cntMgmLimit)), sysd="${target}/iip-ecs");
 
             if (getBooleanValueSafe(cfg.zipBinaries, false)) {
               zip("${target}", "${target}/ecsJars", "${target}/ecs-bin.zip");
@@ -2442,7 +2447,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         mvn(path);
         if (deviceType == defaultDeviceType) {
           generateOsScripts(config, "${target}/ecsServiceMgr", "ecsSvcJars", dfltMain, "IIP-Ecosphere Ecs Runtime/Service Manager", "iip-ecsServiceMgr", "", 
-            addJavaOpts=toJvmMemLimitOpt(cfg.serviceManager.memLimit), sysd="${target}/iip-ecsServiceMgr");
+            addJavaOpts=pltfJavaOpts(config, "ecsSvcJars/plugins", cfg.serviceManager.memLimit), sysd="${target}/iip-ecsServiceMgr");
 
           if (getBooleanValueSafe(cfg.zipBinaries, false)) {
             zip("${target}", "${target}/ecsSvcJars", "${target}/ecsSvcMgr-bin.zip");
@@ -2485,7 +2490,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("ServiceControlMvn", config, "${serviceMgrRoot}/pom.xml", dir="svcJars", main=dfltMain, tests=tests, oktoPlugins=oktoPlugins);
         mvn(serviceMgrRoot);
         generateOsScripts(config, "${target}/serviceMgr", "svcJars", dfltMain, "IIP-Ecosphere Service Manager", "iip-serviceMgr", "iip-ecs.service", 
-            addJavaOpts=toJvmMemLimitOpt(cfg.serviceManager.memLimit), sysd="${target}/iip-serviceMgr");
+            addJavaOpts=pltfJavaOpts(config, "svcJars/plugins", cfg.serviceManager.memLimit), sysd="${target}/iip-serviceMgr");
         if (getBooleanValueSafe(cfg.zipBinaries, false)) {
           zip("${target}", "${target}/svcJars", "${target}/svcMgr-bin.zip");
           zip("${target}", "${target}/serviceMgr.*", "${target}/svcMgr-bin.zip");
@@ -2507,7 +2512,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         oktoPlugins = getOktoflowPlugins(cfg, withAasServer=true, withDeviceIdProviderModule=true, withSemanticIdResolverModules=true, withDeviceRegistryModules=true, withConfigModule=true);        
         vilTemplateProcessor("PlatformMvn", config, "${platformRoot}/pom.xml", dir="plJars", main=dfltMain, tests=tests, monitoring=false, oktoPlugins=oktoPlugins);
         mvn(platformRoot);
-        String pltfOpts = "";
+        String pltfOpts = addJavaPluginOpts(config, "", "plJars/plugins");
         if (isDefined(cfg.centralMemLimit) and cfg.centralMemLimit <> null) {
             pltfOpts = toJvmMemLimitOpt(cfg.centralMemLimit);
         }
@@ -2532,7 +2537,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         vilTemplateProcessor("PlatformMvn", config, "${monitoringRoot}/pom.xml", dir="monJars", main=dfltMain, tests=tests, monitoring=true, oktoPlugins=oktoPlugins);
         mvn(monitoringRoot);
         generateOsScripts(config, "${target}/monitoring", "monJars", dfltMain, "IIP-Ecosphere Platform Monitoring Services", "iip-monitoring", "iip-platform.service", 
-            sysd="${target}/iip-monitoring", addJavaOpts=toJvmMemLimitOpt(cfg.monitoringMemLimit));
+            sysd="${target}/iip-monitoring", addJavaOpts=pltfJavaOpts(config, "monJars/plugins", cfg.monitoringMemLimit));
  
         artifactsRoot.mkdir();
         commonRoot.mkdir();
@@ -2543,6 +2548,18 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         if ((getContainerGenerationSafe(cfg.containerGeneration)) and getPlatformContainerGenerationSafe(cfg.platformContainerGeneration)){
             generatePlatformContainers(config, target);
         }
+    }
+    
+    String addJavaPluginOpts(IIPEcosphere config, String opts, String pluginsFolder) = {
+        String result = opts; 
+        if (withPlugins(config)) {
+            result = result + " -Diip.plugins=" + pluginsFolder;
+        }
+        result;
+    }
+    
+    String pltfJavaOpts(IIPEcosphere config, String pluginsFolder, Integer memLimit) = {
+        addJavaPluginOpts(config, toJvmMemLimitOpt(memLimit), pluginsFolder);
     }
     
     @DispatchBasis

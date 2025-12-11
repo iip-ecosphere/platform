@@ -36,7 +36,7 @@ template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target, String dir, 
         XmlElement ex = appendExecutionsParent(dPlug);
         appendMavenDependencyPluginCopyDepsExecution(ex, jarDir="../${dir}", copyOwn=true);
         appendWinLinuxDependencyPluginBuildClasspathExecution(ex, dir, ownArtifact="${iipGroup}.${artifactId}-${config.iipVer}");
-        appendMavenIipDependencyPluginUnpackPluginsExecution(ex, oktoPlugins, projectVersion, enable=withPlugins(config), outputDir="../${dir}Plugins");
+        appendMavenIipDependencyPluginUnpackPluginsExecution(ex, oktoPlugins, projectVersion, enable=withPlugins(config), outputDir="../${dir}/jars");
         appendCompilerPlugin(plugins);
         appendSurefirePlugin(plugins, tests=tests);
         sequenceOf(String) files = defltOktoResourceFiles();
