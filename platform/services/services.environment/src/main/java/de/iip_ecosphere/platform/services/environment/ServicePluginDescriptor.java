@@ -12,7 +12,17 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
+import java.io.File;
+
+import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
+import de.iip_ecosphere.platform.connectors.ConnectorPluginDescriptor;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.plugins.PluginInstanceDescriptor;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
+import de.iip_ecosphere.platform.support.plugins.PluginManager.PluginFilter;
+import de.iip_ecosphere.platform.support.plugins.PluginManager.PluginInfo;
+import de.iip_ecosphere.platform.support.setup.PluginsSetup;
+import de.iip_ecosphere.platform.support.plugins.PluginManager.ConjunctivePluginFilter;
 
 /**
  * Declares the type of a service plugin descriptor.
@@ -24,5 +34,56 @@ public interface ServicePluginDescriptor<S extends Service> extends PluginInstan
 
     public static final String PLUGIN_ID_PREFIX = "service-";
     public static final String PLUGIN_TEST_ID_PREFIX = PLUGIN_ID_PREFIX + "test-";
+    
+    /**
+     * Returns a plugin filter for platform components that filters out all service plugins 
+     * ({@link PLUGIN_ID_PREFIX}).
+     * 
+     * @return the plugin filter
+     */
+    public static PluginFilter getServicePluginFilter() {
+        return new PluginFilter() {
+            
+            @Override
+            public boolean accept(PluginInfo info) {
+                return !info.getName().startsWith(PLUGIN_ID_PREFIX); 
+            }
+        };
+    }
+
+    /**
+     * Returns a plugin filter for platform components that filters out all connector 
+     * ({@link ConnectorDescriptor#PLUGIN_ID_PREFIX}) and service plugins ({@link PLUGIN_ID_PREFIX}).
+     * 
+     * @return the plugin filter
+     */
+    public static PluginFilter getConnectorAndServicePluginFilter() {
+        return new ConjunctivePluginFilter(getServicePluginFilter(), 
+            ConnectorPluginDescriptor.getConnectorPluginFilter());
+    }
+
+    /**
+     * Helper function to load all plugins from {@link PluginsSetup#getPluginsFolder()} applying 
+     * {@link #getConnectorAndServicePluginFilter()}.
+     * 
+     * @param setup the setup
+     */
+    public static void loadPlatformPlugins(PluginsSetup setup) {
+        loadPlatformPlugins(setup.getPluginsFolder());
+    }
+
+    /**
+     * Helper function to load all plugins from {@code pluginsFolder} applying 
+     * {@link #getConnectorAndServicePluginFilter()}.
+     * 
+     * @param setup the setup
+     */
+    public static void loadPlatformPlugins(String pluginsFolder) {
+        File f = new File(pluginsFolder);
+        if (f.isDirectory()) {
+            LoggerFactory.getLogger(ServicePluginDescriptor.class).info("Loading plugins from {}", f);
+            PluginManager.loadAllFrom(f, getConnectorAndServicePluginFilter());
+        }
+    }
     
 }
