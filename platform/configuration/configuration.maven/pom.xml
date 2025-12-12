@@ -131,7 +131,8 @@
       <groupId>de.iip-ecosphere.platform</groupId>
       <version>${project.version}</version>
     </dependency> 
-    <dependency>
+    <!-- for conflicts with EASy instantiation dependencies -->
+    <!--<dependency> 
       <artifactId>support.json-jackson</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <version>${project.version}</version>
@@ -140,7 +141,7 @@
       <artifactId>support.yaml-snakeyaml</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <version>${project.version}</version>
-    </dependency> 
+    </dependency> -->
 
     <dependency>
       <groupId>org.apache.maven.plugin-testing</groupId>
