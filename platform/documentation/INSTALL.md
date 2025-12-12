@@ -4,7 +4,7 @@ This document summarizes how to install and run the oktoflow platform. We discus
 
 ## Installation from scratch
 
-We recommend a full installation from scratch using the installation package. You can obtain the actual platform install package for [Windows](https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/platform/tools/Install/install.zip) and for [Linux](https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/platform/tools/Install/install.tar.gz). 
+We recommend a full installation from scratch using the installation package. You can obtain the actual platform install package for [Windows](https://projects.sse.uni-hildesheim.de/oktoflow/install.zip) and for [Linux](https://projects.sse.uni-hildesheim.de/oktoflow/install.tar.gz). 
 
 Unpack the installation package, e.g., on Linux
 
