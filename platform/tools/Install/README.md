@@ -245,7 +245,7 @@ You can use the CLI to start individual services of the application on a certain
 
 ### Developing applications
 
-Application development is currently not fully supported by the management UI but we are working on that. This install package contains a [simple example application](summary.pdf) with two services. For creating an application we recommend for now consulting the platform handbook.
+Application development is currently not fully supported by the management UI but we are working on that. This install package contains a [simple example application](docs/summary.pdf) with two services. For creating an application we recommend for now consulting the platform handbook.
 
 Outlook on UI-supported development of applications (still in development):
 

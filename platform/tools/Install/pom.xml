@@ -72,8 +72,15 @@
         <maven.main.skip>true</maven.main.skip>
         <maven.test.skip>true</maven.test.skip>
         <maven.javadoc.skip>true</maven.javadoc.skip>
-      </properties>        
-      <!-- nothing just force platform dependencies -->
+      </properties>
+      <!-- just force platform dependencies -->
+      <dependencies>
+        <dependency> <!-- executed as process, EASy-dependencies may be mitigated by maven and missing -->
+            <artifactId>configuration.easy</artifactId>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <version>${project.version}</version>
+        </dependency>
+      </dependencies>
     </profile>
     <profile>
      <id>Main</id>
@@ -84,6 +91,11 @@
       <dependencies>
         <dependency>
             <artifactId>configuration.configuration</artifactId>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency> <!-- executed as process, EASy-dependencies may be mitigated by maven and missing -->
+            <artifactId>configuration.easy</artifactId>
             <groupId>de.iip-ecosphere.platform</groupId>
             <version>${project.version}</version>
         </dependency>
