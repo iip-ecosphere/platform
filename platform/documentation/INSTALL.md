@@ -14,7 +14,7 @@ All installation steps are described in the [README](../tools/Install/README.md)
 
 ## Pre-packaged Docker containers
 
-For a simple startup, we offer two pre-packaged Docker containers on Docker Hub. These containers are meant
+For a simple startup, we offer two pre-packaged Docker containers on Docker Hub. Please be aware of that these containers are updated infrequently, at least as part of release activities. These containers are meant
 
 * containing the platform parts (AAS server, the ECS Runtime, the Service Manager) and a simple example service artifact. 
 * one with the Command Line Interface shown in the usage scenario above.
