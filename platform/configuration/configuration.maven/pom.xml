@@ -136,12 +136,12 @@
       <artifactId>support.json-jackson</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <version>${project.version}</version>
-    </dependency> 
+    </dependency> -->
     <dependency>
       <artifactId>support.yaml-snakeyaml</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <version>${project.version}</version>
-    </dependency> -->
+    </dependency>
 
     <dependency>
       <groupId>org.apache.maven.plugin-testing</groupId>
