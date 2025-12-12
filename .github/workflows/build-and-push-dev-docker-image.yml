@@ -41,7 +41,7 @@ jobs:
           mvn --batch-mode --update-snapshots package -DskipTests
       - name: Build the test app through tests
         run: |
-          cd ./platform/configuration/configuration
+          cd ./platform/configuration/configuration.easy
           mvn --batch-mode --update-snapshots package -Dtest="IvmlSimpleMeshTests"
           cd ../../..
       - name: Instantiate the platform, prepare container building
