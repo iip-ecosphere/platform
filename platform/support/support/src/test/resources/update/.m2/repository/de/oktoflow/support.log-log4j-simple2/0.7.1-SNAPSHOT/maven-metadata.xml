@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>de.iip-ecosphere.platform</groupId>
+  <artifactId>support.log-slf4j-simple2</artifactId>
+  <versioning>
+    <lastUpdated>20251210125244</lastUpdated>
+    <snapshot>
+      <timestamp>20251210.125244</timestamp>
+      <buildNumber>89</buildNumber>
+    </snapshot>
+    <snapshotVersions>
+      <snapshotVersion>
+        <classifier>plugin</classifier>
+        <extension>zip</extension>
+        <value>0.7.1-20251210.125244-89</value>
+        <updated>20251210125244</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+  <version>0.7.1-SNAPSHOT</version>
+</metadata>

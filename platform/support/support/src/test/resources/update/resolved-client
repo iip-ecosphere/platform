@@ -1,0 +1,4 @@
+[
+  {"url":"./src/test/resources/update/.m2/repository/de/oktoflow/support.log-log4j-simple/0.7.1-SNAPSHOT/support.log-slf4j-simple-0.7.1-20251210.125240-88-plugin.zip", "plugin":true, "name":"support.log-slf4j-simple-0.7.1-SNAPSHOT"},
+  {"url":"./src/test/resources/update/.m2/repository/de/oktoflow/support.log-log4j-simple2/0.7.1-SNAPSHOT/support.log-slf4j-simple2-0.7.1-20251210.125244-89-plugin.zip", "plugin":true, "name":"support.log-slf4j-simple2-0.7.1-SNAPSHOT"}
+]

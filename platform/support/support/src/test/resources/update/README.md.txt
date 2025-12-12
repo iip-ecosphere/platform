@@ -1,0 +1,1 @@
+Mocked Maven repo structure for testing. Files and folders are named the same. File content may be removed/cleaned.

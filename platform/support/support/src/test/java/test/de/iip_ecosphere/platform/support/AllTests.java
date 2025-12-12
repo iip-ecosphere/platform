@@ -49,6 +49,7 @@ import test.de.iip_ecosphere.platform.support.logging.LoggerFactoryTest;
     SshTest.class,
     TaskRegistryTests.class,
     CollectorTest.class,
+    UpdaterTest.class,
     
     FallbackLoggerTest.class,
     LoggerFactoryTest.class

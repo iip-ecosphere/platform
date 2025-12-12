@@ -17,8 +17,8 @@ import de.iip_ecosphere.platform.support.FileUtils;
  */
 public class FileUtilsTest {
     
-    private static int numberTestFiles = 24;
-    private static int numberTestNotServiceFiles = 12;
+    private static int numberTestFiles = 32;
+    private static int numberTestNotServiceFiles = 20;
 
     /**
      * Sets the number of test files to be found.
