@@ -677,25 +677,7 @@ public class Starter {
             while (artPath.startsWith("/")) {
                 artPath = artPath.substring(1);
             }
-            InputStream artifact = null; 
-            try { // spring packaging
-                artifact = ZipUtils.findFile(artFile, "BOOT-INF/classes/" + artPath);
-                if (null == artifact) {
-                    artifact = ZipUtils.findFile(artFile, "BOOT-INF/classes-app/" + artPath);
-                }
-                if (null == artifact) {
-                    artifact = ZipUtils.findFile(artFile, artPath);
-                    if (null != artifact) {
-                        getLogger().info("Found " + artPath + " in " + artFile + " " 
-                            + artifact.getClass().getSimpleName());
-                    }
-                } else {
-                    getLogger().info("Found " + artPath + " in BOOT-INF/classes/" + artPath + " " 
-                        + artifact.getClass().getSimpleName());
-                }
-            } catch (IOException e) {
-                getLogger().info("Cannot open " + artFile + ": " + e.getMessage());
-            }
+            InputStream artifact = findArtifact(artFile, artPath); 
             if (null == artifact) { 
                 artifact = ResourceLoader.getResourceAsStream(Starter.class, artPath);
                 if (null != artifact) {
@@ -710,6 +692,36 @@ public class Starter {
             FileUtils.closeQuietly(artifact);
         }
         return processDir;
+    }
+    
+    /**
+     * Finds a file artifact within an application file/artifact.
+     * 
+     * @param artFile the artifact file
+     * @param artPath the file artifact path within {@code artFile}
+     * @return the input stream (may be <b>null</b> for not found)
+     */
+    public static InputStream findArtifact(File artFile, String artPath) { // TODO externalize spring conventions
+        InputStream artifact = null; 
+        try { // spring packaging
+            artifact = ZipUtils.findFile(artFile, "BOOT-INF/classes/" + artPath);
+            if (null == artifact) {
+                artifact = ZipUtils.findFile(artFile, "BOOT-INF/classes-app/" + artPath);
+            }
+            if (null == artifact) {
+                artifact = ZipUtils.findFile(artFile, artPath);
+                if (null != artifact) {
+                    getLogger().info("Found " + artPath + " in " + artFile + " " 
+                        + artifact.getClass().getSimpleName());
+                }
+            } else {
+                getLogger().info("Found " + artPath + " in BOOT-INF/classes/" + artPath + " " 
+                    + artifact.getClass().getSimpleName());
+            }
+        } catch (IOException e) {
+            getLogger().info("Cannot open " + artFile + ": " + e.getMessage());
+        }
+        return artifact;
     }
 
     /**
