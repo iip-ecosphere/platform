@@ -66,12 +66,12 @@ tag of the implementation component:
 * `netMgr` sets up minimum or maximum port for automated ephemeral port assignment. Default range is 1024-65535 according to RFC 6056. The `netmask` has the same semantics as for `implementation`.
 * `serviceCmdArgs` are optional command line arguments to be passed to all service starts. This can be helful for testing.
 * `supportedAppIds` (initial value taken from environment or system property `iip.supportedAppIds` to ease container customization) are application ids that are particularly supported by this service manager. If empty, all known apps are supported. If ids are given and an app with a different id is started, the operation may fail.
+* `pluginsFolder` (initial value taken from environment or system property `iip.plugins`, default `plugins`) is the folder where plugins of the service manager are stored.
+* `appPluginsFolder` (initial value `null`) is an optional separated folder where only the plugins of apps shall be stored. If not given, the `pluginsFolder` is taken also for apps.
+* `updateAppPlugins` (intial value `true`) whether app plugins shall not only be resolved if the are not already installed rather than also updated upon app start
 
 ## Running
 
 This component must be bundled with further, e.g., upper layer components which pair themselves via JLS, in particular `LifecycleHandler`. To start this component, please use the functions of the `LifecycleHandler` or the default starter classes defined there.
 
 The command line argument `--iip.port=<int>` allows overriding the AAS implementation server port, i.e., in the Yaml above `aas:implementation:port`.
-
-## Missing
-* AAS discovery, currently we rely on the full IP specification instantiated through the configuration

@@ -23,6 +23,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 import de.iip_ecosphere.platform.support.setup.EnableSetupMerge;
+import de.iip_ecosphere.platform.support.setup.PluginsSetup;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
@@ -31,7 +32,7 @@ import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
  * @author Holger Eichelberger, SSE
  */
 @EnableSetupMerge
-public class ServiceSetup {
+public class ServiceSetup implements PluginsSetup {
 
     public static final String ENV_SUPPORTED_APPIDS = "IIP_SUPPORTED_APPIDS";
     public static final String PROPERTY_SUPPORTED_APPIDS = "iip.supportedAppIds";
@@ -42,6 +43,8 @@ public class ServiceSetup {
     private List<String> serviceCmdArgs = new ArrayList<>();
     private List<String> supportedAppIds = initialSupportedAppIds();
     private String pluginsFolder = OsUtils.getPropertyOrEnv(AbstractSetup.PARAM_PLUGINS, "plugins");
+    private String appPluginsFolder = null;
+    private boolean updateAppPlugins = true;
 
     /**
      * Tries to read the supported App ids from {@link #PROPERTY_SUPPORTED_APPIDS} as environment variable or
@@ -83,6 +86,33 @@ public class ServiceSetup {
     }
 
     /**
+     * Changes the (parent) folder where the oktoflow app plugins are located. [yaml convention]
+     * 
+     * @param pluginsFolder the plugins folder;
+     */
+    public void setAppPluginsFolder(String pluginsFolder) { // file causes exception in snakeyaml
+        this.appPluginsFolder = pluginsFolder;
+    }
+
+    /**
+     * Changes the (parent) folder where the oktoflow app plugins are located. [yaml convention]
+     * 
+     * @param pluginsFolder the plugins folder
+     */
+    public void setAppPluginsFolderFile(File pluginsFolder) {
+        setAppPluginsFolder(null == pluginsFolder ? null : pluginsFolder.toString());
+    }
+
+    /**
+     * Whether app plugins shall be updated. [yaml convention]
+     * 
+     * @param updateAppPlugins whether app plugins shall be updated
+     */
+    public void setUpdateAppPlugins(boolean updateAppPlugins) {
+        this.updateAppPlugins = updateAppPlugins;
+    }
+
+    /**
      * Returns the (parent) folder where the oktoflow plugins are located (the folder itself or by default 
      * its sub-folders "plugins" or "oktoPlugins").
      * 
@@ -91,6 +121,25 @@ public class ServiceSetup {
      */
     public String getPluginsFolder() {
         return pluginsFolder;
+    }
+
+    /**
+     * Returns the (parent) folder where the oktoflow app plugins are located. If not specified, use 
+     * {@link #getPluginsFolder()} instead.
+     * 
+     * @return the folder, may be <b>null</b> (then use getPluginsFolder()} instead
+     */
+    public String getAppPluginsFolder() {
+        return appPluginsFolder;
+    }
+
+    /**
+     * Returns whether app plugins shall be updated.
+     * 
+     * @return whether app plugins shall be updated
+     */
+    public boolean getUpdateAppPlugins() {
+        return updateAppPlugins;
     }
 
     /**
