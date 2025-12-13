@@ -1,4 +1,4 @@
-FROM openjdk:8
+FROM eclipse-temurin:21-alpine
 
 # install IIP Ecosphere ECS runtime with default port 9000
 ENV IIP_PORT=9000

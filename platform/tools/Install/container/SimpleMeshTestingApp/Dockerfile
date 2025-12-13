@@ -1,4 +1,4 @@
-FROM openjdk:8
+FROM eclipse-temurin:21-alpine
 ENV IIP_PORT=9001
 COPY svcJars/* /svcJars/
 COPY serviceMgr.sh /

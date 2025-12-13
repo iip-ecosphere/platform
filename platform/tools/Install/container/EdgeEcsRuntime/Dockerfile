@@ -1,4 +1,4 @@
-FROM openjdk:8
+FROM eclipse-temurin:21-alpine
 ENV IIP_PORT=9000
 EXPOSE 9000/TCP
 COPY common/ common

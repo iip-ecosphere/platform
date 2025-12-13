@@ -1,4 +1,4 @@
-FROM openjdk:16-alpine3.13
+FROM eclipse-temurin:21-alpine
 WORKDIR /device
 
 # Broker (src contains broker configuration)

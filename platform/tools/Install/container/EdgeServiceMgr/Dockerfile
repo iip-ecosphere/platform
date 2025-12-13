@@ -1,4 +1,4 @@
-FROM openjdk:16-alpine3.13
+FROM eclipse-temurin:21-alpine
 WORKDIR /device
 COPY brokerJars/ brokerJars
 COPY src/ src
