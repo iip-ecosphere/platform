@@ -136,6 +136,7 @@
                </cleanup>
                <overWriteReleases>false</overWriteReleases>
                <overWriteSnapshots>true</overWriteSnapshots>
+               <force>true</force>
              </configuration>
            </execution>
            <execution>
@@ -170,6 +171,7 @@
                </cleanup>
                <overWriteReleases>false</overWriteReleases>
                <overWriteSnapshots>true</overWriteSnapshots>
+               <force>true</force>
              </configuration>
            </execution>
            

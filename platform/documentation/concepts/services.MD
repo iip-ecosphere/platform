@@ -44,8 +44,8 @@ The common fields (some fields are detailed below) of all service types defined 
 | monitorRcvCount |  Shall the number of received data tuples be monitored and reported during runtime. | True |
 | monitorSentCount |  Shall the number of sent data tuples be monitored and reported during runtime. | True |
 | monitorProcessingTime |  Shall the processing time per data tuple be monitored and reported during runtime. | True |
-| traceRcv |  Shall the service operations be traced, e.g., to the tracing stream (TRACE, TRACE_NO_DATA) or through logging (LOG, LOG_NO_DATA) or on the console (SYSOUT). | NONE |
-| traceSent |  Shall the service operations be traced, see traceRcv. | NONE |
+| traceRcv |  Shall the service operations be traced, e.g., to the tracing stream (`TraceKind::TRACE`, `TraceKind::TRACE_NO_DATA`) or through logging (`TraceKind::LOG`, `TraceKind::LOG_NO_DATA`) or on the console (`TraceKind::SYSOUT`). | `TraceKind::NONE` |
+| traceSent |  Shall the service operations be traced, see `traceRcv`. | `TraceKind::NONE` |
 | plugins | References to plugins used/required, e.g., to use the AAS factory from the specified plugin instead of the default factory. | {}  |
 | description |  Mandatory textual description for the service, e.g., to be included into documentation. May be empty. |     |
 | ver |  Mandatory version of the service |     |
