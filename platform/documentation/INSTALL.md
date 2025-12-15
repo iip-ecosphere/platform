@@ -99,6 +99,3 @@ This was a rather simple scenario involving one combined server and compute node
 ## Further information
 
 For further information on using the individual parts, please consult the platform handbook linked on the main page. Please see also 
-
-* [Windows Installation Guide](Platform_Installation_Guide_for_Windows.pdf). 
-* [Linux Installation Guide](Platform_Installation_Guide_for_Linux.pdf). 
