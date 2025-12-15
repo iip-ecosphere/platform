@@ -69,6 +69,9 @@ public class TestAppMojo extends AbstractLoggingMojo {
     
     @Parameter(defaultValue = "${session.request}")
     private MavenExecutionRequest request;
+
+    @Parameter( defaultValue = "${project.build.directory}", readonly = true )
+    private File targetDirectory;
     
     @Parameter(property = "configuration.testApp.testCmd", required = false, defaultValue = "")
     private String testCmd;
@@ -598,6 +601,34 @@ public class TestAppMojo extends AbstractLoggingMojo {
         getLog().info("Using broker dir: " + dir);
         return dir;
     }
+
+    /**
+     * Returns the marker file whether tests have run at least once.
+     * 
+     * @return the marker file
+     */
+    private File getTestsRunOnceFile() {
+        return new File(targetDirectory, "okto.testsRunOnce");
+    }
+
+    /**
+     * If there was no test-run before, reset {@link #appOffline}.
+     */
+    private void validateAppOffline() {
+        if (!getTestsRunOnceFile().exists()) {
+            appOffline = false;
+        }
+    }
+    
+    /**
+     * Indicates that tests have run once completely.
+     */
+    private void indicateTestsRunOnce() {
+        try {
+            FileUtils.touch(getTestsRunOnceFile());
+        } catch (IOException e) {
+        }
+    }
     
     /**
      * Implements the test execution.
@@ -606,6 +637,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
      * @throws MojoFailureException if the Mojo failed
      */
     public void executeImpl() throws MojoExecutionException, MojoFailureException {
+        validateAppOffline();
         AtomicInteger testTerminatedCount = new AtomicInteger();
         AtomicBoolean testTerminated = new AtomicBoolean(false); 
         if (brokerPort < 0) {
@@ -674,6 +706,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
             throw new MojoExecutionException("Spawned processes did not terminate successfully. "
                 + "See above for details.");
         }
+        indicateTestsRunOnce();
     }
 
 }
