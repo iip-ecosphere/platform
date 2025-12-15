@@ -4,7 +4,7 @@
 
 ### Basic setup
 
-- JDK 21 (tested with JDK 21.0.2), JDK 17 (tested with JDK 17.0.10); either one in in path, evironment variable ``JAVA_HOME`` set to JDK installation directory
+- [JDK 21](https://github.com/adoptium/temurin21-binaries/releases/tag/jdk-21.0.2%2B13) (tested with JDK 21.0.2), [JDK 17](https://github.com/adoptium/temurin17-binaries/releases/tag/jdk-17.0.10%2B7) (tested with JDK 17.0.10); either one in in path, evironment variable ``JAVA_HOME`` set to JDK installation directory
 - Maven 3.9.7 in path
 - Python in path with the following packages (required if Python services are used, required for building and basic operations) 
 
