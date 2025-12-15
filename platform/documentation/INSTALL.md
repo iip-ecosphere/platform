@@ -6,7 +6,7 @@ This document summarizes how to install and run the oktoflow platform. We discus
 
 We recommend a full installation from scratch using the installation package. You can obtain the actual platform install package for [Windows](https://projects.sse.uni-hildesheim.de/oktoflow/install.zip) and for [Linux](https://projects.sse.uni-hildesheim.de/oktoflow/install.tar.gz). 
 
-Unpack the installation package, e.g., on Linux
+Create a directory, copy the installation package into that directory and unpack the installation package, e.g., on Linux
 
     tar xzvf install.tar.gz
 
