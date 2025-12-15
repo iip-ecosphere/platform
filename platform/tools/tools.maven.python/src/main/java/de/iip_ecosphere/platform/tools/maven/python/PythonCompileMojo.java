@@ -60,6 +60,9 @@ public class PythonCompileMojo extends AbstractLoggingMojo {
     @Parameter(property = "python.binary", required = false, defaultValue = "")
     private String python;
 
+    @Parameter(property = "python.pythonArgs", required = false, defaultValue = "")
+    private String pythonArgs;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (!skip) {
@@ -82,6 +85,7 @@ public class PythonCompileMojo extends AbstractLoggingMojo {
                 getLog().info("Testing Python syntax: " + f.getAbsolutePath());
                 if (pyflakesExists) {
                     String[] cmd = {pythonExecutable, "-m", "pyflakes",  f.getAbsolutePath()}; 
+                    cmd = PythonUtils.insertArgs(cmd, 1, pythonArgs);
                     output += runPythonTest(cmd);
                     if (output.contains("No module named")) {
                         pyflakesExists = !output.contains("pyflakes");
@@ -90,6 +94,7 @@ public class PythonCompileMojo extends AbstractLoggingMojo {
                 } 
                 if (!pyflakesExists) {
                     String[] cmd = {pythonExecutable, "-m", "py_compile", f.getAbsolutePath()};
+                    cmd = PythonUtils.insertArgs(cmd, 1, pythonArgs);
                     output += runPythonTest(cmd);
                 }
                 String[] ignore = null == ignoreText ? new String[0] : ignoreText.split(";");

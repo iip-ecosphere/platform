@@ -16,6 +16,11 @@
 
 You can find (some) archived Java and Maven binaries in [the online install folder](https://projects.sse.uni-hildesheim.de/oktoflow/). A simple way of installing Java/Maven is to unpack the binaries and to add the the respective binaries to your path; for Java, please also set the environment variable `JAVA_HOME` to the folder that contains the JDK.
 
+### Python in the build process
+
+We execute Python in the build process of the platform and the apps to validate Python code as well as to execute tests. However, Python setups may be rather individual, ranging from one central Python per device to multiple ones as well as multiple virtual environments. Where Python is executed in the platform and the build processes, we first take the user specified Python into account and, if not explicitly given, try to identify one let it be through environment variables (for Python the binary can be specified in the environment variable `IIP_PYTHON`), the first one in the operating system path as well as some standard locations. In particular for the build processes, also a specification of further Python interpreter parameters like the virtual environment to use (venv, conda, mamba) may be relevant, either explicitly specified or via the environment variable `IIP_PYTHONARGS`). 
+For Maven the corresponding command line arguments are `-Dpython.binary` and `-Dpython.pythonArgs`.
+
 ### Python service setup
 
 Depending on the use of Python packages/libraries by your/used platform services, installation of further Python libraries may be required. Services shall declare their full dependencies in the configuration model, including the required Python version, so that containers can be build automatically from this information. For development, testing or bare metal installation, the Python dependencies above as well as the following dependencies are needed.

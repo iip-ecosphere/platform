@@ -64,6 +64,9 @@ public class PythonTestMojo extends AbstractMojo {
     @Parameter(property = "python.pythonpath", required = false, defaultValue = "")
     private String pythonPath;
 
+    @Parameter(property = "python.pythonArgs", required = false, defaultValue = "")
+    private String pythonArgs;
+
     /**
      * A specific <code>fileSet</code> rule to select files and directories.
      */
@@ -131,6 +134,7 @@ public class PythonTestMojo extends AbstractMojo {
                 if (testFile.length() == 0 || f.getName().startsWith(testFile)) {
                     getLog().info("Executing Python test: " + f.getName());
                     String[] cmd = {pythonExecutable.toString(), f.getName(), modelProject}; 
+                    cmd = PythonUtils.insertArgs(cmd, 1, pythonArgs);
                     output += runPythonTest(cmd, new File(baseDir, "src/test/python/").getAbsolutePath(), envp);
                     testedFileCount++;
                 }
