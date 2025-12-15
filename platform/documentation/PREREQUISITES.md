@@ -14,6 +14,8 @@
 | pyflakes   | 3.2.0  | 3.3.2  |  3.4.0   |
 | websockets | 11.0.2 | 11.0.2 | 15.0.1   |
 
+You can find (some) archived Java and Maven binaries in [the online install folder](https://projects.sse.uni-hildesheim.de/oktoflow/).
+
 ### Python service setup
 
 Depending on the use of Python packages/libraries by your/used platform services, installation of further Python libraries may be required. Services shall declare their full dependencies in the configuration model, including the required Python version, so that containers can be build automatically from this information. For development, testing or bare metal installation, the Python dependencies above as well as the following dependencies are needed.
