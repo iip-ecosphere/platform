@@ -31,7 +31,7 @@ The common fields (some fields are detailed below) of all service types defined 
 | --- | --- | --- |
 | id  | Mandatory unique id for deployment plans and management operations. |     |
 | name | Mandatory name to be turned into programming language name during instantiation. |     |
-| kind |  Mandatory kind of service, one of SOURCE_SERVICE, TRANSFORMATION_SERVICE, SINK_SERVICE, PROBE_SERVICE |     |
+| kind |  Mandatory kind of service, one of `ServiceKind::SOURCE_SERVICE`, `ServiceKind::TRANSFORMATION_SERVICE`, `ServiceKind::SINK_SERVICE`, `ServiceKind::PROBE_SERVICE` |     |
 | asynchronous |  Shall data be processed in synchronous or asynchronous manner. Affects interface. | True |
 | input | Mandatory sequence of input types, wrapped into IOType instances (type referencing to the transported DataType, forward to the transport direction) |     |
 | output |  Mandatory Sequence of output types, wrapped into IOType instances (type referencing to the transported DataType, forward to the transport direction) |     |
