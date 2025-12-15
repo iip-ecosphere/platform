@@ -14,7 +14,7 @@
 | pyflakes   | 3.2.0  | 3.3.2  |  3.4.0   |
 | websockets | 11.0.2 | 11.0.2 | 15.0.1   |
 
-You can find (some) archived Java and Maven binaries in [the online install folder](https://projects.sse.uni-hildesheim.de/oktoflow/).
+You can find (some) archived Java and Maven binaries in [the online install folder](https://projects.sse.uni-hildesheim.de/oktoflow/). A simple way of installing Java/Maven is to unpack the binaries and to add the the respective binaries to your path; for Java, please also set the environment variable `JAVA_HOME` to the folder that contains the JDK.
 
 ### Python service setup
 
