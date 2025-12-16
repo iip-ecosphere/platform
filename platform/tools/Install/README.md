@@ -1,6 +1,6 @@
 # oktoflow platform: Install Support
 
-This project supports the installation of the oktoflow platform.
+This package supports the installation of the oktoflow platform. It contains step-wise installation scripts. All technical prerequisites are listed in [prerequisites document](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/PREREQUISITES.md).
 
 ## Platform dependencies (examples only)
 

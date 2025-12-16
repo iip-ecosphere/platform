@@ -4,6 +4,8 @@
 
 ### Basic setup
 
+The [install package](../tools/Install/README.md) offers scripts for step-wise installing the prerequisites as well as more details on the installation.
+
 - [JDK 21](https://github.com/adoptium/temurin21-binaries/releases/tag/jdk-21.0.2%2B13) (tested with JDK 21.0.2), [JDK 17](https://github.com/adoptium/temurin17-binaries/releases/tag/jdk-17.0.10%2B7) (tested with JDK 17.0.10); either one in in path, evironment variable ``JAVA_HOME`` set to JDK installation directory
 - Maven 3.9.7 in path
 - Python in path with the following packages (required if Python services are used, required for building and basic operations) 
@@ -14,7 +16,7 @@
 | pyflakes   | 3.2.0  | 3.3.2  |  3.4.0   |
 | websockets | 11.0.2 | 11.0.2 | 15.0.1   |
 
-You can find (some) archived Java and Maven binaries in [the online install folder](https://projects.sse.uni-hildesheim.de/oktoflow/). A simple way of installing Java/Maven is to unpack the binaries and to add the the respective binaries to your path; for Java, please also set the environment variable `JAVA_HOME` to the folder that contains the JDK.
+If you plan for a manual installation, you can find (some) archived Java and Maven binaries in [the online install folder](https://projects.sse.uni-hildesheim.de/oktoflow/). A simple way of installing Java/Maven is to unpack the binaries and to add the the respective binaries to your path.
 
 ### Python in the build process
 
