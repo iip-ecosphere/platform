@@ -156,10 +156,10 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, JavaCodeArti
                     block.SystemOutPrintln().arg('"received in ${base.id}: " + ${d}');
                 }
             }
-if (expr <> "") {
-            block.add(expr + ";"); // add only if expr<>"", returns block
-}
-block;            
+            if (expr <> "") {
+                block.add(expr + ";"); // add only if expr<>"", returns block
+            }
+            block;
         } else {
             new JavaCodeStringExpression(expr);
         }
@@ -309,9 +309,11 @@ block;
                 methodName = "process" + methodName.substring(6);
             }
         }
-        nodeBeanAnnotation(c.method("java.util.function.Consumer<${asTypeName(type)}>", methodName, "Called when data arrived that shall be passed on to the connector.")).(m|{
-            m.return(new JavaCodeLambdaExpression("data").asExpr(genRcvProbe(conn, expr, type, "data")), "the data consumer functor");
-        });
+        if (!mainCls.containsMethod(methodName)) {
+            nodeBeanAnnotation(c.method("java.util.function.Consumer<${asTypeName(type)}>", methodName, "Called when data arrived that shall be passed on to the connector.")).(m|{
+                m.return(new JavaCodeLambdaExpression("data").asExpr(genRcvProbe(conn, expr, type, "data")), "the data consumer functor");
+            });
+        }
     }
     
     def Boolean recordSourceIngestor(MeshSource elt, IOType type) {
@@ -389,10 +391,12 @@ block;
                 methodName = methodSuffix;
             }
         }
-        nodeBeanAnnotation(mainCls.method("java.util.function.Consumer<${type}>", methodSuffixWithServiceId, "Called when data arrived that shall be received (data sink).")).(m|{
-            generateSinkMethodBody(snk, overrideImpl(snk.impl), methodName, methodSuffixWithServiceId, type, m);
-            m.getJavadocComment().addReturnComment("the data consumer functor");
-        });
+        if (!mainCls.containsMethod(methodName)) {
+            nodeBeanAnnotation(mainCls.method("java.util.function.Consumer<${type}>", methodSuffixWithServiceId, "Called when data arrived that shall be received (data sink).")).(m|{
+                generateSinkMethodBody(snk, overrideImpl(snk.impl), methodName, methodSuffixWithServiceId, type, m);
+                m.getJavadocComment().addReturnComment("the data consumer functor");
+            });
+        }
     } 
     
     def generateSinkMethodBody(MeshSink snk, ServiceBase service, String methodName, String methodSuffixWithServiceId, String type, JavaCodeMethod m) {

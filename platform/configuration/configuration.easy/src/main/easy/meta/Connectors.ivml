@@ -167,8 +167,6 @@ project Connectors {
        assign (uiGroup = UiInvisibleGroup) to {
            setOf(MappingEntry) mapping = {};
        }
-       Constraint connectorOutputSize = fwdTypes(output).size() < 2;
-       Constraint connectorInputSize = fwdTypes(input).size() < 2;
        Constraint connectorKind = kind <> ServiceKind.PROBE_SERVICE;
        Constraint connectorDeployability = deployable == true;
        Constraint inInterfaceOk = isDefined(inInterface) and inInterface <> null;

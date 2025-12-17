@@ -48,7 +48,7 @@ template MeshBasics(Configuration config, FileArtifact target) {
     
     // added v2->v3    
     def sequenceOf(IOType) reduce(Connector conn, sequenceOf(IOType) types) {
-        Integer maxSize = 1; // TODO take inIf/outIf into account as maximum size
+        Integer maxSize = min(conn.inInterface.size(), conn.outInterface.size());
         sequenceOf(IOType) result = {}; // typically from IVML, i.e., non modifiable container
         Integer pos = 0;
         while (result.size() < maxSize and pos < types.size()) {
@@ -76,7 +76,6 @@ template MeshBasics(Configuration config, FileArtifact target) {
         sequenceOf(ConnectorTypes) result = {};
         sequenceOf(IOType) inTypes = reduce(conn, conn.input); // IVML collection unmodifiable
         sequenceOf(IOType) outTypes = reduce(conn, conn.output);
-
         Integer pos = 0;
         for (IOType outType : outTypes) {
             ConnectorTypes ct = new ConnectorTypes();

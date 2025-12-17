@@ -606,14 +606,16 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
     }
     
     def JavaCodeClass generateConnectorTranslator(JavaCodeClass pc, String name, String parent, String oType, String coType) {
-        pc.addClass(name).setStatic().setPrivate().(c|{
-            c.extends('de.iip_ecosphere.platform.connectors.types.${parent}<${oType}, ${coType}>');
-            c.attribute("java.util.function.Supplier<String>", "pathSupplier");
-            c.constructor().setPrivate().(m|{
-                m.param("java.util.function.Supplier<String>", "pathSupplier");
-                m.assign("this.pathSupplier", "pathSupplier");
+        if (!pc.containsClass(name)) {
+            pc.addClass(name).setStatic().setPrivate().(c|{
+                c.extends('de.iip_ecosphere.platform.connectors.types.${parent}<${oType}, ${coType}>');
+                c.attribute("java.util.function.Supplier<String>", "pathSupplier");
+                c.constructor().setPrivate().(m|{
+                    m.param("java.util.function.Supplier<String>", "pathSupplier");
+                    m.assign("this.pathSupplier", "pathSupplier");
+                });
             });
-        });
+        }
     }
 
     def generateConnectorTranslatorSourceTarget(JavaCodeClass c, String oType, String coType) {
@@ -703,24 +705,27 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
                 connectionIds = connectionIds + ", \"${c}\"";
             }
 
-            parent.addClass(getReceptionCallbackClassName(conn, cType.outType)).implements("de.iip_ecosphere.platform.transport.connectors.ReceptionCallback<${coType}>").setPrivate().(c|{
-                c.initializer(false).(i|{
-                    i.SLComment("initialize Transport if needed");
-                    i.call("de.iip_ecosphere.platform.services.environment.spring.Starter.getSetup", JavaCodeImportScope.CLASS);
+            String rcpCallbackClassName = getReceptionCallbackClassName(conn, cType.outType);
+            if (!parent.containsClass(rcpCallbackClassName)) {
+                parent.addClass(rcpCallbackClassName).implements("de.iip_ecosphere.platform.transport.connectors.ReceptionCallback<${coType}>").setPrivate().(c|{
+                    c.initializer(false).(i|{
+                        i.SLComment("initialize Transport if needed");
+                        i.call("de.iip_ecosphere.platform.services.environment.spring.Starter.getSetup", JavaCodeImportScope.CLASS);
+                    });
+                    c.method("received").(m|{
+                        m.param(coType, "data");
+                        m.override();
+                        m.call("de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider.increaseCounterBy", JavaCodeImportScope.CLASS)
+                            .arg("serviceSent").arg("1.0");
+                        m.call("de.iip_ecosphere.platform.transport.Transport.send", JavaCodeImportScope.CLASS).lambdaArg().var("c")
+                            .expr('c.asyncSend(${composeDestination("${conn.id}_${coType}", app, "appInstId")}, data), "${conn.id}"${connectionIds}'); // lazy for now
+                    });
+                    c.method("Class<${coType}>", "getType").(m|{
+                        m.override();
+                        m.returnClass(coType);
+                    });
                 });
-                c.method("received").(m|{
-                    m.param(coType, "data");
-                    m.override();
-                    m.call("de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider.increaseCounterBy", JavaCodeImportScope.CLASS)
-                        .arg("serviceSent").arg("1.0");
-                    m.call("de.iip_ecosphere.platform.transport.Transport.send", JavaCodeImportScope.CLASS).lambdaArg().var("c")
-                        .expr('c.asyncSend(${composeDestination("${conn.id}_${coType}", app, "appInstId")}, data), "${conn.id}"${connectionIds}'); // lazy for now
-                });
-                c.method("Class<${coType}>", "getType").(m|{
-                    m.override();
-                    m.returnClass(coType);
-                });
-            });
+            }
         }
     }
 
