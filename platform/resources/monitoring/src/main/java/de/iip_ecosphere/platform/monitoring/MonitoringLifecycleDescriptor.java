@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.monitoring;
 
+import de.iip_ecosphere.platform.services.environment.ServicePluginDescriptor;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.PidLifecycleDescriptor;
 import de.iip_ecosphere.platform.transport.Transport;
@@ -25,6 +26,7 @@ public class MonitoringLifecycleDescriptor implements LifecycleDescriptor, PidLi
     
     @Override
     public void startup(String[] args) {
+        ServicePluginDescriptor.loadPlatformPlugins();
         Transport.setTransportSetup(() -> MonitoringSetup.getInstance().getTransport());
     } 
 

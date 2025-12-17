@@ -25,7 +25,6 @@ import de.iip_ecosphere.platform.services.environment.services.TransportConverte
 import de.iip_ecosphere.platform.services.environment.services.TransportConverterFactory;
 import de.iip_ecosphere.platform.support.LifecycleExclude;
 import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
-import de.iip_ecosphere.platform.support.iip_aas.IipVersion;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import de.iip_ecosphere.platform.transport.status.StatusMessageSerializer;
@@ -52,11 +51,10 @@ public class PlattformAasLifecycleDescriptor extends AbstractAasLifecycleDescrip
 
     @Override
     public void startup(String[] args) {
-        System.out.println("oktoflow Platform Server " + IipVersion.getInstance().getVersion() + ".");
+        PlatformSetup setup = PlatformSetup.getInstance();
         super.startup(args);
         ArtifactsManager.startWatching();
 
-        PlatformSetup setup = PlatformSetup.getInstance();
         final int watcherTimeout = setup.getAasHeartbeatTimeout();
         if (watcherTimeout > 0) {
             try {

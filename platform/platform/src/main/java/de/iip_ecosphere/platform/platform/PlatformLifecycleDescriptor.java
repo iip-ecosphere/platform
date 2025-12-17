@@ -28,6 +28,7 @@ import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.PersistenceType;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
+import de.iip_ecosphere.platform.support.iip_aas.IipVersion;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.config.RuntimeSetup;
 import de.iip_ecosphere.platform.transport.Transport;
@@ -51,6 +52,7 @@ public class PlatformLifecycleDescriptor implements LifecycleDescriptor, PidLife
     
     @Override
     public void startup(String[] args) {
+        System.out.println("oktoflow Platform Server " + IipVersion.getInstance().getVersion() + ".");
         RuntimeSetup rSetup = new RuntimeSetup();
         PlatformSetup setup = PlatformSetup.getInstance();
         Transport.setTransportSetup(() -> setup.getTransport());

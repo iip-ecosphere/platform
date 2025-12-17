@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.ecsRuntime;
 
 import java.util.concurrent.ExecutionException;
 
+import de.iip_ecosphere.platform.services.environment.ServicePluginDescriptor;
 import de.iip_ecosphere.platform.support.PidLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.TerminatingLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
@@ -45,6 +46,7 @@ public class EcsLifecycleDescriptor extends AbstractAasLifecycleDescriptor imple
     @Override
     public void startup(String[] args) {
         System.out.println("oktoflow ECS Runtime " + IipVersion.getInstance().getVersion() + ".");
+        ServicePluginDescriptor.loadPlatformPlugins();
         Transport.setTransportSetup(() -> EcsFactory.getSetup().getTransport());
         EcsAas.enable(); // before super.startup/AAS creation!
         super.startup(args);
