@@ -6,6 +6,7 @@ template AmqpWin(IIPEcosphere config, FileArtifact target, String addJavaOpts=""
     def main(IIPEcosphere config, FileArtifact target, String addJavaOpts="") {
         Integer port = config.transportProtocol.port;
         '@echo off
+        cd /D "%~dp0"
         set PORT=${port}
         if "%~1"=="" goto blank
         set PORT=%~1

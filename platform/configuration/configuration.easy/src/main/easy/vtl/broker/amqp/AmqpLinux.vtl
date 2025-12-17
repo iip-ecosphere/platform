@@ -6,6 +6,7 @@ template AmqpLinux(IIPEcosphere config, FileArtifact target, String addJavaOpts=
     def main(IIPEcosphere config, FileArtifact target, String addJavaOpts="") {
         Integer port = config.transportProtocol.port;
         '#!/bin/bash
+        cd "\\$(dirname "$0")"
         PORT=${port}
         if [ $# -gt 0 ]
           then

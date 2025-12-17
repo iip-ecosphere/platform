@@ -6,6 +6,7 @@ import JavaOsBasics;
 template TemplatesMvnBatch(Configuration config, FileArtifact target, Boolean forBuild=true) {
 	
     def main(Configuration config, FileArtifact target, Boolean forBuild=true) {
+        'cd /D "%~dp0"'
         if (forBuild) {
             'mvn -P EasyGen -U generate-sources -Dunpack.force=true'
         } else {

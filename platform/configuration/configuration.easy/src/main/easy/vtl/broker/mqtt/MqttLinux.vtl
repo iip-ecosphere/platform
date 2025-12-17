@@ -9,6 +9,7 @@ template MqttLinux(IIPEcosphere config, FileArtifact target, String addJavaOpts=
         Integer port = config.transportProtocol.port;
         String host = getHostOpt(config);
         '#!/bin/bash
+        cd "\\$(dirname "$0")"
         PORT=${port}
         if [ $# -gt 0 ]
           then
