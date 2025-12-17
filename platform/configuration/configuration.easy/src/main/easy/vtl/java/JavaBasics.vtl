@@ -373,6 +373,7 @@ template JavaBasics(Configuration config, FileArtifact target) {
         appendPlugin(result, iipGroup, "support.processInfo-oshi", projectVersion);
         appendPlugin(result, iipGroup, "support.bytecode-bytebuddy", projectVersion);
         appendPlugin(result, iipGroup, "support.http-apache", projectVersion);
+        appendPlugin(result, iipGroup, "support.metrics-micrometer", projectVersion);
         if (withAas) {
             appendPlugin(result, iipGroup, aasClientModule(config), projectVersion, add=aasExclusions(config, withAasClientExclusions=withAasClientExclusions, withAasServerExclusions=withAasServerExclusions));
             if (withAasServer) {
