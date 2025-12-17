@@ -21,7 +21,7 @@ import de.iip_ecosphere.platform.support.plugins.PluginInstanceDescriptor;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
 import de.iip_ecosphere.platform.support.plugins.PluginManager.PluginFilter;
 import de.iip_ecosphere.platform.support.plugins.PluginManager.PluginInfo;
-import de.iip_ecosphere.platform.support.setup.PluginsSetup;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 import de.iip_ecosphere.platform.support.plugins.PluginManager.ConjunctivePluginFilter;
 
 /**
@@ -63,26 +63,26 @@ public interface ServicePluginDescriptor<S extends Service> extends PluginInstan
     }
 
     /**
-     * Helper function to load all plugins from {@link PluginsSetup#getPluginsFolder()} applying 
-     * {@link #getConnectorAndServicePluginFilter()}.
-     * 
-     * @param setup the setup
+     * Helper function to load all plugins from the plugins directory specified in env/sys property 
+     * {@link AbstractSetup#PARAM_PLUGINS} applying {@link #getConnectorAndServicePluginFilter()}.
      */
-    public static void loadPlatformPlugins(PluginsSetup setup) {
-        loadPlatformPlugins(setup.getPluginsFolder());
+    public static void loadPlatformPlugins() {
+        loadPlatformPlugins(System.getProperty(AbstractSetup.PARAM_PLUGINS));
     }
 
     /**
      * Helper function to load all plugins from {@code pluginsFolder} applying 
      * {@link #getConnectorAndServicePluginFilter()}.
      * 
-     * @param setup the setup
+     * @param pluginsFolder the plugins folder, may be <b>null</b> or empty for none
      */
     public static void loadPlatformPlugins(String pluginsFolder) {
-        File f = new File(pluginsFolder);
-        if (f.isDirectory()) {
-            LoggerFactory.getLogger(ServicePluginDescriptor.class).info("Loading plugins from {}", f);
-            PluginManager.loadAllFrom(f, getConnectorAndServicePluginFilter());
+        if (null != pluginsFolder && pluginsFolder.length() > 0) {
+            File f = new File(pluginsFolder);
+            if (f.isDirectory()) {
+                LoggerFactory.getLogger(ServicePluginDescriptor.class).info("Loading plugins from {}", f);
+                PluginManager.loadAllFrom(f, getConnectorAndServicePluginFilter());
+            }
         }
     }
     
