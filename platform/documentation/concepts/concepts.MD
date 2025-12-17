@@ -37,7 +37,7 @@ Managed platform configurations (and most of the oktoflow examples) follow a cer
 - `AllServices.ivml` all service specifications using datatypes (see [Services](services.MD))
 - `meshes/<MeshName>.ivml` mesh definition linking services to data flows (see [Apps](apps.MD))
 - `apps/<AppName>.ivml` app definition linking all meshes of an app together (see [Apps](apps.MD))
-- `templates` optinal folder containing application template files (see [Apps](apps.MD))
+- `templates` optional folder containing application template files (see [Apps](apps.MD))
 - `TechnicalSetup.ivml` technical settings on where to find AAS servers, whether monitoring shall be started, etc.
 - `PlatformConfiguration.ivml` the top-most project gluing all files together via imports
 
