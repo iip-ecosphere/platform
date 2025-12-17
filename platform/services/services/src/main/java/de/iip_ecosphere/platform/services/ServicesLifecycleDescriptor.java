@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.services;
 
+import de.iip_ecosphere.platform.services.environment.ServicePluginDescriptor;
 import de.iip_ecosphere.platform.support.PidLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.AbstractAasLifecycleDescriptor;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
@@ -43,6 +44,7 @@ public class ServicesLifecycleDescriptor extends AbstractAasLifecycleDescriptor 
     
     @Override
     public void startup(String[] args) {
+        ServicePluginDescriptor.loadPlatformPlugins();
         Transport.setTransportSetup(() -> ServiceFactory.getTransport());
         super.startup(args);
         NetworkManagerFactory.configure(ServiceFactory.getNetworkManagerSetup());
