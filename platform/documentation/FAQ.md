@@ -198,7 +198,7 @@ If there is already a repositories section, please add the contents for the Ã¢â‚
 
 *Reason:* The platform changes and we publish a release form time to time. Both, applications and applications need to be re-instantiated so that new dependencies are taken up and potentially changed interfaces can be addressed correctly. In seldom cases, the also application-specific code must be adjusted manually.
 
-*Solution:* The platform version depends on the version in the Maven POMs and the configuration meta model. In following cases, adjustments to the platform configuration may be needed depending on the changes that were applied in the upgrade. See also [BUILDING](BUILDING).
+*Solution:* The platform version depends on the version in the Maven POMs and the configuration meta model. In following cases, adjustments to the platform configuration may be needed depending on the changes that were applied in the upgrade. See also [BUILDING](BUILDING.md).
  
   * Platform:
     * Grab a new install package, transfer your configuration into that package and run `mvn install`. This will obtain the most recent configuration meta model corresponding to the platform version.
