@@ -42,12 +42,12 @@ def getListOfDeserializedData(path):
     for line in rawData:
         lineList = list(line)
         period = lineList.get("$period", -1)
-        repeats = lineList.get("$repeats", 1)
+        repeats = max(lineList.get("$repeats", 1), 1)
         for dtype in lineList:
             dtype = dtype[0].upper() + dtype[1:]#Python serializers seem to register with uppercase, test data files assume lower case keys!(Seems to be fine in java
             if dtype[0] != "$":
                 dataPoint = serializeDataFromTestFile(line, dtype)
-                for r in range(1, repeats):
+                for r in range(1, repeats + 1):
                     allPoints.append(dataPoint)
     return allPoints
     
@@ -55,7 +55,7 @@ def getListOfDeserializedData(path):
 def runTestsFromTestFile(sId, rawData):
     lineList = list(rawData)
     period = rawData.get("$period", -1)
-    repeats = rawData.get("$repeats", 1)
+    repeats = max(rawData.get("$repeats", 1), 1)
         
     for dtype in lineList:
         dtype = dtype[0].upper() + dtype[1:]#Python serializers seem to register with uppercase, test data files assume lower case keys!(Seems to be fine in java
@@ -63,7 +63,7 @@ def runTestsFromTestFile(sId, rawData):
             dataPoint = serializeDataFromTestFile(rawData, dtype)
             """might be able to get by without dtype IF we can utilise the output of type(dataPoint) by correctly splitting and extracting the type
             Unsure IF there is a secure way to split this to always get the needed element!"""
-            for r in range(1, repeats):
+            for r in range(1, repeats + 1):
                 result = runTestsFromFile(sId, dataPoint, dtype) 
                 print(result)
                 if period > 0:
