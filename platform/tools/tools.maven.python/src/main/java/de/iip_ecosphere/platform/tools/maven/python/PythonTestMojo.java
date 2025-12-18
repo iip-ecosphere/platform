@@ -185,7 +185,7 @@ public class PythonTestMojo extends AbstractMojo {
                 File[] sub = f.listFiles();
                 if (null != sub) {
                     for (File s: sub) {
-                        if (s.isDirectory()) {
+                        if (s.isDirectory() && !s.getName().equals("__pycache__")) {
                             add(paths, "./src/main/python/" + s.getName());
                         }
                     }
