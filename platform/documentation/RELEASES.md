@@ -37,6 +37,7 @@ New features:
 Changes:
 * As part of cleaning up dependencies in the core components of oktoflow:
   * Turning Java objects generically into text is now done via `de.iip_ecosphere.platform.support.StringUtils.toString(object)` for a default format and `de.iip_ecosphere.platform.support.StringUtils.toStringShortStyle(object)` for the short format. The latter replaces the approach with `org.apache.commons.lang3.builder.ReflectionToStringBuilder.toString(object, IipStringStyle.SHORT_STRING_STYLE)` using `de.iip_ecosphere.platform.services.environment.IipStringStyle` as formatting. `de.iip_ecosphere.platform.services.environment.IipStringStyle` was internalized into `de.iip_ecosphere.platform.support.StringUtils` and, thus, can be/was removed from `services.environment`. Please re-build your applications.
+  * The generated connectivity tests in `src/test/java/iip/connectivity` must be upgraded/taken over from the templates as connectors are not supposed to be instantiated directly anymore (plugin approach).
 
 Required adjustments:
 * Due to [#181](https://github.com/iip-ecosphere/platform/issues/181), `inInterface` and `outInterface` of connectors are now sequences, i.e., in IVML `inInterface = {type=...}` turns to `inInterface = {{type=...}}`, akin for `outInterface`, `inAdapterClass` and `outAdapterClass`.
