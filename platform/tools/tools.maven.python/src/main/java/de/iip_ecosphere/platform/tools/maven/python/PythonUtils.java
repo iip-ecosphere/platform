@@ -11,11 +11,10 @@ package de.iip_ecosphere.platform.tools.maven.python;
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-
 import java.io.File;
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang3.SystemUtils;
+// no other libs in here -> oktoflow plugins
 
 /**
  * Some generic Python process helper functions. For now taken over to keep this plugin on Java 8. Considers from 
@@ -29,6 +28,41 @@ public class PythonUtils {
     public static final File DEFAULT_PYTHON_EXECUTABLE = null;
     private static File pythonExecutable = DEFAULT_PYTHON_EXECUTABLE;
 
+    /**
+     * Returns whether we are running on Windows.
+     * 
+     * @return {@code true} for Windows, {@code false} else
+     */
+    public static boolean isOsWindows() {
+        return getSystemProperty("os.name", "").startsWith("Windows");
+    }
+    
+    /**
+     * Returns the operating system "PATH" variable.
+     * 
+     * @return the path variable, empty if not defined/found
+     */
+    public static String getOsPath() {
+        String tmp = System.getenv(isOsWindows() ? "PATH" : "path");
+        return null == tmp ? "" : tmp;
+    }
+    
+    /**
+     * Gets a System property, defaulting to {@code dflt} if the property is not defined/cannot be read.
+     *
+     * @param property the system property name
+     * @return the system property value or {@code deflt} if it is not defined/cannot be read
+     */
+    public static String getSystemProperty(String property, String dflt) {
+        String result;
+        try {
+            result = System.getProperty(property, dflt);
+        } catch (SecurityException ex) { // dflt
+            result = dflt;
+        }
+        return result;
+    }
+    
     /**
      * Defines the (global) Python executable.
      * 
@@ -83,17 +117,18 @@ public class PythonUtils {
         if (tmpPath.exists()) {
             result = tmpPath;
         } else {
-            path = System.getenv(SystemUtils.IS_OS_WINDOWS ? "PATH" : "path");
+            path = getOsPath();
             if (null != path) {
+                String suffix = isOsWindows() ? ".exe" : "";
                 StringTokenizer pathEntries = new StringTokenizer(path, File.pathSeparator);
                 while (pathEntries.hasMoreTokens()) {
                     String pe = pathEntries.nextToken();
-                    tmpPath = new File(pe, "python3");
+                    tmpPath = new File(pe, "python3" + suffix);
                     if (tmpPath.exists()) {
                         result = tmpPath;
                         break;
                     }
-                    tmpPath = new File(pe, "python");
+                    tmpPath = new File(pe, "python" + suffix);
                     if (tmpPath.exists()) {
                         result = tmpPath;
                         break;
