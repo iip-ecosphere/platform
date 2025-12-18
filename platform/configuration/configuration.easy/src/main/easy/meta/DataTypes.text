@@ -12,6 +12,7 @@ DataTypes::RecordType = Specifies a composite data type to be passed along a ser
 DataTypes::RecordType::fields = Declared fields of the containing record type.
 DataTypes::RecordType::refining = Parent type to take over fields from, parent tree shall be cycle-free.
 DataTypes::RecordType::cycleFree = Refining hierarchy must be cycle-free and all fields must be unique.
+DataTypes::EmptyRecord = Empty record type.
 DataTypes::DisplayRow = Description of display row for dashboards.
 DataTypes::DisplayRow::name = Name of display row.
 DataTypes::DisplayRow::displayName = Displayable name of row.

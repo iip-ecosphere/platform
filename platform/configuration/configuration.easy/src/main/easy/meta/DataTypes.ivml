@@ -135,6 +135,11 @@ project DataTypes {
         Constraint cycleFree = createRecordTypeSet(self)->isAcyclic(RecordType t|t.refining) and fieldsOk(self);
     }
     
+    RecordType EmptyRecord = {
+        name = "EmptyRecord",
+        fields = {}
+    };
+    
     const Integer CACHE_ALWAYS = -1;
     const Integer CACHE_NONE = 0;
     

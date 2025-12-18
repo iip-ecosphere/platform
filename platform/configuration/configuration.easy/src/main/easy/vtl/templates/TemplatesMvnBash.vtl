@@ -6,7 +6,9 @@ template TemplatesMvnBash(Configuration config, FileArtifact target, Boolean for
 	
     def main(Configuration config, FileArtifact target, Boolean forBuild=true) {
         '#!/bin/bash'
-        'cd "\\$(dirname "$0")"'
+        '# Resolve the directory of the script (handles ./, ../, and absolute paths)
+        SCRIPT_DIR="\\$(cd "$(dirname "\\${BASH_SOURCE[0]}")" && pwd)"
+        cd "\\$SCRIPT_DIR" || exit 1'
         if (forBuild) {
             'mvn -P EasyGen -U generate-sources -Dunpack.force=true'
         } else {

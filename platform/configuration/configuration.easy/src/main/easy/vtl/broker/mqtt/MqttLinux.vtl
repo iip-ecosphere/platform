@@ -9,7 +9,9 @@ template MqttLinux(IIPEcosphere config, FileArtifact target, String addJavaOpts=
         Integer port = config.transportProtocol.port;
         String host = getHostOpt(config);
         '#!/bin/bash
-        cd "\\$(dirname "$0")"
+        # Resolve the directory of the script (handles ./, ../, and absolute paths)
+        SCRIPT_DIR="\\$(cd "$(dirname "\\${BASH_SOURCE[0]}")" && pwd)"
+        cd "\\$SCRIPT_DIR" || exit 1 
         PORT=${port}
         if [ $# -gt 0 ]
           then
