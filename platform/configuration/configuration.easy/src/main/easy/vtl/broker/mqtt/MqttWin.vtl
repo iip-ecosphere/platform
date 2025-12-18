@@ -9,13 +9,15 @@ template MqttWin(IIPEcosphere config, FileArtifact target, String addJavaOpts=""
         Integer port = config.transportProtocol.port;
         String host = getHostOpt(config);
         '@echo off
+        setlocal
         cd /D "%~dp0"
         set PORT=${port}
         if "%~1"=="" goto blank
         set PORT=%~1
         
         :blank
-        java ${addJavaOpts} -cp "brokerJars/*" ${vmOpt} test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer %PORT% ${host} %*'
+        java ${addJavaOpts} -cp "brokerJars/*" ${vmOpt} test.de.iip_ecosphere.platform.test.mqtt.hivemq.TestHiveMqServer %PORT% ${host} %*
+        endlocal'
     }
 	
 }
