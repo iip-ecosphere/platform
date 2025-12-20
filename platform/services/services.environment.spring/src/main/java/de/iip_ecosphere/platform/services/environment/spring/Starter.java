@@ -272,6 +272,7 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
         registerPlugin("springBroker", new TestSpringBroker());
         transferArgsToEnvironment(args);
         
+        YamlSetup.loadPluginSetup(args);
         loadOktoPlugins();
         PluginSetup.setClassLoader(Starter.class.getClassLoader());
         PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE); // "local" plugins

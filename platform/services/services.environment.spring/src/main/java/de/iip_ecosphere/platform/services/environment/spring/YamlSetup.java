@@ -115,6 +115,35 @@ public class YamlSetup {
     }
     
     /**
+     * Loads the plugin setup if specified, in particular to also disable plugin loading for apps generated/build 
+     * without plugins.
+     * 
+     * @param args potentially overriding command line arguments
+     */
+    public static void loadPluginSetup(String[] args) {
+        boolean found = false;
+        for (String a : args) {
+            if (a.startsWith("--" + Starter.PARAM_IIP_APP_PLUGINS + "=")) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) { // command line takes precedence
+            InputStream in = Starter.getApplicationSetupAsStream();
+            try {
+                Yaml yaml = Yaml.getInstance();
+                Map<String, Object> setup = yaml.loadMapping(in);
+                Object pluginsFolder = setup.get("pluginsFolder");
+                if (pluginsFolder != null) {
+                    System.setProperty(Starter.PARAM_IIP_APP_PLUGINS, pluginsFolder.toString());
+                }
+            } catch (IOException e) {
+                LoggerFactory.getLogger(YamlSetup.class).warn("Cannot read plugin setup: {}", e.getMessage());
+            }
+        }
+    }
+    
+    /**
      * Substitutes values in {@code setup} by values in {@code args}.
      * 
      * @param setup the setup
