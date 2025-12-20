@@ -873,22 +873,24 @@ public class Starter {
                     plugins = pluginParent;
                 }
             } 
-            LoggerFactory.getLogger(Starter.class).info("Using {} as oktoflow plugin directory", plugins);
-            if (plugins.isDirectory()) {
-                LoggerFactory.getLogger(Starter.class).info("Trying to load oktoflow plugins from {}", plugins);
-                PluginFilter filter = info -> {
-                    String name = info.getName();
-                    boolean ok = true;
-                    ok &= !name.startsWith("support.log-"); // local via services.environment.spring
-                    ok &= !name.startsWith("support.metrics-"); // local via services.environment.spring
-                    ok &= !name.startsWith("services."); // exclude higher platform level
-                    ok &= !name.startsWith("ecsRuntime."); // exclude higher platform level
-                    ok &= !name.startsWith("monitoring."); // exclude higher platform level
-                    ok &= !name.startsWith("configuration."); // exclude higher platform level
-                    ok &= !name.startsWith("deviceMgt."); // exclude higher platform level
-                    return ok;
-                };
-                PluginManager.loadAllFrom(plugins, filter);
+            if (plugins.getName().length() > 0) {
+                LoggerFactory.getLogger(Starter.class).info("Using {} as oktoflow plugin directory", plugins);
+                if (plugins.isDirectory()) {
+                    LoggerFactory.getLogger(Starter.class).info("Trying to load oktoflow plugins from {}", plugins);
+                    PluginFilter filter = info -> {
+                        String name = info.getName();
+                        boolean ok = true;
+                        ok &= !name.startsWith("support.log-"); // local via services.environment.spring
+                        ok &= !name.startsWith("support.metrics-"); // local via services.environment.spring
+                        ok &= !name.startsWith("services."); // exclude higher platform level
+                        ok &= !name.startsWith("ecsRuntime."); // exclude higher platform level
+                        ok &= !name.startsWith("monitoring."); // exclude higher platform level
+                        ok &= !name.startsWith("configuration."); // exclude higher platform level
+                        ok &= !name.startsWith("deviceMgt."); // exclude higher platform level
+                        return ok;
+                    };
+                    PluginManager.loadAllFrom(plugins, filter);
+                }
             }
         }
     }
