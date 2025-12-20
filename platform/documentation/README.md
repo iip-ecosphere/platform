@@ -8,7 +8,8 @@ This folder contains the documentation of the okotflow platform.
 * The oktoflow [HOW-TO](HOWTO.MD)
 * The oktoflow [formats catalogue](FORMATS.md)
 * The oktoflow [plugins dictionary](PLUGINS.md)
-* The oktoflow [concepts documentation](concepts/concepts.MD)
+* The oktoflow [configuration concepts](concepts/concepts.MD)
+* The oktoflow [debugging checklist](DEBUGGING.md)
 
 ## Technical Guidelines
 * The technical requirements are documented in [PREREQUISITES](PREREQUISITES.md).

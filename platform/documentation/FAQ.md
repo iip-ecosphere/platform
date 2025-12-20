@@ -265,3 +265,11 @@ After changing the values, run `mvn install` on all affected all-in-one examples
 *Reason:* Must not be a bug, could be an issue of trying to load plugins locally (if a github workspace is detected) to avoid packing-unpacking. We try to improve the build process here.
 
 *Solution:* Force building the missing plugins first, in particular those in services, such as for logging, websockets, rest, json, yaml.
+
+## My App is not running. What to do?
+
+*Symptom:* You are completed with your app mesh and service implementation, but the expected results do not show up.
+
+*Reason:* There may be many reasons, including issues in your code and issues in the platform.
+
+*Solution:* We provide a [debugging checklist](DEBUGGING.md) with reasons and explanations that we identified over time. If you identify issues in the platform, please let us know.
