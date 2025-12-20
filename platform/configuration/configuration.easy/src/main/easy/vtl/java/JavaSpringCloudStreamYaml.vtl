@@ -124,6 +124,9 @@ template JavaSpringCloudStreamYaml(IIPEcosphere config, YamlFileArtifact target,
         produceTransport(config, n);
         produceAas(config, n, withDocker=false, implLocalEphemerial=config.aasImplServer.devicesAsEphemeral);
         produceBinders(config, n);
+        if (withoutPlugins(config)) {
+            n.addValue("pluginsFolder", ""); // if not build with plugins, disable plugins
+        }
         if (app.debug) {
             YamlNode log = n.addObjects("logging/level/org/springframework", "/");
             log.addValue("cloud", "DEBUG");

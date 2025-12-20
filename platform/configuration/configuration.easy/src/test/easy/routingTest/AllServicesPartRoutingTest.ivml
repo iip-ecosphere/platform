@@ -42,7 +42,8 @@ project AllServicesPartRoutingTest {
           type=refBy(command), 
           class="de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.ConnectorCommandEventHandler", 
           artifact=""} // same artifact as connector -> not specified
-        } 
+        },
+        isPlugin = false // not realized as plugin!
     };
     
     Service myProcessorService = JavaService {
