@@ -12,8 +12,10 @@
 
 package test.de.iip_ecosphere.platform.support.json;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
@@ -178,6 +180,14 @@ public class TestJson extends de.iip_ecosphere.platform.support.json.Json {
     @Override
     protected JsonGenerator createGeneratorImpl(Writer writer) {
         return null;
+    }
+
+    @Override
+    public void writeValue(File file, Object value) throws IOException {
+    }
+
+    @Override
+    public void writeValue(OutputStream out, Object value) throws IOException {
     }
     
 }
