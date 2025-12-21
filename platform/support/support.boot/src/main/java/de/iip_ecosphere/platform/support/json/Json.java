@@ -13,9 +13,11 @@
 package de.iip_ecosphere.platform.support.json;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
@@ -318,6 +320,24 @@ public abstract class Json {
     public static String writeValueAsStringDflt(Object value) throws IOException {
         return prototype.writeValueAsString(value);
     }
+    
+    /**
+     * Writes the given value to {@code file}.
+     * 
+     * @param file the file to write to
+     * @param value the value to write
+     * @throws IOException if writing fails
+     */
+    public abstract void writeValue(File file, Object value) throws IOException;
+
+    /**
+     * Writes the given value to {@code out}.
+     * 
+     * @param out the output stream to write to
+     * @param value the value to write
+     * @throws IOException if writing fails
+     */
+    public abstract void writeValue(OutputStream out, Object value) throws IOException;
     
     /**
      * Configures this instance for {@code cls} by considering the annotations in {@code cls}.
