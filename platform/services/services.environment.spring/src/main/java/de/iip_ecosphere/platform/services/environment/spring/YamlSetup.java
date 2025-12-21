@@ -128,10 +128,10 @@ public class YamlSetup {
                 break;
             }
         }
-        if (!found) { // command line takes precedence
+        Yaml yaml = Yaml.getInstance();
+        if (!found && yaml != null) { // command line takes precedence, may be too early - for plain app start only
             InputStream in = Starter.getApplicationSetupAsStream();
             try {
-                Yaml yaml = Yaml.getInstance();
                 Map<String, Object> setup = yaml.loadMapping(in);
                 Object pluginsFolder = setup.get("pluginsFolder");
                 if (pluginsFolder != null) {
