@@ -18,9 +18,11 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import de.iip_ecosphere.platform.support.yaml.YamlFile;
+import de.iip_ecosphere.platform.support.yaml.YamlProviderDescriptor;
 import de.iip_ecosphere.platform.support.yaml.Yaml;
 import de.iip_ecosphere.platform.support.StringUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
@@ -128,8 +130,9 @@ public class YamlSetup {
                 break;
             }
         }
-        Yaml yaml = Yaml.getInstance();
-        if (!found && yaml != null) { // command line takes precedence, may be too early - for plain app start only
+     // command line takes precedence, may be too early - for plain app start only
+        if (!found && PluginManager.getPluginInstance(Yaml.class, YamlProviderDescriptor.class) != null) { 
+            Yaml yaml = Yaml.getInstance();
             InputStream in = Starter.getApplicationSetupAsStream();
             try {
                 Map<String, Object> setup = yaml.loadMapping(in);
