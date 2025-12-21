@@ -12,8 +12,10 @@
 
 package de.oktoflow.platform.support.json.jackson;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.math.BigDecimal;
@@ -266,8 +268,18 @@ public class JacksonJson extends de.iip_ecosphere.platform.support.json.Json {
         } catch (JsonProcessingException e) {
             throw new IOException(e);
         }
-    }       
+    }
     
+    @Override
+    public void writeValue(File file, Object value) throws IOException {
+        mapper.writeValue(file, value);
+    }
+
+    @Override
+    public void writeValue(OutputStream out, Object value) throws IOException {
+        mapper.writeValue(out, value);
+    }
+
     @Override
     public Json configureFor(Class<?> cls) {
         introspector = JsonUtils.configureFor(mapper, introspector, cls);
