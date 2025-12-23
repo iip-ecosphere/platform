@@ -18,11 +18,9 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import de.iip_ecosphere.platform.support.yaml.YamlFile;
-import de.iip_ecosphere.platform.support.yaml.YamlProviderDescriptor;
 import de.iip_ecosphere.platform.support.yaml.Yaml;
 import de.iip_ecosphere.platform.support.StringUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
-import de.iip_ecosphere.platform.support.plugins.PluginManager;
 import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
@@ -118,30 +116,37 @@ public class YamlSetup {
     
     /**
      * Loads the plugin setup if specified, in particular to also disable plugin loading for apps generated/build 
-     * without plugins.
+     * without plugins. Call {@link Yaml#resolveInstance()} after loading plugins!
      * 
      * @param args potentially overriding command line arguments
      */
     public static void loadPluginSetup(String[] args) {
         boolean found = false;
-        for (String a : args) {
-            if (a.startsWith("--" + Starter.PARAM_IIP_APP_PLUGINS + "=")) {
+        for (String a : args) { // command line takes precedence
+            if (a.startsWith("-D" + Starter.PARAM_IIP_APP_PLUGINS + "=")) {
                 found = true;
                 break;
             }
         }
-     // command line takes precedence, may be too early - for plain app start only
-        if (!found && PluginManager.getPluginInstance(Yaml.class, YamlProviderDescriptor.class) != null) { 
+        if (!found) { 
+            // yaml is there if loaded through JLS, plugin loading is later -> resolveInstance later (!)
+            // may be too early - for plain app start only
             Yaml yaml = Yaml.getInstance();
-            InputStream in = Starter.getApplicationSetupAsStream();
-            try {
-                Map<String, Object> setup = yaml.loadMapping(in);
-                Object pluginsFolder = setup.get("pluginsFolder");
-                if (pluginsFolder != null) {
-                    System.setProperty(Starter.PARAM_IIP_APP_PLUGINS, pluginsFolder.toString());
+            if (null != yaml) {
+                InputStream in = Starter.getApplicationSetupAsStream();
+                try {
+                    Map<String, Object> setup = yaml.loadMapping(in);
+                    Object pluginsFolder = setup.get("pluginsFolder");
+                    if (pluginsFolder != null) {
+                        String pf = pluginsFolder.toString();
+                        if (pf.trim().length() == 0) {
+                            pf = Starter.PARAM_IIP_APP_PLUGINS_NO_PLUGINS;
+                        }
+                        System.setProperty(Starter.PARAM_IIP_APP_PLUGINS, pf);
+                    }
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(YamlSetup.class).warn("Cannot read plugin setup: {}", e.getMessage());
                 }
-            } catch (IOException e) {
-                LoggerFactory.getLogger(YamlSetup.class).warn("Cannot read plugin setup: {}", e.getMessage());
             }
         }
     }

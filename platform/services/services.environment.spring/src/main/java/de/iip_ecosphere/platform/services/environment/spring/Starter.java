@@ -276,6 +276,7 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
         loadOktoPlugins();
         PluginSetup.setClassLoader(Starter.class.getClassLoader());
         PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE); // "local" plugins
+        Yaml.resolveInstance(); // if not loaded via JSL in YamlSetup, re-try via plugin manager
 
         ResourceLoader.addTestExcludeFilters(); // exclude test JARs
         ResourceLoader.registerResourceResolver(new SpringResourceResolver()); // ensure spring resolution
