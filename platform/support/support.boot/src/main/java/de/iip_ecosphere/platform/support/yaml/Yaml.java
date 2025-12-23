@@ -31,7 +31,7 @@ public abstract class Yaml {
     private static Yaml instance; 
 
     static {
-        instance = PluginManager.getPluginInstance(Yaml.class, YamlProviderDescriptor.class);
+        instance = obtainPlugin();
     }
     
     /**
@@ -51,6 +51,26 @@ public abstract class Yaml {
     public static void setInstance(Yaml yaml) {
         if (null != yaml) {
             instance = yaml;
+        }
+    }
+
+    /**
+     * Tries obtaining the plugin instance.
+     * 
+     * @return the plugin instance, may be <b>null</b>
+     */
+    private static Yaml obtainPlugin() {
+        return PluginManager.getPluginInstance(Yaml.class, YamlProviderDescriptor.class);
+    }
+    
+    /**
+     * Validates the plugin instance. This might be helpful if the plugin is accessed earlier than plugins are loaded. 
+     * If the plugin is available through plain JLS, it is resolved. If not, it will not be resolved even if the plugin 
+     * is loaded. In that case, after plugin loading, this method can be loaded to resolve the instance.
+     */
+    public static void resolveInstance() {
+        if (null == instance) {
+            instance = obtainPlugin();
         }
     }
     

@@ -73,7 +73,7 @@ public class DefaultPluginDescriptor<T> implements PluginDescriptor<T> {
      * Returns the plugin class upon creation. May override the provided class, in particular if the 
      * result refers to <b>this</b> or {@link #getClass()}, which is not available in the super call of a constructor.
      * 
-     * @param pluginSupplier the supplied supplier
+     * @param pluginClass the plugin class
      * @return {@code pluginSupplier}
      */
     protected Class<T> initPluginClass(Class<T> pluginClass) {
