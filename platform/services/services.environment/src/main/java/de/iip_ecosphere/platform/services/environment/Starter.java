@@ -64,6 +64,7 @@ public class Starter {
     public static final String PARAM_IIP_PORT = "iip.port";
     public static final String PARAM_IIP_APP_ID = "iip.appId";
     public static final String PARAM_IIP_APP_PLUGINS = AbstractSetup.PARAM_PLUGINS;
+    public static final String PARAM_IIP_APP_PLUGINS_NO_PLUGINS = "*";
     public static final String PARAM_IIP_TRANSPORT_GLOBAL = "iip.transport.global";
     public static final String PARAM_IIP_START_SERVER = "iip.start.server";
     public static final String PARAM_IIP_START_SERVER_ONLY = "iip.start.serverOnly";
@@ -865,15 +866,16 @@ public class Starter {
     public static void loadOktoPlugins() {
         if (!oktoPluginsLoaded) {
             oktoPluginsLoaded = true;
-            File pluginParent = new File(System.getProperty(PARAM_IIP_APP_PLUGINS, "target"));
-            File plugins = new File(pluginParent, "plugins");
-            if (!plugins.isDirectory()) { // testing fallback
-                plugins = new File(pluginParent, "oktoPlugins");
-                if (!plugins.isDirectory()) {
-                    plugins = pluginParent;
-                }
-            } 
-            if (plugins.getName().length() > 0) {
+            String pf = System.getProperty(PARAM_IIP_APP_PLUGINS, "target");
+            if (!pf.equals(PARAM_IIP_APP_PLUGINS_NO_PLUGINS)) {
+                File pluginParent = new File(pf);
+                File plugins = new File(pluginParent, "plugins");
+                if (!plugins.isDirectory()) { // testing fallback
+                    plugins = new File(pluginParent, "oktoPlugins");
+                    if (!plugins.isDirectory()) {
+                        plugins = pluginParent;
+                    }
+                } 
                 LoggerFactory.getLogger(Starter.class).info("Using {} as oktoflow plugin directory", plugins);
                 if (plugins.isDirectory()) {
                     LoggerFactory.getLogger(Starter.class).info("Trying to load oktoflow plugins from {}", plugins);
