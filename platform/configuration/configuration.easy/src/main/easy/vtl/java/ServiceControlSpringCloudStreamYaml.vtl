@@ -24,6 +24,9 @@ template ServiceControlSpringCloudStreamYaml(IIPEcosphere config, YamlFileArtifa
         serviceMgr.addValue("brokerPort", mgr.brokerPort);
         serviceMgr.addValue("availabilityRetryDelay", mgr.availabilityRetryDelay);
         serviceMgr.addValue("serviceProtocol", aasProtocolName(config));
+        String appPluginsFolder = getStringValueSafe(mgr.appPluginsFolder, "");
+        serviceMgr.addValueNotEmpty("appPluginsFolder", appPluginsFolder);
+        serviceMgr.addValue("updateAppPlugins", mgr.updateAppPlugins);
         produceTransport(config, serviceMgr);
         produceAas(config, serviceMgr, implLocalEphemerial=config.aasImplServer.devicesAsEphemeral);
         produceNetMgr(config, serviceMgr);
