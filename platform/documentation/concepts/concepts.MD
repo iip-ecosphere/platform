@@ -5,6 +5,7 @@ This documentation summarizes the most important configuration concepts for okto
 - [Services (including authentication and security, AAS nameplates, service parameters, dependencies, serviers)](services.MD)
 - [Connectors](connectors.MD)
 - [Apps and Service Meshes](apps.MD)
+- [App Templates](appTemplates.MD)
 - [Platform](platform.MD)
 
 Further, we provide support for app/service implementation and platform installation.
