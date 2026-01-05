@@ -13,11 +13,11 @@ project IIPEcosphere {
     String instDir = instDirDflt; // linux/system.d only; values taken as default if not frozen
     const String javaExeDflt = "/opt/iip/java";
     String javaExe = javaExeDflt; // symlink in instDir
-    String artifactsFolderDflt = "artifacts";
+    const String artifactsFolderDflt = "artifacts";
     String artifactsFolder = artifactsFolderDflt;
     String artifactsUriPrefix = "";
     String uploadFolder; // if not given, same as artifactsFolder
-    String footprintFolderDflt = "target/footprints";
+    const String footprintFolderDflt = "target/footprints";
     String footprintFolder = footprintFolderDflt;
     String modelBaseFolder = "."; // base folder for metaModel folder and configFolder
     String metaModelFolder = "src/main/easy";
@@ -26,9 +26,9 @@ project IIPEcosphere {
     String genTarget = "gen";
     String modelName = "PlatformConfiguration";
     
-    String pluginsFolderDflt = "plugins";
+    const String pluginsFolderDflt = "plugins";
     String pluginsFolder = pluginsFolderDflt;
-    Boolean withPluginsDflt = false;
+    const Boolean withPluginsDflt = false;
     //assign (uiGroup = UiInvisibleGroup) to {
     Boolean withPlugins = withPluginsDflt;
     //}
@@ -67,7 +67,7 @@ project IIPEcosphere {
         Integer deviceHeartbeatTimeout = deviceHeartbeatTimeoutDflt;
     }
     
-    refTo(SystemDependency) platformPythonDflt = refBy(PYTHON313);
+    const refTo(SystemDependency) platformPythonDflt = refBy(PYTHON313);
     refTo(SystemDependency) platformPython = platformPythonDflt;
  
     freeze {
