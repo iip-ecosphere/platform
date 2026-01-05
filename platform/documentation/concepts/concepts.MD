@@ -5,8 +5,11 @@ This documentation summarizes the most important configuration concepts for okto
 - [Services (including authentication and security, AAS nameplates, service parameters, dependencies, serviers)](services.MD)
 - [Connectors](connectors.MD)
 - [Apps and Service Meshes](apps.MD)
+- [Platform](platform.MD)
+
+Further, we provide support for app/service implementation and platform installation.
 - [App and Service implementation](implementation.MD)
-- [Platform service implementation](platform.MD)
+- [Platform service implementation](platformServices.MD)
 - [Platform installation considerations](install.MD)
 
 Application configurations are specified in terms of the [Integrated Variability Modeling Language (IVML)](http://projects.sse.uni-hildesheim.de/easy/docs-git/docPreview/IVML%20Language%20Spec.pdf). At it's core, IVML consists of typed variables, type definitions, constraints and references among variables. For specifying oktoflow apps, we only need a small structural part of IVML. The IVML models then drive the code generation/instantiation.

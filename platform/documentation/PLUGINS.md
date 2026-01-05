@@ -22,7 +22,7 @@ Basic library integrations in the support layer. Typically, plugins are not addr
 | ssh-sshd| | Java SSH client/server support access using sshd | `de.iip_ecosphere.platform.support.ssh.Ssh` | [support.ssh-sshd](../support/ssh-sshd) |
 | metrics-micrometer | | Java metric probe support using micrometer| `de.iip_ecosphere.platform.support.metrics.MetricsFactory` | [support.metrics-micrometer](../support/metrics-micrometer) |
 | websocket-websocket | | Java websocket support using the websocket library | `de.iip_ecosphere.platform.support.websocket.WebsocketFactory` | [support.websocket](../support/websocket) |
-| yaml-snakeyaml | | Java YAML support using jackson, jsoniter | `de.iip_ecosphere.platform.support.yaml.Yaml` | [support.yaml-snakeyaml](../support/support.yaml-snakeyaml) |
+| yaml-snakeyaml | **yaml** | Java YAML support using jackson, jsoniter | `de.iip_ecosphere.platform.support.yaml.Yaml` | [support.yaml-snakeyaml](../support/support.yaml-snakeyaml) |
 
 ## Capabilities (support)
 
