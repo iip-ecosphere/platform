@@ -24,6 +24,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import de.iip_ecosphere.platform.services.environment.Starter;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.aas.Submodel;
@@ -169,7 +170,9 @@ public abstract class TransportToAasConverter<T> extends TransportConverter<T> {
                 }, false);
                 cleanup(aas);
             } catch (IOException e) {
-                LoggerFactory.getLogger(getClass()).error("Cannot obtain AAS {}: {}", getAasUrn(), e.getMessage());
+                if (Starter.expectAas()) { // potentially annoying during debugging
+                    LoggerFactory.getLogger(getClass()).error("Cannot obtain AAS {}: {}", getAasUrn(), e.getMessage());
+                }
                 aasFailedTimestamp = now;
             }
         }

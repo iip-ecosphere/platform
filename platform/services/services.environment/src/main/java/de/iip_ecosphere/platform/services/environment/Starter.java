@@ -69,6 +69,7 @@ public class Starter {
     public static final String PARAM_IIP_START_SERVER = "iip.start.server";
     public static final String PARAM_IIP_START_SERVER_ONLY = "iip.start.serverOnly";
     public static final String IIP_APP_PREFIX = "iip.app.";
+    public static final String IIP_APP_NOAAS = IIP_APP_PREFIX + "noAas";
     
     public static final String PARAM_IIP_TEST_TRANSPORT_PORT = "iip.test.transport.port";
     public static final String PARAM_IIP_TEST_AAS_PORT = "iip.test.aas.port";
@@ -481,6 +482,15 @@ public class Starter {
         if (tmpPort > 0) {
             consumer.accept(tmpPort);
         }
+    }
+
+    /**
+     * Returns whether the execution may expect a running AAS.
+     * 
+     * @return {@code true} for running AAS, {@code false} else
+     */
+    public static boolean expectAas() {
+        return Boolean.valueOf(System.getProperty(IIP_APP_NOAAS, "true"));
     }
 
     /**
