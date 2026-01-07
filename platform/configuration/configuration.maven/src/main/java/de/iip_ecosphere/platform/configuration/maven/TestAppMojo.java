@@ -483,8 +483,13 @@ public class TestAppMojo extends AbstractLoggingMojo {
         }
         testBuilder.addArgument(
             "-Diip.springStart.args=\"--iip.test.stop=" + testTime 
+            + " --iip.app.noAas=true" 
             + " --iip.test.brokerPort=" + brokerPort 
             + tmpAppArgs + "\"");
+        
+        getLog().info("Trying to execute exec:java@ " + appId + " (must be defined as build step in POM) in profile " 
+            + appProfile);
+        
         return testBuilder;
     }
 
