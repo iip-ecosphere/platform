@@ -402,7 +402,7 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunna
         public void stop();
         
     }
-    
+
     /**
      * Redirects an input stream to another stream (in parallel).
      * 
@@ -411,6 +411,20 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunna
      * @return the runnable performing the redirection
      */
     public static RunnableWithStop redirectIO(final InputStream in, final PrintStream dest) {
+        return redirectIO(in, dest, null);
+    }
+    
+    /**
+     * Redirects an input stream to another stream (in parallel).
+     * 
+     * @param in the input stream of the spawned process (e.g., input/error)
+     * @param dest the destination stream within this class
+     * @param handler to filter/redirect the read information; if it returns {@code true} the line has been processed
+     *   and shall not be emitted to {@code dest}
+     * @return the runnable performing the redirection
+     */
+    public static RunnableWithStop redirectIO(final InputStream in, final PrintStream dest, 
+        Function<String, Boolean> handler) {
         RunnableWithStop result = new RunnableWithStop() {
             
             private boolean cnt = true;
@@ -420,7 +434,13 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunna
                 Scanner sc = new Scanner(in);
                 while (cnt && sc.hasNextLine()) {
                     String line = sc.nextLine();
-                    dest.println(line);
+                    boolean done = false;
+                    if (null != handler) {
+                        done = handler.apply(line);
+                    }
+                    if (!done) {
+                        dest.println(line);
+                    }
                 }
                 sc.close();
             }

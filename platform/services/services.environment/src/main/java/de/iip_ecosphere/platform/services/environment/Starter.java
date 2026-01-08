@@ -490,7 +490,7 @@ public class Starter {
      * @return {@code true} for running AAS, {@code false} else
      */
     public static boolean expectAas() {
-        return Boolean.valueOf(System.getProperty(IIP_APP_NOAAS, "true"));
+        return !Boolean.valueOf(System.getProperty(IIP_APP_NOAAS, "false"));
     }
 
     /**

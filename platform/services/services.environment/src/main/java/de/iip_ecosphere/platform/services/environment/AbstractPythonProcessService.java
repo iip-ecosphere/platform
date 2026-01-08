@@ -458,7 +458,14 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
      * @param err the process error stream
      */
     protected void handleErrorStream(InputStream err) {
-        register(AbstractProcessService.redirectIO(err, System.err));
+        register(AbstractProcessService.redirectIO(err, System.err, l -> {
+            boolean done = false;
+            if (!l.contains("[Error]")) { // assuming loggin, in particular [Info] and no marker, i.e., plain system err
+                System.out.println(l);
+                done = true;
+            }
+            return done;
+        }));
     }
 
     /**
