@@ -23,6 +23,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -63,6 +64,7 @@ import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 public class PythonProcessServiceTest extends TestWithQpid {
 
     private String stringParam = null;
+    private Server qpid;
     
     /**
      * Composes the basic command line arguments for this test. We assume that the service modules are in the 
@@ -258,7 +260,7 @@ public class PythonProcessServiceTest extends TestWithQpid {
     public void testAsyncClientServer() throws IOException, ExecutionException {
         NotificationMode mo = ActiveAasBase.setNotificationMode(NotificationMode.NONE); // no AAS here
         ServerAddress broker = new ServerAddress(Schema.IGNORE);
-        Server qpid = TestWithQpid.fromPlugin(broker);
+        qpid = TestWithQpid.fromPlugin(broker);
         qpid.start();
         EnvironmentSetup setup = EnvironmentSetup.readFromYaml(EnvironmentSetup.class, 
             new FileInputStream("src/test/resources/envSetup.yml"));
@@ -316,9 +318,20 @@ public class PythonProcessServiceTest extends TestWithQpid {
         TimeUtils.sleep(2000);
 
         Transport.releaseConnector(false); // don't stay off, allow reconnect
-        qpid.stop(true);
+        stopBroker();
         ActiveAasBase.setNotificationMode(mo);
         Transport.setTransportSetup(su);
+    }
+
+    /**
+     * Stops the broker after a test, even as a leftover.
+     */
+    @After
+    public void stopBroker() {
+        if (null != qpid) {
+            qpid.stop(true);
+            qpid = null;
+        }
     }
     
     /**

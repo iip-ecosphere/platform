@@ -119,7 +119,8 @@ def start(a):
     elif wsMode:
         responseFunction = wsSendResult
         ingestorFunction = wsIngestResult
-
+    print("oktoflow Python ServiceEnvironment [sys.path]: " + str(sys.path))
+    
     modulesPath = getArg(args.modulesPath)
     sys.path.append(modulesPath)
     # dynamically load (generated) modules
