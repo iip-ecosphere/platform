@@ -460,8 +460,10 @@ public abstract class TransportToAasConverter<T> extends TransportConverter<T> {
                         }, SubmodelElementCollection.class);
                         lastRun = System.currentTimeMillis();
                     } catch (IOException e) {
-                        LoggerFactory.getLogger(getClass()).error("Cannot obtain AAS {}: {}", 
-                            getAasUrn(), e.getMessage());
+                        if (Starter.expectAas()) { // potentially annoying during debugging
+                            LoggerFactory.getLogger(getClass()).error("Cannot obtain AAS {}: {}", 
+                                getAasUrn(), e.getMessage());
+                        }
                     }
                 }
                 
