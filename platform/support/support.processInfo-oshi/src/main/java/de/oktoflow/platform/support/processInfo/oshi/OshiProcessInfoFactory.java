@@ -18,8 +18,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.slf4j.LoggerFactory;
-
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.processInfo.ProcessInfoFactory;
 import oshi.software.os.OSProcess;
 import oshi.software.os.OperatingSystem;
