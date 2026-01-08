@@ -69,7 +69,7 @@ class ValueVisitor implements IValueVisitor {
 
     @Override
     public void visitContainerValue(ContainerValue value) {
-        // no value, mapped above
+        aasValue = StringProvider.toIvmlString(value);
     }
 
     @Override

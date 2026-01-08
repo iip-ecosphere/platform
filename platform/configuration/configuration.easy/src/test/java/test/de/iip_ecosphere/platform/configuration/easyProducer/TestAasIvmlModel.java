@@ -60,6 +60,7 @@ public class TestAasIvmlModel {
         if (args.length < 2) { 
             System.out.println("CfgModelName cfgFolder [meshVariables*]");
         } else {
+            TestWithPlugin.setupAASPlugins();
             TestWithPlugin.loadPlugins();
             EasySetup ep = ConfigurationSetup.getSetup().getEasyProducer();
             File modelFolder = new File("src/main/easy");
@@ -120,7 +121,6 @@ public class TestAasIvmlModel {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
             for (int i = 2; i < args.length; i++) {
                 try {
                     System.out.println("Graph " + args[i] + ":");
