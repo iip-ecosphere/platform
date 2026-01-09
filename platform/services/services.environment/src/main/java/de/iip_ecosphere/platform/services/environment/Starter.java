@@ -98,6 +98,7 @@ public class Starter {
     private static Map<String, Plugin> plugins = new HashMap<>();
     private static boolean oktoPluginsLoaded = false;
     private static Consumer<ProtocolServerBuilder> cmdServerConfigurer = null;
+    private static Runnable afterPluginInitializer = null;
     
     /**
      * Defines a starter plugin.
@@ -865,10 +866,19 @@ public class Starter {
             plugin.run(args);
         }
     }
+
+    /**
+     * Sets an initializer to be executed after loading plugins in {@link #loadOktoPlugins()}.
+     * 
+     * @param initializer the initializer
+     */
+    public static void registerAfterPluginInitializer(Runnable initializer) {
+        afterPluginInitializer = initializer;
+    }
     
     /**
      * Loads the oktoflow plugins if present. Loads plugins only once. Needs args transferred
-     * to environment, i.e., after parse.
+     * to environment, i.e., after parse. Runs and clears {@link #afterPluginInitializer}.
      * 
      * @see #transferArgsToEnvironment(String[])
      * @see #parse(String...)
@@ -903,6 +913,10 @@ public class Starter {
                     };
                     PluginManager.loadAllFrom(plugins, filter);
                 }
+            }
+            if (null != afterPluginInitializer) {
+                afterPluginInitializer.run();
+                afterPluginInitializer = null;
             }
         }
     }
