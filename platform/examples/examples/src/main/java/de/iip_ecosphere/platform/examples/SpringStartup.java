@@ -131,7 +131,20 @@ public class SpringStartup {
             cmdArgs.add(CmdLine.composeArgument(Starter.PARAM_IIP_APP_ID, appId));
         }
     }
-    
+
+    /**
+     * If given in {@code args}, adds {@link Starter#IIP_APP_NOAAS} to {@code cmdArgs}.
+     * 
+     * @param args the command line arguments
+     * @param cmdArgs the command line arguments to be modified as a side effect
+     */
+    private static void addNoAas(String[] args, List<String> cmdArgs) {
+        String noAas = CmdLine.getArg(args, Starter.IIP_APP_NOAAS, "");
+        if (noAas.length() > 0) {
+            cmdArgs.add(CmdLine.composeArgument(Starter.IIP_APP_NOAAS, noAas));
+        }
+    }
+
     /**
      * Starts the application. Considers system property {@value Starter#PROPERTY_JAVA8} as java binary for Java 8 if 
      * not running under Java 8.
@@ -165,6 +178,7 @@ public class SpringStartup {
                 brokerHost, adminPort, serviceProtocol);
             addAasNotificationMode(args, cmdLine);
             addAppId(args, cmdLine);
+            addNoAas(args, cmdLine);
             System.out.println("Starting with arguments: " + cmdLine);
             ProcessBuilder builder = new ProcessBuilder(cmdLine);
             if (null != procCfg) {
