@@ -207,12 +207,14 @@ public class Starter {
 
     /**
      * Adds all environment properties starting with {@link #IIP_APP_PREFIX} or {@link #IIP_TEST_PREFIX} to the command 
-     * line of the service to be started.
+     * line of the service to be started. The plugin parent folder is taken from the system property 
+     * {@link Starter#PARAM_IIP_APP_PLUGINS} with unset default value {@code ""}.
      * 
      * @param args the arguments to add the application environment settings
+     * @see #addAppEnvironment(List, File)
      */
     public static void addAppEnvironment(List<String> args) {
-        addAppEnvironment(args, new File(""));
+        addAppEnvironment(args, new File(System.getProperty(Starter.PARAM_IIP_APP_PLUGINS, "")));
     }
 
     /**
