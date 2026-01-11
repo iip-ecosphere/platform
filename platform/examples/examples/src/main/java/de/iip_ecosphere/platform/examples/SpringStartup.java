@@ -159,7 +159,7 @@ public class SpringStartup {
         int adminPort = -1; // ephemeral
         String serviceProtocol = "";
 
-        PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE); // local plugins
+        loadPlugins(args);
         System.setProperty(NetworkManagerFactory.PROPERTY, PersistentLocalNetworkManagerDescriptor.class.getName());
         System.out.println("Spring Startup with args: " + Arrays.toString(args));
         System.out.println("System environment: " + System.getenv());
@@ -209,6 +209,17 @@ public class SpringStartup {
         } catch (ExecutionException | InterruptedException | IOException e) {
             System.err.println("Running the app: " + e.getMessage());
         }
+    }
+
+    /**
+     * Loads the oktoflow plugins.
+     * 
+     * @param args the command line arguments
+     */
+    private static void loadPlugins(String[] args) {
+        Starter.transferArgsToEnvironment(args);
+        Starter.loadOktoPlugins();
+        PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE); // local plugins
     }
     
     /**
