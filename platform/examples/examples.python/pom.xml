@@ -32,11 +32,6 @@
      <artifactId>connectors</artifactId>
      <version>${project.version}</version>
     </dependency>
-    <dependency>
-     <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>connectors.opcuav1</artifactId>
-     <version>${project.version}</version>
-    </dependency>
     
     <dependency>
       <groupId>junit</groupId>
@@ -61,6 +56,9 @@
   <profiles>
      <profile>    
         <id>App</id>
+        <properties>
+            <maven.javadoc.skip>true</maven.javadoc.skip>
+        </properties>   
         <dependencies>
 	      <dependency>
 	      	 <artifactId>apps.ExamplePythonAppInterfaces</artifactId>
