@@ -24,14 +24,19 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.Profile;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -39,6 +44,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.fileset.FileSet;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import de.iip_ecosphere.platform.configuration.maven.ProcessUnit.ProcessUnitBuilder;
 import de.iip_ecosphere.platform.configuration.maven.ProcessUnit.TerminationListener;
@@ -90,6 +96,9 @@ public class TestAppMojo extends AbstractLoggingMojo {
 
     @Parameter(property = "configuration.testApp.appOffline", required = false, defaultValue = "true")
     private boolean appOffline;
+
+    @Parameter(property = "configuration.testApp.appPluginFolder", required = false, defaultValue = "plugins")
+    private String appPluginFolder;
 
     @Parameter(property = "configuration.testApp.appArgs", required = false)
     private List<String> appArgs;
@@ -481,8 +490,10 @@ public class TestAppMojo extends AbstractLoggingMojo {
         if (null != mvnPluginArgs) {
             testBuilder.addArguments(extrapolate(mvnPluginArgs, befores));
         }
+        String pluginFolderArg = getPluginFolderArgument();
         testBuilder.addArgument(
             "-Diip.springStart.args=\"--iip.test.stop=" + testTime 
+            + pluginFolderArg
             + " --iip.app.noAas=true" 
             + " --iip.test.brokerPort=" + brokerPort 
             + tmpAppArgs + "\"");
@@ -491,6 +502,111 @@ public class TestAppMojo extends AbstractLoggingMojo {
             + appProfile);
         
         return testBuilder;
+    }
+    
+    /**
+     * Inspects the POM model to identify the plugin folder of the app. Tries to identify the Java execution 
+     * determined by {@link #appId} and {@link #appProfile} and from that the first argument for {@code SpringStartup}.
+     * Uses {@link #appPluginFolder}.
+     * 
+     * @return the plugin folder argument, may be empty for none
+     * @see #getPluginFolderArgument(PluginExecution)
+     */
+    private String getPluginFolderArgument() {
+        String result = "";
+        Optional<Profile> appProfileOpt = project.getModel().getProfiles().stream()
+            .filter(p -> p.getId().equals(appProfile))
+            .findFirst();        
+        if (appProfileOpt.isPresent()) {
+            Profile appProfile = appProfileOpt.get();
+            Optional<Plugin> execPluginOpt = appProfile.getBuild().getPlugins().stream()
+                .filter(p -> p.getArtifactId().equals("exec-maven-plugin"))
+                .findFirst();
+            if (execPluginOpt.isPresent()) {
+                Plugin plugin = execPluginOpt.get();
+                Object pluginExecCfg = null;
+                if (plugin.getExecutions().isEmpty()) {
+                    pluginExecCfg = plugin.getConfiguration();
+                } else {
+                    PluginExecution exec = plugin.getExecutionsAsMap().get(appId);
+                    if (exec != null) {
+                        pluginExecCfg = exec.getConfiguration();
+                    }
+                }
+                if (pluginExecCfg != null) {
+                    result = getPluginFolderArgument(pluginExecCfg);
+                } else {
+                    getLog().warn("Cannot find the configuration (default or execution with id " + appId + ") in "
+                        + "exec-maven-plugin in profile " + appProfile + " for appTest");
+                }
+            } else {
+                getLog().warn("Cannot find the exec-maven-plugin in profile " + appProfile + " for appTest");
+            }
+        } else {
+            getLog().warn("Cannot find the mvn profile (" + appProfile + ") for appTest");
+        }
+        return result;
+    }
+    
+    /**
+     * Returns the plugin folder of the app from the {@code PluginExecution} determined by {@link #appId} and 
+     * {@link #appProfile}, there from the first argument for {@code SpringStartup}. Uses {@link #appPluginFolder}.
+     * 
+     * @param pluginExecCfg the execution configuration for the test app
+     * @return the plugin folder argument, may be empty for none
+     * @see #getPluginFolderArgument(String)
+     */
+    private String getPluginFolderArgument(Object pluginExecCfg) {
+        String result = "";
+        AtomicReference<String> arg = new AtomicReference<>("");
+        boolean shallHaveResult = true;
+        if (pluginExecCfg instanceof Xpp3Dom) {
+            Xpp3Dom cfg = (Xpp3Dom) pluginExecCfg;
+            Xpp3Dom args = cfg.getChild("arguments");
+            if (null != args && args.getChildCount() > 0) {
+                arg.set(args.getChild(0).getValue());
+                result = getPluginFolderArgument(arg);
+            } else {
+                getLog().warn("Cannot read the first argument of the execution with id " + appId 
+                    + " in exec-maven-plugin in profile " + appProfile + " for appTest");
+            }
+        } else {
+            shallHaveResult = false;
+            String type = null == pluginExecCfg ? "null" : pluginExecCfg.getClass().getName();
+            getLog().warn("Cannot read the configuration of the execution with id " + appId 
+                + " in exec-maven-plugin in profile " + appProfile + " for appTest: Type is " + type);
+        }
+        if (shallHaveResult && result.isEmpty()) {
+            getLog().warn("First argument path '" + arg.get() + "' of the execution with id " + appId 
+                + " in exec-maven-plugin in profile " + appProfile + " for appTest does not seem "
+                + "to be a path/an existing path");
+        }
+        return result;
+    }
+    
+    /**
+     * Returns the plugin folder of the app from the given {@code path}. Uses {@link #appPluginFolder}.
+     * 
+     * @param pathRef the path as first argument to {@code SpringStartup}, may be modified as a side effect to reflect
+     *   the actual base path taken into account
+     * @return the plugin folder argument, may be empty for none
+     */
+    private String getPluginFolderArgument(AtomicReference<String> pathRef) {
+        String result = "";
+        String path = pathRef.get();
+        if (null != path) {
+            int pos = path.lastIndexOf("/");
+            if (pos > 0) {
+                pathRef.set(path.substring(0, pos));
+                path = pathRef.get() + "/" + appPluginFolder;
+                if (new File(path).isDirectory()) {
+                    result = " -D" + AbstractSetup.PARAM_PLUGINS + "=" + path;
+                    getLog().info("Using path " + path + " from execution with id " + appId 
+                        + " in profile " + appProfile + " as plugin path");
+                }
+            }
+        }
+        return result;
     }
 
     /**
