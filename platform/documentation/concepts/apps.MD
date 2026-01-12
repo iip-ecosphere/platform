@@ -23,6 +23,7 @@ Fields of the 'Application' type.
 | nameplateInfo | Nameplate information denoting the application creator / vendor. |     |
 | createContainer |  Shall containers be created for this application. | false |
 | debug | Shall debug output be included into the generated application code. | false |
+| withDocs | Shall the application be build with documentation (may affect code templates only, may take more time). | false |
 | cmdArg |  Command line arguments to be passed to the application on startup. |     |
 | servers |  References to servers belonging to this application. Servers must also be referenced by services requiring individual servers. | {}  |
 | packaging |  Packaging scheme, see [platform handbook](../PlatformHandbook.pdf) Section 3.5.3 | SpringFat |

@@ -5,13 +5,9 @@ import MeshBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(AssemblyInfo) assemblies, sequenceOf(String) oktoPlugins, Boolean springPackaging=true, String groupId="") {
+template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(AssemblyInfo) assemblies, sequenceOf(String) oktoPlugins, Boolean springPackaging=true, String groupId="", Boolean withDocs=true) {
 
-    def Boolean isGlobalPlugin(String plugin) {
-        plugin.find("platform:transport") > 0 or plugin.find("platform:support.aas.basyx:") > 0 or plugin.find("platform:support.aas.basyx2:") > 0;        
-    }
-
-    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(AssemblyInfo) assemblies, sequenceOf(String) oktoPlugins, Boolean springPackaging=true, String groupId="") {
+    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(AssemblyInfo) assemblies, sequenceOf(String) oktoPlugins, Boolean springPackaging=true, String groupId="", Boolean withDocs=true) {
         String iipGroup = "de.iip-ecosphere.platform";
         String gId = groupId;
         if (length(gId) == 0) {
@@ -46,6 +42,9 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         XmlElement profile = new XmlElement(profiles, "profile");
         new XmlElement(profile, "id", "App");
         new XmlElement(new XmlElement(profile, "activation"), "activeByDefault", "true");
+        if (not(withDocs)) {
+            new XmlElement(new XmlElement(profile, "properties"), "maven.javadoc.skip", "true");
+        }
         
         XmlElement dep = createDependencies(profile);
         
@@ -74,7 +73,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
             skipIfNotFound=true, skipIfNotFoundComment="Tolerant resolution for initial build; skipIfNotFound can be removed/set to false when app interfaces are deployed.");
         appendMavenDependencyPluginArtifactItem(unpackItems, config.sharedArtifact, "python", 
             "\\${project.build.directory}/pySrc", "pyIf.zip", type="zip");
-        appendMavenIipDependencyPluginUnpackPluginsExecution(execs, oktoPlugins, projectVersion, enable=withPlugins(config));
+//appendMavenIipDependencyPluginUnpackPluginsExecution(execs, oktoPlugins, projectVersion, enable=withPlugins(config));
         //appendIipPythonPlugin(plugins, projectVersion);
         //XmlElement pluginMgt = createPlugins(createPluginManagement(build));
         //appendEclipseLifecycleMapping4DependenciesPlugin(pluginMgt, goal="unpack");
@@ -142,11 +141,12 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         new XmlComment(dep, "Remaining test dependencies go here.");
         
         appendDeploymentPlugins(plugins, config);
-        if (globalOktoPlugins.size() > 0 and withPlugins(config)) {
-            XmlElement dependencyPlugin = appendMavenIipDependencyPlugin(plugins, ver=projectVersion);
-            XmlElement execs = new XmlElement(dependencyPlugin, "executions");
-            appendMavenIipDependencyPluginUnpackPluginsExecution(execs, globalOktoPlugins, projectVersion, enable=withPlugins(config));
-        }
+/*
+ if (globalOktoPlugins.size() > 0 and withPlugins(config)) {
+    XmlElement dependencyPlugin = appendMavenIipDependencyPlugin(plugins, ver=projectVersion);
+    XmlElement execs = new XmlElement(dependencyPlugin, "executions");
+    appendMavenIipDependencyPluginUnpackPluginsExecution(execs, globalOktoPlugins, projectVersion, enable=withPlugins(config));
+}*/
     }
 
     // dispatch basis

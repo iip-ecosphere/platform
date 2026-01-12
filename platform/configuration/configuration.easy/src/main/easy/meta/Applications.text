@@ -1,7 +1,8 @@
 Applications::Application::artifact = Optional Maven artifact coordinates for the application, e.g., specific resources. 
 Applications::Application::cmdArg = Command line arguments to be passed into the application when starting it, separated by whitespace.
-Applications::Application::createContainer = Create container for application (default false, experimental).
+Applications::Application::createContainer = Create container for application (default false).
 Applications::Application::debug = Enable additional debug output when starting the application.
+Applications::Application::withDocs = Build the application with documentation (may affect code templates only, default false).
 Applications::Application::description = Description of the application.
 Applications::Application::id = Unique id to administer/manager the application.
 Applications::Application::name = Human readable name of the application.

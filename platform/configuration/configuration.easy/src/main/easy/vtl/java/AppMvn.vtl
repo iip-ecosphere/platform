@@ -93,7 +93,9 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         /*if (isPythonUsed(usedServiceTypes)) {
             appendMavenDependencyPluginExecution(execs, "unpack", "${iipGroup}:services.environment:${projectVersion}", "python", "\\${project.basedir}/src/main/python", "pythonEnv.zip", type="zip");
         }*/
-        appendMavenIipDependencyPluginUnpackPluginsExecution(execs, oktoPlugins, projectVersion, enable=withPlugins(config)); // withoutPlugins
+        if (not(ifArtifact)) {
+            appendMavenIipDependencyPluginUnpackPluginsExecution(execs, oktoPlugins, projectVersion, enable=withPlugins(config), outputDir="target/jars"); // withoutPlugins
+        }
         mapOf(String, XmlElement) goalItems = {}; 
         for (DependencyArtifact bin: bins.asSequence()->sortedBy(b|b.artifact)) { // sortedBy for testing
             if (goalItems.containsKey(bin.goal)) {
@@ -104,6 +106,11 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
                     bin.outputDir, bin.destFileName, type=bin.type, id=bin.goal + "-unpack");
                 goalItems.add(bin.goal, items);
             }
+        }
+        if (withPlugins(config) and not(ifArtifact)) {
+            sequenceOf(String) archiveFiles = {};
+            archiveFiles.add("\\${project.build.directory}/\\${project.artifactId}-\\${project.version}-bin.jar");
+            appendMavenDependencyPluginExecutionSplitClasspath(execs, archiveFiles);
         }
         
         XmlElement depPlugin = appendMavenResourcesPlugin(plugins);

@@ -57,6 +57,7 @@ project Applications {
         assign (uiGroup = UiOptionalGroup1) to {
             Boolean createContainer = false;
             Boolean debug = false;
+            Boolean withDocs = false;
             String cmdArg; // for now, comma separated
             setOf(refTo(Server)) servers = {}; // additional server instances to be started
             setOf(AppPackagingSchema) packaging = { AppPackagingSchema::SpringFat };

@@ -363,7 +363,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
 
                 String appVersion = getAppMvnVersion(a);
                 oktoPlugins = cleanAppTestPlugins(config, oktoPlugins);
-                vilTemplateProcessor("AppMvnTest", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, assemblies=assemblies, oktoPlugins=oktoPlugins, nodes=elements, appName=appName, appVersion=appVersion, appDescription="Implementation of ${a.name}", tests=tests);
+                vilTemplateProcessor("AppMvnTest", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, assemblies=assemblies, oktoPlugins=oktoPlugins, nodes=elements, appName=appName, appVersion=appVersion, appDescription="Implementation of ${a.name}", tests=tests, withDocs=a.withDocs);
                 vilTemplateProcessor("TemplatesIdentityStoreYaml", config, "${resourcesSrc}/identityStore.yml", app=a);
                 vilTemplateProcessor("TemplatesTestLogbackXml", config, "${testResourcesSrc}/logback.xml");
                 identityStoreJsl(testResourcesSrc, cfg);

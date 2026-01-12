@@ -183,10 +183,23 @@ template MavenBasics(Configuration config, FileArtifact target) {
     def XmlElement appendMavenIipDependencyPlugin(XmlElement plugins, String ver="\\${project.version}") {
         appendPlugin(plugins, "de.iip-ecosphere.platform", "dependency-plugin", ver, false);
     } 
-
+    
     def XmlElement appendMavenDependencyPluginUnpackArtifact(XmlElement plugins, String artifact, String classifier, String outputDir, String destFileName, String ver="3.2.0", String type="jar", String phase="process-sources") {
         XmlElement plugin = appendMavenDependencyPlugin(plugins, ver);
         appendMavenDependencyPluginUnpackArtifactExecution(plugin, artifact, classifier, outputDir, destFileName, type, phase);
+    }
+
+    def XmlElement appendMavenDependencyPluginExecutionSplitClasspath(XmlElement execs, sequenceOf(String) archiveFiles, String phase="package", String id="postprocess") {
+        XmlElement exec = new XmlElement(execs, "execution");
+        new XmlElement(exec, "id", id);
+        appendGoal(exec, "split-classpath");
+        new XmlElement(exec, "phase", phase);
+        XmlElement config = appendConfiguration(exec);
+        XmlElement aFiles = new XmlElement(config, "archiveFiles");
+        for (String f : archiveFiles) {
+            new XmlElement(aFiles, "archiveFile", f);
+        }
+        exec;
     }
     
     def XmlElement appendMavenDependencyPluginUnpackArtifactExecution(XmlElement plugin, String artifact, String classifier, String outputDir, String destFileName, String type="jar", String phase="process-sources") {
@@ -703,5 +716,9 @@ template MavenBasics(Configuration config, FileArtifact target) {
         sequenceOf(String) res = {"*.yml", "*.png", "*.jpg", "*.json"};
         res;
     } 
+    
+    def Boolean isGlobalPlugin(String plugin) {
+        plugin.find("platform:transport") > 0 or plugin.find("platform:support.aas.basyx:") > 0 or plugin.find("platform:support.aas.basyx2:") > 0;        
+    }
 
 }

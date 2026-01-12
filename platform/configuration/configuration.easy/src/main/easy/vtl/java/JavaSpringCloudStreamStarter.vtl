@@ -32,7 +32,7 @@ template JavaSpringCloudStreamStarter(Configuration config, JavaCodeArtifact tar
         });
         mainCls.addMainMethod().(m|{
             m.getJavadocComment().setComment("Starts the service chain.");
-            m.addCall("registerSerializers");
+            m.addCall("registerAfterPluginInitializer").addArgument("() -> registerSerializers()");
             m.addCall("main").addArgument("iip.Starter.class").addArgument("args");
         });
     }
