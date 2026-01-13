@@ -576,6 +576,9 @@ export class IvmlFormatterService extends UtilsService {
                 editorInput.multipleInputs = true;
               }
               editorInput.defaultValue = DataUtils.getPropertyValue(input.value, MT_metaDefault);
+              if (editorInput.defaultValue === '{}') {
+                editorInput.defaultValue = '';
+              }
               let ivmlValue = (type?.value?.length ? type.value : editorInput.defaultValue) || "";
               if (selMetaTypeKind === MTK_compound && this.isArray(ivmlValue)) {
                 ivmlValue = DataUtils.getPropertyValue(ivmlValue, input.idShort);
