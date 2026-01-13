@@ -27,7 +27,7 @@
       </mat-form-field>
     </span>
     &nbsp;
-    <span #subEditor *ngIf="input.metaTypeKind == 10 && input.multipleInputs else other" 
+    <span #subEditor *ngIf="(input.metaTypeKind == 10 || this.input.metaTypeKind == 2 ) && input.multipleInputs else other" 
       id="ref-select.inputName.subEd"> 
       <app-subeditor-button [meta]="meta" [input]="input" [selectedType]="selectedType" matIcon="add" (saveEvent)="onChildSaveEvent($event)"></app-subeditor-button>
     </span>

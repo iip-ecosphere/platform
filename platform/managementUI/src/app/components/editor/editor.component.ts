@@ -65,7 +65,7 @@ export class EditorComponent extends Utils implements OnInit {
         this.generateInputs()
       }
     }
-    if (this.metaBackup && this.metaBackup.value) {
+    /*if (this.metaBackup && this.metaBackup.value) {
       let searchTerm = 'Field'
       for (const type of this.metaBackup.value) {
         const refined = DataUtils.getProperty(type.value, MT_metaRefines);
@@ -75,7 +75,7 @@ export class EditorComponent extends Utils implements OnInit {
           }
         }
       }
-    }
+    }*/
   }
 
   private async populateMeta() {
@@ -218,7 +218,8 @@ export class EditorComponent extends Utils implements OnInit {
         let uniGroup = DataUtils.getEditorInputByName(this.uiGroups, event.idShort);
         type = uniGroup?.type;
       } 
-      prop.value.push({value : resultProp, name: resultProp?.name?.value ?? "unnamed", _type: DataUtils.stripGenericType(type)});
+      
+      prop.value.push({value : resultProp, name: resultProp?.name?.value ?? resultProp?.value?.value, _type: DataUtils.stripGenericType(type)});
     }
   }
 
