@@ -111,6 +111,13 @@ public @interface MachineConnector {
      */
     public boolean supportsDataTimeDifference() default false;
     
+    /**
+     * Returns whether this connector implements {@link Connector#enumerateFields(String)}.
+     * 
+     * @return {@code true} for implemented, {@code false} else
+     */
+    public boolean supportsFieldEnumeration() default false;
+    
     // on further properties, adjust ConnectorsAas/ConnectorsAasTest!
     
 }

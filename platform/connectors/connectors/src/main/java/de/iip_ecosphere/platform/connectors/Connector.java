@@ -12,6 +12,8 @@
 package de.iip_ecosphere.platform.connectors;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.iip_ecosphere.platform.connectors.events.DataTimeDifferenceProvider;
 import de.iip_ecosphere.platform.connectors.events.EventHandlingConnector;
@@ -227,6 +229,16 @@ public interface Connector <O, I, CO, CI> extends EventHandlingConnector {
      * @param useNotifications the new value after changing
      */
     public default void notificationsChanged(boolean useNotifications) {
+    }
+    
+    /**
+     * Returns the declared fields that the connector may access. A connector may or not implement this function.
+     * 
+     * @param path the path
+     * @return the fields, shall be an empty list if the connector does not provide access to the fields
+     */
+    public default List<ConnectorField> enumerateFields(String path) {
+        return new ArrayList<>();
     }
 
 }
