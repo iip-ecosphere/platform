@@ -138,7 +138,6 @@ public abstract class AbstractInformationModelConnectorTest<D> implements InputC
         connector.connect(getConnectorParameter());
         ConnectorTest.assertInstance(connector, true);
         LOGGER.info("Connector '" + connector.getName() + "' started");
-        ConnectorField.printFields(connector.enumerateFields(getEnumPathToFields()), System.out);
 
         block(count, 2); // init changes powConsumption and lotSize
         
@@ -183,6 +182,7 @@ public abstract class AbstractInformationModelConnectorTest<D> implements InputC
         assertAdditionalProperties(Step.STOP_COMMAND_SENT, tmp);
 
         ConnectorTest.assertInstance(connector, true);
+        ConnectorField.printFields(connector.enumerateFields(getEnumPathToFields()), System.out);
         connector.disconnect();
         ConnectorTest.assertInstance(connector, false);
         LOGGER.info("Connector '" + connector.getName() + "' disconnected");
