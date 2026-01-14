@@ -374,8 +374,9 @@ export class IvmlFormatterService extends UtilsService {
     params.push(ApiService.createAasOperationParameter("serviceMeshName", AAS_TYPE_STRING, serviceMeshName));
     params.push(ApiService.createAasOperationParameter("format", AAS_TYPE_STRING, GRAPHFORMAT_DRAWFLOW));
     params.push(ApiService.createAasOperationParameter("val", AAS_TYPE_STRING, val));
-    return this.callConfigOperation("setGraph", params, `Service mesh '${serviceMeshName}' was stored.`)
-    /*const response = await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_CONFIGURATION, 
+    var resultMessage: string = appName ? `Application '${appName}' was stored.` : `Service mesh '${serviceMeshName}' was stored.`;
+
+    return this.callConfigOperation("setGraph", params, resultMessage)    /*const response = await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_CONFIGURATION, 
       AAS_OP_PREFIX_SME + "setGraph", param);
   
     let exception = this.api.getPlatformResponse(response)
