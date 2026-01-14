@@ -156,10 +156,10 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, JavaCodeArti
                     block.SystemOutPrintln().arg('"received in ${base.id}: " + ${d}');
                 }
             }
-            if (expr <> "") {
-                block.add(expr + ";"); // add only if expr<>"", returns block
-            }
-            block;
+if (expr <> "") {
+            block.add(expr + ";"); // add only if expr<>"", returns block
+}
+block;            
         } else {
             new JavaCodeStringExpression(expr);
         }
@@ -309,11 +309,9 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, JavaCodeArti
                 methodName = "process" + methodName.substring(6);
             }
         }
-        if (!mainCls.containsMethod(methodName)) {
-            nodeBeanAnnotation(c.method("java.util.function.Consumer<${asTypeName(type)}>", methodName, "Called when data arrived that shall be passed on to the connector.")).(m|{
-                m.return(new JavaCodeLambdaExpression("data").asExpr(genRcvProbe(conn, expr, type, "data")), "the data consumer functor");
-            });
-        }
+        nodeBeanAnnotation(c.method("java.util.function.Consumer<${asTypeName(type)}>", methodName, "Called when data arrived that shall be passed on to the connector.")).(m|{
+            m.return(new JavaCodeLambdaExpression("data").asExpr(genRcvProbe(conn, expr, type, "data")), "the data consumer functor");
+        });
     }
     
     def Boolean recordSourceIngestor(MeshSource elt, IOType type) {
@@ -391,12 +389,10 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, JavaCodeArti
                 methodName = methodSuffix;
             }
         }
-        if (!mainCls.containsMethod(methodName)) {
-            nodeBeanAnnotation(mainCls.method("java.util.function.Consumer<${type}>", methodSuffixWithServiceId, "Called when data arrived that shall be received (data sink).")).(m|{
-                generateSinkMethodBody(snk, overrideImpl(snk.impl), methodName, methodSuffixWithServiceId, type, m);
-                m.getJavadocComment().addReturnComment("the data consumer functor");
-            });
-        }
+        nodeBeanAnnotation(mainCls.method("java.util.function.Consumer<${type}>", methodSuffixWithServiceId, "Called when data arrived that shall be received (data sink).")).(m|{
+            generateSinkMethodBody(snk, overrideImpl(snk.impl), methodName, methodSuffixWithServiceId, type, m);
+            m.getJavadocComment().addReturnComment("the data consumer functor");
+        });
     } 
     
     def generateSinkMethodBody(MeshSink snk, ServiceBase service, String methodName, String methodSuffixWithServiceId, String type, JavaCodeMethod m) {
@@ -636,8 +632,8 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, JavaCodeArti
     def generateClassRest(MeshElement elt, ServiceBase service, JavaCodeClass c) {
     }
         
-    def generateTypeTranslators(MeshProcessor elt, ServiceBase service, String serviceId, JavaCodeClass c) {
-        for (IOType in : elt.input) {
+    def generateTypeTranslators(MeshElement elt, ServiceBase service, String serviceId, JavaCodeClass c) {
+        for (IOType in : service.input) {
             String qType = toQualifiedTypeName(in.type);
             String type = toTypeName(in.type);
             c.addClass(type + "InputTranslator", "In-data JSON type translator.").implements("de.iip_ecosphere.platform.transport.serialization.TypeTranslator<${qType}, String>").(t|{
@@ -658,7 +654,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, JavaCodeArti
             });
         }
         
-        for (IOType out : elt.output) {
+        for (IOType out : service.output) {
             String qType = toQualifiedTypeName(out.type);
             String type = toTypeName(out.type);
             c.addClass(type + "OutputTranslator", "Out-data JSON type translator.").implements("de.iip_ecosphere.platform.transport.serialization.TypeTranslator<String, ${qType}>").(t|{
@@ -1044,8 +1040,18 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, JavaCodeArti
         String expr = 'service.processSyncQuiet("${toSimpleName(inType)}", data, "${toSimpleName(outType)}")';
         m.return(new JavaCodeLambdaExpression("data").asExpr(genSentProbe(service, expr, true, inType, "data")));
     }
+    
+    // added v2->v3
+    def generateSinkMethodBody(MeshSink snk, PythonService service, String methodName, String methodSuffixWithServiceId, String type, JavaCodeMethod m) {
+        String expr = 'service.processQuiet("${toSimpleName(type)}", data)';
+        m.return(new JavaCodeLambdaExpression("data").asExpr(genRcvProbe(service, expr, type, "data")));
+    }
+    
+    def generateSourceMethod(MeshSource src, PythonService service, String type, String methodSuffix, String methodSuffixWithServiceId, JavaCodeClass c) {
+        c.addSLComment("Source method for ${type} currently unimplemented/unclear.");
+    }
 
-    def generateReceptionCallback(MeshProcessor elt, PythonService service, JavaCodeClass c) {
+    def generateReceptionCallback(MeshElement elt, PythonService service, JavaCodeClass c) {
         generateTypeTranslators(elt, service, "_" + toIdentifier(service.id), c);
     }
         

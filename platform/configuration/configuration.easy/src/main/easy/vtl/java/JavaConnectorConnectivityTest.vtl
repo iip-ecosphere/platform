@@ -87,6 +87,11 @@ template JavaConnectorConnectivityTest(IIPEcosphere config, JavaCodeArtifact tar
             init.arg("() -> params");
             init.arg("${clsName}.createConnectorAdapter()");
             mainClsMain.var("de.iip_ecosphere.platform.connectors.Connector" + connGen, "conn").initializer(init);
+            mainClsMain.SystemOutPrintln().addStringArgument("Connector fields (if accessible):");
+            mainClsMain.addCall("de.iip_ecosphere.platform.connectors.ConnectorField.printFields").(c|{
+                c.addCallArgument("conn.enumerateFields").addStringArgument("");
+                c.addArgument("System.out");
+            });
     
             codeAddShutdownHook(mainClsMain, "conn.disconnectSafe()");
             mainClsMain.addCall("conn.connect").addArgument("params");

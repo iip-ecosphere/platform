@@ -257,6 +257,7 @@ project Services {
            String venvName;
        }
        dependencies.uiGroup = UiMandatoryGroup1;
+       Constraint pythonServiceKindOk = kind <> ServiceKind::SOURCE_SERVICE;
        //Constraint conda = isDefined(condaEnv) and condaEnv <> "" implies dependencies->->selectByType(SystemDependency)->select(d|d.key.startsWith("CONDA")).notEmpty();
    }
    

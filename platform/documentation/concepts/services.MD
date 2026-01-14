@@ -283,6 +283,7 @@ A Java Service encapsulates a piece of work implemented in Python. Data type as 
 
 Background:
 - `console_continuous` was the initial integration for Python services. However, as Python caches the console streams by default and the communication performance could be improved, we added `websocket_continuous`, which may become the default in the future. `console_oneShot` is intended services that shall be powered up on demand, i.e., seldomly receive and produce data, so that no static resource consumption happens.
+- `PythonService` currently cannot be used as `ServiceKind::SOURCE_SERVICE`
 
 ### TraceToAasJavaService
 
