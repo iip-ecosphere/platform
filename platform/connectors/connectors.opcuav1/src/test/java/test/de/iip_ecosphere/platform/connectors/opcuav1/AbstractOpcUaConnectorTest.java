@@ -166,4 +166,9 @@ public class AbstractOpcUaConnectorTest extends AbstractInformationModelConnecto
         lastConnector = connector;
     }
 
+    @Override
+    protected String getEnumPathToFields() {
+        return OpcUaConnector.TOP_OBJECTS;
+    }
+
 }

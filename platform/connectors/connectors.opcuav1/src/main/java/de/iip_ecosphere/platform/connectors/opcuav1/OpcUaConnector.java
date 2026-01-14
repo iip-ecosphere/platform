@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
@@ -48,6 +50,7 @@ import org.eclipse.milo.opcua.sdk.client.api.subscriptions.UaMonitoredItem;
 import org.eclipse.milo.opcua.sdk.client.api.subscriptions.UaSubscription;
 import org.eclipse.milo.opcua.sdk.client.nodes.UaNode;
 import org.eclipse.milo.opcua.sdk.client.nodes.UaVariableNode;
+import org.eclipse.milo.opcua.sdk.core.nodes.VariableNode;
 import org.eclipse.milo.opcua.stack.client.DiscoveryClient;
 import org.eclipse.milo.opcua.stack.core.AttributeId;
 import org.eclipse.milo.opcua.stack.core.Identifiers;
@@ -70,6 +73,7 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.ULong;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UNumber;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UShort;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.MonitoringMode;
+import org.eclipse.milo.opcua.stack.core.types.enumerated.NodeClass;
 import org.eclipse.milo.opcua.stack.core.types.enumerated.TimestampsToReturn;
 import org.eclipse.milo.opcua.stack.core.types.structured.AnonymousIdentityToken;
 import org.eclipse.milo.opcua.stack.core.types.structured.CallMethodRequest;
@@ -80,6 +84,7 @@ import org.eclipse.milo.opcua.stack.core.types.structured.IssuedIdentityToken;
 import org.eclipse.milo.opcua.stack.core.types.structured.MonitoredItemCreateRequest;
 import org.eclipse.milo.opcua.stack.core.types.structured.MonitoringParameters;
 import org.eclipse.milo.opcua.stack.core.types.structured.ReadValueId;
+import org.eclipse.milo.opcua.stack.core.types.structured.ReferenceDescription;
 import org.eclipse.milo.opcua.stack.core.types.structured.SignatureData;
 import org.eclipse.milo.opcua.stack.core.types.structured.SimpleAttributeOperand;
 import org.eclipse.milo.opcua.stack.core.types.structured.UserIdentityToken;
@@ -91,6 +96,8 @@ import de.iip_ecosphere.platform.connectors.AbstractConnector;
 import de.iip_ecosphere.platform.connectors.AbstractPluginConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.AdapterSelector;
 import de.iip_ecosphere.platform.connectors.Connector;
+import de.iip_ecosphere.platform.connectors.ConnectorField;
+import de.iip_ecosphere.platform.connectors.ConnectorField.ConnectorFieldBuilder;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
@@ -127,7 +134,7 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
  * @author Holger Eichelberger, SSE
  * @author Jan Cepok, SSE
  */
-@MachineConnector(specificSettings = {}) // other default values sufficient
+@MachineConnector(specificSettings = {}, supportsFieldEnumeration = true) // other default values sufficient
 public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, CO, CI> {
 
     /**
@@ -1349,6 +1356,127 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
     @Override
     public String enabledEncryption() {
         return null;
+    }
+    
+    @Override
+    public List<ConnectorField> enumerateFields(String path) {
+        List<ConnectorField> result = new ArrayList<>();
+        if (null != client) {
+            Map<NodeId, String> types = new HashMap<>();
+            for (Field f : Identifiers.class.getFields()) {
+                try {
+                    Object fVal = f.get(null);
+                    if (fVal instanceof NodeId) {
+                        types.put((NodeId) fVal, f.getName());
+                    }
+                } catch (IllegalArgumentException | IllegalAccessException e) {
+                }                    
+            }
+            try {
+                NodeId startId = Identifiers.RootFolder;
+                if (path != null && path.length() > 0) {
+                    UaNode node = client.getAddressSpace().getNode(startId);
+                    StringTokenizer tokens = new StringTokenizer(path, "" + SEPARATOR_CHAR);
+                    while (null != node && tokens.hasMoreTokens()) {
+                        String subPath = tokens.nextToken();
+                        Optional<UaNode> subPathNode = node.browse().stream()
+                            .filter(r -> r.getBrowseName() != null && subPath.equals(r.getBrowseName().getName()))
+                            .map(r -> client.getAddressSpace().toNodeId(r.getNodeId()))
+                            .map(i -> getNodeSafe(i))
+                            .filter(n -> n != null)
+                            .findFirst();
+                        if (subPathNode.isPresent()) {
+                            node = subPathNode.get();
+                        } else {
+                            node = null; // break
+                        }
+                    }
+                    if (null != node) {
+                        startId = node.getNodeId();
+                    }
+                }
+                enumerateNodes(startId, 0, "", types, result);
+            } catch (UaException e) {
+                LoggerFactory.getLogger(this).info("Field enumeration failed: {}", e.getMessage());
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Returns the node with the given {@code id}.
+     * 
+     * @param id the node id
+     * @return the node, may be <b>null</b> for none
+     */
+    private UaNode getNodeSafe(NodeId id) {
+        try {
+            return client.getAddressSpace().getNode(id);
+        } catch (UaException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Recursively enumerates the nodes in {@code nodeId}.
+     * 
+     * @param nodeId the id of the node to enumerate
+     * @param depth the enumeration depth, call with {@code 0}
+     * @param path the path visited so far
+     * @param result the connector fields, modified as side effect
+     * @throws UaException if accessing the client fails
+     */
+    private void enumerateNodes(NodeId nodeId, int depth, String path, Map<NodeId, String> types,
+        List<ConnectorField> result) throws UaException {
+        List<ReferenceDescription> nodes = client.getAddressSpace().browse(nodeId);
+        for (ReferenceDescription node : nodes) {
+            NodeClass nodeClass = node.getNodeClass();
+
+            String name = node.getBrowseName().getName();
+            String nodePath = path;
+            if (nodePath.length() > 0) {
+                nodePath += SEPARATOR_CHAR;
+            }
+            nodePath += name;
+            
+            ConnectorFieldBuilder builder = ConnectorField.builder(name)
+                .setPath(nodePath)
+                .setNativeType(nodeClass.name())
+                .setNativeId(toString(node.getNodeId()));
+            if (nodeClass == NodeClass.Variable) {
+                Optional<NodeId> nodeIdOpt = node.getNodeId().toNodeId(client.getNamespaceTable());
+                if (nodeIdOpt.isPresent()) {
+                    UaNode ref = getNodeSafe(nodeIdOpt.get());
+                    if (ref instanceof VariableNode) {
+                        VariableNode varNode = (VariableNode) ref;
+                        if (varNode.getDataType() != null) {
+                            builder.setNativeTypeIfNotNull(types.get(varNode.getDataType()));
+                        }
+                    }
+                }
+            } 
+            result.add(builder.build());
+
+            if (nodeClass == NodeClass.Object 
+                // || nodeClass == NodeClass.Folder
+                || nodeClass == NodeClass.Variable) {
+
+                Optional<NodeId> nodeIdOpt = node.getNodeId().toNodeId(client.getNamespaceTable());
+                if (nodeIdOpt.isPresent()) {
+                    enumerateNodes(nodeIdOpt.get(), depth + 1, nodePath, types, result);
+                }
+            }
+        }
+    }    
+    
+    /**
+     * Turns a node id to a string.
+     * 
+     * @param id the id
+     * @return the representing string
+     */
+    private static String toString(ExpandedNodeId id) {
+        return null == id ? null : "{ns=" + id.getNamespaceIndex() + ", id=" + id.getIdentifier() + "}"; 
     }
 
 }
