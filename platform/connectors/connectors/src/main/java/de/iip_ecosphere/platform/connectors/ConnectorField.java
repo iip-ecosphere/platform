@@ -28,6 +28,7 @@ public class ConnectorField {
     private String name;
     private String path;
     private String nativeType;
+    private String nativeId;
     // initial, more may follow
     
     /**
@@ -40,6 +41,7 @@ public class ConnectorField {
         private String name;
         private String path;
         private String nativeType;
+        private String nativeId;
 
         /**
          * Creates a field builder.
@@ -73,12 +75,37 @@ public class ConnectorField {
             return this;
         }
 
+        /**
+         * Sets the native type as used in/by the protocol if {@code nativeType} is not <b>null</b>.
+         * 
+         * @param nativeType the native type
+         * @return <b>this</b> for chaining
+         */
+        public ConnectorFieldBuilder setNativeTypeIfNotNull(String nativeType) {
+            if (null != nativeType) {
+                setNativeType(nativeType);
+            }
+            return this;
+        }
+
+        /**
+         * Sets the native id as used in/by the protocol.
+         * 
+         * @param nativeId the native id
+         * @return <b>this</b> for chaining
+         */
+        public ConnectorFieldBuilder setNativeId(String nativeId) {
+            this.nativeId = nativeId;
+            return this;
+        }
+
         @Override
         public ConnectorField build() {
             ConnectorField result = new ConnectorField();
             result.name = name;
             result.path = path;
             result.nativeType = nativeType;
+            result.nativeId = nativeId;
             return result;
         }
         
@@ -121,12 +148,21 @@ public class ConnectorField {
     /**
      * Returns the native type as used in/by the protocol.
      * 
-     * @return the nativeType, may be <b>null</b> or empty if unknown
+     * @return the nativeType, may be <b>null</b> or empty if unknown/unused
      */
     public String getNativeType() {
         return nativeType;
     }
-    
+
+    /**
+     * Returns the native id as used in/by the protocol.
+     * 
+     * @return the nativeId, may be <b>null</b> or empty if unknown/unused
+     */
+    public String getNativeId() {
+        return nativeId;
+    }
+
     /**
      * Helper function to print connector fields with a default formatter to {@code out}.
      * 
@@ -135,7 +171,7 @@ public class ConnectorField {
      * @see #printFields(List, Function, PrintStream)
      */
     public static void printFields(List<ConnectorField> fields, PrintStream out) {
-        printFields(fields, f -> "- " + f.getPath() + " " + f.getNativeType(), out);
+        printFields(fields, f -> "- " + f.getPath() + ", " + f.getNativeType() + ", " + f.getNativeId(), out);
     }
 
     /**

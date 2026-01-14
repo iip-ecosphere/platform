@@ -20,6 +20,7 @@ import org.junit.Assert;
 
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
+import de.iip_ecosphere.platform.connectors.ConnectorField;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
@@ -94,6 +95,15 @@ public abstract class AbstractInformationModelConnectorTest<D> implements InputC
      * @return the connector parameters
      */
     protected abstract ConnectorParameter getConnectorParameter();
+
+    /**
+     * Returns the enumeration path to the fields for {@link Connector#enumerateFields(String)}.
+     * 
+     * @return
+     */
+    protected String getEnumPathToFields() {
+        return "";
+    }
     
     /**
      * Tests the connector.
@@ -128,6 +138,7 @@ public abstract class AbstractInformationModelConnectorTest<D> implements InputC
         connector.connect(getConnectorParameter());
         ConnectorTest.assertInstance(connector, true);
         LOGGER.info("Connector '" + connector.getName() + "' started");
+        ConnectorField.printFields(connector.enumerateFields(getEnumPathToFields()), System.out);
 
         block(count, 2); // init changes powConsumption and lotSize
         

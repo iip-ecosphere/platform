@@ -230,7 +230,18 @@ public interface Connector <O, I, CO, CI> extends EventHandlingConnector {
      */
     public default void notificationsChanged(boolean useNotifications) {
     }
-    
+
+    /**
+     * Returns all declared fields that the connector may access, i.e., {@link #enumerateFields(String)} with
+     * an empty argument. 
+     * 
+     * @param path the path
+     * @see #enumerateFields(String)
+     */
+    public default List<ConnectorField> enumerateFields() {
+        return enumerateFields("");
+    }
+
     /**
      * Returns the declared fields that the connector may access. A connector may or not implement this function.
      * 
