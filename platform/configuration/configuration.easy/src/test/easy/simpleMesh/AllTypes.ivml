@@ -1,9 +1,30 @@
 project AllTypes {
 
-    import AllTypesPart*; 
+    import IIPEcosphere; 
     import AllConstants;
     
-    // unusual for managed model structure but required for reuse in testing/evaluation environment
+    RecordType rec1 = {
+        name = "Rec1",
+        fields = {
+            Field {
+                name = "intField",
+                type = refBy(IntegerType)
+            }, Field {
+                name = "stringField",
+                type = refBy(StringType)
+            }
+        }
+    };
+    
+    RecordType feedback = {
+        name = "Feedback",
+        fields = {
+            Field {
+                name = "data",
+                type = refBy(StringType)
+            }
+        }
+    };
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
     
