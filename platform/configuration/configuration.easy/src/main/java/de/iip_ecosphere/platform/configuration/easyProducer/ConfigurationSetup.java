@@ -59,11 +59,25 @@ public class ConfigurationSetup extends de.iip_ecosphere.platform.configuration.
      * @return the configuration instance
      */
     public static ConfigurationSetup getSetup() {
+        return getSetup(true);
+    }
+
+    /**
+     * Returns the configuration instance, may read it the first time from a default "configuration.yml" file in the 
+     * root folder of the containing jar. 
+     *
+     * @param log do log or stay quiet
+     * @return the configuration instance
+     */
+    public static ConfigurationSetup getSetup(boolean log) {
         if (null == instance) {
             try {
                 instance = readFromYaml(ConfigurationSetup.class);
             } catch (IOException e) {
-                LoggerFactory.getLogger(ConfigurationSetup.class).warn("Fallback to default config: " + e.getMessage());
+                if (log) {
+                    LoggerFactory.getLogger(ConfigurationSetup.class).warn(
+                        "Fallback to default config: {}", e.getMessage());
+                }
                 instance = new ConfigurationSetup();
             }
         }

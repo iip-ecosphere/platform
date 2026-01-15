@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.configuration.cfg.StatusCache;
+import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor.ExecutionMode;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.collector.Collector;
@@ -330,6 +331,7 @@ public class PlatformInstantiator {
             LoggerFactory.getLogger(ConfigurationSetup.class).setLevel(LogLevel.OFF);
             LoggerFactory.getLogger(Transport.class).setLevel(LogLevel.OFF);
             LoggerFactory.getLogger(StatusCache.class).setLevel(LogLevel.OFF);
+            LoggerFactory.getLogger(ConfigurationSetup.class).setLevel(LogLevel.OFF);
         }
         
         /**
@@ -429,11 +431,11 @@ public class PlatformInstantiator {
      * @throws ExecutionException in case that the instantiation fails and the configurer re-throws the exception
      */
     public static void instantiate(InstantiationConfigurer configurer) throws ExecutionException {
-        ConfigurationSetup setup = ConfigurationSetup.getSetup();
+        ConfigurationSetup setup = ConfigurationSetup.getSetup(false);
         configurer.configure(setup);
         ConfigurationLifecycleDescriptor lcd = configurer.obtainLifecycleDescriptor();
-        lcd.setClassLoader(classLoader); // ignored if null
-        lcd.startup(new String[0]); // shall register executor
+        // classloader is ignored if null
+        lcd.startup(classLoader, ExecutionMode.TOOLING, new String[0]); // shall register executor
         configurer.validateConfiguration(ConfigurationManager.getIvmlConfiguration());
         ReasoningResult rRes = ConfigurationManager.validateAndPropagate();
         if (null == rRes) {

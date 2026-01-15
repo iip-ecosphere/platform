@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutionException;
 import org.junit.Assert;
 
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor;
+import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor.ExecutionMode;
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationSetup;
 import de.iip_ecosphere.platform.configuration.easyProducer.EasyLogLevel;
 import de.iip_ecosphere.platform.configuration.easyProducer.EasySetup;
@@ -155,6 +156,7 @@ public abstract class AbstractIvmlTests {
             .findFirst();
         Assert.assertTrue(first.isPresent());
         ConfigurationLifecycleDescriptor lcd = (ConfigurationLifecycleDescriptor) first.get(); 
+        lcd.setExecutionMode(ExecutionMode.TOOLING);
         Assert.assertNotNull(lcd);
         return lcd;
     }

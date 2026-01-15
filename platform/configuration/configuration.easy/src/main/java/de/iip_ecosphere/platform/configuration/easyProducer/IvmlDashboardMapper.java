@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
+import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor.ExecutionMode;
 import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator.InstantiationConfigurer;
 import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator.NonCleaningInstantiationConfigurer;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlGraphMapper.IvmlGraph;
@@ -772,7 +773,7 @@ public class IvmlDashboardMapper {
         }
         configurer.configure(setup);
         ConfigurationLifecycleDescriptor lcd = configurer.obtainLifecycleDescriptor();
-        lcd.startup(new String[0]); // shall register executor
+        lcd.startup(ExecutionMode.TOOLING, new String[0]); // shall register executor
         Configuration cfg = ConfigurationManager.getIvmlConfiguration();
         ConfigurationManager.validateAndPropagate();
         try {

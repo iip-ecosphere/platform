@@ -31,7 +31,11 @@ import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 
 /**
- * The lifecycle descriptor for the configuration component.
+ * The lifecycle descriptor for the configuration component. The default execution mode is now 
+ * {@link ExecutionMode#IVML} as this lifecycle descriptor is intended to boot the platform service, which, 
+ * through the UI, only needs IVML rather than VIL/VTL. If the caller needs more configuration abilities, please use
+ * {@link ExecutionMode#TOOLING} or {@link ExecutionMode#FULL} with {@link #setExecutionMode(ExecutionMode)} before
+ * calling {@link #startup(String[])}.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -43,6 +47,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
     private boolean doLogging = true;
     private boolean doFilterLogs = false;
     private ClassLoader classLoader = ConfigurationLifecycleDescriptor.class.getClassLoader();
+    private ExecutionMode executionMode = ExecutionMode.IVML;
     
     static {
         addNoEasyLogging(net.ssehub.easy.instantiation.core.model.vilTypes.TypeRegistry.class);
@@ -75,6 +80,55 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
         WARN, 
         ERROR,
         OFF
+    }
+    
+    /**
+     * Defines execution modes implying logging, model loading setup etc.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public enum ExecutionMode {
+        
+        /**
+         * Full execution, the default.
+         */
+        FULL(true),
+        
+        /**
+         * Run IVML only. Mode for the platform server.
+         */
+        IVML(true),
+
+        /**
+         * Run IVML only. Mode for the platform server.
+         */
+        IVML_QUIET(false),
+
+        /**
+         * Run in tooling, e.g., Maven.
+         */
+        TOOLING(false);
+        
+        private boolean exendedLogging;
+        
+        /**
+         * Creates a mode value.
+         * 
+         * @param extendedLogging whether extended logging is desired
+         */
+        private ExecutionMode(boolean extendedLogging) {
+            this.exendedLogging = extendedLogging;
+        }
+        
+        /**
+         * Returns whether extended logging is desired.
+         * 
+         * @return {@code true} for extended logging, {@code false} else
+         */
+        public boolean extendedLogging() {
+            return exendedLogging;
+        }
+        
     }
     
     /**
@@ -194,7 +248,19 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
     }
     
     /**
-     * Explicitly defines the class loader for loading EASy. Default is the class loader of this class.
+     * Changes the execution mode. Must be called before {@link #startup(String[])}.
+     * 
+     * @param mode the new mode, ignored if <b>null</b>
+     */
+    public void setExecutionMode(ExecutionMode mode) {
+        if (mode != null) {
+            this.executionMode = mode;
+        }
+    }
+    
+    /**
+     * Explicitly defines the class loader for loading EASy. Default is the class loader of this class. Must be called 
+     * before {@link #startup(String[])}.
      * 
      * @param classLoader the class loader, ignored if <b>null</b>
      */
@@ -202,6 +268,32 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
         if (null != classLoader) {
             this.classLoader = classLoader;
         }
+    }
+
+    /**
+     * Starts up in a given execution mode.
+     * 
+     * @param mode the new mode, ignored if <b>null</b>
+     * @param args the command line arguments
+     * @see #setExecutionMode(ExecutionMode)
+     * @see #startup(String[])
+     */
+    public void startup(ClassLoader classLoader, ExecutionMode mode, String[] args) {
+        setClassLoader(classLoader);
+        startup(mode, args);
+    }
+
+    /**
+     * Starts up in a given execution mode.
+     * 
+     * @param mode the new mode, ignored if <b>null</b>
+     * @param args the command line arguments
+     * @see #setExecutionMode(ExecutionMode)
+     * @see #startup(String[])
+     */
+    public void startup(ExecutionMode mode, String[] args) {
+        setExecutionMode(mode);
+        startup(args);
     }
     
     @Override
@@ -212,11 +304,11 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             EASyLoggerFactory.INSTANCE.setLogger(logger);
             // pass through everything and let platform logger decide
             EASyLoggerFactory.INSTANCE.setLoggingLevel(LoggingLevel.INFO);
-            ConfigurationSetup setup = ConfigurationSetup.getSetup();
+            ConfigurationSetup setup = ConfigurationSetup.getSetup(executionMode.extendedLogging());
             loader = new ManifestLoader(false, classLoader); // to debug, replace first parameter by true, mvn install
             EasySetup easySetup = setup.getEasyProducer();
             loader.setVerbose(easySetup.getLogLevel() == EasyLogLevel.EXTRA_VERBOSE);
-            getLogger().info("EASy-Producer is starting");
+            getLogger().info("EASy-Producer is starting ({} mode)", executionMode);
             doFilterLogs = easySetup.getLogLevel() == EasyLogLevel.NORMAL;
             doLogging = !doFilterLogs;
             loader.startup();
@@ -236,6 +328,10 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             getLogger().info("Setting up generation target: {}", easySetup.getGenTarget());
             exec.setVilSource(easySetup.getGenTarget());
             exec.setVilTarget(easySetup.getGenTarget());
+            if (ExecutionMode.IVML == executionMode) { // disable VIL/VTL in IVML execution mode
+                exec.setVilFolder(null);
+                exec.setVtlFolder(null);
+            }
             File ivmlCfg = easySetup.getIvmlConfigFolder();
             if (null != ivmlCfg && !ivmlCfg.equals(easySetup.getIvmlMetaModelFolder())) {
                 getLogger().info("Setting up configuration folder: {}", ivmlCfg);

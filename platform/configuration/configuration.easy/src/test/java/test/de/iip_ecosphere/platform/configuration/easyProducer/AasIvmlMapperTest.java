@@ -34,6 +34,7 @@ import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationManager
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationSetup;
 import de.iip_ecosphere.platform.configuration.easyProducer.DrawflowGraphFormat;
 import de.iip_ecosphere.platform.configuration.easyProducer.EasySetup;
+import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor.ExecutionMode;
 import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator.InstantiationConfigurer;
 import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator.NonCleaningInstantiationConfigurer;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.AasIvmlMapper;
@@ -210,10 +211,10 @@ public class AasIvmlMapperTest extends TestWithPlugin {
      * @return the configuration lifecycle descriptor
      */
     private ConfigurationLifecycleDescriptor startEasy(InstantiationConfigurer configurer) {
-        ConfigurationSetup setup = ConfigurationSetup.getSetup();
+        ConfigurationSetup setup = ConfigurationSetup.getSetup(false);
         configurer.configure(setup);
         ConfigurationLifecycleDescriptor lcd = configurer.obtainLifecycleDescriptor();
-        lcd.startup(new String[0]); // shall register executor
+        lcd.startup(ExecutionMode.IVML, new String[0]); // shall register executor
         return lcd;
     }
     

@@ -17,11 +17,12 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor;
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationManager;
+import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor.ExecutionMode;
 import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 
 /**
- * Tests the SimpleMesh model.
+ * Tests the meta model (just whether we can load it at all).
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -34,7 +35,7 @@ public class IvmlMetaModelTests extends AbstractIvmlTests {
     public void testMetaModel() {
         // mvn: stdout now in target/surefire-reports/<qualifiedClassName>-output.txt
         ConfigurationLifecycleDescriptor lcd = assertLifecycleDescriptor();
-        lcd.startup(new String[0]); // shall register executor
+        lcd.startup(ExecutionMode.IVML_QUIET, new String[0]); // shall register executor
         Assert.assertNotNull(ConfigurationManager.getIvmlConfiguration());
         // not much to do, no configuration, shall work anyway, not complete without configuration
         ReasoningResult rRes = ConfigurationManager.validateAndPropagate();

@@ -21,6 +21,7 @@ import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationManager
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationSetup;
 import de.iip_ecosphere.platform.configuration.easyProducer.DrawflowGraphFormat;
 import de.iip_ecosphere.platform.configuration.easyProducer.EasySetup;
+import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor.ExecutionMode;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.AasIvmlMapper;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.GraphFormat;
 import de.iip_ecosphere.platform.configuration.easyProducer.serviceMesh.ServiceMeshGraphMapper;
@@ -62,7 +63,7 @@ public class TestAasIvmlModel {
         } else {
             TestWithPlugin.setupAASPlugins();
             TestWithPlugin.loadPlugins();
-            EasySetup ep = ConfigurationSetup.getSetup().getEasyProducer();
+            EasySetup ep = ConfigurationSetup.getSetup(false).getEasyProducer();
             File modelFolder = new File("src/main/easy");
             File cfgFolder = new File(args[1]);
             ep.setBase(modelFolder);
@@ -73,9 +74,8 @@ public class TestAasIvmlModel {
             if (commonFolder.exists()) { // config.config test setup
                 ep.setAdditionalIvmlFolders(CollectionUtils.toList(commonFolder));
             }
-
             ConfigurationLifecycleDescriptor lc = new ConfigurationLifecycleDescriptor();
-            lc.startup(new String[0]); // shall register executor
+            lc.startup(ExecutionMode.IVML, new String[0]); // shall register executor
             ReasoningResult rRes = ConfigurationManager.validateAndPropagate();
             if (null  == rRes) {
                 System.out.println("No model loaded");

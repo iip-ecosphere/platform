@@ -26,6 +26,7 @@ import de.iip_ecosphere.platform.configuration.easyProducer.EasySetup;
 import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator.InstantiationConfigurer;
 import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator.NonCleaningInstantiationConfigurer;
 import de.iip_ecosphere.platform.configuration.easyProducer.StatisticsVisitor;
+import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor.ExecutionMode;
 import de.iip_ecosphere.platform.configuration.easyProducer.StatisticsVisitor.Statistics;
 import net.ssehub.easy.varModel.confModel.Configuration;
 import net.ssehub.easy.varModel.model.AbstractVariable;
@@ -69,14 +70,14 @@ public class CommentTests {
     public void testComments() {
         // mvn: stdout now in target/surefire-reports/<qualifiedClassName>-output.txt
         SortedSet<String> missing = new TreeSet<>();
-        ConfigurationSetup setup = ConfigurationSetup.getSetup();
+        ConfigurationSetup setup = ConfigurationSetup.getSetup(false);
         EasySetup easySetup = setup.getEasyProducer();
         easySetup.reset();
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(EasySetup.PLATFORM_META_MODEL_NAME, 
             easySetup.getIvmlMetaModelFolder(), new File("gen"));
         configurer.configure(setup);
         ConfigurationLifecycleDescriptor lcd = configurer.obtainLifecycleDescriptor();
-        lcd.startup(new String[0]); // shall register executor
+        lcd.startup(ExecutionMode.IVML, new String[0]); // shall register executor
         StatisticsVisitor vis = new StatisticsVisitor();
         vis.setNoCommentConsumer(v -> recordMissing(v, missing));
         Configuration cfg = ConfigurationManager.getIvmlConfiguration();
