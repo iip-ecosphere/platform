@@ -209,13 +209,7 @@ public class ConfigurationManager {
     private static void init() {
         if (!initialized) {
             if (null != executor) {
-                try {
-                    long start = System.currentTimeMillis();
-                    executor.loadIvmlModel();
-                    getLogger().info("Loaded EASy-Producer models in {} ms", System.currentTimeMillis() - start);
-                } catch (ModelManagementException e) {
-                    getLogger().error("Cannot load EASy-Producer models: " + e.getMessage());
-                }
+                loadIvmlModel(executor);
             }
             if (null == aasIvmlMapper) {
                 aasIvmlMapper = new AasIvmlMapper(() -> ConfigurationManager.getVilConfiguration(), 
@@ -223,6 +217,21 @@ public class ConfigurationManager {
                 aasIvmlMapper.addGraphFormat(new DrawflowGraphFormat());
             }
             initialized = true;
+        }
+    }
+
+    /**
+     * Loads the IVML model of the given {@code executor} and measures the execution.
+     * 
+     * @param executor the executor
+     */
+    public static void loadIvmlModel(EasyExecutor executor) {
+        try {
+            long start = System.currentTimeMillis();
+            executor.loadIvmlModel();
+            getLogger().info("Loaded EASy-Producer models in {} ms", System.currentTimeMillis() - start);
+        } catch (ModelManagementException e) {
+            getLogger().error("Cannot load EASy-Producer models: " + e.getMessage());
         }
     }
     
@@ -245,7 +254,16 @@ public class ConfigurationManager {
             getLogger().error("No executor, cannot reload EASy-Producer models");
         }
     }
-    
+
+    /**
+     * Returns the IVML configuration.
+     * 
+     * @return the configuration
+     */
+    public static Configuration getIvmlConfiguration(EasyExecutor executor) {
+        return executor != null ? executor.getConfiguration() : null;
+    }
+
     /**
      * Returns the IVML configuration.
      * 
@@ -253,14 +271,33 @@ public class ConfigurationManager {
      */
     public static Configuration getIvmlConfiguration() {
         init();
-        return executor != null ? executor.getConfiguration() : null;
+        return getIvmlConfiguration(executor);
     }
-    
+
     /**
      * Sets up container properties for local deployment.
      */
     public static void setupContainerProperties() {
         Configuration cfg = getIvmlConfiguration();
+        setupContainerProperties(cfg);
+    }
+
+    /**
+     * Sets up container properties for local deployment.
+     * 
+     * @param executor the executor to use for the IVML configuration
+     */
+    public static void setupContainerProperties(EasyExecutor executor) {
+        Configuration cfg = getIvmlConfiguration(executor);
+        setupContainerProperties(cfg);
+    }
+
+    /**
+     * Sets up container properties for local deployment.
+     * 
+     * @param cfg the container configuration to use
+     */
+    public static void setupContainerProperties(Configuration cfg) {
         final String containerAuthKeyDecName = "containerManager.authenticationKey";
         try {
             IDecisionVariable varAuthKey = cfg.getDecision(containerAuthKeyDecName, false);
@@ -306,9 +343,7 @@ public class ConfigurationManager {
     public static ReasoningResult validateAndPropagate() {
         return validateAndPropagate(null);
     }
-    
-    // checkstyle: stop exception type check
-    
+
     /**
      * Validates the model and propagates values within the model.
      * 
@@ -317,11 +352,27 @@ public class ConfigurationManager {
      */
     public static ReasoningResult validateAndPropagate(Predicate<Project> projectFilter) {
         init();
+        return validateAndPropagate(executor, projectFilter);
+    }
+
+    // checkstyle: stop exception type check
+    
+    /**
+     * Validates the model and propagates values within the model.
+     * 
+     * @param executor the executor to use
+     * @param projectFilter optional filter on projects to reason on, may be <b>null</b>
+     * @return the reasoning result (preliminary)
+     */
+    public static ReasoningResult validateAndPropagate(EasyExecutor executor, Predicate<Project> projectFilter) {
+        init();
         try {
             if (executor != null) {
                 long start = System.currentTimeMillis();
-                executor.setReasoningProjectFilter(null == projectFilter ? p -> true : projectFilter);
+                Predicate<Project> oldFilter = executor.setReasoningProjectFilterGetOld(
+                    null == projectFilter ? p -> true : projectFilter);
                 ReasoningResult result = executor.propagateOnIvmlModel();
+                executor.setReasoningProjectFilter(oldFilter);
                 getLogger().info("EASy-Producer model reasoning done in {} ms", System.currentTimeMillis() - start);
                 return result;
             } else {
@@ -352,15 +403,15 @@ public class ConfigurationManager {
             throw new ExecutionException(e);
         }
     }
-    
+
     /**
      * Performs a platform instantiation.
      * 
+     * @param executor the executor to use
      * @param startRuleName the name of the start rule to execute
      * @throws ExecutionException if the instantiation fails for some reason
      */
-    public static void instantiate(String startRuleName) throws ExecutionException {
-        init();
+    public static void instantiate(EasyExecutor executor, String startRuleName) throws ExecutionException {
         if (executor != null) {
             try {
                 long start = System.currentTimeMillis();
@@ -374,6 +425,17 @@ public class ConfigurationManager {
                 throw new ExecutionException(e);
             }
         }
+    }
+
+    /**
+     * Performs a platform instantiation.
+     * 
+     * @param startRuleName the name of the start rule to execute
+     * @throws ExecutionException if the instantiation fails for some reason
+     */
+    public static void instantiate(String startRuleName) throws ExecutionException {
+        init();
+        instantiate(executor, startRuleName);
     }
 
     // checkstyle: resume exception type check

@@ -89,7 +89,7 @@ import net.ssehub.easy.varModel.persistency.IVMLWriter.EmitFilter;
  */
 public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
 
-    public static final Predicate<Project> NO_PROJECT_FILTER = p -> true;
+    public static final Predicate<Project> ANY_PROJECT_FILTER = p -> true;
     public static final Predicate<Project> NO_TEMPLATE_FILTER = p -> !IvmlUtils.isTemplate(p);
 
     private static final EmitFilter EMIT_FILTER = (var, val) -> {
@@ -840,7 +840,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      * @throws ExecutionException if the execution of the operation fails
      */
     public String getOpenTemplateVariables(String varName) throws ExecutionException {
-        ReasoningResult res = validateAndPropagate(NO_PROJECT_FILTER); // must include templates
+        ReasoningResult res = validateAndPropagate(ANY_PROJECT_FILTER); // must include templates
         return JsonUtils.toJson(IvmlUtils.analyzeForTemplate(res, varName));
     }
 

@@ -32,6 +32,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.configuration.cfg.ConfigurationChangeType;
+import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor.ExecutionMode;
+import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor;
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationManager;
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationSetup;
 import de.iip_ecosphere.platform.configuration.easyProducer.EasySetup;
@@ -470,28 +472,34 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         if (null != appId) {
             System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, appId);
         }
-        ReasoningResult rRes = ConfigurationManager.validateAndPropagate();
-        if (null == rRes) {
-            throw new ExecutionException("No valid IVML model loaded/found.", null);
-        }
-        EasyExecutor.printReasoningMessages(rRes);
-        ConfigurationManager.setupContainerProperties();
-        ConfigurationManager.instantiate(mode.getStartRuleName()); // throws exception if it fails
-        if (null != appId) {
-            System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, "");
-        }
         Object result = null;
-        switch (mode) {
-        case APPS_NO_DEPS:
-            result = collectTemplates(start);
-            break;
-        case APPS:
-        case INTERFACES:
-            break;
-        default:
-            break;
+        try {
+            EasyExecutor executor = ConfigurationLifecycleDescriptor.createExecutor(ExecutionMode.FULL); // with VIL/VTL
+            ConfigurationManager.loadIvmlModel(executor);
+            ReasoningResult rRes = ConfigurationManager.validateAndPropagate(executor, NO_TEMPLATE_FILTER);
+            if (null == rRes) {
+                throw new ExecutionException("No valid IVML model loaded/found.", null);
+            }
+            IvmlUtils.analyzeReasoningResult(rRes, false, true);            
+            ConfigurationManager.setupContainerProperties(executor);
+            ConfigurationManager.instantiate(executor, mode.getStartRuleName()); // throws exception if it fails
+            if (null != appId) {
+                System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, "");
+            }
+            switch (mode) {
+            case APPS_NO_DEPS:
+                result = collectTemplates(start);
+                break;
+            case APPS:
+            case INTERFACES:
+                break;
+            default:
+                break;
+            }
+            ConfigurationManager.setTaskData(beforeTaskData);
+        } catch (ModelManagementException e) {
+            throw new ExecutionException(e.getMessage(), e);
         }
-        ConfigurationManager.setTaskData(beforeTaskData);
         return result;
     }
     

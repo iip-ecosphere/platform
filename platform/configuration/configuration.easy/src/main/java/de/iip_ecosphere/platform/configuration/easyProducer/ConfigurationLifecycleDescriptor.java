@@ -225,7 +225,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
      * 
      * @author Holger Eichelberger, SSE
      */
-    private class ExecLogger implements net.ssehub.easy.producer.core.mgmt.EasyExecutor.Logger {
+    private static class ExecLogger implements net.ssehub.easy.producer.core.mgmt.EasyExecutor.Logger {
 
         @Override
         public void warn(String text) {
@@ -313,39 +313,8 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             doLogging = !doFilterLogs;
             loader.startup();
             doLogging = true;
-            getLogger().info("Setting up configuration base: {}", easySetup.getBase());
-            getLogger().info("Setting up configuration meta model: {}", easySetup.getIvmlMetaModelFolder());
-            getLogger().info("Setting up configuration model name: {}", easySetup.getIvmlModelName());
-            EasyExecutor exec = new EasyExecutor(
-                easySetup.getBase(), 
-                easySetup.getIvmlMetaModelFolder(), 
-                easySetup.getIvmlModelName());
-            exec.setLogger(new ExecLogger());
-            // VIL model name is fix, IVML/Configuration name may change
-            exec.setVilModelName(EasySetup.PLATFORM_META_MODEL_NAME);
-            // self-instantiation into gen, assumed to be empty, may be cleaned up
-            //exec.setVtlFolder(new File(setup.getIvmlMetaModelFolder(), "vtl")); // can be, but not needed
-            getLogger().info("Setting up generation target: {}", easySetup.getGenTarget());
-            exec.setVilSource(easySetup.getGenTarget());
-            exec.setVilTarget(easySetup.getGenTarget());
-            if (ExecutionMode.IVML == executionMode) { // disable VIL/VTL in IVML execution mode
-                exec.setVilFolder(null);
-                exec.setVtlFolder(null);
-            }
-            File ivmlCfg = easySetup.getIvmlConfigFolder();
-            if (null != ivmlCfg && !ivmlCfg.equals(easySetup.getIvmlMetaModelFolder())) {
-                getLogger().info("Setting up configuration folder: {}", ivmlCfg);
-                exec.prependIvmlFolder(ivmlCfg);
-            }
-            if (null != easySetup.getAdditionalIvmlFolders()) {
-                for (File f : easySetup.getAdditionalIvmlFolders()) {
-                    getLogger().info("Setting up additional configuration folder: {}", f);
-                    exec.addIvmlFolder(f);
-                }
-            }
             try {
-                getLogger().info("Setting up EASy-Producer locations, loading models");
-                exec.setupLocations();
+                EasyExecutor exec = createExecutor(easySetup, executionMode);
                 ConfigurationManager.setExecutor(exec);
                 getLogger().info("EASy-Producer models loaded");
                 StatusCache.start();
@@ -358,6 +327,67 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             getLogger().error("Cannot start EASy-Producer. Configuration capabilities may be disabled. " 
                 + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Creates an EASy-Producer executor with the given execution mode taking the setup information 
+     * from {@link ConfigurationSetup}. EASy-Producer must be loaded before, i.e., {@link #startup(String[])} must be
+     * called before.
+     * 
+     * @param executionMode the execution mode
+     * @return the EASy executor
+     * @throws ModelManagementException when the executor cannot be created/models cannot be loaded
+     */
+    public static EasyExecutor createExecutor(ExecutionMode executionMode) throws ModelManagementException {
+        ConfigurationSetup setup = ConfigurationSetup.getSetup(false);
+        EasySetup easySetup = setup.getEasyProducer();
+        return createExecutor(easySetup, executionMode);
+    }
+    
+    /**
+     * Creates an EASy-Producer executor with the given execution mode taking the setup information 
+     * from {@link ConfigurationSetup}. EASy-Producer must be loaded before, i.e., {@link #startup(String[])} must be
+     * called before or this call may be issued within {@link #startup(String[])}.
+     * 
+     * @param executionMode the execution mode
+     * @return the EASy executor
+     * @throws ModelManagementException when the executor cannot be created/models cannot be loaded
+     */
+    public static EasyExecutor createExecutor(EasySetup easySetup, ExecutionMode executionMode) 
+        throws ModelManagementException {
+        getLogger().info("Setting up configuration base: {}", easySetup.getBase());
+        getLogger().info("Setting up configuration meta model: {}", easySetup.getIvmlMetaModelFolder());
+        getLogger().info("Setting up configuration model name: {}", easySetup.getIvmlModelName());
+        EasyExecutor exec = new EasyExecutor(
+            easySetup.getBase(), 
+            easySetup.getIvmlMetaModelFolder(), 
+            easySetup.getIvmlModelName());
+        exec.setLogger(new ExecLogger());
+        // VIL model name is fix, IVML/Configuration name may change
+        exec.setVilModelName(EasySetup.PLATFORM_META_MODEL_NAME);
+        // self-instantiation into gen, assumed to be empty, may be cleaned up
+        //exec.setVtlFolder(new File(setup.getIvmlMetaModelFolder(), "vtl")); // can be, but not needed
+        getLogger().info("Setting up generation target: {}", easySetup.getGenTarget());
+        exec.setVilSource(easySetup.getGenTarget());
+        exec.setVilTarget(easySetup.getGenTarget());
+        if (ExecutionMode.IVML == executionMode) { // disable VIL/VTL in IVML execution mode
+            exec.setVilFolder(null);
+            exec.setVtlFolder(null);
+        }
+        File ivmlCfg = easySetup.getIvmlConfigFolder();
+        if (null != ivmlCfg && !ivmlCfg.equals(easySetup.getIvmlMetaModelFolder())) {
+            getLogger().info("Setting up configuration folder: {}", ivmlCfg);
+            exec.prependIvmlFolder(ivmlCfg);
+        }
+        if (null != easySetup.getAdditionalIvmlFolders()) {
+            for (File f : easySetup.getAdditionalIvmlFolders()) {
+                getLogger().info("Setting up additional configuration folder: {}", f);
+                exec.addIvmlFolder(f);
+            }
+        }
+        getLogger().info("Setting up EASy-Producer locations, loading models");
+        exec.setupLocations();
+        return exec;
     }
 
     @Override
