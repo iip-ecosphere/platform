@@ -31,6 +31,7 @@ Improvements:
 * [#165](https://github.com/iip-ecosphere/platform/issues/170): Upgrade automated container building/Python
 * [#110](https://github.com/iip-ecosphere/platform/issues/110): UI startup/excution complains (disappeared)
 * [#160](https://github.com/iip-ecosphere/platform/issues/160): Generated multi-type integration for KODEX
+* [#186](https://github.com/iip-ecosphere/platform/issues/186): Support displaying connector fields
 
 New features:
 * [#169](https://github.com/iip-ecosphere/platform/issues/169): File-based connector for CSV, JSON (ReGaP)
