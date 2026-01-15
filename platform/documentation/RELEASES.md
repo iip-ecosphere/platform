@@ -3,11 +3,12 @@
 ### Version 0.8.0 (consolidation, ReGaP basics, JDK 17/JDK 21/Angular19/Python 3.11):
 
 In progress:
-* [#164](https://github.com/iip-ecosphere/platform/issues/164): UI design revision
+* [#164](https://github.com/iip-ecosphere/platform/issues/164): Management UI improvements
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 * [#170](https://github.com/iip-ecosphere/platform/issues/170): Integrate plugins/BaSyx2
 * [#122](https://github.com/iip-ecosphere/platform/issues/122): Transparent encryption, RBAC on AAS (incl. UI authentication)
 * [#180](https://github.com/iip-ecosphere/platform/issues/180): Add application templates
+* [#185](https://github.com/iip-ecosphere/platform/issues/185): Performance improvements
 
 Improvements:
 * Support for JDK 21 based on Eclipse 2024-06.
