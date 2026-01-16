@@ -483,6 +483,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             IvmlUtils.analyzeReasoningResult(rRes, false, true);            
             ConfigurationManager.setupContainerProperties(executor);
             ConfigurationManager.instantiate(executor, mode.getStartRuleName()); // throws exception if it fails
+            executor.discardVILLocations();
+            executor.clearVILModels();
             if (null != appId) {
                 System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, "");
             }

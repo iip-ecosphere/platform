@@ -31,7 +31,7 @@ import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 public class AasChanges extends de.iip_ecosphere.platform.configuration.cfg.AasChanges 
     implements ConfigurationChangeListener {
 
-    static final AasChanges INSTANCE = new AasChanges();
+    public static final AasChanges INSTANCE = new AasChanges();
     
     /**
      * Creates an instances, prevents external creation.
