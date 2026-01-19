@@ -20,6 +20,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.time.Duration;
@@ -114,14 +115,19 @@ public class TestCommons extends Commons {
     
     @Override
     public String toString(Object obj) {
-        return null;
+        return null == obj ? null : obj.toString();
     }
 
     @Override
     public String toStringShortStyle(Object obj) {
-        return null;
+        return null == obj ? null : obj.toString();
     }
-    
+
+    @Override
+    public String toStringMultiLineStyle(Object obj) {
+        return null == obj ? null : obj.toString();
+    }
+
     @Override
     public String removeStart(String str, String remove) {
         return null;
@@ -189,6 +195,10 @@ public class TestCommons extends Commons {
     @Override
     public byte[] toByteArray(InputStream inputStream) throws IOException {
         return null;
+    }
+
+    @Override
+    public void write(byte[] data, OutputStream outputStream) throws IOException {
     }
 
     // File

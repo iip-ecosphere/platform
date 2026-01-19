@@ -180,7 +180,17 @@ public class StringUtils {
     public static String toStringShortStyle(Object obj) {
         return Commons.getInstance().toStringShortStyle(obj);
     }
-    
+
+    /**
+     * Turns an object to an readable string, usually using reflection. Uses a multi-line style.
+     * 
+     * @param obj the object
+     * @return the string representation
+     */
+    public static String toStringMultiLineStyle(Object obj) {
+        return Commons.getInstance().toStringMultiLineStyle(obj);
+    }
+
     /**
      * Removes a substring only if it is at the beginning of a source string,
      * otherwise returns the source string.

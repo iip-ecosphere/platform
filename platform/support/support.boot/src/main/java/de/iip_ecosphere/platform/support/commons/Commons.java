@@ -17,6 +17,7 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.time.Duration;
 import java.util.List;
@@ -221,7 +222,15 @@ public abstract class Commons {
      * @return the string representation
      */
     public abstract String toStringShortStyle(Object obj);
-    
+
+    /**
+     * Turns an object to an readable string, usually using reflection. Uses a multi-line style.
+     * 
+     * @param obj the object
+     * @return the string representation
+     */
+    public abstract String toStringMultiLineStyle(Object obj);
+
     /**
      * Removes a substring only if it is at the beginning of a source string,
      * otherwise returns the source string.
@@ -376,7 +385,17 @@ public abstract class Commons {
      * @throws IOException if an I/O error occurs or reading more than {@link Integer#MAX_VALUE} occurs.
      */
     public abstract byte[] toByteArray(InputStream inputStream) throws IOException;
-    
+
+    /**
+     * Writes bytes from a {@code byte[]} to an {@link OutputStream}.
+     *
+     * @param data the byte array to write, do not modify during output,
+     *     <b>null</b> ignored
+     * @param output the {@link OutputStream} to write to
+     * @throws IOException if an I/O error occurs
+     */
+    public abstract void write(byte[] data, OutputStream outputStream) throws IOException;
+
     // File
     
     /**

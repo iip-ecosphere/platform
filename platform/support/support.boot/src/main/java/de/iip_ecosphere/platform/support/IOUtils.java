@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -92,6 +93,18 @@ public class IOUtils {
      */
     public static byte[] toByteArray(InputStream inputStream) throws IOException {
         return Commons.getInstance().toByteArray(inputStream);
+    }
+    
+    /**
+     * Writes bytes from a {@code byte[]} to an {@link OutputStream}.
+     *
+     * @param data the byte array to write, do not modify during output,
+     *     <b>null</b> ignored
+     * @param output the {@link OutputStream} to write to
+     * @throws IOException if an I/O error occurs
+     */
+    public static void write(byte[] data, OutputStream outputStream) throws IOException {
+        Commons.getInstance().write(data, outputStream);
     }
 
 }

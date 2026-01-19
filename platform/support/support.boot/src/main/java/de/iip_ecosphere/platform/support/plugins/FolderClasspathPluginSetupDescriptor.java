@@ -155,6 +155,9 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
             ClasspathFile cpf = readClasspathFile(in, base);
             if (null != appends) {
                 for (File a: appends) {
+                    if (!a.isFile()) {
+                        a = new File(a, "target/jars/classpath");
+                    }
                     try (InputStream aIn = new FileInputStream(a)) {
                         getLogger().info("Appending classpath from '{}'", a);
                         ClasspathFile aCpf = readClasspathFile(aIn, base);
