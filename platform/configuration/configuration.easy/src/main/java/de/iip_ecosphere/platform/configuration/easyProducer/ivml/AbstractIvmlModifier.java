@@ -238,10 +238,10 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                     prj.removeElement(var);
                     IDecisionVariable dVar = cfg.getDecision(var);
                     cfg.removeDecision(dVar);
-                    notifyChange(dVar, ConfigurationChangeType.DELETED);
                     ReasoningResult res = validateAndPropagate(NO_TEMPLATE_FILTER);
                     throwIfFails(res, true);
                     saveTo(prj, getIvmlFile(prj));
+                    notifyChange(dVar, ConfigurationChangeType.DELETED);
                     getLogger().info("Deleted IVML variable {}", varName);
                 } else {
                     throw new ExecutionException("Project " + prj.getName() + " is not allowed for modification", null);
@@ -573,9 +573,9 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                 setValue(var, t.getValue(), context);
                 target.addBeforeFreeze(var);
                 IDecisionVariable dVar = cfg.createDecision(var);
-                notifyChange(dVar, ConfigurationChangeType.CREATED);
                 context.substitutions.put(t.getDeclaration(), var);
                 context.modified.add(target);
+                notifyChange(dVar, ConfigurationChangeType.CREATED);
             }
         }
     }
@@ -804,8 +804,8 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
             if (mode.setValue) {
                 setValue(var, decVar.getValue(), context);
                 result = cfg.createDecision(var);
-                notifyChange(result, ConfigurationChangeType.CREATED);
                 context.modified.add(appPrj);
+                notifyChange(result, ConfigurationChangeType.CREATED);
             }
         }
         return result;
@@ -1025,8 +1025,10 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                 for (Project p : projects) {
                     saveTo(p, getIvmlFile(p));
                 }
+                IDecisionVariable dVar = cfg.createDecision(var);
+                notifyChange(dVar, ConfigurationChangeType.MODIFIED);
                 getLogger().info("Renamed IVML variable {} to {}", varName, newVarName);
-            } catch (ModelQueryException e) {
+            } catch (ModelQueryException | ConfigurationException e) {
                 throw new ExecutionException(e);
             }
         } else {
@@ -1064,14 +1066,14 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                 //alternative: in own constraint, remove setValue above; may be needed if t is container
                 //createAssignment(var, valueEx, target); 
                 IDecisionVariable dVar = cfg.createDecision(var);
+                ReasoningResult res = validateAndPropagate(NO_TEMPLATE_FILTER);
+                throwIfFails(res, true);
+                saveTo(target, getIvmlFile(target));
                 notifyChange(dVar, ConfigurationChangeType.CREATED);
+                getLogger().info("Created IVML variable {} in {}", varName, target.getName());
             } else {
                 throw new ExecutionException("No such type " + type, null);
             }
-            ReasoningResult res = validateAndPropagate(NO_TEMPLATE_FILTER);
-            throwIfFails(res, true);
-            saveTo(target, getIvmlFile(target));
-            getLogger().info("Created IVML variable {} in {}", varName, target.getName());
             reservedVariableNames.remove(varName);
         } catch (ModelQueryException | ConfigurationException e) {
             throw new ExecutionException(e);

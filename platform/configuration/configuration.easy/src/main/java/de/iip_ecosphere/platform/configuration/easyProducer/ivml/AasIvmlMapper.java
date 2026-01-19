@@ -50,9 +50,8 @@ import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
-import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
-import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.FileUtils;
@@ -61,6 +60,7 @@ import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
+import de.iip_ecosphere.platform.support.aas.ElementsAccess;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
@@ -252,7 +252,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                     if (primitiveType != null && primitiveType.isAssignableFrom(type)) {
                         type = primitiveType; // group them together to simplify the AAS structure
                     } 
-                    String typeName = IvmlDatatypeVisitor.getUnqualifiedType(mapType(type));
+                    String typeName = toAasTypeId(type);
                     SubmodelElementContainerBuilder builder = types.get(typeName);
                     if (null == builder) {
                         builder = createTypeCollectionBuilder(smBuilder, typeName);
@@ -269,6 +269,26 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             LoggerFactory.getLogger(AasIvmlMapper.class).warn("No IVML configuration found. "
                 + "Cannot create IVML-AAS model elements/operations.");
         }
+    }
+
+    /**
+     * Turns an IVML variable name to a mapped AAS type id.
+     * 
+     * @param type the type
+     * @return the mapped type id
+     */
+    private String toAasTypeId(IDecisionVariable var) {
+        return toAasTypeId(var.getDeclaration().getType());
+    }
+
+    /**
+     * Turns an IVML type name to a mapped AAS type id.
+     * 
+     * @param type the type
+     * @return the mapped type id
+     */
+    private String toAasTypeId(IDatatype type) {
+        return AasUtils.fixId(IvmlDatatypeVisitor.getUnqualifiedType(mapType(type)));
     }
     
     /**
@@ -315,9 +335,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @param typeName the type name (turned into an AAS shortID)
      * @return the collection builder
      */
-    private static SubmodelElementListBuilder createTypeCollectionBuilder(SubmodelBuilder smBuilder, 
+    private static SubmodelElementCollectionBuilder createTypeCollectionBuilder(SubmodelBuilder smBuilder, 
         String typeName) {
-        return smBuilder.createSubmodelElementListBuilder(AasUtils.fixId(typeName));
+        return smBuilder.createSubmodelElementCollectionBuilder(AasUtils.fixId(typeName));
     }
     
     /**
@@ -1456,7 +1476,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             }
             SubmodelElementContainerBuilder varBuilder;
             if (TypeQueries.isCompound(rVarType)) {
-                varBuilder = builder.createSubmodelElementCollectionBuilder(AasUtils.fixId(varName));
+                varBuilder = builder.createSubmodelElementListBuilder(AasUtils.fixId(varName));
                 for (int member = 0; member < var.getNestedElementsCount(); member++) {
                     IDecisionVariable elt = var.getNestedElement(member);
                     mapVariable(elt, varBuilder, null);
@@ -1585,13 +1605,18 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * Deletes the mapping of the specified variable in the AAS.
      * 
      * @param sm the submodel to delete from
-     * @param typeName the type name
-     * @param varName the variable name
+     * @param var the variable
      */
-    static void deleteAasVariableMapping(Submodel sm, String typeName, String varName) {
-        SubmodelElementCollection c = sm.getSubmodelElementCollection(AasUtils.fixId(typeName));
+    void deleteAasVariableMapping(Submodel sm, IDecisionVariable var) {
+        String typeName = toAasTypeId(var);
+        String varName = AasUtils.fixId(var.getDeclaration().getName());
+        LoggerFactory.getLogger(this).info("Processing change for {} -> {}", typeName, varName); // method called anyway
+        ElementsAccess c = sm.getSubmodelElementCollection(AasUtils.fixId(typeName));
+        if (null == c) {
+            c = sm.getSubmodelElementList(AasUtils.fixId(typeName));
+        }
         if (null != c) {
-            c.deleteElement(AasUtils.fixId(varName));
+            c.deleteElement(varName);
         }
     }
 
@@ -1602,7 +1627,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @param var the variable
      */
     void mapVariableToAas(SubmodelBuilder smB, IDecisionVariable var) {
-        SubmodelElementContainerBuilder builder = createTypeCollectionBuilder(smB, getType(var));
+        String typeName = toAasTypeId(var);
+        SubmodelElementContainerBuilder builder = createTypeCollectionBuilder(smB, typeName);
         mapVariable(var, builder, null);
         builder.justBuild();
     }

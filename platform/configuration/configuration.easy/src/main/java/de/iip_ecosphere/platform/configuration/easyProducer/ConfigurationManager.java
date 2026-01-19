@@ -246,7 +246,7 @@ public class ConfigurationManager {
                 executor.clearModels();
                 executor.setupLocations();
                 executor.loadIvmlModel();
-                getLogger().info("Reoaded EASy-Producer models in {} ms", System.currentTimeMillis() - start);
+                getLogger().info("Reloaded EASy-Producer models in {} ms", System.currentTimeMillis() - start);
             } catch (ModelManagementException e) {
                 getLogger().error("Cannot load EASy-Producer models: " + e.getMessage());
             }

@@ -5,7 +5,6 @@ import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationManager
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
-import net.ssehub.easy.varModel.model.AbstractVariable;
 
 /**
  * Records an AAS change.
@@ -30,16 +29,13 @@ public class AasChange extends de.iip_ecosphere.platform.configuration.cfg.AasCh
     @Override
     public void apply(Submodel sm, SubmodelBuilder smB) {
         AasIvmlMapper mapper = ConfigurationManager.getAasIvmlMapper();
-        AbstractVariable decl = var.getDeclaration();
-        String varName = decl.getName();
-        String typeName = AasIvmlMapper.getType(var);
-
-        AasIvmlMapper.deleteAasVariableMapping(sm, typeName, varName); // throw away, do nothing if not exists
+        mapper.deleteAasVariableMapping(sm, var); // throw away, do nothing if not exists
         switch (getType()) {
         case CREATED:
             mapper.mapVariableToAas(smB, var);
             break;
         case DELETED:
+            // already deleted
             break;
         case MODIFIED:
             mapper.mapVariableToAas(smB, var);

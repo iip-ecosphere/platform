@@ -10,7 +10,7 @@ template LinuxBash(Configuration config, FileArtifact target, String dir, String
         String m = replace(main, "$", "\\$"); // prevent Linux shell expansion
         '#!/bin/bash
         # Resolve the directory of the script (handles ./, ../, and absolute paths)
-        SCRIPT_DIR="\\$(cd "$(dirname "\\${BASH_SOURCE[0]}")" && pwd)"
+        SCRIPT_DIR="\\$(cd "$(dirname "\\$0")" && pwd)"
         cd "\\$SCRIPT_DIR" || exit 1 
         PID_DIR=${cfg.pidDir}
         java -cp @${dir}/classpath.ux ${javaOpts(cfg, withModuleOpts, addJavaOpts)} -Diip.pid.dir=\\$PID_DIR "${m}" \\$*'
