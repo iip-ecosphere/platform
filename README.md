@@ -12,15 +12,13 @@ For installation and first steps, see [install guide](platform/documentation/INS
 
 ## News
 
-* Updated (more agile) documentation of [configuration conceots](documentation/concepts/concepts.MD)
+* Updated (more agile) documentation of [configuration concepts](documentation/concepts/concepts.MD)
+* Management UI improvements in preparation
 * ReGaP: Influx/Grafana based dashboarding for oktoflow apps, in integration with [Bitmotec](https://www.bitmotec.com/)
 * For easing git checkouts: examples.hm22 and examples.emo23 have been moved to an own repository
 * Upcoming support for Asset Administration Shells metamodel v3 through BaSyx2
 * Support for Python 3.13 and virtual environments
-* Automated container creation upgraded
-* Mangement UI upgraded to Angular 19.
 * Many interesting ideas and proto-requirements from the [ReGaP-community kickoff](https://regap.de/community-kickoff/). Initial contribution: file-based connector for CSV, JSON, etc.
-* oktoflow code generation initially migrated to VTL artifacts, still improving/developing
 
 ## Public demonstrations
 
