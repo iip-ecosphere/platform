@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
@@ -183,7 +184,12 @@ public class ApacheCommons extends de.iip_ecosphere.platform.support.commons.Com
     public String toStringShortStyle(Object obj) {
         return ReflectionToStringBuilder.toString(obj, SHORT_STRING_STYLE);
     }
-    
+
+    @Override
+    public String toStringMultiLineStyle(Object obj) {
+        return ReflectionToStringBuilder.toString(obj, ToStringStyle.MULTI_LINE_STYLE);
+    }
+
     @Override
     public String removeStart(String str, String remove) {
         return org.apache.commons.lang3.StringUtils.removeStart(str, remove);
@@ -267,6 +273,11 @@ public class ApacheCommons extends de.iip_ecosphere.platform.support.commons.Com
     @Override
     public byte[] toByteArray(InputStream inputStream) throws IOException {
         return IOUtils.toByteArray(inputStream);
+    }
+
+    @Override
+    public void write(byte[] data, OutputStream outputStream) throws IOException {
+        IOUtils.write(data, outputStream);
     }
     
     // File
