@@ -57,6 +57,7 @@ import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.PersistenceType;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.ElementsAccess;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
@@ -67,7 +68,6 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
-import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
@@ -226,6 +226,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
      */
     private ConfigurationLifecycleDescriptor startEasyValidate(InstantiationConfigurer configurer) {
         ConfigurationLifecycleDescriptor lcd = startEasy(configurer);
+        ConfigurationManager.reInit();        
         ReasoningResult rRes = ConfigurationManager.validateAndPropagate();
         Assert.assertNotNull("No model loaded", rRes);
         return lcd;
@@ -383,17 +384,16 @@ public class AasIvmlMapperTest extends TestWithPlugin {
      */
     private String assertSubmodel(Submodel sm, String appName, int netIndex, 
         Consumer<SubmodelElementCollection> servicesAsserter) throws ExecutionException {
-        
-        SubmodelElementList sel = sm.getSubmodelElementList("ServiceBase");
+        ElementsAccess sel = sm.getSubmodelElementCollection("ServiceBase");
         Assert.assertNotNull(sel); // 2 variables of type service shall exist in the model
         // Accessing the net as intended
-        sel = sm.getSubmodelElementList("Application");
+        sel = sm.getSubmodelElementCollection("Application");
         Assert.assertNotNull(sel); // 1 variables of type Application shall exist in the model
-        SubmodelElementCollection sec = sel.getSubmodelElementCollection(appName);
+        ElementsAccess sec = sel.getSubmodelElementCollection(appName);
         Assert.assertNotNull(sec); // this application shall be there
         sel = sec.getSubmodelElementList("services");
         Assert.assertNotNull(sel);
-        SubmodelElementCollection varSmc = sel.getSubmodelElementCollection("var_" + netIndex);
+        ElementsAccess varSmc = sel.getSubmodelElementCollection("var_" + netIndex);
         Assert.assertNotNull(varSmc);
         Property prop = varSmc.getProperty("varValue");
         Assert.assertNotNull(prop);

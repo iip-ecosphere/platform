@@ -219,6 +219,13 @@ public class ConfigurationManager {
             initialized = true;
         }
     }
+    
+    /**
+     * Forces re-loading of models/AAS mapper. [testing]
+     */
+    public static void reInit() {
+        initialized = false;
+    }
 
     /**
      * Loads the IVML model of the given {@code executor} and measures the execution.

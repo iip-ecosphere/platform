@@ -1476,7 +1476,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             }
             SubmodelElementContainerBuilder varBuilder;
             if (TypeQueries.isCompound(rVarType)) {
-                varBuilder = builder.createSubmodelElementListBuilder(AasUtils.fixId(varName));
+                varBuilder = builder.createSubmodelElementCollectionBuilder(AasUtils.fixId(varName));
                 for (int member = 0; member < var.getNestedElementsCount(); member++) {
                     IDecisionVariable elt = var.getNestedElement(member);
                     mapVariable(elt, varBuilder, null);
