@@ -223,5 +223,14 @@ public class FileUtilsTest {
         FileUtils.deleteDirectory(f);
         f.delete(); // just to be sure
     }
+    
+    /**
+     * Tests {@link FileUtils#getFolderSize(File)}.
+     */
+    @Test
+    public void folderSizeTest() {
+        Assert.assertEquals(0, FileUtils.getFolderSize(null));
+        Assert.assertTrue(FileUtils.getFolderSize(new File(".")) > 0);
+    }
 
 }

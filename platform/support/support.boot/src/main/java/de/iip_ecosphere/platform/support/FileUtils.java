@@ -566,4 +566,27 @@ public class FileUtils {
         return Commons.getInstance().contentEquals(file1, file2);
     }
 
+    /**
+     * Returns the size of the given folder.
+     * 
+     * @param folder the folder to calculate the size for, may be <b>null</b>
+     * @return the folder size
+     */
+    public static long getFolderSize(File folder) {
+        long size = 0;
+        if (null != folder) {
+            File[] files = folder.listFiles();
+            if (null != files) {
+                for (int i = 0; i < files.length; i++) {
+                    if (files[i].isFile()) {
+                        size += files[i].length();
+                    } else {
+                        size += getFolderSize(files[i]);
+                    }
+                }
+            }
+        }
+        return size;
+    }
+    
 }
