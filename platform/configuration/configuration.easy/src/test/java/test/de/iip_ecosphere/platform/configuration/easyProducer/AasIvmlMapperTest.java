@@ -18,6 +18,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -38,6 +39,7 @@ import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecyc
 import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator.InstantiationConfigurer;
 import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator.NonCleaningInstantiationConfigurer;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.AasIvmlMapper;
+import de.iip_ecosphere.platform.configuration.easyProducer.ivml.AasIvmlMapper.InstantiationMode;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.DefaultEdge;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.DefaultGraph;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.DefaultNode;
@@ -68,6 +70,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
@@ -389,7 +392,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         // Accessing the net as intended
         sel = sm.getSubmodelElementCollection("Application");
         Assert.assertNotNull(sel); // 1 variables of type Application shall exist in the model
-        ElementsAccess sec = sel.getSubmodelElementCollection(appName);
+        ElementsAccess sec = sel.getSubmodelElementList(appName);
         Assert.assertNotNull(sec); // this application shall be there
         sel = sec.getSubmodelElementList("services");
         Assert.assertNotNull(sel);
@@ -633,6 +636,37 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         setupIvmlFiles(); // revert changes
     }
 
+    /**
+     * Tests instantiating a template {@link AasIvmlMapper#getOpenTemplateVariables(String)}.
+     * 
+     * @throws IOException if copying/resetting files fails
+     * @throws ExecutionException if the operation fails
+     * @throws ModelQueryException if accessing IVML parts fails
+     */
+    @Test
+    public void testInstantiateInterfaces() throws IOException, ExecutionException, ModelQueryException {
+        File gen = FileUtils.createTmpFolder("okto-instantiate");
+        File arts = FileUtils.createTmpFolder("okto-artifacts");
+        File artsOrig = ConfigurationSetup.getSetup().getArtifactsFolder();
+        ConfigurationSetup.getSetup().setArtifactsFolder(arts);
+        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
+            ivmlFolder, gen);
+        ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
+        AasIvmlMapper mapper = getInstance(false);
+
+        Object result = mapper.instantiate(InstantiationMode.INTERFACES, null, null); // result does not care here
+        Assert.assertTrue(FileUtils.getFolderSize(gen) > 1);
+        Assert.assertNotNull(result);
+        List<String> resList = Json.listFromJsonDflt(result, String.class);
+        Assert.assertTrue(resList.size() > 0);
+        
+        stopEasy(lcd);
+        setupIvmlFiles(); // revert changes
+        FileUtils.deleteQuietly(gen);
+        FileUtils.deleteQuietly(arts);
+        ConfigurationSetup.getSetup().setArtifactsFolder(artsOrig);
+    }
+    
     /**
      * Tests instantiating a template {@link AasIvmlMapper#getOpenTemplateVariables(String)}.
      * 

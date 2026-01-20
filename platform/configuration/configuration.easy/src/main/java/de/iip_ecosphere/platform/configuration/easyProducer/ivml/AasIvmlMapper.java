@@ -471,7 +471,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      *     template URIs for {@link InstantiationMode#APPS_NO_DEPS} else <b>null</b>
      * @throws ExecutionException when the instantiation fails
      */
-    private Object instantiate(InstantiationMode mode, String appId, String codeFile) throws ExecutionException {
+    public Object instantiate(InstantiationMode mode, String appId, String codeFile) throws ExecutionException {
         TaskData lastTaskData = TaskUtils.getLastTaskData(); // may be wrong thread
         if (null == lastTaskData) { // fallback
             lastTaskData = TaskRegistry.getTaskData();
@@ -513,7 +513,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 result = collectTemplates(start);
                 break;
             case APPS:
+                break;
             case INTERFACES:
+                result = collectTemplates(start);
                 break;
             default:
                 break;
@@ -577,7 +579,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * the file names prefixed by {@link ConfigurationSetup#getArtifactsUriPrefix()} as JSON.
      * 
      * @param startTime the time the generation started (as ms timestamp)
-     * @return the generated template archives
+     * @return the generated template archives as JSON list
      */
     private Object collectTemplates(long startTime) {
         List<String> tmp = new ArrayList<>();
@@ -628,7 +630,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * 
      * @author Holger Eichelberger, SSE
      */
-    private enum InstantiationMode {
+    public enum InstantiationMode {
         
         APPS_NO_DEPS("generateAppsNoDeps"),
         APPS("generateApps"),
@@ -1476,7 +1478,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             }
             SubmodelElementContainerBuilder varBuilder;
             if (TypeQueries.isCompound(rVarType)) {
-                varBuilder = builder.createSubmodelElementCollectionBuilder(AasUtils.fixId(varName));
+                varBuilder = builder.createSubmodelElementListBuilder(AasUtils.fixId(varName));
                 for (int member = 0; member < var.getNestedElementsCount(); member++) {
                     IDecisionVariable elt = var.getNestedElement(member);
                     mapVariable(elt, varBuilder, null);

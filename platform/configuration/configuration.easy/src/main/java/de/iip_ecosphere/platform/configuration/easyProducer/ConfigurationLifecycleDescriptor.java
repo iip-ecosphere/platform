@@ -23,9 +23,7 @@ import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.uni_hildesheim.sse.easy.loader.ManifestLoader;
 import de.uni_hildesheim.sse.easy.loader.framework.Log;
-import de.uni_hildesheim.sse.easy.loader.framework.Log.LoaderLogger;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
-import net.ssehub.easy.basics.logger.ILogger;
 import net.ssehub.easy.basics.logger.LoggingLevel;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
@@ -66,20 +64,6 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
      */
     private static void addNoEasyLogging(Class<?> cls) {
         noEasyLogging.add(cls.getName());
-    }
-    
-    /**
-     * Defines the basic logging levels in here. Keep sequence/ordinals according to imporance, lowest first.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private enum LogLevel {
-        TRACE,
-        DEBUG,
-        INFO, 
-        WARN, 
-        ERROR,
-        OFF
     }
     
     /**
@@ -136,89 +120,29 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
      * 
      * @author Holger Eichelberger, SSE
      */
-    private class Slf4EasyLogger implements ILogger, LoaderLogger {
+    private class Slf4EasyLogger extends EasyLogger {
         
+        /**
+         * Creates a logger instance that logs to the oktoflow logger of this class.
+         */
+        public Slf4EasyLogger() {
+            super(getLogger());
+        }
+
         @Override
-        public void info(String msg, Class<?> clazz, String bundleName) {
-            if (allowLogging(msg, clazz, bundleName, LogLevel.INFO)) {
-                getLogger().info("[" + clazz.getName() + "] " + msg);
+        protected boolean allowLogging(String msg, Class<?> clazz, String bundleName, LogLevel level) {
+            boolean emit = doLogging;
+            if (doFilterLogs && (LogLevel.ERROR != level && LogLevel.WARN != level)) { // limit main decision override 
+                emit = clazz == EasyExecutor.class;
             }
-        }
-
-        @Override
-        public void error(String msg, Class<?> clazz, String bundleName) {
-            if (allowLogging(msg, clazz, bundleName, LogLevel.ERROR)) {
-                getLogger().error("[" + clazz.getName() + "] " + msg);
+            if (emit && level.ordinal() < LogLevel.WARN.ordinal()) { // emit warn/error anyway
+                emit = !noEasyLogging.contains(clazz.getName());
             }
+            return emit;
         }
 
-        @Override
-        public void warn(String msg, Class<?> clazz, String bundleName) {
-            if (allowLogging(msg, clazz, bundleName, LogLevel.WARN)) {
-                getLogger().warn("[" + clazz.getName() + "] " + msg);
-            }
-        }
-
-        @Override
-        public void debug(String msg, Class<?> clazz, String bundleName) {
-            if (allowLogging(msg, clazz, bundleName, LogLevel.DEBUG)) {
-                getLogger().debug("[" + clazz.getName() + "] " + msg);
-            }
-        }
-
-        @Override
-        public void exception(String msg, Class<?> clazz, String bundleName) {
-            if (allowLogging(msg, clazz, bundleName, LogLevel.ERROR)) {
-                getLogger().error("[" + clazz.getName() + "] " + msg);
-            }
-        }
-
-        @Override
-        public void error(String error) {
-            getLogger().error("[Loader] " + error);
-        }
-
-        @Override
-        public void error(String error, Exception exception) {
-            getLogger().error("[Loader] " + error);
-        }
-
-        @Override
-        public void warn(String warning) {
-            getLogger().warn("[Loader] " + warning);
-        }
-
-        @Override
-        public void warn(String warning, Exception exception) {
-            getLogger().warn("[Loader] " + warning);
-        }
-
-        @Override
-        public void info(String msg) {
-            getLogger().warn("[Loader] " + msg); // warn for now
-        }
-        
     }
     
-    /**
-     * Returns whether logging is allowed.
-     * 
-     * @param msg the message
-     * @param clazz the originating class
-     * @param bundleName the originating bundle
-     * @param level the logging level
-     * @return {@code true} for log the message, {@code false} for consume and be quiet
-     */
-    private boolean allowLogging(String msg, Class<?> clazz, String bundleName, LogLevel level) {
-        boolean emit = doLogging;
-        if (doFilterLogs && (LogLevel.ERROR != level && LogLevel.WARN != level)) { // limit main decision override 
-            emit = clazz == EasyExecutor.class;
-        }
-        if (emit && level.ordinal() < LogLevel.WARN.ordinal()) { // emit warn/error anyway
-            emit = !noEasyLogging.contains(clazz.getName());
-        }
-        return emit;
-    }
 
     /**
      * Mapping EASy executor logger information into this logger.
