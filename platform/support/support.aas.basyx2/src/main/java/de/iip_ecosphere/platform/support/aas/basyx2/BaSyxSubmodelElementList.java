@@ -685,9 +685,10 @@ public class BaSyxSubmodelElementList extends BaSyxSubmodelElement implements Su
     @Override
     public void accept(AasVisitor visitor) {
         initialize();
-        visitor.visitSubmodelElementList(this);
-        for (SubmodelElement se : elementsCollection()) {
-            se.accept(visitor);
+        if (visitor.visitSubmodelElementList(this)) {
+            for (SubmodelElement se : elementsCollection()) {
+                se.accept(visitor);
+            }
         }
         visitor.endSubmodelElementList(this);
     }

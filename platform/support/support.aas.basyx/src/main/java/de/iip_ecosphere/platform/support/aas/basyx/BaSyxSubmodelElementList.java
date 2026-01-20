@@ -59,7 +59,7 @@ public class BaSyxSubmodelElementList extends BaSyxSubmodelElement implements Su
     SubmodelElementsRegistrar {
     
     private ISubmodelElementCollection collection;
-    private List<SubmodelElement> elementsList; // not nice, shall be two implementations
+    private List<SubmodelElement> elementsList;
     private Map<String, Builder<?>> deferred;
     
     /**
@@ -678,9 +678,10 @@ public class BaSyxSubmodelElementList extends BaSyxSubmodelElement implements Su
     @Override
     public void accept(AasVisitor visitor) {
         initialize();
-        visitor.visitSubmodelElementList(this);
-        for (SubmodelElement se : visitor.sortSubmodelElements(elementsCollection())) {
-            se.accept(visitor);
+        if (visitor.visitSubmodelElementList(this)) {
+            for (SubmodelElement se : visitor.sortSubmodelElements(elementsCollection())) {
+                se.accept(visitor);
+            }
         }
         visitor.endSubmodelElementList(this);
     }

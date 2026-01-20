@@ -156,12 +156,13 @@ public abstract class AbstractAas<A extends org.eclipse.digitaltwin.aas4j.v3.mod
 
     @Override
     public void accept(AasVisitor visitor) {
-        visitor.visitAas(this);
-        if (null != asset) {
-            asset.accept(visitor);
-        }
-        for (Submodel sm : visitor.sortSubmodels(submodels.values())) {
-            sm.accept(visitor);
+        if (visitor.visitAas(this)) {
+            if (null != asset) {
+                asset.accept(visitor);
+            }
+            for (Submodel sm : visitor.sortSubmodels(submodels.values())) {
+                sm.accept(visitor);
+            }
         }
         visitor.endAas(this);
     }

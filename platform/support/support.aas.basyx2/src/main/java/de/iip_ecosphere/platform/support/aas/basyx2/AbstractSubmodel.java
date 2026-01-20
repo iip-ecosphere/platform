@@ -379,20 +379,21 @@ public abstract class AbstractSubmodel<S extends org.eclipse.digitaltwin.aas4j.v
 
     @Override
     public void accept(AasVisitor visitor) {
-        visitor.visitSubmodel(this);
-        for (Property prop : visitor.sortSubmodelElements(properties.values())) {
-            prop.accept(visitor);
-        }
-        for (DataElement de : visitor.sortSubmodelElements(dataElements.values())) {
-            de.accept(visitor);
-        }
-        for (Operation op : visitor.sortSubmodelElements(operations.values())) {
-            op.accept(visitor);
-        }
-        for (SubmodelElement se : visitor.sortSubmodelElements(submodelElements.values())) {
-            // remaining elements, don't iterate over them again
-            if (!(se instanceof Property || se instanceof DataElement || se instanceof Operation)) {
-                se.accept(visitor);
+        if (visitor.visitSubmodel(this)) {
+            for (Property prop : visitor.sortSubmodelElements(properties.values())) {
+                prop.accept(visitor);
+            }
+            for (DataElement de : visitor.sortSubmodelElements(dataElements.values())) {
+                de.accept(visitor);
+            }
+            for (Operation op : visitor.sortSubmodelElements(operations.values())) {
+                op.accept(visitor);
+            }
+            for (SubmodelElement se : visitor.sortSubmodelElements(submodelElements.values())) {
+                // remaining elements, don't iterate over them again
+                if (!(se instanceof Property || se instanceof DataElement || se instanceof Operation)) {
+                    se.accept(visitor);
+                }
             }
         }
         visitor.endSubmodel(this);

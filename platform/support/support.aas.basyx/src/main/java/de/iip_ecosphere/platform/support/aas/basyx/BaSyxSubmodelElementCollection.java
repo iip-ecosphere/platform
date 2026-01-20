@@ -416,7 +416,7 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
             ordered = collection.isOrdered();
             //allowDuplicates = collection.isAllowDuplicates();
         } else { // just a fallback
-            ordered = true;
+            ordered = false;
             //allowDuplicates = true;
         }
         //ordered = false; // TODO allow list 
@@ -703,9 +703,10 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     @Override
     public void accept(AasVisitor visitor) {
         initialize();
-        visitor.visitSubmodelElementCollection(this);
-        for (SubmodelElement se : visitor.sortSubmodelElements(elementsCollection())) {
-            se.accept(visitor);
+        if (visitor.visitSubmodelElementCollection(this)) {
+            for (SubmodelElement se : visitor.sortSubmodelElements(elementsCollection())) {
+                se.accept(visitor);
+            }
         }
         visitor.endSubmodelElementCollection(this);
     }

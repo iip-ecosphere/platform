@@ -695,9 +695,10 @@ public class BaSyxSubmodelElementCollection extends BaSyxSubmodelElement impleme
     @Override
     public void accept(AasVisitor visitor) {
         initialize();
-        visitor.visitSubmodelElementCollection(this);
-        for (SubmodelElement se : visitor.sortSubmodelElements(elementsCollection())) {
-            se.accept(visitor);
+        if (visitor.visitSubmodelElementCollection(this)) {
+            for (SubmodelElement se : visitor.sortSubmodelElements(elementsCollection())) {
+                se.accept(visitor);
+            }
         }
         visitor.endSubmodelElementCollection(this);
     }

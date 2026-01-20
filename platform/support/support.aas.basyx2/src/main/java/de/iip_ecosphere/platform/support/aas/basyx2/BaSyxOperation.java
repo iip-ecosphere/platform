@@ -380,7 +380,8 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
             return Tools.translateValueFromBaSyx(result == null || result.length == 0 
                 ? null : result[0].getValue(), type);
         } catch (ElementDoesNotExistException | OperationDelegationException | NotInvokableException | ApiException e) {
-            throw new ExecutionException("Invoking operation '" + getIdShort() + "': " +  e.getMessage(), e);
+            throw new ExecutionException("Invoking operation '" + getIdShort() + "': " +  e.getClass().getName() 
+                + " " + e.getMessage(), e);
         } 
     }
 

@@ -334,9 +334,10 @@ public class BaSyxEntity extends BaSyxSubmodelElement implements Entity, Submode
 
     @Override
     public void accept(AasVisitor visitor) {
-        visitor.visitEntity(this);
-        for (SubmodelElement se : visitor.sortSubmodelElements(statementsList)) {
-            se.accept(visitor);
+        if (visitor.visitEntity(this)) {
+            for (SubmodelElement se : visitor.sortSubmodelElements(statementsList)) {
+                se.accept(visitor);
+            }
         }
         visitor.endVisitEntity(this);
     }
