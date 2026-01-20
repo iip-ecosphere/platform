@@ -217,9 +217,10 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
 
     @Override
     public void accept(AasVisitor visitor) {
-        visitor.visitSubmodelElementCollection(this);
-        for (SubmodelElement sm : visitor.sortSubmodelElements(elements.values())) {
-            sm.accept(visitor);
+        if (visitor.visitSubmodelElementCollection(this)) {
+            for (SubmodelElement sm : visitor.sortSubmodelElements(elements.values())) {
+                sm.accept(visitor);
+            }
         }
         visitor.endSubmodelElementCollection(this);
     }

@@ -153,9 +153,10 @@ public class AasSpecVisitor implements AasVisitor {
     }
     
     @Override
-    public void visitAas(Aas aas) {
+    public boolean visitAas(Aas aas) {
         log("AAS " + aas.getIdShort());
         increaseIndentation();
+        return true;
     }
     
     @Override
@@ -169,9 +170,10 @@ public class AasSpecVisitor implements AasVisitor {
     }
 
     @Override
-    public void visitSubmodel(Submodel submodel) {
+    public boolean visitSubmodel(Submodel submodel) {
         log("SUBMODEL " + submodel.getIdShort() + getSemanticId(submodel));
         increaseIndentation();
+        return true;
     }
 
     @Override
@@ -229,9 +231,10 @@ public class AasSpecVisitor implements AasVisitor {
     }
 
     @Override
-    public void visitSubmodelElementCollection(SubmodelElementCollection collection) {
+    public boolean visitSubmodelElementCollection(SubmodelElementCollection collection) {
         log(getHeader("SMC", collection));
         increaseIndentation();
+        return true;
     }
 
     @Override
@@ -240,9 +243,10 @@ public class AasSpecVisitor implements AasVisitor {
     }
 
     @Override
-    public void visitSubmodelElementList(SubmodelElementList list) {
+    public boolean visitSubmodelElementList(SubmodelElementList list) {
         log(getHeader("SML", list));
         increaseIndentation();
+        return true;
     }
 
     @Override
@@ -296,9 +300,10 @@ public class AasSpecVisitor implements AasVisitor {
     }
 
     @Override
-    public void visitEntity(Entity entity) {
+    public boolean visitEntity(Entity entity) {
         log(getHeader("ENTITY", entity));
         increaseIndentation();
+        return true;
     }
 
     @Override

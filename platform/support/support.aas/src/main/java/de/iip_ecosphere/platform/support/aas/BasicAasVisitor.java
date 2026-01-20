@@ -22,7 +22,8 @@ package de.iip_ecosphere.platform.support.aas;
 public class BasicAasVisitor implements AasVisitor {
 
     @Override
-    public void visitAas(Aas aas) {
+    public boolean visitAas(Aas aas) {
+        return true;
     }
 
     @Override
@@ -30,7 +31,8 @@ public class BasicAasVisitor implements AasVisitor {
     }
 
     @Override
-    public void visitSubmodel(Submodel submodel) {
+    public boolean visitSubmodel(Submodel submodel) {
+        return true;
     }
 
     @Override
@@ -50,7 +52,8 @@ public class BasicAasVisitor implements AasVisitor {
     }
 
     @Override
-    public void visitSubmodelElementCollection(SubmodelElementCollection collection) {
+    public boolean visitSubmodelElementCollection(SubmodelElementCollection collection) {
+        return true;
     }
 
     @Override
@@ -58,7 +61,8 @@ public class BasicAasVisitor implements AasVisitor {
     }
 
     @Override
-    public void visitSubmodelElementList(SubmodelElementList list) {
+    public boolean visitSubmodelElementList(SubmodelElementList list) {
+        return true;
     }
 
     @Override
@@ -82,7 +86,8 @@ public class BasicAasVisitor implements AasVisitor {
     }
 
     @Override
-    public void visitEntity(Entity entity) {
+    public boolean visitEntity(Entity entity) {
+        return true;
     }
 
     @Override

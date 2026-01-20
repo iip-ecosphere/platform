@@ -249,24 +249,25 @@ public class FakeSubmodel extends FakeElement implements Submodel {
 
     @Override
     public void accept(AasVisitor visitor) {
-        visitor.visitSubmodel(this);
-        for (SubmodelElement elt : visitor.sortSubmodelElements(filter(Property.class))) {
-            elt.accept(visitor);
-        }
-        for (SubmodelElement elt : visitor.sortSubmodelElements(filter(DataElement.class))) {
-            if (!(elt instanceof Property)) {
+        if (visitor.visitSubmodel(this)) {
+            for (SubmodelElement elt : visitor.sortSubmodelElements(filter(Property.class))) {
                 elt.accept(visitor);
             }
-        }
-        for (SubmodelElement elt : visitor.sortSubmodelElements(filter(Operation.class))) {
-            elt.accept(visitor);
-        }
-        for (SubmodelElement se : visitor.sortSubmodelElements(elements.values())) {
-            // remaining elements, don't iterate over them again
-            if (!(se instanceof Property || se instanceof DataElement || se instanceof Operation)) {
-                se.accept(visitor);
+            for (SubmodelElement elt : visitor.sortSubmodelElements(filter(DataElement.class))) {
+                if (!(elt instanceof Property)) {
+                    elt.accept(visitor);
+                }
             }
-        }        
+            for (SubmodelElement elt : visitor.sortSubmodelElements(filter(Operation.class))) {
+                elt.accept(visitor);
+            }
+            for (SubmodelElement se : visitor.sortSubmodelElements(elements.values())) {
+                // remaining elements, don't iterate over them again
+                if (!(se instanceof Property || se instanceof DataElement || se instanceof Operation)) {
+                    se.accept(visitor);
+                }
+            }
+        }
         visitor.endSubmodel(this);
     }
 

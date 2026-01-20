@@ -12,7 +12,9 @@
 
 package de.iip_ecosphere.platform.support.aas;
 
+import java.io.PrintStream;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
 
 /**
  * A re-usable print visitor for AAS structures. Just prints the AAS to the console. Not applicable
@@ -23,6 +25,28 @@ import java.util.concurrent.ExecutionException;
 public class AasPrintVisitor implements AasVisitor {
 
     private String indentation = "";
+    private PrintStream out;
+    private Predicate<Aas> aasPredicate = a -> true;
+    private Predicate<Submodel> submodelPredicate = s -> true;
+    private Predicate<SubmodelElementCollection> submodelElementCollectionPredicate = c -> true;
+    private Predicate<SubmodelElementList> submodelElementListPredicate = l -> true;
+    private Predicate<Entity> entityPredicate = e -> true;
+
+    /**
+     * Creates a print visitor on {@code System.out}.
+     */
+    public AasPrintVisitor() {
+        this(null);
+    }
+
+    /**
+     * Creates a print visitor on {@code out}.
+     * 
+     * @param out the output stream, may be <b>null</b> then {@code System.out} is used instead 
+     */
+    public AasPrintVisitor(PrintStream out) {
+        this.out = null == out ? System.out : out;
+    }
     
     /**
      * Increases the indentation.
@@ -46,14 +70,14 @@ public class AasPrintVisitor implements AasVisitor {
      * @param text the text
      */
     private void log(String text) {
-        // may be replaced by a real logger, left open as UKL thinks about secure logging
-        System.out.println(indentation + text);
+        out.println(indentation + text);
     }
     
     @Override
-    public void visitAas(Aas aas) {
+    public boolean visitAas(Aas aas) {
         log("AAS " + aas.getIdShort() + " [" + aas.getIdentification() + "]");
         increaseIndentation();
+        return aasPredicate.test(aas);
     }
     
     @Override
@@ -67,9 +91,10 @@ public class AasPrintVisitor implements AasVisitor {
     }
 
     @Override
-    public void visitSubmodel(Submodel submodel) {
+    public boolean visitSubmodel(Submodel submodel) {
         log("SUBMODEL " + submodel.getIdShort() + " [" + submodel.getIdentification() + "]");
         increaseIndentation();
+        return submodelPredicate.test(submodel);
     }
 
     @Override
@@ -105,9 +130,10 @@ public class AasPrintVisitor implements AasVisitor {
     }
 
     @Override
-    public void visitSubmodelElementCollection(SubmodelElementCollection collection) {
+    public boolean visitSubmodelElementCollection(SubmodelElementCollection collection) {
         log("COLLECTION " + collection.getIdShort());
         increaseIndentation();
+        return submodelElementCollectionPredicate.test(collection);
     }
 
     @Override
@@ -116,9 +142,10 @@ public class AasPrintVisitor implements AasVisitor {
     }
 
     @Override
-    public void visitSubmodelElementList(SubmodelElementList list) {
+    public boolean visitSubmodelElementList(SubmodelElementList list) {
         log("LIST " + list.getIdShort());
         increaseIndentation();
+        return submodelElementListPredicate.test(list);
     }
 
     @Override
@@ -157,14 +184,82 @@ public class AasPrintVisitor implements AasVisitor {
     }
 
     @Override
-    public void visitEntity(Entity entity) {
+    public boolean visitEntity(Entity entity) {
         log("ENTITY " + entity.getIdShort());
         increaseIndentation();
+        return entityPredicate.test(entity);
     }
 
     @Override
     public void endVisitEntity(Entity entity) {
         decreaseIndentation();
+    }
+
+    /**
+     * Sets a predicate that enables or disables deeper AAS visiting.
+     * 
+     * @param aasPredicate the predicated, ignored if <b>null</b>
+     * @return <b>this</b> for chaining
+     */
+    public AasPrintVisitor setAasPredicate(Predicate<Aas> aasPredicate) {
+        if (null != aasPredicate) {
+            this.aasPredicate = aasPredicate;
+        }
+        return this;
+    }
+
+    /**
+     * Sets a predicate that enables or disables deeper entity visiting.
+     * 
+     * @param entityPredicate the predicated, ignored if <b>null</b>
+     * @return <b>this</b> for chaining
+     */
+    public AasPrintVisitor setEntityPredicate(Predicate<Entity> entityPredicate) {
+        if (null != entityPredicate) {
+            this.entityPredicate = entityPredicate;
+        }
+        return this;
+    }
+
+    /**
+     * Sets a predicate that enables or disables deeper submodel visiting.
+     * 
+     * @param submodelPredicate the predicated, ignored if <b>null</b>
+     * @return <b>this</b> for chaining
+     */
+    public AasPrintVisitor setSubmodelPredicate(Predicate<Submodel> submodelPredicate) {
+        if (null != submodelPredicate) {
+            this.submodelPredicate = submodelPredicate;
+        }
+        return this;
+    }
+
+    /**
+     * Sets a predicate that enables or disables deeper SMEC visiting.
+     * 
+     * @param submodelElementCollectionPredicate the predicated, ignored if <b>null</b>
+     * @return <b>this</b> for chaining
+     */
+    public AasPrintVisitor setSubmodelElementCollectionPredicate(
+        Predicate<SubmodelElementCollection> submodelElementCollectionPredicate) {
+        if (null != submodelElementCollectionPredicate) {
+            this.submodelElementCollectionPredicate = submodelElementCollectionPredicate;
+        }
+        return this;
+    }
+
+    /**
+     * Sets a predicate that enables or disables deeper SMEL visiting.
+     * 
+     * @param submodelElementListPredicate the predicated, ignored if <b>null</b>
+     * @return <b>this</b> for chaining
+     */
+    public AasPrintVisitor setSubmodelElementListPredicate(Predicate<SubmodelElementList> 
+        submodelElementListPredicate) {
+        if (null != submodelElementListPredicate) {
+            this.submodelElementListPredicate = submodelElementListPredicate;
+        }
+        return this;
     }
 
 }

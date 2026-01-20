@@ -212,9 +212,10 @@ public class FakeEntity extends FakeElement implements Entity {
     
     @Override
     public void accept(AasVisitor visitor) {
-        visitor.visitEntity(this);
-        for (SubmodelElement se : visitor.sortSubmodelElements(elements.values())) {
-            se.accept(visitor);
+        if (visitor.visitEntity(this)) {
+            for (SubmodelElement se : visitor.sortSubmodelElements(elements.values())) {
+                se.accept(visitor);
+            }
         }
         visitor.endVisitEntity(this);
     }

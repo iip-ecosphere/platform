@@ -41,7 +41,9 @@ import java.util.Collection;
  *       implementing classes. As we hope to converge soon to the specification, we believe that such extensions will 
  *       happen rather infrequently.</li>
  *   <li>Indeed, this is still a rather traditional implementation. There are more dynamic ones as some visitors for
- *       the EMF models. Let's keep things more or less simple.</li>
+ *       the EMF models. Let's keep things more or less simple. However, several visit methods can determine whether a 
+ *       nested/deeper recursion shall be carried out. If an respective end method is defined, it shall be called 
+ *       irrespectively of whether a deep recursion is desired.</li>
  * </ul>
  * 
  * @author Holger Eichelberger, SSE
@@ -52,8 +54,9 @@ public interface AasVisitor {
      * Visits an AAS.
      * 
      * @param aas the aas
+     * @return {@code true} for visiting inner structures, {@code false} for not recursing
      */
-    public void visitAas(Aas aas);
+    public boolean visitAas(Aas aas);
 
     /**
      * Notifies the end of visiting an AAS.
@@ -95,8 +98,9 @@ public interface AasVisitor {
      * Visits a sub-model.
      * 
      * @param submodel the sub-model
+     * @return {@code true} for visiting inner structures, {@code false} for not recursing
      */
-    public void visitSubmodel(Submodel submodel);
+    public boolean visitSubmodel(Submodel submodel);
 
     /**
      * Notifies the end of visiting a sub-model.
@@ -123,8 +127,9 @@ public interface AasVisitor {
      * Visits an entity.
      * 
      * @param entity the entity
+     * @return {@code true} for visiting inner structures, {@code false} for not recursing
      */
-    public void visitEntity(Entity entity);
+    public boolean visitEntity(Entity entity);
 
     /**
      * Indicates the end of visiting an entity.
@@ -158,8 +163,9 @@ public interface AasVisitor {
      * Visits a sub-model element collection.
      * 
      * @param collection the collection
+     * @return {@code true} for visiting inner structures, {@code false} for not recursing
      */
-    public void visitSubmodelElementCollection(SubmodelElementCollection collection);
+    public boolean visitSubmodelElementCollection(SubmodelElementCollection collection);
 
     /**
      * Notifies ending the visits of a sub-model element collection.
@@ -172,8 +178,9 @@ public interface AasVisitor {
      * Visits a sub-model element list.
      * 
      * @param list the list
+     * @return {@code true} for visiting inner structures, {@code false} for not recursing
      */
-    public void visitSubmodelElementList(SubmodelElementList list);
+    public boolean visitSubmodelElementList(SubmodelElementList list);
 
     /**
      * Notifies ending the visits of a sub-model element list.

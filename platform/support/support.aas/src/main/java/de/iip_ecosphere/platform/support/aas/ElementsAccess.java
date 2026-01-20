@@ -121,4 +121,11 @@ public interface ElementsAccess {
      */
     public void deleteElement(String idShort);
     
+    /**
+     * Accepts and handles a visitor.
+     * 
+     * @param visitor the visitor
+     */
+    public void accept(AasVisitor visitor);
+    
 }

@@ -15,6 +15,7 @@ package test.de.iip_ecosphere.platform.support.aas;
 import org.junit.Before;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Plugin-based test wit default setup for AAS.
@@ -51,6 +52,7 @@ public class TestWithPlugin extends test.de.iip_ecosphere.platform.support.TestW
         addPluginLocation("support", "support.aas.basyx", "support.log-slf4j-simple");
         addRunAfterLoading(() -> {
             // TODO default from AASFactory
+            LoggerFactory.getLogger(TestWithPlugin.class).info("Using AAS plugin {}", aasPluginId);
             AasFactory.setPluginId(System.getProperty("okto.test.aas.pluginId", aasPluginId)); 
         });
     }
