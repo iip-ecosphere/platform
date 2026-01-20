@@ -206,7 +206,7 @@ public class PrintVisitor extends BasicAasVisitor {
     }
 
     @Override
-    public void visitSubmodelElementCollection(SubmodelElementCollection collection) {
+    public boolean visitSubmodelElementCollection(SubmodelElementCollection collection) {
         CollectionInfo info = new CollectionInfo(skipEntireCollection(collection));
         collectionLevel.push(info);
         PrintType type = getSkipLevel(collection);
@@ -221,6 +221,7 @@ public class PrintVisitor extends BasicAasVisitor {
             indent += "  ";
             info.emitted = true; // assuming that collection elements in the first place determine the output
         }
+        return true;
     }
 
     @Override
