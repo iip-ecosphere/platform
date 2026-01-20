@@ -110,9 +110,11 @@ public class TestWithPlugin {
      */
     public static void addPluginLocation(String parent, String folder, String installFolder, boolean descriptorOnly, 
         String... appends) {
-        locations.add(new PluginLocation(parent, folder, installFolder, descriptorOnly, appends));
-        LoggerFactory.getLogger(TestWithPlugin.class).info("Added plugin location for {} (descriptor only: {})", 
-            folder, descriptorOnly);
+        if (locations.stream().noneMatch(l -> l.parent.equals(parent) && l.folder.equals(folder))) {
+            locations.add(new PluginLocation(parent, folder, installFolder, descriptorOnly, appends));
+            LoggerFactory.getLogger(TestWithPlugin.class).info("Added plugin location for {} (descriptor only: {})", 
+                folder, descriptorOnly);
+        }
     }
 
     /**
