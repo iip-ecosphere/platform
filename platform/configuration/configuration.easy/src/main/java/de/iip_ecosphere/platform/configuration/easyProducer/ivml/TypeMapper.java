@@ -72,6 +72,7 @@ class TypeMapper {
     private Stack<Map<String, Object>> assignments = new Stack<>();
     private Function<String, String> metaShortId;
     private Map<String, Integer> uiGroups = new HashMap<>();
+    private Set<String> requiredTypes;
     
     /**
      * Creates a type mapper instance.
@@ -80,13 +81,15 @@ class TypeMapper {
      * @param variableFilter a variable filter to exclude certain variables/types
      * @param builder the builder to place AAS elements into
      * @param metaShortId function to build a meta shortId property name
+     * @param required type name
      */
     TypeMapper(Configuration cfg, Predicate<AbstractVariable> variableFilter, 
-        SubmodelElementContainerBuilder builder, Function<String, String> metaShortId) {
+        SubmodelElementContainerBuilder builder, Function<String, String> metaShortId, Set<String> requiredTypes) {
         this.cfg = cfg;
         this.builder = builder;
         this.variableFilter = variableFilter;
         this.metaShortId = metaShortId;
+        this.requiredTypes = requiredTypes;
     }
     
     /**
@@ -516,8 +519,9 @@ class TypeMapper {
                 .setValue(Type.STRING, slotName)
                 .setDescription(new LangString(lang, ModelInfo.getCommentSafe(slot)))
                 .build();
+            String typeName = IvmlDatatypeVisitor.getUnqualifiedType(slotType);
             propB.createPropertyBuilder("type")
-                .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(slotType))
+                .setValue(Type.STRING, typeName)
                 .build();
             int uiGroup = 100; // default, always there, mandatory
             Object tmp = getAssignmentValue("uiGroup"); 
@@ -539,9 +543,27 @@ class TypeMapper {
                 .setValue(Type.INTEGER, uiGroup)
                 .build();
             addMetaDefault(cfg.getConfiguration(), slot, propB, metaShortId);
+            addMetaRequired(propB, typeName, metaShortId, requiredTypes);
             if (slotType != type) {
                 mapType(slotType);
             }
+        }
+    }
+    
+    /**
+     * Adds an optional property indicating that the containing field is required.
+     * 
+     * @param varBuilder the variable builder to add the meta-value to
+     * @param typeName the type name to look up
+     * @param metaShortId function to build a meta shortId property name
+     * @param requiredTypes the required types in which to look up {@code typeName}
+     */
+    public static void addMetaRequired(SubmodelElementContainerBuilder varBuilder, String typeName, 
+        Function<String, String> metaShortId, Set<String> requiredTypes) {
+        if (requiredTypes.contains(typeName)) {
+            varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("required")))
+                .setValue(Type.BOOLEAN, true)
+                .build();
         }
     }
 

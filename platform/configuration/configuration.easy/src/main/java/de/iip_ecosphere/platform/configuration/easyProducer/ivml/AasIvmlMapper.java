@@ -134,6 +134,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     protected static final String PRJ_NAME_TECHSETUP = "TechnicalSetup";
     private static final Map<String, String> PROJECT_MAPPING;
     private static final Map<String, String> PARENT_MAPPING;
+    private static final Set<String> REQUIRED_TYPES;
     private static final TypeVisitor TYPE_VISITOR = new TypeVisitor();
     private static final String[] TOP_FOLDERS = {META_TYPE_NAME, "Dependency", "Manufacturer", "ServiceBase", 
         "Server", "ServiceMesh", "Application"}; // top level SM folders, mostly meta-model type names -> mgtUI
@@ -164,6 +165,15 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         projectMap.put("DisplayPanel", PRJ_NAME_ALLTYPES);
         projectMap.put("AliasType", PRJ_NAME_ALLTYPES);
         PROJECT_MAPPING = Collections.unmodifiableMap(projectMap);
+        
+        Set<String> requiredTypes = new HashSet<>(); // not clean, would require reasoning or constraint analysis
+        requiredTypes.add("NonEmptyNameString"); // or resolve until e.g. non empty string is found
+        requiredTypes.add("Id");
+        requiredTypes.add("PositiveInteger");
+        requiredTypes.add("OktoVersion");
+        requiredTypes.add("NonEmptyPort");
+        requiredTypes.add("NonEmptyEphemeralPort");
+        REQUIRED_TYPES = Collections.unmodifiableSet(requiredTypes);
     }
     
     /**
@@ -242,7 +252,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 primitiveType = ModelQuery.findType(cfg.getConfiguration().getProject(), "PrimitiveType", null);
             } catch (ModelQueryException e) {
             }
-            TypeMapper mapper = new TypeMapper(cfg, variableFilter, types.get(META_TYPE_NAME), metaShortId);
+            TypeMapper mapper = new TypeMapper(cfg, variableFilter, types.get(META_TYPE_NAME), metaShortId, 
+                REQUIRED_TYPES);
             mapper.mapTypes();
             Iterator<IDecisionVariable> iter = cfg.getConfiguration().iterator();
             while (iter.hasNext()) {
@@ -1540,14 +1551,16 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         IDatatype type = var.getValue() != null ? var.getValue().getType() : varType;
         String declaredTypeName = IvmlDatatypeVisitor.getUnqualifiedType(var.getDeclaration().getType());
         String varName = var.getDeclaration().getName();
+        String varTypeName = IvmlDatatypeVisitor.getUnqualifiedType(type);
         varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("type")))
-            .setValue(Type.STRING, IvmlDatatypeVisitor.getUnqualifiedType(type))
+            .setValue(Type.STRING, varTypeName)
             .build();
         if (null == displayName && "OktoVersion".equals(declaredTypeName) && "ver".equals(varName)) {
             // mitigate field misnomer for now
             displayName = "version";
         }
         TypeMapper.addMetaDefault(var, varBuilder, metaShortId);
+        TypeMapper.addMetaRequired(varBuilder, varTypeName, metaShortId, REQUIRED_TYPES);
         TypeMapper.addTypeKind(varBuilder, DerivedDatatype.resolveToBasis(type), metaShortId);
         if (var.getDeclaration().getParent() instanceof Project) { // top-level only for now
             varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("project")))
