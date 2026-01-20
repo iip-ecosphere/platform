@@ -51,6 +51,7 @@ import de.iip_ecosphere.platform.platform.cli.PrintVisitor.PrintType;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.TaskRegistry;
 import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
+import de.iip_ecosphere.platform.support.aas.ElementsAccess;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -262,7 +263,7 @@ class CliBackend {
      * @param coll the collection
      * @return {@code true} for exclude, {@code false} for include
      */
-    private static boolean resourceExclusion(SubmodelElementCollection coll) {
+    private static boolean resourceExclusion(ElementsAccess coll) {
         String idShort = coll.getIdShort(); 
         return idShort.equals("containers") || idShort.equals("deviceRegistry")  || idShort.equals("deviceManager");
     }
@@ -304,7 +305,7 @@ class CliBackend {
      * @param filter optional submodel elements collection filter, may be <b>null</b> for none
      * @param skipLevel how to handle printout per level, if not given {@link PrintType#PREFIX} is used
      */
-    protected static void print(SubmodelElement elt, String collPrefix, Predicate<SubmodelElementCollection> filter, 
+    protected static void print(SubmodelElement elt, String collPrefix, Predicate<ElementsAccess> filter, 
         PrintType... skipLevel) {
         if (null != elt) {
             PrintVisitor vis = new PrintVisitor(collPrefix, filter, platformFactory, skipLevel);
@@ -818,7 +819,7 @@ class CliBackend {
      *     printing the collection name
      * @param skipLevel how to handle printout per level, if not given {@link PrintType#PREFIX} is used
      */
-    private static void print(Submodel submodel, String collPrefix, Predicate<SubmodelElementCollection> filter, 
+    private static void print(Submodel submodel, String collPrefix, Predicate<ElementsAccess> filter, 
         PrintType... skipLevel) {
         if (null != submodel) {
             PrintVisitor vis = new PrintVisitor(collPrefix, filter, platformFactory, skipLevel);

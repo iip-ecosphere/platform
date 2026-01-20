@@ -8,8 +8,10 @@ import java.util.function.Predicate;
 
 import de.iip_ecosphere.platform.services.environment.metricsProvider.meterRepresentation.MeterRepresentation;
 import de.iip_ecosphere.platform.support.aas.BasicAasVisitor;
+import de.iip_ecosphere.platform.support.aas.ElementsAccess;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
 import de.iip_ecosphere.platform.support.metrics.Gauge;
 import de.iip_ecosphere.platform.support.metrics.Meter;
 import de.iip_ecosphere.platform.support.semanticId.SemanticIdResolutionResult;
@@ -74,7 +76,7 @@ public class PrintVisitor extends BasicAasVisitor {
     private String collPrefix;
     private String indent = "";
     private PrintType[] skipLevel;
-    private Predicate<SubmodelElementCollection> filter;
+    private Predicate<ElementsAccess> filter;
     private Stack<CollectionInfo> collectionLevel = new Stack<CollectionInfo>();
     private PlatformClientFactory platformFactory;
 
@@ -87,7 +89,7 @@ public class PrintVisitor extends BasicAasVisitor {
      * @param platformFactory platform client factory
      * @param skipLevel how to handle printout per level, if not given {@link PrintType#ID_SHORT} is used
      */
-    public PrintVisitor(String collPrefix, Predicate<SubmodelElementCollection> filter, 
+    public PrintVisitor(String collPrefix, Predicate<ElementsAccess> filter, 
         PlatformClientFactory platformFactory, PrintType... skipLevel) {
         this.collPrefix = collPrefix;
         this.skipLevel = skipLevel;
@@ -101,7 +103,7 @@ public class PrintVisitor extends BasicAasVisitor {
      * @param collection to collection to check for
      * @return the print/skip type
      */
-    private PrintType getSkipLevel(SubmodelElementCollection collection) {
+    private PrintType getSkipLevel(ElementsAccess collection) {
         PrintType result;
         int level = collectionLevel.size() - 1;
         if (level < 0 || level >= skipLevel.length) {
@@ -121,7 +123,7 @@ public class PrintVisitor extends BasicAasVisitor {
      * @param collection the collection to check
      * @return {@code true} for skip transitively, {@code false} for print
      */
-    private boolean skipEntireCollection(SubmodelElementCollection collection) {
+    private boolean skipEntireCollection(ElementsAccess collection) {
         return (null != filter && !filter.test(collection));
     }
 
@@ -226,15 +228,51 @@ public class PrintVisitor extends BasicAasVisitor {
 
     @Override
     public void endSubmodelElementCollection(SubmodelElementCollection collection) {
-        CollectionInfo info = collectionLevel.peek();
-        PrintType type = getSkipLevel(collection);
-        if (type != PrintType.NO) {
-            indent = indent.substring(0, indent.length() - 2);
-            if (!info.emitted) {
-                System.out.println(indent + " None.");
+        if (!collectionLevel.isEmpty()) {
+            CollectionInfo info = collectionLevel.peek();
+            PrintType type = getSkipLevel(collection);
+            if (type != PrintType.NO) {
+                indent = indent.substring(0, indent.length() - 2);
+                if (!info.emitted) {
+                    System.out.println(indent + " None.");
+                }
             }
+            collectionLevel.pop();
         }
-        collectionLevel.pop();
     }
-   
+ 
+    @Override
+    public boolean visitSubmodelElementList(SubmodelElementList list) {
+        CollectionInfo info = new CollectionInfo(skipEntireCollection(list));
+        collectionLevel.push(info);
+        PrintType type = getSkipLevel(list);
+        if (type != PrintType.NO) {
+            if (PrintType.PREFIX == type) {
+                if (null != collPrefix) {
+                    System.out.println(indent + collPrefix + list.getIdShort());
+                }
+            } else {
+                System.out.println(indent + "-" + list.getIdShort());
+            }
+            indent += "  ";
+            info.emitted = true; // assuming that collection elements in the first place determine the output
+        }
+        return true;
+    }
+
+    @Override
+    public void endSubmodelElementList(SubmodelElementList list) {
+        if (!collectionLevel.isEmpty()) {
+            CollectionInfo info = collectionLevel.peek();
+            PrintType type = getSkipLevel(list);
+            if (type != PrintType.NO) {
+                indent = indent.substring(0, indent.length() - 2);
+                if (!info.emitted) {
+                    System.out.println(indent + " None.");
+                }
+            }
+            collectionLevel.pop();
+        }
+    }
+
 }
