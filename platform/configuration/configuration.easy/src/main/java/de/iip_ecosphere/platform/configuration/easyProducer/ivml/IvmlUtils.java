@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 import net.ssehub.easy.basics.messages.Status;
 import net.ssehub.easy.reasoning.core.reasoner.Message;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
+import net.ssehub.easy.varModel.confModel.ConfigurationException;
 import net.ssehub.easy.varModel.confModel.IConfigurationElement;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.cst.AttributeVariable;
@@ -752,6 +753,23 @@ public class IvmlUtils {
             }
         }
         return found;
+    }
+
+    /**
+     * Obtains (gets or creates) a decision from {@code cfg}.
+     * 
+     * @param cfg the configuration
+     * @param decl the variable declaration to obtain the decision for
+     * @return the decision
+     * @throws ConfigurationException if obtaining the decision fails
+     */
+    public static IDecisionVariable obtainDecision(net.ssehub.easy.varModel.confModel.Configuration cfg, 
+        DecisionVariableDeclaration decl) throws ConfigurationException {
+        IDecisionVariable result = cfg.getDecision(decl);
+        if (null == result) {
+            result = cfg.createDecision(decl);
+        }
+        return result;
     }
 
 }

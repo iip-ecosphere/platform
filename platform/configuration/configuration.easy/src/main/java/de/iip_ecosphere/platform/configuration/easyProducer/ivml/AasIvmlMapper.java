@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -438,7 +439,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         sBuilder.defineOperation(OP_GEN_INTERFACES, 
             new JsonResultWrapper(a -> {
                 return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
-                    p -> getAasIvmlMapper().instantiate(InstantiationMode.INTERFACES, null, null)
+                    // second param optional, may be empty -> null
+                    p -> getAasIvmlMapper().instantiate(InstantiationMode.INTERFACES, AasUtils.readString(p), null)
                     , a);
             })
         );
@@ -476,7 +478,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * Instantiates according to the given {@code configurer}.
      * 
      * @param mode the instantiation mode
-     * @param appId the app to build
+     * @param appId the app to build, ignored if empty or <b>null</b>
      * @param codeFile the code file containing the implementation
      * @return summary of instantiation results depending on {@code mode}, e.g., list of generated and downloadable 
      *     template URIs for {@link InstantiationMode#APPS_NO_DEPS} else <b>null</b>
@@ -500,7 +502,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         PlatformInstantiator.setTraceFilter();
         ConfigurationManager.cleanGenTarget();
         long start = System.currentTimeMillis();
-        if (null != appId) {
+        if (null != appId && appId.length() > 0) {
             System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, appId);
         }
         Object result = null;
@@ -691,12 +693,12 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             }
             if (null == result && IvmlUtils.isOfCompoundType(type, "ServiceMesh")) {
                 String prjName = getMeshProjectName(name);
-                result = findOrCreateProject(root, prjName, true);
+                result = findOrCreateProject(root, prjName, true, null);
                 prepareMeshProject(result, root);
             }
             if (null == result && IvmlUtils.isOfCompoundType(type, "Application")) {
                 String prjName = getApplicationProjectName(name);
-                result = findOrCreateProject(root, prjName, true);
+                result = findOrCreateProject(root, prjName, true, null);
                 prepareApplicationProject(result, root, meshes);
             }
             if (null == result) { // immediate fallback
@@ -755,6 +757,30 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             result = new File(result, subpath);
         }
         return new File(result, project.getName() + ".ivml");
+    }
+
+    /**
+     * Notifies changing {@code var} by {@code changeType} in the case of {@code operation} on {@code element}.
+     * 
+     * @param var the changed/created variable
+     * @param changeType the change type
+     * @param operation the operation causing the change to be included in logs if something goes wrong
+     * @param element the element involved the change to be included in logs if something goes wrong
+     */
+    private void notifyChange(DecisionVariableDeclaration var, ConfigurationChangeType changeType, String operation, 
+        String element) {
+        try {
+            if (var != null && changeType != null) {
+                net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
+                notifyChange(IvmlUtils.obtainDecision(cfg, var), changeType);
+            } else {
+                LoggerFactory.getLogger(this).warn("Trying to notify change for {} {}: variable or change type "
+                    + "is null", operation, element);
+            }
+        } catch (ConfigurationException e) {
+            LoggerFactory.getLogger(this).warn("Trying to notify change for {} {}: {}", operation, element, 
+                e.getMessage());
+        }
     }
 
     /**
@@ -906,6 +932,13 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 reloadAndValidate(copies);
                 LoggerFactory.getLogger(getClass()).info("Graph set in IVML app {} = {}, mesh {}, format {}", 
                     appName, appValueEx, meshName, format); // no graph, may become too long
+                if (doMesh) {
+                    notifyChange(results.meshVar, results.meshChange, "mesh", meshName);
+                }
+                if (doApp) {
+                    notifyChange(results.appVar, results.appChange, "app", appName);
+                }
+                
             } catch (ModelQueryException | ModelManagementException e) {
                 LoggerFactory.getLogger(getClass()).info("Setting graph in IVML app {} = {}, mesh '{}', format {}: {}", 
                     appName, appValueEx, meshName, format, e.getMessage()); // no graph, may become too long
@@ -931,9 +964,11 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     protected static class ModelResults {
         
         private Project meshProject;
+        private ConfigurationChangeType meshChange;
         private DecisionVariableDeclaration meshVar;
         private Project appProject;
-        
+        private DecisionVariableDeclaration appVar;
+        private ConfigurationChangeType appChange;
     }
     
     /**
@@ -1027,6 +1062,16 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     }
     
     /**
+     * Turns the knowledge whether something exists to the respective modified/created change type.
+     * 
+     * @param exists the exists status
+     * @return the change type
+     */
+    private static ConfigurationChangeType existsToChangeType(boolean exists) {
+        return exists ? ConfigurationChangeType.MODIFIED : ConfigurationChangeType.CREATED;
+    }
+    
+    /**
      * Writes an application project with the given new mesh variable.
      * 
      * @param appName the application name
@@ -1043,7 +1088,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         IDatatype applicationType = ModelQuery.findType(root, "Application", null);
         
         String appProjectName = getApplicationProjectName(appName);
-        results.appProject = findOrCreateProject(root, appProjectName, true);
+        results.appProject = findOrCreateProject(root, appProjectName, true, 
+            e -> results.appChange = existsToChangeType(e));
         prepareApplicationProject(results.appProject, root, 
             VarModel.INSTANCE.getMatchingModelNames("ServiceMeshPart*"));
         List<Object> meshes = new ArrayList<Object>();
@@ -1075,6 +1121,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             
         DecisionVariableDeclaration appVar = new DecisionVariableDeclaration(
             toIdentifier(appName), applicationType, results.appProject);
+        results.appVar = appVar;
         results.appProject.add(appVar);
         if (appValueEx.length() > 0) {
             setValue(appVar, appValueEx);
@@ -1133,10 +1180,15 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @param scope the scope to look for
      * @param projectName the project name
      * @param find try to find the project or directly create a new project 
+     * @param existsConsumer optional consumer on whether the project existed before, may be <b>null</b> for none
      * @return the project, created or found
      */
-    private Project findOrCreateProject(Project scope, String projectName, boolean find) {
+    private Project findOrCreateProject(Project scope, String projectName, boolean find, 
+        Consumer<Boolean> existsConsumer) {
         Project result = find ? ModelQuery.findProject(scope, projectName) : null;
+        if (null != existsConsumer) {
+            existsConsumer.accept(result != null);
+        }
         if (null == result) {
             result = new Project(projectName);
             IFreezable[] freezables = new IFreezable[] {result};
@@ -1195,7 +1247,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
         Project root = cfg.getProject();
         String meshProjectName = getMeshProjectName(meshName);
-        results.meshProject = findOrCreateProject(root, meshProjectName, false); // just overwrite
+        results.meshProject = findOrCreateProject(root, meshProjectName, false, 
+            e -> results.meshChange = existsToChangeType(e)); // just overwrite
         prepareMeshProject(results.meshProject, root);
         final IDatatype sourceType = ModelQuery.findType(root, "MeshSource", null);
         final IDatatype processorType = ModelQuery.findType(root, "MeshProcessor", null);
@@ -1416,6 +1469,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             .build(Type.STRING, aDesc);
         smBuilder.createOperationBuilder(OP_GEN_INTERFACES)
             .setInvocable(iCreator.createInvocable(OP_GEN_INTERFACES))
+            .addInputVariable("appId", Type.STRING)
             .build(Type.STRING, aDesc);
 
         smBuilder.createOperationBuilder(OP_GET_TEMPLATES)

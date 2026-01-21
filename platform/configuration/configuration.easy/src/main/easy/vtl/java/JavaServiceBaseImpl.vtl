@@ -104,8 +104,8 @@ template JavaServiceBaseImpl(Configuration config, JavaCodeArtifact target, Serv
     def produceParameterBody(RealParameter p) {
         produceAccessors(p, "double");
     }
-
-    def createFallbackConstructor(JavaCodeClass cls, boolean withId, boolean withCode) {
+    
+    def createFallbackConstructor(JavaCodeClass cls, boolean withId, boolean withCode, boolean stateMachine) {
         cls.addConstructor('Fallback constructor setting most fields to "empty" default values.').(m|{
             m.setProtected();
             new JavaCodeMethodCall("super").(c|{
@@ -117,6 +117,10 @@ template JavaServiceBaseImpl(Configuration config, JavaCodeArtifact target, Serv
             });
             if (withCode) {
                 m.addCall("registerParameterConfigurers");
+            }
+            if (stateMachine) {
+            	m.addCall("initiateStateMachine");
+            	m.addAssignment("instance", "this");
             }
         });
     }
@@ -140,6 +144,29 @@ template JavaServiceBaseImpl(Configuration config, JavaCodeArtifact target, Serv
         });
     }
     
+    def createYamlConstructor(JavaCodeClass cls, boolean withId, boolean withCode, boolean stateMachine) {
+        cls.addConstructor('Creates a service instance from YAML information.').(m|{
+            m.setProtected();
+            new JavaCodeMethodCall("super").(c|{
+                if (withId) {
+                    m.getJavadocComment().setComment("Creates a service instance from a service id and a YAML artifact.");
+                    c.addArgument(m.addParameter("String", "serviceId", "the id of the service"));
+                    c.addArgument(m.addParameter("java.io.InputStream", "ymlFile", "the YML file containing the YAML artifact with the service descriptor"));
+                } else {
+                    c.addArgument(m.addParameter("de.iip_ecosphere.platform.services.environment.YamlService", "yaml", "the service information as read from YAML"));
+                }
+                m.add(c);
+            });
+            if (withCode) {
+                m.addCall("registerParameterConfigurers");
+            }
+            if (stateMachine) {
+            	m.addCall("initiateStateMachine");
+            	m.addAssignment("instance", "this");
+            }
+        });
+    }
+    
     def main(Configuration config, JavaCodeArtifact target, ServiceBase service, String pkg) {
         String clsName = asTypeName(service.name);
         // produceForInputTypes/produceForOutputTypes shall not produce something rather than collect the ingestors
@@ -156,8 +183,8 @@ template JavaServiceBaseImpl(Configuration config, JavaCodeArtifact target, Serv
         }
         mainCls.addAttribute("java.util.Map<String, de.iip_ecosphere.platform.services.environment.ParameterConfigurer<?>>", "paramConfigurers").addNew("java.util.HashMap<>");
 
-        createFallbackConstructor(mainCls, false, true);
-        createFallbackConstructor(mainCls, true, true);
+        createFallbackConstructor(mainCls, false, true, false);
+        createFallbackConstructor(mainCls, true, true, false);
         createYamlConstructor(mainCls, false, true);
         createYamlConstructor(mainCls, true, true);
         

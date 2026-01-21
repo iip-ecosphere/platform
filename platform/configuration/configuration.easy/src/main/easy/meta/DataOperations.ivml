@@ -92,7 +92,7 @@ project DataOperations {
     def sequenceOf(ConnectorOperation) collectOperations(DataTranslationOperation op) = op.arguments;
     
     compound AddDataTranslationOperation refines DataTranslationOperation {
-        // TODO constraint: args only real, integer fields/constants
+        // TODO constraint: args only real, integer fields/Fields
     }
 
     compound SubtractDataTranslationOperation refines DataTranslationOperation {
@@ -107,34 +107,30 @@ project DataOperations {
         // TODO constraint: args only real, integer fields/constants
     }
     
-    // --- propositional logic ------------
+    // ------------ Boolean Expressions ------------
+    abstract compound BooleanDataOperation refines DataOperation {}  
+    abstract compound BinaryBooleanOperation refines BooleanDataOperation {
+    	DataOperation leftOperand;
+    	DataOperation rightOperand;
+    }
     
-    
-    abstract compound Condition refines DataOperation {
+    abstract compound EqualsOperation refines BinaryBooleanOperation {}
+    compound EqualsStringOperation refines EqualsOperation {}
+    compound EqualsIntegerOperation refines EqualsOperation {}
         
-    }
+    compound GreaterOperation refines BinaryBooleanOperation {}
+    compound GreaterOrEqualOperation refines BinaryBooleanOperation {}
+    compound GreaterIntegerOperation refines GreaterOperation {}
+    compound GreaterOrEqualIntegerOperation refines GreaterOrEqualOperation {}
     
-    enum ComparisonOperator {EQUALS, NOT_EQUALS, GREATER, GREATER_OR_EQUAL, LESS};
-    
-    compound BooleanCondition refines Condition {
-        DataFieldAccess field;
-    }
-    
-    
-    compound BinaryCondition refines Condition {
-        DataOperation leftOperand;
-        DataOperation rightOperand;
-    }
-    
-    
-    
-    compound EqualsCondition refines BinaryCondition {
-        
-    }
-    
-    @dispatchBasis
-    def String produceCondition(BinaryCondition cond) = {};
-    
-    @dispatchCase
-    def String produceCondition(EqualsCondition cond) = "tutaj jest wynik";
+    compound LocalDataFieldAccess refines DataFieldAccess {}
+    compound BooleanFieldAccess refines BooleanDataOperation {
+    	refTo(Field) field; // TODO: constrain field value needs to be boolean type
+	}
+	compound LocalBooleanFieldAccess refines BooleanDataOperation {
+    	refTo(Field) field; // TODO: constrain field value needs to be boolean type
+	}
+	compound NotOperation refines BooleanDataOperation {
+		BooleanDataOperation operand;
+	}
 }

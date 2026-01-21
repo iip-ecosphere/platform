@@ -9,56 +9,108 @@ import JavaServiceBaseImpl;
 template JavaServiceImplStateMachine(Configuration config, JavaCodeArtifact target, String pkg, JavaService service) extends ServiceBasics {
     
     JavaCodeClass mainCls;
-
-    @DispatchBasis
-    def String produceCondition(DataOperation op) {
+	
+	@DispatchBasis
+	 def String produceCondition(DataOperation op) {
         "";
     }
-
+    
     @DispatchCase
-    def String produceCondition(BooleanCondition cond) {
-        produceCondition(cond.field);
+    def String produceCondition(EqualsStringOperation op) {
+    	if(op.rightOperand.isKindOf(StringConstantDataOperation)) {
+    		produceCondition(op.rightOperand) + ".equals(" + produceCondition(op.leftOperand) + ")";
+    	} else {
+    		produceCondition(op.leftOperand) + ".equals(" + produceCondition(op.rightOperand) + ")";
+    	} 	   
+    }
+	
+    @DispatchCase
+	def String produceCondition(EqualsIntegerOperation op) {
+	    produceCondition(op.leftOperand) + " == " + produceCondition(op.rightOperand);
+	}
+	
+	@DispatchCase
+    def String produceCondition(GreaterIntegerOperation op) {
+    	produceCondition(op.leftOperand) + " > " + produceCondition(op.rightOperand);
+    }
+    
+    @DispatchCase
+    def String produceCondition(GreaterOrEqualIntegerOperation op) {
+    	produceCondition(op.leftOperand) + " >= " + produceCondition(op.rightOperand);
     }
 
+    // data field access
     @DispatchCase
     def String produceCondition(DataFieldAccess op) {
-        "data." + op.field.name + "()";
+    	// TODO: this is suboptimal since I cannot be sure if instance of this RecordType will be called data every time
+        "data.get" + (op.field.name).firstToUpperCase() + "()"; 
     }
 
-    @DispatchCase
-    def String produceCondition(EqualsCondition op) {
-        produceCondition(op.leftOperand) + " == " + produceCondition(op.rightOperand);
-        // this is a problem
-        //Integer val1 = op.leftOperand.value;
-        //IntegerConstantDataOperation lala = op.leftOperand;
-        //Integer val = lala.value;
-        //mainCls.addAttribute("equals cond: ", "dasdfa ${op.leftOperand}");
-        //mainCls.addAttribute("equals value: ", " ${val}");
-        //JavaCodeBlock block = 'LO:';
+	@DispatchCase
+    def String produceCondition(LocalDataFieldAccess op) {
+        "get" + (op.field.name).firstToUpperCase() + "()";
     }
+   	
+	@DispatchCase
+	def String produceCondition(BooleanFieldAccess op) {
+	     "data.get" + (op.field.name).firstToUpperCase() + "()"; 
+	}
+	
+	@DispatchCase
+	def String produceCondition(LocalBooleanFieldAccess op) {
+	     "get" + (op.field.name).firstToUpperCase() + "()"; 
+	}
+	
+	@DispatchCase
+	def String produceCondition(NotOperation op) {
+	    "(!" + produceCondition(op.operand) + ")";
+	}
     
     @DispatchCase
     def String produceCondition(IntegerConstantDataOperation op) {
         "${op.value}";
     }
      
-    def test() {
-        'test funkcja';
+    @DispatchCase
+    def String produceCondition(StringConstantDataOperation op) {
+        '\"${op.value}\"';
     }
     
-    def getAllEvents(StateMachine sm, setOf(String) events) {
-        for (State state : sm.states) {
-            for (Transition t : state.transitions) {
-                String eventName = t.event.field.field.name;
-                if(!events.includes(eventName)) {
-                    events.add(eventName);
-                }
+    def getAllTransitions(StateMachine sm, setOf(Transition) transitionList) {
+    	for (State state : sm.states){
+    		for (Transition t : state.transitions) {
+             	transitionList.add(t);
             }
-        }
+    	}
+    }
+    
+    def getAllActions(StateMachine sm, setOf(Action) actions, setOf(String) debug) {
+    	for (State state : sm.states) {
+    		for (Transition t: state.transitions) {
+    			for (Action a : t.actions) {
+    				actions.add(a);
+    				debug.add(a.id);
+    			}
+    		}
+    	}
     }
 
+    def findTransitionForInput(String inputName, setOf(Transition) allTransitions, setOf(Transition) inputTransitions, setOf(String) debug) {
+    	debug.add("() inputName=" + inputName + ":");
+    	for(Transition t : allTransitions) {
+    		Event event = t.event;
+    		for (Trigger trigger : event.triggers) {
+    			SignalSource source = trigger.source;
+    			if(source.inputName == inputName) {
+    				debug.add("- " + t.id + "with name " + t.name);
+    				inputTransitions.add(t);
+    			}
+    		}
+    	}
+    }
+    
     // called via produceForInputTypes/produceForOutputTypes
-    def produceAsyncProcessorBody(IOType type) {
+    def produceAsyncProcessorBodyDummy(IOType type) {
         // @Monika: variant 1, only the block as java code, add block
         String t = toTypeName(type);
         String inputParam = "data";
@@ -66,71 +118,22 @@ template JavaServiceImplStateMachine(Configuration config, JavaCodeArtifact targ
         JavaCodeMethod m = mainCls.addMethod("", "process" + t.firstToUpperCase());
         m.addOverrideAnnotation();
         m.addParameter(toQualifiedTypeName(t), "data");
+        
+    }
+
+    // called via produceForInputTypes/produceForOutputTypes
+    def produceAsyncProcessorBody(IOType type) {
+        // @Monika: variant 1, only the block as java code, add block
+        String t = toTypeName(type);
+        StateMachine sm = service.stateMachine;
+        JavaCodeMethod m = mainCls.addMethod("", "process" + t.firstToUpperCase());
+        m.addOverrideAnnotation();
+        m.addParameter(toQualifiedTypeName(t), "data");
         JavaCodeBlock b = '// comment';
         m.addAll(b);
+        JavaCodeBlock fsmFunCall = 'fsm.process${t.firstToUpperCase()}(data);';
+        m.addAll(fsmFunCall);
 
-        RecordType data = type.type;        
-        if(data.name == service.stateMachine.input.name ) {
-            /*
-            for(State s : service.stateMachine.states) {
-                for (Transition t : s.transitions) {
-                    BinaryCondition cond = t.condition;
-                    //mainCls.addAttribute("condition", "${cond}");
-                    //JavaCodeBlock block = '// condition ${t.id} ${cond.leftOperand};';
-                    //JavaCodeBlock block = produceCondition(cond);
-                
-                    //m.addAll(block);
-                    mainCls.addAttribute("jkaljfs", test());
-                    //produceCondition(cond);
-                    //mainCls.addAttribute("PROD", produceCondition(cond));
-                    
-                    
-                //IntegerConstantDataOperation operand = cond.leftOperand; 
-                 //mainCls.addAttribute("condition", "${cond.value}");
-                 //mainCls.addAttribute("condition", "${t.condition.leftOperand}");
-                }
-            } */
-            for (Field f : data.fields) {
-            m.addIf('true /*' + inputParam + '.get${(f.name).firstToUpperCase()}()*/').(a | {
-                a.addSLComment((service.stateMachine.id).firstToLowerCase() + "." + f.name);
-            });
-            } 
-            
-            // create if only for events (not condition) from data
-            JavaCodeBlock b1 = '// events';
-            m.addAll(b1);
-            setOf(String) eventNames = {};
-            
-            getAllEvents(sm, eventNames);
-            for(String name : eventNames) {
-                
-                for (Field f : data.fields) {
-                    if(f.name == name) {
-                        m.addIf('true /*${f.name}()*/');
-                        for(State state : service.stateMachine.states) {
-                            for(Transition transition: state.transitions) {
-                                
-                                if(transition.event.field.field.name == name) {
-                                    m.addIf('true /*${produceCondition(transition.condition)}*/');
-                
-                                    
-                                }
-                
-                            }
-                    }}
-                }
-                
-            }
-        }
-
-        /* this works
-        for(State state : service.stateMachine.states) {
-            for(Transition transition: state.transitions) {
-                m.addIf('EVENT: ${transition.event.field.field.name}()');
-            }
-        }
-        * 
-        */
     }
     
     // called via produceForInputTypes/produceForOutputTypes
@@ -153,139 +156,363 @@ template JavaServiceImplStateMachine(Configuration config, JavaCodeArtifact targ
                 // do whatever
             }
         '));
-        //mainCls.addMethod(toQualifiedTypeName(type), "produce" + t.firstToUpperCase());
     }    
-    
     
     def main(Configuration config, JavaCodeArtifact target, String pkg, JavaService service) {
         String clsName = asTypeName(service.name);
         mainCls = codeCreateClass(target, pkg, clsName, "IIP-Ecosphere service with state machine for service \'${service.name}\'");
         mainCls.addExtends("iip.impl.${clsName}Impl");
-
-        createFallbackConstructor(mainCls, false, false);
-        createFallbackConstructor(mainCls, true, false);
-        createYamlConstructor(mainCls, false, false);
-        createYamlConstructor(mainCls, true, false);
+        StateMachine sm = service.stateMachine;
+        
+        // Names
+        String stateMachineId = sm.id;
+        String stateMachineClassName = stateMachineId.firstToUpperCase();
+        String fsm = "fsm";
+        String ctx = "ctx";
+        String currentState = "currentState";
+        String stateInterfaceName = "State";
+        String stateInstName = "state";
+        String serviceClsName = (service.id).firstToUpperCase();
+        String serviceInstName = "service";
+        String lastStateChange = "lastStateChange";
+        String timeout = "TIMEOUT";
+        
+        String clockClsName = "java.time.Clock";
+        String clockInstName = "clock";
+        String nowFunction = "now";
+        String millisSinceLastStateChange = "millisSinceLastStateChange";
+        String hasElapsed = "hasElapsed";
+        
+        String setStateFucName = "setState";
+        String markStateChangeFunName = "markStateChange";
+        String getNameFunName = "getName"; 
+        String getCtx = "getCtx";
+        
+        // service attributes
+        mainCls.addAttribute(stateMachineClassName, fsm);
+        // TODO: the instance of ActionDecider is here only because of the design of HM22
+        // -> static method to receive notification "switchingAiCompleted".
+        // Remove it later (also from constructor methods!). 
+        mainCls.addAttribute(service.id, "instance").setStatic(); 
+        
+        createFallbackConstructor(mainCls, false, false, true);
+        createFallbackConstructor(mainCls, true, false, true);
+        
+        createYamlConstructor(mainCls, false, false, true);
+        createYamlConstructor(mainCls, true, false, true);
         
         produceForInputTypes(service);
         produceForOutputTypes(service);
         
-        StateMachine sm = service.stateMachine;
-        String stateMachineId = sm.id;
-        String ctx = "context";
-        String currentState = "currentState";
+        setOf(Action) allActions = {};
+       	setOf(String) debugAllActions = {};
+       	getAllActions(sm, allActions, debugAllActions);
         
-        mainCls.addAttribute(service.stateMachine.id, (service.stateMachine.id).firstToLowerCase()).setPublic();
-        
-        
-             
-        mainCls.addClass("State").asInterface().(i | {
-            setOf(String) events = {};
-            getAllEvents(sm, events);
-            for(String event : events) {
-                i.addMethod(new JavaCodeMethod('void ${event}();'));
-            }           
-        });
-        
-        // constructor
-        mainCls.addConstructor("NOWY KONSTRUCZOR").(newConst | {
-            String smNameLowerCase = (service.stateMachine.id).firstToLowerCase();
-            newConst.addCall("super").addArgument("ServiceKind.${service.kind}");
-            newConst.addAssignment("this." + smNameLowerCase, "this.new ${service.stateMachine.id}()");
-        });
 
-        // Interface impl
-        for (State state : sm.states) {
-            String stateId = state.id;
-            mainCls.addClass(stateId.firstToUpperCase() + "State").setPublic().implements("State").(subCls | {
-                subCls.addAttribute(stateMachineId.firstToUpperCase(), ctx).setFinal();
-                    
-                subCls.addConstructor("default constructor").(cons | {
-                    cons.addParameter(sm.id, "context", "");            
-                    cons.addAssignment("this." + ctx, ctx);
-                });
-                
-                setOf(String) events = {};          
-                getAllEvents(sm, events);
-                for (String event : events) {
-                    for (Transition t : state.transitions) {
-                        String eventName = t.event.field.field.name;
-                        if(event == eventName) {
-                            subCls.addMethod(new JavaCodeMethod('public void ${eventName}(){
-                                System.out.println("${t.log}");
-                                context.${t.target.id}();
-                                context.setState(context.get${(t.target.id).firstToUpperCase()}State());
-                                
-                            };')).addOverrideAnnotation();
-                        }
-                    }   
-                }
-            });
-        } 
-                        
-        mainCls.addClass(
-            "${sm.id}"
-        ).(cls | {  
-            
-            cls.addAttribute("State", currentState); 
-            
-            cls.addConstructor().(cons | {
-                String lastStateId;
-                for (State state : sm.states) {
-                    cons.addAssignment(
-                        state.id + "State", " new " + (state.id).firstToUpperCase() + "State(this)"
-                    );
-                    lastStateId = state.id;
-                }
-                cons.addAssignment("currentState", lastStateId + "State");
-            });
-            
-            setOf(String) events = {};
-            for (State state : sm.states) {
-                for (Transition t : state.transitions) {
-                    String eventName = t.event.field.field.name;
-                    if(!events.includes(eventName)) {
-                        events.add(eventName);
-                        cls.addMethod(new JavaCodeMethod(
-                        'public void ${eventName}(){
-                            currentState. ${eventName}();       
-                        };')
-                    );}
-                        
-                }       
-                cls.addAttribute("State", state.id + "State").setFinal(); 
-                
-                // Helping methods
-                cls.addMethod(new JavaCodeMethod(
-                    'public State get${(state.id).firstToUpperCase()}State(){
-                        return this.${state.id}State;       
-                    };')
-                );      
-                
-                // Actions
-                cls.addMethod(new JavaCodeMethod(
-                    'public void ${(state.id)}Action(){
-                        System.out.println("${(state.id).firstToUpperCase()}");
-                    };')
-                );
-                
-                cls.addMethod(new JavaCodeMethod(
-                    'public void ${state.id}(){
-                        ${state.id}Action();
-                    };')
-                );
-                 
-            }
-            
-            // Helping methods
-            cls.addMethod(new JavaCodeMethod(
-                'public void setState(State state) {
-                    this.currentState = state;
-                };
-                '
-            ));
+        mainCls.addMethod(new JavaCodeMethod(
+        	'public void initiateStateMachine() {
+				this.${fsm} = new ${stateMachineClassName}(this, Clock.systemDefaultZone());
+			};')
+		);
+        
+        // local variables getter
+        for(Field f : sm.localVariables.fields) {
+        	String name = f.name;
+        	mainCls.addMethod(new JavaCodeMethod(
+        		'public ${toTypeName(f.type)} get${name.firstToUpperCase()}() {
+					throw new UnsupportedOperationException("Not implemented yet");	
+				};')
+			);
+        }
+        
+        setOf(Transition) transitionList = {};
+        getAllTransitions(sm, transitionList);
+        
+        // State interface
+		mainCls.addClass(stateInterfaceName).asInterface().setPublic().(i | {
+				i.addMethod(new JavaCodeMethod('String ${getNameFunName}();'));
+				// function for each transition (name)               
+	            for(Transition t : transitionList) {
+	        		if(isDefined(t.payload)) {
+	        			String paramName = t.payload;
+	        			i.addMethod(new JavaCodeMethod('void ${t.name}(${paramName.firstToUpperCase()} data);'));
+	
+	        		} else {
+	        			i.addMethod(new JavaCodeMethod('void ${t.name}();'));
+	        		}
+	        	}
+        });   
+        
+        // AbstractStateMachine     
+        mainCls.addClass("AbstractStateMachine").setAbstract().(asmCls | {
+        	asmCls.addAttribute(clockClsName, clockInstName).setFinal();
+        	asmCls.addAttribute("long", lastStateChange);
+        	asmCls.addConstructor("").(newConst | {
+        		newConst.addParameter(clockClsName, clockInstName, "");  
+        		newConst.addAssignment("this." + clockInstName, clockInstName);
+        		newConst.addAssignment("this." + lastStateChange, nowFunction + "()");
+        		
+        	});
+        	
+        	asmCls.addMethod(new JavaCodeMethod(
+        		'public long ${nowFunction}() {
+					return ${clockInstName}.millis();	
+				};')
+			);
+			
+			asmCls.addMethod(new JavaCodeMethod(
+        		'public long ${millisSinceLastStateChange}() {
+					return ${nowFunction}() - ${lastStateChange};
+				};')
+			);
+			
+			asmCls.addMethod(new JavaCodeMethod(
+        		'public boolean ${hasElapsed}(long threshold) {
+					return ${millisSinceLastStateChange}() >= threshold;
+				};')
+			);
+			
+			asmCls.addMethod(new JavaCodeMethod(
+        		'public void ${markStateChangeFunName}() {
+					this.${lastStateChange} = ${nowFunction}();
+				};')
+			);
         });
         
+        // StateMachine
+        mainCls.addClass(stateMachineClassName).extends("Abstract" + stateMachineClassName).(smCls | {
+        	smCls.addAttribute(stateInterfaceName, currentState);
+        	smCls.addMethod(new JavaCodeMethod(
+	        		'public ${stateInterfaceName} get${ (currentState).firstToUpperCase()}() {
+						return this.${currentState};	
+					};')
+			);
+        	
+        	smCls.addAttribute(serviceClsName, serviceInstName).setFinal();
+        	if(isDefined(sm.timeout)) {
+        		smCls.addAttribute("long", timeout).addInitializer(sm.timeout).setPublicStaticFinal();
+        	}
+        	
+        	// states & their getter
+        	for (State state : sm.states) {
+        		smCls.addAttribute(stateInterfaceName, (state.id).firstToLowerCase() + stateInterfaceName).setFinal();
+        		
+        		smCls.addMethod(new JavaCodeMethod(
+	        		'public ${stateInterfaceName} get${ (state.id).firstToUpperCase() + stateInterfaceName}() {
+						return ${ (state.id).firstToLowerCase() + stateInterfaceName};	
+					};')
+				);
+        	}
+        	
+        	smCls.addConstructor("").(newConst | {
+        		newConst.addParameter(serviceClsName, serviceInstName, ""); 
+        		newConst.addParameter(clockClsName, clockInstName, ""); 
+        		newConst.addCall("super").addArgument(clockInstName);
+        		
+        		// state init
+        		for (State state : sm.states) {
+        			newConst.addAssignment("this." + (state.id).firstToLowerCase() + stateInterfaceName, 
+        				"new " + (state.id).firstToUpperCase() + stateInterfaceName + "(this)"
+        			);
+        		}
+        		newConst.addAssignment("this." + serviceInstName, serviceInstName);
+        		newConst.addCall(setStateFucName).addArgument((sm.initialState.id).firstToLowerCase()+ stateInterfaceName);
+        		
+        	});
+        	
+        	// AbstractState
+	        smCls.addClass("AbstractState").setPublic().setAbstract().implements(stateInterfaceName).(absCls | {
+	        	String classId = "StateMachine";  
+	        	String logFunName = "logIgnored";
+	        	absCls.addAttribute(classId, ctx).setFinal(); 
+	        	
+	        	absCls.addConstructor("").(newConst | {
+	        		JavaCodeBlock c = 'this.${ctx} = ${ctx};' ;
+	        		newConst.addAll(c);
+	        		newConst.addParameter(classId, ctx, ""); 
+	        	});            
+	            
+	        	for(Transition t : transitionList) {
+	        		String paramName = "";
+	        		if(isDefined(t.payload)) {
+	        			paramName = (t.payload).firstToUpperCase() + " data";
+	        		}
+	        		absCls.addMethod(new JavaCodeMethod('public void ${t.name}(${paramName})
+							{${logFunName}("${t.name}");};')).addOverrideAnnotation();
+	        	}
+	        	absCls.addMethod(new JavaCodeMethod(
+	        		'void ${logFunName}(String transName) {
+						System.out.println("[FSM] Transition " + transName + " is not defined in state " + ${getNameFunName}());
+					};'
+				));
+				
+				absCls.addMethod(new JavaCodeMethod(
+	        		'${classId} ${getCtx}() {
+						return this.${ctx};
+					};'
+				));
+	        });
+        	        	
+        	// Class for each State
+        	for (State state : sm.states) {
+        		String stateClsName = (state.id).firstToUpperCase() + stateInterfaceName;
+        		smCls.addClass(stateClsName).extends("Abstract" + stateInterfaceName).(stateCls | {
+        			stateCls.addConstructor("").(stateConst | {
+		        		stateConst.addParameter(stateMachineClassName, ctx, ""); 
+		        		stateConst.addCall("super").addArgument(ctx);
+        			});
+  
+        			stateCls.addMethod(new JavaCodeMethod(
+		        		'public String  ${getNameFunName} () {
+							return "${state.id}";						
+		                };'
+		            )); 	
+		            
+		            for(Transition t : state.transitions) {
+		            	String nextState = getCtx + '().' 
+		            		+ setStateFucName + '(' + getCtx +'().get' + (t.target.id).firstToUpperCase() 
+		            		+ stateInterfaceName + '());';
+		            	String action = '';
+		     
+		            	
+		            	if(isDefined(t.actions)) {
+		            		for(Action a : t.actions) {
+		            			if(isDefined(a.payload)) {
+		            				action = action + getCtx + '().${a.id}(data)\n;';
+		            			} else {
+		            				action = action + getCtx + '().${a.id}()\n;';
+		            			}
+		            			
+		            		}	
+		            	}
+		            	
+		            	if(isDefined(t.payload)) {
+		            		stateCls.addMethod(new JavaCodeMethod(
+				        		'public void ${t.name}(${t.payload} data) {
+									${nextState}
+									${action}
+								};')
+							).addOverrideAnnotation();
+								
+							
+		            	} else {
+		            		stateCls.addMethod(new JavaCodeMethod(
+				        		'public void ${t.name}() {
+									${nextState}
+									${action}
+								};')
+							).addOverrideAnnotation();
+				        }
+					}	       
+        		});
+        	}
+        	
+        	// StateMachine - actions   
+        	for(Action action : allActions) {
+        		String funcCall = serviceInstName + "." + action.id + "();";
+        		if(isDefined(action.payload)) {
+        			funcCall = serviceInstName + "." + action.id + "(data);";
+        			smCls.addMethod(new JavaCodeMethod( 
+				    	'public void ${action.id}(${action.payload} data) {
+							${funcCall}
+						};')
+					);
+        		} else {
+        			smCls.addMethod(new JavaCodeMethod( 
+				    	'public void ${action.id}() {
+							${funcCall}
+						};')
+					);
+				}
+        	}     	
+        	  	
+        	// StateMachine - helping functions
+        	smCls.addMethod(new JavaCodeMethod(
+        		'public void  ${setStateFucName} (${stateInterfaceName} ${stateInstName}){
+					this.${currentState} = ${stateInstName};
+					${markStateChangeFunName}();
+					
+                };'
+             ));
+  
+  			// FSM Events as functions
+  			setOf(String) debug = {};
+        	
+  			for (IOType io: service.input){
+    			DataType dt = io.type;
+    			String name = (dt.name).firstToUpperCase();
+    			
+    			setOf(Transition) inputTransitions = {};
+    			findTransitionForInput(name, transitionList, inputTransitions, debug);
+    			
+    			String inputTransitionFunCall = '';
+    			
+    			for (Transition t : inputTransitions) {
+    				String call = "";
+    			
+				    if (isDefined(t.payload)) {
+				        call = "currentState." + t.name + "(data);";
+				    } else {
+				        call = "currentState." + t.name + "();";
+				    }
+				    if(t.condition <> null) {
+				    	
+				       if(isDefined(t.hasSubcondition)) {
+					       	inputTransitionFunCall =
+					            inputTransitionFunCall
+					            + "if (" + produceCondition(t.condition) + ") {\n"
+					            + "		if(" + produceCondition(t.subcondition) + ") {\n"
+					            + "    		" + call + "\n"
+					            + "}}\n";
+				       } else {
+					       	inputTransitionFunCall =
+					            inputTransitionFunCall
+					            + "if (" + produceCondition(t.condition) + ") {\n"
+					            + "    " + call + "\n"
+					            + "}\n";
+				       }
+							 
+				    } else {
+				    	inputTransitionFunCall =
+				            inputTransitionFunCall
+				            + call + "\n";
+				    }
+				   	
+				}
+				
+				if(isDefined(sm.timeout)) {
+					smCls.addMethod(new JavaCodeMethod(
+		        		'public void  process${name}(${name} data){
+							if(hasElapsed(${timeout})) {
+								setState(getStopState());
+							}
+							${inputTransitionFunCall}
+							
+		                };'));
+				} else {
+					smCls.addMethod(new JavaCodeMethod(
+		        		'public void  process${name}(${name} data){
+							${inputTransitionFunCall}
+							
+		                };'));
+				}
+
+    		}
+        });
+		
+		// Service actions
+		for(Action action : allActions) {
+			if(isDefined(action.payload)) {
+				mainCls.addMethod(new JavaCodeMethod( 
+			    'public void ${action.id}(${action.payload} data) {
+				};')
+			);	
+			} else {
+				mainCls.addMethod(new JavaCodeMethod( 
+			    'public void ${action.id}() {
+				};')
+				);	
+			}	
+        }   
     }
-    
 }

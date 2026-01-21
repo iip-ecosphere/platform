@@ -10,6 +10,41 @@ project ServiceStateMachines {
    
    annotate BindingTime bindingTime = BindingTime::compile to .;
    annotate Integer uiGroup = UiMandatoryGroup1 to .;
+     
+   enum UpdateMode {CHANGE_OF_VALUE, CYCLIC};
+   compound SignalSource {
+   		String id;
+   		DataFieldAccess value;
+   		String inputName;
+   		UpdateMode updateMode;
+   }
+   
+   enum TriggerMode {ON_CHANGE, ON_UPDATE}; 
+   compound Trigger {
+   		String id;
+   		TriggerMode triggerMode;
+   		String expectedValue;
+   		refTo(DataType) expectedValueType;
+   		refTo(SignalSource) source;
+   }
+   
+   compound Event {
+		String id;
+      	setOf(refTo(Trigger)) triggers;
+   }
+       
+   compound Transition {
+       String id;
+       String name;
+       refTo(Event) event;
+       String log; 
+       refTo(State) target;
+       BooleanDataOperation condition;
+       BooleanDataOperation subcondition;
+       Boolean hasSubcondition;
+       String payload;
+       setOf(refTo(Action)) actions;
+   }
    
    compound State {
        String id;
@@ -17,23 +52,18 @@ project ServiceStateMachines {
        setOf(refTo(Transition)) transitions;       
    }
    
-   compound Event {
-       DataFieldAccess field;
-   }
-      
-   compound Transition {
-       String id;
-       refTo(Event) event;
-       String log; 
-       refTo(State) target;
-       Condition condition;
-       
+   compound Action {
+    	String id;
+    	String payload;
    }
    
    compound StateMachine {
        String id;
        setOf(refTo(State)) states;
        refTo(RecordType) input;
+       Integer timeout; // milliseconds
+       refTo(State) initialState;
+       refTo(RecordType) localVariables;
    }
    
 }
