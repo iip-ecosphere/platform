@@ -119,8 +119,8 @@ project KodexMesh {
         class = "de.iip_ecosphere.platform.test.apps.serviceImpl.NoImpl",
         artifact = "de.iip-ecosphere.platform:apps.ServiceImpl:" + iipVer,
         kind = ServiceKind::SINK_SERVICE,
-        input = {{type=refBy(TurnstilePlcOutput)}, {type=refBy(rec2)}},
-        stateMachine = refBy(Turnstile)
+        input = {{type=refBy(TurnstilePlcOutput)}, {type=refBy(rec2)}}
+        //,stateMachine = refBy(Turnstile)
     };
 
     // --------- state machine ---------------------------------
@@ -149,11 +149,13 @@ project KodexMesh {
     };
     
     Event insertCoin = {
-        field = DataFieldAccess{field=refBy(TurnstilePlcOutput.fields[0])}
+        id = "insertCoin"
+        //field = DataFieldAccess{field=refBy(TurnstilePlcOutput.fields[0])}
     };
     
     Event push = {
-        field = DataFieldAccess{field=refBy(TurnstilePlcOutput.fields[1])},
+        id = "push"
+        //field = refBy(TurnstilePlcOutput.fields[1]),
     };
     
     State unlocked = {
@@ -173,8 +175,8 @@ project KodexMesh {
         event = refBy(insertCoin),
         log = "inserting a coin in locked state -> unlocking the tile",
         target = refBy(unlocked),
-        condition = BooleanCondition {
-            field = DataFieldAccess{field=refBy(TurnstilePlcOutput.fields[0])}
+        condition = BooleanFieldAccess {
+            field = refBy(TurnstilePlcOutput.fields[0])
         } 
     };
     
@@ -183,8 +185,8 @@ project KodexMesh {
         event = refBy(push),
         log = "Pushing in locked state  -> no change",
         target = locked,
-        condition = BooleanCondition {
-            field = DataFieldAccess{field=refBy(TurnstilePlcOutput.fields[1])}
+        condition = BooleanFieldAccess {
+            field = refBy(TurnstilePlcOutput.fields[1])
         } 
     };
     
@@ -196,7 +198,7 @@ project KodexMesh {
         /*condition = BooleanCondition {
             field = DataFieldAccess{field=refBy(TurnstilePlcOutput.fields[2])}
         }*/
-        condition = EqualsCondition { // 3 = 3
+        condition = EqualsIntegerOperation { // 3 = 3
             leftOperand = DataFieldAccess{field=refBy(TurnstilePlcOutput.fields[2])},
             rightOperand = IntegerConstantDataOperation{value=3} 
         }
@@ -207,8 +209,8 @@ project KodexMesh {
         event = refBy(push),
         target= refBy(locked),
         log = "Pushing in unlocked state -> push successful",
-        condition = BooleanCondition {
-            field = DataFieldAccess{field=refBy(TurnstilePlcOutput.fields[3])}
+        condition = BooleanFieldAccess {
+            field = refBy(TurnstilePlcOutput.fields[3])
         } 
     };
     
