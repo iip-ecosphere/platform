@@ -764,7 +764,7 @@ public class IvmlUtils {
      * @throws ConfigurationException if obtaining the decision fails
      */
     public static IDecisionVariable obtainDecision(net.ssehub.easy.varModel.confModel.Configuration cfg, 
-        DecisionVariableDeclaration decl) throws ConfigurationException {
+        AbstractVariable decl) throws ConfigurationException {
         IDecisionVariable result = cfg.getDecision(decl);
         if (null == result) {
             result = cfg.createDecision(decl);

@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -75,6 +74,7 @@ import net.ssehub.easy.varModel.confModel.AssignmentState;
 import net.ssehub.easy.varModel.confModel.ConfigurationException;
 import net.ssehub.easy.varModel.confModel.IDecisionVariable;
 import net.ssehub.easy.varModel.cst.CSTSemanticException;
+import net.ssehub.easy.varModel.cst.ConstantValue;
 import net.ssehub.easy.varModel.management.VarModel;
 import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.Attribute;
@@ -693,12 +693,12 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             }
             if (null == result && IvmlUtils.isOfCompoundType(type, "ServiceMesh")) {
                 String prjName = getMeshProjectName(name);
-                result = findOrCreateProject(root, prjName, true, null);
+                result = findOrCreateProject(root, prjName, true);
                 prepareMeshProject(result, root);
             }
             if (null == result && IvmlUtils.isOfCompoundType(type, "Application")) {
                 String prjName = getApplicationProjectName(name);
-                result = findOrCreateProject(root, prjName, true, null);
+                result = findOrCreateProject(root, prjName, true);
                 prepareApplicationProject(result, root, meshes);
             }
             if (null == result) { // immediate fallback
@@ -762,8 +762,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     /**
      * Notifies changing {@code var} by {@code changeType} in the case of {@code operation} on {@code element}.
      * 
-     * @param var the changed/created variable
-     * @param changeType the change type
+     * @param var the changed/created variable, may be <b>null</b> then logged as issue
+     * @param changeType the change type, may be <b>null</b> then logged as issue
      * @param operation the operation causing the change to be included in logs if something goes wrong
      * @param element the element involved the change to be included in logs if something goes wrong
      */
@@ -801,8 +801,13 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             appName, meshName, appProject != null);
         try {
             Map<Project, CopiedFile> copies = new HashMap<>();
+            Project meshProject = null;
+            File appProjectFile = null;
+            ModelResults results = new ModelResults();
+            results.recordChanges(appProject, null);
             if (isNonEmptyString(meshName)) {
-                Project meshProject = ModelQuery.findProject(root, getMeshProjectName(meshName));
+                meshProject = ModelQuery.findProject(root, getMeshProjectName(meshName));
+                results.recordChanges(meshProject, null);
                 IDatatype meshType = ModelQuery.findType(root, "ServiceMesh", null);
                 DecisionVariableDeclaration meshVarDecl = ModelQuery.findDeclaration(
                     meshProject, new FirstDeclTypeSelector(meshType));
@@ -813,23 +818,35 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                     if (null != appVarDecl) {
                         IDecisionVariable var = cfg.getDecision(appVarDecl);
                         IDecisionVariable svc = var.getNestedElement("services");
-                        deleteReferenceFromContainerValue(svc, meshVarDecl); 
+                        deleteReferenceFromContainerValue(svc, meshVarDecl, var);
+                        
+                        appProjectFile = getIvmlFile(appProject);
+                        copies.put(appProject, copyToTmp(appProjectFile));
+                        saveTo(appProject, appProjectFile);
+                        results.recordChange(appVarDecl, ConfigurationChangeType.MODIFIED);
                     }
                 }
                 File f = getIvmlFile(meshProject);
                 copies.put(meshProject, copyToTmp(f));
                 f.delete();
-                notifyChange(meshProject, ConfigurationChangeType.DELETED);
+                results.recordChanges(meshProject, ConfigurationChangeType.DELETED);
             }
-            if (null != appProject && null == meshName || meshName.length() == 0) {
-                File f = getIvmlFile(appProject);
-                copies.put(appProject, copyToTmp(f));
-                f.delete();
-                notifyChange(appProject, ConfigurationChangeType.DELETED);
+            if (null != appProject && (null == meshName || meshName.length() == 0)) {
+                if (null == appProjectFile) {
+                    appProjectFile = getIvmlFile(appProject);
+                    copies.put(appProject, copyToTmp(appProjectFile));
+                }
+                appProjectFile.delete();
+                results.recordChanges(appProject, ConfigurationChangeType.DELETED);
+            } else {
+                appProject = null;
             }
             reloadAndValidate(copies);
             LoggerFactory.getLogger(getClass()).info("Deleted graph in IVML, app '{}' mesh '{}'", 
                 appName, meshName);
+            results.notifyChanges("Delete graph", appName + (isNonEmptyString(meshName) ? ", " + meshName : ""));
+            notifyChange(meshProject, ConfigurationChangeType.DELETED);
+            notifyChange(appProject, ConfigurationChangeType.DELETED);
         } catch (ModelQueryException e) {
             throw new ExecutionException(e);
         }
@@ -841,11 +858,12 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * 
      * @param var the variable to take the value from, may be <b>null</b>
      * @param search the variable declaration to search the reference for
+     * @param parVar the parent variable, for changing the containing var in IVML/project for saving
      * @return the new container value, may be <b>null</b> for not found
      * @throws ExecutionException if re-assigning the value fails
      */
-    private ContainerValue deleteReferenceFromContainerValue(IDecisionVariable var, AbstractVariable search) 
-        throws ExecutionException {
+    private ContainerValue deleteReferenceFromContainerValue(IDecisionVariable var, AbstractVariable search, 
+        IDecisionVariable parVar) throws ExecutionException {
         ContainerValue val = null;
         if (null != var && var.getValue() instanceof ContainerValue) {
             val = (ContainerValue) var.getValue();
@@ -860,8 +878,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             if (eltSize != val.getElementSize()) {
                 var.unfreeze(AssignmentState.ASSIGNED);
                 try {
-                    var.setValue(val, AssignmentState.FROZEN);
-                } catch (ConfigurationException e) {
+                    var.setValue(val, AssignmentState.FROZEN); // in config
+                    parVar.getDeclaration().setValue(new ConstantValue(parVar.getValue())); // and in model for saving
+                } catch (ConfigurationException | CSTSemanticException | ValueDoesNotMatchTypeException e) {
                     throw new ExecutionException(e);
                 }
             }
@@ -932,11 +951,12 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 reloadAndValidate(copies);
                 LoggerFactory.getLogger(getClass()).info("Graph set in IVML app {} = {}, mesh {}, format {}", 
                     appName, appValueEx, meshName, format); // no graph, may become too long
+                results.refreshChanges();
                 if (doMesh) {
-                    notifyChange(results.meshVar, results.meshChange, "mesh", meshName);
+                    results.notifyChanges("mesh", meshName);
                 }
                 if (doApp) {
-                    notifyChange(results.appVar, results.appChange, "app", appName);
+                    results.notifyChanges("app", appName);
                 }
                 
             } catch (ModelQueryException | ModelManagementException e) {
@@ -961,14 +981,148 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * 
      * @author Holger Eichelberger, SSE
      */
-    protected static class ModelResults {
+    protected class ModelResults {
         
         private Project meshProject;
-        private ConfigurationChangeType meshChange;
+        private Map<String, DecisionVariableDeclaration> names = new HashMap<>();
+        private Map<DecisionVariableDeclaration, ConfigurationChangeType> changes = new HashMap<>();
         private DecisionVariableDeclaration meshVar;
         private Project appProject;
-        private DecisionVariableDeclaration appVar;
-        private ConfigurationChangeType appChange;
+
+        /**
+         * Adds {@code var} to {@link #meshProject} and records the change as of {@code type}.
+         * 
+         * @param var the variable 
+         * @param type the change type
+         */
+        private void addToMeshProject(DecisionVariableDeclaration var, ConfigurationChangeType type) {
+            meshProject.add(var);
+            recordChange(var, type);
+        }
+
+        /**
+         * Adds {@code var} to {@link #appProject} and records the change as of {@code type}.
+         * 
+         * @param var the variable 
+         * @param type the change type
+         */
+        private void addToAppProject(DecisionVariableDeclaration var, ConfigurationChangeType type) {
+            appProject.add(var);
+            recordChange(var, type);
+        }
+
+        /**
+         * Records the change state of all top-level decision variables in {@code prj}.
+         * 
+         * @param prj the project, ignored if <b>null</b>
+         * @param type the change type, may be <b>null</b> for variable is known but change type is yet unclear 
+         *   (usually as initialization)
+         */
+        private void recordChanges(Project prj, ConfigurationChangeType type) {
+            if (null != prj) {
+                for (int e = 0; e < prj.getElementCount(); e++) {
+                    ContainableModelElement elt = prj.getElement(e);
+                    if (elt instanceof DecisionVariableDeclaration) {
+                        recordChange((DecisionVariableDeclaration) elt, type);
+                    }
+                }
+            }
+        }
+
+        /**
+         * Records a change on {@code var}. Tracks changes by variable names so if {@code var} replaces an older 
+         * variable, the change is still recorded while the older variable reference is removed from the recording
+         * and replaced by the newer one. {@link ConfigurationChangeType#DELETED} takes precedence.
+         * 
+         * @param var the variable
+         * @param type the primary change type, may be changed to {@code ConfigurationChangeType#MODIFIED} if the 
+         *   variable is already known even if its type is <b>null</b>.
+         */
+        private void recordChange(DecisionVariableDeclaration var, ConfigurationChangeType type) {
+            recordChange(var, type, ConfigurationChangeType.MODIFIED);
+        }
+        
+        /**
+         * Records a change on {@code var}. Tracks changes by variable names so if {@code var} replaces an older 
+         * variable, the change is still recorded while the older variable reference is removed from the recording
+         * and replaced by the newer one. {@link ConfigurationChangeType#DELETED} takes precedence.
+         * 
+         * @param var the variable
+         * @param type the primary change type, may be changed to {@code existsType} if the {@code mode} is not 
+         *     {@link ConfigurationChangeType#DELETED} and variable was already recorded even if the state is 
+         *     <b>null</b>
+         * @param existsType the type to use when the variable is already recorded/known
+         */
+        private void recordChange(DecisionVariableDeclaration var, ConfigurationChangeType type, 
+            ConfigurationChangeType existsType) {
+            ConfigurationChangeType chType = type;
+            // handle/replace variable re-creation, AAS only sees names
+            DecisionVariableDeclaration oldVar = names.get(var.getName()); 
+            if (oldVar != null && type != ConfigurationChangeType.DELETED) {
+                chType = existsType;
+                changes.remove(oldVar);
+            }
+            names.put(var.getName(), var);
+            changes.put(var, chType);
+        }
+        
+        /**
+         * Commits changes, i.e., inspects all recorded variables and replaces change types of <b>null</b> (initial) 
+         * by {@code type}.
+         * 
+         * @param type the new change type for initially recorded variables without state
+         */
+        private void commitChanges(ConfigurationChangeType type) {
+            for (Map.Entry<DecisionVariableDeclaration, ConfigurationChangeType> ent : changes.entrySet()) {
+                if (ent.getValue() == null) {
+                    ent.setValue(type);
+                }
+            }
+        }
+        
+        /**
+         * Notifies all changes with their recorded type.
+         * 
+         * @param operation the
+         * @param operation the operation causing the change to be included in logs if something goes wrong
+         * @param element the element involved the change to be included in logs if something goes wrong
+         * @see AasIvmlMapper#notifyChange(DecisionVariableDeclaration, ConfigurationChangeType, String, String)
+         */
+        private void notifyChanges(String operation, String element) {
+            for (Map.Entry<DecisionVariableDeclaration, ConfigurationChangeType> ent : changes.entrySet()) {
+                if (ent.getValue() != null) {
+                    notifyChange(ent.getKey(), ent.getValue(), operation, element);
+                }
+            }
+            changes.clear();
+            names.clear();
+        }
+        
+        /**
+         * Refreshes all decision variable declaration references in the change recording. This may be needed if
+         * a model reload has been performed and changes shall be notified with the new/reasoned values instead
+         * of the original values.
+         */
+        private void refreshChanges() {
+            net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
+            Project prj = cfg.getProject();
+            List<DecisionVariableDeclaration> decls = new ArrayList<>(changes.keySet());
+            for (DecisionVariableDeclaration decl : decls) {
+                String name = decl.getName();
+                try {
+                    ContainableModelElement elt = ModelQuery.findElementByName(prj, name, null);
+                    if (elt instanceof DecisionVariableDeclaration) {
+                        DecisionVariableDeclaration eDecl = (DecisionVariableDeclaration) elt;
+                        changes.put(eDecl, changes.remove(decl));
+                        names.put(name, eDecl);
+                    }
+                } catch (ModelQueryException e) {
+                    LoggerFactory.getLogger(AasIvmlMapper.class).warn(
+                        "Cannot refresh change status for variable {}: {}", name, e.getMessage());
+                }
+            }
+        }
+        
     }
     
     /**
@@ -1062,16 +1216,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     }
     
     /**
-     * Turns the knowledge whether something exists to the respective modified/created change type.
-     * 
-     * @param exists the exists status
-     * @return the change type
-     */
-    private static ConfigurationChangeType existsToChangeType(boolean exists) {
-        return exists ? ConfigurationChangeType.MODIFIED : ConfigurationChangeType.CREATED;
-    }
-    
-    /**
      * Writes an application project with the given new mesh variable.
      * 
      * @param appName the application name
@@ -1088,8 +1232,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         IDatatype applicationType = ModelQuery.findType(root, "Application", null);
         
         String appProjectName = getApplicationProjectName(appName);
-        results.appProject = findOrCreateProject(root, appProjectName, true, 
-            e -> results.appChange = existsToChangeType(e));
+        results.appProject = findOrCreateProject(root, appProjectName, true);
+        results.recordChanges(results.appProject, null);
         prepareApplicationProject(results.appProject, root, 
             VarModel.INSTANCE.getMatchingModelNames("ServiceMeshPart*"));
         List<Object> meshes = new ArrayList<Object>();
@@ -1098,7 +1242,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             for (int e = 0; e < results.appProject.getElementCount(); e++) {
                 ContainableModelElement elt = results.appProject.getElement(e);
                 if (elt instanceof DecisionVariableDeclaration) {
-                    IDecisionVariable var = cfg.getDecision((DecisionVariableDeclaration) elt);
+                    DecisionVariableDeclaration varDecl = (DecisionVariableDeclaration) elt;
+                    IDecisionVariable var = cfg.getDecision(varDecl);
                     Value val = var.getNestedElement("services").getValue();
                     if (val instanceof ContainerValue) {
                         ContainerValue cValue = (ContainerValue) val;
@@ -1111,6 +1256,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                                 meshes.add(mVal); // TODO value conversion?
                             }
                         }
+                        results.recordChange(varDecl, ConfigurationChangeType.MODIFIED);
                     }
                 }
             }
@@ -1121,12 +1267,11 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             
         DecisionVariableDeclaration appVar = new DecisionVariableDeclaration(
             toIdentifier(appName), applicationType, results.appProject);
-        results.appVar = appVar;
-        results.appProject.add(appVar);
+        results.addToAppProject(appVar, ConfigurationChangeType.CREATED);
         if (appValueEx.length() > 0) {
             setValue(appVar, appValueEx);
         }
-        notifyChange(results.appProject, ConfigurationChangeType.CREATED); // may be modified, shall work anyway
+        results.commitChanges(ConfigurationChangeType.DELETED);
     }
 
     /**
@@ -1180,15 +1325,10 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @param scope the scope to look for
      * @param projectName the project name
      * @param find try to find the project or directly create a new project 
-     * @param existsConsumer optional consumer on whether the project existed before, may be <b>null</b> for none
      * @return the project, created or found
      */
-    private Project findOrCreateProject(Project scope, String projectName, boolean find, 
-        Consumer<Boolean> existsConsumer) {
+    private Project findOrCreateProject(Project scope, String projectName, boolean find) {
         Project result = find ? ModelQuery.findProject(scope, projectName) : null;
-        if (null != existsConsumer) {
-            existsConsumer.accept(result != null);
-        }
         if (null == result) {
             result = new Project(projectName);
             IFreezable[] freezables = new IFreezable[] {result};
@@ -1247,8 +1387,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
         Project root = cfg.getProject();
         String meshProjectName = getMeshProjectName(meshName);
-        results.meshProject = findOrCreateProject(root, meshProjectName, false, 
-            e -> results.meshChange = existsToChangeType(e)); // just overwrite
+        results.meshProject = findOrCreateProject(root, meshProjectName, false); // just overwrite
+        results.recordChanges(results.meshProject, null);
         prepareMeshProject(results.meshProject, root);
         final IDatatype sourceType = ModelQuery.findType(root, "MeshSource", null);
         final IDatatype processorType = ModelQuery.findType(root, "MeshProcessor", null);
@@ -1275,7 +1415,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 + ",impl=" + IvmlUtils.getVarNameSafe(findServiceVar(services, n.getImpl()), "null")
                 + ",next = {";
             valueMap.put(nodeVar, nodeValEx);
-            results.meshProject.add(nodeVar);
+            results.addToMeshProject(nodeVar, ConfigurationChangeType.CREATED);
             nodeMap.put(n, nodeVar);
             if (type == sourceType && !sources.contains(nodeVar)) {
                 sources.add(nodeVar);
@@ -1292,7 +1432,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 }
                 DecisionVariableDeclaration edgeVar = new DecisionVariableDeclaration(
                     edgeVarName, connectorType, results.meshProject);
-                results.meshProject.add(edgeVar);
+                results.addToMeshProject(edgeVar, ConfigurationChangeType.CREATED);
                 DecisionVariableDeclaration end = nodeMap.get(e.getEnd());
                 String valueEx = "{name=\"" + edgeName + "\", next=refBy(" + toId(end.getName()) + ")}";
                 setValue(edgeVar, valueEx);
@@ -1309,7 +1449,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             setValue(nodeVar, valueMap.get(nodeVar) + "}}"); 
         }
         results.meshVar = new DecisionVariableDeclaration(toIdentifier(meshName), meshType, results.meshProject);
-        results.meshProject.add(results.meshVar);
+        results.addToMeshProject(results.meshVar, ConfigurationChangeType.CREATED);
         String meshValEx = "{description=\"" + meshName + "\", sources={";
         for (int s = 0; s < sources.size(); s++) {
             if (s > 0) {
@@ -1319,7 +1459,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         }
         meshValEx += "}}";
         setValue(results.meshVar, meshValEx);
-        notifyChange(results.meshProject, ConfigurationChangeType.CREATED);
+        results.commitChanges(ConfigurationChangeType.DELETED);
     }
     
     /**

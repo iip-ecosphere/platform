@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.junit.After;
@@ -30,6 +31,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.configuration.cfg.ConfigurationChangeType;
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor;
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationManager;
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationSetup;
@@ -305,14 +307,16 @@ public class AasIvmlMapperTest extends TestWithPlugin {
 
     /**
      * A slightly extended graph mapper that changes an extended managed model structure with wildcards
-     * for AllTypes and AllServices into the usual structure while modifying a graph. 
+     * for AllTypes and AllServices into the usual structure while modifying a graph. This specialized testing
+     * mapper records all changes and makes them available via {@link #getChanges()}.
      * 
      * @author Holger Eichelberger, SSE
      */
     private static class MyAasIvmlMapper extends AasIvmlMapper {
         
         private boolean adapt;
-
+        private Map<IDecisionVariable, ConfigurationChangeType> changes = new HashMap<>();
+        
         /**
          * Creates a mapper with default settings.
          * 
@@ -323,7 +327,75 @@ public class AasIvmlMapperTest extends TestWithPlugin {
          */
         public MyAasIvmlMapper(Supplier<Configuration> cfgSupplier, IvmlGraphMapper graphMapper, boolean adapt) {
             super(cfgSupplier, graphMapper, null);
+            setChangeListener(new ConfigurationChangeListener() {
+                
+                @Override
+                public void configurationChanged(IDecisionVariable var, ConfigurationChangeType type) {
+                    changes.put(var,  type);
+                }
+                
+            });
             this.adapt = adapt;
+        }
+
+        /**
+         * Asserts the number of changes.
+         * 
+         * @param count the expected number of changes
+         */
+        private void assertChangesCount(int count) {
+            Assert.assertEquals("Number of changes differs", count, changes.size());
+        }
+
+        /**
+         * Asserts a change on the specified variable.
+         * 
+         * @param varPred predicate identifying the variable to test for, via its name
+         * @param type the expected change type
+         */
+        private void assertChange(Predicate<String> varPred, ConfigurationChangeType type) {
+            Map.Entry<IDecisionVariable, ConfigurationChangeType> found = null;
+            for (Map.Entry<IDecisionVariable, ConfigurationChangeType> ent : changes.entrySet()) {
+                if (varPred.test(ent.getKey().getDeclaration().getName())) {
+                    found = ent;
+                    break;
+                }
+            }
+            Assert.assertNotNull("Change for specified variable not found/recorded.", found);
+            Assert.assertEquals("Change type mismatch", type, found.getValue());
+        }
+        
+        /**
+         * Convenience method for {@link #assertChangesCount(int)}, 
+         * {@link #assertChange(Predicate, ConfigurationChangeType)} and {@link #clearChanges()}.
+         * 
+         * @param count the expected number of changes
+         * @param varPred predicate identifying the variable to test for, via its name
+         * @param type the expected change type
+         */
+        private void assertChangeAndClear(int count, Predicate<String> varPred, ConfigurationChangeType type) {
+            assertChangesCount(count);
+            assertChange(varPred, type);
+            clearChanges();
+        }
+        
+        /**
+         * Asserts {@code type\ on all variables in {@code names} found by equality.
+         * 
+         * @param type the expected change type
+         * @param names variable names to be asserted
+         */
+        private void assertChanges(ConfigurationChangeType type, String... names) {
+            for (String name: names) {
+                assertChange(n -> n.equals(name), type);
+            }
+        }
+        
+        /**
+         * Clears all recorded changes.
+         */
+        private void clearChanges() {
+            changes.clear();
         }
 
         @Override
@@ -368,10 +440,9 @@ public class AasIvmlMapperTest extends TestWithPlugin {
      *   a default managed model
      * @return the instance
      */
-    private AasIvmlMapper getInstance(boolean adapt) {
+    private MyAasIvmlMapper getInstance(boolean adapt) {
         Configuration cfg = ConfigurationManager.getVilConfiguration();
         Assert.assertNotNull("No configuration available", cfg);
-        // TODO no listeners for now
         return new MyAasIvmlMapper(() -> cfg, new ServiceMeshGraphMapper(), adapt); 
     }
     
@@ -439,7 +510,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
-        AasIvmlMapper mapper = getInstance(false);
+        MyAasIvmlMapper mapper = getInstance(false);
         
         Map<String, String> values = new HashMap<String, String>();
         values.put("instDir", "\"/home/iip\""); // IVML expression
@@ -455,10 +526,17 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         assertStringVar("mg.art:art:1.2.3", mapper.getVariable("deviceIdProvider.artifact"));
         
         assertIvmlFileChange(MODEL_NAME, false, "instDir", "javaExe", "deviceIdProvider");
-    
+        mapper.assertChangesCount(values.size());
+        for (String name : values.keySet()) {
+            mapper.assertChange(n -> n.equals(name), ConfigurationChangeType.MODIFIED);
+        }
+        mapper.clearChanges();
+
         stopEasy(lcd);
         setupIvmlFiles(); // revert changes
     }
+    
+    // checkstyle: stop method length check
 
     /**
      * Tests the set/delete graph functions.
@@ -475,23 +553,23 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         
         DefaultGraph graph = new DefaultGraph(null);
         DefaultNode n1 = new DefaultNode(null);
-        n1.setName("src");
+        n1.setName("graphSrc");
         graph.addNode(n1);
         DefaultNode n2 = new DefaultNode(null);
         n2.setName("Sink");
-        n2.setImpl("snk");
+        n2.setImpl("graphSnk");
         graph.addNode(n2);
         DefaultEdge e1 = new DefaultEdge(null, n1, n2);
         n1.addEdge(e1);
         n2.addEdge(e1);
-        
-        AasIvmlMapper mapper = getInstance(true);
+
+        MyAasIvmlMapper mapper = getInstance(true);
         mapper.addGraphFormat(drawflowFormat);
         
-        mapper.createVariable("rec1", "RecordType", false, "{}");
+        mapper.createVariable("graphRec1", "RecordType", false, "{}");
         String valueEx = "{"
-            + "id=\"SimpleSource\"," 
-            + "name=\"Simple Data Source\","
+            + "id=\"SimpleGraphSource\"," 
+            + "name=\"Simple Graph Data Source\","
             + "description=\"\","
             + "ver=\"0.1.0\","
             + "deployable=true,"
@@ -499,12 +577,12 @@ public class AasIvmlMapperTest extends TestWithPlugin {
             + "class=\"de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleSourceImpl\","
             + "artifact=\"de.iip-ecosphere.platform:apps.ServiceImpl:0.4.0\","
             + "kind=ServiceKind::SOURCE_SERVICE,"
-            + "output={{type=rec1}}"
+            + "output={{type=graphRec1}}"
             + "}";
-        mapper.createVariable("src", "JavaService", false, valueEx);
+        mapper.createVariable("graphSrc", "JavaService", false, valueEx);
         valueEx = "{"
-            + "id=\"SimpleSink\"," 
-            + "name=\"Simple Data Sink\","
+            + "id=\"SimpleGraphSink\"," 
+            + "name=\"Simple Graph Data Sink\","
             + "description=\"\","
             + "ver=\"0.1.0\","
             + "deployable=true,"
@@ -512,33 +590,45 @@ public class AasIvmlMapperTest extends TestWithPlugin {
             + "class=\"de.iip_ecosphere.platform.test.apps.serviceImpl.SimpleSinkImpl\","
             + "artifact=\"de.iip-ecosphere.platform:apps.ServiceImpl:0.4.0\","
             + "kind=ServiceKind::SINK_SERVICE,"
-            + "input={{type=rec1}}"
+            + "input={{type=graphRec1}}"
             + "}";
-        mapper.createVariable("snk", "JavaService", false, valueEx);
+        mapper.createVariable("graphSnk", "JavaService", false, valueEx);
         
         valueEx = "{"
-            + "id=\"myApp\","
+            + "id=\"myTestApp\","
             + "name=\"name\","
             + "description=\"\","
             + "ver=\"0.1.0\""
             + "}";
-        mapper.setGraph("myApp", valueEx, "myMesh", drawflowFormat.getName(), drawflowFormat.toString(graph));
+        mapper.setGraph("myTestApp", valueEx, "myTestMesh", drawflowFormat.getName(), drawflowFormat.toString(graph));
 
-        assertIvmlFileChange("AllTypes", false, "rec1");
-        assertIvmlFileChange("AllServices", false, "src", "snk");
-        assertIvmlFileChange("meshes/ServiceMeshPartMyMesh", false, "myMesh", "src", "Sink");
-        assertIvmlFileChange("apps/ApplicationPartMyApp", false, "myApp");
+        assertIvmlFileChange("AllTypes", false, "graphRec1");
+        assertIvmlFileChange("AllServices", false, "graphSrc", "graphSnk");
+        assertIvmlFileChange("meshes/ServiceMeshPartMyTestMesh", false, "myTestMesh", "graphSrc", "Sink");
+        assertIvmlFileChange("apps/ApplicationPartMyTestApp", false, "myTestApp");
+        mapper.assertChanges(ConfigurationChangeType.CREATED, "node_Sink", "graphSrc", "myTestMesh", "node_graphSrc", 
+            "graphSnk", "conn_0", "graphRec1", "myTestApp");
+        mapper.clearChanges();
 
-        mapper.deleteGraph("myApp", "myMesh");
-        Assert.assertFalse(resolveIvmlFile("meshes/ServiceMeshPartMyAppMyMesh").exists());
-        assertIvmlFileChange("apps/ApplicationPartMyApp", false, "myApp");
-        mapper.deleteGraph("myApp", null);
-        Assert.assertFalse(resolveIvmlFile("meshes/ServiceMeshPartMyAppMyMesh").exists());
-        Assert.assertFalse(resolveIvmlFile("apps/ApplicationPartMyApp").exists());
+        mapper.deleteGraph("myTestApp", "myTestMesh"); // delete mesh without app
+        Assert.assertFalse(resolveIvmlFile("meshes/ServiceMeshPartMyAppMyTestMesh").exists());
+        assertIvmlFileChange("apps/ApplicationPartMyTestApp", false, "myTestApp");
+        mapper.assertChanges(ConfigurationChangeType.DELETED, "node_Sink", "conn_0", "node_graphSrc", "myTestMesh");
+        mapper.assertChanges(ConfigurationChangeType.MODIFIED, "myTestApp"); // delete mesh without app
+        mapper.clearChanges();
+
+        mapper.deleteGraph("myTestApp", null); // delete remaining app
+        Assert.assertFalse(resolveIvmlFile("meshes/ServiceMeshPartMyTestAppMyMesh").exists());
+        Assert.assertFalse(resolveIvmlFile("apps/ApplicationPartMyTestApp").exists());
+        mapper.assertChanges(ConfigurationChangeType.DELETED, "myTestApp"); // delete mesh without app
+        mapper.assertChangesCount(1);
+        mapper.clearChanges();
         
         stopEasy(lcd);
         setupIvmlFiles(); // revert changes
     }
+    
+    // checkstyle: resume method length number check
 
     /**
      * Tests the create/delete variable function.
@@ -551,9 +641,10 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
-        AasIvmlMapper mapper = getInstance(false);
+        MyAasIvmlMapper mapper = getInstance(false);
 
         mapper.createVariable("rec1", "RecordType", false, "{}");
+        mapper.assertChangeAndClear(1, n -> n.endsWith("rec1"), ConfigurationChangeType.CREATED);
 
         String valueEx = "{"
             + "id=\"SimpleSource\"," 
@@ -571,15 +662,19 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         mapper.createVariable("test1", "JavaService", false, valueEx);
         assertIvmlFileChange("AllTypes", false, "rec1");
         assertIvmlFileChange("AllServices", false, "test1");
+        mapper.assertChangeAndClear(1, n -> n.endsWith("test1"), ConfigurationChangeType.CREATED);
         
         mapper.deleteVariable("test1");
         assertIvmlFileChange("AllTypes", false, "rec1");
         assertIvmlFileChange("AllServices", true, "test1");
+        mapper.assertChangeAndClear(1, n -> n.endsWith("test1"), ConfigurationChangeType.DELETED);
 
         mapper.createVariable("test2", "setOf(Integer)", false, "{25, 27}");
         assertIvmlFileChange("AllConstants", false, "test2");
+        mapper.assertChangeAndClear(1, n -> n.endsWith("test2"), ConfigurationChangeType.CREATED);
         mapper.deleteVariable("test2");
         assertIvmlFileChange("AllConstants", true, "test2");
+        mapper.assertChangeAndClear(1, n -> n.endsWith("test2"), ConfigurationChangeType.DELETED);
         
         stopEasy(lcd);
         setupIvmlFiles(); // revert changes
@@ -620,7 +715,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
-        AasIvmlMapper mapper = getInstance(false);
+        MyAasIvmlMapper mapper = getInstance(false);
 
         mapper.renameVariable("myMesh", "myMesh1");
 
@@ -631,6 +726,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         var = IvmlModelQuery.findVariable(root, "myMesh1", null);
         Assert.assertNotNull(var); // shall be there
         Assert.assertEquals("ServiceMeshPartMyMesh", var.getProject().getName()); // shall still be there
+        mapper.assertChangeAndClear(1, n -> n.endsWith("myMesh1"), ConfigurationChangeType.MODIFIED);
 
         stopEasy(lcd);
         setupIvmlFiles(); // revert changes

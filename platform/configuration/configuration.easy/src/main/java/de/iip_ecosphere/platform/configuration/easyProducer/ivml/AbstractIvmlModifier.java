@@ -119,6 +119,15 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
             throw new IllegalArgumentException("graphMapper must not be null");
         }
         this.graphMapper = graphMapper;
+        setChangeListener(changeListener);
+    }
+
+    /**
+     * Sets the change listener. [testing]
+     * 
+     * @param changeListener the new change listener
+     */
+    protected void setChangeListener(ConfigurationChangeListener changeListener) {
         this.changeListener = changeListener;
     }
     
@@ -166,7 +175,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      * @param prj the project to write
      * @param out the writer to write the project to
      */
-    private static void write(Project prj, Writer out) {
+    protected static void write(Project prj, Writer out) {
         IVMLWriter writer = new IVMLWriter(out);
         writer.setFormatInitializer(true);
         writer.setEmitProjectFreezeDot(true);
@@ -1025,7 +1034,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                 for (Project p : projects) {
                     saveTo(p, getIvmlFile(p));
                 }
-                IDecisionVariable dVar = cfg.createDecision(var);
+                IDecisionVariable dVar = IvmlUtils.obtainDecision(cfg, var);
                 notifyChange(dVar, ConfigurationChangeType.MODIFIED);
                 getLogger().info("Renamed IVML variable {} to {}", varName, newVarName);
             } catch (ModelQueryException | ConfigurationException e) {
@@ -1065,7 +1074,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                 target.add(var);
                 //alternative: in own constraint, remove setValue above; may be needed if t is container
                 //createAssignment(var, valueEx, target); 
-                IDecisionVariable dVar = cfg.createDecision(var);
+                IDecisionVariable dVar = IvmlUtils.obtainDecision(cfg, var);
                 ReasoningResult res = validateAndPropagate(NO_TEMPLATE_FILTER);
                 throwIfFails(res, true);
                 saveTo(target, getIvmlFile(target));
@@ -1608,15 +1617,17 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
     /**
      * Notifies a potential change listener about changing a whole project the same way.
      * 
-     * @param prj the project
+     * @param prj the project, ignored if <b>null</b>
      * @param type the change type
      */
     protected void notifyChange(Project prj, ConfigurationChangeType type) {
-        net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
-        for (int e = 0; e < prj.getElementCount(); e++) {
-            ContainableModelElement elt = prj.getElement(e);
-            if (elt instanceof AbstractVariable) {
-                notifyChange(cfg.getDecision((AbstractVariable) elt), type);
+        if (null != prj) {
+            net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
+            for (int e = 0; e < prj.getElementCount(); e++) {
+                ContainableModelElement elt = prj.getElement(e);
+                if (elt instanceof AbstractVariable) {
+                    notifyChange(cfg.getDecision((AbstractVariable) elt), type);
+                }
             }
         }
     }
