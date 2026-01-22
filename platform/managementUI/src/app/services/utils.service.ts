@@ -101,6 +101,9 @@ export class Utils {
     if (input.displayName) {
       result = input.displayName;
     }
+    if (input.isRequired) {
+      result = result + " *";
+    }
     return result;
   }
 

@@ -434,7 +434,7 @@ export class ListComponent extends Utils implements OnInit {
         type: item.varType, value: item.varValue,
         description: [{ language: '', text: '' }],
         refTo: false, multipleInputs: false, meta: meta_entry,
-        isReadOnly: false
+        isReadOnly: false, isRequired: false
       };
 
       if (primitiveDataTypes.includes(editorInput.type) && this.currentTab == "Constants") {
@@ -506,7 +506,7 @@ export class ListComponent extends Utils implements OnInit {
         type: type, value: "",
         description: [{ language: '', text: '' }],
         refTo: false, multipleInputs: false, meta: meta_entry,
-        isReadOnly: false
+        isReadOnly: false, isRequired: false
       };
 
       if (primitiveDataTypes.includes(editorInput.type)) {
@@ -540,7 +540,7 @@ export class ListComponent extends Utils implements OnInit {
   public genTemplate(appId: string) {
     let inputVariables: InputVariable[] = [];
     inputVariables.push(ApiService.createAasOperationParameter("appId", AAS_TYPE_STRING, appId));
-    this.execFunctionInConfig("genAppsNoDepsAsync", inputVariables)
+    this.execFunctionInConfig("genInterfacesAsync", inputVariables)
   }
 
   public isUploading(appId: string) {

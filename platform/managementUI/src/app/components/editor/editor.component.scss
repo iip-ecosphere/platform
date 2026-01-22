@@ -97,3 +97,18 @@ tr:nth-child(odd) {
   transition: opacity 0.3s ease-in-out; /* Smooth opacity transition */
   font-size: large;
 }
+
+.required-hint {
+  color: #f44336; /* Material red */
+  font-weight: 500;
+}
+
+.required-line-msg {
+  display:flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  overflow-y:hidden;
+  gap: 0.5em;
+  background-color: sty.$color_seaBlue;
+  margin-bottom: 0.2em;
+}

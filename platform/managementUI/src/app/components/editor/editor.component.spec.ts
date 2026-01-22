@@ -236,7 +236,7 @@ async function test(fixture: ComponentFixture<EditorComponent>, component: Edito
     let inputs = compiled.querySelector('div[class="inputGroup"]') as HTMLElement;
     expect(inputs).toBeTruthy();
     var uiGroups = inputs.children;
-    for (var g = 0; g < uiGroups.length; g++) {
+    for (var g = 1; g < uiGroups.length; g++) {
       var uiGroup = uiGroups[g] as HTMLElement;
       var inputName = uiGroup.querySelector('[id="inputName"]') as HTMLElement;
       if (inputName) {

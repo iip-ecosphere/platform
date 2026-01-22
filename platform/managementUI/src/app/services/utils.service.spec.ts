@@ -72,14 +72,14 @@ describe('UtilsService', () => {
   });
 
   it('should implement getValue', () => {
-    let input: editorInput = {value: 10, name:"var", type:"Integer", description: [{language:"de", text: "abc"}], isReadOnly: false};
+    let input: editorInput = {value: 10, name:"var", type:"Integer", description: [{language:"de", text: "abc"}], isReadOnly: false, isRequired: false};
     expect(service.getValue(input)).toBe(10);
     input.valueTransform = i => i.value + 10;
     expect(service.getValue(input)).toBe(20);
   });
 
   it('should implement getDisplayName', () => {
-    let input: editorInput = {value: 10, name:"var", type:"Integer", description: [{language:"de", text: "abc"}], isReadOnly: false};
+    let input: editorInput = {value: 10, name:"var", type:"Integer", description: [{language:"de", text: "abc"}], isReadOnly: false, isRequired: false};
     expect(service.getDisplayName(input)).toBe("var");
     input.displayName = "dName";
     expect(service.getDisplayName(input)).toBe("dName");

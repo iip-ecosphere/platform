@@ -94,10 +94,13 @@
       </tr>
     </table>
   </mat-card>-->
-
+  
+  <mat-hint class="required-line-msg">{{ showRequiredMsg
+    ? 'Some required fields are missing. Please fill in all fields marked with *.'
+    : 'Fields marked with * are required.' }}
+  </mat-hint>
 
   <div *ngFor="let uiGroup of uiGroups; index as uiGroupIndex">
-
     <div class="inputGroup">
       <div *ngFor="let input of uiGroup.inputs">
         <mat-card appearance="outlined" class="inputBox custom" *ngIf="!input.multipleInputs && !input.refTo; else ref">
@@ -112,6 +115,7 @@
                       type="text" ngDefaultControl [(ngModel)]=input.value [readonly]="input.isReadOnly"/>
                   </mat-form-field>
                 </div>
+                <mat-hint *ngIf="showRequiredMsg && input.isRequired && !input.value" class="required-hint">Required</mat-hint>
               </div>
             </div>
             <ng-template #subEditor>              

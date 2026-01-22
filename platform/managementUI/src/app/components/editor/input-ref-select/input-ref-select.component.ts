@@ -15,7 +15,7 @@ import { IvmlFormatterService } from 'src/app/components/services/ivml/ivml-form
 export class InputRefSelectComponent extends Utils implements OnInit {
 
   @Input() activeTextinput = false;
-  @Input() input: editorInput = {name: '', type: '', description: [{text: '', language: ''}], refTo: true, value: undefined, isReadOnly: false};
+  @Input() input: editorInput = {name: '', type: '', description: [{text: '', language: ''}], refTo: true, value: undefined, isReadOnly: false, isRequired: false};
   @Input() meta: Resource | undefined;
   @Input() rows: number = -1; // unset, calculate
   @Output() saveEvent = new EventEmitter<SaveEvent>();

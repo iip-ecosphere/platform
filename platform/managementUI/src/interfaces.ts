@@ -365,6 +365,10 @@ export interface editorInput {
    */
   isReadOnly: boolean;
   /**
+   * Does the variable/value disabled.
+   */
+  isRequired: boolean;
+  /**
    * Shall the editor represent multiple selectable/modifiable inputs.
    */
   multipleInputs?: boolean;
@@ -470,6 +474,7 @@ export const MT_metaVariable = 'metaVariable';
 export const MT_metaDisplayName = 'metaDisplayName';
 export const MT_metaConstant = 'metaConstant';
 export const MT_metaTemplate = 'metaTemplate';
+export const MT_metaRequired = 'metaRequired';
 export const MT_varValue = 'varValue';
 
 export const metaTypes = [MT_metaState, MT_metaProject,

@@ -4,7 +4,8 @@ import { ApiService } from 'src/app/services/api.service';
 import { IvmlFormatterService } from 'src/app/components/services/ivml/ivml-formatter.service';
 import {
   Resource, uiGroup, editorInput, configMetaContainer, ResourceAttribute,
-  primitiveDataTypes, IvmlRecordValue, IvmlValue, UserFeedback, MT_metaRefines
+  primitiveDataTypes, IvmlRecordValue, IvmlValue, UserFeedback,
+  MT_metaRequired
 } from 'src/interfaces';
 import { Utils, DataUtils } from 'src/app/services/utils.service';
 import { SaveEvent } from './inputControls/subeditor-button/subeditor-button.component';
@@ -35,6 +36,7 @@ export class EditorComponent extends Utils implements OnInit {
 
   //showDropdown = true;
   showInputs = true;
+  showRequiredMsg = false;
   variableName = '';
   ivmlType: string = "";
   feedback: string = ""
@@ -128,6 +130,10 @@ export class EditorComponent extends Utils implements OnInit {
    * Called when creating a new variable is requested from the editor.
    */
   public async create() {
+    if (!this.validateRequiredInputs()) {
+      return; // stops async function
+    }
+
     let creationData: IvmlRecordValue = {};
     this.showInputs = false;
     this.transferUiGroups(this.uiGroups, creationData);
@@ -153,6 +159,10 @@ export class EditorComponent extends Utils implements OnInit {
    * Called from the editor to save the entered values into type.value. This may be called in the top-level editor or a sub-level editor.
    */
   public async save() {
+    if (!this.validateRequiredInputs()) {
+      return; // stops async function
+    }
+
     let complexType: IvmlRecordValue = {};
 
     if (this.type) {
@@ -264,6 +274,28 @@ export class EditorComponent extends Utils implements OnInit {
         //result[input.name] = tmp;
       }
     }
+  }
+
+  validateRequiredInputs(): boolean {
+    let isValid = true;
+  
+    for (const group of this.uiGroups) {
+      const allInputs = [
+        ...group.inputs,
+        ...group.optionalInputs,
+        ...group.fullLineInputs,
+        ...group.fullLineOptionalInputs
+      ];
+  
+      for (const input of allInputs) {
+        if (input.isRequired && !input.value) {
+           isValid = false;
+           this.showRequiredMsg = true;
+        }
+      }
+    }
+  
+    return isValid;
   }
 
 }

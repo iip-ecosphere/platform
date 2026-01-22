@@ -1,5 +1,5 @@
 //import { type } from 'os';
-import { InputVariable, primitiveDataTypes, IVML_TYPE_PREFIX_enumeration, JsonPlatformOperationResult, IvmlRecordValue, IVML_TYPE_String, IVML_TYPE_Boolean, IvmlValue, UserFeedback, uiGroup, configMetaContainer, MT_metaTypeKind, MTK_enum, configMetaEntry, editorInput, Resource, metaTypes, DR_displayName, MTK_derived, MT_metaRefines, MT_metaDefault, MTK_compound, MT_metaAbstract, MTK_primitive, MTK_langString, IVML_TYPE_NonEmptyString } from 'src/interfaces';
+import { InputVariable, primitiveDataTypes, IVML_TYPE_PREFIX_enumeration, JsonPlatformOperationResult, IvmlRecordValue, IVML_TYPE_String, IVML_TYPE_Boolean, IvmlValue, UserFeedback, uiGroup, configMetaContainer, MT_metaTypeKind, MTK_enum, configMetaEntry, editorInput, Resource, metaTypes, DR_displayName, MTK_derived, MT_metaRefines, MT_metaDefault, MTK_compound, MT_metaAbstract, MTK_primitive, MTK_langString, IVML_TYPE_NonEmptyString, MT_metaRequired } from 'src/interfaces';
 import { Injectable } from '@angular/core';
 import { AAS_OP_PREFIX_SME, AAS_TYPE_STRING, ApiService, GRAPHFORMAT_DRAWFLOW, IDSHORT_SUBMODEL_CONFIGURATION } from '../../../services/api.service';
 import { DataUtils, EditorPartition, UtilsService } from '../../../services/utils.service';
@@ -472,7 +472,7 @@ export class IvmlFormatterService extends UtilsService {
             name: "isConst", type: IVML_TYPE_Boolean, value: isConst,
             description: [{ language: '', text: '' }],
             refTo: false, multipleInputs: false, meta: meta_const,
-            isReadOnly: false
+            isReadOnly: false, isRequired: true
           };
           editorInputIsConst.metaTypeKind = selMetaTypeKind;
           inputs.push(editorInputIsConst);
@@ -482,7 +482,7 @@ export class IvmlFormatterService extends UtilsService {
             name: "name", type: IVML_TYPE_String, value: name,
             description: [{ language: '', text: '' }],
             refTo: false, multipleInputs: false, meta: meta_name,
-            isReadOnly: name ? true : false
+            isReadOnly: name ? true : false, isRequired: true
           };
           editorInputName.metaTypeKind = selMetaTypeKind;
           inputs.push(editorInputName);
@@ -493,7 +493,7 @@ export class IvmlFormatterService extends UtilsService {
           name: "value", type: selectedType.idShort, value: val,
           description: [{ language: '', text: '' }],
           refTo: false, multipleInputs: false, meta: meta_entry,
-          isReadOnly: false
+          isReadOnly: false, isRequired: true
         };
         editorInputValue.metaTypeKind = selMetaTypeKind;
 
@@ -509,6 +509,7 @@ export class IvmlFormatterService extends UtilsService {
         });
       } else {
         for (const input of selectedType.value) {
+          let metaRequired = DataUtils.getProperty(input.value, MT_metaRequired) ?? false;
           if (input.idShort && metaTypes.indexOf(input.idShort) === -1) {
             let isOptional = false;
             let uiGroup: number = DataUtils.getPropertyValue(input.value, 'uiGroup'); // translated 100 -> 1
@@ -524,7 +525,7 @@ export class IvmlFormatterService extends UtilsService {
                 name: '', type: '', value: [], description:
                   [{ language: '', text: '' }],
                 refTo: false, multipleInputs: false,
-                isReadOnly: false
+                isReadOnly: false, isRequired: metaRequired
               };
 
               let name = DataUtils.getProperty(input.value, 'name');

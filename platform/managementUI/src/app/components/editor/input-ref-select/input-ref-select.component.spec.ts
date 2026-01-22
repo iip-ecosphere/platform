@@ -75,7 +75,8 @@ describe('InputRefSelectComponent', () => {
       refTo: false,
       multipleInputs: true,
       metaTypeKind: MTK_compound,
-      isReadOnly: false
+      isReadOnly: false,
+      isRequired: false
     };
     fixture.detectChanges();
     await fixture.whenStable();
@@ -117,7 +118,8 @@ describe('InputRefSelectComponent', () => {
       refTo: true,
       multipleInputs: false,
       metaTypeKind: MTK_compound,
-      isReadOnly: false
+      isReadOnly: false,
+      isRequired: false
     };
     fixture.detectChanges();
     await fixture.whenStable();
@@ -176,7 +178,8 @@ describe('InputRefSelectComponent', () => {
       refTo: false,
       multipleInputs: true,
       metaTypeKind: MTK_primitive,
-      isReadOnly: false
+      isReadOnly: false,
+      isRequired: false
     };
     fixture.detectChanges();
     await fixture.whenStable();
