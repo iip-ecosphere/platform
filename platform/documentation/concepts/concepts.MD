@@ -35,6 +35,8 @@ project <Name> {
 
 The top-level structure (`project`) contains all related elements, starting with the import of other IVML files, the declaration of annotations (must be repeated in each file, here when must an IVML variable be bound at latest), type and variable declarations (for data types, services, connectors, applications and meshes) and finally a `freeze` block. As IVML configurations can be layered it is relevant for code generation to know, which information is stable, i.e., `frozen`. Usually, application configuration files end with an all-freeze, expressed by the freeze block and a "." for the whole file (like in operating systems the actual directory).
 
+## File structure
+
 Managed platform configurations (and most of the oktoflow examples) follow a certain file structure, all files located in `src/main/easy`:
 - `AllConstants.ivml` (optional) global contants used by upstream IVML projects
 - `AllTypes.ivml` all datatype specifications (see [Datatypes](types.MD))
@@ -46,3 +48,27 @@ Managed platform configurations (and most of the oktoflow examples) follow a cer
 - `PlatformConfiguration.ivml` the top-most project gluing all files together via imports
 
 If created via the oktoflow management UI, you will get in touch with the concepts rather than IVML itself. If you wish to work based on examples, as some of our videos show, a bit more configuration/IVML knowledge is helpful. 
+
+## How to create an application
+
+There are two ways to create an oktoflow application:
+
+* Using the management UI: 
+  - [Install](../INSTALL.md) the platform
+  - Start the platform
+  - Open the management UI 
+  - Enter the application configuration (in particular data types, services, service mesh, application). 
+  - For the specific application, let the platform create an application code template. 
+  - Import the template into your IDE.
+  - Complement the application classes with your specific code.
+  - Test your services with the generated data input files and unit tests (may require a takeover from the application code template)
+  - Upload a ZIP of your service implementation into the platform and let it integrate the app
+  - Create a deployment plan
+  - Start the app via the platform using the deployment plan
+* Based on an existing example:
+  - Download an existing all-in-one application, e.g., [examples.python](../../examples/examples.python) or one matching described in the [examples collection](../examples/examples.md)
+  - Modify the configuration model in `src/main/easy`, details for the individual element are linked above
+  - Run the code generation `mvn install` (may lead to compile or test errors as the code may not fit the application)
+  - Change the application classes to include your specific code (or take the application code template in `target/gen/xx/templates` to implement new services using your code)
+  - Test your services with the generated data input files and unit tests (may require a takeover from the application code template)
+  - Build and test the whole application with `mvn install` 
