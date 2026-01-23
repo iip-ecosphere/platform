@@ -167,6 +167,8 @@ template JavaServiceImplStateMachine(Configuration config, JavaCodeArtifact targ
         // Names
         String stateMachineId = sm.id;
         String stateMachineClassName = stateMachineId.firstToUpperCase();
+        String abstractStateMachineClassName = "AbstractStateMachine";
+        String abstractStateClassName = "AbstractState";
         String fsm = "fsm";
         String ctx = "ctx";
         String currentState = "currentState";
@@ -244,7 +246,7 @@ template JavaServiceImplStateMachine(Configuration config, JavaCodeArtifact targ
         });   
         
         // AbstractStateMachine     
-        mainCls.addClass("AbstractStateMachine").setAbstract().(asmCls | {
+        mainCls.addClass(abstractStateMachineClassName).setAbstract().(asmCls | { 
         	asmCls.addAttribute(clockClsName, clockInstName).setFinal();
         	asmCls.addAttribute("long", lastStateChange);
         	asmCls.addConstructor("").(newConst | {
@@ -280,7 +282,7 @@ template JavaServiceImplStateMachine(Configuration config, JavaCodeArtifact targ
         });
         
         // StateMachine
-        mainCls.addClass(stateMachineClassName).extends("Abstract" + stateMachineClassName).(smCls | {
+        mainCls.addClass(stateMachineClassName).extends(abstractStateMachineClassName).(smCls | {
         	smCls.addAttribute(stateInterfaceName, currentState);
         	smCls.addMethod(new JavaCodeMethod(
 	        		'public ${stateInterfaceName} get${ (currentState).firstToUpperCase()}() {
@@ -321,15 +323,14 @@ template JavaServiceImplStateMachine(Configuration config, JavaCodeArtifact targ
         	});
         	
         	// AbstractState
-	        smCls.addClass("AbstractState").setPublic().setAbstract().implements(stateInterfaceName).(absCls | {
-	        	String classId = "StateMachine";  
+	        smCls.addClass(abstractStateClassName).setPublic().setAbstract().implements(stateInterfaceName).(absCls | {
 	        	String logFunName = "logIgnored";
-	        	absCls.addAttribute(classId, ctx).setFinal(); 
+	        	absCls.addAttribute(stateMachineClassName, ctx).setFinal(); 
 	        	
 	        	absCls.addConstructor("").(newConst | {
 	        		JavaCodeBlock c = 'this.${ctx} = ${ctx};' ;
 	        		newConst.addAll(c);
-	        		newConst.addParameter(classId, ctx, ""); 
+	        		newConst.addParameter(stateMachineClassName, ctx, ""); 
 	        	});            
 	            
 	        	for(Transition t : transitionList) {
@@ -347,7 +348,7 @@ template JavaServiceImplStateMachine(Configuration config, JavaCodeArtifact targ
 				));
 				
 				absCls.addMethod(new JavaCodeMethod(
-	        		'${classId} ${getCtx}() {
+	        		'${stateMachineClassName} ${getCtx}() {
 						return this.${ctx};
 					};'
 				));
@@ -356,7 +357,8 @@ template JavaServiceImplStateMachine(Configuration config, JavaCodeArtifact targ
         	// Class for each State
         	for (State state : sm.states) {
         		String stateClsName = (state.id).firstToUpperCase() + stateInterfaceName;
-        		smCls.addClass(stateClsName).extends("Abstract" + stateInterfaceName).(stateCls | {
+        		//smCls.addClass(stateClsName).extends("Abstract" + stateInterfaceName).(stateCls | {
+        		smCls.addClass(stateClsName).extends(abstractStateClassName).(stateCls | {
         			stateCls.addConstructor("").(stateConst | {
 		        		stateConst.addParameter(stateMachineClassName, ctx, ""); 
 		        		stateConst.addCall("super").addArgument(ctx);
