@@ -16,6 +16,4 @@ To demonstrate and validate the oktoflow platform, we collect in this folder a s
 * [REST example](examples.rest/README.md): Integrating a REST connector into a simple service mesh.
 * [Python venv example](examples.pythonCondaVenv/README.md): Demonstrating the use of Conda/venv for Python services.
 
-The [examples](examples/README.md) component contains helpful reusable basic functionality for examples and apps.
-
-More to come soon.
+For a more detailed summary, see [../documentation/examples/examples.md].
