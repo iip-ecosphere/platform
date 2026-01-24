@@ -40,13 +40,13 @@ This example was developed by the IIP-Ecosphere project partners for the Hannove
 
 The application demonstrates a visual AI-based quality inspection process for a configurable lot 1 production, where a robot with mounted camera takes pictures from three sides of an aluminum car model. A QR code on the indicates an external AAS describing the configuration of the car. The two other pictures are utilized by a Python-based AI to detect the number of windows, the color of the tires, the presence of an engraving as well as whether “scratches” were accidentally caused on the surface of the car. The services, in particular the AI, can be executed in different deployment settings, e.g., on a Phoenix Contact AXC 3152 PLC/edge device. For this purpose, the application consists of two generated connectors (OPC UA to obtain input from the PLC, AAS to request information on the car configuration), a camera source, the AI (as service family to switch between alternative AI implementations), the action decider (controlling the overall process) as well as a customized version of the generic, platform-provided `TraceToAAS` service. The application involves forward data flows as well as backward data flows for controlling the process, i.e., signaling among the services. The figure below illustrates the physical setup. 
 
-![image](hm22.jpg)
+![HM'22 demonstrator](hm22.jpg)
 
 ### [examples.emo23](https://github.com/iip-ecosphere/examples/tree/main/examples.emo23)
 
 This example is an evolution of _examples.hm22_ to demonstrate a federated learning showcase on Hannover Fair 2023 and, in an improved version, the Days of Computer Science 2023 in Hildesheim as well as for Nürnberg Digital 2023. The demonstrator showcased the application of a platform-generated federated learning service with two cobots representing two distinct factories. One cobot learned anomalies from the other without having seen them before. 
 
-![image](emo23.jpg)
+![EMO'23 demonstrator](emo23.jpg)
 
 For the final public exhibition of the IIP-Ecosphere project at EMO’23, the Hannover Fair 2023 demonstrator has been extended towards a visual quality inspection process of two collaborating cobots. One cobot graps a model of the car and identifies it through a sensor provided by MIP technology (AI-enhanced sensor reading, finally leading to the retrieval of the respective car AAS). After successful identification, the whole cobot still gripping the car is moved by a Lenze linear drive close to the other cobot, thus overlapping the safty perimeters of both cobots. There, the model car is placed and the linear drive moves the identification cobot back to its original position. On the forward way, obstacles like friction and tension can be applied to the drive to be detected by a condition monitoring AI service. The second cobot then performs the quality detection as done in the examples.hm22 application.
 

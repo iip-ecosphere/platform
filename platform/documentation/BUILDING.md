@@ -38,6 +38,10 @@ The meta-model defines the configuration types as well as the actions for code g
   
 As a side effect, also this command creates the application code templates. The generated code template contains helper scripts for Windows/Linux (`updateModel.bat`, `updateModel.sh`) that ease the update of the meta model.
 
+## Using a different resource folder
+
+The default folder for resources to be packaged directly into application artifacts is `resources` in the project root. However, there are cases where this folder shall not be used, e.g., when IPR-protected binaries shall be packaged into an application. Then, a mirror folder of `resources` shall be created, usually called `resources.ipr`, which can be passed to the build process using `-Diip.resources="resources.ipr"`. Please keep in mind that by default, the `.gitignore` file of application projects excludes this folder to avoid committing IPR-protected files to a public repository. 
+
 ## Platform
 
 Ensure that the Maven platformDependencies are installed (see [install](../../tools/Install))
