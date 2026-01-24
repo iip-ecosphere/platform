@@ -275,10 +275,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, oktoPlugins=oktoPlugins, bins=bins, assemblies=assemblies, resources=resources, 
                     starterCls=appStarterCls, appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests, copyRuntimeDependencies=copyDependencies);
                 vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
-                vilTemplateProcessor("TemplatesMvnBash", config, "${appRoot}/build.sh", forBuild=true);
-                vilTemplateProcessor("TemplatesMvnBash", config, "${appRoot}/updateModel.sh", forBuild=false);
-                vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/build.bat", forBuild=true);
-                vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/updateModel.bat", forBuild=false);
                 generatePlugins(cfg, appRoot);
                 mvn(appRoot);
 
@@ -318,6 +314,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 vilTemplateProcessor("TemplatesEclipsePyDevProject", config, "${appRoot}/.pydevproject", appName=appName);
                 vilTemplateProcessor("TemplatesEclipseGitignore", config, "${appRoot}/.gitignore", appName=appName);
                 vilTemplateProcessor("TemplatesEasyProducer", config, "${appRoot}/.EASyProducer", appName=appName);
+                vilTemplateProcessor("TemplatesMvnBash", config, "${appRoot}/build.sh", forBuild=true);
+                vilTemplateProcessor("TemplatesMvnBash", config, "${appRoot}/updateModel.sh", forBuild=false);
+                vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/build.bat", forBuild=true);
+                vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/updateModel.bat", forBuild=false);
                 // currently no separate templates
                 Path vsCodeSettings = "${appRoot}/.vscode";
                 vsCodeSettings.mkdir();
