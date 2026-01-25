@@ -6,7 +6,9 @@ Applications running on the oktoflow platform consist of connectors and services
 
 In an app configuration, `MeshSource` (data source), `MeshProcessor` (processor) and `MeshSink` (receiver) are connected as nodes (refining `MeshElement`) in a service mesh. Each node references the underlying implementing service/connector, allowing the same service to be used in multiple service meshes or multiple times in the same service mesh. Data flows among service mesh elements are specified as `MeshConnector`. An application specifies its constituting service meshes (usually one) as well as technical information.
 
-Table 21 summarizes all configurable fields for mesh and application types. As indicated in Figure 48, MeshElement is the most common type of mesh nodes. MeshSource and MeshInnerElement are refining MeshElement, and, in turn, MeshProcessor and MeshSink are refining MeshInnerElement. Besides constraints that apply, it is important to understand that the input/output data types of mesh elements must not be configured as they are pulled automatically \[14\] from the implementing services and compared along the data flow graph described by the mesh connectors to validate the data flow during configuration validation.
+The tables summarize all configurable fields for mesh and application types. For details and background on the types and their relations see the [platform handbook](../PlatformHandbook.pdf), e.g., how values from servics are pulled during configuration validation into `MeshElement` instances to ensure a consistent configuration.
+
+Usually, applications run in distributed manner. Manually starting apps and their services is possible (through the platform CLI), but tedious. [Deployment plans](deploymentPlans.MD) allow for specifying the startup "program" of an app with respect to existing resources.
 
 ## Application
 
@@ -108,7 +110,34 @@ The current conventions are:
 
 During template instantiation, the definitions from a single template file are extracted and transferred into the usual structure of a managed configuration. Currently, application and service mesh elements are renamed (to remain unique), while services, data types and constants are taken over for reuse. This is an initial approach that may prove practical or may require changes in the future. The template itself is not modified. 
 
-Further conventions will follow on how to handle re-usable service implementations that shall be distributed along with templates (probably either the oktoflow `defaultLib` or standalone Maven projects, not all-in-one examples).
+Type substitutions allows customizing an application derived from a template. When specified in an `Application`, types defined in the application can be substituted during instantiation by refined types. However, this requires that services are implemented in a more generic manner, i.e., output type instances are created through factory methods (then only the instantiated services know the type substituations) and, as input types may also be substituted, taking over input values from input types shall be done through generic copy operations provided by the service base implementations of the platform.
+
+| Field |  Description | Default |
+| --- |  --- | --- |
+| fromType | Reference to the `DataType` that shall be substituted | |
+| toType | Reference to the `DataType` that shall substitute `fromType` | |
+
+Moreover, app templates may already prescribe identity, authentication and security information, preferrably as gaps, so that the concrete information, e.g., identity tokens must be entered by the user upon app template instantiation. Although by the introduction of identity stores we aim at avoiding plain passwords and identity tokens in configuration models, we tolerate them in this case. If specified, the application instantiation will create an identity store from the following configuration structure of type `AppIdentityStore`:
+
+| Field |  Description | Default |
+| --- |  --- | --- |
+|includeInApplication | Whether the identity store shall be included in integrated application (required for app templates) or just for code templates. | |
+|identities | sequence of `AppIdentityStoreEntry` | |
+
+An `AppIdentityStoreEntry` is an abstract type with the following fields:
+
+| Field |  Description | Default |
+| --- |  --- | --- |
+|name | Required non-empty name/identification of the entry. Services or connectors may refer to this name in their authentication/security configuration  | |
+
+A `UserPwAppIdentityStoreEntry` is a refined `AppIdentityStoreEntry` with the following fields:
+
+| Field |  Description | Default |
+| --- |  --- | --- |
+|userName| Required non-empty name of the user account  | |
+|password| Required non-empty password or identity token | |
+
+Further types (e.g., keystore identities) and conventions will follow on how to handle re-usable service implementations that shall be distributed along with templates (probably either the oktoflow `defaultLib` or standalone Maven projects, not all-in-one examples).
 
 ## An example of Application IVML file
 
