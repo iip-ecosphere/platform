@@ -25,12 +25,16 @@ Fields of the 'Application' type.
 | nameplateInfo | Nameplate information denoting the application creator / vendor. |     |
 | createContainer |  Shall containers be created for this application. | false |
 | debug | Shall debug output be included into the generated application code. | false |
-| withDocs | Shall the application be build with documentation (may affect code templates only, may take more time). | false |
+| withDocs | Shall the application be build with documentation (may affect code templates only, may take more time). | `false` |
 | cmdArg |  Command line arguments to be passed to the application on startup. |     |
-| servers |  References to servers belonging to this application. Servers must also be referenced by services requiring individual servers. | {}  |
-| packaging |  Packaging scheme, see [platform handbook](../PlatformHandbook.pdf) Section 3.5.3 | SpringFat |
-| typeSubstitutions | Substitutes given input/output types by refined input/output types, specified in terms of `TypeSubstitution` instances consisting of `fromType` and `toType` | {} |
-| derivedFrom | Name of the template this application is derived from, just as information | null |
+| servers |  References to servers belonging to this application. Servers must also be referenced by services requiring individual servers. | `{}` |
+| packaging | Packaging scheme, see [platform handbook](../PlatformHandbook.pdf) Section 3.5.3 | `AppPackagingSchema::SpringFat` |
+| displayRows | Sequence of references to [DisplayRow instances](types.MD) to indicate the dashboard display rows that belong to this application | `{}` |
+| typeSubstitutions | Substitutes given input/output types by refined input/output types, specified in terms of `TypeSubstitution` instances, see [app templates](appTemplates.MD) for details. | {} |
+| identityStore | Optional application identity store, see [app templates](appTemplates.MD) for details. | `null` |
+| derivedFrom | Name of the app template this application is derived from, just as information | `null` |
+
+Type substitutions
 
 ## ServiceMesh
 
@@ -98,50 +102,6 @@ A sub-mesh has all fields of `ServiceBase` as well as the following fields:
 | --- |  --- | --- |
 | sources |  `MeshConnector` instances pointing to the source mesh elements of this sub-mesh. |     |
 | pseudoSink | A single sink where outgoing flows connect to. Will be virtually substituted by the outgoing mesh connectors of the referring `MeshElement`. |     |
-
-## Application Templates
-
-Sometimes it is helpful for users to have already working applications as starting point for own applications. As part of the [DATIpilot ReGaP innovation community](https://regap.de) we are investigating such templates. Currently, a template looks like a normal application, potentially containing sub-meshes, but due to specific conventions, configuration constraints that apply to normal applications are relaxed. In other words, templates may have configuration gaps that are then requested as user input on the user interface. An instantiated template becomes an application that must fullfill all constraints. In contrast to a manually implemented application, such an application model can be extended by the user and the oktoflow application code generation can be exploited as usual.
-
-The current conventions are:
-- template IVML files are located in the meta model or in an application the folder `src/main/easy/templates`
-- template the name of template IVML files/projects start with `TemplatePart`
-- template IVML files contain all application, service mesh, service, connector, datatype and constant definitions in the same file
-
-During template instantiation, the definitions from a single template file are extracted and transferred into the usual structure of a managed configuration. Currently, application and service mesh elements are renamed (to remain unique), while services, data types and constants are taken over for reuse. This is an initial approach that may prove practical or may require changes in the future. The template itself is not modified. 
-
-Further types (e.g., keystore identities) and conventions will follow on how to handle re-usable service implementations that shall be distributed along with templates (probably either the oktoflow `defaultLib` or standalone Maven projects, not all-in-one examples).
-
-### Type substitutions
-
-Type substitutions allows customizing an application derived from a template. When specified in an `Application`, types defined in the application can be substituted during instantiation by refined types. However, this requires that services are implemented in a more generic manner, i.e., output type instances are created through factory methods (then only the instantiated services know the type substituations) and, as input types may also be substituted, taking over input values from input types shall be done through generic copy operations provided by the service base implementations of the platform.
-
-| Field |  Description | Default |
-| --- |  --- | --- |
-| fromType | Reference to the `DataType` that shall be substituted | |
-| toType | Reference to the `DataType` that shall substitute `fromType` | |
-
-### App identity stores
-
-Moreover, app templates may already prescribe identity, authentication and security information, preferrably as gaps, so that the concrete information, e.g., identity tokens must be entered by the user upon app template instantiation. Although by the introduction of identity stores we aim at avoiding plain passwords and identity tokens in configuration models, we tolerate them in this case. If specified, the application instantiation will create an identity store from the following configuration structure of type `AppIdentityStore`:
-
-| Field |  Description | Default |
-| --- |  --- | --- |
-|includeInApplication | Whether the identity store shall be included in integrated application (required for app templates) or just for code templates. | |
-|identities | sequence of `AppIdentityStoreEntry` | |
-
-An `AppIdentityStoreEntry` is an abstract type with the following fields:
-
-| Field |  Description | Default |
-| --- |  --- | --- |
-|name | Required non-empty name/identification of the entry. Services or connectors may refer to this name in their authentication/security configuration  | |
-
-A `UserPwAppIdentityStoreEntry` is a refined `AppIdentityStoreEntry` with the following fields:
-
-| Field |  Description | Default |
-| --- |  --- | --- |
-|userName| Required non-empty name of the user account  | |
-|password| Required non-empty password or identity token | |
 
 ## An example of Application IVML file
 
