@@ -1,11 +1,11 @@
 # oktoflow app configuration: App Templates
 
-While oktoflow examples typically realize full applications (as all-in-one-examples), it might be difficult to start off app modeling (in particular on the management UI) with a fully equipped application. App templates try to address this issue by allowing "applications with intended gaps". This templating concept is new and part of the ongoing work in the [ReGaP innovation community](https://regap.de).
+While oktoflow examples typically realize full applications (as all-in-one-examples), it might be difficult to start off app modeling with a fully equipped application. App templates try to address this issue by allowing "applications with intended gaps". This templating concept is new and part of the ongoing work in the [ReGaP innovation community](https://regap.de).
 
 * An app template is an oktoflow application for which not all required fields may be filled. Thus, an app template cannot be instantiated as an usual application configuration. In contrast, the management UI must identify the gaps and explicitly ask the user how to fill these gaps prior to turning the template into an app on behalf of the user. The resulting app must then comply with all configuration rules of oktoflow's application metamodel.
-* In contrast to the managed configuration structure, apps reside as single IVML projects (name prefix "TemplatePart") in the optional `templates` folder. Templates may contain constants, data types (including dashboard information), services, connectors, service meshes and application instances.
-* In particular data types may overlap between different templates; if two data types have the same name, only one is taken over into the platform configuration.
-* All services used in a template app must be platform services, i.e., shipped with the platform, preferrably generic platform services that can be operated with arbitrary data (possibly detailed by additional configuration information).
+* Following the managed configuration structure, apps reside as single IVML projects (name prefix "TemplatePart") in the optional `templates` folder. Templates may contain constants, data types (including dashboard information), services, connectors, service meshes and application instances.
+* In particular, data types may overlap between different templates; if two data types have the same name, only one is taken over into the platform configuration.
+* All services used in a template app shall be platform services, i.e., shipped with the platform, preferrably generic platform services that can be operated with arbitrary data (possibly detailed by additional configuration information).
 * Simple gaps are fields that are not filled out or configured in a conflicting way. Alternative services can be represented by service/connector families. 
 * If specialized data types are needed, applications created from a template can defined data type substitutions which are taken into account during app instantiation. To be effective, service implementations must then use the generic ways to create instances of data types or to transfer data among data type instances.
 
