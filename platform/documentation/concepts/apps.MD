@@ -110,12 +110,18 @@ The current conventions are:
 
 During template instantiation, the definitions from a single template file are extracted and transferred into the usual structure of a managed configuration. Currently, application and service mesh elements are renamed (to remain unique), while services, data types and constants are taken over for reuse. This is an initial approach that may prove practical or may require changes in the future. The template itself is not modified. 
 
+Further types (e.g., keystore identities) and conventions will follow on how to handle re-usable service implementations that shall be distributed along with templates (probably either the oktoflow `defaultLib` or standalone Maven projects, not all-in-one examples).
+
+### Type substitutions
+
 Type substitutions allows customizing an application derived from a template. When specified in an `Application`, types defined in the application can be substituted during instantiation by refined types. However, this requires that services are implemented in a more generic manner, i.e., output type instances are created through factory methods (then only the instantiated services know the type substituations) and, as input types may also be substituted, taking over input values from input types shall be done through generic copy operations provided by the service base implementations of the platform.
 
 | Field |  Description | Default |
 | --- |  --- | --- |
 | fromType | Reference to the `DataType` that shall be substituted | |
 | toType | Reference to the `DataType` that shall substitute `fromType` | |
+
+### App identity stores
 
 Moreover, app templates may already prescribe identity, authentication and security information, preferrably as gaps, so that the concrete information, e.g., identity tokens must be entered by the user upon app template instantiation. Although by the introduction of identity stores we aim at avoiding plain passwords and identity tokens in configuration models, we tolerate them in this case. If specified, the application instantiation will create an identity store from the following configuration structure of type `AppIdentityStore`:
 
@@ -136,8 +142,6 @@ A `UserPwAppIdentityStoreEntry` is a refined `AppIdentityStoreEntry` with the fo
 | --- |  --- | --- |
 |userName| Required non-empty name of the user account  | |
 |password| Required non-empty password or identity token | |
-
-Further types (e.g., keystore identities) and conventions will follow on how to handle re-usable service implementations that shall be distributed along with templates (probably either the oktoflow `defaultLib` or standalone Maven projects, not all-in-one examples).
 
 ## An example of Application IVML file
 
