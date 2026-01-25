@@ -21,3 +21,5 @@ This document aims at collecting potential issues and resolutions when developin
 * If the applications seems "to loose data", enable tracing on selected/all connectors/services, e.g., in IVML `traceSent=TraceKind::SYSOUT` (see [service configuration concepts](concepts/services.MD)). 
   * For performance reason, tracing is disabled by default and shall be disabled after debugging is done.
   * Tracing also works in distributed manner, i.e., via a central collector.
+  
+Apps can be tested in automated/distributed fashion using the [Platform Evaluation and Testing Environment (PETE)](../../tests/test.environment).

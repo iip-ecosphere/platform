@@ -4,7 +4,7 @@ Due to the Maven build process and the generation of code during the instantiati
 
 ## All-in-one project structure
 
-![Maven project structure with gen folder](mvnProject.png)
+<img src="mvnProject.png" width="200">
 
 The figure above illustrates the overall structure of an all-in-one implementation project as we use it for most of the platform examples. If is a Maven project structure with additional folders and files. On top-level, it consists of two folders, 
 - a folder for the sources (`src`), which contains your code that relies on platform code and generated code. 
@@ -37,7 +37,7 @@ After the first run of the build process/app instantiation, the `target/gen` fol
 
 ### ApplicationInterfaces folder structure
 
-![AppInterfaces structure in gen folder](appInterfaces.png)
+<img src="appInterfaces.png" width="200">
 
 As illustrated above, the `ApplicationInterfaces` is a usual Maven project, i.e., simplified compared to all-in-one projects. As usual in Maven, the `src` folder contains `main` for production and `test` for test code (here optional, the interface artifacts so far has no generated tests), with sub-folders `java` for Java code, `assembly` for optional assembly descriptors and `python` for optional Python code. The main project folder contains the Maven build specification `pom.xml`.
 
@@ -57,7 +57,7 @@ For downloading the `ApplicationInterfaces` via the management UI, the `Applicat
 
 The second kind of folder contains an integrated application as Maven project, i.e., for each configured application in a platform configuration a folder named according to the respective application is created. The folder contains the integration of the employed services/connectors into the service execution engine, the representation of the data flows as well as service engine specific testing code. The classes in this generated Maven project also rely on `ApplicationInterfaces` as well as on your (integrated) service code. The typical structure is again a Maven project as illustrated below:
 
-![Application structure in gen folder](appProject.png)
+<img src="appProject.png" width="200">
 
 As Python code is integrated through platform Java classes and an oktoflow app is a Java/Spring application, the project is more or less a pure Java project. In `src/main` it contains of
   - `assembly` containing specialized assembly descriptors, usually for obtaining Python Maven artifacts and re-packaging them into the application
@@ -69,7 +69,7 @@ In `src/test` there are generated test classes, in particular a service-level te
 
 The third directory `templates` contains the generated application/service code templates. 
 
-![Application code template structure in gen folder](appTemplate.png)
+<img src="appTemplate.png" width="200">
 
 This folder contains one Maven project per supported IDE (currently only Eclipse with additional files for VSCode) and within such a folde the template sources to support the implementation of application service. The contents of a project folder is packaged into a ZIP by the application instantiation process to make it availble for download through the management UI. The project contains
 

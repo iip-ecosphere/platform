@@ -39,8 +39,9 @@ There are three ways to create an own application. These summaries are currently
 
 Please consider the typical/expected [project structures](projects.md). A collection of build commands can be found in the [build guideline](../BUILDING.md).
 
-# Service Realization Rules and Considerations
+Apps can be tested in automated/distributed fashion using the [Platform Evaluation and Testing Environment (PETE)](../../tests/test.environment).
 
+# Service Realization Rules and Considerations
 
 Realizing an application within the conventions and assumptions of frameworks or an entire platform is not trivial, in particular if conventions and assumptions are not documented. The [platform handbook](../PlatformHandbook.pdf) details the architectural constraints for the platform. While the constraints apply to the whole platform, in particular also to the realization of platform compnents, in this section, we operationalize the constraints in terms of specific rules for realization of application services. To remind about the rules, we place clearly visible comments into the generated skeletons in the application code templates. 
 
