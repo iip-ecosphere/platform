@@ -12,7 +12,7 @@ For installation and first steps, see [install guide](platform/documentation/INS
 
 ## News
 
-* Updated (more agile) documentation of [configuration concepts](documentation/concepts/concepts.MD)
+* Updated (more agile) documentation of [configuration concepts](documentation/concepts/concepts.MD) as well as completely revised [platform handbook](documentation/PlatformHandbook.pdf)
 * Management UI improvements in preparation
 * ReGaP: Influx/Grafana based dashboarding for oktoflow apps, in integration with [Bitmotec](https://www.bitmotec.com/)
 * For easing git checkouts: examples.hm22 and examples.emo23 have been moved to an own repository
@@ -86,6 +86,7 @@ IEEE 28th International Conference on Emerging Technologies and Factory Automati
 
 ## Contributing Student Works
 
+* Ahmed Gamal Attia Mansour Salem, Design, Implementation and Evaluation of an Angular-based Configurator for oktoflow connectors, MSc thesis, 2025
 * Monika Staciwa, AAS alternatives for Industry 4.0/IIoT platform oktoflow, MSc project thesis, 2025
 * Christian Nikolajew, REST Konnektor für die oktoflow-Plattform, BSc thesis, 2024
 * Kevin Schaperjahn, Python Code Artifakte für EASy-Producer / oktoflow, BSc project thesis, 2024
