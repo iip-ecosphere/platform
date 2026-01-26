@@ -150,7 +150,7 @@ Fields in in/output datatypes shall be of the specialized type `RestField` rathe
 
 ## File connector
 
-The `FileConnector` makes that in local files available or writes to local files, respectively. This is in particular helpful for initial testing of applications, but also required, in particular with CSV format in the energy metering domain. The `FileConnector` is a `ChannelConnector` and, thus, allows for serializers and parsers/formatters to be set up, i.e., to turn the file connector into, e.g., a JSON, a TSV or a CSV connector. 
+The `FileConnector` makes that in local files available or writes to local files, respectively. This is in particular helpful for initial testing of applications, but also required, in particular with CSV format in the energy metering domain. The `FileConnector` is a `ChannelConnector` and, thus, allows for serializers and parsers/formatters to be set up, i.e., to turn the file connector into, e.g., a JSON, a TSV or a CSV connector.
 
 | Field |  Description | Default |
 | --- | --- | --- |
@@ -158,6 +158,7 @@ The `FileConnector` makes that in local files available or writes to local files
 | writeFiles |  Path in the URL used to approach the database. | "" |
 | dataTimeDiff |  Number of data tuples to write at once. |     |
 
+Currently, the `FileConnector` always skips the first line assuming that it contains headers. If this is a too general assumption, please let us know so that we can add a flag to the configuration/connector.
 
 The field `readFiles` may contain a single file name, a folder nome or multiple file names (generically as Java regular expressions) determining the files to be read. Files are read from the file system or as app resources. If multiple files are configured, their names are sorted lexicographically to determine the reading sequence. The field `writeFiles` may contain a file or folder in the file system to write incoming data to (if not specified, incoming data will be ignored). Data points read from the `readFiles` may be ingested with a fixed sampling frequency in polling mode or a simulated time in non-polling mode, either as fixed time between subsequent data points (`dataTimediff`) or through a `ConnectorInputHandler` or a `DataTimeDiffProvider` in generated connector integrations based on the last intested data point.
 
