@@ -45,6 +45,7 @@ import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlGraphMapper
 import de.iip_ecosphere.platform.support.aas.IdentifierType;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.LangString;
+import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Registry;
@@ -120,6 +121,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     public static final String OP_GET_TEMPLATES = "getTemplates";
     public static final String OP_INSTANTIATE_TEMPLATE = "instantiateTemplate";
     public static final String OP_GET_OPEN_TEMPLATE_VARIABLES = "getOpenTemplateVariables";
+    public static final String OP_GET_UNUSED_PROJECTNAMES = "getUnusedProjectNames";
+    public static final String OP_ADD_IMPORTS = "addImports";
+    public static final String OP_REMOVE_IMPORTS = "removeImports";
     
     public static final Predicate<AbstractVariable> FILTER_NO_CONSTRAINT_VARIABLES = 
         v -> !TypeQueries.isConstraint(v.getType());
@@ -129,6 +133,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     public static final String META_TYPE_NAME = "meta";
     public static final Function<String, String> SHORTID_PREFIX_META = n -> "meta" + PseudoString.firstToUpperCase(n);
     public static final String PROGRESS_COMPONENT_ID = "Configuration";
+    protected static final String PRJ_NAME_PLATFCONFIG = "PlatformConfiguration";
     protected static final String PRJ_NAME_ALLCONSTANTS = "AllConstants";
     protected static final String PRJ_NAME_ALLSERVICES = "AllServices";
     protected static final String PRJ_NAME_ALLTYPES = "AllTypes";
@@ -469,6 +474,24 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         sBuilder.defineOperation(OP_GET_OPEN_TEMPLATE_VARIABLES, 
             new JsonResultWrapper(a -> {
                 getAasIvmlMapper().getOpenTemplateVariables(AasUtils.readString(a));
+                return null;
+            }, getAasOperationCompletedListener())
+        );
+        sBuilder.defineOperation(OP_GET_UNUSED_PROJECTNAMES, 
+            new JsonResultWrapper(a -> {
+                getAasIvmlMapper().getUnusedProjects();
+                return null;
+            }, getAasOperationCompletedListener())
+        );
+        sBuilder.defineOperation(OP_ADD_IMPORTS, 
+            new JsonResultWrapper(a -> {
+                getAasIvmlMapper().addImports(AasUtils.readString(a));
+                return null;
+            }, getAasOperationCompletedListener())
+        );
+        sBuilder.defineOperation(OP_REMOVE_IMPORTS, 
+            new JsonResultWrapper(a -> {
+                getAasIvmlMapper().removeImports(AasUtils.readString(a));
                 return null;
             }, getAasOperationCompletedListener())
         );
@@ -1549,81 +1572,90 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      */
     private void addOperations(SubmodelBuilder smBuilder, InvocablesCreator iCreator) {
         AuthenticationDescriptor aDesc = AasPartRegistry.getSubmodelAuthentication();
-        smBuilder.createOperationBuilder(OP_CHANGE_VALUES)
+        createOperationBuilder(smBuilder, OP_CHANGE_VALUES, iCreator)
             .addInputVariable("valueExprs", Type.STRING)
-            .setInvocable(iCreator.createInvocable(OP_CHANGE_VALUES))
             .build(aDesc);
-        smBuilder.createOperationBuilder(OP_GET_GRAPH)
+        createOperationBuilder(smBuilder, OP_GET_GRAPH, iCreator)
             .addInputVariable("varName", Type.STRING)
             .addInputVariable("format", Type.STRING)
-            .setInvocable(iCreator.createInvocable(OP_GET_GRAPH))
             .build(Type.STRING, aDesc);
-        smBuilder.createOperationBuilder(OP_SET_GRAPH)
+        createOperationBuilder(smBuilder, OP_SET_GRAPH, iCreator)
             .addInputVariable("appName", Type.STRING)
             .addInputVariable("appValExpr", Type.STRING)
             .addInputVariable("serviceMeshName", Type.STRING)
             .addInputVariable("format", Type.STRING)
             .addInputVariable("val", Type.STRING)
-            .setInvocable(iCreator.createInvocable(OP_SET_GRAPH))
             .build(aDesc);
-        smBuilder.createOperationBuilder(OP_DELETE_GRAPH)
+        createOperationBuilder(smBuilder, OP_DELETE_GRAPH, iCreator)
             .addInputVariable("appName", Type.STRING)
             .addInputVariable("serviceMeshName", Type.STRING)
-            .setInvocable(iCreator.createInvocable(OP_DELETE_GRAPH))
             .build(aDesc);
-        smBuilder.createOperationBuilder(OP_GET_VARIABLE_NAME)
+        createOperationBuilder(smBuilder, OP_GET_VARIABLE_NAME, iCreator)
             .addInputVariable("type", Type.STRING)
             .addInputVariable("elementName", Type.STRING)
             .addInputVariable("elementVersion", Type.STRING)
-            .setInvocable(iCreator.createInvocable(OP_GET_VARIABLE_NAME))
             .build(Type.STRING, aDesc);
-        smBuilder.createOperationBuilder(OP_CREATE_CONSTANT)
+        createOperationBuilder(smBuilder, OP_CREATE_CONSTANT, iCreator)
             .addInputVariable("varName", Type.STRING)
             .addInputVariable("type", Type.STRING)
             .addInputVariable("valExpr", Type.STRING)
-            .setInvocable(iCreator.createInvocable(OP_CREATE_CONSTANT))
             .build(aDesc);
-        smBuilder.createOperationBuilder(OP_CREATE_VARIABLE)
+        createOperationBuilder(smBuilder, OP_CREATE_VARIABLE, iCreator)
             .addInputVariable("varName", Type.STRING)
             .addInputVariable("type", Type.STRING)
             .addInputVariable("valExpr", Type.STRING)
-            .setInvocable(iCreator.createInvocable(OP_CREATE_VARIABLE))
             .build(aDesc);
-        smBuilder.createOperationBuilder(OP_RENAME_VARIABLE)
+        createOperationBuilder(smBuilder, OP_RENAME_VARIABLE, iCreator)
             .addInputVariable("varName", Type.STRING)
             .addInputVariable("newVarName", Type.STRING)
-            .setInvocable(iCreator.createInvocable(OP_RENAME_VARIABLE))
             .build(aDesc);
-        smBuilder.createOperationBuilder(OP_DELETE_VARIABLE)
+        createOperationBuilder(smBuilder, OP_DELETE_VARIABLE, iCreator)
             .addInputVariable("varName", Type.STRING)
-            .setInvocable(iCreator.createInvocable(OP_DELETE_VARIABLE))
             .build(aDesc);
-        smBuilder.createOperationBuilder(OP_GEN_APPS)
-            .setInvocable(iCreator.createInvocable(OP_GEN_APPS))
+        createOperationBuilder(smBuilder, OP_GEN_APPS, iCreator)
             .addInputVariable("appId", Type.STRING)
             .addInputVariable("codeFile", Type.STRING)
             .build(Type.STRING, aDesc);
-        smBuilder.createOperationBuilder(OP_GEN_APPS_NO_DEPS)
-            .setInvocable(iCreator.createInvocable(OP_GEN_APPS_NO_DEPS))
+        createOperationBuilder(smBuilder, OP_GEN_APPS_NO_DEPS, iCreator)
             .addInputVariable("appId", Type.STRING)
             .build(Type.STRING, aDesc);
-        smBuilder.createOperationBuilder(OP_GEN_INTERFACES)
-            .setInvocable(iCreator.createInvocable(OP_GEN_INTERFACES))
+        createOperationBuilder(smBuilder, OP_GEN_INTERFACES, iCreator)
             .addInputVariable("appId", Type.STRING)
             .build(Type.STRING, aDesc);
 
-        smBuilder.createOperationBuilder(OP_GET_TEMPLATES)
-            .setInvocable(iCreator.createInvocable(OP_GET_TEMPLATES))
+        createOperationBuilder(smBuilder, OP_GET_TEMPLATES, iCreator)
             .build(Type.STRING, aDesc);
-        smBuilder.createOperationBuilder(OP_INSTANTIATE_TEMPLATE)
-            .setInvocable(iCreator.createInvocable(OP_INSTANTIATE_TEMPLATE))
+        createOperationBuilder(smBuilder, OP_INSTANTIATE_TEMPLATE, iCreator)
             .addInputVariable("varName", Type.STRING)
             .addInputVariable("appName", Type.STRING)
             .build(Type.STRING, aDesc);
-        smBuilder.createOperationBuilder(OP_GET_OPEN_TEMPLATE_VARIABLES)
-            .setInvocable(iCreator.createInvocable(OP_GET_OPEN_TEMPLATE_VARIABLES))
+        createOperationBuilder(smBuilder, OP_GET_OPEN_TEMPLATE_VARIABLES, iCreator)
             .addInputVariable("varName", Type.STRING)
             .build(Type.STRING, aDesc);
+        createOperationBuilder(smBuilder, OP_GET_UNUSED_PROJECTNAMES, iCreator)
+            .addInputVariable("varName", Type.STRING)
+            .build(Type.STRING, aDesc);
+        createOperationBuilder(smBuilder, OP_ADD_IMPORTS, iCreator)
+            .addInputVariable("imports", Type.STRING)
+            .build(Type.STRING, aDesc);
+        createOperationBuilder(smBuilder, OP_REMOVE_IMPORTS, iCreator)
+            .addInputVariable("imports", Type.STRING)
+            .build(Type.STRING, aDesc);
+    }
+    
+    /**
+     * Creates an operation builder on {@code smBuilder} with {@code opName} as operation and invocable name using 
+     * {@code iCreator} as invocable creator.
+     * 
+     * @param smBuilder the submodel builder to create the operation on
+     * @param opName the operation name used also as invocable name
+     * @param iCreator the invocables creator for creating the invocable
+     * @return the operation builder instance
+     */
+    private static OperationBuilder createOperationBuilder(SubmodelBuilder smBuilder, String opName, 
+        InvocablesCreator iCreator) {
+        return smBuilder.createOperationBuilder(opName)
+            .setInvocable(iCreator.createInvocable(opName));
     }
     
     /**
@@ -1841,5 +1873,31 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         mapVariable(var, builder, null);
         builder.justBuild();
     }
+
+    @Override
+    protected Predicate<String> getFilterUnusedProjectPredicate() {
+        return name -> {
+            boolean exclude = false;
+            exclude |= name.equals(PRJ_NAME_PLATFCONFIG); // top-level
+            exclude |= name.contains("Part"); // dynamic/wildcard imports
+            return exclude;
+        };
+    }
+
+    @Override
+    protected Project getProjectForImports(net.ssehub.easy.varModel.confModel.Configuration cfg) {
+        Project result = cfg.getProject();
+        Project tmp = ModelQuery.findProject(result, PRJ_NAME_ALLCONSTANTS);
+        if (tmp != null) {
+            result = tmp;
+        } else { // fallback
+            tmp = ModelQuery.findProject(result, PRJ_NAME_ALLSERVICES);
+            if (tmp != null) {
+                result = tmp;
+            }
+        }
+        return result;
+    }
+
 
 }

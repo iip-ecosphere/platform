@@ -348,6 +348,15 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         }
 
         /**
+         * Asserts the number of changes.
+         * 
+         * @param pred the predicate that must apply to the number of changes
+         */
+        private void assertChangesCount(Predicate<Integer> pred) {
+            Assert.assertTrue("Number of changes differs", pred.test(changes.size()));
+        }
+
+        /**
          * Asserts a change on the specified variable.
          * 
          * @param varPred predicate identifying the variable to test for, via its name
@@ -924,6 +933,37 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         Assert.assertTrue(Character.isJavaIdentifierStart(variableName.charAt(0)));
         Assert.assertFalse(varNames.contains(variableName));
         varNames.add(variableName);
+    }
+
+    /**
+     * Tests {@link AasIvmlMapper#getUnusedProjects()}, {@link AasIvmlMapper#addImports(String)} and 
+     * {@link AasIvmlMapper#removeImports(String)}.
+     * 
+     * @throws ExecutionException shall not occur
+     */
+    @Test
+    public void testImports() throws ExecutionException {
+        varNames.clear();
+        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
+            ivmlFolder, FileUtils.getTempDirectory());
+        ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
+        
+        MyAasIvmlMapper mapper = getInstance(false);
+        String result = mapper.getUnusedProjects();
+        List<String> unused = Json.listFromJsonDflt(result, String.class);
+        Assert.assertTrue(unused.size() > 0); // currently Vdma40001 and PhoenixContactEem
+        mapper.assertChangesCount(0);
+        
+        mapper.addImports("[\"PhoenixContactEem\"]");
+        mapper.assertChangesCount(c -> c > 0);
+        mapper.clearChanges();
+        
+        mapper.removeImports("[\"PhoenixContactEem\"]");
+        mapper.assertChangesCount(c -> c > 0);
+        mapper.clearChanges();
+
+        stopEasy(lcd);
+        varNames.clear();
     }
 
 }

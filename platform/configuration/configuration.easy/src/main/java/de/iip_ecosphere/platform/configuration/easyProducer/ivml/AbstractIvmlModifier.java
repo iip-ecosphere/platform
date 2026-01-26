@@ -23,12 +23,18 @@ import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlGraphMapper
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlGraphMapper.IvmlGraphNode;
 import de.iip_ecosphere.platform.configuration.easyProducer.serviceMesh.ServiceMeshGraphMapper;
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.json.Json;
+import de.iip_ecosphere.platform.support.json.JsonArrayBuilder;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.uni_hildesheim.sse.ConstraintSyntaxException;
 import de.uni_hildesheim.sse.ModelUtility;
+import net.ssehub.easy.basics.modelManagement.ModelImport;
+import net.ssehub.easy.basics.modelManagement.ModelInfo;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
+import net.ssehub.easy.basics.modelManagement.Version;
+import net.ssehub.easy.basics.modelManagement.VersionedModelInfos;
 import net.ssehub.easy.instantiation.core.model.vilTypes.PseudoString;
 import net.ssehub.easy.instantiation.core.model.vilTypes.configuration.ChangeHistory;
 import net.ssehub.easy.instantiation.core.model.vilTypes.configuration.Configuration;
@@ -46,6 +52,7 @@ import net.ssehub.easy.varModel.cst.ConstraintSyntaxTree;
 import net.ssehub.easy.varModel.cst.OCLFeatureCall;
 import net.ssehub.easy.varModel.cst.Variable;
 import net.ssehub.easy.varModel.cstEvaluation.EvaluationVisitor;
+import net.ssehub.easy.varModel.management.VarModel;
 import net.ssehub.easy.varModel.model.AbstractVariable;
 import net.ssehub.easy.varModel.model.ConstantDecisionVariableDeclaration;
 import net.ssehub.easy.varModel.model.Constraint;
@@ -1245,7 +1252,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                 File f = getIvmlFile(p);
                 copies.put(p, copyToTmp(f));
                 saveTo(p, f);
-                getLogger().info(" - Writing IVML file {}", f);
+                getLogger().info("Writing IVML file {}", f);
             }
             reloadAndValidate(copies);
         }
@@ -1613,16 +1620,28 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
             changeListener.configurationChanged(var, type);
         }
     }
-    
+
     /**
-     * Notifies a potential change listener about changing a whole project the same way.
+     * Notifies a potential change listener about changing a whole project the same way. Uses 
+     * {@link #getIvmlConfiguration()} to obtain the decision variables.
      * 
      * @param prj the project, ignored if <b>null</b>
      * @param type the change type
      */
     protected void notifyChange(Project prj, ConfigurationChangeType type) {
+        notifyChange(prj, getIvmlConfiguration(), type);
+    }
+
+    /**
+     * Notifies a potential change listener about changing a whole project the same way.
+     * 
+     * @param prj the project, ignored if <b>null</b>
+     * @param cfg the configuration to take the decisions from 
+     * @param type the change type
+     */
+    protected void notifyChange(Project prj, net.ssehub.easy.varModel.confModel.Configuration cfg, 
+        ConfigurationChangeType type) {
         if (null != prj) {
-            net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
             for (int e = 0; e < prj.getElementCount(); e++) {
                 ContainableModelElement elt = prj.getElement(e);
                 if (elt instanceof AbstractVariable) {
@@ -1642,7 +1661,183 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
         IDatatype type = var.getDeclaration().getType();
         return IvmlDatatypeVisitor.getUnqualifiedType(type);
     }
+
+    /**
+     * Returns all unused IVML projects, i.e., IVML projects that could be imported but are currently not imported.
+     * 
+     * @return all unused imports as JSON array of objects containing the name of the project
+     * @throws ExecutionException if obtaining the unused imports fails
+     */
+    public String getUnusedProjects() throws ExecutionException {
+        JsonArrayBuilder ab = Json.createArrayBuilder();
+        Map<String, ModelInfo<Project>> unused = calcUnusedImports();
+        for (Map.Entry<String, ModelInfo<Project>> inf : unused.entrySet()) {
+            ab.add(Json.createObjectBuilder()
+                .add("name", inf.getKey())
+                .add("description", "")
+                .build());
+        }
+        getLogger().info("Getting unused imports: {}", unused.keySet());
+        return ab.build().toString();
+    }
     
+    /**
+     * Returns all unused IVML imports, i.e., IVML projects that could be imported. Uses 
+     * {@link #getFilterUnusedProjectPredicate()} to filter the result.
+     * 
+     * @return name-modelInfo mapping of all unused imports, may be empty for none
+     */
+    private Map<String, ModelInfo<Project>> calcUnusedImports() {
+        Map<String, ModelInfo<Project>> infs = new HashMap<>();
+        for (List<VersionedModelInfos<Project>> infos: VarModel.INSTANCE.availableModels().versionedModelInfos()) {
+            for (VersionedModelInfos<Project> vInfos : infos) {
+                for (int v = 0; v < vInfos.size(); v++) {
+                    ModelInfo<Project> info = vInfos.get(v);
+                    // getResolved() may be null if not imported/loaded
+                    String name = info.getName();
+                    ModelInfo<Project> recentInfo = infs.get(name);
+                    if (recentInfo == null || (Version.compare(info.getVersion(), recentInfo.getVersion()) > 0)) {
+                        infs.put(name, info);
+                    }               
+                }
+            }
+        }
+        Set<String> imported = new HashSet<>();
+        for (String name : VarModel.INSTANCE.availableModels().modelNames()) {
+            ModelInfo<Project> info = infs.get(name);
+            if (null != info) {
+                for (int i = 0; i < info.getImportsCount(); i++) {
+                    ModelImport<Project> imp = info.getImport(i);
+                    if (!imp.isConflict()) {
+                        imported.add(info.getImport(i).getName());
+                    }
+                }
+            }
+        }
+        for (String n: imported) {
+            infs.remove(n);
+        }
+        Predicate<String> pred = getFilterUnusedProjectPredicate();
+        List<String> unused = new ArrayList<>(infs.keySet());
+        for (String n: unused) {
+            if (pred.test(n)) {
+                infs.remove(n);
+            }
+        }
+        
+        return infs;
+    }
+    
+    /**
+     * Returns a predicate that filters out unused projects that shall not be made available for imports.
+     * 
+     * @return the predicate
+     */
+    protected Predicate<String> getFilterUnusedProjectPredicate() {
+        return s -> false;
+    }
+    
+    /**
+     * Adds the specified imports.
+     * 
+     * @param imports the imports, given as JSON list of IVML project names
+     * @throws ExecutionException if obtaining the unused imports fails
+     */
+    public void addImports(String imports) throws ExecutionException {
+        modifyImports(imports, true);
+    }
+
+    /**
+     * Removes the specified imports.
+     * 
+     * @param imports the imports, given as JSON list of IVML project names
+     * @throws ExecutionException if obtaining the unused imports fails
+     */
+    public void removeImports(String imports) throws ExecutionException {
+        modifyImports(imports, false);
+    }
+
+    /**
+     * Returns the project to be used for adding/removing imports. May require the name of the import in future.
+     * 
+     * @param cfg the actual configuration
+     * @return the project
+     */
+    protected Project getProjectForImports(net.ssehub.easy.varModel.confModel.Configuration cfg) {
+        return cfg.getProject(); // top-level
+    }
+    
+    /**
+     * Modifies the configuration for the specified imports.
+     * 
+     * @param imports the imports, given as JSON list of IVML project names
+     * @param add if {@code true} then add, else {@code remove}\
+     * @throws ExecutionException if obtaining the unused imports fails
+     * @see #getProjectForImports(net.ssehub.easy.varModel.confModel.Configuration)
+     */
+    private void modifyImports(String imports, boolean add) throws ExecutionException {
+        Map<String, ModelInfo<Project>> unused = calcUnusedImports();
+        List<String> imps = Json.createInstance().listFromJson(imports, String.class);
+        net.ssehub.easy.varModel.confModel.Configuration cfg = getIvmlConfiguration();
+        Project prj = getProjectForImports(cfg); 
+        if (null != imps) {
+            Map<Project, CopiedFile> copies = new HashMap<>();
+            File prjFile = null;
+            List<Project> removed = new ArrayList<>();
+            for (String imp : imps) {
+                if (add) {
+                    ModelInfo<Project> info = unused.get(imp);
+                    if (null != info) {
+                        ProjectImport pImp = new ProjectImport(imp);
+                        try {
+                            pImp.setResolved(info.getResolved());
+                        } catch (ModelManagementException e) {
+                            getLogger().info("Cannot set resolved IVML project on import for " + imp);
+                        }
+                        getLogger().info("Adding import {}", imp);
+                        prj.addImport(pImp);
+                    } else {
+                        getLogger().info("{} is already imported/used", imp);
+                    }
+                } else {
+                    ProjectImport pImp = null;
+                    for (int i = 0; i < prj.getImportsCount(); i++) {
+                        ProjectImport tmpImp = prj.getImport(i);
+                        if (tmpImp .getName().equals(imp)) {
+                            removed.add(tmpImp.getResolved());
+                            pImp = tmpImp;
+                            getLogger().info("Removing import {}", imp);
+                            break;
+                        }
+                    }
+                    prj.removeImport(pImp);
+                }
+                if (null == prjFile) {
+                    prjFile = getIvmlFile(prj);
+                    copies.put(prj, copyToTmp(prjFile));
+                }
+            }
+
+            if (null != prjFile) {
+                saveTo(prj, prjFile);
+                getLogger().info("Writing IVML file {}", prjFile);
+                reloadAndValidate(copies);
+                if (add) { // use updated information after add
+                    cfg = getIvmlConfiguration();
+                    prj = getProjectForImports(cfg);
+                    for (String imp : imps) {
+                        Project impPrj = ModelQuery.findProject(prj, imp);
+                        notifyChange(impPrj, ConfigurationChangeType.CREATED);
+                    }            
+                } else { // take the unchanged infos from start of method
+                    for (Project rmv : removed) {
+                        notifyChange(rmv, cfg, ConfigurationChangeType.DELETED);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Returns the logger.
      * 
