@@ -1,0 +1,107 @@
+project Vdma40001_4DataTypes {
+
+    import IIPEcosphere;
+    import DataTypes;
+    import OpcUaDataTypes;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    /**
+     * VDMA 40001-4 / OPC 40001-4 Data Types
+     * 
+     * This IVML model defines the data types for the VDMA 40001-4 connector.
+     * These types are used for energy management in machinery applications.
+     * 
+     * Standard: OPC 40001-4 "Machinery – Energy Management" Release 1.00
+     * Namespace: http://opcfoundation.org/UA/Machinery/Energy/
+     */
+
+    /**
+     * Energy Consumption Data Type according to OPC 40001-4.
+     * 
+     * Represents energy consumption measurements including total energy,
+     * active power, reactive power, and apparent power.
+     * 
+     * This type corresponds to the EnergyConsumptionData Java class.
+     */
+    compound EnergyConsumptionData {
+        /**
+         * Total energy consumption in kilowatt-hours (kWh).
+         */
+        Real totalEnergy;
+        
+        /**
+         * Active power in watts (W).
+         */
+        Real activePower;
+        
+        /**
+         * Reactive power in volt-amperes reactive (VAR).
+         */
+        Real reactivePower;
+        
+        /**
+         * Apparent power in volt-amperes (VA).
+         */
+        Real apparentPower;
+    }
+
+    /**
+     * Energy Efficiency Data Type according to OPC 40001-4.
+     * 
+     * Represents energy efficiency metrics including efficiency factor
+     * and power factor.
+     * 
+     * This type corresponds to the EnergyEfficiencyData Java class.
+     */
+    compound EnergyEfficiencyData {
+        /**
+         * Efficiency factor (dimensionless, typically 0.0 to 1.0).
+         */
+        Real efficiencyFactor;
+        
+        /**
+         * Power factor (dimensionless, typically -1.0 to 1.0).
+         */
+        Real powerFactor;
+    }
+
+    /**
+     * Operating State Enumeration according to OPC 40001-4.
+     * 
+     * Represents the operating state of a machine.
+     * 
+     * This type corresponds to the OperatingState enum in Vdma40001_4Namespace.
+     */
+    enum OperatingState {
+        /**
+         * Machine is off.
+         */
+        OFF=0,
+        
+        /**
+         * Machine is idle (ready but not processing).
+         */
+        IDLE=1,
+        
+        /**
+         * Machine is running (actively processing).
+         */
+        RUNNING=2,
+        
+        /**
+         * Machine is in maintenance mode.
+         */
+        MAINTENANCE=3,
+        
+        /**
+         * Machine is in error state.
+         */
+        ERROR=4
+    };
+
+    freeze {
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.compile);
+
+}
