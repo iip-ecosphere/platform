@@ -235,8 +235,8 @@ export class EditorComponent extends Utils implements OnInit {
       } 
       
       prop.value.push({value : resultProp, 
-                          name: resultProp?.name?.value ?? resultProp?.value?.value, 
-                          _type: DataUtils.stripGenericType(type)});
+                       name: resultProp?.name?.value ?? resultProp?.value?.value, 
+                       _type: DataUtils.stripGenericType(type)});
     }
   }
 
