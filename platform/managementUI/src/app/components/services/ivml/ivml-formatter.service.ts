@@ -119,6 +119,8 @@ export class IvmlFormatterService extends UtilsService {
         }
         if (elemt.hasOwnProperty('_type')) { // IVML "value" or primitive
           result += this.toIvml(elemt);
+        } else if (elemt?.startsWith?.(IVML_TYPE_PREFIX_enumeration)){
+          result += elemt.replace(IVML_TYPE_PREFIX_enumeration, "");
         } else {
           result += DataUtils.isIvmlRefTo(DataUtils.stripGenericType(value._type)) ? `refBy(${elemt})` : elemt;
         }
@@ -593,7 +595,17 @@ export class IvmlFormatterService extends UtilsService {
                   ivmlValue = editorInput.defaultValue;
                 }
               }
-              if (editorInput.multipleInputs) {
+              if (editorInput.multipleInputs && editorInput.metaTypeKind == MTK_enum) {
+                const enumValues = this.extractEnumSet(editorInput.defaultValue) ?? [];
+
+                editorInput.defaultValue = enumValues.map(value => ({
+                  value,
+                  _type: typeGenerics
+                }));
+                initial = editorInput.defaultValue;
+                editorInput.valueTransform = inputs => inputs.value.map((input: any) => 
+                  IVML_TYPE_PREFIX_enumeration + (input._type || "") + '.' + input.value)
+              } else if (editorInput.multipleInputs) {
                 initial = ivmlValue
               } else if (editorInput.metaTypeKind === MTK_enum) {
                 initial = ivmlValue
@@ -855,6 +867,14 @@ export class IvmlFormatterService extends UtilsService {
     } else {
       return false
     }
+  }
+
+  				
+  private extractEnumSet(value: string): string[] {
+    return value
+      .replace(/[{}]/g, '')
+      .split(',')
+      .map(v => v.substring(v.lastIndexOf('.') + 1));
   }
 
   private getParentItem(meta: Resource, metaRefines: string) {
