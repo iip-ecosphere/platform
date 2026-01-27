@@ -156,7 +156,7 @@ The `FileConnector` makes that in local files available or writes to local files
 | --- | --- | --- |
 | readFiles |  Connect by http (false) or https (true). | true |
 | writeFiles |  Path in the URL used to approach the database. | "" |
-| dataTimeDiff |  Number of data tuples to write at once. |     |
+| dataTimeDiff |  Time between the ingestion of two subsequent data tuples taken from the input file. | `0`  |
 | skipFirstLine | Consider the first line as header and skip it | `false` |
 
 The field `readFiles` may contain a single file name, a folder nome or multiple file names (generically as Java regular expressions) determining the files to be read. Files are read from the file system or as app resources. If multiple files are configured, their names are sorted lexicographically to determine the reading sequence. The field `writeFiles` may contain a file or folder in the file system to write incoming data to (if not specified, incoming data will be ignored). Data points read from the `readFiles` may be ingested with a fixed sampling frequency in polling mode or a simulated time in non-polling mode, either as fixed time between subsequent data points (`dataTimediff`) or through a `ConnectorInputHandler` or a `DataTimeDiffProvider` in generated connector integrations based on the last intested data point.
