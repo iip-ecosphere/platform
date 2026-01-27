@@ -69,6 +69,7 @@ project CommonSetup {
     footprintFolder = "gen/footprints";
     pidDir = "/run";
     //no artifactsUriPrefix for local test/devels execution, else "http://127.0.0.1:4200/download";    
+    artifactsFolder = "artifacts"; // re-specify it so that UI build process can replace it
 
     // ------------ freezing ------------------
     
