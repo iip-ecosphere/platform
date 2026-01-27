@@ -15,7 +15,7 @@ template UiAngularExpress(IIPEcosphere config, FileArtifact target) {
               port = ${port};
 
         app.use(bodyParser.json());
-        app.use(express.static(process.cwd()+"/dist/iipes-web/"));
+        app.use(express.static(process.cwd()+"/dist/iipes-web/browser"));
         app.use(cors());
 
         app.get(/^(\\/download)/, (req, res) => {
@@ -34,7 +34,7 @@ template UiAngularExpress(IIPEcosphere config, FileArtifact target) {
         });
 
         app.get(/^\\//, (req, res) => {
-          res.sendFile(process.cwd()+"/dist/iipes-web/index.html")
+          res.sendFile(process.cwd()+"/dist/iipes-web/browser/index.html")
         });
 
         app.listen(port, () => {
