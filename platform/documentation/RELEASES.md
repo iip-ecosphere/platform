@@ -1,14 +1,24 @@
 # oktoflow platform: Releases
 
+### Already For the next release
+
+* [#189](https://github.com/iip-ecosphere/platform/issues/179): Clean up container VTL scripts
+* [#189](https://github.com/iip-ecosphere/platform/issues/182): Try optimizing container sizes
+* [#189](https://github.com/iip-ecosphere/platform/issues/183): Enable AAS metamodel v3 in mgmt UI
+* [#189](https://github.com/iip-ecosphere/platform/issues/187): Integrate expression editor
+* [#189](https://github.com/iip-ecosphere/platform/issues/188): On-demand IVML imports
+* [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
+* [#122](https://github.com/iip-ecosphere/platform/issues/122): Transparent encryption, RBAC on AAS (incl. UI authentication)
+* [#185](https://github.com/iip-ecosphere/platform/issues/185): Performance improvements
+
 ### Version 0.8.0 (consolidation, ReGaP basics, JDK 17/JDK 21/Angular19/Python 3.11):
 
 In progress:
+* [#189](https://github.com/iip-ecosphere/platform/issues/184): Support venv on mvn Python tooling
+* [#189](https://github.com/iip-ecosphere/platform/issues/189): Revise documentation
 * [#164](https://github.com/iip-ecosphere/platform/issues/164): Management UI improvements
-* [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
-* [#170](https://github.com/iip-ecosphere/platform/issues/170): Integrate plugins/BaSyx2
-* [#122](https://github.com/iip-ecosphere/platform/issues/122): Transparent encryption, RBAC on AAS (incl. UI authentication)
+* [#170](https://github.com/iip-ecosphere/platform/issues/170): Enable plugins/BaSyx2
 * [#180](https://github.com/iip-ecosphere/platform/issues/180): Add application templates
-* [#185](https://github.com/iip-ecosphere/platform/issues/185): Performance improvements
 
 Improvements:
 * Support for JDK 21 based on Eclipse 2024-06.
