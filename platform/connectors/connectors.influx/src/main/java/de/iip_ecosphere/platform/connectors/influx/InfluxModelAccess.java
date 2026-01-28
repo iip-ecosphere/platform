@@ -35,6 +35,7 @@ import de.iip_ecosphere.platform.connectors.model.ModelOutputConverter;
  */
 public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
 
+    static final String FIELD_TIME = "*T*";
     private static final String SEPARATOR = "_";
     private List<String> nesting = new ArrayList<>();
     private String prefix = "";
@@ -94,6 +95,7 @@ public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
     private InfluxOutputConverter outputConverter = new InfluxOutputConverter();
     private InfluxConnector<?, ?> connector;
     private Point writePoint;
+    private Instant writePointTime;
     private Map<String, Object> readValues;
 
     /**
@@ -130,7 +132,16 @@ public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
     private void initPoint() {
         if (null == writePoint) {
             writePoint = Point.measurement(connector.getMeasurement());
+            writePointTime = null;
         }
+    }
+    
+    /**
+     * Clears the point to write.
+     */
+    private void clearPoint() {
+        writePoint = null;
+        writePointTime = null;
     }
 
     @Override
@@ -144,6 +155,11 @@ public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
         initPoint();
         writePoint.addField(prefix + qName, value);
     }
+    
+    @Override
+    public void setLongIndex(String qName, long value) throws IOException {
+        writePointTime = Instant.ofEpochMilli(value);
+    }    
 
     @Override
     public void setByte(String qName, byte value) throws IOException {
@@ -194,12 +210,32 @@ public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
         }
     }
 
+    @Override
+    public long getLongIndex(String qName) throws IOException {
+        Long result = null;
+        if (null != readValues) {
+            Object time = readValues.get(FIELD_TIME);
+            if (time instanceof Instant) {
+                Instant instant = (Instant) time;
+                result = instant.getEpochSecond();
+            }
+        }
+        if (null == result) {
+            throw new IOException("No data to read");
+        }
+        return result.longValue();
+    }
+    
     /**
      * Called by connector when writing of the current object is completed.
      */
     void writeCompleted() {
         if (null != writePoint) {
-            writePoint.time(Instant.now(), WritePrecision.MS);
+            Instant time = writePointTime;
+            if (null == writePointTime) {
+                time = Instant.now();
+            }
+            writePoint.time(time, WritePrecision.MS);
             int batchSize = connector.getBatchSize();
             if (batchSize > 1) {
                 if (batch.size() == batchSize) {
@@ -213,6 +249,7 @@ public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
                 WriteApiBlocking writeApi = connector.getClient().getWriteApiBlocking();
                 writeApi.writePoint(writePoint);
             }
+            clearPoint();
         }
     }
     

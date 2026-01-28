@@ -173,13 +173,13 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
                 if (null != tok) {
                     if (tok.getType() == TokenType.ISSUED) {
                         client = InfluxDBClientFactory.create(url, tok.getTokenDataAsCharArray(), org, bucket);
-                        LOGGER.info("INFLUX connected to " + url + " by token");
+                        LOGGER.info("INFLUX connected to {} by token", url);
                     } else if (tok.getType() == TokenType.USERNAME) {
                         client = InfluxDBClientFactory.createV1(url, tok.getUserName(), tok.getTokenDataAsCharArray(), 
                             bucket, null, WriteConsistency.ONE);
-                        LOGGER.info("INFLUX connected to " + url + " by username/password");
+                        LOGGER.info("INFLUX connected to {} by username/password", url);
                     } else {
-                        LOGGER.error("INFLUX connector cannot handle identity token type " + tok.getType() + "!");
+                        LOGGER.error("INFLUX connector cannot handle identity token type {}!", tok.getType());
                     }
                 }
                 if (null == client) {
@@ -300,6 +300,7 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
                         for (FluxRecord fluxRecord : records) {
                             String field = fluxRecord.getField();
                             Instant time = fluxRecord.getTime();
+                            values.put(InfluxModelAccess.FIELD_TIME, time);
                             if (null != field) {
                                 if (lastRecordTime != null && !lastRecordTime.equals(time) 
                                     || recordComplete.isComplete(values, field)) {
