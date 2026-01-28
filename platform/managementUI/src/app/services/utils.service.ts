@@ -142,6 +142,12 @@ export class Utils {
         // editor IVML value
         if (DataUtils.isIvmlRefTo(element._type)) {
           idShort = this.getElementDisplayName(element.value, true);
+        } else if (element.value.hasOwnProperty("systemProperty")) {
+          idShort = element.value.systemProperty.value;
+        } else if (element.value.hasOwnProperty("type")) {
+          idShort = element.value.type.value;
+        } else if (element._type == "TypeSubstitution") {
+          idShort = element.value.fromType.value + " To " + element.value.toType.value;
         } else {
           idShort = element.value;
         }

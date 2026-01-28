@@ -5,7 +5,8 @@ import { IvmlFormatterService } from 'src/app/components/services/ivml/ivml-form
 import {
   Resource, uiGroup, editorInput, configMetaContainer, ResourceAttribute,
   primitiveDataTypes, IvmlRecordValue, IvmlValue, UserFeedback,
-  MT_metaRequired
+  MT_metaRequired,
+  MTK_enum
 } from 'src/interfaces';
 import { Utils, DataUtils } from 'src/app/services/utils.service';
 import { SaveEvent } from './inputControls/subeditor-button/subeditor-button.component';
@@ -222,14 +223,20 @@ export class EditorComponent extends Utils implements OnInit {
     if (prop.value === null) {
       prop.value = [];
     }
-    if (event.multipleInputs) {
+    if (event.multipleInputs && prop.metaTypeKind == MTK_enum) {
+      prop.value.push({value : resultProp?.value?.value, 
+                       name: resultProp?.name?.value ?? resultProp?.value?.value, 
+                       _type: resultProp?.value?._type});
+    } else if (event.multipleInputs) {
       let type = prop.type;
       if (this.type) {
         let uniGroup = DataUtils.getEditorInputByName(this.uiGroups, event.idShort);
         type = uniGroup?.type;
       } 
       
-      prop.value.push({value : resultProp, name: resultProp?.name?.value ?? resultProp?.value?.value, _type: DataUtils.stripGenericType(type)});
+      prop.value.push({value : resultProp, 
+                       name: resultProp?.name?.value ?? resultProp?.value?.value, 
+                       _type: DataUtils.stripGenericType(type)});
     }
   }
 
