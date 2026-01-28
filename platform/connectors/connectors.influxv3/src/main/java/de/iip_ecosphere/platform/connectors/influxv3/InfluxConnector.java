@@ -54,7 +54,7 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
  * @author Holger Eichelberger
  */
 @MachineConnector(hasModel = false, supportsModelStructs = false, supportsEvents = false, specificSettings = 
-    {"DATABASE", "MEASUREMENT", "TAGS", "BATCH"})
+    {"DATABASE", "MEASUREMENT", "TAGS", "BATCH", "BASETIME"})
 @MachineConnectorSupportedQueries({StringTriggerQuery.class, SimpleTimeseriesQuery.class})
 public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, Object, CO, CI, InfluxModelAccess> {
 
@@ -69,6 +69,7 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
     private Set<String> tags = new HashSet<>();
     private int batchSize = 1;
     private RecordCompletePredicate recordComplete = RecordCompletePredicate.DEFAULT;
+    private long baseTime = -1;
 
     /**
      * The descriptor of this connector (see META-INF/services).
@@ -144,6 +145,13 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
             }
             database = params.getSpecificStringSetting("DATABASE");
             measurement = params.getSpecificStringSetting("MEASUREMENT");
+            Long longTmp = params.getSpecificLongSetting("BASETIME");
+            if (longTmp != null) {
+                baseTime = longTmp.longValue();
+                if (baseTime == 0) {
+                    baseTime = System.currentTimeMillis();
+                }
+            }
             String tmp = params.getSpecificStringSetting("TAGS");
             if (null != tmp) {
                 Arrays.stream(tmp.split(",")).forEach(t -> tags.add(t));
@@ -436,6 +444,34 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
      */
     int getBatchSize() {
         return batchSize;
+    }
+
+    /**
+     * Turns a float time into a timestamp considering {@link #baseTime} if specified. May loose decimal places.
+     * 
+     * @param float the received float value
+     * @return the time stamp
+     */
+    long toTimestamp(float value) {
+        long result = (long) value;
+        if (baseTime > 0) {
+            result += baseTime;
+        }
+        return result;
+    }
+
+    /**
+     * Turns a timestamp into a float considering {@link #baseTime} if specified. May not return initial decimal places.
+     * 
+     * @param value the timestamp
+     * @return the float value
+     */
+    float fromTimestamp(long value) {
+        long result = value;
+        if (baseTime > 0) {
+            result -= baseTime;
+        }
+        return result;
     }
 
 }

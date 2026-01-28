@@ -162,6 +162,11 @@ public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
     }    
 
     @Override
+    public void setFloatIndex(String qName, float value) throws IOException {
+        writePointTime = Instant.ofEpochMilli(connector.toTimestamp(value));
+    }    
+
+    @Override
     public void setByte(String qName, byte value) throws IOException {
         initPoint();
         writePoint.addField(prefix + qName, value);
@@ -225,7 +230,23 @@ public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
         }
         return result.longValue();
     }
-    
+
+    @Override
+    public float getFloatIndex(String qName) throws IOException {
+        Float result = null;
+        if (null != readValues) {
+            Object time = readValues.get(FIELD_TIME);
+            if (time instanceof Instant) {
+                Instant instant = (Instant) time;
+                result = connector.fromTimestamp(instant.getEpochSecond());
+            }
+        }
+        if (null == result) {
+            throw new IOException("No data to read");
+        }
+        return result.floatValue();
+    }
+
     /**
      * Called by connector when writing of the current object is completed.
      */

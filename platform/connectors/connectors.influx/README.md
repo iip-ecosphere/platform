@@ -10,5 +10,6 @@ Besides connection and authentication data, a connector parameters object passed
 - MEASUREMENT: the logical name of the data/objects to be written
 - TAGS: the field names to be used as tags, may be empty, a single name or a list of comma-separated name
 - BATCH: the size of a batch for batched writing of multiple cached data points, by default 1
+- BASETIME: if float timestamps are provided and intended as elapsed time differences, specifies the time base in ms to obtain timestamps; may be 0 for now
 
 For now, INFLUX specific `StringTriggerQueries` (valid InfluxQL, type of query ignored) or more abstract `SimpleTimeSeriesQueries` are considered. Query results must be monotonic ascending in the time field of the data points. Results are streamed either based on time differences of the data points in the database or - with higher priority - a fixed delay given by the query.
