@@ -406,6 +406,15 @@ public interface InputParser<T> {
          * @throws IOException if conversion fails
          */
         public Object toObject(T data) throws IOException;
+        
+        /**
+         * Converts parsed index data returned by {@link ParseResult} to long.
+         * 
+         * @param data the obtained data
+         * @return the converted integer
+         * @throws IOException if conversion fails
+         */
+        public long toLongIndex(T data) throws IOException;
 
     }
     

@@ -253,6 +253,15 @@ public interface OutputFormatter<T> {
          * @throws IOException if conversion fails
          */
         public T fromObject(Object data) throws IOException;
+        
+        /**
+         * Converts data from a long index to the output format.
+         * 
+         * @param data the obtained data
+         * @return the converted long
+         * @throws IOException if conversion fails
+         */
+        public T fromLongIndex(long data) throws IOException;
 
     }
 

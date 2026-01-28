@@ -135,5 +135,14 @@ public class ConverterFromString implements InputConverter<String> {
     public BigDecimal toBigDecimal(String data) throws IOException {
         return new BigDecimal(data);
     }
+    
+    @Override
+    public long toLongIndex(String data) throws IOException {
+        try {
+            return Long.parseLong(data);
+        } catch (NumberFormatException e) {
+            throw new IOException(e);
+        }
+    }
 
 }

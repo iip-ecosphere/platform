@@ -482,6 +482,11 @@ public final class JsonInputParser implements InputParser<JsonIterator> {
         public BigDecimal toBigDecimal(JsonIterator data) throws IOException {
             return data.toBigDecimalValue();
         }
+        
+        @Override
+        public long toLongIndex(JsonIterator data) throws IOException {
+            return data.toLongValue();
+        }
 
     }
     

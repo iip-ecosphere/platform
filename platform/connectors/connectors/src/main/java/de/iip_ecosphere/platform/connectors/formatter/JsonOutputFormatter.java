@@ -168,6 +168,11 @@ public class JsonOutputFormatter implements OutputFormatter<IOConsumer<JsonGener
         public IOConsumer<JsonGenerator> fromBigDecimal(BigDecimal data) throws IOException {
             return g -> g.writeNumber(data);
         }
+        
+        @Override
+        public IOConsumer<JsonGenerator> fromLongIndex(long data) throws IOException {
+            return g -> g.writeNumber(data);
+        }
 
     }
     

@@ -170,4 +170,9 @@ public class ModelInputConverter implements InputConverter<Object> {
         }
     }
 
+    @Override
+    public long toLongIndex(Object data) throws IOException {
+        return (long) data;
+    }
+
 }

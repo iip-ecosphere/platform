@@ -119,4 +119,9 @@ public class ConverterToString implements OutputConverter<String> {
         return data.toString();
     }
 
+    @Override
+    public String fromLongIndex(long data) throws IOException {
+        return Long.toString(data);
+    }
+
 }

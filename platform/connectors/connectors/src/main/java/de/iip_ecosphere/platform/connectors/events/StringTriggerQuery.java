@@ -21,6 +21,7 @@ public class StringTriggerQuery implements ConnectorTriggerQuery {
 
     private String query;
     private int delay = 0;
+    private String type;
 
     /**
      * Creates a trigger query.
@@ -38,12 +39,25 @@ public class StringTriggerQuery implements ConnectorTriggerQuery {
      * @param delay the fixed delay after each result, in ms, ignored if not positive
      */
     public StringTriggerQuery(String query, int delay) {
+        this(query, delay, null);
+    }
+
+    /**
+     * Creates a trigger query.
+     * 
+     * @param query the query
+     * @param delay the fixed delay after each result, in ms, ignored if not positive
+     * @param type the query type; depends on the underlying connector, may be ignored; <b>null</b> or empty means 
+     *     connector default
+     */
+    public StringTriggerQuery(String query, int delay, String type) {
         this.query = query;
         this.delay = delay;
+        this.type = type;
     }
-    
+
     /**
-     * Returns the query .
+     * Returns the query.
      * 
      * @return the query 
      */
@@ -55,5 +69,14 @@ public class StringTriggerQuery implements ConnectorTriggerQuery {
     public int delay() {
         return delay;
     }
-    
+
+    /**
+     * Returns the query type.
+     * 
+     * @return the query type, may be <b>null</b> or empty means connector default
+     */
+    public String getType() {
+        return type;
+    }
+
 }

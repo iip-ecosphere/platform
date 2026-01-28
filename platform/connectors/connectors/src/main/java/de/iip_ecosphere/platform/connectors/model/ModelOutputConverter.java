@@ -138,4 +138,9 @@ public class ModelOutputConverter implements OutputConverter<Object> {
         return data;
     }
 
+    @Override
+    public Object fromLongIndex(long data) throws IOException {
+        return data;
+    }
+
 }

@@ -142,7 +142,7 @@ public interface ModelAccess {
     }
 
     /**
-     * Returns a double property value.
+     * Returns a long property value.
      * 
      * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
      * @return the property value
@@ -151,6 +151,18 @@ public interface ModelAccess {
      */
     public default long getLong(String qName) throws IOException {
         return getInputConverter().toLong(get(qName));
+    }
+
+    /**
+     * Returns a long index/timestamp property value.
+     * 
+     * @param qName the qualified name of the index/timestamp property (composed using {@link #getQSeparator()}).
+     * @return the index/timestamp property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default long getLongIndex(String qName) throws IOException {
+        return getInputConverter().toLongIndex(get(qName));
     }
 
     /**
@@ -251,6 +263,18 @@ public interface ModelAccess {
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
     public default void setLong(String qName, long value) throws IOException {
+        set(qName, getOutputConverter().fromLong(value));
+    }
+
+    /**
+     * Changes a long index/timestamp property value.
+     * 
+     * @param qName the qualified name of the index/timestamp property (composed using {@link #getQSeparator()}).
+     * @param value the new index/timestamp property value
+     * @throws IOException in case that the access fails or setting properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default void setLongIndex(String qName, long value) throws IOException {
         set(qName, getOutputConverter().fromLong(value));
     }
 
