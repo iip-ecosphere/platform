@@ -637,6 +637,28 @@ public class ConnectorParameter {
     }
     
     /**
+     * Returns a connector specific setting as Long.
+     * 
+     * @param key the key of the setting as defined by the connect
+     * @return the value, may be <b>null</b>
+     */
+    public Long getSpecificLongSetting(String key) {
+        Long result = null;
+        Object setting = specificSettings.get(key);
+        if (setting instanceof Long) {
+            result = (Long) setting;
+        } else if (setting != null) {
+            try {
+                result = Long.valueOf(setting.toString());
+            } catch (NumberFormatException e) {
+                LoggerFactory.getLogger(ConnectorParameter.class).warn(
+                    "Value {} of specific setting {} is not a long.", setting, key);
+            }
+        }
+        return result;
+    }    
+    
+    /**
      * Applies the connector specific setting in {@code key} if specified to {@code setter}.
      *  
      * @param key the key of the setting as defined by the connect
@@ -649,5 +671,17 @@ public class ConnectorParameter {
         }
     }
     
+    /**
+     * Applies the connector specific setting in {@code key} if specified to {@code setter}.
+     *  
+     * @param key the key of the setting as defined by the connect
+     * @param setter the value setter
+     */
+    public void setSpecificLongSetting(String key, Consumer<Long> setter) {
+        Long value = getSpecificLongSetting(key);
+        if (null != value) {
+            setter.accept(value);
+        }
+    }
 
 }

@@ -223,8 +223,7 @@ public interface Connector <O, I, CO, CI> extends EventHandlingConnector {
     }
     
     /**
-     * Called when the notifications setting has been changed in
-     * {@link #useNotifications(boolean)}.
+     * Called when the notifications setting has been changed.
      * 
      * @param useNotifications the new value after changing
      */
@@ -235,7 +234,6 @@ public interface Connector <O, I, CO, CI> extends EventHandlingConnector {
      * Returns all declared fields that the connector may access, i.e., {@link #enumerateFields(String)} with
      * an empty argument. 
      * 
-     * @param path the path
      * @see #enumerateFields(String)
      */
     public default List<ConnectorField> enumerateFields() {
