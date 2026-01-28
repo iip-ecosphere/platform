@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+	
+	<artifactId>connectors.influxv3</artifactId>
+	<packaging>jar</packaging>
+	<name>connectors INFLUX v3 extension</name>
+	<description>The INFLUX v3 connectors extension component in the transport layer of the oktoflow platform.</description>
+
+	<parent>
+		<groupId>de.iip-ecosphere.platform</groupId>
+		<artifactId>platformDependenciesBOM</artifactId>
+		<version>0.7.1-SNAPSHOT</version>
+		<relativePath/>
+	</parent>
+	
+	<properties>
+	    <powermock.version>2.0.9</powermock.version>
+	    <argLine>--add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED</argLine>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.influxdb</groupId>
+			<artifactId>influxdb3-java</artifactId>
+			<version>1.7.0</version> <!-- JDK 17 > 7.0.0 -->
+        </dependency>
+		<dependency>
+			<groupId>de.iip-ecosphere.platform</groupId>
+			<artifactId>support.aas</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>de.iip-ecosphere.platform</groupId>
+			<artifactId>transport</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>de.iip-ecosphere.platform</groupId>
+			<artifactId>connectors</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+            <version>${apache.commons.io.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>de.iip-ecosphere.platform</groupId>
+			<artifactId>support</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>de.iip-ecosphere.platform</groupId>
+			<artifactId>transport</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>de.iip-ecosphere.platform</groupId>
+			<artifactId>connectors</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+	    <dependency>
+          <artifactId>support.commons-apache</artifactId>
+          <groupId>de.iip-ecosphere.platform</groupId>
+          <scope>test</scope>
+          <version>${project.version}</version>
+        </dependency>
+ 	   <dependency>
+	      <groupId>org.powermock</groupId>
+	      <artifactId>powermock-module-junit4-legacy</artifactId>
+	      <version>${powermock.version}</version>
+	      <scope>test</scope>
+	   </dependency>
+	   <dependency>
+	      <groupId>org.powermock</groupId>
+	      <artifactId>powermock-api-mockito2</artifactId>
+	      <version>${powermock.version}</version>
+	      <scope>test</scope>
+	   </dependency>
+		
+<!-- 		<dependency>
+		    <groupId>org.mockito</groupId>
+		    <artifactId>mockito-core</artifactId>
+		</dependency> -->		
+		<dependency>
+		    <groupId>org.powermock</groupId>
+		    <artifactId>powermock-module-junit4</artifactId>
+		    <version>1.6.4</version>
+		    <scope>test</scope>
+		</dependency>
+	</dependencies>
+	
+  <build>
+    <plugins>
+         <plugin>
+             <groupId>de.iip-ecosphere.platform</groupId>
+             <artifactId>dependency-plugin</artifactId>
+             <version>${project.version}</version>
+             <executions>
+                 <execution>
+                     <id>copy-dependencies</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>copy-plugin-dependencies</goal>
+                     </goals>
+                 </execution>
+                 <execution>
+                     <id>build-classpath-plugin</id>
+                     <phase>prepare-package</phase>
+                     <goals>
+                         <goal>build-plugin-classpath</goal>
+                     </goals>
+                 </execution>
+                 <execution>
+                     <id>assemble</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>assemble-plugin</goal>
+                     </goals>
+                 </execution>
+             </executions>
+         </plugin>
+    </plugins>
+  </build>
+
+</project>
