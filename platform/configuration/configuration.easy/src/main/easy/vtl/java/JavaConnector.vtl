@@ -974,6 +974,24 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
         r.call("setSpecificSetting").stringArg("MEASUREMENT").stringArg(conn.measurement);
         r.call("setSpecificSetting").stringArg("TAGS").stringArg(tags);
         r.call("setSpecificSetting").stringArg("BATCH").stringArg(conn.batchSize);
+        r.call("setSpecificSetting").stringArg("BASETIME").arg(conn.baseTime);
+    }
+
+    /**
+    * Generates the specific connector settings for the INFLUX connector conn.
+    */
+    @DispatchCase
+    def generateSpecificSettings(InfluxV3Connector conn, JavaCodeMethodCall r) { // added v2->v3
+        String tags = "";
+        for (IOTypeWithPath t : conn.inInterface) {
+            appendWithSeparator(tags, ",", collectTags(t.type, ""));
+        }
+        String connectorName = toIdentifier(conn.name);
+        r.call("setSpecificSetting").stringArg("DATABASE").stringArg(conn.database);
+        r.call("setSpecificSetting").stringArg("MEASUREMENT").stringArg(conn.measurement);
+        r.call("setSpecificSetting").stringArg("TAGS").stringArg(tags);
+        r.call("setSpecificSetting").stringArg("BATCH").stringArg(conn.batchSize);
+        r.call("setSpecificSetting").stringArg("BASETIME").arg(conn.baseTime);
     }
     
     /**
@@ -989,6 +1007,23 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
 
     @DispatchCase
     def getConnectorSchema(InfluxConnector conn) {
+        String result = "de.iip_ecosphere.platform.support.Schema.HTTP";
+        if (isDefined(conn.security) and conn.security <> null and conn.ssl) {
+            result = "de.iip_ecosphere.platform.support.Schema.HTTPS";
+        }
+        result;
+    }
+
+    @DispatchCase
+    def generateEndpointPath(InfluxV3Connector conn, JavaCodeMethodCall r) { // added v2->v3
+        String urlPath = getStringValueSafe(conn.urlPath, "");
+        if (urlPath <> "") {
+            r.call("setEndpointPath").stringArg(urlPath);
+        }
+    }
+
+    @DispatchCase
+    def getConnectorSchema(InfluxV3Connector conn) { // added v2->v3
         String result = "de.iip_ecosphere.platform.support.Schema.HTTP";
         if (isDefined(conn.security) and conn.security <> null and conn.ssl) {
             result = "de.iip_ecosphere.platform.support.Schema.HTTPS";

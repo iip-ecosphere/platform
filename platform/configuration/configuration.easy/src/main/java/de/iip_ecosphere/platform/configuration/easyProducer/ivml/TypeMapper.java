@@ -81,7 +81,7 @@ class TypeMapper {
      * @param variableFilter a variable filter to exclude certain variables/types
      * @param builder the builder to place AAS elements into
      * @param metaShortId function to build a meta shortId property name
-     * @param required type name
+     * @param requiredTypes required type names
      */
     TypeMapper(Configuration cfg, Predicate<AbstractVariable> variableFilter, 
         SubmodelElementContainerBuilder builder, Function<String, String> metaShortId, Set<String> requiredTypes) {

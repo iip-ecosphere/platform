@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor.ExecutionMode;
 import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator.InstantiationConfigurer;
@@ -71,7 +72,9 @@ public class IvmlDashboardMapper {
     private AasFactory factory;
     private Map<String, Object> unitMapping;
     private String targetMapping = "grafana";
-    private List<DisplayRow> displayRows;
+    private List<DisplayRow> displayRows = new ArrayList<>();
+    private DisplayRow fallbackDisplayRow;
+    private Map<String, DisplayPanel> displayPanels = new HashMap<>();
     
     private transient String appName;
     private transient String appId;
@@ -160,14 +163,15 @@ public class IvmlDashboardMapper {
                         appVersion += "-SNAPSHOT";
                     }
                 }
-                displayRows = collectDisplayRows(var.getNestedElement("displayRows"));
+                collectDisplayRows(var.getNestedElement("displayRows"));
                 createHeader(smB);
                 createDisplayRows(smB);
                 SubmodelElementCollectionBuilder dashboardB = createDashboardSpec(smB);
                 SubmodelElementCollectionBuilder panelsB = dashboardB.createSubmodelElementCollectionBuilder("panels");
                 SubmodelElementCollectionBuilder dbB = dashboardB.createSubmodelElementCollectionBuilder("db");
                 Map<String, String> dbMapping = new HashMap<>();
-                
+
+                // collect fields, types -> panelsB
                 IDecisionVariable meshes = var.getNestedElement("services");
                 if (null != meshes) {
                     ServiceMeshGraphMapper mapper = new ServiceMeshGraphMapper();
@@ -175,12 +179,11 @@ public class IvmlDashboardMapper {
                         IDecisionVariable mesh = Configuration.dereference(meshes.getNestedElement(n));
                         IvmlGraph graph = mapper.getGraphFor(mesh);
                         for (IvmlGraphNode node : graph.nodes()) {
-                            processNode(node, panelsB, dbB, dbMapping);
+                            processNode(node, dbB, dbMapping);
                         }
                     }
                 }
-
-                // TODO rows format??
+                createDisplayPanels(panelsB);
 
                 panelsB.build();
                 dbB.build();
@@ -199,34 +202,71 @@ public class IvmlDashboardMapper {
      * 
      * @author Holger Eichelberger, SSE
      */
-    private static class DisplayRow {
+    private class DisplayRow {
         private String id;
         private String name;
         private String displayName;
+
+        /**
+         * Creates a display row.
+         * 
+         * @param factory the AAS factory
+         */
+        DisplayRow(AasFactory factory) {
+            id = factory.fixId("row_" + displayRows.size());
+            displayRows.add(this);
+        }
+
+    }
+    
+    /**
+     * Represents a display panel.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private class DisplayPanel {
+        @SuppressWarnings("unused")
+        private String id;
+        private String name;
+        private String displayName;
+        private DisplayRow displayRow;
+        private List<Field> fields = new ArrayList<>();
+        private String type;
+        private String unit;
+        private ConnectorInfo influx;
+        private String influxDb;
+        private Legend legend; 
+        private PanelPosition position;
+        
+        /**
+         * Creates a display panel.
+         * 
+         * @param factory the AAS factory
+         * @param ivmlId the IVML/pseudo id to uniquely identify  the panel
+         */
+        DisplayPanel(AasFactory factory, String ivmlId) {
+            id = factory.fixId("panel_" + displayPanels.size());
+            displayPanels.put(ivmlId, this);
+        }
     }
 
     /**
      * Collects the display rows.
      * 
      * @param var the (application) variable to get the display rows from
-     * @return the display rows
      */
-    private List<DisplayRow> collectDisplayRows(IDecisionVariable var) {
-        List<DisplayRow> result = new ArrayList<>();
+    private void collectDisplayRows(IDecisionVariable var) {
         if (null != var) {
             for (int e = 0; e < var.getNestedElementsCount(); e++) {
                 IDecisionVariable element = IvmlUtils.dereference(var.getNestedElement(e));
                 String name = IvmlUtils.getStringValue(element, "name", "");
                 if (name.length() > 0) {
-                    DisplayRow row = new DisplayRow();
-                    result.add(row);
+                    DisplayRow row = new DisplayRow(factory);
                     row.name = name;
                     row.displayName = IvmlUtils.getStringValue(element, "displayName", null);
-                    row.id = factory.fixId("row_" + result.size());
                 }
             }
         }
-        return result;
     }
     
     /**
@@ -300,10 +340,10 @@ public class IvmlDashboardMapper {
      * Processes an IVML graph node, filters influx connectors and transfers the information into individual panels.
      * 
      * @param node the node to process
-     * @param panelsB the panels (parent) builder
+     * @param dbsB the database builder
+     * @param dbMapping mapping of the name of the found connection info to the influxDb
      */
-    private void processNode(IvmlGraphNode node, SubmodelElementCollectionBuilder panelsB, 
-        SubmodelElementCollectionBuilder dbsB, Map<String, String> dbMapping) {
+    private void processNode(IvmlGraphNode node, SubmodelElementCollectionBuilder dbsB, Map<String, String> dbMapping) {
         IDecisionVariable var = node.getVariable();
         IDecisionVariable impl = Configuration.dereference(var.getNestedElement("impl"));
         if (null != impl) {
@@ -318,7 +358,7 @@ public class IvmlDashboardMapper {
                 if (null != inputVar && inputVar.getNestedElementsCount() > 0) { // connectors have only one
                     IDecisionVariable ioTypeVar = inputVar.getNestedElement(0);
                     IDecisionVariable typeVar = Configuration.dereference(ioTypeVar.getNestedElement("type"));
-                    processType(resolveType(typeVar), connInfo, panelsB, influxDb);
+                    resolveType(typeVar, connInfo, influxDb);
                 }
             }
         }
@@ -427,8 +467,6 @@ public class IvmlDashboardMapper {
         @SuppressWarnings("unused")
         private String name;
         private List<Field> fields = new ArrayList<>();
-        private Legend legend; // type-level or field-level?
-        private PanelPosition position; // type-level or field-level?
     }
     
     /**
@@ -438,12 +476,25 @@ public class IvmlDashboardMapper {
      */
     private static class Field {
         private String name;
+        @SuppressWarnings("unused")
         private String field;
+        @SuppressWarnings("unused")
         private String description;
         private String displayName;
         private String unit;
-        private String panelType; // values??
-        private DisplayRow displayRow;
+        private String panelType;
+        private List<DisplayPanel> displayPanels = new ArrayList<>();
+        @SuppressWarnings("unused")
+        private RecordType recordType;
+        
+        /**
+         * Returns whether the field is enabled for display.
+         * 
+         * @return {@code true} if enabled, {@code false} else
+         */
+        private boolean isEnabled() {
+            return !isBlank(unit) && !isBlank(panelType);
+        }
     }
     
     /**
@@ -522,9 +573,11 @@ public class IvmlDashboardMapper {
      * Resolves an IVML type to dashboard relevant information.
      * 
      * @param var the variable representing the type, may be <b>null</b>
+     * @param influx the influx connector information
+     * @param influxDB the identifier of the db
      * @return the resolved information, may be <b>null</b>
      */
-    private RecordType resolveType(IDecisionVariable var) {
+    private RecordType resolveType(IDecisionVariable var, ConnectorInfo influx, String influxDb) {
         RecordType result = null;
         if (null != var) {
             if (var != null) {
@@ -536,22 +589,52 @@ public class IvmlDashboardMapper {
                     for (int f = 0; f < fields.getNestedElementsCount(); f++) {
                         IDecisionVariable fieldVar = fields.getNestedElement(f);
                         Field fld = new Field();
+                        fld.recordType = result;
                         fld.name = IvmlUtils.getStringValue(fieldVar, "name", "");
                         fld.field = IvmlUtils.getStringValue(fieldVar, "mappedName", fld.name);
                         fld.description = IvmlUtils.getStringValue(fieldVar, "description", "");
                         fld.displayName = IvmlUtils.getStringValue(fieldVar, "displayName", "");
                         fld.unit = resolveSemanticIdToUnit(fieldVar);
                         fld.panelType = resolvePanelType(fieldVar);
-                        IDecisionVariable displayRow = IvmlUtils.dereference(fieldVar.getNestedElement("displayRow"));
-                        String displayRowName = IvmlUtils.getStringValue(displayRow, "name", null);
-                        if (displayRowName != null) {
-                            Optional<DisplayRow> dr = displayRows
-                                .stream()
-                                .filter(r -> r.name.equals(displayRowName))
-                                .findFirst();
-                            if (dr.isPresent()) {
-                                fld.displayRow = dr.get(); 
+                        IDecisionVariable displayPanel = fieldVar.getNestedElement("displayPanel");
+                        if (null != displayPanel && displayPanel.getNestedElementsCount() > 0) {
+                            for (int p = 0; p < displayPanel.getNestedElementsCount(); p++) {
+                                IDecisionVariable dpVar = IvmlUtils.dereference(displayPanel.getNestedElement(p));
+                                String ivmlId = dpVar.getDeclaration().getName();
+                                DisplayPanel dp = displayPanels.get(ivmlId);
+                                if (null == dp) {
+                                    dp = new DisplayPanel(factory, ivmlId);
+                                    dp.id = factory.fixId("panel_" + displayPanels.size());
+                                    dp.name = IvmlUtils.getStringValue(dpVar, "name", "");
+                                    dp.displayName = IvmlUtils.getStringValue(dpVar, "displayName", "");
+                                    dp.displayRow = getDisplayRow(dpVar);
+                                    dp.unit = fld.unit;
+                                    dp.type = fld.panelType;
+                                    dp.influx = influx;
+                                    dp.influxDb = influxDb;
+                                    dp.fields.add(fld);
+                                } else if (dp.unit.equals(fld.unit) && dp.type.equals(fld.panelType)) {
+                                    fld.displayPanels.add(dp);
+                                    dp.fields.add(fld);
+                                } else {
+                                    System.out.println("Panel/field mismatch regarding unit and panelType in " 
+                                        + dp.name + "/" + fld.name);
+                                }
                             }
+                        } else if (fld.isEnabled()) { // just fallback so that there is a panel, is not assigned to rows
+                            DisplayPanel dp = new DisplayPanel(factory, "*fallback*" + fld.name);
+                            dp.id = factory.fixId("panel_" + displayPanels.size());
+                            dp.name = fld.name;
+                            dp.displayName = fld.displayName;
+                            dp.fields.add(fld);
+                            if (null == fallbackDisplayRow) {
+                                fallbackDisplayRow = new DisplayRow(factory);
+                            }
+                            dp.displayRow = fallbackDisplayRow;
+                            dp.unit = fld.unit;
+                            dp.type = fld.panelType;
+                            dp.influx = influx;
+                            dp.influxDb = influxDb;
                         }
                         result.fields.add(fld);
                     }
@@ -561,6 +644,28 @@ public class IvmlDashboardMapper {
                 //result.position
             }
         }        
+        return result;
+    }
+    
+    /**
+     * Determines the display row of {@code var}.
+     * 
+     * @param var the variable to query
+     * @return the display row, may be <b>null</b> for none
+     */
+    private DisplayRow getDisplayRow(IDecisionVariable var) {
+        DisplayRow result = null;
+        IDecisionVariable displayRow = IvmlUtils.dereference(var.getNestedElement("displayRow"));
+        String displayRowName = IvmlUtils.getStringValue(displayRow, "name", null);
+        if (displayRowName != null) {
+            Optional<DisplayRow> dr = displayRows
+                .stream()
+                .filter(r -> r.name.equals(displayRowName))
+                .findFirst();
+            if (dr.isPresent()) {
+                result = dr.get(); 
+            }
+        }
         return result;
     }
 
@@ -628,42 +733,38 @@ public class IvmlDashboardMapper {
     }
 
     /**
-     * Turns a resolved record type into AAS.
+     * Creates the contents of the display panels. 
      * 
-     * @param type the record type, may be <b>null</b> or not qualified for dashbording
-     * @param influx the influx connector information
-     * @param panelsB the parent panels builder
+     * @param panelsB the parent builder for the panels
      */
-    private void processType(RecordType type, ConnectorInfo influx, SubmodelElementCollectionBuilder panelsB, 
-        String influxDb) {
-        if (null != type && influx != null) {
-            for (Field f : type.fields) {
-                if (!isBlank(f.unit) && !isBlank(f.panelType)) {
-                    SubmodelElementCollectionBuilder panelB = panelsB.createSubmodelElementCollectionBuilder(f.name);
-                    createProperty(panelB, "title", Type.STRING, f.name, "Panel title");
-                    createProperty(panelB, "unit", Type.STRING, f.unit, "Panel unit");
-                    createProperty(panelB, "datasource_uid", Type.STRING, influxDb, 
-                        "Unique identifier for InfluxDB in db section");
-                    createProperty(panelB, "bucket", Type.STRING, influx.bucket, "InfluxDB bucket"); 
-                    createProperty(panelB, "measurement", Type.STRING, influx.measurement, "InfluxDB measurement");
-                    // TODO fields comma separated??
-                    createProperty(panelB, "fields", Type.STRING, f.field, "InfluxDB fields in measurement");
-                    createProperty(panelB, "panel_type", Type.STRING, f.panelType, "Panel type");
-                    createProperty(panelB, "description", Type.STRING, f.description, "Panel description");
-                    createProperty(panelB, "displayName", Type.STRING, f.displayName, "Panel display name");
-                    if (f.displayRow != null) {
-                        createProperty(panelB, "row", Type.STRING, f.displayRow.id, 
-                            "Display row id pointing to rows section");
-                    }
-                    
-                    // TODO axis_max_soft
-                    // TODO axis_min_soft
-                    // TODO axis_label
-                    processLegend(type.legend, panelB);
-                    processPanelPosition(type.position, panelB);
-                    panelB.build();
-                }
+    private void createDisplayPanels(SubmodelElementCollectionBuilder panelsB) {
+        for (DisplayPanel p : displayPanels.values()) {
+            SubmodelElementCollectionBuilder panelB = panelsB.createSubmodelElementCollectionBuilder(
+                factory.fixId(p.name));
+            createProperty(panelB, "title", Type.STRING, p.name, "Panel title");
+            createProperty(panelB, "unit", Type.STRING, p.unit, "Panel unit");
+            createProperty(panelB, "datasource_uid", Type.STRING, p.influxDb, 
+                "Unique identifier for InfluxDB in db section");
+            if (p.influx != null) {
+                createProperty(panelB, "bucket", Type.STRING, p.influx.bucket, "InfluxDB bucket"); 
+                createProperty(panelB, "measurement", Type.STRING, p.influx.measurement, "InfluxDB measurement");
             }
+            String fields = p.fields.stream().map(f -> f.name).collect(Collectors.joining(","));
+            createProperty(panelB, "fields", Type.STRING, fields, "InfluxDB fields in measurement");
+            createProperty(panelB, "panel_type", Type.STRING, p.type, "Panel type");
+            createProperty(panelB, "description", Type.STRING, "", "Panel description");
+            createProperty(panelB, "displayName", Type.STRING, p.displayName, "Panel display name");
+            if (p.displayRow != null) {
+                createProperty(panelB, "row", Type.STRING, p.displayRow.id, 
+                    "Display row id pointing to rows section");
+            }
+            
+            // TODO axis_max_soft
+            // TODO axis_min_soft
+            // TODO axis_label
+            processLegend(p.legend, panelB);
+            processPanelPosition(p.position, panelB);
+            panelB.build();
         }
     }
 

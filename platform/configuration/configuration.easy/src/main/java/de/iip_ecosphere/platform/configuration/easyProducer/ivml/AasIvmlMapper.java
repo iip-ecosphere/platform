@@ -291,7 +291,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     /**
      * Turns an IVML variable name to a mapped AAS type id.
      * 
-     * @param type the type
+     * @param var the variable to return the id for
      * @return the mapped type id
      */
     private String toAasTypeId(IDecisionVariable var) {
@@ -1106,7 +1106,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         /**
          * Notifies all changes with their recorded type.
          * 
-         * @param operation the
          * @param operation the operation causing the change to be included in logs if something goes wrong
          * @param element the element involved the change to be included in logs if something goes wrong
          * @see AasIvmlMapper#notifyChange(DecisionVariableDeclaration, ConfigurationChangeType, String, String)

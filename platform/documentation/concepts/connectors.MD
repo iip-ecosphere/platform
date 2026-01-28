@@ -125,6 +125,7 @@ Fields in input/output datatypes shall be of type `ModbusField` rather than `Fie
 | measurement |  The name of the data tuple type. |     |
 | bucket |  The name of the data bucket. |     |
 | organization |  The organization holding the database |     |
+| baseTime | If float timestamps are provided and intended as elapsed time differences, specifies the time base in ms to obtain timestamps; may be 0 for now; disabled if not positive | -1|
 
 Fields in in/output datatypes shall be of the specialized type `InfluxField` rather than `Field`, which specifies mapped names for fields (if specific implementation names shall be used) or whether a field is considered as a tag rather than a data field. Usual Fields can be used and are interpreted as they are, i.e., the field name is then the given name.
 
@@ -144,6 +145,7 @@ In particular, `LongIndexType` may be used representing here a timestamp in ms s
 | batchSize |  Number of data tuples to write at once. | 1   |
 | measurement |  The name of the data tuple type. |     |
 | database | The name of the database. |     |
+| baseTime | If float timestamps are provided and intended as elapsed time differences, specifies the time base in ms to obtain timestamps; may be 0 for now; disabled if not positive | -1|
 
 As for the v2/v1 Influx connector, `InfluxField` and `LongIndexType` can be used. For details, see above.
 

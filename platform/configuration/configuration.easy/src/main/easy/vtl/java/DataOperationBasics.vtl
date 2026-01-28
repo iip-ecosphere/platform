@@ -380,6 +380,16 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     def convName(LongTypeType type) {
         "Long";
     }
+    
+    @DispatchCase
+    def convName(LongIndexTypeType type) { // added v2->v3
+        "LongIndex";
+    }
+
+    @DispatchCase
+    def convName(FloatIndexTypeType type) { // added v2->v3
+        "FloatIndex";
+    }
 
     @DispatchCase
     def convName(StringTypeType type) {

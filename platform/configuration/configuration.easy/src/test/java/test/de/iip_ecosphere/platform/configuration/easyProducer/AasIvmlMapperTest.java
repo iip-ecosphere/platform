@@ -308,7 +308,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
     /**
      * A slightly extended graph mapper that changes an extended managed model structure with wildcards
      * for AllTypes and AllServices into the usual structure while modifying a graph. This specialized testing
-     * mapper records all changes and makes them available via {@link #getChanges()}.
+     * mapper records all changes and makes them available for assertions.
      * 
      * @author Holger Eichelberger, SSE
      */
@@ -389,7 +389,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         }
         
         /**
-         * Asserts {@code type\ on all variables in {@code names} found by equality.
+         * Asserts {@code type} on all variables in {@code names} found by equality.
          * 
          * @param type the expected change type
          * @param names variable names to be asserted

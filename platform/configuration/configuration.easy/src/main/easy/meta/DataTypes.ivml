@@ -214,6 +214,12 @@ project DataTypes {
         name = "Long"
     };
 
+    compound LongIndexTypeType refines LongTypeType {
+    }
+    LongIndexTypeType LongIndexType = {
+        name = "LongIndex"
+    };
+
     compound StringTypeType refines PrimitiveType {
     }
     StringTypeType StringType = {
@@ -236,6 +242,12 @@ project DataTypes {
     }
     FloatTypeType FloatType = {
         name = "Float"
+    };
+
+    compound FloatIndexTypeType refines FloatTypeType {
+    }
+    LongIndexTypeType FloatIndexType = {
+        name = "FloatIndex"
     };
 
     compound DoubleTypeType refines NumericPrimitiveType {
@@ -445,9 +457,11 @@ project DataTypes {
     freeze {
         IntegerType;
         LongType;
+        LongIndexType;
         StringType;
         BooleanType;
         FloatType;
+        FloatIndexType;
         DoubleType;
         ObjectType;
         Integer16Type;
