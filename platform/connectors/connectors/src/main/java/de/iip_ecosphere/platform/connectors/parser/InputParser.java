@@ -416,6 +416,15 @@ public interface InputParser<T> {
          */
         public long toLongIndex(T data) throws IOException;
 
+        /**
+         * Converts parsed index data returned by {@link ParseResult} to float.
+         * 
+         * @param data the obtained data
+         * @return the converted float
+         * @throws IOException if conversion fails
+         */
+        public float toFloatIndex(T data) throws IOException;
+
     }
     
     /**

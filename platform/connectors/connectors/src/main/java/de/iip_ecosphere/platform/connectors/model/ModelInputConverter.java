@@ -175,4 +175,9 @@ public class ModelInputConverter implements InputConverter<Object> {
         return (long) data;
     }
 
+    @Override
+    public float toFloatIndex(Object data) throws IOException {
+        return (float) data;
+    }
+
 }

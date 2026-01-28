@@ -124,4 +124,9 @@ public class ConverterToString implements OutputConverter<String> {
         return Long.toString(data);
     }
 
+    @Override
+    public String fromFloatIndex(float data) throws IOException {
+        return Float.toString(data);
+    }
+
 }

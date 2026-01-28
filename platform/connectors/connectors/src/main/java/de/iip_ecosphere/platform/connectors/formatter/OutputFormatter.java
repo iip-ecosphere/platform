@@ -263,6 +263,15 @@ public interface OutputFormatter<T> {
          */
         public T fromLongIndex(long data) throws IOException;
 
+        /**
+         * Converts data from a float index to the output format.
+         * 
+         * @param data the obtained data
+         * @return the converted float
+         * @throws IOException if conversion fails
+         */
+        public T fromFloatIndex(float data) throws IOException;
+
     }
 
     /**

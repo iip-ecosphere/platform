@@ -488,6 +488,11 @@ public final class JsonInputParser implements InputParser<JsonIterator> {
             return data.toLongValue();
         }
 
+        @Override
+        public float toFloatIndex(JsonIterator data) throws IOException {
+            return data.toFloatValue();
+        }
+
     }
     
     @Override

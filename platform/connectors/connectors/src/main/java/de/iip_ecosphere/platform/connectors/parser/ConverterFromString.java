@@ -145,4 +145,13 @@ public class ConverterFromString implements InputConverter<String> {
         }
     }
 
+    @Override
+    public float toFloatIndex(String data) throws IOException {
+        try {
+            return Float.parseFloat(data);
+        } catch (NumberFormatException e) {
+            throw new IOException(e);
+        }
+    }
+
 }

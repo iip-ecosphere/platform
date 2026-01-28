@@ -166,6 +166,18 @@ public interface ModelAccess {
     }
 
     /**
+     * Returns a float index/timestamp property value.
+     * 
+     * @param qName the qualified name of the index/timestamp property (composed using {@link #getQSeparator()}).
+     * @return the index/timestamp property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default float getFloatIndex(String qName) throws IOException {
+        return getInputConverter().toFloatIndex(get(qName));
+    }
+
+    /**
      * Returns a short property value.
      * 
      * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
@@ -275,7 +287,19 @@ public interface ModelAccess {
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
     public default void setLongIndex(String qName, long value) throws IOException {
-        set(qName, getOutputConverter().fromLong(value));
+        set(qName, getOutputConverter().fromLongIndex(value));
+    }
+
+    /**
+     * Changes a float index/timestamp property value.
+     * 
+     * @param qName the qualified name of the index/timestamp property (composed using {@link #getQSeparator()}).
+     * @param value the new index/timestamp property value
+     * @throws IOException in case that the access fails or setting properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default void setFloatIndex(String qName, float value) throws IOException {
+        set(qName, getOutputConverter().fromFloatIndex(value));
     }
 
     /**

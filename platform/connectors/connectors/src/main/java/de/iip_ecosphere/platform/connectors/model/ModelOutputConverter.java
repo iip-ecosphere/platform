@@ -143,4 +143,9 @@ public class ModelOutputConverter implements OutputConverter<Object> {
         return data;
     }
 
+    @Override
+    public Object fromFloatIndex(float data) throws IOException {
+        return data;
+    }
+
 }

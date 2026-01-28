@@ -174,6 +174,11 @@ public class JsonOutputFormatter implements OutputFormatter<IOConsumer<JsonGener
             return g -> g.writeNumber(data);
         }
 
+        @Override
+        public IOConsumer<JsonGenerator> fromFloatIndex(float data) throws IOException {
+            return g -> g.writeNumber(data);
+        }
+
     }
     
     /**
