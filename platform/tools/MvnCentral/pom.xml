@@ -541,6 +541,18 @@
         <classifier>plugin</classifier>
         <type>zip</type>
     </dependency>
+    <dependency>
+        <artifactId>connectors.influxv3</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <artifactId>connectors.influxv3</artifactId>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <version>${project.version}</version>
+        <classifier>plugin</classifier>
+        <type>zip</type>
+    </dependency>
     
     <dependency>
         <artifactId>services.environment</artifactId>

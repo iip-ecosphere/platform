@@ -69,6 +69,7 @@
      <module>connectors/connectors.ads</module>
      <module>connectors/connectors.serial</module>
      <module>connectors/connectors.influx</module>
+     <module>connectors/connectors.influxv3</module>
      <module>connectors/connectors.modbustcpipv1</module>
      <module>connectors/connectors.rest</module>
      <module>connectors/connectors.file</module>
