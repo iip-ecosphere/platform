@@ -17,6 +17,7 @@ The following primitive types are currently defined:
 |IntegerType | Integer| usual 32 bit signed integer number as in programming languages |
 |ShortType | Short| usual 16 bit signed integer number as in programming languages |
 |LongType | Long | usual 64 bit signed integer number as in programming languages | 
+|LongIndexType | LongIndex | Refinement of `LongType` to indicate database/time indexes | 
 |ByteType | Byte| usual 8 bit signed integer number as in programming languages |
 |StringType | String | for character strings |
 |StringBase64Type | String Base64 | for Base64 encoded character strings |

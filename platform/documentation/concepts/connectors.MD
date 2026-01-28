@@ -115,7 +115,7 @@ The Modbus/TCP connector communicates with devices such as industrial energy met
 
 Fields in input/output datatypes shall be of type `ModbusField` rather than `Field` providing the offset of the respective field into the register table of the connected device. In thurn, field types shall be the defined Modbus alias types such as `Modbus_int16` rather than the generic oktoflow types so that the types could be correctly mapped to byte lengths and values.
 
-## Influx Connector
+## Influx Connector (Influx DV v2/v1)
 
 | Field |  Description | Default |
 | --- |  --- | --- |
@@ -132,6 +132,20 @@ Fields in in/output datatypes shall be of the specialized type `InfluxField` rat
 | --- |  --- | --- |
 | mappedName | name of the Influx field to use, instead of `name` | |
 | tag | is the field a tag | false |
+
+In particular, `LongIndexType` may be used representing here a timestamp in ms since 1970-01-01T00:00:00Z that shall be used instead of the actual time when writing a data point. If not given, the actual (client) point in time when writing the data point is used instead.
+
+## Influx Connector v3 (InfluxDB v3)
+
+| Field |  Description | Default |
+| --- |  --- | --- |
+| ssl | Connect by http (false) or https (true). | true |
+| urlPath |  Path in the URL used to approach the database. | "" |
+| batchSize |  Number of data tuples to write at once. | 1   |
+| measurement |  The name of the data tuple type. |     |
+| database | The name of the database. |     |
+
+As for the v2/v1 Influx connector, `InfluxField` and `LongIndexType` can be used. For details, see above.
 
 ## REST connector
 
