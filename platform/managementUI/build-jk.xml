@@ -7,6 +7,9 @@
 	
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
+        <exec executable="/bin/bash">
+            <arg value="${basedir}/../cleanup.sh"/>
+        </exec> 
         <maven pomFile="pom.xml" goal="deploy">
             <arg value="-Dunpack.force=true"/>
         	<arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
@@ -24,5 +27,8 @@
                 <include name="IIP-Ecosphere-mgtUi-latest.tgz"/>
             </fileset>
         </oscp> 
+        <exec executable="/bin/bash">
+            <arg value="${basedir}/../cleanup.sh"/>
+        </exec> 
 	</target>
 </project>
