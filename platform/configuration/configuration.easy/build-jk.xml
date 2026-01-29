@@ -12,7 +12,7 @@
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
         <exec executable="/bin/bash">
-          <arg value="${basedir}/cleanup.sh"/>
+            <arg value="${user.home}/cleanOkto.sh"/>
         </exec>	
 		
 	    <maven pomFile="pom.xml" goal="install">
@@ -37,7 +37,7 @@
         <ant dir="${genFolderTests}/RoutingTest/RoutingTestApp" antfile="build-jk.xml" />
 
         <exec executable="/bin/bash">
-          <arg value="${basedir}/cleanup.sh"/>
+            <arg value="${user.home}/cleanOkto.sh"/>
         </exec>	
 	</target>
 </project>

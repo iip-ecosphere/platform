@@ -8,7 +8,7 @@
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
         <exec executable="/bin/bash">
-          <arg value="${basedir}/cleanup.sh"/>
+            <arg value="${user.home}/cleanOkto.sh"/>
         </exec>
 	    <maven pomFile="pom.xml" goal="install">
 	        <arg value="-Dokto.test.easy.model.parent=${model_parent}"/> <!-- must be set in jenkins ANT build step, no invoker -->
@@ -18,5 +18,8 @@
             <arg value="-Dokto.mvn.home=${maven.bin.dir}/bin"/>
     	</maven>
 		<mvnDeployResolveArtifact folderName="IIP-examples" pomFile="pom.xml" jarFolder="target" artifactPattern="examples-*.*.*.jar" />
+        <exec executable="/bin/bash">
+            <arg value="${user.home}/cleanOkto.sh"/>
+        </exec> 
 	</target>
 </project>
