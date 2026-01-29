@@ -219,6 +219,7 @@ template JavaServiceBaseImpl(Configuration config, JavaCodeArtifact target, Serv
             });
             mainCls.addMethod("", "ingest" + sT.firstToUpperCase(), "Sends {@code data} to all registered ${sT} ingestors.").setProtected().(m|{
                 m.param(t, "data", "the data to be sent");
+                addLoggerCall(m.addIf(att + ".isEmpty()"), "warn", "No ingestor for ${sT} registered. Ignoring");
                 m.addForLoop("int", "i", "0", "i < ${att}.size()", "i++").(f|{
                     f.addCall("get").qualifiedBy(att).addArgument("i").addCall("ingest").addArgument("data");
                 });
