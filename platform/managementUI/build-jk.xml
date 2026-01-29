@@ -8,7 +8,7 @@
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
         <exec executable="/bin/bash">
-            <arg value="${basedir}/../cleanup.sh"/>
+        	<arg value="${user.home}/cleanOkto.sh"/>
         </exec> 
         <maven pomFile="pom.xml" goal="deploy">
             <arg value="-Dunpack.force=true"/>
@@ -28,7 +28,7 @@
             </fileset>
         </oscp> 
         <exec executable="/bin/bash">
-            <arg value="${basedir}/../cleanup.sh"/>
+            <arg value="${user.home}/cleanOkto.sh"/>
         </exec> 
 	</target>
 </project>
