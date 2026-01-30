@@ -134,6 +134,7 @@ public class TestMoquetteServer extends AbstractTestServer {
     public static void main(String[] args) {
         BasicConfigurator.configure();
         TestMoquetteServer server = new TestMoquetteServer(new ServerAddress(Schema.IGNORE, getInteger(args, 8883)));
+        server.scheduleShutdownHook(true);
         server.start();
     }
 

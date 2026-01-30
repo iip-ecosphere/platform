@@ -39,6 +39,7 @@ public class TestQpidTlsServer extends TestQpidServer {
     public static void main(String[] args) {
         setConfigDir(new File("./src/test/secCfg"));
         TestQpidTlsServer server = new TestQpidTlsServer(new ServerAddress(Schema.IGNORE, getInteger(args, 8883)));
+        server.scheduleShutdownHook(true);
         server.start();
     }
 

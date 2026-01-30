@@ -39,6 +39,7 @@ public class TestHiveMqTlsServer extends TestHiveMqServer {
     public static void main(String[] args) {
         setConfigDir(new File("./src/test/secCfg"));
         TestHiveMqTlsServer server = new TestHiveMqTlsServer(getServerAddress(args));
+        server.scheduleShutdownHook(true);
         server.start();
     }
 

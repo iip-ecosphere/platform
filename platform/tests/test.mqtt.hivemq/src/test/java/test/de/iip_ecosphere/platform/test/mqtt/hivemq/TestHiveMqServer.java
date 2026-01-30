@@ -102,6 +102,7 @@ public class TestHiveMqServer extends AbstractTestServer {
      */
     public static void main(String[] args) {
         TestHiveMqServer server = new TestHiveMqServer(getServerAddress(args));
+        server.scheduleShutdownHook(true);
         server.start();
     }
 

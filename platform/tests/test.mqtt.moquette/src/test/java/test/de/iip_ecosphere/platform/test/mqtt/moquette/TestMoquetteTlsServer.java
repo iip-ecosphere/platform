@@ -43,6 +43,7 @@ public class TestMoquetteTlsServer extends TestMoquetteServer {
         setConfigDir(new File("./src/test/secCfg"));
         TestMoquetteTlsServer server = new TestMoquetteTlsServer(
             new ServerAddress(Schema.IGNORE, getInteger(args, 8883)));
+        server.scheduleShutdownHook(true);
         server.start();
     }
 
