@@ -17,7 +17,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import test.de.iip_ecosphere.platform.configuration.easyProducer.AbstractIvmlTests;
-import test.de.iip_ecosphere.platform.configuration.easyProducer.IvmlContainerLxcTests;
 import test.de.iip_ecosphere.platform.configuration.easyProducer.IvmlContainerTests;
 import test.de.iip_ecosphere.platform.configuration.easyProducer.IvmlSerializerConfig1Tests;
 
@@ -34,7 +33,7 @@ import test.de.iip_ecosphere.platform.configuration.easyProducer.IvmlSerializerC
     // from configuration.configuration -> to allow for platform/mangementUi build before
     IvmlSerializerConfig1Tests.class,
     IvmlContainerTests.class,
-    IvmlContainerLxcTests.class,
+    //IvmlContainerLxcTests.class, // snap installation/cleanup difficult
 
     ConfigurationTests.class
 })
