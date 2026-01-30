@@ -1,7 +1,5 @@
 # IIP-Ecosphere platform: ECSruntime extension for LXC
 
-** IMPLEMENTATION TEMPLATE - NOT FUNCTIONAL **
-
 LXC extension/implementation of the SPI interfaces of the IIP-Ecosphere container management agent (ECSruntime) running on compute resources.
 
 ## Container descriptor
