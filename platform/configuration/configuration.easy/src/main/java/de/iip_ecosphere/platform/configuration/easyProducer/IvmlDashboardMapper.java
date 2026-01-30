@@ -14,12 +14,16 @@ package de.iip_ecosphere.platform.configuration.easyProducer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -30,6 +34,7 @@ import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlGraphMapper
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlGraphMapper.IvmlGraphNode;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlUtils;
 import de.iip_ecosphere.platform.configuration.easyProducer.serviceMesh.ServiceMeshGraphMapper;
+import de.iip_ecosphere.platform.support.IOUtils;
 import de.iip_ecosphere.platform.support.StringUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -48,6 +53,7 @@ import de.iip_ecosphere.platform.support.plugins.FolderClasspathPluginSetupDescr
 import de.iip_ecosphere.platform.support.plugins.Plugin;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
 import de.iip_ecosphere.platform.support.resources.MavenResourceResolver;
+import de.iip_ecosphere.platform.support.resources.OktoflowResourceResolver;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.yaml.Yaml;
 import net.ssehub.easy.varModel.confModel.Configuration;
@@ -56,8 +62,6 @@ import net.ssehub.easy.varModel.model.ModelQuery;
 import net.ssehub.easy.varModel.model.ModelQueryException;
 import net.ssehub.easy.varModel.model.Project;
 import net.ssehub.easy.varModel.model.datatypes.IDatatype;
-import net.ssehub.easy.varModel.model.values.EnumValue;
-import net.ssehub.easy.varModel.model.values.Value;
 
 /**
  * IVML-to-AAS/submodel mapper for dashboard creation with ReGaP/Bitmotec. Not realized as VTL as intended to provide
@@ -183,7 +187,7 @@ public class IvmlDashboardMapper {
                         }
                     }
                 }
-                createDisplayPanels(panelsB);
+                createDisplayPanels(panelsB, determineDisplayPanelsSequence(cfg, factory));
 
                 panelsB.build();
                 dbB.build();
@@ -195,6 +199,81 @@ public class IvmlDashboardMapper {
                 }
             }
         }
+    }
+    
+    /**
+     * Determines the display panels sequence, mainly from IVML, adding further collected panels 
+     * from {@link #displayPanels}.
+     * 
+     * @param cfg the IVML configuration
+     * @param factory the AAS factory
+     * @return the display panels sequence
+     * @throws ModelQueryException if querying IVML fails
+     */
+    private List<DisplayPanel> determineDisplayPanelsSequence(Configuration cfg, AasFactory factory) 
+        throws ModelQueryException {
+        Iterator<IDecisionVariable> iter = cfg.getConfiguration().iterator();
+        Project prj = cfg.getConfiguration().getProject();
+        final IDatatype panelType = ModelQuery.findType(prj, "DisplayPanel", null);
+        Set<DisplayPanel> knownPanels = new HashSet<>();
+        List<DisplayPanel> panelSequence = new ArrayList<DisplayPanel>();
+        while (iter.hasNext()) {
+            IDecisionVariable var = iter.next();
+            IDatatype type = var.getDeclaration().getType();
+            if (panelType.isAssignableFrom(type) && !IvmlUtils.isTemplate(var.getDeclaration())) {
+                String ivmlId = getDisplayPanelId(var);
+                DisplayPanel dp = displayPanels.get(ivmlId);
+                if (null == dp) {
+                    dp = createDisplayPanel(var, factory, ivmlId);
+                }
+                panelSequence.add(dp);
+                knownPanels.add(dp);
+            }
+        }
+        for (DisplayPanel p : displayPanels.values()) {
+            if (!knownPanels.contains(p)) {
+                panelSequence.add(p);
+            }
+        }
+        return panelSequence;
+    }
+    
+    /**
+     * Returns the internal IVML-based ID of a display panel.
+     * 
+     * @param var the IVML variable representing the display panel
+     * @return the display panel id
+     */
+    private String getDisplayPanelId(IDecisionVariable var) {
+        return var.getDeclaration().getName();
+    }
+        
+    /**
+     * Creates a display panel.
+     * 
+     * @param var the IVML variable representing the display panel
+     * @param factory the AAS factory
+     * @param ivmlId the IVML id to use for the panel (@see #getDisplayPanelId(IDecisionVariable)}
+     * @return the display panel
+     */
+    private DisplayPanel createDisplayPanel(IDecisionVariable var, AasFactory factory, String ivmlId) {
+        DisplayPanel dp = new DisplayPanel(factory, ivmlId);
+        dp.id = factory.fixId("panel_" + displayPanels.size());
+        dp.name = IvmlUtils.getStringValue(var, "name", "");
+        dp.displayName = IvmlUtils.getStringValue(var, "displayName", "");
+        dp.displayRow = getDisplayRow(var);
+        dp.logo = IvmlUtils.getStringValue(var, "logo", null);
+        dp.logoType = LogoType.URL;
+        String fit = IvmlUtils.getEnumValueName(var.getNestedElement("fit"));
+        if (null != fit) {
+            try {
+                dp.fit = FitType.valueOf(fit.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                LoggerFactory.getLogger(IvmlDashboardMapper.class).warn("Cannot map fit value {}: {}", fit, 
+                    e.getMessage());
+            }
+        }
+        return dp;
     }
     
     /**
@@ -220,6 +299,46 @@ public class IvmlDashboardMapper {
     }
     
     /**
+     * Represents a panel logo type.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private enum LogoType {
+        URL,
+        BASE64
+    }
+    
+    /**
+     * Represents a panel fit type.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private enum FitType {
+        NONE(""),
+        CONTAIN("contain");
+        
+        private String value;
+        
+        /**
+         * Creates a fit type.
+         * 
+         * @param value the corresponding dashboard value
+         */
+        private FitType(String value) {
+            this.value = value;
+        }
+        
+        /**
+         * Returns the dashboard value.
+         * 
+         * @return the dashboard value
+         */
+        public String getValue() {
+            return value;
+        }
+    }
+    
+    /**
      * Represents a display panel.
      * 
      * @author Holger Eichelberger, SSE
@@ -237,6 +356,9 @@ public class IvmlDashboardMapper {
         private String influxDb;
         private Legend legend; 
         private PanelPosition position;
+        private String logo; // URL or file name to be resolved
+        private LogoType logoType;
+        private FitType fit = FitType.NONE; 
         
         /**
          * Creates a display panel.
@@ -248,6 +370,7 @@ public class IvmlDashboardMapper {
             id = factory.fixId("panel_" + displayPanels.size());
             displayPanels.put(ivmlId, this);
         }
+        
     }
 
     /**
@@ -574,7 +697,7 @@ public class IvmlDashboardMapper {
      * 
      * @param var the variable representing the type, may be <b>null</b>
      * @param influx the influx connector information
-     * @param influxDB the identifier of the db
+     * @param influxDb the identifier of the db
      * @return the resolved information, may be <b>null</b>
      */
     private RecordType resolveType(IDecisionVariable var, ConnectorInfo influx, String influxDb) {
@@ -600,14 +723,10 @@ public class IvmlDashboardMapper {
                         if (null != displayPanel && displayPanel.getNestedElementsCount() > 0) {
                             for (int p = 0; p < displayPanel.getNestedElementsCount(); p++) {
                                 IDecisionVariable dpVar = IvmlUtils.dereference(displayPanel.getNestedElement(p));
-                                String ivmlId = dpVar.getDeclaration().getName();
+                                String ivmlId = getDisplayPanelId(dpVar);
                                 DisplayPanel dp = displayPanels.get(ivmlId);
                                 if (null == dp) {
-                                    dp = new DisplayPanel(factory, ivmlId);
-                                    dp.id = factory.fixId("panel_" + displayPanels.size());
-                                    dp.name = IvmlUtils.getStringValue(dpVar, "name", "");
-                                    dp.displayName = IvmlUtils.getStringValue(dpVar, "displayName", "");
-                                    dp.displayRow = getDisplayRow(dpVar);
+                                    dp = createDisplayPanel(dpVar, factory, ivmlId);
                                     dp.unit = fld.unit;
                                     dp.type = fld.panelType;
                                     dp.influx = influx;
@@ -676,14 +795,8 @@ public class IvmlDashboardMapper {
      * @return the panel type
      */
     private String resolvePanelType(IDecisionVariable var) {
-        String displayValue = null;
         IDecisionVariable displayVar = var.getNestedElement("display");
-        if (null != displayVar) {
-            Value val = displayVar.getValue();
-            if (val instanceof EnumValue) {
-                displayValue = ((EnumValue) val).getValue().getName();
-            }
-        }
+        String displayValue = IvmlUtils.getEnumValueName(displayVar);
         if (displayValue != null) {
             Object tmp = unitMapping.get("Display_" + displayValue);
             if (null != tmp) {
@@ -736,11 +849,13 @@ public class IvmlDashboardMapper {
      * Creates the contents of the display panels. 
      * 
      * @param panelsB the parent builder for the panels
+     * @param panels the panels sequence, mostly determined by IVML
      */
-    private void createDisplayPanels(SubmodelElementCollectionBuilder panelsB) {
-        for (DisplayPanel p : displayPanels.values()) {
+    private void createDisplayPanels(SubmodelElementCollectionBuilder panelsB, List<DisplayPanel> panels) {
+        for (DisplayPanel p : panels) {
             SubmodelElementCollectionBuilder panelB = panelsB.createSubmodelElementCollectionBuilder(
                 factory.fixId(p.name));
+            processLogo(p, panelB);
             createProperty(panelB, "title", Type.STRING, p.name, "Panel title");
             createProperty(panelB, "unit", Type.STRING, p.unit, "Panel unit");
             createProperty(panelB, "datasource_uid", Type.STRING, p.influxDb, 
@@ -765,6 +880,62 @@ public class IvmlDashboardMapper {
             processLegend(p.legend, panelB);
             processPanelPosition(p.position, panelB);
             panelB.build();
+        }
+    }
+
+    /**
+     * Processes a specified logo.
+     * 
+     * @param panel the panel to take the logo from. If resolved, the panel type may be changed as a side effect.
+     * @param panelsB the parent builder for the panels
+     */
+    private void processLogo(DisplayPanel panel, SubmodelElementCollectionBuilder panelsB) {
+        SubmodelElementCollectionBuilder logoB = null;
+        if (panel.logo != null && !panel.logo.isBlank()) {
+            String logoSpec = panel.logo;
+            if (!(logoSpec.startsWith("http://") || logoSpec.startsWith("https://"))) {
+                InputStream logoFile = ResourceLoader.getResourceAsStream(logoSpec, 
+                    new OktoflowResourceResolver(new File(""), "software"));
+                if (null != logoFile) {
+                    try {
+                        byte[] imageBytes = IOUtils.toByteArray(logoFile);
+                        logoFile.close();
+                        panel.logo = new String(imageBytes, StandardCharsets.UTF_8);
+                        panel.logoType = LogoType.BASE64;
+                    } catch (IOException e) {
+                        LoggerFactory.getLogger(IvmlDashboardMapper.class).warn("While reading logo {}: {}", 
+                            logoSpec, e.getMessage());
+                        panel.logo = null;
+                    }
+                } else {
+                    LoggerFactory.getLogger(IvmlDashboardMapper.class).warn("While reading logo {}: no such "
+                        + "resource", logoSpec);
+                    panel.logo = null;
+                }
+            }
+            if (null != panel.logo) {
+                logoB = panelsB.createSubmodelElementCollectionBuilder(factory.fixId("custom_options"));
+                String propertyName;
+                String description;
+                if (panel.logoType == LogoType.URL) {
+                    propertyName = "imageUrl";
+                    description = "The image URL of the image to display";
+                } else {
+                    propertyName = "image";
+                    description = "";
+                }
+                createProperty(logoB, propertyName, Type.STRING, panel.logo, description);
+                panel.type = "image";
+            }
+        }
+        if (panel.fit != FitType.NONE) {
+            if (null == logoB) {
+                logoB = panelsB.createSubmodelElementCollectionBuilder(factory.fixId("custom_options"));
+            }
+            createProperty(logoB, "fit", Type.STRING, panel.fit.getValue(), "The panel fitting");
+        }
+        if (null != logoB) {
+            logoB.build();
         }
     }
 

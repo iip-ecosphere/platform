@@ -191,7 +191,22 @@ public class IvmlUtils {
         }
         return result;
     }
-    
+
+    /**
+     * Returns the name of an enum value's literal from the given {@code var}.
+     * 
+     * @param var the variable (may be <b>null</b>)
+     * @return the literal name or <b>null</b>
+     */
+    public static String getEnumValueName(IDecisionVariable var) {
+        String result = null;
+        EnumValue val = getEnumValue(var);
+        if (val != null) {
+            result = val.getValue().getName();
+        }
+        return result;
+    }
+
     /**
      * Turns an enum value to its name.
      * 

@@ -143,7 +143,8 @@ project DataTypes {
     const Integer CACHE_ALWAYS = -1;
     const Integer CACHE_NONE = 0;
     
-    enum Display { TimeSeries, Gauge, BarChart, Table };
+    enum Display { TimeSeries, Gauge, BarChart, Table, Stat, Piechart }; // Image is implicit
+    enum DisplayPanelFit { None, Contain };
     
     compound DisplayRow {
         NonEmptyString name;
@@ -154,6 +155,8 @@ project DataTypes {
         NonEmptyString name;
         String displayName = "";
         refTo(DisplayRow) displayRow = null;
+        String logo = null;
+        DisplayPanelFit fit = DisplayPanelFit::None;
     }
     
     Constraint displayRowNamesUnique = allInstances(DisplayRow)->isUnique(t|t.name);
