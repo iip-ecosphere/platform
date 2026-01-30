@@ -178,5 +178,16 @@ public abstract class AbstractTestServer implements Server {
         }
         return f;
     }
+    
+    /**
+     * Schedules a shutdown hook on this instance calling {@link #stop(boolean)}.
+     * 
+     * @param dispose dispose the stored information
+     */
+    public void scheduleShutdownHook(final boolean dispose) {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            stop(dispose);
+        }));
+    }
 
 }
