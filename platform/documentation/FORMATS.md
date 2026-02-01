@@ -22,3 +22,63 @@ This file is supposed to provide a catalogue of various fixed data formats, e.g.
 ## Semantic Id resolution catalogues
 
 - Local [YAML-based Semantic Id catalogue format](../support/support.iip-aas/README.md)
+
+## Dashboard mapping
+
+Currently documented here, may move when integrated into build process.
+
+### Semantic Id value unit mapping file
+
+`src/main/resources/semanticIdDashboard.yml` in `configuration.easy` with format
+
+```
+  tool-key:
+    semantic-id1: tool-value-unit
+    semantic-id2: tool-value-unit
+```
+
+and default mapping for `grafana`.
+
+### Dashboard AAS JSON
+
+Produced by `IvmlDashboardMapper` in `configuration.easy`, actual JSON format depends on used AAS plugin, e.g., BaSyx1 for metamodel v2 or BaSyx2 for metamodel v3. SM means SubModel, SMEC means SubModelElementCollection, * indicates a potentially unlimited repetition of the element, ? indicates an optional element.
+
+- SM `dashboardSpec`
+    - Property `oktoVersion`, Type `STRING`, oktoflow version
+    - Property `name`, Type `STRING`, name of oktoflow app
+    - Property `id`, Type `STRING`, id of oktoflow app
+    - Property `version`, Type `STRING`, version of oktoflow app
+    - Property `aasMetamodelVersion`, Type `STRING`, version of AAS metamodel used, value: `v2` | `v3`, determines how JSON structure looks like
+    - SMEC `Rows`; dashboard rows, spec may go without rows then a default row shall be assumed
+      - SMEC* _row-id_
+         - Property `id`, Type `STRING`, unique id of display row
+         - Property `name`, Type `STRING`, name of display row
+         - Property `displayName`, Type `STRING`, optional display name, may be empty; if not given, use `name` instead
+    - SMEC `Dashboard`; top-level dashboard description
+         - Property `title`, Type `STRING`, title of the dashboard
+         - Property `uid`, Type `STRING`, unique id of the dashboard
+         - SMEC `tags`; currently empty, may be `time_from`, `time_to`, `timezone`
+    - SMEC `panels`; individual single/multi-valued dashboard panels
+       - SMEC _ panel-id_
+         - SMEC? `custom-options`
+           - Property? `imageUrl`, Type `STRING`, URL to logo, either `imageUrl` or `image` shall be given if panel type is `image`
+           - Property? `image`, Type `STRING`, Base64 encoded PNG/JPEG, see `imageUrl`
+           - Property? `fit`, Type `STRING`, **unclear**, values `contain`
+         - Property `title`, Type `STRING`, title of the panel
+         - Property `unit`, Type `STRING`, value unit of the data in the panel, see grafana value units and Semantic Id value unit mapping above
+         - Property `datasource_uid`, Type `STRING`, refers one of the entries in `db` below
+         - Property**?** `bucket`, Type `STRING`, Influx bucket in `datasource_uid` specifying data source
+         - Property**?** `measurement`, Type `STRING`, Influx measurement in `datasource_uid` specifying data source
+         - Property `fields`, Type `STRING`, Fields from Influx measurement to display, may be a single field or field names separated by commas; time axis is taken from influx time field
+         - Property `panel_type`, Type `STRING`, Type of the panel, one of `timeseries`, `gauge`, `barchart`, `table`, `stat`, `piechart`, `image`
+         - Property `description`, Type `STRING`, description of the panel, may be empty
+         - Property `displayName`, Type `STRING`, display name of the panel, may be empty; if not given, use panel `name` instead
+         - Property? `row`, Type `STRING`, ref to unique display row id, if given and valid assign panel to specified row
+
+         May be complemented with `axis_min_soft`, `axis_max_soft`, `axis_label`, legend and panel position.
+    - SMEC `db`; database, data source
+      - SMEC* _db-id_
+          - Property? `urlPath`, Type `STRING`, optional URL path to database
+          - Property `organization`, Type `STRING`, InfluxDb organization
+          - Property? `token`, Type `STRING`, optional InfluxDb access token, if permitted to export from identity store
+
