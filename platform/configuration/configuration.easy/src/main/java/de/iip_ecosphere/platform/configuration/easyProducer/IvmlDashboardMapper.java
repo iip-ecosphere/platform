@@ -15,8 +15,8 @@ package de.iip_ecosphere.platform.configuration.easyProducer;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -263,7 +263,6 @@ public class IvmlDashboardMapper {
         dp.displayName = IvmlUtils.getStringValue(var, "displayName", "");
         dp.displayRow = getDisplayRow(var);
         dp.logo = IvmlUtils.getStringValue(var, "logo", null);
-        dp.logoType = LogoType.URL;
         String fit = IvmlUtils.getEnumValueName(var.getNestedElement("fit"));
         if (null != fit) {
             try {
@@ -296,16 +295,6 @@ public class IvmlDashboardMapper {
             displayRows.add(this);
         }
 
-    }
-    
-    /**
-     * Represents a panel logo type.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private enum LogoType {
-        URL,
-        BASE64
     }
     
     /**
@@ -357,7 +346,6 @@ public class IvmlDashboardMapper {
         private Legend legend; 
         private PanelPosition position;
         private String logo; // URL or file name to be resolved
-        private LogoType logoType;
         private FitType fit = FitType.NONE; 
         
         /**
@@ -451,8 +439,8 @@ public class IvmlDashboardMapper {
      */
     private SubmodelElementCollectionBuilder createDashboardSpec(SubmodelBuilder smB) {
         SubmodelElementCollectionBuilder dashboardB = smB.createSubmodelElementCollectionBuilder("Dashboard");
-        createProperty(dashboardB, "title", Type.STRING, appName, "application name"); // TODO preliminary the app name
-        createProperty(dashboardB, "uid", Type.STRING, appId, "application UID");
+        createProperty(dashboardB, "title", Type.STRING, appName, "title of the dashboard"); // TODO preliminary name
+        createProperty(dashboardB, "uid", Type.STRING, appId, "app/dashboard UID");
         SubmodelElementCollectionBuilder tagsB = dashboardB.createSubmodelElementCollectionBuilder("tags");
         tagsB.build();
         // TODO time_from, time_to, timezone
@@ -900,8 +888,13 @@ public class IvmlDashboardMapper {
                     try {
                         byte[] imageBytes = IOUtils.toByteArray(logoFile);
                         logoFile.close();
-                        panel.logo = new String(imageBytes, StandardCharsets.UTF_8);
-                        panel.logoType = LogoType.BASE64;
+                        String imageBase64 = Base64.getEncoder().encodeToString(imageBytes);
+                        String imageSpec = "png"; // assume default
+                        int pos = logoSpec.lastIndexOf(".");
+                        if (pos > 0 && pos + 1 < logoSpec.length()) {
+                            imageSpec = logoSpec.substring(pos + 1).toLowerCase();
+                        }
+                        panel.logo = "data:image/" + imageSpec + ";base64," + imageBase64;
                     } catch (IOException e) {
                         LoggerFactory.getLogger(IvmlDashboardMapper.class).warn("While reading logo {}: {}", 
                             logoSpec, e.getMessage());
@@ -915,16 +908,8 @@ public class IvmlDashboardMapper {
             }
             if (null != panel.logo) {
                 logoB = panelsB.createSubmodelElementCollectionBuilder(factory.fixId("custom_options"));
-                String propertyName;
-                String description;
-                if (panel.logoType == LogoType.URL) {
-                    propertyName = "imageUrl";
-                    description = "The image URL of the image to display";
-                } else {
-                    propertyName = "image";
-                    description = "";
-                }
-                createProperty(logoB, propertyName, Type.STRING, panel.logo, description);
+                createProperty(logoB, "imageUrl", Type.STRING, panel.logo, 
+                    "The image URL/data of the image to display");
                 panel.type = "image";
             }
         }

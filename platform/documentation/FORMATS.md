@@ -61,8 +61,7 @@ Produced by `IvmlDashboardMapper` in `configuration.easy`, actual JSON format de
     - SMEC `panels`; individual single/multi-valued dashboard panels
        - SMEC _ panel-id_
          - SMEC? `custom-options`
-           - Property? `imageUrl`, Type `STRING`, URL to logo, either `imageUrl` or `image` shall be given if panel type is `image`
-           - Property? `image`, Type `STRING`, Base64 encoded PNG/JPEG, see `imageUrl`
+           - Property? `imageUrl`, Type `STRING`, URL to logo, either `imageUrl` or `image` shall be given if panel type is `image`; may also be the name of a classpath-loadable figure that is transformed into a base64 encoded prefixed with "data:_transfer-encoding_;base64,"
            - Property? `fit`, Type `STRING`, **unclear**, values `contain`
          - Property `title`, Type `STRING`, title of the panel
          - Property `unit`, Type `STRING`, value unit of the data in the panel, see grafana value units and Semantic Id value unit mapping above
