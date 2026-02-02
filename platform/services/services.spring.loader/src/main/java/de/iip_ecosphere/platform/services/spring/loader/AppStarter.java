@@ -50,7 +50,6 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.plugins.ChildClassLoader;
 import de.iip_ecosphere.platform.support.plugins.ChildFirstClassLoader;
 import de.iip_ecosphere.platform.support.plugins.ChildFirstURLClassLoader;
-import de.iip_ecosphere.platform.support.plugins.CompoundEnumeration;
 import de.iip_ecosphere.platform.support.plugins.FindClassClassLoader;
 
 import org.springframework.boot.loader.archive.Archive.EntryFilter;
@@ -422,9 +421,12 @@ public class AppStarter {
          * @throws Exception if creating the class loader fails
          */
         protected ClassLoader createClassLoader(URL[] urls) throws Exception {
-            // could also be an URL classloader
-            //return new LaunchedURLClassLoader(isExploded(), getArchive(), urls, getClass().getClassLoader());
-            return new ChildFirstLaunchedURLClassLoader(isExploded(), getArchive(), urls, getClass().getClassLoader());
+            if (ChildFirstClassLoader.useChildFirst()) {
+                return new ChildFirstLaunchedURLClassLoader(isExploded(), getArchive(), urls, 
+                    getClass().getClassLoader());
+            } else {
+                return new LaunchedURLClassLoader(isExploded(), getArchive(), urls, getClass().getClassLoader());
+            }
         }
         
     }
@@ -449,47 +451,26 @@ public class AppStarter {
             super(exploded, rootArchive, urls, null);
             this.realParent = realParent;
         }
-        
+                
         @Override
         public URL getResource(String name) {
-            URL result = realParent.getResource(name);
+            URL result = findResource(name);
             if (null == result) {
-                result = super.getResource(name);
+                result = realParent.getResource(name);
             }
             return result;
         }
         
         @Override
         public Enumeration<URL> getResources(String name) throws IOException {
-            @SuppressWarnings("unchecked")
-            Enumeration<URL>[] tmp = (Enumeration<URL>[]) new Enumeration<?>[2];
-            int index = 0;
-            IOException ex1 = null;
-            IOException ex2 = null;
-            try {
-                tmp[index++] = realParent.getResources(name);
-            } catch (IOException ex) {
-                ex1 = ex;
-            }
-            try {
-                tmp[index++] = super.getResources(name);
-            } catch (IOException ex) {
-                ex2 = ex;
-            }
-            if (ex1 != null && ex2 != null) {
-                throw ex1;
-            }
-            return new CompoundEnumeration<>(tmp);        
-        }
-        
-        @Override
-        public InputStream getResourceAsStream(String name) {
-            InputStream result = realParent.getResourceAsStream(name);
+            Enumeration<URL> result = findResources(name);
             if (null == result) {
-                result = super.getResourceAsStream(name);
+                result = realParent.getResources(name);
             }
             return result;
         }
+        
+        // the other getResource methods in ClassLoader rely on these two
         
         @Override
         public Class<?> findClass(String name) throws ClassNotFoundException {
@@ -746,6 +727,7 @@ public class AppStarter {
                         cpUrls.add(f.toURI().toURL());
                     }
                     loader = new ChildFirstURLClassLoader(cpUrls.toArray(new URL[cpUrls.size()]), loader);
+                    //loader = new URLClassLoader(cpUrls.toArray(new URL[cpUrls.size()]), loader);
                     break;
                 }
                 try {
