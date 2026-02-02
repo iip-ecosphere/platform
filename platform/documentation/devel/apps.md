@@ -4,7 +4,7 @@ This document summarizes guidelines on how to realize oktoflow applications. Fur
 
 ## Ways to implement an oktoflow application
 
-There are three ways to create an own application. These summaries are currently a rough sketch. More details and links to tutorials will follow.
+There are three ways to create an own application. These summaries are currently a rough sketch. More details and links to tutorials will follow. There is a further document on hints and background to [debugging](debugApps.md)
 
 ### Using the management UI: 
 
