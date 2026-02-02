@@ -1,6 +1,7 @@
 # oktoflow platform: Install Support (Windows)
 
 ### Prepare the server
+>Please note that the software versions may have changed. The most current versions are listed in the platform prerequisites documentation: [Prerequisites](https://github.com/iip-ecosphere/platform/blob/main/platform/documentation/PREREQUISITES.md).
 
 On the server, where we will build and instantiate the platform also for the devices, install the programs unzip, Java JDK (version 17 or up due to some limitations of used dependencies), maven (version 3.9.13) and docker (version 20.10.7):
 
@@ -37,6 +38,7 @@ Also install the required python packages
     python -m pip install PyYAML==6.0
     python -m pip install websockets==11.0.2
     
+
 If docker 20.10.7 (recommended version) is not installed, please execute 
 
     curl https://desktop.docker.com/win/main/amd64/65384/Docker%%20Desktop%%20Installer.exe -O DockerDesktopInstaller.exe
@@ -62,7 +64,7 @@ You may check the registry using ("147.172.178.145" should be changed to the IP 
     
 ### Prepare the devices
 
-On devices, the installation may differ depending on the desired degree of containerization. If you want to run the fundamental platform components on bare metal, please install also JDK 13, maven, python, python packages and docker on the devices. If you plan to run only containers on the devices, docker is sufficient.
+On devices, the installation may differ depending on the desired degree of containerization. If you want to run the fundamental platform components on bare metal, please install also JDK, Maven, Python, Python packages and Docker on the devices. If you plan to run only containers on the devices, docker is sufficient.
 
 Create or edit the ``daemon.json`` file (usually in ``C:\ProgramData\Docker\config\daemon.json``) in order to access the local Docker registry installed above, here without TLS certificate ("147.172.178.145" should be changed to the IP address of your machine that running the Docker registry). For an empty file, this looks like:
 
@@ -76,7 +78,7 @@ Then a restart of docker may be required.
 
 Depending on the use of Python in services, the build process for applications may include Python syntax checking and execution of Python unit tests. If you plan to run the platform on bare metal under administrator permissions, e.g., as systemd service, please install the following python dependencies globally, i.e., with administrator permissions.
 
-At least pyflakes and for service execution PyYaml as well as websockets must be installed (Please check the tested library for each version of Python [PREREQUISITES](PREREQUISITES.md))
+At least pyflakes and for service execution PyYaml as well as websockets must be installed (Please check the tested library for each version of Python  [Prerequisites](https://github.com/iip-ecosphere/platform/blob/main/platform/documentation/PREREQUISITES.md))
 
     python -m pip install pyflakes==2.5.0
     python -m pip install PyYAML==6.0
