@@ -13,10 +13,11 @@
 package de.iip_ecosphere.platform.support.plugins;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.function.Function;
+
+import de.iip_ecosphere.platform.support.OsUtils;
 
 /**
  * A delegating child-first classloader.
@@ -71,35 +72,14 @@ public class ChildFirstClassLoader extends ClassLoader implements IdentifyingCla
     
     @Override
     public Enumeration<URL> getResources(String name) throws IOException {
-        @SuppressWarnings("unchecked")
-        Enumeration<URL>[] tmp = (Enumeration<URL>[]) new Enumeration<?>[2];
-        int index = 0;
-        IOException ex1 = null;
-        IOException ex2 = null;
-        try {
-            tmp[index++] = childClassLoader.getResources(name);
-        } catch (IOException ex) {
-            ex1 = ex;
-        }
-        try {
-            tmp[index++] = super.getResources(name);
-        } catch (IOException ex) {
-            ex2 = ex;
-        }
-        if (ex1 != null && ex2 != null) {
-            throw ex1;
-        }
-        return new CompoundEnumeration<>(tmp);
-    }
-    
-    @Override
-    public InputStream getResourceAsStream(String name) {
-        InputStream result = childClassLoader.getResourceAsStream(name);
-        if (null == result) {
-            result = super.getResourceAsStream(name);
+        Enumeration<URL> result = childClassLoader.getResources(name);
+        if (result == null) {
+            result = super.getResources(name);
         }
         return result;
     }
+
+    // the other getResource methods in ClassLoader rely on these two
 
     @Override
     public void setClassAssertionStatus(String className, boolean enabled) {
@@ -133,6 +113,21 @@ public class ChildFirstClassLoader extends ClassLoader implements IdentifyingCla
     @Override
     public String toString() {
         return super.toString() + " with child " + childClassLoader;
+    }
+    
+    /**
+     * Returns whether a child-first classloader shall be used. This method is for experiments and shall be removed
+     * later.
+     * 
+     * @return {@code true} or the value of the environment variable {@code OKTO_PLUGIN_CHILD_FIRST}
+     */
+    public static boolean useChildFirst() {
+        boolean result = true;
+        String tmp = OsUtils.getEnv("OKTO_PLUGIN_CHILD_FIRST");
+        if (tmp != null) {
+            result = Boolean.valueOf(tmp);
+        }
+        return result;
     }
     
 }

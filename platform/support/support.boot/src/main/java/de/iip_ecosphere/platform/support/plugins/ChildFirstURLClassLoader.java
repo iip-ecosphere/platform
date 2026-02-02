@@ -13,7 +13,6 @@
 package de.iip_ecosphere.platform.support.plugins;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
@@ -43,46 +42,24 @@ class ChildURLClassLoader extends URLClassLoader implements ChildClassLoader {
     
     @Override
     public URL getResource(String name) {
-        URL result = realParent.getResource(name);
+        URL result = findResource(name);
         if (null == result) {
-            result = super.getResource(name);
+            result = realParent.getResource(name);
         }
         return result;
     }
     
     @Override
     public Enumeration<URL> getResources(String name) throws IOException {
-        @SuppressWarnings("unchecked")
-        Enumeration<URL>[] tmp = (Enumeration<URL>[]) new Enumeration<?>[2];
-        int index = 0;
-        IOException ex1 = null;
-        IOException ex2 = null;
-        try {
-            tmp[index++] = realParent.getResources(name);
-        } catch (IOException ex) {
-            ex1 = ex;
-        }
-        try {
-            tmp[index++] = super.getResources(name);
-        } catch (IOException ex) {
-            ex2 = ex;
-        }
-        if (ex1 != null && ex2 != null) {
-            throw ex1;
-        }
-        return new CompoundEnumeration<>(tmp);        
-    }
-    
-    @Override
-    public InputStream getResourceAsStream(String name) {
-        InputStream result = realParent.getResourceAsStream(name);
+        Enumeration<URL> result = findResources(name);
         if (null == result) {
-            result = super.getResourceAsStream(name);
+            result = realParent.getResources(name);
         }
         return result;
     }
     
-
+    // the other getResource methods in ClassLoader rely on these two
+    
     @Override
     public Class<?> findClass(String name) throws ClassNotFoundException {
         Class<?> result = findLoadedClass(name); 
