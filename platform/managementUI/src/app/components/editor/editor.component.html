@@ -226,5 +226,5 @@
 </div>-->
 
 <div *ngIf="feedback != ''" class="feedback">
-  <p>{{ feedback }}</p>
+  <div [innerHTML]="feedback"></div>
 </div>

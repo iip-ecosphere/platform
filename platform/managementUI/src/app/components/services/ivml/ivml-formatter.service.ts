@@ -88,7 +88,7 @@ export class IvmlFormatterService extends UtilsService {
   private getFeedback(opResult: JsonPlatformOperationResult | null, success: string): UserFeedback {
     let result: UserFeedback = { feedback: success, successful: true };
     if (opResult && opResult.exception) {
-      result.feedback = "Exception: " + opResult.exception;
+      result.feedback = this.buildConstraintMessage(opResult.exception);
       result.successful = false;
     }
     return result;
@@ -869,7 +869,32 @@ export class IvmlFormatterService extends UtilsService {
     }
   }
 
-  				
+  /**
+   * Improve/simplify EASy reasoner messages
+   * @returns {String}
+   */
+  private buildConstraintMessage(message: string): string {
+    const match = message.match(/Constraints not satisfied:\[(.*?)\]/);
+    if (!match) return '';
+
+    const raw = match[1];
+
+    const constraints = raw
+      .split(/\)\s*,\s*/)
+      .map(c => c.endsWith(')') ? c : c + ')')
+      .map(c => c.trim())
+      .filter(Boolean);
+
+    return (
+      'Constraints not satisfied:<br>' +
+      constraints.map(c => `• ${c}`).join('<br>')
+    );
+  }
+
+  /**
+   * Extract Enum Set values
+   * @returns {string[]}
+   */
   private extractEnumSet(value: string): string[] {
     return value
       .replace(/[{}]/g, '')
