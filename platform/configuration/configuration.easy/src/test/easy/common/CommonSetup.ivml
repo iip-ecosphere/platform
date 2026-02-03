@@ -69,7 +69,8 @@ project CommonSetup {
     footprintFolder = "gen/footprints";
     pidDir = "/run";
     //no artifactsUriPrefix for local test/devels execution, else "http://127.0.0.1:4200/download";    
-    artifactsFolder = "artifacts"; // re-specify it so that UI build process can replace it
+    artifactsFolder = "artifacts"; // re-specify it so that UI build process for testing can replace it
+    artifactsUriPrefix = ""; // re-specify it so that UI build process for testing can replace it
 
     // ------------ freezing ------------------
     
@@ -93,7 +94,7 @@ project CommonSetup {
         javaOpts;
         pidDir;
         artifactsFolder;
-        //artifactsUriPrefix; // use default -> artifacts folder for local test/devel executions
+        artifactsUriPrefix;
         footprintFolder;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);

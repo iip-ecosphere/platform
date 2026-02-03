@@ -845,13 +845,13 @@ public class IvmlDashboardMapper {
                 factory.fixId(p.name));
             processLogo(p, panelB);
             createProperty(panelB, "title", Type.STRING, p.name, "Panel title");
-            createProperty(panelB, "unit", Type.STRING, p.unit, "Panel unit");
-            createProperty(panelB, "datasource_uid", Type.STRING, p.influxDb, 
+            createPropertyEmpty(panelB, "unit", Type.STRING, p.unit, "Panel unit");
+            createPropertyEmpty(panelB, "datasource_uid", Type.STRING, p.influxDb,  
                 "Unique identifier for InfluxDB in db section");
-            if (p.influx != null) {
-                createProperty(panelB, "bucket", Type.STRING, p.influx.bucket, "InfluxDB bucket"); 
-                createProperty(panelB, "measurement", Type.STRING, p.influx.measurement, "InfluxDB measurement");
-            }
+            createPropertyEmpty(panelB, "bucket", Type.STRING, p.influx == null ? "" : p.influx.bucket,  
+                "InfluxDB bucket"); 
+            createPropertyEmpty(panelB, "measurement", Type.STRING, p.influx == null ? "" : p.influx.measurement, 
+                "InfluxDB measurement");
             String fields = p.fields.stream().map(f -> f.name).collect(Collectors.joining(","));
             createProperty(panelB, "fields", Type.STRING, fields, "InfluxDB fields in measurement");
             createProperty(panelB, "panel_type", Type.STRING, p.type, "Panel type");
@@ -951,6 +951,20 @@ public class IvmlDashboardMapper {
             createProperty(panelB, "width", Type.INTEGER, position.width, "Panel position: width");
             createProperty(panelB, "height", Type.INTEGER, position.height, "Panel position: height");
         }
+    }
+
+    /**
+     * Creates an AAS property with empty default if value is not given.
+     * 
+     * @param parent the parent builder
+     * @param idShort the idShort
+     * @param type the property type
+     * @param value the property value, may be <b>null</b>, then {@code dflt} is used
+     * @param description the description to be added
+     */
+    private void createPropertyEmpty(SubmodelElementContainerBuilder parent, String idShort, Type type, Object value, 
+        String description) {
+        createProperty(parent, idShort, type, value == null ? "" : value, description);
     }
     
     /**
