@@ -171,7 +171,7 @@ class TypeMapper {
     private void mapCompoundType(Compound type) {
         String typeId = AasUtils.fixId(type.getName());
         if (!isDoneType(typeId)) {
-            SubmodelElementCollectionBuilder typeB = builder.createSubmodelElementCollectionBuilder(typeId);
+            SubmodelElementListBuilder typeB = builder.createSubmodelElementListBuilder(typeId);
             Map<String, SubmodelElementListBuilder> doneSlots = new HashMap<>();
             mapCompoundSlots(type, type, type, typeB, doneSlots);
             mapRefines(type, type, typeB, doneSlots);
@@ -399,7 +399,7 @@ class TypeMapper {
      * @param typeB the type builder
      * @param doneSlots already done slot names
      */
-    private void mapRefines(Compound type, Compound topType, SubmodelElementCollectionBuilder typeB, 
+    private void mapRefines(Compound type, Compound topType, SubmodelElementListBuilder typeB, 
         Map<String, SubmodelElementListBuilder> doneSlots) {
         for (int r = 0; r < type.getRefinesCount(); r++) {
             Compound refines = type.getRefines(r);
@@ -418,7 +418,7 @@ class TypeMapper {
      * @param doneSlots already done slot names
      */
     private void mapCompoundSlots(IDecisionVariableContainer cnt, Compound type, Compound topType, 
-        SubmodelElementCollectionBuilder typeB, Map<String, SubmodelElementListBuilder> doneSlots) {
+        SubmodelElementListBuilder typeB, Map<String, SubmodelElementListBuilder> doneSlots) {
         for (int i = 0; i < cnt.getElementCount(); i++) {
             mapCompoundSlot(cnt.getElement(i), type, topType, typeB, doneSlots);
         }
@@ -507,7 +507,7 @@ class TypeMapper {
      * @param doneSlots already done slot names
      */
     private void mapCompoundSlot(DecisionVariableDeclaration slot, Compound type, Compound topType,
-        SubmodelElementCollectionBuilder typeB, Map<String, SubmodelElementListBuilder> doneSlots) {
+        SubmodelElementListBuilder typeB, Map<String, SubmodelElementListBuilder> doneSlots) {
         // if we get into trouble with property ids, we have to sub-structure that
         String slotName = AasUtils.fixId(slot.getName());
         if (!doneSlots.containsKey(slotName) && variableFilter.test(slot)) {
@@ -547,6 +547,7 @@ class TypeMapper {
             if (slotType != type) {
                 mapType(slotType);
             }
+            propB.build();
         }
     }
     
