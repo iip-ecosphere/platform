@@ -30,6 +30,7 @@ import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.uni_hildesheim.sse.ConstraintSyntaxException;
 import de.uni_hildesheim.sse.ModelUtility;
+import net.ssehub.easy.basics.messages.Status;
 import net.ssehub.easy.basics.modelManagement.ModelImport;
 import net.ssehub.easy.basics.modelManagement.ModelInfo;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
@@ -38,7 +39,6 @@ import net.ssehub.easy.basics.modelManagement.VersionedModelInfos;
 import net.ssehub.easy.instantiation.core.model.vilTypes.PseudoString;
 import net.ssehub.easy.instantiation.core.model.vilTypes.configuration.ChangeHistory;
 import net.ssehub.easy.instantiation.core.model.vilTypes.configuration.Configuration;
-import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 import net.ssehub.easy.reasoning.core.frontend.ReasonerFrontend;
 import net.ssehub.easy.reasoning.core.reasoner.Message;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
@@ -876,26 +876,30 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
             String msg = "";
             if (null != res) {
                 for (int m = 0; m < res.getMessageCount(); m++) {
-                    if (msg.length() > 0) {
-                        msg += "\n";
-                    }
                     Message rmsg = res.getMessage(m);
-                    msg += rmsg.getDescription();
-                    msg += rmsg.getConflictComments();
-                    msg += rmsg.getConflictSuggestions();
-                    // remove?
-                    for (int v = 0; v < res.getAffectedVariablesCount(); v++) {
-                        if (v > 0) {
-                            msg += ", ";
+                    if (rmsg.getStatus() == Status.ERROR) {
+                        if (msg.length() > 0) {
+                            msg += "\n";
                         }
-                        msg += res.getAffectedVariable(v).getQualifiedName();
+                        msg += rmsg.getDescription();
+                        msg += rmsg.getConflictComments();
+                        //msg += rmsg.getConflictSuggestions();
+                        // remove?
+                        /*for (int v = 0; v < res.getAffectedVariablesCount(); v++) {
+                            if (v > 0) {
+                                msg += ", ";
+                            }
+                            msg += res.getAffectedVariable(v).getQualifiedName();
+                        }*/
                     }
                 }
-                EasyExecutor.printReasoningMessages(res); // preliminary
             } else {
                 msg = "Internal reasoning issue. Please check logs.";
             }
             getLogger().error("Reasoning failed: {}", msg);
+            /*if (null != res) {
+                EasyExecutor.printReasoningMessages(res); // preliminary
+            }*/
             throw new ExecutionException(msg, null);
         }
     }
