@@ -59,7 +59,7 @@ Produced by `IvmlDashboardMapper` in `configuration.easy`, actual JSON format de
          - Property `uid`, Type `STRING`, unique id of the dashboard
          - SMEC `tags`; currently empty, may be `time_from`, `time_to`, `timezone`
     - SMEC `panels`; individual single/multi-valued dashboard panels
-       - SMEC _ panel-id_
+       - SMEC _panel-id_
          - SMEC? `custom-options`
            - Property? `imageUrl`, Type `STRING`, URL to logo, either `imageUrl` or `image` shall be given if panel type is `image`; may also be the name of a classpath-loadable figure that is transformed into a base64 encoded prefixed with "data:_transfer-encoding_;base64,"
            - Property? `fit`, Type `STRING`, **unclear**, values `contain`
