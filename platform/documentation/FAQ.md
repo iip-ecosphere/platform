@@ -280,4 +280,4 @@ After changing the values, run `mvn install` on all affected all-in-one examples
 
 *Reason:* We defined basic date/time types like `DateTimeType` (corresponding to ISO-8061, see [LocalDateTime](https://docs.oracle.com/javase/8/docs/api/java/time/LocalDateTime.html)) and the `IEC61131_3DateTimeType` for IEC51131-3, but we cannot foresee, which data/time formats are adequate for you.
 
-*Solution:* We provide a generic date/time type for which you can specify the format (in Java meta-format). For details, see the [types configuration summary](../concepts/types.MD).
+*Solution:* We provide a generic date/time type for which you can specify the format (in Java meta-format). For details, see the [types configuration summary](concepts/types.MD).
