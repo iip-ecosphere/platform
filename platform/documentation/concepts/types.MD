@@ -33,7 +33,7 @@ The following primitive types are currently defined:
 |UnsignedInteger32Type | UnsignedInt32 | 32 bit unsigned integer as in OPC UA |
 |UnsignedInteger64Type | UnsignedInt64 | 64 bit unsigned integer as in OPC UA|
 |ByteStringType | ByteString | A sequence of octets as in OPC UA. |
-|DateTimeType | DateTime | Generic, system locale-dependent date/time format |
+|DateTimeType | DateTime | Generic, system locale-dependent date/time format based on ISO-8061, see [LocalDateTime](https://docs.oracle.com/javase/8/docs/api/java/time/LocalDateTime.html) |
 |IEC61131_3DateTimeType | IEC 61131-3 DateTime | date time in IEC 61131-3 format|
 
 Using arrays/lists, the following convenience types for frequently used primitives are provided:
@@ -170,3 +170,18 @@ AliasType AmpereType = {
 | semanticId | Optional semantic id detailing the type | _represents.semanticId_ | |
 
 Let us assume that similarly an `AliasType` called `MilliAmpereType` has been defined. Then, in the example `influxEnergyData` type above, the `type = refBy(FloatType)` can be replaced by `type = refBy(MilliAmpereType)` and the `semanticId` can be left out there as it has been already defined on `MilliAmpereType`.
+
+## Specific Date/Time types
+
+Besides the predefined `DateTimeType` (corresponding to ISO-8061) and the `IEC61131_3DateTimeType` for IEC51131-3, we allow for defining generic date/time formats. Basis is `GenericDateTimeTypeType` that must be refined in your model, e.g., in `AllTypes.ivml`.
+
+```
+GenericDateTimeTypeType MyTimeType = {
+    name = "MyTime",
+    format = "yyyy-MM-dd HH:mm:ss"
+};    
+
+```
+
+and use it in `RecordType` definitions as `refBy(MyTimeType)`. The `name` must be unique among all types, the `format` is 
+stated according to [SimpleDateFormat](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/text/SimpleDateFormat.html).

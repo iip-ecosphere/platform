@@ -273,3 +273,11 @@ After changing the values, run `mvn install` on all affected all-in-one examples
 *Reason:* There may be many reasons, including issues in your code and issues in the platform.
 
 *Solution:* We provide a [debugging checklist](DEBUGGING.md) with reasons and explanations that we identified over time. If you identify issues in the platform, please let us know.
+
+## I need a certain time format, but the provided types do not work. What to do?
+
+*Symptom:* Using the wrong date/time type may end in a parsing exception.
+
+*Reason:* We defined basic date/time types like `DateTimeType` (corresponding to ISO-8061, see [LocalDateTime](https://docs.oracle.com/javase/8/docs/api/java/time/LocalDateTime.html)) and the `IEC61131_3DateTimeType` for IEC51131-3, but we cannot foresee, which data/time formats are adequate for you.
+
+*Solution:* We provide a generic date/time type for which you can specify the format (in Java meta-format). For details, see the [types configuration summary](../concepts/types.MD).
