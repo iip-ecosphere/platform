@@ -77,11 +77,8 @@ template JavaSpringCloudStreamMeshElementPartKodex(Configuration config, FileArt
             m.addCall("service.registerOutputTypeTranslator").addClassArgument(outType).addStringArgument(field).addArgument(new JavaCodeConstructorCall(outType + "OutputTranslator"));
         }
         mapOf(IOType, IOType) pairs = ioPairs(elt);
-println("KODEX* " + pairs);        
         for (IOType in: pairs.keys()) {
-println("KODEX** " + in);        
             IOType out = pairs.get(in);
-println("KODEX** " + in+" "+out);        
             String inField = getRtsaFieldName(in);
             String outField = getRtsaFieldName(out);
             m.addCall("service.registerInOutRelation").addStringArgument(inField).addStringArgument(outField);
