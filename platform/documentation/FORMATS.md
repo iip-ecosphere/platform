@@ -53,7 +53,7 @@ Produced by `IvmlDashboardMapper` in `configuration.easy`, actual JSON format de
       - SMEC* _row-id_
          - Property `id`, Type `STRING`, unique id of display row
          - Property `name`, Type `STRING`, name of display row
-         - Property `displayName`, Type `STRING`, optional display name, may be empty; if not given, use `name` instead
+         - Property `displayName`, Type `STRING`, optional display name, may be empty; if empty, use `name` instead
     - SMEC `Dashboard`; top-level dashboard description
          - Property `title`, Type `STRING`, title of the dashboard
          - Property `uid`, Type `STRING`, unique id of the dashboard
@@ -71,7 +71,7 @@ Produced by `IvmlDashboardMapper` in `configuration.easy`, actual JSON format de
          - Property `fields`, Type `STRING`, Fields from Influx measurement to display, may be a single field or field names separated by commas; time axis is taken from influx time field
          - Property `panel_type`, Type `STRING`, Type of the panel, one of `timeseries`, `gauge`, `barchart`, `table`, `stat`, `piechart`, `image`
          - Property `description`, Type `STRING`, description of the panel, may be empty
-         - Property `displayName`, Type `STRING`, display name of the panel, may be empty; if not given, use panel `name` instead
+         - Property `displayName`, Type `STRING`, display name of the panel, may be empty; if empty, use panel `name` instead
          - Property? `row`, Type `STRING`, ref to unique display row id, if given and valid assign panel to specified row
 
          May be complemented with `axis_min_soft`, `axis_max_soft`, `axis_label`, legend and panel position.
