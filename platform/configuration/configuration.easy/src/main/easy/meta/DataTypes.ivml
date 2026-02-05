@@ -144,7 +144,7 @@ project DataTypes {
     const Integer CACHE_NONE = 0;
     
     enum Display { TimeSeries, Gauge, BarChart, Table, Stat, Piechart }; // Image is implicit
-    enum DisplayPanelFit { None, Contain };
+    enum DisplayPanelFit { None, Contain, Cover, Fill };
     
     compound DisplayRow {
         NonEmptyString name;

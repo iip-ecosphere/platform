@@ -41,7 +41,7 @@ and default mapping for `grafana`.
 
 ### Dashboard AAS JSON
 
-Produced by `IvmlDashboardMapper` in `configuration.easy`, actual JSON format depends on used AAS plugin, e.g., BaSyx1 for metamodel v2 or BaSyx2 for metamodel v3. SM means SubModel, SMEC means SubModelElementCollection, * indicates a potentially unlimited repetition of the element, ? indicates an optional element.
+Produced by `IvmlDashboardMapper` in `configuration.easy`, actual JSON format depends on used AAS plugin, e.g., BaSyx1 for metamodel v2 or BaSyx2 for metamodel v3. SM means SubModel, SMEC means SubModelElementCollection, SMEL means SubModelElementList, * indicates a potentially unlimited repetition of the element, ? indicates an optional element.
 
 - SM `dashboardSpec`
     - Property `oktoVersion`, Type `STRING`, oktoflow version
@@ -59,16 +59,19 @@ Produced by `IvmlDashboardMapper` in `configuration.easy`, actual JSON format de
          - Property `uid`, Type `STRING`, unique id of the dashboard
          - SMEC `tags`; currently empty, may be `time_from`, `time_to`, `timezone`
     - SMEC `panels`; individual single/multi-valued dashboard panels
-       - SMEC _panel-id_
-         - SMEC? `custom-options`
+       - SMEL _panel-id_
+         - SMEC `custom-options`
            - Property? `imageUrl`, Type `STRING`, URL to logo, either `imageUrl` or `image` shall be given if panel type is `image`; may also be the name of a classpath-loadable figure that is transformed into a base64 encoded prefixed with "data:_transfer-encoding_;base64,"
-           - Property? `fit`, Type `STRING`, **unclear**, values `contain`
+           - Property `fit`, Type `STRING`, **unclear**, values `contain`
          - Property `title`, Type `STRING`, title of the panel
          - Property `unit`, Type `STRING`, value unit of the data in the panel, see grafana value units and Semantic Id value unit mapping above
          - Property `datasource_uid`, Type `STRING`, refers one of the entries in `db` below, may be empty for none, e.g., for an image panel
          - Property `bucket`, Type `STRING`, Influx bucket in `datasource_uid` specifying data source, may be empty for none, e.g., for an image panel
          - Property `measurement`, Type `STRING`, Influx measurement in `datasource_uid` specifying data source, may be empty for none, e.g., for an image panel
-         - Property `fields`, Type `STRING`, Fields from Influx measurement to display, may be a single field or field names separated by commas; time axis is taken from influx time field
+         - SMEC `fields`
+           - SMEC* _field-name_
+               - Property `name`, Type `STRING`, field from Influx measurement to display
+               - Property `displayName`, Type `STRING`, display name for field, may be empty; if empty, use field `name` instead
          - Property `panel_type`, Type `STRING`, Type of the panel, one of `timeseries`, `gauge`, `barchart`, `table`, `stat`, `piechart`, `image`
          - Property `description`, Type `STRING`, description of the panel, may be empty
          - Property `displayName`, Type `STRING`, display name of the panel, may be empty; if empty, use panel `name` instead

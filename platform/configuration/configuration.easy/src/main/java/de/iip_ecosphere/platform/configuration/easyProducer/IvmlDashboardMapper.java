@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor.ExecutionMode;
 import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator.InstantiationConfigurer;
@@ -43,6 +42,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
+import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.identities.IdentityStore;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
@@ -171,7 +171,7 @@ public class IvmlDashboardMapper {
                 createHeader(smB);
                 createDisplayRows(smB);
                 SubmodelElementCollectionBuilder dashboardB = createDashboardSpec(smB);
-                SubmodelElementCollectionBuilder panelsB = dashboardB.createSubmodelElementCollectionBuilder("panels");
+                SubmodelElementListBuilder panelsB = dashboardB.createSubmodelElementListBuilder("panels");
                 SubmodelElementCollectionBuilder dbB = dashboardB.createSubmodelElementCollectionBuilder("db");
                 Map<String, String> dbMapping = new HashMap<>();
 
@@ -266,10 +266,10 @@ public class IvmlDashboardMapper {
         String fit = IvmlUtils.getEnumValueName(var.getNestedElement("fit"));
         if (null != fit) {
             try {
-                dp.fit = FitType.valueOf(fit.toUpperCase());
+                dp.mode = ObjectFitType.valueOf(fit.toUpperCase());
             } catch (IllegalArgumentException e) {
-                LoggerFactory.getLogger(IvmlDashboardMapper.class).warn("Cannot map fit value {}: {}", fit, 
-                    e.getMessage());
+                LoggerFactory.getLogger(IvmlDashboardMapper.class).warn("Cannot map fit value {}. Keeping NONE. "
+                    + "Reason: {}", fit, e.getMessage());
             }
         }
         return dp;
@@ -298,13 +298,15 @@ public class IvmlDashboardMapper {
     }
     
     /**
-     * Represents a panel fit type.
+     * Represents a panel CSS {@code object-fit} type.
      * 
      * @author Holger Eichelberger, SSE
      */
-    private enum FitType {
-        NONE(""),
-        CONTAIN("contain");
+    private enum ObjectFitType {
+        NONE("none"),
+        CONTAIN("contain"),
+        COVER("cover"),
+        FILL("fill");
         
         private String value;
         
@@ -313,7 +315,7 @@ public class IvmlDashboardMapper {
          * 
          * @param value the corresponding dashboard value
          */
-        private FitType(String value) {
+        private ObjectFitType(String value) {
             this.value = value;
         }
         
@@ -346,7 +348,7 @@ public class IvmlDashboardMapper {
         private Legend legend; 
         private PanelPosition position;
         private String logo; // URL or file name to be resolved
-        private FitType fit = FitType.NONE; 
+        private ObjectFitType mode = ObjectFitType.NONE; 
         
         /**
          * Creates a display panel.
@@ -439,11 +441,11 @@ public class IvmlDashboardMapper {
      */
     private SubmodelElementCollectionBuilder createDashboardSpec(SubmodelBuilder smB) {
         SubmodelElementCollectionBuilder dashboardB = smB.createSubmodelElementCollectionBuilder("Dashboard");
-        createProperty(dashboardB, "title", Type.STRING, appName, "title of the dashboard"); // TODO preliminary name
+        createProperty(dashboardB, "title", Type.STRING, appName, "title of the dashboard");
         createProperty(dashboardB, "uid", Type.STRING, appId, "app/dashboard UID");
         SubmodelElementCollectionBuilder tagsB = dashboardB.createSubmodelElementCollectionBuilder("tags");
         tagsB.build();
-        // TODO time_from, time_to, timezone
+        // open: time_from, time_to, timezone
         return dashboardB;
     }
 
@@ -839,21 +841,24 @@ public class IvmlDashboardMapper {
      * @param panelsB the parent builder for the panels
      * @param panels the panels sequence, mostly determined by IVML
      */
-    private void createDisplayPanels(SubmodelElementCollectionBuilder panelsB, List<DisplayPanel> panels) {
+    private void createDisplayPanels(SubmodelElementListBuilder panelsB, List<DisplayPanel> panels) {
         for (DisplayPanel p : panels) {
             SubmodelElementCollectionBuilder panelB = panelsB.createSubmodelElementCollectionBuilder(
                 factory.fixId(p.name));
             processLogo(p, panelB);
             createProperty(panelB, "title", Type.STRING, p.name, "Panel title");
-            createPropertyEmpty(panelB, "unit", Type.STRING, p.unit, "Panel unit");
-            createPropertyEmpty(panelB, "datasource_uid", Type.STRING, p.influxDb,  
+            createPropertyDfltEmpty(panelB, "unit", Type.STRING, p.unit, "Panel unit");
+            createPropertyDfltEmpty(panelB, "datasource_uid", Type.STRING, p.influxDb,  
                 "Unique identifier for InfluxDB in db section");
-            createPropertyEmpty(panelB, "bucket", Type.STRING, p.influx == null ? "" : p.influx.bucket,  
+            createPropertyDfltEmpty(panelB, "bucket", Type.STRING, p.influx == null ? "" : p.influx.bucket,  
                 "InfluxDB bucket"); 
-            createPropertyEmpty(panelB, "measurement", Type.STRING, p.influx == null ? "" : p.influx.measurement, 
+            createPropertyDfltEmpty(panelB, "measurement", Type.STRING, p.influx == null ? "" : p.influx.measurement, 
                 "InfluxDB measurement");
-            String fields = p.fields.stream().map(f -> f.name).collect(Collectors.joining(","));
-            createProperty(panelB, "fields", Type.STRING, fields, "InfluxDB fields in measurement");
+
+            createFields(panelB, p);
+            
+            //String fields = p.fields.stream().map(f -> f.name).collect(Collectors.joining(","));
+            //createProperty(panelB, "fields", Type.STRING, fields, "InfluxDB fields in measurement");
             createProperty(panelB, "panel_type", Type.STRING, p.type, "Panel type");
             createProperty(panelB, "description", Type.STRING, "", "Panel description");
             createProperty(panelB, "displayName", Type.STRING, p.displayName, "Panel display name");
@@ -862,13 +867,34 @@ public class IvmlDashboardMapper {
                     "Display row id pointing to rows section");
             }
             
-            // TODO axis_max_soft
-            // TODO axis_min_soft
-            // TODO axis_label
+            // open: axis_max_soft
+            // open: axis_min_soft
+            // open: axis_label
             processLegend(p.legend, panelB);
             processPanelPosition(p.position, panelB);
             panelB.build();
         }
+    }
+
+    /**
+     * Creates the fields entry for a panel in terms of a submodel element collection containing field details, 
+     * e.g., name, displayName.
+     * 
+     * @param panelB the builder of the panel
+     * @param panel the panel information containing the fields
+     */
+    private void createFields(SubmodelElementCollectionBuilder panelB, DisplayPanel panel) {
+        SubmodelElementCollectionBuilder fieldsB = panelB.createSubmodelElementCollectionBuilder(
+            factory.fixId("fields"));
+        for (Field f : panel.fields) {
+            SubmodelElementCollectionBuilder fieldB = fieldsB.createSubmodelElementCollectionBuilder(
+                factory.fixId(f.name));
+            createPropertyDfltEmpty(fieldB, "name", Type.STRING, f.name, "Field name in db");
+            createPropertyDfltEmpty(fieldB, "displayName", Type.STRING, f.displayName, 
+                "Display name of field in db");
+            fieldB.build();
+        }
+        fieldsB.build();
     }
 
     /**
@@ -878,7 +904,8 @@ public class IvmlDashboardMapper {
      * @param panelsB the parent builder for the panels
      */
     private void processLogo(DisplayPanel panel, SubmodelElementCollectionBuilder panelsB) {
-        SubmodelElementCollectionBuilder logoB = null;
+        SubmodelElementCollectionBuilder logoB = panelsB.createSubmodelElementCollectionBuilder(
+            factory.fixId("custom_options"));
         if (panel.logo != null && !panel.logo.isBlank()) {
             String logoSpec = panel.logo;
             if (!(logoSpec.startsWith("http://") || logoSpec.startsWith("https://"))) {
@@ -907,21 +934,13 @@ public class IvmlDashboardMapper {
                 }
             }
             if (null != panel.logo) {
-                logoB = panelsB.createSubmodelElementCollectionBuilder(factory.fixId("custom_options"));
                 createProperty(logoB, "imageUrl", Type.STRING, panel.logo, 
                     "The image URL/data of the image to display");
                 panel.type = "image";
             }
         }
-        if (panel.fit != FitType.NONE) {
-            if (null == logoB) {
-                logoB = panelsB.createSubmodelElementCollectionBuilder(factory.fixId("custom_options"));
-            }
-            createProperty(logoB, "fit", Type.STRING, panel.fit.getValue(), "The panel fitting");
-        }
-        if (null != logoB) {
-            logoB.build();
-        }
+        createProperty(logoB, "mode", Type.STRING, panel.mode.getValue(), "The object-fit mode");
+        logoB.build();
     }
 
     /**
@@ -962,8 +981,8 @@ public class IvmlDashboardMapper {
      * @param value the property value, may be <b>null</b>, then {@code dflt} is used
      * @param description the description to be added
      */
-    private void createPropertyEmpty(SubmodelElementContainerBuilder parent, String idShort, Type type, Object value, 
-        String description) {
+    private void createPropertyDfltEmpty(SubmodelElementContainerBuilder parent, String idShort, Type type, 
+        Object value, String description) {
         createProperty(parent, idShort, type, value == null ? "" : value, description);
     }
     

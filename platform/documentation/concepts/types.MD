@@ -112,7 +112,7 @@ Again, in turn, `Field` instances may specify a `DisplayRow` or a `DisplayPanel`
 | displayName | Optional display name for the panel. |  ""   |
 | displayRow | Optional reference to the display row that shall display this panel. If not given, the panel will occur in some default (top)-row of the dashboard. | - |
 | logo | Resolvable file name in classpath or `resources/software` or `http://`/`https://` resource pointing a logo. Turns panel into a logo panel. | `null` |
-| fit | Panel fitting, may be `DisplayPanelFit::None` or `DisplayPanelFit::Contains` | `DisplayPanelFit::None` |
+| fit | How to fit panel image contents, akin to CSS `object-fit`, may be `DisplayPanelFit::None`, `DisplayPanelFit::Contains`, `DisplayPanelFit::Fill`, or `DisplayPanelFit::Cover` | `DisplayPanelFit::None` |
 
 Although all display related fields are optional for usual `Field` instances in a `RecordType`, because an usual `Field` shall not be displayed on a dashboard, they partially become mandatory if a `Field` shall be displayed. The following example illustrates this:
 
