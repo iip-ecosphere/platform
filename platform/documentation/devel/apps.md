@@ -29,6 +29,17 @@ There are three ways to create an own application. These summaries are currently
 - Test your services with the generated data input files and unit tests (may require a takeover from the application code template)
 - Build and test the whole application with `mvn install` 
 
+If you want to do this with different examples, please note that they must have individual Maven artifacts as otherwise implementation parts are incorrectly loaded across examples. As copying examples is not the usual approach, the adjustments must be done manually. In more details,
+- In `TechnicalSetup.ivml` the artifact name in `sharedArtifact` must be unique for all examples. In a platform managed configuration, only a single such artifact exists for all applications. However, all-in-one examples mimick a platform instance and, thus, need a unique name here.
+- In the application`s IVML, the `name` and `id` must be unique for all all-in-one examples as this makes up the name of the application Maven artifact.
+- In `pom.xml` 
+  - the `artifactId` must be unique and replace the respective artifact id in `AllServices.ivml`. Please pay attention to the `groupId` which in the examples typically ends with `.apps`, which must be correct in both, `pom.xml` and `Services.ivml`.
+  - the dependency pointing to the `sharedArtifact` must be replaced (as renamed above)
+  - if stated, the dependency the generated application must be replaced (as renamed above)
+  - the application executions (Java execution plugin `exec-maven-plugin`) must be adjusted so that they match path and artifact of the application (as renamed above)
+
+If you then change the model, please remove all classes that could have taken over from the original app code template that would not be valid anymore as they rely on different tyes, e.g., those in `src/test/iip/connectivity`. After building the app interfaces, you may find them with `mvn -P App install`.
+
 ### Based on a separated model [impl.model](../../tools/impl.model) and implementation project:
 
 - Obtain a copy of [impl.model](../../tools/impl.model)
