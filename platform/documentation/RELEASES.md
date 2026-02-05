@@ -25,6 +25,7 @@ Improvements:
 * Retrofit for BaSyx 1.5.1, in particular in AAS connector.
 * [#106](https://github.com/iip-ecosphere/platform/issues/106): Migration to JDK 17
 * Build process improvements for multiple Java/Maven installations like CI.
+* ReGaP: Influx/Grafana based dashboarding for oktoflow apps, integration of [oktoflow2grafana](https://github.com/iip-ecosphere/oktoflow2grafana).
 * [#19](https://github.com/iip-ecosphere/platform/issues/19): Integration of generated IDTA interfaces.
 * Revision of code generation to Java/Python/JSON/YAML artifacts provided by EASy-Producer
 * Code templates contain bash and batch scripts for building the app as well as a python source mapping for VScode

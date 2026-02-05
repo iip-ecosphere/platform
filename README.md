@@ -15,7 +15,7 @@ For installation and first steps, see [install guide](platform/documentation/INS
 * Updated (more agile) documentation of [configuration concepts](documentation/concepts/concepts.MD) as well as completely revised [platform handbook](documentation/PlatformHandbook.pdf)
 * New INFLUX DB v3 connector for ReGaP.
 * Ongoing Management UI improvements
-* ReGaP: Influx/Grafana based dashboarding for oktoflow apps, in integration with [Bitmotec](https://www.bitmotec.com/)
+* ReGaP: Influx/Grafana based dashboarding for oktoflow apps, integration of [oktoflow2grafana](https://github.com/iip-ecosphere/oktoflow2grafana).
 * For easing git checkouts: examples.hm22 and examples.emo23 have been moved to an own repository
 * Upcoming support for Asset Administration Shells metamodel v3 through BaSyx2
 * Support for Python 3.13 and virtual environments

@@ -135,7 +135,7 @@ Although all display related fields are optional for usual `Field` instances in 
     
 ```
 
-i.e., `display` and `semanticId` become mandatory for dashboarding fields, `displayName` and `displayRow` are still optional where, if not given, default values are assumed. If a `displayRow` is given, a display row must be defined (also in `AllTypes.ivml`)
+i.e., `display` and `semanticId` become mandatory for dashboarding fields, `displayName` and `displayRow` are still optional where, if not given, default values are assumed. `DisplayRow` and `DisplayPanel` are finer-grained model elements for the ReGaP Influx/Grafana mapping and the integration of [oktoflow2grafana](https://github.com/iip-ecosphere/oktoflow2grafana). If a `displayRow` is given, a display row must be defined (also in `AllTypes.ivml`)
 
 ```
     DisplayRow topRow = {
