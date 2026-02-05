@@ -42,6 +42,7 @@ and default mapping for `grafana`.
 ### Dashboard AAS JSON
 
 Produced by `IvmlDashboardMapper` in `configuration.easy`, actual JSON format depends on used AAS plugin, e.g., BaSyx1 for metamodel v2 or BaSyx2 for metamodel v3. SM means SubModel, SMEC means SubModelElementCollection, SMEL means SubModelElementList, * indicates a potentially unlimited repetition of the element, ? indicates an optional element.
+JSON is taken up by [oktoflow2grafana](https://github.com/iip-ecosphere/oktoflow2grafana).
 
 - SM `dashboardSpec`
     - Property `oktoVersion`, Type `STRING`, oktoflow version
