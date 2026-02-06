@@ -29,6 +29,81 @@ The setup for this component defines the `base` folder for the model, which typi
 
 The setup also may contain a `serviceArtifactStorage`and a `containerImageStorage` PackageStorageSetup specification from [deviceMgt](../../resources/deviceMgt/README.md), which are currently not used.
 
+## AAS configuration format
+
+oktoflow maps the actual platform/app configuration into an AAS as backend for the management UI. SM means SubModel, SMEC means SubModelElementCollection, SMEL means SubModelElementList, * indicates a potentially unlimited repetition of the element, ? indicates an optional element.
+JSON is taken up by [oktoflow2grafana](https://github.com/iip-ecosphere/oktoflow2grafana).
+
+- SM `Configuration` URN `iri:urn:::AAS:::iipEcosphere#CFG`
+    - OPERATION setGraph
+    - OPERATION deleteVariable
+    - OPERATION changeValues
+    - OPERATION genInterfacesAsync
+    - OPERATION removeImports
+    - OPERATION getGraph
+    - OPERATION addImports
+    - OPERATION getVariableName
+    - OPERATION deleteGraph
+    - OPERATION renameVariable
+    - OPERATION instantiateTemplate
+    - OPERATION getTemplates
+    - OPERATION createConstantVariable
+    - OPERATION getOpenTemplateVariables
+    - OPERATION createVariable
+    - OPERATION genAppsNoDepsAsync
+    - OPERATION genAppsAsync
+    - OPERATION getUnusedProjectNames
+    - SMEC* _typeName_ (e.g., metamodel type `Server`)
+        - SMEL _instanceVariableName_ (e.g., `MyServer`)
+            - SMEC* _fieldName_ (fields with values, only if variable is of compound type)
+                - PROPERTY `varValue`: value of variable, corresponding primitive type, where available including semanticId
+                - PROPERTY `metaVariable`, Type `String`, IVML variable name, may differ from SMEC idShort due to AAS name conventions
+                - PROPERTY `metaState`, Type `String`, IVML variable state, e.g., `FROZEN`
+                - PROPERTY `metaTemplate`, Type `Boolean`, whether field is in app template
+                - PROPERTY? `metaDisplayName`, Type `String`, if given, supersedes `metaVariable` by a human-readable display name
+                - PROPERTY `metaType`, Type `String`, IVML type of field
+                - PROPERTY `metaTypeKind`, Type `Integer`, only on top-level kind of type
+                    - `1`: primitive
+                    - `2`: enum
+                    - `3`: container
+                    - `4`: constraint
+                    - `9`: derived/typedef
+                    - `10`: compound
+                - PROPERTY? `metaConstant`, Type `Boolean`, whether variable is a constant
+            - PROPERTY `varValue`: value of variable, corresponding primitive type, where available including semanticId
+            - PROPERTY `metaVariable`, Type `String`, IVML variable name, may differ from SMEC idShort due to AAS name conventions
+            - PROPERTY `metaState`, Type `String`, IVML variable state, e.g., `FROZEN`
+            - PROPERTY `metaTemplate`, Type `Boolean`, whether field is in app template
+            - PROPERTY? `metaDisplayName`, Type `String`, if given, supersedes `metaVariable` by a human-readable display name
+            - PROPERTY `metaType`, Type `String`, IVML type of field
+            - PROPERTY `metaTypeKind`, Type `Integer`, only on top-level kind of type
+                - `1`: primitive
+                - `2`: enum
+                - `3`: container
+                - `4`: constraint
+                - `9`: derived/typedef
+                - `10`: compound
+            - PROPERTY? `metaConstant`, Type `Boolean`, whether variable is a constant
+    - SMEC `meta` (type definitions, all types referred above shall be listed here)
+        - SMEL* _typeName_ (sorted in sequence that UI shall use for display)
+            - SMEC* _fieldName_ 
+                 - PROPERTY `name`, Type `String`, name of field, may differ from SMEC idShort due to AAS name conventions
+                 - PROPERTY `uiGroup`, Type `Integer`, group for displaying multiple fields, i.e.,
+                     - `0`: invisible
+                     - `100`: mandatory group 1, if needed `1`..`98` denote specific positions with this group and `99` add the field always to the front of the group
+                     - `-100`: optional group 1, if needed `-1`..`-98` denote specific positions with this group and `-99` add the field always to the front of the group
+                     - `200`: mandatory group 2, if needed `101`..`198` denote specific positions with this group and `199` add the field always to the front of the group
+                     - `-200`: optional group 1, if needed `-101`..`-198` denote specific positions with this group and `-199` add the field always to the front of the group
+                 - PROPERTY? `metaDisplayName`, Type `String`, if given, supersedes `metaVariable` by a human-readable display name
+                 - PROPERTY? `metaDefault`, Type `String`, if given, the IVML expression denoting the default value of this field
+                 - PROPERTY? `metaRequired`, Type `Boolean`, is the value of this field mandatory?
+                 - PROPERTY `type`, Type `String`, IVML type, may be primitive or composed, shall be listed for reference in `meta`
+                 - PROPERTY? `metaConstant`, Type `Boolean`, whether field is a constant
+            - PROPERTY? `metaAbstract`, Type `Boolean`, whether the type is abstract and cannot be instantiated, only if `metaTypeKind` is `10` (compound)
+            - PROPERTY `metaRefines`, the parent type(s), only if `metaTypeKind` is `10` (compound), may be empty
+            - PROPERTY `metaProject`, defining IVML project
+              
+
 ## Configuration meta-model
 
 The configuration meta-model and its instantiation are written in the languages of EASy-Producer, namely Integrated Variability Modeling Language (IVML), Variability Instantiation Language (VIL) and Variability Template/Asset Language (VTL). EASy-Producer is open source on [github](https://github.com/SSEHUB/EASyProducer), also the most [recent specifications of IVML, VIL and VTL](https://github.com/SSEHUB/EASyProducer/tree/master/doc/web/docPreview). The [configuration model](/src/main/easy) is also explained/documented.

@@ -10,7 +10,7 @@ This file is supposed to provide a catalogue of various fixed data formats, e.g.
 ## Setup files
 
 - [Management UI](../managementUI/README.md)
-- [Central platform services](../platform/README.md) with [configuration](../configuration/configuration/README.md) and possibly [monitoring](../resources/monitoring.prometheus/README.md)
+- [Central platform services](../platform/README.md) with [configuration.easy](../configuration/configuration.easy/README.md) and possibly [monitoring](../resources/monitoring.prometheus/README.md)
 - Monitoring with [Prometheus](../resources/monitoring.prometheus/README.md)
 - ECS runtime for [Docker](../resources/ecsRuntime.docker/README.md) and (in preparation) [LXC](../resources/ecsRuntime.lxc/README.md)
 - Service manager for [Spring](../services/services.spring/README.md)
@@ -22,6 +22,10 @@ This file is supposed to provide a catalogue of various fixed data formats, e.g.
 ## Semantic Id resolution catalogues
 
 - Local [YAML-based Semantic Id catalogue format](../support/support.iip-aas/README.md)
+
+## Configuration AAS
+
+- [Configuration AAS](../configuration/configuration.easy/README.md)
 
 ## Dashboard mapping
 
