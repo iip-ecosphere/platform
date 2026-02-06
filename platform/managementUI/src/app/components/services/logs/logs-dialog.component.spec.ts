@@ -16,7 +16,8 @@ describe('LogsDialogComponent', () => {
     declarations: [LogsDialogComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
     imports: [],
-    providers: [provideHttpClient(withInterceptorsFromDi())]
+    providers: [provideHttpClient(withInterceptorsFromDi())],
+    teardown: {destroyAfterEach: false} // NG0205: Injector has already been destroyed
 })
     .compileComponents();
     fixture = TestBed.createComponent(LogsDialogComponent);
