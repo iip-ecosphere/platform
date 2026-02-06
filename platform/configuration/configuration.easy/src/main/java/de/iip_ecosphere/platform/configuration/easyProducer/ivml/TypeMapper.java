@@ -172,10 +172,10 @@ class TypeMapper {
         String typeId = AasUtils.fixId(type.getName());
         if (!isDoneType(typeId)) {
             SubmodelElementListBuilder typeB = builder.createSubmodelElementListBuilder(typeId);
-            Map<String, SubmodelElementListBuilder> doneSlots = new HashMap<>();
+            Map<String, SubmodelElementCollectionBuilder> doneSlots = new HashMap<>();
             mapCompoundSlots(type, type, type, typeB, doneSlots);
             mapRefines(type, type, typeB, doneSlots);
-            for (SubmodelElementListBuilder builder : sortMembers(type, doneSlots)) {
+            for (SubmodelElementCollectionBuilder builder : sortMembers(type, doneSlots)) {
                 builder.build();
             }
             typeB.createPropertyBuilder(metaShortId.apply("abstract"))
@@ -196,25 +196,28 @@ class TypeMapper {
      * @param slots the SME builders per slot
      * @return the sorted members
      */
-    private List<SubmodelElementListBuilder> sortMembers(Compound type, 
-        Map<String, SubmodelElementListBuilder> slots) {
-        List<SubmodelElementListBuilder> result = new ArrayList<>();
+    private List<SubmodelElementCollectionBuilder> sortMembers(Compound type, 
+        Map<String, SubmodelElementCollectionBuilder> slots) {
+        List<SubmodelElementCollectionBuilder> result = new ArrayList<>();
         Set<String> done = null;
         if (type instanceof Compound) {
             List<String> names = new ArrayList<String>();
             done = new HashSet<>();
             collectMemberNames((Compound) type, names, done);
-            Map<Integer, List<SubmodelElementListBuilder>> namesByUiGroups = new HashMap<>();
+            Map<Integer, List<SubmodelElementCollectionBuilder>> namesByUiGroups = new HashMap<>();
             for (String name : names) {
-                SubmodelElementListBuilder elt = slots.get(name);
+                SubmodelElementCollectionBuilder elt = slots.get(name);
                 if (null != elt) {
                     int uiGroup = getUiGroup(type.getName(), name);
                     int uiPos = uiGroup % UIGROUP_SPACING;
                     uiGroup /= UIGROUP_SPACING;
-                    List<SubmodelElementListBuilder> tmp = namesByUiGroups.get(uiGroup);
+                    List<SubmodelElementCollectionBuilder> tmp = namesByUiGroups.get(uiGroup);
                     if (null == tmp) {
                         tmp = new ArrayList<>();
                         namesByUiGroups.put(uiGroup, tmp);
+                    }
+                    if (uiPos == 0) { // usually, this shall be the sorted sequence by name, i.e., at the end, see next
+                        uiPos = -1;
                     }
                     if (uiPos == UIGROUP_POS_FRONT) {
                         uiPos = 0;
@@ -243,8 +246,8 @@ class TypeMapper {
     * @param start the start ui group/key
     * @param inc the increment, terminate immediately after first transfer if {@code 0}
     */
-    private void add(Map<Integer, List<SubmodelElementListBuilder>> src, 
-        List<SubmodelElementListBuilder> tgt, int start, int inc) {
+    private void add(Map<Integer, List<SubmodelElementCollectionBuilder>> src, 
+        List<SubmodelElementCollectionBuilder> tgt, int start, int inc) {
         int u = start;
         while (src.get(u) != null) {
             tgt.addAll(src.get(u));
@@ -400,7 +403,7 @@ class TypeMapper {
      * @param doneSlots already done slot names
      */
     private void mapRefines(Compound type, Compound topType, SubmodelElementListBuilder typeB, 
-        Map<String, SubmodelElementListBuilder> doneSlots) {
+        Map<String, SubmodelElementCollectionBuilder> doneSlots) {
         for (int r = 0; r < type.getRefinesCount(); r++) {
             Compound refines = type.getRefines(r);
             mapCompoundSlots(refines, refines, topType, typeB, doneSlots);
@@ -418,7 +421,7 @@ class TypeMapper {
      * @param doneSlots already done slot names
      */
     private void mapCompoundSlots(IDecisionVariableContainer cnt, Compound type, Compound topType, 
-        SubmodelElementListBuilder typeB, Map<String, SubmodelElementListBuilder> doneSlots) {
+        SubmodelElementListBuilder typeB, Map<String, SubmodelElementCollectionBuilder> doneSlots) {
         for (int i = 0; i < cnt.getElementCount(); i++) {
             mapCompoundSlot(cnt.getElement(i), type, topType, typeB, doneSlots);
         }
@@ -507,13 +510,13 @@ class TypeMapper {
      * @param doneSlots already done slot names
      */
     private void mapCompoundSlot(DecisionVariableDeclaration slot, Compound type, Compound topType,
-        SubmodelElementListBuilder typeB, Map<String, SubmodelElementListBuilder> doneSlots) {
+        SubmodelElementListBuilder typeB, Map<String, SubmodelElementCollectionBuilder> doneSlots) {
         // if we get into trouble with property ids, we have to sub-structure that
         String slotName = AasUtils.fixId(slot.getName());
         if (!doneSlots.containsKey(slotName) && variableFilter.test(slot)) {
             String lang = AasIvmlMapper.getLang();
             IDatatype slotType = slot.getType();
-            SubmodelElementListBuilder propB = typeB.createSubmodelElementListBuilder(slotName);
+            SubmodelElementCollectionBuilder propB = typeB.createSubmodelElementCollectionBuilder(slotName);
             doneSlots.put(slotName, propB);
             propB.createPropertyBuilder("name")
                 .setValue(Type.STRING, slotName)
@@ -547,7 +550,32 @@ class TypeMapper {
             if (slotType != type) {
                 mapType(slotType);
             }
-            propB.build();
+            addDisplayName(null, propB, typeName, slotName, metaShortId);
+            // no propB.build() here, happens after sorting
+        }
+    }
+    
+    
+    /**
+     * Adds a potential display name. If no {@code displayName} is yet given, it might be potentially a default
+     * mapping, e.g., for {@code OktoVersion} and {@code ver}.
+     * 
+     * @param displayName the display name known so far, may be <b>null</b> for none.
+     * @param varBuilder the variable builder to add the meta-value to
+     * @param typeName the type name
+     * @param varName the variable name
+     * @param metaShortId function to build a meta shortId property name
+     */
+    public static void addDisplayName(String displayName, SubmodelElementContainerBuilder varBuilder, String typeName, 
+        String varName, Function<String, String> metaShortId) {
+        if (null == displayName && "OktoVersion".equals(typeName) && "ver".equals(varName)) {
+            // mitigate field misnomer for now
+            displayName = "version";
+        }
+        if (null != displayName) {
+            varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("displayName")))
+                .setValue(Type.STRING, displayName)
+                .build();
         }
     }
     

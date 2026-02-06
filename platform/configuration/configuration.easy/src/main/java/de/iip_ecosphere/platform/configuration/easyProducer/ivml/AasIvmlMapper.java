@@ -1780,10 +1780,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("type")))
             .setValue(Type.STRING, varTypeName)
             .build();
-        if (null == displayName && "OktoVersion".equals(declaredTypeName) && "ver".equals(varName)) {
-            // mitigate field misnomer for now
-            displayName = "version";
-        }
         TypeMapper.addMetaDefault(var, varBuilder, metaShortId);
         TypeMapper.addMetaRequired(varBuilder, varTypeName, metaShortId, REQUIRED_TYPES);
         TypeMapper.addTypeKind(varBuilder, DerivedDatatype.resolveToBasis(type), metaShortId);
@@ -1792,11 +1788,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 .setValue(Type.STRING, mapParent(var))
                 .build();
         }
-        if (null != displayName) {
-            varBuilder.createPropertyBuilder(AasUtils.fixId(metaShortId.apply("displayName")))
-                .setValue(Type.STRING, displayName)
-                .build();
-        }
+        TypeMapper.addDisplayName(displayName, varBuilder, declaredTypeName, varName, metaShortId);
         try {
             IDatatype serviceType = ModelQuery.findType(var.getConfiguration().getProject(), "ServiceBase", null);
             if (null != serviceType && serviceType.isAssignableFrom(varType)) {
