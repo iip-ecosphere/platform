@@ -813,7 +813,7 @@ export class IvmlFormatterService extends UtilsService {
         }
       }
     }
-    meta!.value = newMetaValues;
+    meta!.value = newMetaValues.sort((a, b) => (a.idShort ?? '').localeCompare(b.idShort ?? ''));
     return meta;
   }
 

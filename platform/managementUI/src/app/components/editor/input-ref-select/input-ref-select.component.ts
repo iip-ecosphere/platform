@@ -95,7 +95,7 @@ export class InputRefSelectComponent extends Utils implements OnInit {
       let comp = dialog.componentInstance;
       // transfer relevant values
       comp.selector = true;
-      comp.references = DataUtils.deepCopy(this.references);
+      comp.references = DataUtils.deepCopy(this.references).sort((a, b) => (a.idShort ?? '').localeCompare(b.idShort ?? ''));
       comp.activeTextinput = this.activeTextinput;
       comp.input = DataUtils.deepCopy(this.input);
       // link to this as parent and record dialog for closing
