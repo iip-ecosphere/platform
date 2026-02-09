@@ -44,16 +44,43 @@ RUN sudo apt-get install openjdk-21-jre -y
 RUN sudo apt-get install openjdk-8-jre -y
 RUN sudo apt install maven -y
 RUN sudo apt install git -y 
-RUN sudo apt install nodejs npm -y --fix-missing
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt-get install -y nodejs
 RUN sudo apt install gedit -y
+
+# ------ intalling newer version of firefox -------------------------------------------
+RUN apt-get update && apt-get install -y \
+    wget \
+    bzip2 \
+    libgtk-3-0 \
+    libdbus-glib-1-2 \
+    libasound2 \
+    libx11-xcb1 \
+    libxcb-dri3-0 \
+    libdrm2 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    libgbm1 \
+    libnss3 \
+    libpango1.0-0 \
+    libxss1 \
+    libxtst6 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Download latest stable Firefox
+RUN apt-get update && apt-get install -y file wget tar xz-utils bzip2 \
+    libgtk-3-0 libdbus-glib-1-2 libasound2 libx11-xcb1 libxcb-dri3-0 libdrm2 \
+    libxcomposite1 libxdamage1 libxrandr2 libgbm1 libnss3 libpango1.0-0 libxss1 libxtst6 libxtst6 \
+    && wget -O /tmp/firefox.tar.xz "https://download.mozilla.org/?product=firefox-latest&os=linux64&lang=en-US" -q \
+    && tar -xJf /tmp/firefox.tar.xz -C /opt/ \
+    && ln -s /opt/firefox/firefox /usr/local/bin/firefox \
+    && rm /tmp/firefox.tar.xz
 
 # ------ Desktop setup ----------------------------------------------------------------
 # Icons
 COPY icon.xpm /opt/eclipse
 COPY eclipse.desktop /root/Desktop/eclipse.desktop
-COPY chrome.desktop /root/Desktop/chrome.desktop
-# Chrome plugin
-COPY mjhpgnbimicffchbodmgfnemoghjakai.json /opt/google/chrome/extensions/mjhpgnbimicffchbodmgfnemoghjakai.json
+COPY firefox.desktop /root/Desktop/firefox.desktop
 
 # running platform
 COPY platform.conf /etc/supervisor/conf.d/platform.conf
