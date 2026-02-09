@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Firefox
+Type=Application
+Exec=/usr/local/bin/firefox
+Terminal=false
+Icon=/opt/firefox/browser/chrome/icons/default/default128.png
+Categories=Network;WebBrowser;
