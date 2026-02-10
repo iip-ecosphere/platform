@@ -31,6 +31,11 @@ COPY ecs_starter.sh ecs_starter.sh
 COPY serviceMgr_starter.sh serviceMgr_starter.sh
 COPY monitoring_starter.sh monitoring_starter.sh
 COPY ui_starter.sh ui_starter.sh
+
+# meta-model and model
+COPY target/easy target/easy
+COPY target/template/ src/main/easy/
+
 RUN chmod 777 *   
 
 # ------ Eclipse ----------------------------------------------------------------------

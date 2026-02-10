@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>DevContainer</artifactId>
+
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependenciesSpring</artifactId> <!-- preliminary-->
+     <version>0.7.1-SNAPSHOT</version>
+     <relativePath/>
+  </parent>
+  
+  <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.1</version>
+
+                <executions>
+                    <execution>
+                        <id>unpack-configuration-artifacts</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+
+                        <configuration>
+                            <artifactItems>
+
+                                <artifactItem>
+                                    <groupId>de.iip-ecosphere.platform</groupId>
+                                    <artifactId>configuration.configuration</artifactId>
+                                    <version>${project.version}</version>
+                                    <classifier>easy</classifier>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>
+                                        ${project.build.directory}/easy
+                                    </outputDirectory>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>de.iip-ecosphere.platform</groupId>
+                                    <artifactId>configuration.configuration</artifactId>
+                                    <version>${project.version}</version>
+                                    <classifier>template</classifier>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>
+                                        ${project.build.directory}/template
+                                    </outputDirectory>
+                                </artifactItem>
+
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+    </project>
+  <!--
+  <properties>
+      <iip.resources>resources</iip.resources>
+      <iip.model>PlatformConfiguration</iip.model>
+      <iip.modelDir>src/main/easy</iip.modelDir>
+      <iip.outputDir>gen</iip.outputDir>
+  </properties>
+-->
+  <!-- required for container building on github when release is not already in Mvn central 
+  <repositories>       
+    <repository>
+      <id>SSE-mvn</id> 
+      <name>SSE</name>
+      <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
+      <layout>default</layout>
+    </repository>
+    
+    <repository>
+        <id>central</id>
+        <url>https://repo1.maven.org/maven2</url>
+        <snapshots>
+            <enabled>false</enabled>
+            <updatePolicy>never</updatePolicy>
+        </snapshots>
+    </repository>
+    
+    <repository>
+        <id>bintray</id>
+        <url>https://jcenter.bintray.com</url>
+        <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+        </releases>
+        <snapshots>
+            <enabled>false</enabled>
+            <updatePolicy>never</updatePolicy> 
+        </snapshots>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+     <pluginRepository>
+       <id>SSE-plugins</id>
+       <name>SSE</name>
+       <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
+       <layout>default</layout>
+       <releases>
+          <enabled>true</enabled>
+          <updatePolicy>never</updatePolicy>
+       </releases>
+       <snapshots>
+          <enabled>true</enabled>
+          <updatePolicy>always</updatePolicy>
+       </snapshots>
+     </pluginRepository>
+  </pluginRepositories>
+-->
+<!--
+  <profiles>
+    <profile>
+      <id>DepsOnly</id>
+      <properties>
+        <maven.main.skip>true</maven.main.skip>
+        <maven.test.skip>true</maven.test.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+      </properties>
+      -->
+      <!-- just force platform dependencies -->
+      <!-- executed as process, EASy-dependencies may be mitigated by maven and missing -->
+      <!--
+      <dependencies>
+        <dependency> 
+            <artifactId>configuration.easy</artifactId>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <version>${project.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+     <id>Main</id>
+     <activation>
+        <activeByDefault>true</activeByDefault>
+     </activation>
+  -->
+  <!--
+      <dependencies>
+        <dependency>
+            <artifactId>configuration.configuration</artifactId>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <version>${project.version}</version>
+        </dependency>
+        -->
+        <!-- executed as process, EASy-dependencies may be mitigated by maven and missing 
+        <dependency> 
+            <artifactId>configuration.easy</artifactId>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <version>${project.version}</version>
+        </dependency>
+        
+        <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      
+      <build>
+        <plugins>
+    	    
+           
+        </plugins>
+      </build> 
+    </profile>
+  </profiles>    
+  -->
+  
+
