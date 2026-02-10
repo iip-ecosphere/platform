@@ -33,9 +33,8 @@ COPY monitoring_starter.sh monitoring_starter.sh
 COPY ui_starter.sh ui_starter.sh
 
 # meta-model and model
-#COPY target/easy target/easy
-COPY target/easy /root/Desktop/test
-COPY target/template/TechnicalSetup.ivml TechnicalSetup.ivml
+COPY target/easy target/easy
+COPY target/template/ src/main/easy/
 
 RUN chmod 777 *   
 
