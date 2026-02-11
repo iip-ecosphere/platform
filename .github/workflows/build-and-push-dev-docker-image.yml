@@ -62,6 +62,10 @@ jobs:
         run: |
           cd ./platform/tools/Install/container/DevContainer
           mvn validate
+          echo "=== Listing DevContainer directory ==="
+          ls -la
+          echo "=== Listing target directory ==="
+          ls -la target || echo "target directory does NOT exist"
           mkdir -p ../../gen/target/easy
           mkdir -p ../../gen/target/template
           cp -r target/easy/* ../../gen/target/easy/
