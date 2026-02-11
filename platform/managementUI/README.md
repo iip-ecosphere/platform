@@ -68,6 +68,11 @@ Ensure that the temporary file `src/test/tmp/config.json` does not exist (must b
 
 `ng serve` in the project folder of the management UI.
 
+If you also need to download generated artifacts (templates), please
+
+- Execute `ng serve --proxy-config proxy.conf.json` instead of `ng serve`
+- Execute in an own shell `node server.js`
+
 If you also need a running application (all tests shall be developed so that executing an application is optional although decreasing the test coverage), please execute in an own shell
 
 - `cd gen/platform`
