@@ -1,5 +1,5 @@
 FROM dorowu/ubuntu-desktop-lxde-vnc:latest
-WORKDIR /root/platform
+WORKDIR /root/platform/gen
 
 # ------ platform components -----------------------------------------------------------
 # Broker
@@ -24,7 +24,7 @@ COPY mgtUi.sh mgtUi.sh
 # CLI
 COPY cli.sh cli.sh
 COPY deployment_plan.yaml artifacts/deployment_plan.yaml
-COPY SimpleMeshInstallTestingApp/target/SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar
+COPY SimpleMeshInstallTestingApp/target/SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar /root/platform/SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar
 # Starter scripts
 COPY brokerPl_starter.sh brokerPl_starter.sh
 COPY ecs_starter.sh ecs_starter.sh
@@ -33,8 +33,8 @@ COPY monitoring_starter.sh monitoring_starter.sh
 COPY ui_starter.sh ui_starter.sh
 
 # meta-model and model
-COPY target/easy target/easy
-COPY target/template/ src/main/easy/
+COPY target/easy /root/platform/target/easy
+COPY target/template/ /root/platform/src/main/easy/
 
 RUN chmod 777 *   
 
