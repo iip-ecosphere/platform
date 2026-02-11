@@ -134,6 +134,10 @@
 		                     <value>pidDir = "${java.io.tmpdir}";</value>
 		                     <escapeValueIn>backslashes</escapeValueIn>
 		                 </replacement>
+		                 <replacement>
+		                     <token>artifactsUriPrefix = "";</token>
+		                     <value>artifactsUriPrefix = "artifacts";</value>
+		                 </replacement>
 		             </replacements>
 		             <skip>${skip.replacement}</skip>
 			       </configuration>
