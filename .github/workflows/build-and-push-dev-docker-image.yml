@@ -58,7 +58,7 @@ jobs:
           cp gen/SimpleMeshInstallTestingApp/target/SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar gen/SimpleMeshTestingApp-0.1.0-SNAPSHOT-bin.jar
           echo "Base directory for container creation:"
           ls gen
-      - name: Prepare DevContainer configuration (Maven)
+      - name: Prepare DevContainer configuration
         run: |
           cd ./platform/tools/Install/container/DevContainer
           mvn validate
