@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.support.plugins;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -124,11 +125,36 @@ public class URLPluginSetupDescriptor implements PluginSetupDescriptor {
      * @return the created classloader
      */
     protected ClassLoader createClassLoader(URL[] urls, ClassLoader parent) {
+        ClassLoader result = null;
         if (ChildFirstClassLoader.useChildFirst()) {
-            return new ChildFirstURLClassLoader(urls, parent);
+            File idxFile = getIndexFile();
+            if (null != idxFile) {
+                try {
+                    result = new ChildFirstIndexedClassloader(idxFile, parent);
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(URLPluginSetupDescriptor.class).warn(
+                        "Cannot create {}, falling back to {}. Reason: {}", 
+                        ChildFirstIndexedClassloader.class.getSimpleName(), 
+                        ChildFirstURLClassLoader.class.getSimpleName(), 
+                        e.getMessage());
+                }
+            }
+            if (null == result) {
+                result = new ChildFirstURLClassLoader(urls, parent);
+            }
         } else {
-            return new URLClassLoader(urls, parent);
+            result = new URLClassLoader(urls, parent);
         }
+        return result;
+    }
+    
+    /**
+     * Returns the index file for classloading.
+     * 
+     * @return the index file
+     */
+    protected File getIndexFile() {
+        return null;
     }
 
     /**

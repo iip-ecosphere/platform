@@ -42,6 +42,7 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
 
     private File installDir;
     private boolean descriptorOnly;
+    private File indexFile;
 
     /**
      * Creates an instance based on project folder containing jars and the classpath in "target/classes/classpath".
@@ -63,6 +64,13 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
         super(loadClasspathSafe(folder, descriptorOnly, appends));
         this.installDir = folder;
         this.descriptorOnly = descriptorOnly;
+        File cpFile = findClasspathFile(folder, "");
+        if (cpFile.isFile()) {
+            File idxFile = new File(cpFile.toString() + ".idx");
+            if (idxFile.exists()) {
+                this.indexFile = idxFile;
+            }        
+        }
     }
 
     @Override
@@ -276,6 +284,11 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
             name = name.substring(0, pos);
         }
         return name;
+    }
+    
+    @Override
+    protected File getIndexFile() {
+        return indexFile;
     }
 
     @Override

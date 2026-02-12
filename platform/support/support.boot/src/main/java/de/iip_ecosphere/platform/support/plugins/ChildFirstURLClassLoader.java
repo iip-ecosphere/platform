@@ -29,6 +29,10 @@ class ChildURLClassLoader extends URLClassLoader implements ChildClassLoader {
     
     private FindClassClassLoader realParent;
 
+    static {
+        registerAsParallelCapable();
+    }
+    
     /**
      * Creates an instance with delegation to the real parent class loader.
      * 
@@ -106,6 +110,10 @@ public class ChildFirstURLClassLoader extends ChildFirstClassLoader {
     
     //https://stackoverflow.com/questions/5445511/how-do-i-create-a-parent-last-child-first-classloader
     // -in-java-or-how-to-overr
+    
+    static {
+        registerAsParallelCapable();
+    }
     
     /**
      * Creates a child-first classloader using the context class loader of the current thread as parent.

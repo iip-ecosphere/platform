@@ -391,7 +391,7 @@ public abstract class Commons {
      *
      * @param data the byte array to write, do not modify during output,
      *     <b>null</b> ignored
-     * @param output the {@link OutputStream} to write to
+     * @param outputStream the {@link OutputStream} to write to
      * @throws IOException if an I/O error occurs
      */
     public abstract void write(byte[] data, OutputStream outputStream) throws IOException;

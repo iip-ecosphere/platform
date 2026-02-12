@@ -53,7 +53,8 @@ import test.de.iip_ecosphere.platform.support.logging.LoggerFactoryTest;
     StreamGobblerTest.class,
     ObjectUtilsTest.class,
     ClassLoaderUtilsTest.class,
-    AtomicDoubleTest.class
+    AtomicDoubleTest.class,
+    TestProviderDescriptorTest.class
 })
 public class AllTests {
 }
