@@ -413,11 +413,8 @@ class TypeMapper {
         Map<String, SubmodelElementCollectionBuilder> doneSlots) {
         for (int r = 0; r < type.getRefinesCount(); r++) {
             Compound refines = type.getRefines(r);
-            String typeId = AasUtils.fixId(refines.getName());
-            if (!isDoneType(typeId)) {
-                mapCompoundSlots(refines, refines, topType, typeB, doneSlots);
-                mapRefines(refines, topType, typeB, doneSlots);
-            }
+            mapCompoundSlots(refines, refines, topType, typeB, doneSlots);
+            mapRefines(refines, topType, typeB, doneSlots);
         }
     }
 
