@@ -638,7 +638,7 @@ export interface EditorPartition {
   // rows
 }
 
-export const WIDTH_CARD = 20 + 0.9; // em
+export const WIDTH_CARD = 22 + 0.9; // em
 export const WIDTH_CARD_GRID = 3;   // em
 export const HEIGHT_CARD = 8; // em
 export const HEIGHT_HEADER = 5; // em

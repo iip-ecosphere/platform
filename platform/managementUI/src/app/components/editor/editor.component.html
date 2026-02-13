@@ -118,8 +118,10 @@
                 <mat-hint *ngIf="showRequiredMsg && input.isRequired && !input.value" class="required-hint">Required</mat-hint>
               </div>
             </div>
-            <ng-template #subEditor>              
-              <app-subeditor-button [meta]="metaBackup" [input]="input" matIcon="menu_open" showValue="true" (saveEvent)="saveEventHandler($event)"></app-subeditor-button>
+            <ng-template #subEditor>         
+              <mat-card appearance="outlined" class="inputBoxSubEdit custom">
+                <app-subeditor-button [meta]="metaBackup" [input]="input" matIcon="menu_open" showValue="true" (saveEvent)="saveEventHandler($event)"></app-subeditor-button>
+              </mat-card>     
             </ng-template>
           </div>
           <ng-template #booleanCase>
@@ -162,7 +164,7 @@
       <div class="inputGroup" *ngIf="uiGroup.toggleOptional">
         <div *ngFor="let input of uiGroup.optionalInputs">
           <mat-card appearance="outlined" class="inputBox custom">
-            <mat-card-content *ngIf="!input.multipleInputs && !input.refTo; else refOpt">
+            <div *ngIf="!input.multipleInputs && !input.refTo; else refOpt">
               <p class="inputLabel">{{ getDisplayName(input) }}</p>
               <div *ngIf="input.type != 'Boolean'; else optBooleanCase">
                 <div *ngIf="input.metaTypeKind != 2; else optEnumCase">
@@ -185,9 +187,11 @@
                 <app-lang-string-input [meta]="metaBackup" [input]="input"></app-lang-string-input>
               </ng-template>
               <ng-template #subEditor>
-                <app-subeditor-button [meta]="metaBackup" [input]="input" matIcon="menu_open" showValue="true" (saveEvent)="saveEventHandler($event)"></app-subeditor-button>
+                <mat-card appearance="outlined" class="inputBoxSubEdit custom">
+                  <app-subeditor-button [meta]="metaBackup" [input]="input" matIcon="menu_open" showValue="true" (saveEvent)="saveEventHandler($event)"></app-subeditor-button>
+                </mat-card>
               </ng-template>
-            </mat-card-content>
+            </div>
 
             <ng-template #refOpt>
                 <!--<span class="inputLabel">{{ getDisplayName(input) }}

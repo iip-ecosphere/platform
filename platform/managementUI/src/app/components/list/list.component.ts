@@ -11,6 +11,7 @@ import { WebsocketService } from 'src/app/websocket.service';
 import { StatusCollectionService } from 'src/app/services/status-collection.service';
 import { chunkInput } from '../file-upload/file-upload.component';
 import { IvmlFormatterService } from 'src/app/components/services/ivml/ivml-formatter.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 /**
  * Information on a file being uploaded.
@@ -70,6 +71,7 @@ export class ListComponent extends Utils implements OnInit {
     public dialog: MatDialog,
     public websocketService: WebsocketService,
     public collector: StatusCollectionService,
+    private snackBar: MatSnackBar,
     private ivmlFormatter: IvmlFormatterService) {
     super();
     this.sub = websocketService.getMsgSubject().subscribe((value: any) => {
@@ -540,6 +542,20 @@ export class ListComponent extends Utils implements OnInit {
   public genTemplate(appId: string) {
     let inputVariables: InputVariable[] = [];
     inputVariables.push(ApiService.createAasOperationParameter("appId", AAS_TYPE_STRING, appId));
+    const snackRef = this.snackBar.open(
+      `Generate application template for ${appId}, please wait...`,
+      undefined,
+      {
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      }
+    );
+    const tempSub = this.websocketService.getMsgSubject().subscribe((value: string) => {
+      if (value.includes(appId)) {
+        snackRef.dismiss();
+        tempSub.unsubscribe();
+      }
+    })
     this.execFunctionInConfig("genAppsNoDepsAsync", inputVariables)
   }
 
@@ -559,6 +575,17 @@ export class ListComponent extends Utils implements OnInit {
       this.api.uploadFileAsArrayBuffer(ArtifactKind.IMPLEMENTATION_ARTIFACT, seqNr, file.name, chunk);
     }, () => {
       info.uploading = false;
+
+      // Toast: upload finished
+      this.snackBar.open(
+        `Upload complete: ${file.name}`,
+        'Close',
+        { 
+          duration: 7000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top' 
+        }
+      );
     });
   }
 
@@ -569,6 +596,20 @@ export class ListComponent extends Utils implements OnInit {
     let fileName = fileInfo?.file.name || '';
     this.appFiles.delete(appId);
     inputVariables.push(ApiService.createAasOperationParameter("codeFile", AAS_TYPE_STRING, fileName));
+    const snackRef = this.snackBar.open(
+      `Integrate the application with the uploaded template, please wait...`,
+      undefined,
+      {
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      }
+    );
+    const tempSub = this.websocketService.getMsgSubject().subscribe((value: string) => {
+      if (value.includes("Configuration")) {
+        snackRef.dismiss();
+        tempSub.unsubscribe();
+      }
+    })
     this.execFunctionInConfig("genAppsAsync", inputVariables)
   }
 
