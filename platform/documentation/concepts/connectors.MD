@@ -134,7 +134,19 @@ Fields in in/output datatypes shall be of the specialized type `InfluxField` rat
 | mappedName | name of the Influx field to use, instead of `name` | |
 | tag | is the field a tag | false |
 
-In particular, `LongIndexType` may be used representing here a timestamp in ms since 1970-01-01T00:00:00Z that shall be used instead of the actual time when writing a data point. If not given, the actual (client) point in time when writing the data point is used instead.
+In particular, `LongIndexType` may be used representing here a timestamp in ms since 1970-01-01T00:00:00Z that shall be used instead of the actual time when writing a data point. If not given, the actual (client) point in time when writing the data point is used instead. 
+
+If the specified `bucket` does not exist, the connector will create it in the specified `organization` when a successful connection was established. However, the connector will not create the specified `organization` if it does not exist. If, e.g., permission reasons, `organization` or `bucket` cannot be accessed, further access will fail. 
+
+Please note that only Influx v1 allows for an `USERNAME` token taken from the identity store. n authenticated `InfluxConnector` for Influx v2 expects an issued token, e.g.,
+
+```
+identities:
+    "influxCloud": 
+        type: ISSUED
+        tokenData: my-hidden-token
+        tokenEncryptionAlgorithm: UTF-8
+```
 
 ## Influx Connector v3 (InfluxDB v3)
 
@@ -147,7 +159,7 @@ In particular, `LongIndexType` may be used representing here a timestamp in ms s
 | database | The name of the database. |     |
 | baseTime | If float timestamps are provided and intended as elapsed time differences, specifies the time base in ms to obtain timestamps; may be 0 for the point in time when the app is started/the connector instance is created; disabled if not positive | -1|
 
-As for the v2/v1 Influx connector, `InfluxField` and `LongIndexType` can be used. For details, see above.
+As for the v2/v1 Influx connector, `InfluxField` and `LongIndexType` can be used. For details, see above. For authentication, also the v3 connector expects an `ISSUED` token, see above.
 
 ## REST connector
 

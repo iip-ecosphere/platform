@@ -29,10 +29,12 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import com.influxdb.client.BucketsApi;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
 import com.influxdb.client.QueryApi;
 import com.influxdb.client.WriteApiBlocking;
+import com.influxdb.client.domain.Bucket;
 import com.influxdb.client.write.Point;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
@@ -249,6 +251,17 @@ public class InfluxConnectorTest {
     }
 
     /**
+     * Returns a bucket.
+     * 
+     * @return the bucket
+     */
+    private Bucket getBucket() {
+        Bucket result = new Bucket();
+        result.setName("myBucket");
+        return result;
+    }
+
+    /**
      * Tests the {@link InfluxConnector}.
      * 
      * @throws IOException shall not occur
@@ -262,6 +275,8 @@ public class InfluxConnectorTest {
         PowerMockito.mockStatic(InfluxDBClientFactory.class);
         PowerMockito.mockStatic(InfluxDBClient.class);
         InfluxDBClient dbClientMock = PowerMockito.mock(InfluxDBClient.class);
+        BucketsApi bucketMock = PowerMockito.mock(BucketsApi.class);
+        PowerMockito.when(bucketMock.findBucketByName(Mockito.anyString())).thenReturn(getBucket());
         QueryApi dbQueryApiMock = PowerMockito.mock(QueryApi.class);
         PowerMockito.when(dbQueryApiMock.query(Mockito.anyString())).thenReturn(getDataTable());
         WriteApiBlocking dbWriteApiBlockingMock = PowerMockito.mock(WriteApiBlocking.class);

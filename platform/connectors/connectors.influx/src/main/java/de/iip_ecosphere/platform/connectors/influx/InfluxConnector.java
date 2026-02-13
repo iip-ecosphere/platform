@@ -19,12 +19,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import com.influxdb.client.BucketsApi;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
 import com.influxdb.client.QueryApi;
+import com.influxdb.client.domain.Bucket;
+import com.influxdb.client.domain.Organization;
 import com.influxdb.client.domain.WriteConsistency;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
@@ -192,6 +196,8 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
                 }
                 if (null == client) {
                     LOGGER.error("INFLUX not connected!");
+                } else {
+                    ensureBucket();
                 }
             } catch (Exception e) {
                 LOGGER.error("INFLUX connection failed: {}", e.getMessage());
@@ -200,6 +206,39 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
         }
     }
 
+    /**
+     * Ensures that the specified bucket exists.
+     */
+    private void ensureBucket() {
+        if (this.bucket != null && this.org != null) {
+            BucketsApi bucketsApi = client.getBucketsApi();
+            try {
+                Bucket existingBucket = bucketsApi.findBucketByName(this.bucket);
+                if (existingBucket == null) {
+                    Optional<Organization> org = client.getOrganizationsApi()
+                         .findOrganizations()
+                         .stream()
+                         .filter(o -> o.getName().equals(this.org))
+                         .findFirst();
+                    if (org.isPresent()) {
+                        Bucket bucket = bucketsApi.createBucket(this.bucket, org.get());
+                        if (null != bucket) {
+                            LOGGER.info("Created bucket {} in organization {}", bucket.getName(), org);
+                        }
+                    } else {
+                        LOGGER.warn("Cannot find organization {}, further access will fail", org);
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.error("Bucket access failed: {}", e.getMessage());
+            }
+        } else if (bucket == null) {
+            LOGGER.warn("Bucket not specified, further access will fail", org);
+        } else {
+            LOGGER.warn("Organization not specified, further access will fail", org);
+        }
+    }
+    
     // checkstyle: resume exception type check
 
     @Override
