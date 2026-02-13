@@ -163,6 +163,7 @@ public class TestWithPlugin {
             PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE);
             loaded = true;
             boolean found = false;
+            long start = System.currentTimeMillis();
             for (PluginLocation loc : locations) {
                 File folder = findPluginFolder("..", loc.folder); // for platform parts in "support"
                 if (!folder.isDirectory()) { // just in case
@@ -172,14 +173,19 @@ public class TestWithPlugin {
                     folder = findPluginFolder("../../" + loc.parent, loc.folder); 
                 }
                 if (enableLocalPlugins && folder.isDirectory()) { // in local git repo
+                    long innerStart = System.currentTimeMillis();
                     LoggerFactory.getLogger(TestWithPlugin.class).info("Loading plugin from {} (development)", folder);
                     File[] appends = collectAppends(folder.getParentFile(), loc.appends);
-                    PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(folder, loc.descriptorOnly, 
-                        appends));
+                    FolderClasspathPluginSetupDescriptor desc = new FolderClasspathPluginSetupDescriptor(folder, 
+                        loc.descriptorOnly, appends);
+                    PluginManager.registerPlugin(desc);
+                    LoggerFactory.getLogger(TestWithPlugin.class).info("Loading took {} ms", 
+                        System.currentTimeMillis() - innerStart);
                     found = true;
                 } else { // local, unpacked
                     folder = new File(installDir);
                     if (folder.isDirectory()) {
+                        long innerStart = System.currentTimeMillis();
                         File[] appends = collectAppends(folder, loc.appends);
                         LoggerFactory.getLogger(TestWithPlugin.class).info("Loading plugin from {} "
                             + "(test deployment)", installDir);
@@ -188,8 +194,11 @@ public class TestWithPlugin {
                             cpFile = new File(installDir + "/" + loc.installFolder);
                         }
                         loc.installFolder = cpFile.getName();
-                        PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(
-                            cpFile, loc.descriptorOnly, appends));
+                        FolderClasspathPluginSetupDescriptor desc = new FolderClasspathPluginSetupDescriptor(
+                            cpFile, loc.descriptorOnly, appends);
+                        PluginManager.registerPlugin(desc);
+                        LoggerFactory.getLogger(TestWithPlugin.class).info("Loading took {} ms", 
+                            System.currentTimeMillis() - innerStart);
                         found = true;
                     }
                 }
@@ -201,6 +210,8 @@ public class TestWithPlugin {
             for (Runnable r : runAfterLoading) {
                 r.run();
             }
+            LoggerFactory.getLogger(TestWithPlugin.class).info("Loading all plugins in {} ms", 
+                System.currentTimeMillis() - start);
         }
     }
 
