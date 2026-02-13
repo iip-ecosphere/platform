@@ -540,7 +540,7 @@ export class ListComponent extends Utils implements OnInit {
   public genTemplate(appId: string) {
     let inputVariables: InputVariable[] = [];
     inputVariables.push(ApiService.createAasOperationParameter("appId", AAS_TYPE_STRING, appId));
-    this.execFunctionInConfig("genInterfacesAsync", inputVariables)
+    this.execFunctionInConfig("genAppsNoDepsAsync", inputVariables)
   }
 
   public isUploading(appId: string) {
