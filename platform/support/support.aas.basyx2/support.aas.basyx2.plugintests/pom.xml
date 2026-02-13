@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>support.aas.basyx2.plugintests</artifactId>
+  <name>support AAS/BaSyx2 testing</name>
+  <description>The oktoflow AAS/BaSyx2 dependeny-free testing environment.</description>
+
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependenciesBOM</artifactId>
+     <version>0.7.1-SNAPSHOT</version>
+     <relativePath/>
+  </parent>
+      
+  <dependencies>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>support.aas</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>2.24.3</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>support</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>support.aas</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+
+    <plugins>
+        <plugin>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>dependency-plugin</artifactId>
+            <version>${iip.version}</version>
+            <executions>
+
+                <execution>
+                    <id>okto plugins</id>
+                    <goals>
+                        <goal>unpack-plugins</goal>
+                    </goals>
+                    <phase>test-compile</phase>
+                    <configuration>
+                        <plugins>
+                            <plugin>
+                                <artifactId>support.log-slf4j-simple</artifactId>
+                                <setupDescriptor>None</setupDescriptor> <!-- for only appending -->
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.processInfo-oshi</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.websocket-websocket</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.yaml-snakeyaml</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.bytecode-bytebuddy</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.rest-spark</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.commons-apache</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.json-jackson</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.metrics-micrometer</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.aas.basyx2</artifactId>
+                                <appends> <!-- complement the plugin, add the platform logging -->
+                                   <append>support.log-slf4j-simple</append>
+                                </appends>
+                                <asTest>true</asTest>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.aas.basyx2.server</artifactId>
+                                <appends> <!-- complement the plugin, add the platform logging -->
+                                   <append>support.log-slf4j-simple</append>
+                                </appends>
+                                <asTest>true</asTest>
+                            </plugin>
+                        </plugins>
+                        <relocate>true</relocate> <!-- needed to enable append -->
+                        <relocateTarget>${project.build.directory}/jars</relocateTarget>
+                        <version>${iip.version}</version>
+                    </configuration>
+                </execution>
+
+            </executions>
+        </plugin>
+      </plugins>
+
+  </build>
+
+  
+</project>

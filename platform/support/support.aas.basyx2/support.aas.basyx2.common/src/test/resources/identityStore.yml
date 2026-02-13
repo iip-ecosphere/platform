@@ -1,0 +1,8 @@
+name: support.aas.basyx2.commons
+identities:
+    keystore:
+        type: USERNAME
+        tokenData: a1234567    
+        tokenEncryptionAlgorithm: UTF-8
+        file: keystore.jks
+    
