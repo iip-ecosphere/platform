@@ -1,6 +1,6 @@
 # Connectors Component INFLUX extension in the Transport Layer of the oktoflow platform
 
-INFLUX v1/v2 database connector for bi-directional access to external timeseries data. We run the tests without AAS factory installed in order to simplify testing against a mocked INFLUX DB client. If required, additionally also an AAS server according to the ``AasPartRegistry`` must be initiated. Manually tested against Influx2 version 2.7.6. It can be loaded as plugin or used as JSL component (direct dependency, e.g. for testing).
+INFLUX v1/v2 database connector for bi-directional access to external timeseries data. We run the tests without AAS factory installed in order to simplify testing against a mocked INFLUX DB client. If required, additionally also an AAS server according to the ``AasPartRegistry`` must be initiated. Manually tested against Influx2 version 2.7.6 and 2.8.0. It can be loaded as plugin or used as JSL component (direct dependency, e.g. for testing).
 
 The DB URL is composed from the respective information of the connector parameters, i.e., schema, host, port and endpoint path. Authentication for v2 databases utilizes issued identity tokens containing the respective API token issued by the target Influx DB. Authentication for v1 databases may go via username/password - there the given bucket is used as "database name", write consistency is set to ONE and no specific retention policy is given.
 
