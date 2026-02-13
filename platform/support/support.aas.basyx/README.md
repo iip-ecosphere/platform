@@ -12,7 +12,7 @@ Client-side Asset Administration Shell (AAS) abstraction based on [Eclipse BaSyx
 - Supported identifier translation: ``urn:`` with URN syntax, ``urnText:`` arbitrary text to be used as raw URN, 
 - Optional TLS for AAS can be setup through keystores. The AAS servers require a certificate with alias "tomcat", also for VAB.
 
-This package is intended to represent in particular the client side of an AAS (which may imply a local server). For a compliant AAS server, i.e., for remote deployment of AAS, please refer to the [Basyx AAS server abstraction](support.aas.basxy.server/README.md), which complements the
+This package is intended to represent in particular the client side of an AAS (which may imply a local server). For a compliant AAS server, i.e., for remote deployment of AAS, the dependencies shall also include the Basyx AAS server abstraction (part of this project, can be attached to the client plugin), which complements the
 client side with server-sided functionality. We separated client and server side in particular to manage, reduce and optimizer the dependencies and resource usage on (Edge) client side.
 
 This component is considered to be the core component of AAS BaSyx plugins with different BaSyx versions. For this purpose, some relevant/known functions are abstracted into ``VersionAdjustments`` to be set by the actual implementation. By default, this component loads its own factory, but deployed with classifier core, it's just the library with out PluginDescriptor and AasFactoryDescriptor entries in META-INF/services. Currently, the "core" package still includes the BaSyxAasFactory implementation.
