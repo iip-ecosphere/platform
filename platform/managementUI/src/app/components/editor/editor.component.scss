@@ -70,6 +70,15 @@ tr:nth-child(odd) {
   color: black;
 }
 
+.inputBoxSubEdit {
+  min-height: 5em;
+  min-width: calc(2.3em + #{sty.$editorInputFieldWidth});
+  margin: 0.2em;
+  background-color: sty.$color_poolBlue_light;
+  border: 1px solid sty.$color_lakeGreen;
+  color: black;
+}
+
 .refInput {
     min-height: 8em;
     min-width: 16em;
