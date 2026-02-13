@@ -7,7 +7,11 @@ project CommonSetup {
     // ------------ component setup ------------------
 
     serializer = Serializer::Json;
-    // serviceManager, containerManager are already defined    
+
+    // containerManager is already defined    
+    serviceManager = SpringCloudStream {
+        memLimit = 512
+    };
         
     aasServer = {
         schema = AasSchema::HTTP,
@@ -71,6 +75,8 @@ project CommonSetup {
     //no artifactsUriPrefix for local test/devels execution, else "http://127.0.0.1:4200/download";    
     artifactsFolder = "artifacts"; // re-specify it so that UI build process for testing can replace it
     artifactsUriPrefix = ""; // re-specify it so that UI build process for testing can replace it
+    centralMemLimit = 0; // re-specify it so that UI build process for testing can replace it
+    monitoringMemLimit = 256; // re-specify it so that UI build process for testing can replace it
 
     // ------------ freezing ------------------
     
@@ -87,6 +93,8 @@ project CommonSetup {
         serviceManager;
         serviceProtocol;
         containerManager;
+        centralMemLimit;
+        monitoringMemLimit;
         deviceMgtStorageServer;
         deviceMgtStorage;
         deviceRegistry;

@@ -36,8 +36,8 @@ project IIPEcosphere {
     Boolean containerGeneration = true; // To generate or skip the creation of all containers.
     Boolean platformContainerGeneration = true; // To generate or skip the Platform container creation.
     assign (semanticId = Eclass_Unit_MByte) to {
-        Integer centralMemLimit = 0; // general memory limit for central platform services, e.g., JVM memory limit in MBytes
-        Integer monitoringMemLimit = 256; // general memory limit for central platform services, e.g., JVM memory limit in MBytes
+        Integer centralMemLimit = 0; // general memory limit for central platform services, e.g., JVM memory limit in MBytes; sync with common setup
+        Integer monitoringMemLimit = 256; // general memory limit for central platform services, e.g., JVM memory limit in MBytes; sync with common setup
     }
     Boolean containerBaseImageMethod = false; // Use container base image method during the container creation.
     Boolean containerTestingMode = false; // Add more testing software into the containers.
