@@ -3,7 +3,7 @@ project DataTypes {
     import MetaConcepts;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
-    annotate Integer uiGroup = UiMandatoryGroup1 to .;
+    //annotate Integer uiGroup = UiMandatoryGroup1 to .; // reasoner re-assignment issue
     
     NonEmptyString iipVer = "0.7.1-SNAPSHOT"; // Maven version of platform
     const String mvnIipGroup = "de.iip-ecosphere.platform";

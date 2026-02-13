@@ -302,6 +302,10 @@ class TypeMapper {
      * @param type the IVML type
      */
     void mapType(IDatatype type) {
+        // if called from a slot/field, we are in a new context; save assignments and re-start stack
+        Stack<Map<String, Object>> outerAssignments = assignments;
+        assignments = new Stack<>();
+
         type = Reference.dereference(type);
         if (type instanceof DerivedDatatype) {
             mapDerivedType((DerivedDatatype) type);
@@ -314,6 +318,9 @@ class TypeMapper {
                 mapCompoundType((Compound) type);
             }
         }
+        
+        // switching back context, restore assignments
+        assignments = outerAssignments;
     }
     
     /**
@@ -406,8 +413,11 @@ class TypeMapper {
         Map<String, SubmodelElementCollectionBuilder> doneSlots) {
         for (int r = 0; r < type.getRefinesCount(); r++) {
             Compound refines = type.getRefines(r);
-            mapCompoundSlots(refines, refines, topType, typeB, doneSlots);
-            mapRefines(refines, topType, typeB, doneSlots);
+            String typeId = AasUtils.fixId(refines.getName());
+            if (!isDoneType(typeId)) {
+                mapCompoundSlots(refines, refines, topType, typeB, doneSlots);
+                mapRefines(refines, topType, typeB, doneSlots);
+            }
         }
     }
 
