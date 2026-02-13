@@ -52,6 +52,20 @@ Please consider the typical/expected [project structures](projects.md). A collec
 
 Apps can be tested in automated/distributed fashion using the [Platform Evaluation and Testing Environment (PETE)](../../tests/test.environment).
 
+# Testing
+
+oktoflow support various testing levels. We just briefly summarize them here.
+
+- Testing the connectivity of an individual connector: From the generated app code templates, take over the generated connectivity test in `src/test/java/iip/connectivity` as well as the respective `exec-maven-plugin` entries from the generated `pom.xml`. Please note that for authenticated connectors, also the identity store must be up to date.
+- Testing individual services through (Java/Python) unit tests: Generic tests per service are generated into the app code templates. The tests read data from service-specific data files, load the service into a feasible environment and feed the service instance with the data. Please note that we generate only data file templates, i.e., you must provide actual testing data. Further, there are currently no meaningful asserts as we do not required support service validity expressions in the model.
+- Testing individual services in the service environment: Packaging a services with resources, unpacking the service and then running it through the respective service environment may reveal deployment issues. However, running a service in a simulated service-only Spring Cloud Stream environment is not tivial. For this purpose, the generated app code templates contain respective tests, that you may take over into your implementation project.
+- Testing an individual connector as a service: Works similar to testing individual services, but requires a connector to be mocked, i.e., `mock=true` in the `AllServices.ivml`.
+- Testing applications through mocking: Feed the connectors with mocking data (as for testing individual services/connector) but letting the data run through the entire application. For this purpose, applications can be started as Java applications. Please note that all runtime prerequisites like Python installation and packages must be met. The generated `pom.xml` contains respective entires (the `id` is the application `id`) in `exec-maven-plugin`.
+- Testing the application with real data in a simulated/real environment.
+- Testing the deployment and execution of (mocked) applications using the Platform Evaluation and Testing Environment (PETE).
+
+The levels are discussed in more details in the [platform handbook](../PlatformHandbook.pdf).
+
 # Service Realization Rules and Considerations
 
 Realizing an application within the conventions and assumptions of frameworks or an entire platform is not trivial, in particular if conventions and assumptions are not documented. The [platform handbook](../PlatformHandbook.pdf) details the architectural constraints for the platform. While the constraints apply to the whole platform, in particular also to the realization of platform compnents, in this section, we operationalize the constraints in terms of specific rules for realization of application services. To remind about the rules, we place clearly visible comments into the generated skeletons in the application code templates. 
