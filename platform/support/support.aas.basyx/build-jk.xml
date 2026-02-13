@@ -8,5 +8,6 @@
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
 	    <maven pomFile="pom.xml" goal="deploy"/>
+	    <maven pomFile="support.aas.basyx.server/pom.xml" goal="deploy"/>
 	</target>
 </project>
