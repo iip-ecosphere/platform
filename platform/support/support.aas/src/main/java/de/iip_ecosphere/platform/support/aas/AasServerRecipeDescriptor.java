@@ -13,7 +13,10 @@
 package de.iip_ecosphere.platform.support.aas;
 
 /**
- * JSL descriptor for creating a (specialized) server recipe descriptor.
+ * JSL descriptor for creating a (specialized) server recipe descriptor. This descriptor is only intended
+ * if the server implementation is realized as an add-on dependency or a "plugin" that is supposed to be 
+ * appended to the main AAS plugin (legacy). If the server implementation is realized as a real plugin, see 
+ * {@link AasFactory}.
  * 
  * @author Holger Eichelberger, SSE
  */

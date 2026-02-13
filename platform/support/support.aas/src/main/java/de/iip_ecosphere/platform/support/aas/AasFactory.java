@@ -34,6 +34,7 @@ import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.plugins.SingletonPlugin;
+import de.iip_ecosphere.platform.support.plugins.TestProviderDescriptor;
 import de.iip_ecosphere.platform.support.plugins.Plugin;
 import de.iip_ecosphere.platform.support.plugins.PluginDescriptor;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
@@ -67,10 +68,12 @@ public abstract class AasFactory {
      */
     public static final String DEFAULT_PLUGIN_ID = "aas" + PluginManager.POSTFIX_ID_DEFAULT;
     
+    public static final String POSTFIX_ID_SERVER = "-server";
+    
     public static final String PROPERTY_PLUGIN_ID = "okto.aasFactoryId";
 
     /**
-     * Factory descriptor for Java Service Loader.
+     * Factory descriptor for plugin/Java Service Loader.
      * 
      * @author Holger Eichelberger, SSE
      */
@@ -87,6 +90,30 @@ public abstract class AasFactory {
                 installDir);
         }
         
+    }
+    
+    /**
+     * Server factory plugin descriptor, for cases that the server implementaton is a seperately loadable 
+     * oktoflow plugin.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public abstract static class AbstractServerFactoryDescriptor 
+        implements PluginDescriptor<AasServerFactoryDescriptor> {
+
+        /**
+         * Creates the server factory.
+         * 
+         * @return the server factory
+         */
+        public abstract AasServerFactoryDescriptor createInstance();
+
+        @Override
+        public Plugin<AasServerFactoryDescriptor> createPlugin(File installDir) {
+            return new SingletonPlugin<AasServerFactoryDescriptor>(getId(), getFurtherIds(), 
+                AasServerFactoryDescriptor.class, p -> createInstance(), installDir);
+        }
+
     }
     
     /**
@@ -237,6 +264,7 @@ public abstract class AasFactory {
     private static AasFactory instance = DUMMY;
     private static String pluginId = OsUtils.getPropertyOrEnv("okto.aasFactoryId", DEFAULT_PLUGIN_ID);
     private static boolean noInstanceWarningEmitted = false;
+    private static AasServerFactoryDescriptor serverFactoryInstance = null;
     
     private Map<String, ProtocolCreator> protocolCreators = new HashMap<>();
     private String[] protocols;
@@ -308,6 +336,15 @@ public abstract class AasFactory {
      */
     public static String getPluginId() {
         return pluginId;
+    }
+    
+    /**
+     * Returns the base plugin id of this factory, e.g., to construct a dependent server pluginId.
+     * 
+     * @return the plugin id, by default the {@link #DEFAULT_PLUGIN_ID}
+     */
+    public String getBasePluginId() {
+        return DEFAULT_PLUGIN_ID;
     }
     
     /**
@@ -460,6 +497,7 @@ public abstract class AasFactory {
      */
     public final ServerRecipe createServerRecipe() {
         ServerRecipe result = null;
+        // legacy
         Optional<AasServerRecipeDescriptor> first = ServiceLoaderUtils.filterExcluded(AasServerRecipeDescriptor.class);
         if (first.isPresent()) {
             result  = first.get().createInstance();
@@ -475,7 +513,10 @@ public abstract class AasFactory {
      * 
      * @return the default server recipe (may be <b>null</b> for none)
      */
-    protected abstract ServerRecipe createDefaultServerRecipe();
+    protected ServerRecipe createDefaultServerRecipe() {
+        AasServerFactoryDescriptor factory = getServerFactory();
+        return factory != null ? factory.createServerRecipe() : null;
+    }
     
     /**
      * Obtains access to a registry for unencrypted AAS via HTTP.
@@ -497,12 +538,31 @@ public abstract class AasFactory {
     public abstract Registry obtainRegistry(SetupSpec spec, Schema aasSchema) throws IOException;
     
     /**
-     * Creates a deployment recipe for unencrypted deployment.
+     * Creates a deployment recipe for AAS deployment.
      * 
      * @param spec the setup specification
      * @return the deployment recipe instance (may be <b>null</b> if no AAS implementation is registered)
      */
-    public abstract DeploymentRecipe createDeploymentRecipe(SetupSpec spec);
+    public DeploymentRecipe createDeploymentRecipe(SetupSpec spec) {
+        AasServerFactoryDescriptor factory = getServerFactory();
+        return factory != null ? factory.createDeploymentRecipe(spec) : null;
+    }
+
+    /**
+     * Returns the server factory instance.
+     * 
+     * @return the server factory instance, may be <b>null</b>
+     */
+    protected AasServerFactoryDescriptor getServerFactory() {
+        if (null == serverFactoryInstance) {
+            Plugin<AasServerFactoryDescriptor> plugin = PluginManager.getPlugin(
+                getBasePluginId() + POSTFIX_ID_SERVER, AasServerFactoryDescriptor.class);
+            if (null != plugin) {
+                serverFactoryInstance = plugin.getInstance();
+            }
+        }
+        return serverFactoryInstance;
+    }
     
     /**
      * Creates a persistence recipe.
@@ -706,6 +766,19 @@ public abstract class AasFactory {
         for (AasComponent c : components) {
             available.put(c, func);
         }
+    }
+    
+    /**
+     * Returns a test represented as it's class for execution in jUnit. This is required if a test running a service 
+     * manager and other components like AAS as plugins shall get execute a test independently. Delegates the
+     * work to {@link TestProviderDescriptor}. [testing]
+     * 
+     * @param index a 0-based index of the test/suite to return; usually test and implementing service manager are in 
+     *    close relationship and know the valid indexes
+     * @return the test classes or <b>null</b> if there is none for the given index
+     */
+    public Class<?>[] getTests(int index) {
+        return TestProviderDescriptor.getTests(index, getClass().getClassLoader());
     }
 
 }

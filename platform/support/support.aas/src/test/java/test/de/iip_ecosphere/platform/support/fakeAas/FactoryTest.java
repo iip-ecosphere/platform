@@ -123,6 +123,11 @@ public class FactoryTest {
             return DUMMY.getMetaModelVersion();
         }
 
+        @Override
+        public String getBasePluginId() {
+            return DUMMY.getBasePluginId();
+        }
+
     }
     
     /**

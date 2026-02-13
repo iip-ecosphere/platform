@@ -72,7 +72,7 @@ public class KeyStoreDescriptor implements Serializable {
      */
     public KeyStoreDescriptor(KeystoreCoordinate keystore, String alias, boolean appliesToClient, 
         boolean hostNameVerification) {
-        this(new File(keystore.getPassword()), keystore.getPassword(), alias, appliesToClient, hostNameVerification);
+        this(new File(keystore.getFile()), keystore.getPassword(), alias, appliesToClient, hostNameVerification);
     }
 
     /**

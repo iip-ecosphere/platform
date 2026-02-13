@@ -80,4 +80,24 @@ public interface ServerRecipe extends CorsEnabledRecipe {
      */
     public Server createRegistryServer(SetupSpec spec, PersistenceType persistence, String... options);
 
+    /**
+     * Creates an optional concept dictionary server.
+     * 
+     * @param spec the setup specification (host is ignored, i.e., localhost, but endpoint determines the base URL path)
+     * @return the server instance, may be <b>null</b> for none/not supported
+     */
+    public default Server createConceptDictionaryServer(SetupSpec spec) {
+        return null;
+    }
+
+    /**
+     * Creates an optional discovery server.
+     * 
+     * @param spec the setup specification (host is ignored, i.e., localhost, but endpoint determines the base URL path)
+     * @return the server instance, may be <b>null</b> for none/not supported
+     */
+    public default Server createDiscoveryServer(SetupSpec spec) {
+        return null;
+    }
+    
 }

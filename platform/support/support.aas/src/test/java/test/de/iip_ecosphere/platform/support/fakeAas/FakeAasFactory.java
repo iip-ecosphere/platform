@@ -121,4 +121,9 @@ public class FakeAasFactory extends AasFactory {
         return "v0";
     }
 
+    @Override
+    public String getBasePluginId() {
+        return DEFAULT_PLUGIN_ID;
+    }
+
 }
