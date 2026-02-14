@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 import de.iip_ecosphere.platform.services.environment.GenericMultiTypeServiceImpl.InTypeInfo;
 import de.iip_ecosphere.platform.services.environment.GenericMultiTypeServiceImpl.OutTypeInfo;
 import de.iip_ecosphere.platform.support.FileUtils;
-import de.iip_ecosphere.platform.support.PythonUtils;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.StringUtils;
 import de.iip_ecosphere.platform.support.json.Json;
@@ -42,6 +41,7 @@ import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.connectors.TransportConnector;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
+import de.oktoflow.platform.tools.lib.PythonUtils;
 
 /**
  * Generic command-line-based Python integration for multiple data types. Considers 
