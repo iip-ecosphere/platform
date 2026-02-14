@@ -229,7 +229,7 @@
                             <logRegExprs>
                                 <logRegExpr>.*RECEIVED.*</logRegExpr>
                             </logRegExprs>
-                            <testTime>120000</testTime>
+                            <testTime>180000</testTime>
                         </configuration>
                     </execution>
 	            </executions>

@@ -121,6 +121,9 @@
                                 <artifactId>support.aas.basyx2</artifactId>
                             </plugin>
                             <plugin>
+                                <artifactId>support.aas.basyx2.server</artifactId>
+                            </plugin>
+                            <plugin>
                                 <artifactId>support.aas.basyx</artifactId>
                             </plugin>
                             <plugin>

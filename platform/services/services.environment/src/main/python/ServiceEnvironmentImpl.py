@@ -162,7 +162,10 @@ def start(a):
         console(a, args.data, sId)
     elif wsMode:
         signal.signal(signal.SIGINT, wsStop)
-        asyncio.run(wsMain(args.port[0]))
+        try:
+            asyncio.run(wsMain(args.port[0]))
+        except Exception as exception:
+            sys.stderr.write("Python ServiceEnvironment [Warn]: Exception in asyncio " + str(exception) + "\n")
     else: # currently no alternative, just use console as fallback
         console(a, args.data, sId)
 

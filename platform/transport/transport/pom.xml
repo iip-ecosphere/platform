@@ -128,6 +128,12 @@
                                 </appends>
                             </plugin>
                             <plugin>
+                                <artifactId>support.aas.basyx2.server</artifactId>
+                                <appends> <!-- complement the plugin, add the platform logging -->
+                                   <append>support.log-slf4j-simple</append>
+                                </appends>
+                            </plugin>
+                            <plugin>
                                 <artifactId>support.aas.basyx</artifactId>
                                 <appends> <!-- complement the plugin, add the platform logging -->
                                    <append>support.log-slf4j-simple</append>
