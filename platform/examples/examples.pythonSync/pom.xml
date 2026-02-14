@@ -15,6 +15,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>tools.lib</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <artifactId>configuration.configuration</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <version>${project.version}</version>

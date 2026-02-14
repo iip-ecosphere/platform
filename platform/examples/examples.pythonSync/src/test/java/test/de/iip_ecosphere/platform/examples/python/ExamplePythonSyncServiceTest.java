@@ -23,8 +23,8 @@ import java.util.Scanner;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.NetUtils;
-import de.iip_ecosphere.platform.support.PythonUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.oktoflow.platform.tools.lib.PythonUtils;
 
 /**
  * Basic testing for the Python service implementation.
