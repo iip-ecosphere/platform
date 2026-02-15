@@ -17,7 +17,8 @@ import java.io.File;
 
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.tools.maven.python.PythonUtils;
+import de.oktoflow.platform.tools.lib.PythonUtils;
+
 import org.junit.Assert;
 
 /**

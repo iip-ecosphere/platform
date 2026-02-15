@@ -26,6 +26,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.fileset.FileSet;
 
+import de.oktoflow.platform.tools.lib.PythonUtils;
+
 /**
  * Maven Mojo for executing Python programs.
  * 
