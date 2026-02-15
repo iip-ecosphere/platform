@@ -36,7 +36,6 @@ import test.de.iip_ecosphere.platform.support.logging.LoggerFactoryTest;
     PidFileTest.class,
     TimeUtilsTest.class,
     ResourceLoaderTest.class,
-    PythonUtilsTest.class,
     NetUtilsTest.class,
     SchemaServerEndpointTest.class,
     InstalledDependenciesSetupTest.class,

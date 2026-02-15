@@ -20,6 +20,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>tools.lib</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>

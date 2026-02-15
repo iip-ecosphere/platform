@@ -21,6 +21,7 @@ import java.util.Arrays;
 
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.oktoflow.platform.tools.lib.loader.ChildFirstIndexedClassloader;
 
 /**
  * Default URL-based plugin setup descriptor. Typically, a specific descriptor inherits from this class and sets

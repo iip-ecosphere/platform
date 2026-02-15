@@ -25,25 +25,6 @@
       <artifactId>support.boot</artifactId>
       <version>${iip.version}</version>
     </dependency>
-    <dependency>
-	  <groupId>de.iip-ecosphere.platform</groupId>
-	  <artifactId>maven-python</artifactId>
-	  <version>${iip.version}</version>
-	  <exclusions>
-	  	<exclusion>
-	  		<groupId>org.apache.maven</groupId>
-	  		<artifactId>maven-core</artifactId>
-	  	</exclusion>
-	  	<exclusion>
-	  		<groupId>org.apache.maven</groupId>
-	  		<artifactId>maven-compat</artifactId>
-	  	</exclusion>
-	  	<exclusion>
-	  		<groupId>org.apache.maven.shared</groupId>
-	  		<artifactId>file-management</artifactId>
-	  	</exclusion>
-	  </exclusions>
-    </dependency>
   
     <dependency>
       <groupId>junit</groupId>

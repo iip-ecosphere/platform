@@ -20,8 +20,8 @@ import de.iip_ecosphere.platform.support.resources.ResourceLoader;
  */
 public class FileUtilsTest {
     
-    private static int numberTestFiles = 29;
-    private static int numberTestNotServiceFiles = 22;
+    private static int numberTestFiles = 27;
+    private static int numberTestNotServiceFiles = 20;
 
     /**
      * Sets the number of test files to be found.
