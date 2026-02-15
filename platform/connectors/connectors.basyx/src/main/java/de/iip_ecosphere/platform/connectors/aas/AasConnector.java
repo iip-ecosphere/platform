@@ -46,6 +46,7 @@ import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.ElementsAccess;
+import de.iip_ecosphere.platform.support.aas.IdentityStoreAuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Registry;
@@ -53,6 +54,7 @@ import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.types.common.Utils;
+import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.plugins.Plugin;
@@ -231,6 +233,7 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                 regEp = new Endpoint(schema, params.getHost(), params.getPort(), epPath);
             }
             BasicSetupSpec spec = new BasicSetupSpec(regEp);
+            setupAuthentication(spec);
             registry = factory.obtainRegistry(spec, schema);
             LOGGER.info("Connected to AAS registry: {}, notification interval {}", regEp.toUri(), 
                 params.getNotificationInterval());
@@ -249,6 +252,25 @@ public class AasConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
                     connectedAAS.put(nonPollingAas, aas);
                 }
             }
+        }
+    }
+
+    /**
+     * Sets up the authentication if specified.
+     * 
+     * @param spec the setup specification to be modified as a side effect
+     */
+    private void setupAuthentication(BasicSetupSpec spec) {
+        IdentityToken idToken = params.getIdentityToken(ConnectorParameter.ANY_ENDPOINT);
+        if (null != idToken) {
+            spec.setAuthentication(new IdentityStoreAuthenticationDescriptor() {
+
+                @Override
+                public IdentityToken getClientToken() {
+                    return idToken;
+                }
+                
+            });
         }
     }
     
