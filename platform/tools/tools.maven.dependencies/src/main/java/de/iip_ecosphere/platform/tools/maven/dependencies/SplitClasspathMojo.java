@@ -21,7 +21,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
@@ -34,12 +33,15 @@ import java.util.zip.ZipEntry;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Profile;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
 
 /**
  * A mojo that splits classpaths into main and app classpaths based on contained file name parts. Handlers spring
@@ -50,6 +52,9 @@ import org.apache.maven.plugins.annotations.Parameter;
 @Mojo( name = "split-classpath", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true )
 public class SplitClasspathMojo extends AbstractMojo {
 
+    @Parameter(defaultValue = "${project}", readonly = true)
+    private MavenProject project;
+    
     @Parameter( property = "mdep.archiveFile", defaultValue = "", required = true )
     private List<File> archiveFiles;
 
@@ -88,12 +93,9 @@ public class SplitClasspathMojo extends AbstractMojo {
             if (mainPatterns == null) {
                 mainPatterns = new ArrayList<>();
             }
+            analyzeDependencies();
             if (mainPatterns.isEmpty()) {
-                Collections.addAll(mainPatterns, "maven-python", "transport-", "support-", "support.boot-", 
-                    "support.aas-", "support.iip-aas-", "connectors-", "services.environment-", 
-                    "services.spring.loader-");
-                // preliminary, to become plugins // TODO clean up!!!
-                Collections.addAll(mainPatterns, "commons-io", "commons-lang3", "jackson-", "joda-", "jsoniter");
+                Layers.addMainPatterns(mainPatterns, true);
             }
             for (File f: archiveFiles) {
                 if (null != f) { // erroneous XML
@@ -103,6 +105,45 @@ public class SplitClasspathMojo extends AbstractMojo {
             cleanup();
         } else {
             getLog().info("Skipping.");
+        }
+    }
+    
+    /**
+     * Analyzes the dependencies for discouraged use of plugins as direct dependencies.
+     * 
+     * @throws MojoFailureException if the discouraged use is considered to be a failure
+     */
+    private void analyzeDependencies() throws MojoFailureException {
+        List<String> patterns = new ArrayList<>();
+        if (mainPatterns.isEmpty()) {
+            Layers.addMainPatterns(patterns, false);
+        } else {
+            patterns.addAll(mainPatterns);
+        }
+        analyzeDependencies(project.getDependencies(), patterns, null);
+        for (Profile profile : project.getModel().getProfiles()) {
+            analyzeDependencies(profile.getDependencies(), patterns, profile.getId());
+        }
+    }
+    
+    /**
+     * Analyzes the {@code dependencies} for discouraged use of plugins as direct dependencies.
+     * 
+     * @param dependencies dependencies to be analyzed
+     * @param patterns artifactId prefixes that must not be used
+     * @param profile the name of the profile, <b>null</b> for no profile
+     */
+    private void analyzeDependencies(List<Dependency> dependencies, List<String> patterns, String profile) {
+        for (Dependency dep: project.getDependencies()) {
+            for (String pattern : patterns) {
+                if (!dep.getScope().equals("test") && dep.getArtifactId().startsWith(pattern)) {
+                    String patText = profile == null ? "" : " in profile " + profile;
+                    getLog().warn("Project dependency " + dep.getGroupId() + ":" + dep.getArtifactId() 
+                        + patText
+                        + " is considered as plugin and, thus, discouraged");
+                    // throw new MojoFailureException(pattern);
+                }
+            }
         }
     }
 

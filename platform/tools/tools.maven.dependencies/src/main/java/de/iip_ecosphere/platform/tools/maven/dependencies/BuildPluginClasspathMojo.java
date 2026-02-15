@@ -33,6 +33,8 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
+import de.iip_ecosphere.platform.tools.maven.dependencies.Resolver.UnpackMode;
+
 /**
  * Specialized mojo for building plugin classpath files.
  * 
@@ -53,8 +55,8 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
     @Parameter( property = "mdep.addTestArtifact", defaultValue = "false" )
     private boolean addTestArtifact;
 
-    @Parameter( property = "mdep.unpackMode", defaultValue = Layers.DEFAULT_UNPACK_MODE )
-    private String unpackMode;
+    @Parameter( property = "mdep.unpackMode", defaultValue = Resolver.DEFAULT_UNPACK_MODE )
+    private UnpackMode unpackMode;
 
     @Parameter( property = "mdep.setupDescriptor", defaultValue = "FolderClasspath" )
     private String setupDescriptor;
@@ -167,11 +169,11 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
             file = new File(resolvedFile);
         }
         if (file != null) {
-            if ("resolve".equalsIgnoreCase(unpackMode)) {
+            if (unpackMode == UnpackMode.RESOLVE || unpackMode == UnpackMode.SNAPSHOTS) {
                 Resolver resolver = new Resolver(repoSystem, repoSession, remoteRepositories, getLog());
                 Set<Artifact> artifacts = getResolvedDependencies(true);
-                resolver.writeResolvedFile(file, artifacts, a -> resolver.resolveToUrl(a), 
-                    a -> a.getArtifactId(), a -> a.getVersion());
+                resolver.writeResolvedFile(file, artifacts, a -> unpackMode, a -> resolver.resolveToUrl(a), 
+                    a -> a.getArtifactId(), a -> a.getVersion(), false);
             } else {
                 file.delete();
             }
@@ -216,11 +218,11 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
     }
     
     /**
-     * Validates whether JSL descriptor files in {@link descParent} have their counterparts in classes compiled to 
-     * {@link classDir}.
+     * Validates whether JSL descriptor files in {@code descParent} have their counterparts in classes compiled to 
+     * {@code classDir}.
      * 
-     * @param logConsumer consumer for logging messages
      * @param descParent, usually a resource folder where {@code META-INF/services} is located within
+     * @param logConsumer consumer for logging messages
      * @param classDir the parent folders to search classes within
      * @return {@code true} if valid, {@code false} if failed
      */
@@ -249,8 +251,8 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
     }
 
     /**
-     * Validates whether a JSL descriptor file in {@link descParent} has counterparts in classes compiled to 
-     * {@link classDirList}.
+     * Validates whether a JSL descriptor file in {@code descParent} has counterparts in classes compiled to 
+     * {@code classDirList}.
      * 
      * @param desc the descriptor file
      * @param logConsumer consumer for logging messages
@@ -259,16 +261,16 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
      * @return {@code true} if valid, {@code false} if failed
      */
     private boolean validateJsl(File desc, Consumer<String> logConsumer, String descClass, List<File> classDirList) {
-        boolean result = true;
+        boolean found = false;
         for (File cDir : classDirList) {
             File clsFile = new File(cDir, descClass.replace(".", "/") + ".class");
-            if (!clsFile.isFile()) {
-                logConsumer.accept("Class '" + descClass + "' (" + clsFile + ") in JSL descriptor " + desc 
-                    + " not found in " + classDirList);
-                result = false;
-            }
+            found |= clsFile.isFile();
         }
-        return result;
+        if (!found) {
+            logConsumer.accept("Class '" + descClass + "' ) in JSL descriptor " + desc 
+                + " not found in " + classDirList);
+        }
+        return found;
     }
 
     @Override

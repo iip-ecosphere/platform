@@ -53,6 +53,9 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 
+import de.iip_ecosphere.platform.tools.maven.dependencies.Resolver.UnpackMode;
+import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
+
 /**
  * Extended unpack Mojo for plugins.
  * 
@@ -93,6 +96,9 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
 
     @Parameter( property = "mdep.resolvedFile", defaultValue = "*")
     private String resolvedFile;
+
+    @Parameter( property = "mdep.createIndex", defaultValue = "true")
+    private boolean createIndex;
 
     private List<ClasspathFile> classpathFiles = new ArrayList<>();
     
@@ -261,7 +267,6 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         
     }
     
-    
     @Override
     public void doExecute() throws MojoExecutionException, MojoFailureException {
         resolver = new Resolver(repoSystem, repoSession, remoteRepositories, getLog());
@@ -292,10 +297,12 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             for (PluginItem pl : plugins) {
                 ArtifactItem item = toArtifactItem(pl);
                 String artId = item.getArtifactId();
-                getLog().info("Configuring plugin '" + artId + "' -> " + item.getOutputDirectory());
-                item.setFileMappers(new FileMapper[] {
-                    new RelocatingFileMapper(artId, "-" + getActualVersion(pl), true)}); // pl.hasAppends()
-                artifactItems.add(item);
+                if (artId != null && artId.trim().length() > 0) { // if the generation does nonsense
+                    getLog().info("Configuring plugin '" + artId + "' -> " + item.getOutputDirectory());
+                    item.setFileMappers(new FileMapper[] {
+                        new RelocatingFileMapper(artId, "-" + getActualVersion(pl), true)}); // pl.hasAppends()
+                    artifactItems.add(item);
+                }
             }
             setArtifactItems(artifactItems);
         }
@@ -310,8 +317,8 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                 getLog().info("Running in shortcut local test mode, cannot handle appends");
             }
         }
-        relocate();
-        storeResolved();
+        Map<String, UnpackMode> modes = relocate();
+        storeResolved(modes);
     }
     
     /**
@@ -349,11 +356,12 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
     }
     
     /**
-     * Stores the resolved dependencies if enabled.
+     * Stores the resolved plugin dependencies if enabled.
      * 
+     * @param modes the unpack modes as classpathfile/plugin name-unpack mode map
      * @throws MojoExecutionException if obtaining the dependencies fails
      */
-    private void storeResolved() throws MojoExecutionException {
+    private void storeResolved(Map<String, UnpackMode> modes) throws MojoExecutionException {
         if (writeResolved && plugins != null && plugins.size() > 0) {
             File file = null;
             if (resolvedFile == null || resolvedFile.equals("*")) {
@@ -363,8 +371,9 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             }
             if (file != null) {
                 Resolver resolver = new Resolver(repoSystem, repoSession, remoteRepositories, getLog());
-                resolver.writeResolvedFile(file, plugins, p -> resolver.resolveToUrl(toArtifactItem(p)), 
-                    p -> p.getArtifactId(), p -> getActualVersion(p));
+                resolver.writeResolvedFile(file, plugins, p -> modes.get(p.getArtifactId()), 
+                    p -> resolver.resolveToUrl(toArtifactItem(p)), p -> p.getArtifactId(), p -> getActualVersion(p), 
+                    true);
             } else {
                 getLog().info("Skipping resolution file as disabled");
             }
@@ -578,10 +587,12 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
     /**
      * Relocates the unpacked files.
      * 
+     * @return the unpack modes as classpathfile/plugin name-unpack mode map
      * @throws MojoExecutionException if the execution fails
      * @throws MojoFailureException if a remarkable processing failure occurred
      */
-    private void relocate() throws MojoExecutionException, MojoFailureException {
+    private Map<String, UnpackMode> relocate() throws MojoExecutionException, MojoFailureException {
+        Map<String, UnpackMode> modes = new HashMap<>();
         File pluginDir = null;
         if (relocate) {
             File tgtDir = relocateTarget;
@@ -615,7 +626,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                 getLog().info("Rewriting classpath file " + src);
             }
             try {
-                if (relocate) {
+                if (relocate && !isSameFile(tgt, src)) {
                     FileUtils.deleteQuietly(tgt);
                     FileUtils.moveFile(src, tgt);
                 }
@@ -626,6 +637,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                 out.println(BuildPluginClasspathMojo.KEY_SEQUENCE_NR + seqNr);
                 String prefix = null;
                 String mode = null;
+                List<JarLocation> locs = new ArrayList<>();
                 for (String line : contents) {
                     if (line.startsWith("#")) {
                         prefix = extractSuffix(BuildPluginClasspathMojo.KEY_PREFIX, line, prefix);
@@ -635,25 +647,109 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                         Tokenizer tokenizer = new Tokenizer(line);
                         prefix = fixPrefix(prefix, tokenizer);
                         if (relocate) {
-                            processCpLineRelocation(cpFile, mode, out, tokenizer, prefix, relocateTarget);
+                            locs.addAll(processCpLineRelocation(cpFile, mode, out, tokenizer, prefix, relocateTarget));
                         } else {
-                            processCpLineNoRelocation(cpFile, mode, line, out, tokenizer, prefix);
+                            locs.addAll(processCpLineNoRelocation(cpFile, mode, line, out, tokenizer, prefix));
                         }
                         out.println();
                     } 
                 }
+                modes.put(cf.getName(), Resolver.toUnpackMode(mode));
                 out.close();
                 if (relocate) {
                     FileUtils.deleteQuietly(src);
                 }
+                writeIndex(locs, tgt);
             } catch (IOException e) {
                 throw new MojoFailureException("Cannot postprocess " + src + ": " + e.getMessage());
             }
             seqNr++;
         }
+        return modes;
+    }
+    
+    /**
+     * Writes the (optional) classloader index file.
+     * 
+     * @param locs the Jar locations to be turned into the index file
+     * @param cpFile the associated classpath file to create the index for
+     */
+    private void writeIndex(List<JarLocation> locs, File cpFile) {
+        if (createIndex) {
+            File index = new File(cpFile.toString() + ".idx");
+            try {
+                LoaderIndex idx = new LoaderIndex();
+                for (JarLocation loc: locs) {
+                    LoaderIndex.addToIndex(idx, loc.toFile(), loc.actual);
+                }
+                LoaderIndex.toFile(idx, index);
+                getLog().info("Stored class index to " + index);
+            } catch (IOException e) {
+                getLog().error("Cannot write index file " + index + ": " + e.getClass().getSimpleName() 
+                    + " " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Returns whether {@code f1} and {@code f2} seem to be the same file path.
+     *
+     * @param f1 the first file
+     * @param f2 the second file
+     * @return {@code true} for the same, {@code false} else
+     */
+    private boolean isSameFile(File f1, File f2) {
+        boolean same = false;
+        try {
+            same = f1.getCanonicalPath().equals(f2.getCanonicalPath());
+        } catch (IOException e) {
+            getLog().debug("During isSameFile for " + f1 + " and " + f2 + ": " + e.getMessage());
+        }
+        return same;
     }
     
     // checkstyle: stop parameter number check
+
+    /**
+     * Represent a Jar location.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class JarLocation {
+        
+        private String original;
+        private String actual;
+        
+        /**
+         * A jar location with just the orignal path.
+         * 
+         * @param original the original path
+         */
+        private JarLocation(String original) {
+            this.original = original;
+        }
+
+        /**
+         * A jar location with the orignal and an actual path to be used in the LoaderIndex.
+         * 
+         * @param original the original path
+         * @param actual the actual path
+         */
+        private JarLocation(String original, String actual) {
+            this.original = original;
+            this.actual = actual;
+        }
+
+        /**
+         * Turns this location to a (source) file.
+         * 
+         * @return the file
+         */
+        File toFile() {
+            return new File(original);
+        }
+        
+    }
     
     /**
      * Processes a classpath line while plugin relocation. 
@@ -664,9 +760,11 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
      * @param tokenizer the tokenizer
      * @param prefix the classpath token prefix
      * @param jarFolder the folder where to copy the jars to
+     * @return list of paths of actual classpath entries
      */
-    private void processCpLineRelocation(String name, String mode, PrintStream out, Tokenizer tokenizer, String prefix, 
-        File jarFolder) {
+    private List<JarLocation> processCpLineRelocation(String name, String mode, PrintStream out, Tokenizer tokenizer, 
+        String prefix, File jarFolder) {
+        List<JarLocation> result = new ArrayList<>();
         List<String> tokens = new ArrayList<>();
         while (tokenizer.hasMoreTokens()) {
             tokens.add(tokenizer.nextToken());
@@ -682,13 +780,14 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         }
         Iterator<String> tokenIter = tokens.iterator();
         while (tokenIter.hasNext()) {
-            String token = tokenIter.next();
-            token = rewriteToken(token, mode, prefix, jarFolder, tokenizer);
+            String origToken = tokenIter.next();
+            String token = rewriteToken(origToken, mode, prefix, jarFolder, tokenizer, result);
             out.print(token);
             if (tokenIter.hasNext()) {
                 out.print(tokenizer.sep);
             }
         }
+        return result;
     }
 
     /**
@@ -700,9 +799,11 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
      * @param out the output stream for the rewritten classpath file
      * @param tokenizer the tokenizer
      * @param prefix the classpath token prefix (for {@link #forceResolve})
+     * @return list of paths of actual classpath entries
      */
-    private void processCpLineNoRelocation(String name, String mode, String line, PrintStream out, Tokenizer tokenizer, 
-        String prefix) {
+    private List<JarLocation> processCpLineNoRelocation(String name, String mode, String line, PrintStream out, 
+        Tokenizer tokenizer, String prefix) {
+        List<JarLocation> result = new ArrayList<>();
         List<String> tokens = new ArrayList<>();
         Set<String> knownTokens = new HashSet<>();
         while (tokenizer.hasMoreTokens()) {
@@ -714,7 +815,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             handleAppends(name, knownTokens, cp -> tokens.add(cp));
             List<String> processedTokens = tokens
                 .stream()
-                .map(token -> rewriteToken(token, mode, prefix, null, tokenizer))
+                .map(token -> rewriteToken(token, mode, prefix, null, tokenizer, result))
                 .collect(Collectors.toList());
             out.print(String.join(tokenizer.sep, processedTokens));
         } else {
@@ -723,14 +824,17 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             if (pos > 0) { // differentiating directory, if not-relocating
                 name = name.substring(0, pos);
             }
+            for (String tok : tokens) {
+                result.add(new JarLocation(tok));
+            }
             handleAppends(name, knownTokens, cp -> {
                 out.print(tokenizer.sep);
                 out.print(cp);
+                result.add(new JarLocation(cp));
             });
         }
+        return result;
     }
-
-    // checkstyle: resume parameter number check
 
     /**
      * Rewrites a classpath token.
@@ -741,9 +845,11 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
      * @param jarFolder the folder where to copy the jars to (considerd only for {@link #resolveAndCopy}, 
      *     may be <b>null</b> considered as if {@link #resolveAndCopy} is {@code false})
      * @param tokenizer the tokenizer
+     * @param locations Jar locations (modified per token)
      * @return {@code token} or the rewritten token
      */
-    private String rewriteToken(String token, String mode, String prefix, File jarFolder, Tokenizer tokenizer) {
+    private String rewriteToken(String token, String mode, String prefix, File jarFolder, Tokenizer tokenizer, 
+        List<JarLocation> locations) {
         if (tokenizer.win) {
             token = token.replace("target\\jars\\", "jars\\");
             token = token.replace("target\\", "jars\\");
@@ -754,10 +860,15 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         if (isModeResolve(mode)) {
             token = stripPrefix(prefix, token);
             token = resolve(token, jarFolder);
+            locations.add(new JarLocation(token));
+        } else {
+            locations.add(new JarLocation(jarFolder.toString() + "/../" + token, token));
         }
         return token;
     }
-    
+
+    // checkstyle: resume parameter number check
+
     /**
      * Returns whether we are in resolve mode, i.e., either {@code mode} indicates "resolve" or {@link #forceResolve}.
      * 

@@ -13,6 +13,8 @@
 package de.iip_ecosphere.platform.tools.maven.dependencies;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.apache.maven.plugin.logging.Log;
 
@@ -23,9 +25,8 @@ import org.apache.maven.plugin.logging.Log;
  */
 public class Layers {
 
-    public static final String DEFAULT_UNPACK_MODE = "jars"; // -> "resolve"
-    
     private static final String[] LAYERS = {
+        "tools.lib",
         "support.boot",
         "support", 
         "support.aas", 
@@ -41,6 +42,32 @@ public class Layers {
         "configuration",
         "platform"
     };
+    
+    private static final String[] MAIN_ARTID_PATTERNS = {
+        "maven-python-", 
+        "support.boot-",
+        "support-", 
+        "support.aas-", 
+        "support.iip-aas-", 
+        "transport-", 
+        "connectors-", 
+        "services.environment-", 
+        "services.spring.loader-"            
+    };
+    
+    /**
+     * Adds the main plugin artifactId name patterns to {@code #mainPatterns}.
+     * 
+     * @param mainPatterns the collection to add the patterns to
+     * @param includeNonPlugins also include (preliminary) patterns needed during migration
+     */
+    public static void addMainPatterns(Collection<String> mainPatterns, boolean includeNonPlugins) {
+        Collections.addAll(mainPatterns, MAIN_ARTID_PATTERNS);
+        if (includeNonPlugins) {
+            // preliminary, to become plugins // TODO clean up!!!
+            Collections.addAll(mainPatterns, "commons-io", "commons-lang3", "jackson-", "joda-", "jsoniter");
+        }
+    }
     
     /**
      * Determines the exclude artifact ids.
@@ -61,21 +88,6 @@ public class Layers {
             if (last >= 0) {
                 result = String.join(", ", Arrays.copyOfRange(LAYERS, 0, last + 1));
             }
-            /*String result2 = excludeIds;           
-            if (artifactId.startsWith("support.aas.")) {
-                result2 = "support, support.aas";
-            } else if (artifactId.startsWith("support.")) {
-                result2 = "support";
-            } else if (artifactId.startsWith("transport.")) {
-                result2 = "support, support.aas, support.iip-aas, transport";
-            } else if (artifactId.startsWith("connectors.")) {
-                result2 = "support, support.aas, support.iip-aas, transport, connectors";
-            } else if (artifactId.startsWith("services.")) {
-                result2 = "support, support.aas, support.iip-aas, transport, services.environment, services";
-            } else if (artifactId.startsWith("deviceMgt.")) {
-                result2 = "support, support.aas, support.iip-aas, transport, services.environment, services, deviceMgt";
-            } // further cases
-            log.info("CP " + result2);*/
             result = append(result, "maven-python"); // through support
         }
         if (asTest) {

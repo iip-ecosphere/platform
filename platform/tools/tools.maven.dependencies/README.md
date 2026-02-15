@@ -161,7 +161,7 @@ Each execution may be configured independently. Some configuration settings shal
 Specialized goal to build a plugin classpath file. Based on the refined ``build-classpath`` above, but ships with a pre-configuration for plugin classpaths. In more details, sets the output file to `${project.build.directory}/jars/classpath`, `prependGroupId` to `true`, `overWriteIfNewer` to `true`, `localRepoProperty` to `${project.build.directory}/jars`, `prefix` to `${project.build.directory}/jars`, `fileSeparator` to `/`, `pathSeparator` to `:`, and, if not set otherwise, `includeScope` to `runtime` (with `addTestArtifact` set to `test`). Further, prepends the own artifact by default and via `addTestArtifact` also the corresponding test artifact. Adds a set of befores as comments, including `prefix`, `unpackMode`, `setupDescriptor` and `pluginIds` (see below). 
 
 - `addTestArtifact` (default `false`, user property `mdep.addTestArtifact`) adds the test artifact based on the actual project
-- `unpackMode` (default `jars`, user property `mdep.unpackMode`) specifies how unpacking shall happen, i.e., whether jars are included in the plugin artifact (`jars`) or whether they shall be resolved (`resolve`)
+- `unpackMode` (default `JARS`, user property `mdep.unpackMode`) specifies how unpacking shall happen, i.e., whether jars are included in the plugin artifact (`JARS`), whether only snapshots shall be considered (`SNAPSHOTS`) or whether they shall be resolved (`RESOLVE`)
 - `setupDescriptor` (default `FolderClasspath`, user property `mdep.setupDescriptor`) specifies the descriptor implementation that shall be announced to the plugin manager, may be a shortcut for platform supplied descriptors (`FolderClasspath`, `CurrentClassloader`, ``PluginBased`, `Process`), a qualified classname assuming a non-arg constructor, or empty for no loading through the class loader (rather than appending during unpack).
 - `pluginIds` (default empty, user property `mdep.pluginIds`) specifies pluginIds for the `PluginBased` setup descriptor (comma separated, only first considered by now), may also be used with others whereby then the plugin is also announced by `PluginBased`
 - `validateJsl` (default `WARN`, user property `mdep.validateJsl`) specifies whether classes listed in JSL files shall be validated for their counterparts in `target`, leads to warnings (`WARN`), information (`INFO`), errors (`ERROR`) or build failures (`FAIL`) if classes do not exist. Can be switched warnings `OFF`.
@@ -177,17 +177,15 @@ The inherited setting ``excludeArtifactIds`` shall be configured in a way that p
 
 ## assemble-plugin
 
-Creates a plugin-zip with classpath files from default directories (either ``${project.build.directory}/jars`` or ``${project.build.directory}/classes``) as well as the plugin jars and it's dependencies from jars (depending on `unpackMode`).
+Creates a plugin-archive with classpath files from default directories (either ``${project.build.directory}/jars`` or ``${project.build.directory}/classes``) as well as the plugin jars and it's dependencies from jars (depending on `unpackMode`).
 
-- `unpackMode` (default `jars`, user property `mdep.unpackMode`) specifies how unpacking shall happen, i.e., whether jars are included in the plugin artifact (`jars`) or whether they shall be resolved (`resolve`)
+- `unpackMode` (default `JARS`, user property `mdep.unpackMode`) specifies how unpacking shall happen, i.e., whether jars are included in the plugin artifact (`JARS`), whether only snapshots shall be considered (`SNAPSHOTS`) or whether they shall be resolved (`RESOLVE`)
 - `addTestArtifact` (default `false`, user property `mdep.addTestArtifact`) adds the test artifact based on the actual project
 - `furtherFiles` allowing to handle further files in usual Maven manner. Currently only the sub-structure `excludes/exclude` is considered to expliclitly exclude JARs from ``${project.build.directory}/jars`` that shall not be packaged/assembled.
 
-Unfortunately, reusing the Maven assembly plugin for this purpose was not possible due to technical (injection) issues.
-
 ## unpack-plugins
 
-oktoflow plugins ship as zip files with contained classpath file(s) and jars in `target/jars`. This extension of the unpack goal eases the unpacking of plugins for tests and platform installation.
+oktoflow plugins ship as archive files with contained classpath file(s) and jars in `target/jars`. This extension of the unpack goal eases the unpacking of plugins for tests and platform installation.
 
 In the basic version, for testing, use 
 
@@ -208,7 +206,7 @@ In the basic version, for testing, use
                     <configuration>
                         <plugins>
                             <plugin>
-                                <name>support.aas.basyx2</name>
+                                <artifactId>support.aas.basyx2</artifactId>
                                 <appends> <!-- complement the plugin, add the platform logging -->
                                    <append>log-slf4j-simple</append>
                                 </appends>                                
@@ -216,7 +214,7 @@ In the basic version, for testing, use
                                 <setupDescriptor>FolderClasspaht</setupDescriptor>
                             </plugin>
                             <plugin>
-                                <name>support.aas.basyx</name>
+                                <artifactId>support.aas.basyx</artifactId>
                                 <appends> <!-- complement the plugin, add the platform logging -->
                                    <append>log-slf4j-simple</append>
                                 </appends>
@@ -241,6 +239,7 @@ If we are not in `relocate` mode, the plugin is only enabled, if the relative di
 
 - `writeResolved` (default `false`, user property `mdep.writeResolved`) specifies whether the original locations of plugins shall be stored in a file
 - `resolvedFile` (default `${project.build.directory}/classes/resolved`, user property `mdep.resolvedFile`) specifies where to store the file for `storeResolved`
+- `createIndex` (default `true`, user property `mdep.createIndex`) whether a classpath index file shall be created for the plugin
 
 ## split-classpath
 

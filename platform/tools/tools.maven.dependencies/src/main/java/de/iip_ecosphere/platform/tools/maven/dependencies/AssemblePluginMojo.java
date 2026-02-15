@@ -37,6 +37,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.shared.model.fileset.FileSet;
 
+import de.iip_ecosphere.platform.tools.maven.dependencies.Resolver.UnpackMode;
 import de.iip_ecosphere.platform.tools.maven.python.FilesetUtils;
 
 /**
@@ -51,8 +52,8 @@ public class AssemblePluginMojo extends AbstractMojo {
     @Parameter( property = "mdep.addTestArtifact", defaultValue = "false" )
     private boolean addTestArtifact;
   
-    @Parameter( property = "mdep.unpackMode", defaultValue = Layers.DEFAULT_UNPACK_MODE )
-    private String unpackMode;
+    @Parameter( property = "mdep.unpackMode", defaultValue = Resolver.DEFAULT_UNPACK_MODE )
+    private UnpackMode unpackMode;
     
     @Parameter( required = false )
     private boolean asTest;
@@ -86,7 +87,7 @@ public class AssemblePluginMojo extends AbstractMojo {
             if (resolv.exists()) {
                 addFile(out, resolv, "", false);
             }
-            if (isJarUnpacking()) {
+            if (Resolver.include(unpackMode, namePrefix)) {
                 addFile(out, prependGroup(new File(targetDirectory, namePrefix + ".jar")), "target/", false);
                 if (addTestArtifact || asTest) {
                     addFile(out, prependGroup(new File(targetDirectory, namePrefix + "-tests.jar")), "target/", false);
@@ -94,14 +95,12 @@ public class AssemblePluginMojo extends AbstractMojo {
             }
             Set<File> excluded = new HashSet<>();
             FilesetUtils.determineFiles(furtherFiles, false, f -> excluded.add(f));
-            if (isJarUnpacking()) {
-                getLog().info("Adding dependencies jars from " + jarsDir);
-                File[] jars = jarsDir.listFiles();
-                if (null != jars) {
-                    for (File f : jars) {
-                        if (f.getName().endsWith(".jar") && !excluded.contains(f)) {
-                            addFile(out, f, "target/jars/", false);
-                        }
+            getLog().info("Adding dependencies jars from " + jarsDir);
+            File[] jars = jarsDir.listFiles();
+            if (null != jars) {
+                for (File f : jars) {
+                    if (f.getName().endsWith(".jar") && !excluded.contains(f) && Resolver.include(unpackMode, f)) {
+                        addFile(out, f, "target/jars/", false);
                     }
                 }
             }
@@ -110,7 +109,7 @@ public class AssemblePluginMojo extends AbstractMojo {
         }
         projectHelper.attachArtifact(project, "zip", "plugin" + (asTest ? "-test" : ""), outputFile);
     }
-
+    
     /**
      * Prepends the group id before an usual Maven artifact as we need it that way for resolution on unpacking.
      * 
@@ -125,15 +124,6 @@ public class AssemblePluginMojo extends AbstractMojo {
             getLog().error("While prepending groupId: " + e.getClass().getSimpleName() + " " + e.getMessage());
         }
         return result;
-    }
-    
-    /**
-     * Returns whether unpacking mode is "jars".
-     * 
-     * @return {@code true} for jars, else {@code false} in particular for "resolve"
-     */
-    private boolean isJarUnpacking() {
-        return "jars".equals(unpackMode);
     }
 
     /**

@@ -41,10 +41,18 @@ import org.eclipse.aether.resolution.ArtifactResult;
  */
 class Resolver {
 
+    public static final String DEFAULT_UNPACK_MODE = "JARS"; // -> TODO "resolve", see toUnpackMode()
+
     private Log log;
     private List<RemoteRepository> remoteRepositories;
     private RepositorySystemSession repoSession;
     private RepositorySystem repoSystem;
+    
+    enum UnpackMode {
+        JARS,
+        SNAPSHOTS,
+        RESOLVE
+    }
     
     /**
      * Creates a resolver instance.
@@ -221,31 +229,49 @@ class Resolver {
         return result;
     }
     
+    // checkstyle: stop parameter number check
+    
     /**
      * Writes the dependency resolution file.
      * 
      * @param <T> the type of dependency item
      * @param file the file to write
      * @param items the dependency items
+     * @param unpackModeProvider provides the unpack mode for an item (use {@link UnpackMode#RESOLVE} for all, 
+     *     {@link UnpackMode#JARS} for none)
      * @param resolutionProvider resolves an item to its dependency URL (may lead to an empty or <b>null</b> value, 
      *     ignored then)
      * @param artifactIdProvider resolves an item to its artifact id
      * @param versionProvider resolves an item to its version
      */
-    <T> void writeResolvedFile(File file, Collection<T> items, Function<T, String> resolutionProvider, 
-        Function <T, String> artifactIdProvider, Function <T, String> versionProvider) {
+    <T> void writeResolvedFile(File file, Collection<T> items, Function<T, UnpackMode> unpackModeProvider, 
+        Function<T, String> resolutionProvider, Function <T, String> artifactIdProvider, Function <T, 
+        String> versionProvider, boolean plugin) {
         try (PrintStream out = new PrintStream(new FileOutputStream(file))) {
             out.println("[");
             boolean first = true;
             for (T p : items) {
-                String urlPath = resolutionProvider.apply(p);
-                if (null != urlPath && urlPath.length() > 0) {
-                    if (!first) {
-                        out.println(",");
+                String artifactId = artifactIdProvider.apply(p);
+                String name = artifactId + "-" + versionProvider.apply(p);
+                UnpackMode unpackMode = unpackModeProvider.apply(p);
+                if (null == unpackMode) {
+                    unpackMode = toUnpackMode(DEFAULT_UNPACK_MODE);
+                }
+                if (include(unpackMode, name)) {
+                    String urlPath = resolutionProvider.apply(p);
+                    if (null != urlPath && urlPath.length() > 0) {
+                        if (!first) {
+                            out.println(",");
+                        }
+                        out.print("  {\"url\":\"");
+                        out.print(urlPath);
+                        out.print("\", \"plugin\":");
+                        out.print(plugin);
+                        out.print(", \"name\":\"");
+                        out.print(name);
+                        out.print("\"}");
+                        first = false;
                     }
-                    out.print("  {\"url\":\"" + urlPath + "\", \"name\":\"" + artifactIdProvider.apply(p) 
-                        + "-" + versionProvider.apply(p) + "\"}");
-                    first = false;
                 }
             }
             if (!first) {
@@ -258,6 +284,8 @@ class Resolver {
         }
     }
 
+    // checkstyle: resume parameter number check
+
     /**
      * The log.
      * 
@@ -265,6 +293,70 @@ class Resolver {
      */
     private Log getLog() {
         return log;
+    }
+
+    /**
+     * Returns whether the given file/artifact name is a snapshot.
+     *
+     * @param name the name
+     * @return {@code true} for snapshot, {@code false} else
+     */
+    static boolean isSnapshot(String name) {
+        return name.contains("-SNAPSHOT"); // simplistic
+    }
+
+    /**
+     * Determines whether an artifact/file with given {@code name} shall be included (to a Jar, the resolved file).
+     * 
+     * @param file the file to take the name from
+     * @return {@code true} for inclusion, {@code false} else
+     */
+    static boolean include(UnpackMode unpackMode, File file) {
+        return include(unpackMode, file.getName());
+    }
+
+    /**
+     * Determines whether an artifact/file with given {@code name} shall be included (to a Jar, the resolved file).
+     * 
+     * @param name the name (prefix)
+     * @return {@code true} for inclusion, {@code false} else
+     */
+    static boolean include(UnpackMode unpackMode, String name) {
+        boolean add;
+        switch (unpackMode) {
+        case JARS:
+            add = true;
+            break;
+        case RESOLVE:
+            add = false;
+            break;
+        case SNAPSHOTS:
+            add = Resolver.isSnapshot(name);
+            break;
+        default:
+            add = false;
+            break;
+        }
+        return add;
+    }
+    
+    /**
+     * Turns a string to an unpack mode.
+     * 
+     * @param mode the string, may be <b>null</b> then the unpack mode of {@link #DEFAULT_UNPACK_MODE}
+     * @return the unpack mode
+     */
+    static UnpackMode toUnpackMode(String mode) {
+        UnpackMode result;
+        if (null == mode) {
+            mode = DEFAULT_UNPACK_MODE;
+        }
+        try {
+            result = UnpackMode.valueOf(mode);
+        } catch (IllegalArgumentException ex) {
+            result = UnpackMode.JARS;
+        }
+        return result;
     }
 
 }
