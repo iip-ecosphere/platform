@@ -14,7 +14,6 @@ package de.iip_ecosphere.platform.connectors.mqttv5;
 
 import java.io.IOException;
 import java.util.function.Supplier;
-import java.util.logging.Level;
 
 import org.eclipse.paho.mqttv5.client.IMqttToken;
 import org.eclipse.paho.mqttv5.client.MqttAsyncClient;
