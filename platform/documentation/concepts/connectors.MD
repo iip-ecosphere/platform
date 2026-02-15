@@ -71,7 +71,7 @@ While `JsonFormatter`/`JsonParser` do not require further information, `TextLine
 
 ## OPC UA connector
 
-The OPC UA  connector is a model connector with no further fields.
+The OPC UA  connector is a model connector with no further fields. Regarding authentication, this connector supports `USERNAME`, `ISSUED`, `X509` and `ANONYMOUS` authentication tokens as well as TLS encryption.
 
 ## AAS connector
 
@@ -82,6 +82,8 @@ The Asset Administration Shell (AAS) connector is a model connector that support
 | registryHost | Mandatory hostname of the AAS registry. |     |
 | registryPort | Mandatory port of the AAS registry. |     |
 | idShortSpec | Mandatory name or Java regular expression denoting the AAS submodel (paths) acting as external source/sink. |     |
+
+This connector this connector supports `USERNAME`, `ISSUED`, `X509` and `ANONYMOUS` authentication tokens as well as TLS encryption.
 
 Background: 
 - The connector was primarily realized for AAS metamodel v2. Through a more recent oktoflow AAS plugin, also metamodel v3 is supported. However, in the future, we may have to distinguish between AAS and sumbodel host/port.
@@ -193,14 +195,14 @@ To ease the application, pre-defined `FileConnector` types are `JsonFileConnecto
 
 ## MQTTv3 connector
 
-The `MQTTv3` connector is a channel connector with no further fields. Formatters and parsers can be applied as described for the `FileConnector`. 
+The `MQTTv3` connector is a channel connector with no further fields. Formatters and parsers can be applied as described for the `FileConnector`. This connector supports `USERNAME` authentication tokens and TLS encryption. 
 
 The `MipMqttV3Connector` is an example of a pre-configured connector with fixed input/output types. The connector is part of oktoflow's default library.
 
 ## MQTTv5 connector
 
-The `MQTTv5` connector is a channel connector with no further fields. Formatters and parsers can be applied as described for the `FileConnector`.
+The `MQTTv5` connector is a channel connector with no further fields. Formatters and parsers can be applied as described for the `FileConnector`. This connector supports `USERNAME` authentication tokens and TLS encryption. 
 
 ## MQTT connector
 
-The `MQTT` connector is a channel connector which selects dynamically between `MQTTv3` and `MQTTv5` connector. The MQTT connector has no further fields. Formatters and parsers can be applied as described for the `FileConnector`.
+The `MQTT` connector is a channel connector which selects dynamically between `MQTTv3` and `MQTTv5` connector. The MQTT connector has no further fields. Formatters and parsers can be applied as described for the `FileConnector`. This connector supports authentication and encryption as provided by the underlying connector.
