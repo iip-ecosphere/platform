@@ -51,6 +51,7 @@ New features:
 
 Changes:
 * As part of cleaning up dependencies in the core components of oktoflow:
+  * `de.iip_ecosphere.platform.support.PythonUtils` in `support` inherited from the Python Maven plugin became `de.oktoflow.platform.tools.lib.PythonUtils` in `tools.lib`, releasing dependencies
   * Turning Java objects generically into text is now done via `de.iip_ecosphere.platform.support.StringUtils.toString(object)` for a default format and `de.iip_ecosphere.platform.support.StringUtils.toStringShortStyle(object)` for the short format. The latter replaces the approach with `org.apache.commons.lang3.builder.ReflectionToStringBuilder.toString(object, IipStringStyle.SHORT_STRING_STYLE)` using `de.iip_ecosphere.platform.services.environment.IipStringStyle` as formatting. `de.iip_ecosphere.platform.services.environment.IipStringStyle` was internalized into `de.iip_ecosphere.platform.support.StringUtils` and, thus, can be/was removed from `services.environment`. Please re-build your applications.
   * The generated connectivity tests in `src/test/java/iip/connectivity` must be upgraded/taken over from the templates as connectors are not supposed to be instantiated directly anymore (plugin approach).
   * Check all application POM for direct use of oktoflow [plugins](PLUGINS.md). Plugins must not be stated as production dependencies while test dependencies are ok. Default plugins are added through the POM of the generated, integrated app.
