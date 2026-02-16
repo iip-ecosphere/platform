@@ -71,6 +71,7 @@ RUN apt-get update && apt-get install -y \
     libxss1 \
     libxtst6 \
     && rm -rf /var/lib/apt/lists/*
+    
 
 # Download latest stable Firefox
 RUN apt-get update && apt-get install -y file wget tar xz-utils bzip2 \
@@ -80,12 +81,30 @@ RUN apt-get update && apt-get install -y file wget tar xz-utils bzip2 \
     && tar -xJf /tmp/firefox.tar.xz -C /opt/ \
     && ln -s /opt/firefox/firefox /usr/local/bin/firefox \
     && rm /tmp/firefox.tar.xz
+    
+# ------ Installing VSCode -----------------------------------------------------------
+# Install dependencies for VSCode
+RUN apt-get update && apt-get install -y \
+    wget \
+    gpg \
+    apt-transport-https \
+    software-properties-common \
+    && rm -rf /var/lib/apt/lists/*
+
+# Import Microsoft GPG key and add repo
+RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /usr/share/keyrings/packages.microsoft.gpg \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" \
+    > /etc/apt/sources.list.d/vscode.list
+
+RUN apt-get update && apt-get install -y code \
+    && rm -rf /var/lib/apt/lists/*
 
 # ------ Desktop setup ----------------------------------------------------------------
 # Icons
 COPY icon.xpm /opt/eclipse
 COPY eclipse.desktop /root/Desktop/eclipse.desktop
 COPY firefox.desktop /root/Desktop/firefox.desktop
+COPY vscode.desktop /root/Desktop/vscode.desktop
 
 # running platform
 COPY platform.conf /etc/supervisor/conf.d/platform.conf
