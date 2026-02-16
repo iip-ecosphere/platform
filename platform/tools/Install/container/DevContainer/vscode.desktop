@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=VSCode
+Comment=Visual Studio Code
+Exec=/usr/share/code/code --no-sandbox --user-data-dir=/root/.vscode
+Icon=/usr/share/pixmaps/vscode.png
+Terminal=false
+Type=Application
+Categories=Development;IDE;
+
