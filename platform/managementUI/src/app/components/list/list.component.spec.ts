@@ -51,6 +51,7 @@ describe('ListComponent', () => {
       fixture = TestBed.createComponent(ListComponent);
       component = fixture.componentInstance;
       component.websocketService.emitInfo = false;
+      component.configExpertMode.expertMode = true;
       fixture.detectChanges();
       router = TestBed.inject(Router);
       location = TestBed.inject(Location);
@@ -67,7 +68,7 @@ describe('ListComponent', () => {
     await fixture.detectChanges();
     let compiled = fixture.nativeElement as HTMLElement;
 
-    for (let tab of component.tabsParam) {
+    for (let tab of component.normalTabsParam) {
       let container = compiled.querySelector(`table[id="menu.${tab.tabName}"]`) as HTMLElement;
       expect(container).toBeTruthy();
       expect(container?.querySelector('tr td img')).toBeTruthy(); // AAS icon
@@ -154,7 +155,7 @@ async function test(fixture: ComponentFixture<ListComponent>, component: ListCom
   
   await fixture.detectChanges();
   let compiled = fixture.nativeElement as HTMLElement;
-  let tabName = component.tabsParam[tabIndex].tabName;
+  let tabName = component.exportTabsParam[tabIndex].tabName;
   let expIdShort = new Set<string>(expectedDataIdShort);
   let tabContext = "in table " + tabName;
   let navigateSpy = spyOn(router, 'navigateByUrl');
@@ -162,7 +163,7 @@ async function test(fixture: ComponentFixture<ListComponent>, component: ListCom
   let menuClick = compiled.querySelector(`span[id="menuClick.${tabName}"]`) as HTMLElement;
   expect(menuClick).withContext(tabContext).toBeTruthy();
   menuClick.click(); // TODO mock?
-  await component.loadData(component.tabsParam[tabIndex].metaProject, component.tabsParam[tabIndex].submodelElement);
+  await component.loadData(component.exportTabsParam[tabIndex].metaProject, component.exportTabsParam[tabIndex].submodelElement);
 
   await fixture.detectChanges();
   await fixture.whenRenderingDone();

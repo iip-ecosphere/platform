@@ -81,6 +81,8 @@ describe('UtilsService', () => {
   it('should implement getDisplayName', () => {
     let input: editorInput = {value: 10, name:"var", type:"Integer", description: [{language:"de", text: "abc"}], isReadOnly: false, isRequired: false};
     expect(service.getDisplayName(input)).toBe("var");
+    input.value = [{kind:"Instance", value: "version", valueType: "string", idShort:	"metaDisplayName"}]
+    expect(service.getDisplayName(input)).toBe("version");
     input.displayName = "dName";
     expect(service.getDisplayName(input)).toBe("dName");
   });

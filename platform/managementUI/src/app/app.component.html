@@ -21,9 +21,20 @@
 
 
 <nav mat-tab-nav-bar class="mainMenu">
-  <a mat-tab-link [routerLink]="'resources'"> resources </a>
-  <a mat-tab-link [routerLink]="'list'"> configuration </a>
-  <a mat-tab-link [routerLink]="'services'"> runtime </a>
+  <a mat-tab-link [routerLink]="'resources'"> Resources </a>
+  <a mat-tab-link [routerLink]="'list'"> 
+    Configuration (
+      <span>
+        <mat-checkbox
+          [(ngModel)]="configExpertMode.expertMode"
+          (change)="onExpertModeChange($event.checked)"
+          (click)="$event.stopPropagation()">
+        </mat-checkbox>
+        Expert Mode
+      </span>
+    )
+  </a>
+  <a mat-tab-link [routerLink]="'services'"> Runtime </a>
   <a mat-tab-link (click)="logout($event)" *ngIf="showLogout()"> logout </a>
 </nav>
 

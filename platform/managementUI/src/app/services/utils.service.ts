@@ -100,7 +100,13 @@ export class Utils {
     let result = input.name;
     if (input.displayName) {
       result = input.displayName;
+    } else {
+      const metaDisplayName = DataUtils.getProperty(input.meta?.value, "metaDisplayName") ?? DataUtils.getProperty(input.value, "metaDisplayName")
+      if (metaDisplayName) {
+        result = metaDisplayName.value;
+      }
     }
+
     if (input.isRequired) {
       result = result + " *";
     }
