@@ -682,7 +682,9 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             try {
                 LoaderIndex idx = new LoaderIndex();
                 for (JarLocation loc: locs) {
-                    LoaderIndex.addToIndex(idx, loc.toFile(), loc.actual);
+                    // handle exceptions tolerantly, sometimes class files are listed but not present/needed
+                    LoaderIndex.addToIndex(idx, loc.toFile(), loc.actual, 
+                        ex -> getLog().warn(ex.getClass().getSimpleName() + " " + ex.getMessage()));
                 }
                 LoaderIndex.toFile(idx, index);
                 getLog().info("Stored class index to " + index + " " + idx.getClassesCount() + " classes and " 
