@@ -84,6 +84,12 @@ Please note that several Python models exceed the permitted file size of github,
   * For pushing (after a git commit/push), an additional command is needed, e.g. ``git lfs push origin main --all``. If it hangs, restart the command. 
   * Receiving files requires ``git lfs pull``.
 
+## Git Longpaths (Windows)
+
+On Windows, dependent on your version of git, it might be necessary to enable `longpaths` using
+
+`git config --system core.longpaths true`
+
 ## Git Authentication
 
 Git does not allow for username/password commits anymore. Please create an auth token and use that as password.
