@@ -121,6 +121,7 @@
               <failOnError>false</failOnError>
               <detectJavaApiLink>false</detectJavaApiLink> 
               <detectOfflineLinks>false</detectOfflineLinks>
+              <doclint>all,-missing</doclint>
             </configuration>
             <executions>
               <execution>

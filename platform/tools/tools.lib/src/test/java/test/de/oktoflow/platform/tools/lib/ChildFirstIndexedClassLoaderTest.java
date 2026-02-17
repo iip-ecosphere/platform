@@ -49,6 +49,14 @@ public class ChildFirstIndexedClassLoaderTest {
         LoaderIndex.addToIndex(index, false, resName, location);
         LoaderIndex.toFile(index, indexFile);
         System.out.println("index.idx written");
+        
+        Assert.assertTrue(index.getClassesCount() > 0);
+        Assert.assertTrue(index.getResourcesCount() > 0);
+        Assert.assertTrue(index.getLocationsCount() > 0);
+        Assert.assertNotNull(index.getClassLocation(clsName));
+        Assert.assertNull(index.getClassLocation("abc"));
+        Assert.assertNotNull(index.getResourceLocations(resName));
+        Assert.assertNull(index.getResourceLocations("abc"));
 
         ChildFirstIndexedClassloader loader = new ChildFirstIndexedClassloader(indexFile, null);
         Class<?> cls = loader.loadClass(clsName);
@@ -57,6 +65,7 @@ public class ChildFirstIndexedClassLoaderTest {
         Assert.assertNotNull(loader.findResource(resName));
         Assert.assertNotNull(loader.getResource(resName));
         Assert.assertNotNull(loader.getResourceAsStream(resName));
+        loader.close();
     }
     
 }

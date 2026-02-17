@@ -16,22 +16,34 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 /**
- * A priority (child first) class loader that takes its indexing from an index file.
+ * A priority (child first) class loader that takes its indexing from an index file. Requires first running 
+ * {@link LoaderIndex#createIndex(List)} on the Jars to load and then feeding this class loader with the index file. We 
+ * inherit from {@link URLClassLoader} and override {@link #getURLs()} so that frameworks like 
+ * <a href="https://github.com/classgraph/classgraph">ClassGraph</a> take a (transparent) notice of this class loader.
+ * 
  * 
  * @author ChatGPT
  * @author Holger Eichelberger, SSE
  */
-public class ChildFirstIndexedClassloader extends ClassLoader {
+public class ChildFirstIndexedClassloader extends URLClassLoader {
     
+    private static final String CLASS_SUFFIX = ".class";
+    private final List<String> files;
     private final Map<String, String> locationIndex;
     private final Map<String, String> classIndex;
     private final Map<String, String> resourceIndex;
@@ -40,38 +52,43 @@ public class ChildFirstIndexedClassloader extends ClassLoader {
     static {
         registerAsParallelCapable();
     }
-    
-    /**
-     * Creates an indexed classloader.
-     * 
-     * @param classIndex the class index (class-to-jar mapping)
-     * @param resourceIndex the resource index (class-to-jar mapping)
-     * @param parent the parent class loader
-     */
-    public ChildFirstIndexedClassloader(Map<String, String> locationIndex, Map<String, String> classIndex,
-        Map<String, String> resourceIndex, ClassLoader parent) {
-        super(parent);
-        this.locationIndex = locationIndex;
-        this.classIndex = classIndex;
-        this.resourceIndex = resourceIndex;
-    }
 
     /**
      * Creates an indexed classloader.
      * 
-     * @param index the 
+     * @param index the index instance
+     * @param parent the parent class loader for delegation
      */
     public ChildFirstIndexedClassloader(LoaderIndex index, ClassLoader parent) {
-        this(index.getLocationIndex(), index.getClassIndex(), index.getResourceIndex(), parent);
+        super(new URL[0], parent);
+        this.files = index.getFilesList();
+        this.locationIndex = index.getLocationIndex();
+        this.classIndex = index.getClassIndex();
+        this.resourceIndex = index.getResourceIndex();
     }
 
     /**
      * Creates an indexed classloader.
      * 
-     * @param index the 
+     * @param index the index file
+     * @param parent the parent class loader for delegation
+     * @throws IOException if loading the index fails
      */
     public ChildFirstIndexedClassloader(File index, ClassLoader parent) throws IOException {
         this(LoaderIndex.fromFile(index), parent);
+    }
+
+    @Override
+    public URL[] getURLs() { // for ClassGraph
+        URL[] result = new URL[files.size()];
+        for (int f = 0; f < files.size(); f++) {
+            try {
+                result[f] = new File(files.get(f)).toURI().toURL();
+            } catch (MalformedURLException e) {
+                System.err.println("Cannot turn file " + files.get(f) + " to URL: " + e.getMessage());
+            }
+        }
+        return result;
     }
 
     @Override
@@ -84,7 +101,7 @@ public class ChildFirstIndexedClassloader extends ClassLoader {
         Path jarPath = Paths.get(jarPathStr);
         try {
             JarFile jar = jarCache.computeIfAbsent(jarPath, this::openJar);
-            String entryName = name.replace('.', '/') + ".class";
+            String entryName = name.replace('.', '/') + CLASS_SUFFIX;
             JarEntry entry = jar.getJarEntry(entryName);
             if (null == entry) {
                 throw new ClassNotFoundException(name);
@@ -118,10 +135,11 @@ public class ChildFirstIndexedClassloader extends ClassLoader {
 
     @Override
     public URL findResource(String name) {
-        String locStr = resourceIndex.get(name);
+        String locStr = getResourceLocation(name);
         if (null == locStr) {
             return null;
         }
+        locStr = locStr.split(LoaderIndex.RESOURCE_SEPARATOR)[0]; // only the first one here
         String jarPathStr = locationIndex.get(locStr);
         Path jarPath = Paths.get(jarPathStr);
         try {
@@ -130,7 +148,7 @@ public class ChildFirstIndexedClassloader extends ClassLoader {
             if (null == entry) {
                 return null;
             }
-            return new URL("jar:file:" + jarPath.toAbsolutePath() + "!/" + name);
+            return constructJarFileUrl(jarPath.toAbsolutePath(), name);
         } catch (IllegalArgumentException | IOException e) {
             return null;
         }
@@ -147,6 +165,58 @@ public class ChildFirstIndexedClassloader extends ClassLoader {
         } catch (IOException e) {
             return null;
         }
+    }
+    
+    /**
+     * Obtains the resource location, alternatively taking class file names as resources.
+     * 
+     * @param name the resource/class name
+     * @return the resource location(s), may be separated by {@link LoaderIndex#RESOURCE_SEPARATOR}
+     */
+    private String getResourceLocation(String name) {
+        String locStr = resourceIndex.get(name);
+        if (null == locStr && name.endsWith(CLASS_SUFFIX)) {
+            name = name.substring(0, name.length() - CLASS_SUFFIX.length()).replace('/', '.');
+            locStr = classIndex.get(name);
+        }    
+        return locStr;
+    }
+
+    @Override
+    public Enumeration<URL> findResources(String name) throws IOException {
+        String locStr = getResourceLocation(name);
+        if (null == locStr) {
+            return null;
+        }
+        String[] locStrs = locStr.split(LoaderIndex.RESOURCE_SEPARATOR);
+        List<URL> result = new ArrayList<URL>();
+        for (int l = 0; l < locStrs.length; l++) {
+            String jarPathStr = locationIndex.get(locStrs[l]);
+            Path jarPath = Paths.get(jarPathStr);
+            try {
+                JarFile jar = jarCache.computeIfAbsent(jarPath, this::openJar);
+                JarEntry entry = jar.getJarEntry(name);
+                if (null == entry) {
+                    return null;
+                }
+                result.add(constructJarFileUrl(jarPath.toAbsolutePath(), name));
+            } catch (IllegalArgumentException | IOException e) {
+                return Collections.emptyEnumeration();
+            }
+        }
+        return Collections.enumeration(result);
+    }
+    
+    /**
+     * Constructs a Jar-file URL.
+     * 
+     * @param path the path to the jar file
+     * @param entry the path within the Jar file to the JarEntry
+     * @return the URL
+     * @throws MalformedURLException if the URL cannot be constructed
+     */
+    private static URL constructJarFileUrl(Path path, String entry) throws MalformedURLException {
+        return new URL("jar:file:" + LoaderIndex.normalize(path) + "!/" + entry);
     }
 
     /**
