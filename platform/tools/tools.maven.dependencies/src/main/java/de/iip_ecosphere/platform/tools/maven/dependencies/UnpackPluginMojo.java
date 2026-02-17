@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -649,7 +650,8 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                         if (relocate) {
                             locs.addAll(processCpLineRelocation(cpFile, mode, out, tokenizer, prefix, relocateTarget));
                         } else {
-                            locs.addAll(processCpLineNoRelocation(cpFile, mode, line, out, tokenizer, prefix));
+                            locs.addAll(processCpLineNoRelocation(cpFile, mode, line, out, tokenizer, prefix, 
+                                tgt.getParentFile()));
                         }
                         out.println();
                     } 
@@ -681,15 +683,22 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             File index = new File(cpFile.toString() + ".idx");
             try {
                 LoaderIndex idx = new LoaderIndex();
+                AtomicInteger exceptionCount = new AtomicInteger();
                 for (JarLocation loc: locs) {
                     // handle exceptions tolerantly, sometimes class files are listed but not present/needed
                     LoaderIndex.addToIndex(idx, loc.toFile(), loc.actual, 
-                        ex -> getLog().warn(ex.getClass().getSimpleName() + " " + ex.getMessage()));
+                        ex -> {
+                            exceptionCount.incrementAndGet();
+                            getLog().warn(ex.getClass().getSimpleName() + " " + ex.getMessage());
+                        });
                 }
-                LoaderIndex.toFile(idx, index);
-                getLog().info("Stored class index to " + index + " " + idx.getClassesCount() + " classes and " 
-                    + idx.getResourcesCount() + " resources in " + idx.getLocationsCount() + " locations in " 
-                    + (System.currentTimeMillis() - start) + " ms");
+                if (exceptionCount.get() < locs.size() // not only exceptions, we found classes or resources
+                    && idx.getClassesCount() + idx.getResourcesCount() > 0) { // resort to usual classloader
+                    LoaderIndex.toFile(idx, index);
+                    getLog().info("Stored class index to " + index + " " + idx.getClassesCount() + " classes and " 
+                        + idx.getResourcesCount() + " resources in " + idx.getLocationsCount() + " locations in " 
+                        + (System.currentTimeMillis() - start) + " ms");
+                }
             } catch (IOException e) {
                 getLog().error("Cannot write index file " + index + ": " + e.getClass().getSimpleName() 
                     + " " + e.getMessage());
@@ -808,7 +817,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
      * @return list of paths of actual classpath entries
      */
     private List<JarLocation> processCpLineNoRelocation(String name, String mode, String line, PrintStream out, 
-        Tokenizer tokenizer, String prefix) {
+        Tokenizer tokenizer, String prefix, File jarFolder) {
         List<JarLocation> result = new ArrayList<>();
         List<String> tokens = new ArrayList<>();
         Set<String> knownTokens = new HashSet<>();
@@ -831,12 +840,12 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                 name = name.substring(0, pos);
             }
             for (String tok : tokens) {
-                result.add(new JarLocation(tok));
+                result.add(new JarLocation(jarFolder + "/" + tok, tok));
             }
             handleAppends(name, knownTokens, cp -> {
                 out.print(tokenizer.sep);
                 out.print(cp);
-                result.add(new JarLocation(cp));
+                result.add(new JarLocation(jarFolder + "/" + cp, cp)); // ??
             });
         }
         return result;
