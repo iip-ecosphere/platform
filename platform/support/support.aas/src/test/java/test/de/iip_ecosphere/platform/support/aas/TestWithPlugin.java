@@ -49,7 +49,7 @@ public class TestWithPlugin extends test.de.iip_ecosphere.platform.support.TestW
      */
     public static void setupAASPlugins() {
         addPluginLocation("support", "support.aas.basyx2", "support.log-slf4j-simple");
-        addPluginLocation("support", "support.aas.basyx2.server", "support.log-slf4j-simple");
+        addPluginLocation("support/support.aas.basyx2", "support.aas.basyx2.server", "support.log-slf4j-simple");
         addPluginLocation("support", "support.aas.basyx", "support.log-slf4j-simple");
         addRunAfterLoading(() -> {
             // TODO default from AASFactory
