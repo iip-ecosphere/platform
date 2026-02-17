@@ -15,6 +15,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -39,11 +40,13 @@ public class LoaderIndex implements Serializable {
      * Updates the {@link #files} list in the specified sequence of {@code jars}.
      *
      * @param jars list of jar files
+     * @param consumer optional exception consumer to tolerantly handle IO exceptions, exceptions are thrown if 
+     *     <b>null</b>
      * @return plugin index
      * @throws IOException if adding files fails
      */
-    public static LoaderIndex createIndex(List<Path> jars) throws IOException {
-        return addToIndex(new LoaderIndex(), jars);
+    public static LoaderIndex createIndex(List<Path> jars, Consumer<IOException> consumer) throws IOException {
+        return addToIndex(new LoaderIndex(), jars, consumer);
     }
 
     /**
@@ -52,12 +55,15 @@ public class LoaderIndex implements Serializable {
      *
      * @param index the index to add the information to 
      * @param jars list of jar files
+     * @param consumer optional exception consumer to tolerantly handle IO exceptions, exceptions are thrown if 
+     *     <b>null</b>
      * @return {@code index}
      * @throws IOException if adding files fails
      */
-    public static LoaderIndex addToIndex(LoaderIndex index, List<Path> jars) throws IOException {
+    public static LoaderIndex addToIndex(LoaderIndex index, List<Path> jars, Consumer<IOException> consumer) 
+        throws IOException {
         for (Path jarPath : jars) {
-            addToIndex(index, jarPath.toFile(), null);
+            addToIndex(index, jarPath.toFile(), null, consumer);
         }
         return index;
     }
@@ -70,9 +76,12 @@ public class LoaderIndex implements Serializable {
      * @param jarFile the jarFile to index
      * @param location optional actual location of {@code jarFile}, e.g., for relocation; if <b>null</b> or empty, 
      *   use the relative path of {@code jarFile} instead
+     * @param consumer optional exception consumer to tolerantly handle IO exceptions, exceptions are thrown if 
+     *     <b>null</b>
      * @throws IOException if {@code jarFile} cannot be opened
      */
-    public static void addToIndex(LoaderIndex index, File jarFile, String location) throws IOException {
+    public static void addToIndex(LoaderIndex index, File jarFile, String location, Consumer<IOException> consumer) 
+        throws IOException {
         if (null == location || location.length() == 0) {
             location = jarFile.toString();
         }
@@ -95,6 +104,12 @@ public class LoaderIndex implements Serializable {
                 }
             }
             index.files.add(jarFile.toString());
+        } catch (IOException e) {
+            if (null == consumer) {
+                throw e;
+            } else {
+                consumer.accept(e);
+            }
         }
     }
     
@@ -335,7 +350,7 @@ public class LoaderIndex implements Serializable {
     }
     
     /**
-     * Returns the files that were used to construct this index via {@link #createIndex(List)}.
+     * Returns the files that were used to construct this index via {@link #createIndex(List, Consumer)}.
      * 
      * @return the files, in the actual construction/classpath sequence
      */
@@ -344,7 +359,7 @@ public class LoaderIndex implements Serializable {
     }
     
     /**
-     * Returns the files that were used to construct this index via {@link #createIndex(List)}.
+     * Returns the files that were used to construct this index via {@link #createIndex(List, Consumer)}.
      * 
      * @return the files, in the actual construction/classpath sequence
      */

@@ -32,7 +32,8 @@ import java.util.jar.JarFile;
 
 /**
  * A priority (child first) class loader that takes its indexing from an index file. Requires first running 
- * {@link LoaderIndex#createIndex(List)} on the Jars to load and then feeding this class loader with the index file. We 
+ * {@link LoaderIndex#createIndex(List, java.util.function.Consumer)} on the Jars to load and then feeding this class 
+ * loader with the index file. We 
  * inherit from {@link URLClassLoader} and override {@link #getURLs()} so that frameworks like 
  * <a href="https://github.com/classgraph/classgraph">ClassGraph</a> take a (transparent) notice of this class loader.
  * 
