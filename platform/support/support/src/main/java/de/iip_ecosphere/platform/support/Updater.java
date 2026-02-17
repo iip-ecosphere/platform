@@ -154,7 +154,9 @@ public class Updater {
                         }
                     }
                     if (!jarPaths.isEmpty()) {
-                        LoaderIndex.toFile(LoaderIndex.createIndex(extractedJars), indexFile);
+                        LoaderIndex.toFile(LoaderIndex.createIndex(extractedJars, 
+                            ex -> LoggerFactory.getLogger(Updater.class).warn("While indexing: {} {}", 
+                                ex.getClass().getSimpleName(), ex.getMessage())), indexFile);
                     }
                 } catch (IOException e) {
                     LoggerFactory.getLogger(Updater.class).warn(
