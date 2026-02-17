@@ -69,7 +69,7 @@ jobs:
           mkdir -p ../../gen/target/easy
           mkdir -p ../../gen/target/template
           cp -r target/easy/* ../../gen/target/easy/
-          cp target/template/TechnicalSetup.ivml ../../gen/target/template/
+          cp target/template/* ../../gen/target/template/
       - name: Get pre-packaged EASy-Producer
         uses: wei/wget@v1
         with:
