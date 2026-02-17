@@ -10,7 +10,8 @@ Asset Administration Shell (AAS) abstraction based on [Eclipse BaSyx v2](https:/
 - Supported identifier translation: ``urn:`` with URN syntax, ``urnText:`` arbitrary text to be used as raw URN, 
 - Optional TLS for AAS can be setup through keystores. The AAS servers require a certificate with alias "tomcat", also for asset implementations.
 
-This package is mainly intended to represent in particular the client side of an AAS (which may imply a local server) as well as in-memory sever instances.
+This package is mainly intended to represent in particular the client side of an AAS (which may imply a local server) as well as in-memory sever instances. 
+Asset server instances now rely on the platform's rest plugin, e.g., `support.rest-spark`. Please ensure that the plugin is available.
 
 **Missing**
 - Various AAS concepts (incremental addition as needed by the platform)

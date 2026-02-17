@@ -60,6 +60,9 @@
                                    <append>support.log-slf4j-simple</append>
                                 </appends>
                             </plugin>
+                            <plugin>
+                                <artifactId>support.rest-spark</artifactId>
+                            </plugin>
                         </plugins>
                         <version>${iip.version}</version>
                     </configuration>
@@ -116,6 +119,12 @@
     </dependency>
     <dependency>
       <artifactId>support.json-jackson</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <artifactId>support.rest-spark</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <scope>test</scope>
       <version>${project.version}</version>

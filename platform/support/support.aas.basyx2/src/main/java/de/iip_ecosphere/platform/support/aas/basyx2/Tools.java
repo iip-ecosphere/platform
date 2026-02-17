@@ -80,7 +80,9 @@ public class Tools {
     private static final Function<Object, String> DFLT_OBJECT2BASXY = o -> null != o ? o.toString() : null;
     private static final Function<String, Object> DFLT_BASYX2OBJECT = o -> o;
     private static final Function<Object, String> DFLT_INT2BASXY = o -> DatatypeConverter.printInt((Integer) o);
+    private static final Function<Object, String> DFLT_LONG2BASXY = o -> DatatypeConverter.printLong((Long) o);
     private static final Function<String, Object> DFLT_BASYX2INT = s -> DatatypeConverter.parseInt(s);
+    private static final Function<String, Object> DFLT_BASYX2LONG = s -> DatatypeConverter.parseLong(s);
     private static final Function<Object, String> DFLT_INTEGER2BASXY 
         = o -> DatatypeConverter.printInteger((BigInteger) o);
     private static final Function<String, Object> DFLT_BASYX2INTEGER = s -> DatatypeConverter.parseInteger(s);
@@ -106,7 +108,7 @@ public class Tools {
         mapType(Type.INT8, DataTypeDefXsd.INT, DFLT_INT2BASXY, DFLT_BASYX2INT);
         mapType(Type.INT16, DataTypeDefXsd.INT, DFLT_INT2BASXY, DFLT_BASYX2INT);
         mapType(Type.INT32, DataTypeDefXsd.INT, DFLT_INT2BASXY, DFLT_BASYX2INT);
-        mapType(Type.INT64, DataTypeDefXsd.INT, DFLT_INT2BASXY, DFLT_BASYX2INT);
+        mapType(Type.INT64, DataTypeDefXsd.LONG, DFLT_LONG2BASXY, DFLT_BASYX2LONG);
         
         mapType(Type.UINT8, DataTypeDefXsd.UNSIGNED_INT, DFLT_INT2BASXY, DFLT_BASYX2INT);
         mapType(Type.UINT16, DataTypeDefXsd.UNSIGNED_INT, DFLT_INT2BASXY, DFLT_BASYX2INT);
