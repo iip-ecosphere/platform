@@ -10,7 +10,7 @@
 	    <maven pomFile="support.aas.basyx2.common/pom.xml" goal="deploy"/>
 	    <maven pomFile="support.aas.basyx2.server/pom.xml" goal="deploy"/>
 	    <maven pomFile="pom.xml" goal="deploy"/>
-        <!--<maven pomFile="support.aas.basyx2.plugintests/pom.xml" goal="install"/>-->
+        <maven pomFile="support.aas.basyx2.plugintests/pom.xml" goal="install"/>
 		<delete dir="tomcat.8080"/>
 		<delete dir="support.aas.basyx2.server/tomcat.8080"/>
 	</target>

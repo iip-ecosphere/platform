@@ -23,9 +23,9 @@ import test.de.iip_ecosphere.platform.support.aas.TechnicalDataSubmodelTest;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     ToolTests.class,
-    BaSyxTest.class,
+    //BaSyxTest.class, // -> plugintest
     BaSyxPersistenceTest.class,
-    BaSyxDeploymentTest.class,
+    //BaSyxDeploymentTest.class, // -> plugintest
     BaSyxCodecTest.class,
     TechnicalDataSubmodelTest.class,
     

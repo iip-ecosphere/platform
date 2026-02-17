@@ -14,24 +14,19 @@
   
   <properties>
     <basyx.version>2.0.0-milestone-05</basyx.version>
+    <aas4j.version>1.0.4</aas4j.version>
   </properties>
   
-  <dependencyManagement>
-     <dependencies>
-       <dependency>
-         <groupId>org.springframework.boot</groupId>
-         <artifactId>spring-boot-starter-parent</artifactId>
-         <version>3.4.3</version> <!-- sync version with BaSyX! -->
-         <type>pom</type>
-         <scope>import</scope>
-       </dependency>
-     </dependencies>
-  </dependencyManagement>
   
   <dependencies>
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>support.aas</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>support.aas.basyx2.common</artifactId>
      <version>${project.version}</version>
     </dependency>
       <dependency>
@@ -49,200 +44,84 @@
         <artifactId>jackson-databind</artifactId>
         <version>2.18.2</version>
       </dependency>
-      <dependency>
-        <groupId>org.yaml</groupId>
-        <artifactId>snakeyaml</artifactId>
-        <version>2.3</version>
-      </dependency>
-    <dependency>
-      <groupId>io.micrometer</groupId>
-      <artifactId>micrometer-core</artifactId>
-      <version>1.14.4</version>
-    </dependency>
+      
       <dependency>
         <groupId>jakarta.xml.bind</groupId>
+        <version>3.0.1</version>
         <artifactId>jakarta.xml.bind-api</artifactId>
-      </dependency>
-      <dependency>
-        <groupId>io.swagger.core.v3</groupId>
-        <artifactId>swagger-core-jakarta</artifactId>
-        <version>2.2.22</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.integration</groupId>
-        <artifactId>spring-integration-file</artifactId>
-        <version>6.4.2</version>
       </dependency>      
-<!--      <dependency>
+          
+      <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>1.5.16</version>
+        <version>1.4.11</version>
       </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-core</artifactId>
-        <version>1.5.16</version>
-      </dependency>-->
+        <version>1.4.11</version>
+      </dependency>
       
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.aasservice-core</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.aasservice-backend-inmemory</artifactId>
-        <version>${basyx.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.aasenvironment-core</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.aasxfileserver-core</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.filerepository-backend-inmemory</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.aasdiscoveryservice-core</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.http</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.authorization</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.aasrepository-core</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>
-    <dependency>
-       <groupId>org.eclipse.digitaltwin.basyx</groupId>
-       <artifactId>basyx.aasrepository-backend-inmemory</artifactId>
-       <version>${basyx.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.submodelservice-core</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.submodelrepository-backend-inmemory</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>   
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.submodelservice-backend-inmemory</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.submodelrepository-core</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.aasregistry-service-basemodel</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>    
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.aasregistry-service</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.aasregistry-service-inmemory-storage</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.backend.inmemory.core</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.submodelregistry-service</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.submodelregistry-service-basemodel</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>    
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.submodelregistry-service-inmemory-storage</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>    
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.filerepository-backend</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.aasenvironment-client</artifactId>
-        <version>${basyx.version}</version>
-    </dependency>
     <dependency>
         <groupId>org.eclipse.digitaltwin.basyx</groupId>
         <artifactId>basyx.aasrepository-client</artifactId>
         <version>${basyx.version}</version>
-    </dependency>
-    
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-actuator</artifactId>
-    </dependency>
-
-
-    <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-jdbc</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-web</artifactId>
+        <exclusions>
+            <exclusion>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-tomcat</artifactId>
+            </exclusion>
+            <exclusion>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-el</artifactId>
+            </exclusion>
+            <exclusion>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            </exclusion>
+        </exclusions>
     </dependency>
 
-    
     <dependency>
-        <groupId>org.springdoc</groupId>
-        <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-        <version>2.6.0</version>
-        <scope>provided</scope>
+        <groupId>org.eclipse.digitaltwin.basyx</groupId>
+        <artifactId>basyx.aasregistry-client-native</artifactId>
+        <version>${basyx.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.eclipse.digitaltwin.basyx</groupId>
+        <artifactId>basyx.submodelregistry-client-native</artifactId>
+        <version>${basyx.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.eclipse.digitaltwin.basyx</groupId>
+        <artifactId>basyx.submodelrepository-client</artifactId>
+        <version>${basyx.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.eclipse.digitaltwin.aas4j</groupId>
+        <artifactId>aas4j-dataformat-xml</artifactId>
+        <version>${aas4j.version}</version>
     </dependency>
     <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-test</artifactId>
-        <scope>test</scope>
+        <groupId>org.eclipse.digitaltwin.aas4j</groupId>
+        <artifactId>aas4j-dataformat-json</artifactId>
+        <version>${aas4j.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.eclipse.digitaltwin.aas4j</groupId>
+        <artifactId>aas4j-dataformat-aasx</artifactId>
+        <version>${aas4j.version}</version>
     </dependency>
     
+    
+    <!-- basyx.aasdiscoveryservice-client -->
+    <!-- basyx.aasservice-client -->
+    <!-- basyx.submodelservice-client -->
+    <!-- basyx.aasrepository-client-->
+    <!-- basyx.aasenvironment-client (many dependencies) -->
     
     <dependency>
          <groupId>com.google.guava</groupId>
@@ -259,11 +138,6 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-core</artifactId>
-        <scope>test</scope>
     </dependency>
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
@@ -317,6 +191,9 @@
                             <plugin>
                                 <artifactId>support.rest-spark</artifactId>
                             </plugin>
+                            <plugin>
+                                <artifactId>support.aas.basyx2.server</artifactId>
+                            </plugin>
                         </plugins>
                         <version>${iip.version}</version>
                     </configuration>
@@ -342,6 +219,38 @@
                          <goal>assemble-plugin</goal>
                      </goals>
                  </execution>
+                 
+                 <execution>
+                     <id>copy-dependencies-test</id>
+                     <goals>
+                         <goal>copy-plugin-dependencies</goal>
+                     </goals>
+                     <phase>package</phase>
+                     <configuration>
+                       <asTest>true</asTest>
+                     </configuration>
+                 </execution>
+                 <execution>
+                     <id>build-classpath-plugin-test</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>build-plugin-classpath</goal>
+                     </goals>
+                     <configuration>
+                       <asTest>true</asTest>
+                     </configuration>
+                 </execution>
+                 <execution>
+                     <id>assemble-test</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>assemble-plugin</goal>
+                     </goals>
+                     <configuration>
+                       <asTest>true</asTest>
+                     </configuration>
+                 </execution>
+                 
              </executions>
          </plugin>
         <plugin>

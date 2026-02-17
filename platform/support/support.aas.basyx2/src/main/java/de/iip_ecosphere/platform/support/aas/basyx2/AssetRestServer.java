@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.support.aas.basyx2.apps.asset;
+package de.iip_ecosphere.platform.support.aas.basyx2;
 
 import java.util.Arrays;
 import java.util.Base64;
@@ -19,10 +19,12 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.OperationVariable;
+import org.eclipse.digitaltwin.aas4j.v3.model.Property;
+import org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElement;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultOperationVariable;
+import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultProperty;
 import org.eclipse.digitaltwin.basyx.http.Aas4JHTTPSerializationExtension;
 import org.eclipse.digitaltwin.basyx.http.BaSyxHTTPConfiguration;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,7 +34,6 @@ import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.IdentityTokenWithRole;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.ComponentSetup;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.State;
-import de.iip_ecosphere.platform.support.aas.basyx2.AasOperationsProvider;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 import de.iip_ecosphere.platform.support.rest.Rest;
@@ -123,7 +124,7 @@ public class AssetRestServer implements Server {
             String info = req.getParam("Authorization");
             if (null == info) {
                 if (!auth.requiresAnonymousAccess()) {
-                    server.halt(HttpStatus.FORBIDDEN.value(), "Anonymous access not permitted.");
+                    server.halt(HttpStat.FORBIDDEN.value(), "Anonymous access not permitted.");
                 }
             } else {
                 if (info.startsWith(PREFIX_AUTH_BASIC)) {
@@ -134,7 +135,7 @@ public class AssetRestServer implements Server {
                         String pwd = cred.substring(pos + 1);
                         IdentityTokenWithRole token = users.get(userName);
                         if (null == token || !token.getTokenDataAsString().equals(pwd)) {
-                            server.halt(HttpStatus.FORBIDDEN.value(), "Unknown user/password.");
+                            server.halt(HttpStat.FORBIDDEN.value(), "Unknown user/password.");
                         }
                     }
                 } else if (info.startsWith(PREFIX_AUTH_BEARER)) {
@@ -162,18 +163,142 @@ public class AssetRestServer implements Server {
         }
         res.setApplicationJsonType();
         if (null == op) {
-            return createErrorObject(req, res, HttpStatus.FORBIDDEN, "Forbidden");
+            return createErrorObject(req, res, HttpStat.FORBIDDEN, "Forbidden");
         } else {
             try {
                 OperationVariable[] args = mapper.readValue(req.getBody(), OperationVariable[].class);
-                ResponseEntity<OperationVariable[]> result = AssetSpringApp.invokeOperation(opName, args, op);
-                res.setStatus(result.getStatusCode().value());
+                ResponseEnt<OperationVariable[]> result = invokeOperation(opName, args, op);
+                res.setStatus(result.getStatus().value());
                 // handle error implicit?
                 return mapper.writeValueAsString(result.getBody());
             } catch (JsonProcessingException e) {
-                return createErrorObject(req, res, HttpStatus.INTERNAL_SERVER_ERROR, "Internal: " + e.getMessage());
+                return createErrorObject(req, res, HttpStat.INTERNAL_SERVER_ERROR, "Internal: " + e.getMessage());
             }
         }
+    }
+    
+    // checkstyle: stop exception type check
+
+    /**
+     * Executes a given function.
+     * 
+     * @param opName the operation name
+     * @param requestData the request data
+     * @param func the function, may be <b>null</b>
+     * @return the function execution result
+     */
+    static ResponseEnt<OperationVariable[]> invokeOperation(String opName, OperationVariable[] requestData, 
+        Function<Object[], Object> func) {
+        HttpStat responseStatus;
+        OperationVariable[] result = null;
+        
+        if (null != func) {
+            try {
+                Object[] params = new Object[requestData.length];
+                for (int r = 0; r < requestData.length; r++) {
+                    SubmodelElement re = requestData[r].getValue();
+                    if (re instanceof Property) {
+                        params[r] = ((Property) re).getValue();
+                    }
+                }
+                Object funcResult = func.apply(params);
+                result = new OperationVariable[1];
+                result[0] = new DefaultOperationVariable();
+                Property resultProperty = new DefaultProperty();
+                result[0].setValue(resultProperty);
+                resultProperty.setValue(null == funcResult ? null : funcResult.toString());
+                responseStatus = HttpStat.OK;
+            } catch (Throwable t) {
+                LoggerFactory.getLogger(AssetRestServer.class).error("Calling AAS operation '{}': {}", 
+                    opName, t.getMessage());
+                LoggerFactory.getLogger(AssetRestServer.class).error("Exception: " + t);
+                responseStatus = HttpStat.INTERNAL_SERVER_ERROR;
+            }
+        } else {
+            responseStatus = HttpStat.NOT_IMPLEMENTED;
+        }
+        return new ResponseEnt<OperationVariable[]>(result, responseStatus);        
+    }
+
+    // checkstyle: resume exception type check
+    
+    /**
+     * Represents selected HTTP status values.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private enum HttpStat {
+        
+        OK(200),
+        BAD_REQUEST(400),
+        UNAUTHORIZED(401),
+        FORBIDDEN(403),
+        NOT_FOUND(404),
+        INTERNAL_SERVER_ERROR(500),
+        NOT_IMPLEMENTED(501);
+        
+        private int value;
+        
+        /**
+         * Creates a constant.
+         * 
+         * @param value the status value
+         */
+        private HttpStat(int value) {
+            this.value = value;
+        }
+        
+        /**
+         * Returns the status value.
+         * 
+         * @return the value
+         */
+        public int value() {
+            return value;
+        }
+        
+    }
+
+    /**
+     * Represents a response entity.
+     * 
+     * @param <T> the body type
+     * @author Holger Eichelberger, SSE
+     */
+    private static class ResponseEnt<T> {
+        
+        private final HttpStat status;
+        private T body;
+
+        /**
+         * Creates a response entity instance.
+         * 
+         * @param body the body value
+         * @param status the status
+         */
+        private ResponseEnt(T body, HttpStat status) {
+            this.body = body;
+            this.status = status;
+        }
+        
+        /**
+         * Returns the HTTP status.
+         * 
+         * @return the HTTP status
+         */
+        private HttpStat getStatus() {
+            return status;
+        }
+
+        /**
+         * Returns the body value.
+         * 
+         * @return the body
+         */
+        private T getBody() {
+            return body;
+        }
+
     }
     
     /**
@@ -218,7 +343,7 @@ public class AssetRestServer implements Server {
      * @param error the error description
      * @return the error object as JSON string
      */
-    private String createErrorObject(Request req, Response res, HttpStatus status, String error) {
+    private String createErrorObject(Request req, Response res, HttpStat status, String error) {
         res.setStatus(status.value());
         String result = "{";
         result = appendValue("timestamp", System.currentTimeMillis(), result);

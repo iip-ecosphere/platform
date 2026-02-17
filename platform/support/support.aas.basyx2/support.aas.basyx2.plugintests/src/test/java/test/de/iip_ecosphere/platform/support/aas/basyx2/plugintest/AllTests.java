@@ -37,6 +37,7 @@ public class AllTests {
         addPluginLocation("support", "support.bytecode-bytebuddy");
         addPluginLocation("support", "support.json-jackson");
         addPluginLocation("support", "support.rest-spark");
+        addPluginLocation("support", "support.aas.basyx2");
         addPluginLocation("support/support.aas.basyx2", "support.aas.basyx2.server");
         loadPlugins();
     }

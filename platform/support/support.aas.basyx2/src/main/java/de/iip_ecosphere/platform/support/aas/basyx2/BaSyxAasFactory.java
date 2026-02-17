@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.support.aas.basyx2;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.basyx2.common.PluginId;
 
 /**
  * AAS factory for BaSyx. Do not rename, this class is referenced in {@code META-INF/services}.
@@ -21,7 +22,7 @@ import de.iip_ecosphere.platform.support.aas.AasFactory;
  */
 public class BaSyxAasFactory extends AbstractBaSyxAasFactory {
 
-    public static final String PLUGIN_ID = "aas.basyx-2.0";
+    public static final String PLUGIN_ID = PluginId.PLUGIN_ID;
     
     /**
      * Factory descriptor for Java Service Loader.
@@ -47,6 +48,11 @@ public class BaSyxAasFactory extends AbstractBaSyxAasFactory {
      */
     public BaSyxAasFactory() {
         registerPersistenceRecipe(new AasxPersistenceRecipe());
+    }
+    
+    @Override
+    public String getBasePluginId() {
+        return PLUGIN_ID;
     }
     
     @Override

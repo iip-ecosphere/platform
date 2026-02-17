@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.eclipse.digitaltwin.aas4j.v3.model.impl.DefaultSubmodel;
-import org.eclipse.digitaltwin.basyx.aasenvironment.IdShortPathBuilder;
 import org.eclipse.digitaltwin.basyx.client.internal.ApiException;
 import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistException;
 import org.eclipse.digitaltwin.basyx.submodelrepository.client.ConnectedSubmodelRepository;
@@ -33,6 +32,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx2.AbstractAas.BaSyxAbstractAasBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx2.BaSyxSubmodelElement.PathFunction;
+import de.iip_ecosphere.platform.support.aas.basyx2.basyx.IdShortPathBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementList.SubmodelElementListBuilder;

@@ -33,7 +33,6 @@ import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistExceptio
 import org.eclipse.digitaltwin.basyx.core.exceptions.NotInvokableException;
 import org.eclipse.digitaltwin.basyx.core.exceptions.OperationDelegationException;
 import org.eclipse.digitaltwin.basyx.submodelrepository.client.ConnectedSubmodelRepository;
-import org.eclipse.digitaltwin.basyx.submodelrepository.feature.operation.delegation.HTTPOperationDelegation;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
@@ -53,10 +52,13 @@ import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
  */
 public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
     
+    // taken over from HTTPOperationDelegation, dependency reduction
+    public static final String INVOCATION_DELEGATION_TYPE = "invocationDelegation";
+    
     public static final String INVOCATION_DELEGATION_SUBMODELID_TYPE 
-        = HTTPOperationDelegation.INVOCATION_DELEGATION_TYPE + "-submodelId";
+        = INVOCATION_DELEGATION_TYPE + "-submodelId";
     public static final String INVOCATION_DELEGATION_SUBMODELREGISTRYURL_TYPE 
-        = HTTPOperationDelegation.INVOCATION_DELEGATION_TYPE + "-submodelRegistryUrl";
+        = INVOCATION_DELEGATION_TYPE + "-submodelRegistryUrl";
     
     private org.eclipse.digitaltwin.aas4j.v3.model.Operation operation;
     
@@ -221,7 +223,7 @@ public class BaSyxOperation extends BaSyxSubmodelElement implements Operation {
                 String url = invocable.getUrl();
                 String submodelRepoUrl = invocable.getSubmodelRepositoryUrl();
                 if (null != url && null != submodelRepoUrl) {
-                    addInvocationQualifier(HTTPOperationDelegation.INVOCATION_DELEGATION_TYPE, url);
+                    addInvocationQualifier(INVOCATION_DELEGATION_TYPE, url);
                     final String submodelId = parentBuilder.getInstance().getIdentification();
                     if (null == submodelId || submodelId.isEmpty()) {
                         LoggerFactory.getLogger(this).warn("Operation execution of {} may fail as no submodelId is "

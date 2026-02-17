@@ -14,8 +14,7 @@ Basic functionality for the oktoflow platform in terms of:
   * [metrics plugin](support.metrics-micrometer/README.md)
   * [HTTP (client) plugin](support.http-apache/README.md)
   * Asset Administration Shell (AAS) [abstraction](support.aas/README.md) with visitor, communication protocol support and useful recipes for deployment and I/O
-  * [Default AAS client abstraction implementation](support.aas.basyx/README.md) for [Eclipse Basyx](https://www.eclipse.org/basyx/)
-  * [Default AAS server abstraction implementation](support.aas.basyx.server/README.md) for [Eclipse Basyx](https://www.eclipse.org/basyx/)
+  * [AAS client plugin implementation](support.aas.basyx/README.md) for [Eclipse Basyx 1.3.0](https://www.eclipse.org/basyx/)
   * [AAS client plugin](support.aas.basyx1_0/README.md) for [Eclipse Basyx 1.0.1](https://www.eclipse.org/basyx/), retrofitted alternative version as "extension" of [support.aas.basyx](support.aas.basyx/README.md)
   * [AAS client plugin](support.aas.basyx1_5/README.md) for [Eclipse Basyx 1.5.1](https://www.eclipse.org/basyx/), retrofitted alternative version as "extension" of [support.aas.basyx](support.aas.basyx/README.md)
   * [AAS client plugin](support.aas.basyx2/README.md) for [Eclipse Basyx 2](https://www.eclipse.org/basyx/)

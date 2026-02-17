@@ -12,21 +12,18 @@
 
 package test.de.iip_ecosphere.platform.support.aas.basyx2;
 
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.Endpoint;
-import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
-import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
-import de.iip_ecosphere.platform.support.aas.AasFactory;
-import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
-import de.iip_ecosphere.platform.support.aas.Invokable;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
+import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.Invokable;
+import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx2.BaSyxAasFactory;
-import de.iip_ecosphere.platform.support.aas.basyx2.BaSyxLocalServer;
 import de.iip_ecosphere.platform.support.aas.Type;
 import test.de.iip_ecosphere.platform.support.aas.AasTest;
 import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
@@ -52,6 +49,7 @@ public class BaSyxTest extends AasTest {
     @Override
     protected void setupPlugins() {
         TestWithPlugin.addPluginLocation("support", "support.rest-spark");
+        TestWithPlugin.addPluginLocation("support/support.aas.basyx2", "support.aas.basyx2.server");
         TestWithPlugin.loadPlugins();
     }
     
@@ -83,18 +81,16 @@ public class BaSyxTest extends AasTest {
     }
     
     /**
-     * Tests starting/stopping the BaSyx servers.
+     * Tests the persistence type translation.
      */
-    @Ignore("Just for development")
     @Test
-    public void testServers() {
-        BasicSetupSpec spec = new BasicSetupSpec(new Endpoint(Schema.HTTP, ""), new Endpoint(Schema.HTTP, ""), 
-            new Endpoint(Schema.HTTP, ""), new Endpoint(Schema.HTTP, ""));
-        BaSyxLocalServer server = new BaSyxLocalServer(spec, BaSyxLocalServer.ServerType.COMBINED, 
-            LocalPersistenceType.INMEMORY);
-        server.start();
-        TimeUtils.sleep(3000);
-        server.stop(false);
+    public void testPersistenceType() {
+        ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
+        Assert.assertEquals(LocalPersistenceType.INMEMORY, rcp.toPersistenceType("")); // fallback
+        Assert.assertEquals(LocalPersistenceType.INMEMORY, 
+            rcp.toPersistenceType(LocalPersistenceType.INMEMORY.name()));
+        Assert.assertEquals(LocalPersistenceType.INMEMORY, 
+            rcp.toPersistenceType(LocalPersistenceType.INMEMORY.name().toLowerCase()));
     }
 
 }

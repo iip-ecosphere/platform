@@ -21,8 +21,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.springframework.context.ConfigurableApplicationContext;
-
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.JsonPayloadCodec;
@@ -30,8 +28,6 @@ import de.iip_ecosphere.platform.support.aas.OperationsProvider;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
-import de.iip_ecosphere.platform.support.aas.basyx2.apps.asset.AssetRestServer;
-import de.iip_ecosphere.platform.support.aas.basyx2.apps.asset.AssetSpringApp;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
@@ -177,7 +173,6 @@ public class AasOperationsProvider extends HashMap<String, Object> implements Op
 
         private SetupSpec spec;
         private AasOperationsProvider instance;
-        private boolean forTomcat = false;
         
         /**
          * Creates a builder instance.
@@ -202,46 +197,13 @@ public class AasOperationsProvider extends HashMap<String, Object> implements Op
         }
 
         @Override
-        public ProtocolServerBuilder forTomcat() {
-            forTomcat = true;
+        public ProtocolServerBuilder forTomcat() { // TODO remove
             return this;
         }
         
         @Override
         public Server build() {
-            return forTomcat ? new AssetRestServer(instance, spec.getSetup(AasComponent.ASSET)) 
-                : createBaSyxTomcatServer();
-        }
-        
-        /**
-         * Creates a BaSyX-based Tomcat server instance as AAS asset server.
-         * 
-         * @return the server instance
-         */
-        private Server createBaSyxTomcatServer() {
-            return new Server() {
-
-                private ConfigurableApplicationContext ctx;
-                
-                @Override
-                public Server start() {
-                    int port = spec.getAssetServerAddress().getPort();
-                    if (BaSyxAbstractAasServer.shallStart(spec.getAssetServerState())) {
-                        System.out.println("Starting AAS-REST server (Tomcat) on " + port);
-                        ctx = BaSyxAbstractAasServer.createContext(AssetSpringApp.class, port, 
-                            BaSyxAbstractAasServer.createConfigurer(spec.getSetup(AasComponent.ASSET))
-                                .addBeanRegistrationInitializer(AasOperationsProvider.class, instance), 
-                            s -> spec.notifyAssetServerStateChange(s));
-                    }
-                    return this;
-                }
-
-                @Override
-                public void stop(boolean dispose) {
-                    BaSyxAbstractAasServer.close(ctx, s -> spec.notifyAssetServerStateChange(s));
-                }
-
-            };
+            return new AssetRestServer(instance, spec.getSetup(AasComponent.ASSET));
         }
 
         @Override
