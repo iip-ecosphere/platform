@@ -43,6 +43,7 @@ Services::PythonService::servicesPackageName = Name of the packages the service 
 Services::PythonService::condaEnv = Optional name of the conda environment. The conda command is either taken from the path or from specified installedDependencies.
 Services::PythonService::venvName = Optional name of the venv environment. The venv command is either taken from the path or from specified installedDependencies.
 Services::PythonService::pythonServiceKindOk = Currently the generation does not support Python Source Services.
+Services::PythonService::dependencies = Dependencies required by service.
 Services::Service::deployable = Can service be deployed to remote resources or must it be executed centrally.
 Services::Service::description = Description of service functionality.
 Services::Service::ver = Version of service (numbers separated by a dot).

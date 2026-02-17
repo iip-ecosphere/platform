@@ -4,6 +4,7 @@ project DataTypes {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
     //annotate Integer uiGroup = UiMandatoryGroup1 to .; // reasoner re-assignment issue
+    // then Field: display*, readOnly, nullable and semanticId as well as RecordType: refine and semanticId -> optional1
     
     NonEmptyString iipVer = "0.7.1-SNAPSHOT"; // Maven version of platform
     const String mvnIipGroup = "de.iip-ecosphere.platform";

@@ -53,8 +53,8 @@ project Applications {
         assign (displayName = "meshes") to {
             setOf(refTo(ServiceMesh)) services; // no services is ok, then the artifact must have hand-crafted services
         }
-        NameplateInfo nameplateInfo;
         assign (uiGroup = UiOptionalGroup1) to {
+            NameplateInfo nameplateInfo;
             Boolean createContainer = false;
             Boolean debug = false;
             Boolean withDocs = false;
