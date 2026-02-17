@@ -3,6 +3,7 @@ import { buildInformation } from 'src/interfaces';
 import { ApiService } from './services/api.service';
 import { EnvConfigService } from './services/env-config.service';
 import { UserService } from './services/user.service';
+import { ConfigExpertModeService } from './services/config-expert-mode.service';
 
 @Component({
     selector: 'app-root',
@@ -13,14 +14,13 @@ import { UserService } from './services/user.service';
 export class AppComponent implements OnInit{
   title = 'IIPES_Web';
 
-
   Data: buildInformation = {
     version: '',
     buildId: '',
     isRelease: undefined,
   };
 
-  constructor(private api: ApiService, private cfg: EnvConfigService, private user:UserService) {}
+  constructor(private api: ApiService, private cfg: EnvConfigService, private user:UserService, public configExpertMode: ConfigExpertModeService) {}
 
   async ngOnInit() {
     const response = await this.api.getPlatformData();
@@ -61,4 +61,8 @@ export class AppComponent implements OnInit{
     this.user.clear();
   }
 
+  onExpertModeChange(checked: boolean) {
+    this.configExpertMode.expertMode = checked;
+  }
+  
 }

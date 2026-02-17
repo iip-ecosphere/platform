@@ -23,6 +23,7 @@ import {MatListModule} from '@angular/material/list';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { ResourcesComponent } from './components/resources/resources.component';
 import { ContainersComponent } from './components/containers/containers.component';
@@ -98,6 +99,7 @@ import { LoginComponent } from './components/login/login.component';
         MatDividerModule,
         MatTooltipModule,
         MatDialogModule,
+        MatCheckboxModule,
         MatRadioModule], providers: [{
             provide: HTTP_INTERCEPTORS,
             useClass: Interceptor,

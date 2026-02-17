@@ -12,6 +12,7 @@ import { StatusCollectionService } from 'src/app/services/status-collection.serv
 import { chunkInput } from '../file-upload/file-upload.component';
 import { IvmlFormatterService } from 'src/app/components/services/ivml/ivml-formatter.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ConfigExpertModeService } from '../../services/config-expert-mode.service';
 
 /**
  * Information on a file being uploaded.
@@ -54,6 +55,8 @@ class RowEntry {
 export class ListComponent extends Utils implements OnInit {
   //currentTab: string | null = null;
   currentTab = "";
+  selectedTabIndex = 0;
+  currentExpertMode = false;
   rawData: any;
   filteredData: any;
   varValue = "varValue"
@@ -64,7 +67,6 @@ export class ListComponent extends Utils implements OnInit {
   private appFiles = new Map<string, FileUploadInfo>();
   meta: Resource | undefined;
   metaBackup: Resource | undefined;
-
   constructor(private router: Router,
     public http: HttpClient,
     public api: ApiService,
@@ -72,7 +74,8 @@ export class ListComponent extends Utils implements OnInit {
     public websocketService: WebsocketService,
     public collector: StatusCollectionService,
     private snackBar: MatSnackBar,
-    private ivmlFormatter: IvmlFormatterService) {
+    private ivmlFormatter: IvmlFormatterService, 
+    public configExpertMode: ConfigExpertModeService) {
     super();
     this.sub = websocketService.getMsgSubject().subscribe((value: any) => {
       collector.receiveStatus(JSON.parse(value))
@@ -82,7 +85,7 @@ export class ListComponent extends Utils implements OnInit {
   // Filter ---------------------------------------------------------------------
   // Information how the raw data for a given tab should be filtered:
   // with the metaProject or with a name of the submodelElement
-  tabsParam = [
+  exportTabsParam = [
     { tabName: "Setup", metaProject: "TechnicalSetup", submodelElement: null },
     { tabName: "Constants", metaProject: "AllConstants", submodelElement: null },
     { tabName: "Types", metaProject: "AllTypes", submodelElement: null },
@@ -90,6 +93,14 @@ export class ListComponent extends Utils implements OnInit {
     { tabName: "Nameplates", metaProject: null, submodelElement: "Manufacturer" },
     { tabName: "Services", metaProject: null, submodelElement: "ServiceBase" },
     { tabName: "Servers", metaProject: null, submodelElement: "Server" },
+    { tabName: "Meshes", metaProject: null, submodelElement: "ServiceMesh" },
+    { tabName: "Applications", metaProject: null, submodelElement: "Application" }
+  ]
+
+  normalTabsParam = [
+    { tabName: "Constants", metaProject: "AllConstants", submodelElement: null },
+    { tabName: "Types", metaProject: "AllTypes", submodelElement: null },
+    { tabName: "Services", metaProject: null, submodelElement: "ServiceBase" },
     { tabName: "Meshes", metaProject: null, submodelElement: "ServiceMesh" },
     { tabName: "Applications", metaProject: null, submodelElement: "Application" }
   ]
@@ -117,11 +128,28 @@ export class ListComponent extends Utils implements OnInit {
     this.populateMeta();
   }
 
+  ngDoCheck() {
+    if (this.currentExpertMode !== this.configExpertMode.expertMode) {
+      if (this.configExpertMode.expertMode) {
+        this.selectedTabIndex = this.exportTabsParam.findIndex(tab => tab.tabName === this.currentTab);
+        //this.currentTab = 'Setup';
+      } else {
+        this.selectedTabIndex = this.normalTabsParam.findIndex(tab => tab.tabName === this.currentTab);
+        if (this.selectedTabIndex == -1) {
+          this.selectedTabIndex = 0;
+          this.currentTab = 'Constants';
+        }
+      }
+      this.currentExpertMode = this.configExpertMode.expertMode;
+      this.populateMeta();
+    }
+  }
+
   private async populateMeta() {
     this.metaBackup = await this.api.getMeta();
     this.meta = this.ivmlFormatter.filterMeta(this.metaBackup, this.currentTab);
-    const tabName = this.currentTab === '' ? 'Setup' : this.currentTab;
-    const selectedTab = this.tabsParam.find(tab => tab.tabName === tabName);
+    const tabName = this.currentTab === '' ? 'Constants' : this.currentTab;
+    const selectedTab = this.visibleTabs.find(tab => tab.tabName === tabName);
     if (selectedTab) {
       this.getDisplayData(selectedTab?.tabName, selectedTab?.metaProject, selectedTab?.submodelElement)
     }
@@ -531,7 +559,7 @@ export class ListComponent extends Utils implements OnInit {
       // Subscribe to dialog close event
       dialogRef.afterClosed().subscribe(result => {
         const tabName = this.currentTab === '' ? 'Setup' : this.currentTab;
-        const selectedTab = this.tabsParam.find(tab => tab.tabName === tabName);
+        const selectedTab = this.visibleTabs.find(tab => tab.tabName === tabName);
         if (selectedTab) {
           this.getDisplayData(selectedTab?.tabName, selectedTab?.metaProject, selectedTab?.submodelElement)
         }
@@ -643,9 +671,8 @@ export class ListComponent extends Utils implements OnInit {
    * Return the constant for html page.
    * 
    * @param item html item
-   * @returns the vlue of the metaConstant
+   * @returns the value of the metaConstant
    */
-
   isConstantValue(item: any): boolean {
     let result: boolean = false;
     if (primitiveDataTypes.includes(item.varType) && item.value.length > 0) {
@@ -653,6 +680,18 @@ export class ListComponent extends Utils implements OnInit {
       result = values.find(obj => obj.metaConstant);
     }
     return result;
+  }
+
+    /**
+   * Return the list of tabs based expert mode.
+   * 
+   * @returns the list of tabs
+   */
+  get visibleTabs() {
+    if (!this.configExpertMode.expertMode) {
+      return this.normalTabsParam;
+    }
+    return this.exportTabsParam;
   }
 
 }

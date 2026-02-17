@@ -5,9 +5,9 @@ mat-raised-button color="success"
 (click)="create()">NEW
 </button>
 -->
-<mat-tab-group animationDuration="0ms" mat-stretch-tabs>
+<mat-tab-group animationDuration="0ms" mat-stretch-tabs [(selectedIndex)]="selectedTabIndex">
   <!-- Tab menu -->
-  <div *ngFor="let tab of tabsParam">
+  <div *ngFor="let tab of visibleTabs">
     <mat-tab label="{{tab.tabName}}">
       <ng-template mat-tab-label >
         <span (click)="getDisplayData(tab.tabName, tab.metaProject, tab.submodelElement)" class="custom-label" id="menuClick.{{tab.tabName}}">
