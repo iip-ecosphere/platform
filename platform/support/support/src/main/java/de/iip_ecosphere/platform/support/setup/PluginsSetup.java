@@ -23,7 +23,8 @@ public interface PluginsSetup {
      * Returns the (parent) folder where the oktoflow plugins are located (the folder itself or by default 
      * its sub-folders "plugins" or "oktoPlugins").
      * 
-     * @return the folder, by default taken from {@link #PARAM_PLUGINS} (env or sys property), fallback "plugins"
+     * @return the folder, by default taken from {@link AbstractSetup#PARAM_PLUGINS} (env or sys property), fallback 
+     *     "plugins"
      */
     public String getPluginsFolder();
 

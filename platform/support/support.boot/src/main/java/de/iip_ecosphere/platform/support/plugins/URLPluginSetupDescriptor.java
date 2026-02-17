@@ -15,13 +15,18 @@ package de.iip_ecosphere.platform.support.plugins;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.oktoflow.platform.tools.lib.loader.ChildFirstIndexedClassloader;
+import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 
 /**
  * Default URL-based plugin setup descriptor. Typically, a specific descriptor inherits from this class and sets
@@ -131,8 +136,20 @@ public class URLPluginSetupDescriptor implements PluginSetupDescriptor {
             File idxFile = getIndexFile();
             if (null != idxFile) {
                 try {
-                    result = new ChildFirstIndexedClassloader(idxFile, parent);
-                } catch (IOException e) {
+                    LoaderIndex index = LoaderIndex.fromFile(idxFile);
+                    Map<String, String> urlMapping = new HashMap<>();
+                    for (URL url : urls) {
+                        String u = LoaderIndex.normalize(Paths.get(url.toURI()).toString());
+                        for (String loc : index.getLocations()) {
+                            String l = LoaderIndex.normalize(loc);
+                            if (u.endsWith(l)) {
+                                urlMapping.put(loc, u);
+                            }
+                        }
+                    }
+                    index.substituteLocations(urlMapping);
+                    result = new ChildFirstIndexedClassloader(index, parent);
+                } catch (IOException | URISyntaxException e) {
                     LoggerFactory.getLogger(URLPluginSetupDescriptor.class).warn(
                         "Cannot create {}, falling back to {}. Reason: {}", 
                         ChildFirstIndexedClassloader.class.getSimpleName(), 

@@ -19,7 +19,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.function.Consumer;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -33,6 +38,7 @@ import org.xml.sax.SAXException;
 import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.json.JsonIterator;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 
 /**
  * Utility class to update application plugins (upon application start).
@@ -60,6 +66,18 @@ public class Updater {
     }
 
     /**
+     * Adds {@code path} to {@code paths} if {@code path} ends with ".jar".
+     * 
+     * @param path the path to consider
+     * @param paths the list aggegating jars
+     */
+    private static void addJar(Path path, List<Path> paths) {
+        if (path.toString().endsWith(".jar")) {
+            paths.add(path);
+        }
+    }
+
+    /**
      * Update plugins.
      * 
      * @param resolved the resolved plugin file as written by the oktoflow resource plugin for packaging 
@@ -73,6 +91,7 @@ public class Updater {
         if (null == resolved) {
             throw new IOException("No \"resolved\" input stream given.");
         }
+        List<Path> extractedJars = new ArrayList<>();
         String json = IOUtils.toString(resolved);
         JsonIterator it = Json.parse(json);
         for (int i = 0; i < it.size(); i++) {
@@ -87,6 +106,7 @@ public class Updater {
             boolean plugin = eIt.get("plugin").toBooleanValue();
             
             File pluginFile = new File(pluginsFolder, name);
+            File indexFile = new File(pluginsFolder, name + ".idx");
             String type = plugin ? "plugin" : "dependency";
             if (!pluginFile.exists() || (name.endsWith(SNAPSHOT) && updatePlugins)) {
                 LoggerFactory.getLogger(Updater.class).info("Resolving {} {}", type, name);
@@ -105,7 +125,7 @@ public class Updater {
                     FileUtils.copyInputStreamToFile(res.stream, targetFile);
                     FileUtils.closeQuietly(res.stream);
                     if (plugin) {
-                        unzipPlugin(targetFile, name);
+                        unzipPlugin(targetFile, name, p -> addJar(p, extractedJars));
                     }
                     if (res.hasBuildNr()) {
                         metadata.put(name, res.buildNr);
@@ -118,6 +138,29 @@ public class Updater {
                     }
                 }
             }
+            if (pluginFile.exists()) {
+                try {
+                    List<String> lines = IOUtils.readLines(new FileInputStream(pluginFile));
+                    List<Path> jarPaths = new ArrayList<>();
+                    for (String line : lines) {
+                        if (!line.trim().startsWith("#")) {
+                            StringTokenizer tokens = new StringTokenizer(line, ";:");
+                            while (tokens.hasMoreTokens()) {
+                                String token = tokens.nextToken();
+                                File f = new File(token);
+                                f = new File(pluginsFolder, f.getName());
+                                jarPaths.add(f.toPath());
+                            }
+                        }
+                    }
+                    if (!jarPaths.isEmpty()) {
+                        LoaderIndex.toFile(LoaderIndex.createIndex(extractedJars), indexFile);
+                    }
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(Updater.class).warn(
+                        "Cannot create/write index. Ignoring. Reason: {}", e.getMessage());
+                }
+            }
         }
     }
     
@@ -126,12 +169,13 @@ public class Updater {
      * 
      * @param file the file containing the plugin (stored in plugins folder)
      * @param name the name of the plugin
+     * @param pathConsumer consumes paths of unpacked files (may be <b>null</b> for none)
      * @throws IOException if unzipping fails
      */
-    private static void unzipPlugin(File file, String name) throws IOException {
+    private static void unzipPlugin(File file, String name, Consumer<Path> pathConsumer) throws IOException {
         File pluginDir = file.getParentFile();
         ZipUtils.extractZip(new FileInputStream(file), pluginDir.toPath(), 
-            e -> !e.getName().equals("resolved"));
+            e -> !e.getName().equals("resolved"), false, pathConsumer);
         File cp = new File(pluginDir, "classpath");
         File cpTarget = new File(pluginDir, name);
         FileUtils.deleteQuietly(cpTarget);

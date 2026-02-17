@@ -544,7 +544,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         }
 
         /**
-         * Returns the next token,.
+         * Returns the next token.
          * 
          * @return the next token
          * @see #hasMoreTokens()
@@ -676,6 +676,8 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
      */
     private void writeIndex(List<JarLocation> locs, File cpFile) {
         if (createIndex) {
+            long start = System.currentTimeMillis();
+            getLog().info("Indexing classes...");
             File index = new File(cpFile.toString() + ".idx");
             try {
                 LoaderIndex idx = new LoaderIndex();
@@ -683,7 +685,9 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                     LoaderIndex.addToIndex(idx, loc.toFile(), loc.actual);
                 }
                 LoaderIndex.toFile(idx, index);
-                getLog().info("Stored class index to " + index);
+                getLog().info("Stored class index to " + index + " " + idx.getClassesCount() + " classes and " 
+                    + idx.getResourcesCount() + " resources in " + idx.getLocationsCount() + " locations in " 
+                    + (System.currentTimeMillis() - start) + " ms");
             } catch (IOException e) {
                 getLog().error("Cannot write index file " + index + ": " + e.getClass().getSimpleName() 
                     + " " + e.getMessage());

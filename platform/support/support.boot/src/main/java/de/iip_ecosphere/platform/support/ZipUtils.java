@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Enumeration;
 import java.util.function.Consumer;
@@ -202,7 +203,7 @@ public class ZipUtils {
     }
 
     // adapted from https://mkyong.com/java/how-to-decompress-files-from-a-zip-file/
-    
+
     /**
      * Extracts a ZIP/JAR file.
      * 
@@ -212,6 +213,21 @@ public class ZipUtils {
      * @throws IOException if something I/O related fails
      */
     public static void extractZip(InputStream in, Path target, Predicate<ZipEntry> pred) throws IOException {
+        extractZip(in, target, pred, false, null);
+    }
+
+    /**
+     * Extracts a ZIP/JAR file.
+     * 
+     * @param in the input stream containing the ZIP/JAR file
+     * @param target the target path
+     * @param pred a predicate selecting ZIP entries for creation/extraction (may be <b>null</b> for all contents) 
+     * @param flatten whether directories shall be flattened or unpacked
+     * @param pathConsumer consumes paths of unpacked files (may be <b>null</b> for none)
+     * @throws IOException if something I/O related fails
+     */
+    public static void extractZip(InputStream in, Path target, Predicate<ZipEntry> pred, boolean flatten, 
+        Consumer<Path> pathConsumer) throws IOException {
         try (ZipInputStream zis = new ZipInputStream(in)) {
             ZipEntry zipEntry = zis.getNextEntry();
             while (zipEntry != null) {
@@ -219,14 +235,22 @@ public class ZipUtils {
                 if (null == pred || pred.test(zipEntry)) {
                     Path newPath = zipSlipProtect(zipEntry, target);
                     if (isDirectory) {
-                        Files.createDirectories(newPath);
+                        if (!flatten) {
+                            Files.createDirectories(newPath);
+                        }
                     } else {
-                        if (newPath.getParent() != null) {
+                        if (newPath.getParent() != null && !flatten) {
                             if (Files.notExists(newPath.getParent())) {
                                 Files.createDirectories(newPath.getParent());
                             }
                         }
+                        if (flatten) {
+                            newPath = Paths.get(target.toString(), newPath.getFileName().toString());
+                        }
                         Files.copy(zis, newPath, StandardCopyOption.REPLACE_EXISTING);
+                        if (null != pathConsumer) {
+                            pathConsumer.accept(newPath);
+                        }
                     }
                 }
                 zipEntry = zis.getNextEntry();

@@ -59,6 +59,7 @@ public class UpdaterTest {
         Assert.assertTrue(new File(pluginsFolder, "target").exists());
         Assert.assertTrue(new File(pluginsFolder, ".metadata").exists());
         Assert.assertTrue(new File(pluginsFolder, "support.log-slf4j-simple2-0.7.1-SNAPSHOT").exists());
+        Assert.assertTrue(new File(pluginsFolder, "support.log-slf4j-simple2-0.7.1-SNAPSHOT.idx").exists());
         
         FileUtils.deleteQuietly(pluginsFolder);
     }
