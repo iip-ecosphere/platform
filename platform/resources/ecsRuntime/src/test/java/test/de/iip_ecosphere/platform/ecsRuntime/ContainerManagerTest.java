@@ -25,13 +25,14 @@ import de.iip_ecosphere.platform.ecsRuntime.ContainerState;
 import de.iip_ecosphere.platform.ecsRuntime.EcsFactory;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
+import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 /**
  * Template test.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ContainerManagerTest {
+public class ContainerManagerTest extends TestWithQpid {
     
     /**
      * Template test.

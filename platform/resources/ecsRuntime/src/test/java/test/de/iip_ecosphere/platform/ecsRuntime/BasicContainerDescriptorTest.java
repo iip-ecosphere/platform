@@ -17,6 +17,8 @@ import java.io.File;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.ecsRuntime.BasicContainerDescriptor;
+import test.de.iip_ecosphere.platform.transport.TestWithQpid;
+
 import org.junit.Assert;
 
 /**
@@ -24,7 +26,7 @@ import org.junit.Assert;
  *
  * @author Holger Eichelberger, SSE
  */
-public class BasicContainerDescriptorTest {
+public class BasicContainerDescriptorTest extends TestWithQpid {
     
     /**
      * Tests the descriptor.

@@ -20,13 +20,14 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.ecsRuntime.EcsSetup;
 import de.iip_ecosphere.platform.ecsRuntime.EcsSetup.AbstractManagerSetup;
 import de.iip_ecosphere.platform.support.net.NetworkManagerSetup;
+import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 /**
  * Tests {@link EcsSetup}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class EcsSetupTest {
+public class EcsSetupTest extends TestWithQpid {
     
     private static class MySetup extends AbstractManagerSetup {
     }
