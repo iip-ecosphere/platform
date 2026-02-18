@@ -41,13 +41,14 @@ import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
+import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 
 /**
  * Tests {@link ServiceManager}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ServiceManagerTest {
+public class ServiceManagerTest extends TestWithQpid {
     
     /**
      * Tests {@link ServiceManager}.

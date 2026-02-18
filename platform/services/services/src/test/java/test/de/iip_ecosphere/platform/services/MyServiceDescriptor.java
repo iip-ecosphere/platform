@@ -96,7 +96,8 @@ class MyServiceDescriptor extends AbstractServiceDescriptor<MyArtifactDescriptor
 
     @Override
     public InvocablesCreator getInvocablesCreator() {
-        return InvocablesCreator.NULL_CREATOR;
+        // ignore for BaSyX2, this is just a basic operation test without need for AAS ops
+        return InvocablesCreator.NULL_CREATOR; 
     }
     
 }

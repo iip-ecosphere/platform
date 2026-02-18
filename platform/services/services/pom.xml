@@ -52,7 +52,7 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <artifactId>support.json-jackson</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <scope>test</scope>
@@ -69,7 +69,7 @@
       <groupId>de.iip-ecosphere.platform</groupId>
       <scope>test</scope>
       <version>${project.version}</version>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -103,6 +103,18 @@
                             </plugin>
                             <plugin>
                                 <artifactId>test.amqp.qpid</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.rest-spark</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.yaml-snakeyaml</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.json-jackson</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.commons-apache</artifactId>
                             </plugin>
                         </plugins>
                         <version>${iip.version}</version>

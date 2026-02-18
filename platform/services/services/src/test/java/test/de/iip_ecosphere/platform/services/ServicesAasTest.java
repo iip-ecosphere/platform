@@ -93,6 +93,8 @@ public class ServicesAasTest extends TestWithQpid {
     public void testAas() throws IOException, ExecutionException, URISyntaxException {
         NotificationMode oldM = ActiveAasBase.setNotificationMode(NotificationMode.SYNCHRONOUS);
         Assert.assertTrue(AasPartRegistry.contributorClasses().contains(ServicesAas.class));
+        // not a full implementation, we do not expect execution of AAS ops here
+        boolean oldLogExec = ServicesAas.setLogExecutionErrors(false); 
         AasSetup newSetup = AasSetup.createLocalEphemeralSetup();
         System.out.println("Registry: " + newSetup.getRegistryEndpoint().toUri());
         System.out.println("Servier: " + newSetup.getServerEndpoint().toUri());
@@ -113,6 +115,7 @@ public class ServicesAasTest extends TestWithQpid {
         implServer.stop(true);
         AasPartRegistry.setAasSetup(oldSetup);
         ActiveAasBase.setNotificationMode(oldM);
+        ServicesAas.setLogExecutionErrors(oldLogExec);
     }
 
     /**
@@ -129,6 +132,8 @@ public class ServicesAasTest extends TestWithQpid {
         AasSetup aasSetup = AasSetup.createLocalEphemeralSetup(null, false);
         AasSetup oldSetup = AasPartRegistry.setAasSetup(aasSetup);
         ServiceFactory.setAasSetup(aasSetup);
+        // not a full implementation, we do not expect execution of AAS ops here
+        boolean oldLogExec = ServicesAas.setLogExecutionErrors(false); 
 
         ServerRecipe rcp = AasFactory.getInstance().createServerRecipe();
         Server registryServer = rcp
@@ -151,6 +156,7 @@ public class ServicesAasTest extends TestWithQpid {
         AbstractAasLifecycleDescriptor.setWaitForIipAas(oldWaitIip);
         AasPartRegistry.setAasSetup(oldSetup);
         ActiveAasBase.setNotificationMode(oldM);
+        ServicesAas.setLogExecutionErrors(oldLogExec);
     }
     
     /**

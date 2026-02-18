@@ -140,11 +140,25 @@ public class ServicesAas implements AasContributor {
     public static final String NAME_OP_SERVICE_INSTANCE_COUNT  = "getServiceInstanceCount";
     public static final String NAME_OP_SERVICE_STATE_COUNT  = "getServiceStateCount";
     public static final String NAME_OP_SERVICE_STREAM_LOG = "serviceStreamLog";
+    
+    private static boolean logExecutionErrors = true;
 
     // expected remote states
     private static final Set<ServiceState> ERROR_IF_NOT_FOUND = Set.of(ServiceState.FAILED, ServiceState.RUNNING, 
         ServiceState.STOPPING, ServiceState.PASSIVATING, ServiceState.PASSIVATED, ServiceState.RECONFIGURING, 
         ServiceState.RECOVERED, ServiceState.RECOVERING, ServiceState.MIGRATING);
+    
+    /**
+     * Determines whether execution errors shall be logged.
+     * 
+     * @param logErrors log or not log
+     * @return the old state of logging
+     */
+    public static boolean setLogExecutionErrors(boolean logErrors) {
+        boolean old = logExecutionErrors;
+        logExecutionErrors = logErrors;
+        return old;
+    }
     
     @Override
     public Aas contributeTo(AasBuilder aasBuilder, InvocablesCreator iCreator) {
@@ -864,7 +878,7 @@ public class ServicesAas implements AasContributor {
             SubmodelElementCollection elt = services.getSubmodelElementCollection(serviceId);
             String actName = ServiceState.toString(act);
             if (null != elt) {
-                boolean logError = act != null && ERROR_IF_NOT_FOUND.contains(act) 
+                boolean logError = logExecutionErrors && act != null && ERROR_IF_NOT_FOUND.contains(act) 
                     && desc.getKind() != ServiceKind.SERVER;
                 Operation op = elt.getOperation(NAME_OP_SVC_SET_STATE);
                 if (null != op) {
