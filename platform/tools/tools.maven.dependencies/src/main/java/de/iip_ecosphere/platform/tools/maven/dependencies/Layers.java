@@ -45,7 +45,8 @@ public class Layers {
     };
     
     private static final String[] MAIN_ARTID_PATTERNS = {
-        "maven-python-", 
+        "tools.lib-", 
+        "maven-python-", // legacy, shall be replaced by tools.lib-
         "support.boot-",
         "support-", 
         "support.aas-", 
@@ -130,7 +131,7 @@ public class Layers {
      */
     static boolean isOsCpFile(File file) {
         String path = file.toString();
-        return path.endsWith("-win") || !path.endsWith("-linux");
+        return path.endsWith("-win") || path.endsWith("-linux");
     }
     
 }
