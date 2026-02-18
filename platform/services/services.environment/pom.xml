@@ -97,24 +97,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <artifactId>support.json-jackson</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <scope>test</scope>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <artifactId>support.yaml-snakeyaml</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <scope>test</scope>
-      <version>${project.version}</version>
-    </dependency>     
-    <dependency>
-      <artifactId>support.rest-spark</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <scope>test</scope>
-      <version>${project.version}</version>
-    </dependency>     
-    <dependency>
       <artifactId>support.websocket-websocket</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <scope>test</scope>
@@ -126,12 +108,6 @@
       <scope>test</scope>
       <version>${project.version}</version>
     </dependency>     
-    <dependency>
-      <artifactId>support.commons-apache</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <scope>test</scope>
-      <version>${project.version}</version>
-    </dependency>
     <dependency>
       <artifactId>support.metrics-micrometer</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
@@ -245,6 +221,18 @@
                             </plugin>
                             <plugin>
                                 <artifactId>test.amqp.qpid</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.rest-spark</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.yaml-snakeyaml</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.json-jackson</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.commons-apache</artifactId>
                             </plugin>
                         </plugins>
                         <version>${iip.version}</version>
