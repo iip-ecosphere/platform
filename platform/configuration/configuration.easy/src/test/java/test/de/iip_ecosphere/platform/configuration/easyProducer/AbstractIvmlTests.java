@@ -42,6 +42,7 @@ import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 import net.ssehub.easy.varModel.confModel.Configuration;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
 import static test.de.iip_ecosphere.platform.services.environment.PythonEnvironmentTest.*;
 
@@ -50,7 +51,7 @@ import static test.de.iip_ecosphere.platform.services.environment.PythonEnvironm
  * 
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractIvmlTests {
+public abstract class AbstractIvmlTests extends TestWithPlugin {
     
     public static final File TEST_BASE_FOLDER = new File(EasySetup.getTestingEasyModelParent(), "target/gen/tests");
     public static final File MODEL_BASE_FOLDER = new File(EasySetup.getTestingEasyModelParent(), "src/test/easy");

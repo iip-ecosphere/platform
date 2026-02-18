@@ -21,13 +21,14 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.configuration.easyProducer.EasySetup;
 import test.de.iip_ecosphere.platform.configuration.easyProducer.AbstractIvmlTests.TestConfigurer;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
 /**
  * Tests the {@link TestConfigurer}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class TestConfigurerTest {
+public class TestConfigurerTest extends TestWithPlugin {
 
     /**
      * Tests the test configurer "serialization" into command line parameters.
