@@ -5,19 +5,13 @@ mat-raised-button color="success"
 (click)="create()">NEW
 </button>
 -->
-<mat-tab-group animationDuration="0ms" mat-stretch-tabs [(selectedIndex)]="selectedTabIndex">
+<mat-tab-group animationDuration="0ms" mat-stretch-tabs [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="updateSelectedTab($event)">
   <!-- Tab menu -->
-  <div *ngFor="let tab of visibleTabs">
-    <mat-tab label="{{tab.tabName}}">
-      <ng-template mat-tab-label >
-        <span (click)="getDisplayData(tab.tabName, tab.metaProject, tab.submodelElement)" class="custom-label" id="menuClick.{{tab.tabName}}">
-          <table id="menu.{{tab.tabName}}">
-            <tr>
-              <td class="tab-label"><img src="/assets/aas.png" class="aas-icon-tab"></td>
-              <td class="tab-label">{{tab.tabName}}</td>
-            </tr>
-          </table>
-        </span>
+  @for (tab of visibleTabs; track $index) {
+    <mat-tab label="{{tab.tabName}}" aria-label="menu.{{tab.tabName}}">
+      <ng-template mat-tab-label>
+        <img src="/assets/aas.png" class="aas-icon-tab">
+        <span class="tab-label-black">{{ tab.tabName }}</span>
       </ng-template>
 
       <!-- TODO probably delete
@@ -112,7 +106,7 @@ mat-raised-button color="success"
         </tr>
       </table>
     </mat-tab>
-  </div>
+  } 
 </mat-tab-group>
 
 

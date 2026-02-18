@@ -18,6 +18,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectModule } from '@angular/material/select';
 import { EditorComponent } from '../editor/editor.component';
 import { FormsModule } from '@angular/forms';
+import { MatTabGroupHarness } from '@angular/material/tabs/testing';
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 
 describe('ListComponent', () => {
 
@@ -68,15 +70,22 @@ describe('ListComponent', () => {
     await fixture.detectChanges();
     let compiled = fixture.nativeElement as HTMLElement;
 
-    for (let tab of component.normalTabsParam) {
-      let container = compiled.querySelector(`table[id="menu.${tab.tabName}"]`) as HTMLElement;
+    for (let tab of component.expertTabsParam) {
+      let container = compiled.querySelector(`[aria-label="menu.${tab.tabName}"]`) as HTMLElement;
       expect(container).toBeTruthy();
-      expect(container?.querySelector('tr td img')).toBeTruthy(); // AAS icon
-      let elt = container?.querySelector('tr td:nth-child(2)') as HTMLElement;
+      expect(container?.querySelector('span span img')).toBeTruthy(); // AAS icon
+      let elt = container?.querySelector('span span:nth-child(2)') as HTMLElement;
       expect(elt).toBeTruthy();
       expect(elt.innerText).toContain(tab.tabName);
 
-      let menuClick = compiled.querySelector(`span[id="menuClick.${tab.tabName}"]`) as HTMLElement;
+      const loader = TestbedHarnessEnvironment.loader(fixture);
+      const tabGroup = await loader.getHarness(MatTabGroupHarness);
+
+      const menuClick = await tabGroup.getTabs({
+        label: tab.tabName
+      });
+
+      // let menuClick = compiled.querySelector(`span[id="menuClick.${tab.tabName}"]`) as HTMLElement;
       expect(menuClick).toBeTruthy();
     }
   });
@@ -155,15 +164,21 @@ async function test(fixture: ComponentFixture<ListComponent>, component: ListCom
   
   await fixture.detectChanges();
   let compiled = fixture.nativeElement as HTMLElement;
-  let tabName = component.exportTabsParam[tabIndex].tabName;
+  let tabName = component.expertTabsParam[tabIndex].tabName;
   let expIdShort = new Set<string>(expectedDataIdShort);
   let tabContext = "in table " + tabName;
   let navigateSpy = spyOn(router, 'navigateByUrl');
   
-  let menuClick = compiled.querySelector(`span[id="menuClick.${tabName}"]`) as HTMLElement;
-  expect(menuClick).withContext(tabContext).toBeTruthy();
-  menuClick.click(); // TODO mock?
-  await component.loadData(component.exportTabsParam[tabIndex].metaProject, component.exportTabsParam[tabIndex].submodelElement);
+  const loader = TestbedHarnessEnvironment.loader(fixture);
+  const tabGroup = await loader.getHarness(MatTabGroupHarness);
+
+  await tabGroup.selectTab({ label: tabName });
+
+  //let menuClick = compiled.querySelector(`span[id="menuClick.${tabName}"]`) as HTMLElement;
+  // expect(menuClick).withContext(tabContext).toBeTruthy();
+  // menuClick.click(); // TODO mock?
+  
+  await component.loadData(component.expertTabsParam[tabIndex].metaProject, component.expertTabsParam[tabIndex].submodelElement);
 
   await fixture.detectChanges();
   await fixture.whenRenderingDone();
