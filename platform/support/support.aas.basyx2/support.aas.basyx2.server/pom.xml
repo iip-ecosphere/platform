@@ -300,7 +300,7 @@
                  </execution>
                  <execution>
                      <id>build-classpath-plugin</id>
-                     <phase>prepare-package</phase> <!-- Eclipse autobuild -->
+                     <phase>package</phase> <!-- Eclipse autobuild -->
                      <goals>
                          <goal>build-plugin-classpath</goal>
                      </goals>
