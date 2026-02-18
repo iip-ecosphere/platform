@@ -114,30 +114,6 @@
      <type>test-jar</type>
      <scope>test</scope>
     </dependency>
-    <!--<dependency>
-      <artifactId>support.yaml-snakeyaml</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <scope>test</scope>
-      <version>${project.version}</version>
-    </dependency> 
-    <dependency>
-      <artifactId>support.commons-apache</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <scope>test</scope>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <artifactId>support.json-jackson</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <scope>test</scope>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <artifactId>support.rest-spark</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <scope>test</scope>
-      <version>${project.version}</version>
-    </dependency>-->
   </dependencies>
   
 </project>
