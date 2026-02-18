@@ -75,6 +75,8 @@ The OPC UA  connector is a model connector with no further fields. Regarding aut
 
 `inInterface` or `outInterface` shall specify the `path` to an OPC node where the fields/substructures of the respective `RecordType` are located. A path implicitly starts with `Root`, i.e., a path like `Root/Objects/PLCnext/Arp.Plc.Eclr/RobInstance01/` shown in some OPC UA tooling becomes `Objects/PLCnext/Arp.Plc.Eclr/RobInstance01/` in the model. The fields/substructures in the respective type must exactly match the browse names and data types as specified in the OPC server (the specification of NodeIds as we support it for IVML files derived from OPC specification XMLs may be made available here in one of the next versions of the platform.)
 
+As the underlying implementation only provides rather coarse-grained (model-level) OPC Events, it is currently mandatory to specify a `samplingPeriod` to obtain data. Please also take into account that `Field` as a default caching time of `CACHE_ALWAYS` (static fields), i.e., for dynamically changing fields `CACHE_NONE` or a meaningful caching time for your application must be specified.
+
 ## AAS connector
 
 The Asset Administration Shell (AAS) connector is a model connector that supports the following additional fields:
