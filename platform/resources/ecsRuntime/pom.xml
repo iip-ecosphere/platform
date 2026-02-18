@@ -64,12 +64,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <artifactId>support.metrics-micrometer</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <scope>test</scope>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -114,6 +108,9 @@
                             </plugin>
                             <plugin>
                                 <artifactId>support.commons-apache</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.metrics-micrometer</artifactId>
                             </plugin>
                         </plugins>
                         <version>${iip.version}</version>
