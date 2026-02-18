@@ -51,6 +51,9 @@ public class TestWithPlugin extends test.de.iip_ecosphere.platform.support.TestW
         addPluginLocation("support", "support.aas.basyx2", "support.log-slf4j-simple");
         addPluginLocation("support/support.aas.basyx2", "support.aas.basyx2.server", "../support.log-slf4j-simple");
         addPluginLocation("support", "support.aas.basyx", "support.log-slf4j-simple");
+        addPluginLocation("support", "support.yaml-snakeyaml");
+        addPluginLocation("support", "support.json-jackson");
+        addPluginLocation("support", "support.commons-apache");
         addPluginLocation("support", "support.rest-spark");
         addRunAfterLoading(() -> {
             // TODO default from AASFactory
