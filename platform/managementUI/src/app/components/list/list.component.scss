@@ -69,3 +69,9 @@
   font-size: 20px;
   vertical-align: middle;
 }
+
+/* tab-specific override */
+.tab-label-black {
+  color: black !important;
+  margin-left: 8px;
+}

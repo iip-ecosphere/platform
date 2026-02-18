@@ -109,6 +109,9 @@ export class ServicesComponent extends Utils implements OnInit {
     });
   }
 
+  public updateSelectedTab($event: { index: number; }){
+      this.getDisplayData(this.tabsParam[$event.index].tabName, this.tabsParam[$event.index].submodel, this.tabsParam[$event.index].submodelElement)
+  }
   // ------------------ Filter -----------------------------------
 
   public async getDisplayData(tab:string, submodel:any, submodelElement: string) {

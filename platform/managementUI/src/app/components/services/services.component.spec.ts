@@ -41,7 +41,7 @@ describe('ServicesComponent', () => {
     let windowOpenSpy = spyOn(window, 'open');
     let navTabsBtn = new Map<string, HTMLElement>();
     let expectedTabs = new Set<string>(component.tabsParam.map(p => p.tabName));
-    let navTabs = compiled.querySelectorAll('td[id="tab.text"]');
+    let navTabs = compiled.querySelectorAll('span[id="tab.text"]');
     expect(navTabs).toBeTruthy();
     navTabs.forEach((n) => {
       expectedTabs.delete(n.innerHTML.trim());

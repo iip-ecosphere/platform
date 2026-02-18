@@ -85,7 +85,7 @@ export class ListComponent extends Utils implements OnInit {
   // Filter ---------------------------------------------------------------------
   // Information how the raw data for a given tab should be filtered:
   // with the metaProject or with a name of the submodelElement
-  exportTabsParam = [
+  expertTabsParam = [
     { tabName: "Setup", metaProject: "TechnicalSetup", submodelElement: null },
     { tabName: "Constants", metaProject: "AllConstants", submodelElement: null },
     { tabName: "Types", metaProject: "AllTypes", submodelElement: null },
@@ -96,14 +96,15 @@ export class ListComponent extends Utils implements OnInit {
     { tabName: "Meshes", metaProject: null, submodelElement: "ServiceMesh" },
     { tabName: "Applications", metaProject: null, submodelElement: "Application" }
   ]
+  defaultExpertTab = 'Setup'
 
   normalTabsParam = [
-    { tabName: "Constants", metaProject: "AllConstants", submodelElement: null },
     { tabName: "Types", metaProject: "AllTypes", submodelElement: null },
     { tabName: "Services", metaProject: null, submodelElement: "ServiceBase" },
     { tabName: "Meshes", metaProject: null, submodelElement: "ServiceMesh" },
     { tabName: "Applications", metaProject: null, submodelElement: "Application" }
   ]
+  defaultNormalTab = 'Types'
 
   // Display ---------------------------------------------------------------------
   paramToDisplay = [
@@ -131,13 +132,13 @@ export class ListComponent extends Utils implements OnInit {
   ngDoCheck() {
     if (this.currentExpertMode !== this.configExpertMode.expertMode) {
       if (this.configExpertMode.expertMode) {
-        this.selectedTabIndex = this.exportTabsParam.findIndex(tab => tab.tabName === this.currentTab);
+        this.selectedTabIndex = this.expertTabsParam.findIndex(tab => tab.tabName === this.currentTab);
         //this.currentTab = 'Setup';
       } else {
         this.selectedTabIndex = this.normalTabsParam.findIndex(tab => tab.tabName === this.currentTab);
         if (this.selectedTabIndex == -1) {
           this.selectedTabIndex = 0;
-          this.currentTab = 'Constants';
+          this.currentTab = this.defaultNormalTab;
         }
       }
       this.currentExpertMode = this.configExpertMode.expertMode;
@@ -148,11 +149,16 @@ export class ListComponent extends Utils implements OnInit {
   private async populateMeta() {
     this.metaBackup = await this.api.getMeta();
     this.meta = this.ivmlFormatter.filterMeta(this.metaBackup, this.currentTab);
-    const tabName = this.currentTab === '' ? 'Constants' : this.currentTab;
+    let defaultTab = this.configExpertMode.expertMode ? this.defaultExpertTab : this.defaultNormalTab;
+    const tabName = this.currentTab === '' ? defaultTab : this.currentTab;
     const selectedTab = this.visibleTabs.find(tab => tab.tabName === tabName);
     if (selectedTab) {
       this.getDisplayData(selectedTab?.tabName, selectedTab?.metaProject, selectedTab?.submodelElement)
     }
+  }
+
+  public updateSelectedTab($event: { index: number; }){
+      this.getDisplayData(this.visibleTabs[$event.index].tabName, this.visibleTabs[$event.index].metaProject, this.visibleTabs[$event.index].submodelElement)
   }
 
   public async getDisplayData(tabName: string, metaProject: string | null, submodelElement: string | null) {
@@ -691,7 +697,7 @@ export class ListComponent extends Utils implements OnInit {
     if (!this.configExpertMode.expertMode) {
       return this.normalTabsParam;
     }
-    return this.exportTabsParam;
+    return this.expertTabsParam;
   }
 
 }

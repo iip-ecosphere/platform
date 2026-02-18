@@ -36,4 +36,78 @@
   border-color:rgb(173, 171, 172); /*outer ring color change*/
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of tabs that may no longer apply for the MDC version.*/
+:host ::ng-deep .mat-tab-header-pagination-chevron {
+  border-color: black;
+ }
 
+ // default material color is white
+/* TODO(mdc-migration): The following rule targets internal classes of select that may no longer apply for the MDC version.*/
+:host ::ng-deep .mat-select-value {    
+  color: black !important;  
+}
+
+// default material color is white
+/* TODO(mdc-migration): The following rule targets internal classes of select that may no longer apply for the MDC version.*/
+:host ::ng-deep .mat-select-arrow {    
+  color: black !important;  
+}
+
+// default material color is white
+::ng-deep .mat-mdc-select-panel {    
+  background: white !important;  
+}
+
+/* TODO(mdc-migration): The following rule targets internal classes of option that may no longer apply for the MDC version.*/
+::ng-deep .mat-mdc-option.mat-selected:not(.mat-option-disabled) {
+  color: sty.$color_lakeGreen !important;
+}
+
+::ng-deep .mat-mdc-tab, .mat-focus-indicator, .mdc-tab-indicator--active {
+    background-color: sty.$color_poolBlue !important;
+}
+
+.mdc-tab {
+  background-color: sty.$color_poolBlue !important;
+}
+
+::ng-deep .mat-mdc-option {    
+  color: black !important;
+}
+
+
+.item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  color: black;
+}
+
+.buttons {
+  justify-content: flex-end;
+}
+
+.text {
+  font-size: medium;
+  justify-content: flex-start;
+}
+
+.mat-divider {
+  border-top-color: rgb(0, 0, 0);
+}
+
+.file-input {
+  display: none;
+}
+
+.const-icon {
+  color: sty.$color_spaBlue !important;;
+  font-size: 20px;
+  vertical-align: middle;
+}
+
+/* tab-specific override */
+.tab-label-black {
+  color: black !important;
+  margin-left: 8px;
+}

@@ -1,17 +1,10 @@
 <p style="margin-bottom:2px"></p>
-<mat-tab-group animationDuration="0ms" mat-stretch-tabs>
-  <div *ngFor="let tab of tabsParam">
+<mat-tab-group animationDuration="0ms" mat-stretch-tabs (selectedTabChange)="updateSelectedTab($event)">
+  @for (tab of tabsParam; track $index) {
     <mat-tab label="{{tab.tabName}}">
-      <ng-template mat-tab-label >
-        <span (click)="getDisplayData(tab.tabName, tab.submodel, tab.submodelElement)"
-        class="custom-label">
-          <table>
-            <tr>
-              <td id="tab.img" class="tab-label"><img src="/assets/aas.png" class="aas-icon-tab"></td>
-              <td id="tab.text" class="tab-label">{{tab.tabName}}</td>
-            </tr>
-          </table>
-        </span>
+      <ng-template mat-tab-label>
+        <img src="/assets/aas.png" class="aas-icon-tab">
+        <span id="tab.text" class="tab-label-black">{{ tab.tabName }}</span>
       </ng-template>
 
       <ng-template #instances>
@@ -80,7 +73,7 @@
         </tr>
       </table>
     </mat-tab>
-  </div>
+  }
 </mat-tab-group>
 
 
