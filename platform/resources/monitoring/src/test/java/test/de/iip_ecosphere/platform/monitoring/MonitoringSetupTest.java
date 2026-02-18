@@ -15,6 +15,8 @@ package test.de.iip_ecosphere.platform.monitoring;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.monitoring.MonitoringSetup;
+import test.de.iip_ecosphere.platform.transport.TestWithQpid;
+
 import org.junit.Assert;
 
 /**
@@ -22,7 +24,7 @@ import org.junit.Assert;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class MonitoringSetupTest {
+public class MonitoringSetupTest extends TestWithQpid {
     
     /**
      * Rather basic setup test.

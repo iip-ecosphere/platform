@@ -34,15 +34,19 @@
 
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>transport.amqp</artifactId>
-     <version>${project.version}</version>
-     <scope>test</scope>
-    </dependency>
-    <dependency>
-     <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>services.environment.spring</artifactId>
      <version>${project.version}</version>
      <scope>test</scope>
+     <exclusions>
+       <exclusion>
+         <groupId>de.iip-ecosphere.platform</groupId>
+         <artifactId>support.log-slf4j-simple</artifactId>
+       </exclusion>
+       <exclusion>
+         <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-logging</artifactId>
+       </exclusion>
+     </exclusions>
     </dependency>
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
@@ -70,24 +74,6 @@
      <version>${project.version}</version>
      <type>test-jar</type>
      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <artifactId>support.json-jackson</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <scope>test</scope>
-      <version>${project.version}</version>
-    </dependency> 
-    <dependency>
-      <artifactId>support.yaml-snakeyaml</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <scope>test</scope>
-      <version>${project.version}</version>
-    </dependency> 
-    <dependency>
-      <artifactId>support.commons-apache</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <scope>test</scope>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <artifactId>support.metrics-micrometer</artifactId>
@@ -128,6 +114,21 @@
                             </plugin>
                             <plugin>
                                 <artifactId>test.amqp.qpid</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>transport.amqp</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.rest-spark</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.yaml-snakeyaml</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.json-jackson</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.commons-apache</artifactId>
                             </plugin>
                         </plugins>
                         <version>${iip.version}</version>
