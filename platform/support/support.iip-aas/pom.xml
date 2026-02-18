@@ -63,6 +63,15 @@
                             <plugin>
                                 <artifactId>support.rest-spark</artifactId>
                             </plugin>
+                            <plugin>
+                                <artifactId>support.yaml-snakeyaml</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.json-jackson</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.commons-apache</artifactId>
+                            </plugin>
                         </plugins>
                         <version>${iip.version}</version>
                     </configuration>
@@ -105,7 +114,7 @@
      <type>test-jar</type>
      <scope>test</scope>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <artifactId>support.yaml-snakeyaml</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <scope>test</scope>
@@ -128,7 +137,7 @@
       <groupId>de.iip-ecosphere.platform</groupId>
       <scope>test</scope>
       <version>${project.version}</version>
-    </dependency>
+    </dependency>-->
   </dependencies>
   
 </project>

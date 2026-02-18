@@ -23,6 +23,8 @@ import de.iip_ecosphere.platform.support.iip_aas.config.BasicEndpointValidator;
 import de.iip_ecosphere.platform.support.iip_aas.config.EndpointHolder;
 import de.iip_ecosphere.platform.support.iip_aas.config.RuntimeSetup;
 import de.iip_ecosphere.platform.support.iip_aas.config.RuntimeSetupEndpointValidator;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
+
 import org.junit.Assert;
 
 /**
@@ -30,7 +32,7 @@ import org.junit.Assert;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class EndpointHolderTest {
+public class EndpointHolderTest extends TestWithPlugin {
     
     /**
      * Tests {@link EndpointHolder}, {@link BasicEndpointValidator}, {@link RuntimeSetupEndpointValidator}.

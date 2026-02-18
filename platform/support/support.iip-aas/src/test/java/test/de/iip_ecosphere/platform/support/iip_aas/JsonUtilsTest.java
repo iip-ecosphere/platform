@@ -192,7 +192,7 @@ public class JsonUtilsTest {
     }
 
     /**
-     * Tests {@link JsonUtils#handleIipDataClasses(ObjectMapper)}.
+     * Tests {@link Json#handleIipDataClasses()}.
      * 
      * @throws IOException shall not occur
      */

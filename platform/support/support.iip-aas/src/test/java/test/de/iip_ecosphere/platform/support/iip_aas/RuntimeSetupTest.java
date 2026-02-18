@@ -18,6 +18,8 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.iip_aas.config.RuntimeSetup;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
+
 import org.junit.Assert;
 
 /**
@@ -25,7 +27,7 @@ import org.junit.Assert;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class RuntimeSetupTest {
+public class RuntimeSetupTest extends TestWithPlugin {
     
     /**
      * Tests the runtime setup reading/writing.
