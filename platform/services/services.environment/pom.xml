@@ -234,6 +234,9 @@
                             <plugin>
                                 <artifactId>support.commons-apache</artifactId>
                             </plugin>
+                            <plugin>
+                                <artifactId>support.metrics-micrometer</artifactId>
+                            </plugin>
                         </plugins>
                         <version>${iip.version}</version>
                     </configuration>
