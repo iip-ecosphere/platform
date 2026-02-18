@@ -26,3 +26,4 @@ service-mgr:
     password: pwd
     user: user  
   pluginsFolder: target/plugins
+  updateAppPlugins: false

@@ -472,7 +472,11 @@ public class SpringCloudServiceDescriptor extends AbstractServiceDescriptor<Spri
         if (null != config.getJavaOpts()) {
             cmdLine.addAll(config.getJavaOpts());
         }
-        File pluginParent = new File(SpringInstances.getConfig().getPluginsFolder());
+        String plFolder = SpringInstances.getConfig().getAppPluginsFolder();
+        if (null == plFolder) {
+            plFolder = SpringInstances.getConfig().getPluginsFolder();
+        }
+        File pluginParent = new File(plFolder);
         Starter.addAppEnvironment(cmdLine, pluginParent); 
         cmdLine.addAll(service.getCmdArg(port, protocol));
         return cmdLine;

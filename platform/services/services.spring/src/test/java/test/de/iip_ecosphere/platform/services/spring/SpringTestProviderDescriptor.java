@@ -12,7 +12,7 @@
 
 package test.de.iip_ecosphere.platform.services.spring;
 
-import de.iip_ecosphere.platform.services.TestProviderDescriptor;
+import de.iip_ecosphere.platform.support.plugins.TestProviderDescriptor;
 
 /**
  * Provides the tests requiring plugins/classloader separation to the external classpath-less test project.

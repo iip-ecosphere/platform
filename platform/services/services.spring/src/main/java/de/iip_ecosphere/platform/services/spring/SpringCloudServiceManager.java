@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.services.spring;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.time.Duration;
@@ -55,6 +56,7 @@ import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.LifecycleHandler;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.Updater;
 import de.iip_ecosphere.platform.support.commons.Commons;
 import de.iip_ecosphere.platform.support.commons.Tailer;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
@@ -202,6 +204,7 @@ public class SpringCloudServiceManager
                 YamlArtifact yamlArtifact = null;
                 if (null != jarFile) {
                     yamlArtifact = DescriptorUtils.readFromFile(jarFile);
+                    updatePlugins(jarFile);
                 } else {
                     DescriptorUtils.throwExecutionException("Adding " + location, 
                         "Cannot load " + location + ". Must be a (resolved) file.");
@@ -221,6 +224,23 @@ public class SpringCloudServiceManager
             found.increaseUsageCount();
             LOGGER.info("Found known artifact for {}, registering additional use", location);
             return found.getId();
+        }
+    }
+    
+    /**
+     * Resolves/updates the plugins required by the application artifact {@code jarFile}.
+     * 
+     * @param jarFile update
+     */
+    private void updatePlugins(File jarFile) {
+        InputStream resolved = Starter.findArtifact(jarFile, "resolved");
+        if (null != resolved) {
+            ServiceSetup setup = SpringInstances.getConfig();
+            String pluginFolder = setup.getAppPluginsFolder();
+            if (null == pluginFolder || pluginFolder.length() == 0) {
+                pluginFolder = setup.getPluginsFolder();
+            }
+            Updater.updatePluginsQuiet(resolved, new File(pluginFolder), setup.getUpdateAppPlugins());
         }
     }
 
