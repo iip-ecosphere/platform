@@ -55,6 +55,7 @@ public class TestWithPlugin extends test.de.iip_ecosphere.platform.support.TestW
         addPluginLocation("support", "support.json-jackson");
         addPluginLocation("support", "support.commons-apache");
         addPluginLocation("support", "support.rest-spark");
+        addPluginLocation("support", "support.metrics-micrometer");
         addRunAfterLoading(() -> {
             // TODO default from AASFactory
             LoggerFactory.getLogger(TestWithPlugin.class).info("Using AAS plugin {}", aasPluginId);
