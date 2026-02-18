@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.tools.maven.dependencies;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -119,6 +120,17 @@ public class Layers {
             result += a;
         }
         return result;
+    }
+
+    /**
+     * Returns whether a classpath {@code file} is operating system specific.
+     * 
+     * @param file the file to check for
+     * @return {@code true} for OS specific, {@code false} else
+     */
+    static boolean isOsCpFile(File file) {
+        String path = file.toString();
+        return path.endsWith("-win") || !path.endsWith("-linux");
     }
     
 }

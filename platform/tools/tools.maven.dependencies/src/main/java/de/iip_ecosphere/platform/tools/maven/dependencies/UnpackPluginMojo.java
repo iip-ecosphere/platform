@@ -677,7 +677,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
      * @param cpFile the associated classpath file to create the index for
      */
     private void writeIndex(List<JarLocation> locs, File cpFile) {
-        if (createIndex) {
+        if (createIndex && !Layers.isOsCpFile(cpFile)) {
             long start = System.currentTimeMillis();
             getLog().info("Indexing classes...");
             File index = new File(cpFile.toString() + ".idx");
