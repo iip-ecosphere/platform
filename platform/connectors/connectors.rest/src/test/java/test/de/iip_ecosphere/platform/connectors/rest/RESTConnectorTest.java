@@ -29,14 +29,19 @@ import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import test.de.iip_ecosphere.platform.connectors.ConnectorTest;
+import test.de.iip_ecosphere.platform.support.TestWithPlugin;
 
-public class RESTConnectorTest {
+public class RESTConnectorTest extends TestWithPlugin {
 
     private static final String CONN_SET_ID = "set";
     private static final String CONN_SINGLE_ID = "single";
     private static final Logger LOGGER = LoggerFactory.getLogger(RESTConnectorTest.class);
     private static TestServer testServer;
-
+    
+    static {
+        addPluginLocation("support", "support.json-jackson");
+    }
+    
     /**
      * Creates an instance of this test.
      */

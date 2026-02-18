@@ -29,6 +29,30 @@
 			<version>${project.version}</version>
 		</dependency>
 
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.5.12</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-core</artifactId>
+        <version>1.5.12</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>2.0.15</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>2.0.15</version>
+        <optional>true</optional>
+        <scope>test</scope>
+      </dependency>
+      
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -41,6 +65,13 @@
             <version>4.5.13</version>
 		</dependency>
 
+         <dependency>
+           <groupId>de.iip-ecosphere.platform</groupId>
+           <artifactId>support</artifactId>
+           <version>${project.version}</version>
+           <type>test-jar</type>
+           <scope>test</scope>
+         </dependency>
          <dependency>
            <groupId>de.iip-ecosphere.platform</groupId>
            <artifactId>support.aas</artifactId>
@@ -69,13 +100,19 @@
         <dependency>
           <groupId>com.fasterxml.jackson.core</groupId>
           <artifactId>jackson-core</artifactId>
-          <version>2.18.0</version>
+          <version>2.18.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>com.fasterxml.jackson.core</groupId>
           <artifactId>jackson-databind</artifactId>
-          <version>2.18.0</version>
+          <version>2.18.1</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-annotations</artifactId>
+          <version>2.18.1</version>
           <scope>test</scope>
         </dependency>
 	</dependencies>
