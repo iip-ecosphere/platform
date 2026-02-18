@@ -24,13 +24,14 @@ import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.connectors.types.AbstractProtocolAdapter;
 import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
 /**
  * Tests {@link ConnectorExtensionDescriptor}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ConnectorExtensionDescriptorTest {
+public class ConnectorExtensionDescriptorTest extends TestWithPlugin {
 
     private static final String ID = "abba";
     private static final String VALUE = "xyz";

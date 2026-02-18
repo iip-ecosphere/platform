@@ -50,24 +50,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <artifactId>support.json-jackson</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <scope>test</scope>
-      <version>${project.version}</version>
-    </dependency> 
-    <dependency>
-      <artifactId>support.yaml-snakeyaml</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <scope>test</scope>
-      <version>${project.version}</version>
-    </dependency> 
-    <dependency>
-      <artifactId>support.commons-apache</artifactId>
-      <groupId>de.iip-ecosphere.platform</groupId>
-      <scope>test</scope>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
       <version>${com.googlecode.json-simple.version}</version>
@@ -90,39 +72,48 @@
             <version>${iip.version}</version>
             <executions>
                 <execution>
-                    <id>AAS plugins</id>
+                    <id>okto plugins</id>
                     <goals>
-                        <goal>unpack</goal>
+                        <goal>unpack-plugins</goal>
                     </goals>
                     <phase>test-compile</phase>
                     <configuration>
-                        <artifactItems>
-                            <artifactItem>
-                                <groupId>de.iip-ecosphere.platform</groupId>
+                        <plugins>
+                            <plugin>
+                                <artifactId>support.log-slf4j-simple</artifactId>
+                            </plugin>
+                            <plugin>
                                 <artifactId>support.aas.basyx2</artifactId>
-                                <version>${iip.version}</version>
-                                <type>zip</type>
-                                <classifier>plugin</classifier>
-                                <overWrite>true</overWrite>
-                                <outputDirectory>${project.build.directory}/oktoPlugins/basyx2</outputDirectory>
-                                <destFileName>basyx2.zip</destFileName>
-                            </artifactItem>
-                            <artifactItem>
-                                <groupId>de.iip-ecosphere.platform</groupId>
+                                <appends> <!-- complement the plugin, add the platform logging -->
+                                   <append>support.log-slf4j-simple</append>
+                                </appends>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.aas.basyx2.server</artifactId>
+                                <appends> <!-- complement the plugin, add the platform logging -->
+                                   <append>support.log-slf4j-simple</append>
+                                </appends>
+                            </plugin>
+                            <plugin>
                                 <artifactId>support.aas.basyx</artifactId>
-                                <version>${iip.version}</version>
-                                <type>zip</type>
-                                <classifier>plugin</classifier>
-                                <overWrite>true</overWrite>
-                                <outputDirectory>${project.build.directory}/oktoPlugins/basyx</outputDirectory>
-                                <destFileName>basyx.zip</destFileName>
-                            </artifactItem>
-                        </artifactItems>
-                     <cleanup>
-                         <directory>${project.build.directory}/oktoPlugins</directory>
-                     </cleanup>
-                     <forceCleanup>true</forceCleanup>
-                     <skipIfExists>../../support/support</skipIfExists> <!-- test uses local plugin, not on CI -->
+                                <appends> <!-- complement the plugin, add the platform logging -->
+                                   <append>support.log-slf4j-simple</append>
+                                </appends>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.rest-spark</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.yaml-snakeyaml</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.json-jackson</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>support.commons-apache</artifactId>
+                            </plugin>
+                        </plugins>
+                        <version>${iip.version}</version>
                     </configuration>
                 </execution>
             </executions>

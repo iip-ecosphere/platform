@@ -26,13 +26,14 @@ import de.iip_ecosphere.platform.connectors.parser.JsonInputParser.JsonInputConv
 import de.iip_ecosphere.platform.connectors.parser.JsonInputParser.JsonParseResult;
 import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
 /**
  * Tests {@link JsonOutputFormatter}.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class JsonOutputFormatterTest {
+public class JsonOutputFormatterTest extends TestWithPlugin {
     
     static {
         PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE);

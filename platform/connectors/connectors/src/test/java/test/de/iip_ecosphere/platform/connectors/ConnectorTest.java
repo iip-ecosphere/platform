@@ -41,6 +41,7 @@ import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 import test.de.iip_ecosphere.platform.support.fakeAas.FactoryTest;
 import test.de.iip_ecosphere.platform.transport.Command;
 import test.de.iip_ecosphere.platform.transport.CommandJsonSerializer;
@@ -52,7 +53,7 @@ import test.de.iip_ecosphere.platform.transport.ProductJsonSerializer;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class ConnectorTest {
+public class ConnectorTest extends TestWithPlugin {
 
     private static AasFactory original;
     
