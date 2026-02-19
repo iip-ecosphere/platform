@@ -1,6 +1,6 @@
 /**
  * ******************************************************************************
- * Copyright (c) {2025} The original author or authors
+ * Copyright (c) {2026} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
  * available under the terms of the Eclipse Public License 2.0 which is available 
@@ -14,15 +14,17 @@ package de.iip_ecosphere.platform.support.plugins;
 
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Enumeration;
+
+import de.oktoflow.platform.tools.lib.loader.IndexClassloader;
+import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 
 /**
  * A delegating child classloader to make internal methods accessible.
  * 
  * @author Stackoverflow
  */
-class ChildURLClassLoader extends URLClassLoader implements ChildClassLoader {
+class ChildIndexClassLoader extends IndexClassloader implements ChildClassLoader {
     
     //https://stackoverflow.com/questions/5445511/how-do-i-create-a-parent-last-child-first-classloader
     // -in-java-or-how-to-overr
@@ -36,11 +38,11 @@ class ChildURLClassLoader extends URLClassLoader implements ChildClassLoader {
     /**
      * Creates an instance with delegation to the real parent class loader.
      * 
-     * @param urls the URLs to load classes from
-     * @param realParent
+     * @param index the index to load classes from
+     * @param realParent the real parent
      */
-    public ChildURLClassLoader(URL[] urls, FindClassClassLoader realParent) {
-        super(urls, null);
+    public ChildIndexClassLoader(LoaderIndex index, FindClassClassLoader realParent) {
+        super(index, null);
         this.realParent = realParent;
     }
     
@@ -49,6 +51,10 @@ class ChildURLClassLoader extends URLClassLoader implements ChildClassLoader {
         URL result = findResource(name);
         if (null == result) {
             result = realParent.getResource(name);
+            if (null == result) {
+                String modName = name.replace('$', '/'); // Spring 2.4 behavior package$Class for non-inner classes
+                result = realParent.getResource(modName);
+            }
         }
         return result;
     }
@@ -68,46 +74,27 @@ class ChildURLClassLoader extends URLClassLoader implements ChildClassLoader {
     public Class<?> findClass(String name) throws ClassNotFoundException {
         Class<?> result = findLoadedClass(name); 
         if (null == result) {
-            result = findClassIntern(name);
+            try {
+                // first try to use the URLClassLoader findClass
+                result = super.findClass(name);
+            } catch (ClassNotFoundException e) {
+                // if that fails, we ask our real parent classloader to load the class (we give up)
+                result = realParent.loadClass(name);
+            }
         }
         return result;
-    }
-        
-    /**
-     * Finds a class (no caching).
-     * 
-     * @param name the qualified class name
-     * @return the class object
-     * @throws ClassNotFoundException if the class cannot be found
-     */
-    public Class<?> findClassIntern(String name) throws ClassNotFoundException {
-        boolean isJava = name.startsWith("java.") || name.startsWith("javax."); // java is java
-        try {
-            if (isJava) {
-                return realParent.loadClass(name);
-            }
-        } catch (ClassNotFoundException e) {
-            // may also fail if there is eg no logger, the try super
-        }
-        try {
-            // first try to use the URLClassLoader findClass
-            return super.findClass(name);
-        } catch (ClassNotFoundException e) {
-            // if that fails, we ask our real parent classloader to load the class (we give up)
-            return realParent.loadClass(name);
-        }
     }
         
 }    
 
 /**
- * A delegating child-first URL classloader.
+ * A delegating child-first index classloader.
  * 
  * @author Stackoverflow
  * @author Holger Eichelberger, SSE
  */
-public class ChildFirstURLClassLoader extends ChildFirstClassLoader {
-    
+public class ChildFirstIndexClassLoader extends ChildFirstClassLoader {
+
     //https://stackoverflow.com/questions/5445511/how-do-i-create-a-parent-last-child-first-classloader
     // -in-java-or-how-to-overr
     
@@ -118,20 +105,20 @@ public class ChildFirstURLClassLoader extends ChildFirstClassLoader {
     /**
      * Creates a child-first classloader using the context class loader of the current thread as parent.
      * 
-     * @param urls the URLs to load classes from
+     * @param index the index to load classes from
      */
-    public ChildFirstURLClassLoader(URL[] urls) {
-        this(urls, null);
+    public ChildFirstIndexClassLoader(LoaderIndex index) {
+        this(index, null);
     }        
 
     /**
      * Creates a child-first classloader.
      * 
-     * @param urls the URLs to load classes from
+     * @param index the index to load classes from
      * @param parent the parent class loader
      */
-    public ChildFirstURLClassLoader(URL[] urls, ClassLoader parent) {
-        super(p -> new ChildURLClassLoader(urls, p), parent);
+    public ChildFirstIndexClassLoader(LoaderIndex index, ClassLoader parent) {
+        super(p -> new ChildIndexClassLoader(index, p), parent);
     }
-    
-}    
+
+}

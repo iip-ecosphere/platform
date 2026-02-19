@@ -24,8 +24,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
-import de.oktoflow.platform.tools.lib.loader.ChildFirstIndexedClassloader;
+import de.oktoflow.platform.tools.lib.loader.IndexClassloader;
 import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 
 /**
@@ -134,7 +135,7 @@ public class URLPluginSetupDescriptor implements PluginSetupDescriptor {
         ClassLoader result = null;
         if (ChildFirstClassLoader.useChildFirst()) {
             File idxFile = getIndexFile();
-            if (null != idxFile) {
+            if (null != idxFile && OsUtils.getBooleanEnv("OKTO_USE_PLUGIN_INDEXES", true)) {
                 try {
                     LoaderIndex index = LoaderIndex.fromFile(idxFile);
                     Map<String, String> urlMapping = new HashMap<>();
@@ -148,11 +149,11 @@ public class URLPluginSetupDescriptor implements PluginSetupDescriptor {
                         }
                     }
                     index.substituteLocations(urlMapping);
-                    result = new ChildFirstIndexedClassloader(index, parent);
+                    result = new ChildFirstIndexClassLoader(index, parent);
                 } catch (IOException | URISyntaxException e) {
                     LoggerFactory.getLogger(URLPluginSetupDescriptor.class).warn(
                         "Cannot create {}, falling back to {}. Reason: {}", 
-                        ChildFirstIndexedClassloader.class.getSimpleName(), 
+                        IndexClassloader.class.getSimpleName(), 
                         ChildFirstURLClassLoader.class.getSimpleName(), 
                         e.getMessage());
                 }

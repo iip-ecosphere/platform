@@ -122,12 +122,7 @@ public class ChildFirstClassLoader extends ClassLoader implements IdentifyingCla
      * @return {@code true} or the value of the environment variable {@code OKTO_PLUGIN_CHILD_FIRST}
      */
     public static boolean useChildFirst() {
-        boolean result = true;
-        String tmp = OsUtils.getEnv("OKTO_PLUGIN_CHILD_FIRST");
-        if (tmp != null) {
-            result = Boolean.valueOf(tmp);
-        }
-        return result;
+        return OsUtils.getBooleanEnv("OKTO_PLUGIN_CHILD_FIRST", true);
     }
     
 }

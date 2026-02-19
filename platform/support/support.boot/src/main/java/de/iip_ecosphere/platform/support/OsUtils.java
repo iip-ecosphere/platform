@@ -106,7 +106,34 @@ public class OsUtils {
         }
         return result;
     }
-    
+
+    /**
+     * Returns a value from the system environment, either as given or all in capital characters with dots replaced 
+     * by underscores.
+     * 
+     * @param key the key to look for
+     * @param dflt the value to use if there is no configured value
+     * @return the value, may by {@code dflt} for none
+     * @see #getEnv(String)
+     */
+    public static String getEnv(String key, String dflt) {
+        String result = getEnv(key);
+        return result == null ? dflt : result;
+    }
+
+    /**
+     * Returns a boolean value from the system environment, either as given or all in capital characters with dots 
+     * replaced by underscores.
+     * 
+     * @param key the key to look for
+     * @param dflt the value to use if there is no configured value
+     * @return the value, may by {@code dflt} for none
+     * @see #getEnv(String, String)
+     */
+    public static boolean getBooleanEnv(String key, boolean dflt) {
+        return Boolean.valueOf(getEnv(key, String.valueOf(dflt)));
+    }
+
     /**
      * Returns a value from the system properties or system environment, either as given or all in capital 
      * characters with dots replaced by underscores.
