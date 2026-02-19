@@ -85,6 +85,7 @@ import static de.iip_ecosphere.platform.services.spring.SpringInstances.*;
 public class SpringCloudServiceManager 
     extends AbstractServiceManager<SpringCloudArtifactDescriptor, SpringCloudServiceDescriptor> {
 
+    public static final String PLUGIN_ID = "services-spring";
     public static final String OPT_SERVICE_PREFIX = "iip.service.";
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringCloudServiceManager.class);
     private ServerManager serverManager;
@@ -115,7 +116,7 @@ public class SpringCloudServiceManager
          * Creates an instance. [JSL]
          */
         public SpringCloudServiceFactoryDescriptor() {
-            super("services", List.of("services-spring"), ServiceFactoryDescriptor.class, null);
+            super("services", List.of(PLUGIN_ID), ServiceFactoryDescriptor.class, null);
             LifecycleHandler.consider(getClass().getClassLoader());
         }
 

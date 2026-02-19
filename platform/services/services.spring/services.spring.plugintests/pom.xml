@@ -143,6 +143,7 @@
                         <relocate>true</relocate> <!-- needed to enable append -->
                         <relocateTarget>${project.build.directory}/jars</relocateTarget>
                         <version>${iip.version}</version>
+                        <createIndex>false</createIndex> <!-- preliminary -->
                     </configuration>
                 </execution>
 
