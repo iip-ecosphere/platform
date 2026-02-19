@@ -375,6 +375,11 @@ public class LoaderIndex implements Serializable {
      * be ignored
      */
     public void substituteLocations(Map<String, String> mapping) {
+        for (String v : mapping.values()) {
+            if (!new File(v).exists()) {
+                System.out.println("WARNING: substitution " + v + " does not exist.");
+            }
+        }
         for (String oldVal : mapping.keySet()) {
             String loc = locationReverseIndex.remove(oldVal);
             if (null != loc) {

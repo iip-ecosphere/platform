@@ -31,9 +31,9 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 /**
- * A priority (child first) class loader that takes its indexing from an index file. Requires first running 
- * {@link LoaderIndex#createIndex(List, java.util.function.Consumer)} on the Jars to load and then feeding this class 
- * loader with the index file. We 
+ * A class loader that takes its indexing from an index file. Requires first running 
+ * {@link LoaderIndex#createIndex(List, java.util.function.Consumer)} on the Jars to load and then feeding the index 
+ * into this class loader with. We 
  * inherit from {@link URLClassLoader} and override {@link #getURLs()} so that frameworks like 
  * <a href="https://github.com/classgraph/classgraph">ClassGraph</a> take a (transparent) notice of this class loader.
  * 
@@ -41,7 +41,7 @@ import java.util.jar.JarFile;
  * @author ChatGPT
  * @author Holger Eichelberger, SSE
  */
-public class ChildFirstIndexedClassloader extends URLClassLoader {
+public class IndexClassloader extends URLClassLoader {
     
     private static final String CLASS_SUFFIX = ".class";
     private final List<String> files;
@@ -60,7 +60,7 @@ public class ChildFirstIndexedClassloader extends URLClassLoader {
      * @param index the index instance
      * @param parent the parent class loader for delegation
      */
-    public ChildFirstIndexedClassloader(LoaderIndex index, ClassLoader parent) {
+    public IndexClassloader(LoaderIndex index, ClassLoader parent) {
         super(new URL[0], parent);
         this.files = index.getFilesList();
         this.locationIndex = index.getLocationIndex();
@@ -75,7 +75,7 @@ public class ChildFirstIndexedClassloader extends URLClassLoader {
      * @param parent the parent class loader for delegation
      * @throws IOException if loading the index fails
      */
-    public ChildFirstIndexedClassloader(File index, ClassLoader parent) throws IOException {
+    public IndexClassloader(File index, ClassLoader parent) throws IOException {
         this(LoaderIndex.fromFile(index), parent);
     }
 
@@ -177,8 +177,12 @@ public class ChildFirstIndexedClassloader extends URLClassLoader {
     private String getResourceLocation(String name) {
         String locStr = resourceIndex.get(name);
         if (null == locStr && name.endsWith(CLASS_SUFFIX)) {
-            name = name.substring(0, name.length() - CLASS_SUFFIX.length()).replace('/', '.');
-            locStr = classIndex.get(name);
+            String modName = name.substring(0, name.length() - CLASS_SUFFIX.length()).replace('/', '.');
+            locStr = classIndex.get(modName);
+            if (null == locStr) {
+                // Spring 2.4 behavior package$Class for non-inner classes
+                locStr = classIndex.get(modName.replace('$', '/')); 
+            }
         }    
         return locStr;
     }

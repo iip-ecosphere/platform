@@ -17,13 +17,13 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import de.oktoflow.platform.tools.lib.loader.ChildFirstIndexedClassloader;
+import de.oktoflow.platform.tools.lib.loader.IndexClassloader;
 import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 
 import org.junit.Assert;
 
 /**
- * Tests {@link ChildFirstIndexedClassloader}.
+ * Tests {@link IndexClassloader}.
  * 
  * @author Holger Eichelberger, SSE
  *
@@ -32,7 +32,7 @@ public class ChildFirstIndexedClassLoaderTest {
 
     
     /**
-     * Tests {@link ChildFirstIndexedClassloader}.
+     * Tests {@link IndexClassloader}.
      * 
      * @throws IOException if files are not found
      * @throws ClassNotFoundException the the expected class is not found
@@ -58,7 +58,7 @@ public class ChildFirstIndexedClassLoaderTest {
         Assert.assertNotNull(index.getResourceLocations(resName));
         Assert.assertNull(index.getResourceLocations("abc"));
 
-        ChildFirstIndexedClassloader loader = new ChildFirstIndexedClassloader(indexFile, null);
+        IndexClassloader loader = new IndexClassloader(indexFile, null);
         Class<?> cls = loader.loadClass(clsName);
         Assert.assertNotNull(cls);
         Assert.assertEquals(clsName, cls.getName());
