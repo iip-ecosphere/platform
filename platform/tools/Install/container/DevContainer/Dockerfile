@@ -36,6 +36,12 @@ COPY ui_starter.sh ui_starter.sh
 COPY target/easy /root/platform/target/easy
 COPY target/template/ /root/platform/src/main/easy/
 
+# getting install
+RUN mkdir -p /root/platform/Install \
+ && wget -O /root/platform/install.tar.gz \
+    https://projects.sse.uni-hildesheim.de/oktoflow/install.tar.gz \
+ && tar -xzf /root/platform/install.tar.gz -C /root/platform/Install
+
 RUN chmod 777 *   
 
 # ------ Eclipse ----------------------------------------------------------------------
@@ -47,10 +53,20 @@ RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-ke
 RUN sudo apt-get update
 RUN sudo apt-get install openjdk-21-jre -y
 RUN sudo apt-get install openjdk-8-jre -y
-RUN sudo apt install maven -y
 RUN sudo apt install git -y 
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt-get install -y nodejs
 RUN sudo apt install gedit -y
+# maven
+RUN wget https://archive.apache.org/dist/maven/maven-3/3.9.7/binaries/apache-maven-3.9.7-bin.tar.gz
+RUN tar xzpvf apache-maven-3.9.7-bin.tar.gz
+RUN ln -s $PWD/apache-maven-3.9.7/bin/mvn /usr/bin/mvn
+# py dependencies
+RUN apt-get update && apt-get install -y python3-pip
+RUN python3 -m pip install websockets==11.0.2
+
+# ------ Installing platform dependencies ---------------------------------------------
+RUN mvn -f /root/platform/Install/pom.xml -P DepsOnly install
+
 
 # ------ intalling newer version of firefox -------------------------------------------
 RUN apt-get update && apt-get install -y \
