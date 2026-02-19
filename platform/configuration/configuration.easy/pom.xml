@@ -199,6 +199,25 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
+    <!-- keep plugins for platform instantiator -->
+    <dependency>
+      <artifactId>support.json-jackson</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency> 
+    <dependency>
+      <artifactId>support.yaml-snakeyaml</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency> 
+    <dependency>
+      <artifactId>support.commons-apache</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -483,6 +502,7 @@
                          <appends> <!-- test dependencies, declared in configuration.maven -->
                              <append>repo/de/iip-ecosphere/platform/support.json-jackson/${project.version}/support.json-jackson-${project.version}.jar</append>
                              <append>repo/de/iip-ecosphere/platform/support.yaml-snakeyaml/${project.version}/support.yaml-snakeyaml-${project.version}.jar</append>
+                             <append>repo/de/iip-ecosphere/platform/support.yaml-snakeyaml/${project.version}/support.commons-apache-${project.version}.jar</append>
                          </appends>
                      </configuration>
                  </execution>
@@ -508,6 +528,7 @@
                          <appends> <!-- test dependencies, declared in configuration.maven -->
                              <append>repo/de/iip-ecosphere/platform/support.json-jackson/${project.version}/support.json-jackson-${project.version}.jar</append>
                              <append>repo/de/iip-ecosphere/platform/support.yaml-snakeyaml/${project.version}/support.yaml-snakeyaml-${project.version}.jar</append>
+                             <append>repo/de/iip-ecosphere/platform/support.yaml-snakeyaml/${project.version}/support.commons-apache-${project.version}.jar</append>
                          </appends>
                      </configuration>
                  </execution>
