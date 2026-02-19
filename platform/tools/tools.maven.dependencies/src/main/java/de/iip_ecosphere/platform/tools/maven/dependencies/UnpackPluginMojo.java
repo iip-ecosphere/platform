@@ -677,31 +677,35 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
      * @param cpFile the associated classpath file to create the index for
      */
     private void writeIndex(List<JarLocation> locs, File cpFile) {
-        if (createIndex && !Layers.isOsCpFile(cpFile)) {
-            long start = System.currentTimeMillis();
-            getLog().info("Indexing classes...");
+        if (!Layers.isOsCpFile(cpFile)) {
             File index = new File(cpFile.toString() + ".idx");
-            try {
-                LoaderIndex idx = new LoaderIndex();
-                AtomicInteger exceptionCount = new AtomicInteger();
-                for (JarLocation loc: locs) {
-                    // handle exceptions tolerantly, sometimes class files are listed but not present/needed
-                    LoaderIndex.addToIndex(idx, loc.toFile(), loc.actual, 
-                        ex -> {
-                            exceptionCount.incrementAndGet();
-                            getLog().warn(ex.getClass().getSimpleName() + " " + ex.getMessage());
-                        });
+            if (createIndex) {
+                long start = System.currentTimeMillis();
+                getLog().info("Indexing classes...");
+                try {
+                    LoaderIndex idx = new LoaderIndex();
+                    AtomicInteger exceptionCount = new AtomicInteger();
+                    for (JarLocation loc: locs) {
+                        // handle exceptions tolerantly, sometimes class files are listed but not present/needed
+                        LoaderIndex.addToIndex(idx, loc.toFile(), loc.actual, 
+                            ex -> {
+                                exceptionCount.incrementAndGet();
+                                getLog().warn(ex.getClass().getSimpleName() + " " + ex.getMessage());
+                            });
+                    }
+                    if (exceptionCount.get() < locs.size() // not only exceptions, we found classes or resources
+                        && idx.getClassesCount() + idx.getResourcesCount() > 0) { // resort to usual classloader
+                        LoaderIndex.toFile(idx, index);
+                        getLog().info("Stored class index to " + index + " " + idx.getClassesCount() + " classes and " 
+                            + idx.getResourcesCount() + " resources in " + idx.getLocationsCount() + " locations in " 
+                            + (System.currentTimeMillis() - start) + " ms");
+                    }
+                } catch (IOException e) {
+                    getLog().error("Cannot write index file " + index + ": " + e.getClass().getSimpleName() 
+                        + " " + e.getMessage());
                 }
-                if (exceptionCount.get() < locs.size() // not only exceptions, we found classes or resources
-                    && idx.getClassesCount() + idx.getResourcesCount() > 0) { // resort to usual classloader
-                    LoaderIndex.toFile(idx, index);
-                    getLog().info("Stored class index to " + index + " " + idx.getClassesCount() + " classes and " 
-                        + idx.getResourcesCount() + " resources in " + idx.getLocationsCount() + " locations in " 
-                        + (System.currentTimeMillis() - start) + " ms");
-                }
-            } catch (IOException e) {
-                getLog().error("Cannot write index file " + index + ": " + e.getClass().getSimpleName() 
-                    + " " + e.getMessage());
+            } else { // if indexes are disabled, do not trigger index-based class loading
+                index.delete();
             }
         }
     }
