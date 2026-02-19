@@ -189,17 +189,21 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
         if (!closing) {
             closing = true;
             super.disconnect();
-            try {
-                channel.close();
-            } catch (TimeoutException e) {
-                // nothing for now
-            } catch (AlreadyClosedException e) {
-                // ok, fine
+            if (null != channel) {
+                try {
+                    channel.close();
+                } catch (TimeoutException e) {
+                    // nothing for now
+                } catch (AlreadyClosedException e) {
+                    // ok, fine
+                }
             }
-            try {
-                connection.close();
-            }  catch (AlreadyClosedException e) {
-                // ok, fine
+            if (null != connection) {
+                try {
+                    connection.close();
+                }  catch (AlreadyClosedException e) {
+                    // ok, fine
+                }
             }
         }
     }

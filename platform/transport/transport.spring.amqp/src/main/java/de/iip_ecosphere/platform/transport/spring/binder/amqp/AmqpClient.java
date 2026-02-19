@@ -167,11 +167,15 @@ public class AmqpClient {
             for (String t: tpcs) {
                 unsubscribeFrom(t);
             }
-            channel.close();
+            if (null != channel) {
+                channel.close();
+                channel = null;
+            }
             topics.clear();
-            channel = null;
-            connection.close();
-            connection = null;
+            if (null != connection) {
+                connection.close();
+                connection = null;
+            }
         } catch (IOException | TimeoutException e) {
             LOGGER.error("Stopping AMQP client: " + e.getMessage(), e);
         }
