@@ -3,8 +3,7 @@ project DataTypes {
     import MetaConcepts;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
-    //annotate Integer uiGroup = UiMandatoryGroup1 to .; // reasoner re-assignment issue
-    // then Field: display*, readOnly, nullable and semanticId as well as RecordType: refine and semanticId -> optional1
+    annotate Integer uiGroup = UiMandatoryGroup1 to .; 
     
     NonEmptyString iipVer = "0.7.1-SNAPSHOT"; // Maven version of platform
     const String mvnIipGroup = "de.iip-ecosphere.platform";
@@ -46,7 +45,9 @@ project DataTypes {
     abstract compound DataType {
         NonEmptyString name;
         Constraint isNameOk = isNameOk(self);
-        String semanticId = "";
+        assign (uiGroup = UiOptionalGroup1) to {
+            String semanticId = "";
+        }
     }
     
     @DispatchBasis
@@ -55,7 +56,9 @@ project DataTypes {
     
     compound AliasType refines DataType {
         refTo(DataType) represents;
-        String semanticId = represents.semanticId;
+         assign (uiGroup = UiOptionalGroup1) to {
+            String semanticId = represents.semanticId;
+        }
     }
     
     // allow for unique selection on UI, not necessarily needed for code generation
@@ -132,7 +135,9 @@ project DataTypes {
  
     compound RecordType refines CDataProperty, DataType {
         Fields fields;
-        refTo(RecordType) refining = null;
+        assign (uiGroup = UiOptionalGroup1) to {
+            refTo(RecordType) refining = null;
+        }
         Constraint fieldNamesUnique = fields->select(f|isRelevant(f))->isUnique(l|l.name);
         Constraint cycleFree = createRecordTypeSet(self)->isAcyclic(RecordType t|t.refining) and fieldsOk(self);
     }
@@ -170,13 +175,15 @@ project DataTypes {
             refTo(DataType) type;
             String description = "";
             Boolean optional = false;
-            Boolean readOnly = false;
-            Boolean nullable = false;
-            String semanticId = type.semanticId;
-            String displayName = "";
-            Display display = null;
-            refTo(DisplayRow) displayRow = null;
-            setOf(refTo(DisplayPanel)) displayPanel = null;
+            assign (uiGroup = UiOptionalGroup1) to {
+                Boolean readOnly = false;
+                Boolean nullable = false;
+                String semanticId = type.semanticId;
+                String displayName = "";
+                Display display = null;
+                refTo(DisplayRow) displayRow = null;
+                setOf(refTo(DisplayPanel)) displayPanel = null;
+            }
         }
         Integer cachingTime = CACHE_ALWAYS;
         Constraint isNameOk = isNameOk(self);

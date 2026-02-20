@@ -3,6 +3,7 @@
 template TemplatesVsCodeEnvProject(IIPEcosphere config, FileArtifact target) {
 	
     def main(IIPEcosphere config, FileArtifact target) {
+        // initial, focuses on workspace root not project, unclear; no input
         String sep = target.getPathSeparator();
         '{
              "python.pythonPath": "\\${PYTHONPATH}${sep}\\${workspaceRoot}/target/pyEnv/iip${sep}\\${workspaceRoot}/target/pySrc"

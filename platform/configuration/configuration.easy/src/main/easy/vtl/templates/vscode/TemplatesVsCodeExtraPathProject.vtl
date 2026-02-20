@@ -1,0 +1,11 @@
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template TemplatesVsCodeExtraPathProject(IIPEcosphere config, FileArtifact target) {
+	
+    def main(IIPEcosphere config, FileArtifact target) {
+        '{
+             "python.analysis.extraPaths": ["./target/pyEnv/iip", "./target/pySrc"]
+        }'
+    }
+	
+}

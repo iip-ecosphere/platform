@@ -322,6 +322,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 Path vsCodeSettings = "${appRoot}/.vscode";
                 vsCodeSettings.mkdir();
                 vilTemplateProcessor("TemplatesVsCodeEnvProject", config, "${vsCodeSettings}/settings.json");
+                vilTemplateProcessor("TemplatesVsCodeExtraPathProject", config, "${vsCodeSettings}/pref.json");
 
                 setOf(AssemblyInfo) assemblies = {}; 
                 mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
