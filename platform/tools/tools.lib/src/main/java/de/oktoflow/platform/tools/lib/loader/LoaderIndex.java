@@ -98,7 +98,7 @@ public class LoaderIndex implements Serializable {
                     String className = name
                             .replace('/', '.')
                             .replaceAll("\\.class$", "");
-                    addToIndex(index, index.classIndex, className, location, false);
+                    addToIndex(index, index.classIndex, className, location, true);
                 } else {
                     addToIndex(index, index.resourceIndex, name, location, true);
                 }
