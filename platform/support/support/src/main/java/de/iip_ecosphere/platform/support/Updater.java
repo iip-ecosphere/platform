@@ -138,7 +138,7 @@ public class Updater {
                     }
                 }
             }
-            if (pluginFile.exists()) {
+            if (pluginFile.exists() && !indexFile.exists()) {
                 try {
                     List<String> lines = IOUtils.readLines(new FileInputStream(pluginFile));
                     List<Path> jarPaths = new ArrayList<>();
@@ -179,9 +179,15 @@ public class Updater {
         ZipUtils.extractZip(new FileInputStream(file), pluginDir.toPath(), 
             e -> !e.getName().equals("resolved"), false, pathConsumer);
         File cp = new File(pluginDir, "classpath");
+        File cpIdx = new File(pluginDir, "classpath.idx");
         File cpTarget = new File(pluginDir, name);
         FileUtils.deleteQuietly(cpTarget);
         cp.renameTo(cpTarget);
+        if (cpIdx.isFile()) {
+            cpTarget = new File(pluginDir, name + ".idx");
+            FileUtils.deleteQuietly(cpTarget);
+            cpIdx.renameTo(cpTarget);
+        }
         FileUtils.deleteQuietly(file);
         // relocate target -> plugins ?
     }

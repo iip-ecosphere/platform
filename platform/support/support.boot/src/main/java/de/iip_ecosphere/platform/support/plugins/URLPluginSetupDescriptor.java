@@ -135,7 +135,8 @@ public class URLPluginSetupDescriptor implements PluginSetupDescriptor {
         ClassLoader result = null;
         if (ChildFirstClassLoader.useChildFirst()) {
             File idxFile = getIndexFile();
-            if (null != idxFile && OsUtils.getBooleanEnv("OKTO_USE_PLUGIN_INDEXES", true)) {
+            if (null != idxFile && idxFile.isFile() && idxFile.length() > 0 
+                && OsUtils.getBooleanEnv("OKTO_USE_PLUGIN_INDEXES", true)) {
                 try {
                     LoaderIndex index = LoaderIndex.fromFile(idxFile);
                     Map<String, String> urlMapping = new HashMap<>();
