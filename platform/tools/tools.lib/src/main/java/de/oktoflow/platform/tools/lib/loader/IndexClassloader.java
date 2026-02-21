@@ -98,7 +98,7 @@ public class IndexClassloader extends URLClassLoader {
         if (null == locStr) {
             throw new ClassNotFoundException(name);
         }
-        locStr = locStr.split(LoaderIndex.RESOURCE_SEPARATOR)[0]; // only the first one here
+        locStr = LoaderIndex.getFirstResourceLocation(locStr); // only the first one here
         String jarPathStr = locationIndex.get(locStr);
         Path jarPath = Paths.get(jarPathStr);
         try {
@@ -141,7 +141,7 @@ public class IndexClassloader extends URLClassLoader {
         if (null == locStr) {
             return null;
         }
-        locStr = locStr.split(LoaderIndex.RESOURCE_SEPARATOR)[0]; // only the first one here
+        locStr = LoaderIndex.getFirstResourceLocation(locStr); // only the first one here
         String jarPathStr = locationIndex.get(locStr);
         Path jarPath = Paths.get(jarPathStr);
         try {

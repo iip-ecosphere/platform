@@ -25,8 +25,22 @@ import java.util.jar.JarFile;
  * @author Holger Eichelberger, SSE
  */
 public class LoaderIndex implements Serializable {
+
+    /**
+     * Introduces the "default" file name suffix for index files.
+     */
+    public static final String INDEX_SUFFIX = ".idx";
+
+    /**
+     * Defines the separator between multiple resources/locations as character.
+     */
+    public static final char RESOURCE_SEPARATOR_CHAR = ',';
+
+    /**
+     * Defines the separator between multiple resources/locations as String.
+     */
+    public static final String RESOURCE_SEPARATOR = String.valueOf(RESOURCE_SEPARATOR_CHAR);
     
-    public static final String RESOURCE_SEPARATOR = ",";
     private static final long serialVersionUID = -3350988607004003802L;
 
     private List<String> files = new ArrayList<>();
@@ -327,6 +341,17 @@ public class LoaderIndex implements Serializable {
             }
         }
         return result;
+    }
+    
+    /**
+     * Returns the first location in {@code locStr} before {@link LoaderIndex#RESOURCE_SEPARATOR} if stated at all.
+     * 
+     * @param locStr the locations string
+     * @return the first location
+     */
+    public static String getFirstResourceLocation(String locStr) {
+        int i = locStr.indexOf(RESOURCE_SEPARATOR_CHAR);
+        return i < 0 ? locStr : locStr.substring(0, i);
     }
     
     /**

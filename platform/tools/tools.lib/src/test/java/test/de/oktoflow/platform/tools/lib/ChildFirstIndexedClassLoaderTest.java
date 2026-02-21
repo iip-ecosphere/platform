@@ -14,6 +14,9 @@ package test.de.oktoflow.platform.tools.lib;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -43,10 +46,13 @@ public class ChildFirstIndexedClassLoaderTest {
         final String clsName = "indexLoaderTest.ClassToLoad";
         final String resName = "testResource.txt";
         final String location = "src/test/resources/index.jar";
+        final String location2 = "src/test/resources/index2.jar";
 
         LoaderIndex index = new LoaderIndex();
         LoaderIndex.addToIndex(index, true, clsName, location);
+        LoaderIndex.addToIndex(index, true, clsName, location2);
         LoaderIndex.addToIndex(index, false, resName, location);
+        LoaderIndex.addToIndex(index, false, resName, location2);
         LoaderIndex.toFile(index, indexFile);
         System.out.println("index.idx written");
         
@@ -65,6 +71,9 @@ public class ChildFirstIndexedClassLoaderTest {
         Assert.assertNotNull(loader.findResource(resName));
         Assert.assertNotNull(loader.getResource(resName));
         Assert.assertNotNull(loader.getResourceAsStream(resName));
+        List<URL> res = Collections.list(loader.getResources(resName));
+        Assert.assertEquals(2, res.size());
+        Assert.assertNotNull(loader.getURLs()); // the construction here does not add URLs
         loader.close();
     }
     
