@@ -204,6 +204,11 @@ template JavaMapping(Configuration config, FileArtifact target) {
             default: ""
         }
     }
+    
+    // added v2->v3
+    def getIipGroup() {
+        "de.iip-ecosphere.platform";
+    }
 
     def String aasExclusions(IIPEcosphere cfg, Boolean withAasClientExclusions=false, Boolean withAasServerExclusions=false) {
         String result = "";

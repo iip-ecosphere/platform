@@ -356,7 +356,7 @@ template JavaBasics(Configuration config, FileArtifact target) {
         Boolean withCentralMonitoringModule=false, Boolean withDeviceRegistryModules=false, Boolean withContainerManagerModule=false, 
         Boolean withConfigModule=false) {
         String projectVersion = config.iipVer;
-        String iipGroup = "de.iip-ecosphere.platform";
+        String iipGroup = getIipGroup();
         sequenceOf(String) result = {};
         if (withLogging) {
             // later included simple may collide, we run for now with default implementation

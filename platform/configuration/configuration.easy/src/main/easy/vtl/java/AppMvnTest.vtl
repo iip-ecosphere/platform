@@ -38,6 +38,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         new XmlComment(properties, "Could be project.version, but that may differ depending on implementation, context, ...");
         projectVersion = "\\${iip.version}";
         
+        XmlElement globalDeps = createDependencies(project);
         XmlElement profiles = new XmlElement(project, "profiles");
         XmlElement profile = new XmlElement(profiles, "profile");
         new XmlElement(profile, "id", "App");
@@ -58,7 +59,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         appendExclusion(e, "org.springframework.boot", "spring-boot-starter-web");
         appendExclusion(e, "org.springframework.boot", "spring-boot-starter-actuator"); 
         appendDependency(dep, gId, appName, appVersion, scope="test", type="test-jar");
-        appendDependencies(dep, oktoPlugins, projectVersion, enable=withoutPlugins(config));
+        appendDependencies(globalDeps, oktoPlugins, projectVersion, enable=withoutPlugins(config));
      
         XmlElement build = createMavenBuildElement(profile, "", false);
         XmlElement plugins = createPlugins(build);
@@ -91,7 +92,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
             new XmlElement(exec, "id", "${clsName}Test");
             XmlElement execCfg = new XmlElement(exec, "configuration");
             new XmlElement(execCfg, "mainClass", "iip.nodes.${clsName}Test");
-            new XmlElement(execCfg, "classpathFilenameExclusions", testClasspathFnExclusions);
+            new XmlElement(execCfg, "dependencyaclasspathFilenameExclusions", testClasspathFnExclusions);
             new XmlElement(execCfg, "classpathScope", "test");
             if (elt.impl.isKindOf(Connector)) {
                 XmlElement exec = new XmlElement(execPluginExecs, "execution");
@@ -103,11 +104,12 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
             }
         }
         XmlElement exec = new XmlElement(execPluginExecs, "execution");
-        new XmlElement(exec, "id", "App");
+        new XmlElement(exec, "id", "app");
         XmlElement execCfg = new XmlElement(exec, "configuration");
         new XmlElement(execCfg, "mainClass", getStarterMainClass(config.serviceManager));
         XmlElement execArgs = new XmlElement(execCfg, "arguments");
-        new XmlElement(execArgs, "argument", "<put relative location of integrated, generated application here>");
+        String artifactsFolder = getStringValueSafe(config.artifactsFolder, config.artifactsFolderDflt);
+        new XmlElement(execArgs, "argument", "${artifactsFolder}/${appName}.jar");
         new XmlElement(execCfg, "classpathScope", "test");
         
         exec = new XmlElement(execPluginExecs, "execution");
@@ -119,26 +121,26 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         new XmlElement(execArgs, "argument", "--status=true");
         new XmlElement(execCfg, "classpathScope", "test");
         
-        dep = createDependencies(project);
-        new XmlComment(dep, "Due to required exclusions, this dependency must be repeated as early as possible. Typically, it does not conflict with usual dependencies in profiles.");
-        appendDependency(dep, "org.glassfish", "jakarta.el", scope="test");
-        appendDependency(dep, "de.iip-ecosphere.platform", "services.environment", projectVersion);
-        appendDependency(dep, iipGroup, serviceEnvironmentModule(config), projectVersion);
-        appendDependency(dep, iipGroup, serviceLoaderModule(config), projectVersion);
-        appendDependency(dep, iipGroup, "kiServices.functions", projectVersion);
-        d = appendDependency(dep, iipGroup, "examples", projectVersion);
+//        dep = createDependencies(project);
+        new XmlComment(globalDeps, "Due to required exclusions, this dependency must be repeated as early as possible. Typically, it does not conflict with usual dependencies in profiles.");
+        appendDependency(globalDeps, "org.glassfish", "jakarta.el", scope="test");
+        appendDependency(globalDeps, "de.iip-ecosphere.platform", "services.environment", projectVersion);
+        appendDependency(globalDeps, iipGroup, serviceEnvironmentModule(config), projectVersion);
+        appendDependency(globalDeps, iipGroup, serviceLoaderModule(config), projectVersion);
+        appendDependency(globalDeps, iipGroup, "kiServices.functions", projectVersion);
+        d = appendDependency(globalDeps, iipGroup, "examples", projectVersion);
         appendSingleExclusion(d, iipGroup, "services.spring");
-        new XmlComment(dep, "Remaining global dependencies go here."); 
-        appendDependency(dep, "junit", "junit", scope="test");
-        new XmlComment(dep, "Initially, fixed protocol");
-        //appendDependency(dep, iipGroup, aasClientModule(config), projectVersion);
-        appendDependency(dep, iipGroup, "support", projectVersion);
-        appendDependency(dep, iipGroup, "transport", projectVersion, scope="test", type="test-jar");
-        appendDependencies(dep, globalOktoPlugins, projectVersion, enable=withoutPlugins(config));
-        //appendDependency(dep, iipGroup, transportProtocolModule(config), projectVersion);
-        appendDependency(dep, iipGroup, serviceManagerModule(config), projectVersion, scope="test");
-        appendServiceManagerDeps(dep, config.serviceManager);
-        new XmlComment(dep, "Remaining test dependencies go here.");
+        new XmlComment(globalDeps, "Remaining global dependencies go here."); 
+        appendDependency(globalDeps, "junit", "junit", scope="test");
+        new XmlComment(globalDeps, "Initially, fixed protocol");
+        //appendDependency(globalDeps, iipGroup, aasClientModule(config), projectVersion);
+        appendDependency(globalDeps, iipGroup, "support", projectVersion);
+        appendDependency(globalDeps, iipGroup, "transport", projectVersion, scope="test", type="test-jar");
+        appendDependencies(globalDeps, globalOktoPlugins, projectVersion, enable=withoutPlugins(config));
+        //appendDependency(globalDeps, iipGroup, transportProtocolModule(config), projectVersion);
+        appendDependency(globalDeps, iipGroup, serviceManagerModule(config), projectVersion, scope="test");
+        appendServiceManagerDeps(globalDeps, config.serviceManager);
+        new XmlComment(globalDeps, "Remaining test dependencies go here.");
         
         appendDeploymentPlugins(plugins, config);
 /*
@@ -147,6 +149,26 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
     XmlElement execs = new XmlElement(dependencyPlugin, "executions");
     appendMavenIipDependencyPluginUnpackPluginsExecution(execs, globalOktoPlugins, projectVersion, enable=withPlugins(config));
 }*/
+
+        profile = new XmlElement(profiles, "profile");
+        new XmlElement(profile, "id", "Exec");
+        build = createMavenBuildElement(profile, "", false);
+        plugins = createPlugins(build);
+        dependencyPlugin = appendMavenIipDependencyPlugin(plugins, ver=projectVersion);
+        execs = new XmlElement(dependencyPlugin, "executions");
+        unpackItems = appendMavenDependencyPluginExecution(execs, "copy", 
+            gId+":"+appName+":"+appVersion, "bin", 
+            "\\${project.build.directory}/apps", "${appName}.jar", type="jar", id="app", phase="validate");
+        
+        execPlugin = appendPlugin(plugins, "org.codehaus.mojo", "exec-maven-plugin", "3.0.0", false);
+        execPluginExecs = appendExecutionsParent(execPlugin);
+        exec = new XmlElement(execPluginExecs, "execution");
+        new XmlElement(exec, "id", "app");
+        execCfg = new XmlElement(exec, "configuration");
+        new XmlElement(execCfg, "mainClass", getStarterMainClass(config.serviceManager));
+        execArgs = new XmlElement(execCfg, "arguments");
+        new XmlElement(execArgs, "argument", "\\${project.build.directory}/apps/${appName}.jar");
+        new XmlElement(execCfg, "classpathScope", "test");
     }
 
     // dispatch basis
