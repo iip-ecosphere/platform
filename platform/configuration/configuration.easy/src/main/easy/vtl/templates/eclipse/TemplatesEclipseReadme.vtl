@@ -50,8 +50,8 @@ Typical build steps:
 For testing the connectors/services individually or the application locally, please start the configured broker first. 
 Following maven commands are generated, but may require individual customization, e.g., through environment properties.
 Also input files (see `src/test/resources`) require renaming and adjustments.
-- `mvn -P Exec dependency:copy@app exec:java@app` downloads (if necessary) and runs the full application with all services locally without the platform.
-- `mvn -P App exec:java@app` executes the app from the platforms artifact directory.
+- `mvn -P Exec dependency:copy@app exec:java@app` (also `run.bat`/`run.sh`) downloads and runs the full application after it was built with all services locally without the platform.
+- `mvn -P App exec:java@app` executes the app after it was built from the platforms artifact directory (must be set up correctly).
 - `mvn -P App exec:java@transportLogger` runs the transport logger with default setup in the context of this application.
 ${genTestExecutions(nodes)}
  

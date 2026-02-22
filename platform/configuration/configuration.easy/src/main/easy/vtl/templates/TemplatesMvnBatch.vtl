@@ -3,15 +3,17 @@ import JavaOsBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template TemplatesMvnBatch(Configuration config, FileArtifact target, Boolean forBuild=true) {
+template TemplatesMvnBatch(Configuration config, FileArtifact target, Boolean forBuild=true, Boolean forRun=false) {
 	
-    def main(Configuration config, FileArtifact target, Boolean forBuild=true) {
+    def main(Configuration config, FileArtifact target, Boolean forBuild=true, Boolean forRun=false) {
         'setlocal
         cd /D "%~dp0"'
-        if (forBuild) {
-            'mvn -P EasyGen -U generate-sources -Dunpack.force=true'
-        } else {
+        if (forRun) {
+            'mvn -P Exec dependency:copy@app exec:java@app'
+        } else if (forBuild) {
             'mvn install %*'
+        } else {
+            'mvn -P EasyGen -U generate-sources -Dunpack.force=true'
         }
         'endlocal'
     }

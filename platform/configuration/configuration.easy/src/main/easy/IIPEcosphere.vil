@@ -314,10 +314,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 vilTemplateProcessor("TemplatesEclipsePyDevProject", config, "${appRoot}/.pydevproject", appName=appName);
                 vilTemplateProcessor("TemplatesEclipseGitignore", config, "${appRoot}/.gitignore", appName=appName);
                 vilTemplateProcessor("TemplatesEasyProducer", config, "${appRoot}/.EASyProducer", appName=appName);
-                vilTemplateProcessor("TemplatesMvnBash", config, "${appRoot}/build.sh", forBuild=true);
-                vilTemplateProcessor("TemplatesMvnBash", config, "${appRoot}/updateModel.sh", forBuild=false);
-                vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/build.bat", forBuild=true);
-                vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/updateModel.bat", forBuild=false);
+                vilTemplateProcessor("TemplatesMvnBash", config, "${appRoot}/build.sh", forBuild=true, forRun=false);
+                vilTemplateProcessor("TemplatesMvnBash", config, "${appRoot}/updateModel.sh", forBuild=false, forRun=false);
+                vilTemplateProcessor("TemplatesMvnBash", config, "${appRoot}/run.sh", forBuild=false, forRun=true);
+                vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/build.bat", forBuild=true, forRun=false);
+                vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/updateModel.bat", forBuild=false, forRun=false);
+                vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/run.bat", forBuild=false, forRun=true);
                 // currently no separate templates
                 Path vsCodeSettings = "${appRoot}/.vscode";
                 vsCodeSettings.mkdir();
