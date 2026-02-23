@@ -67,6 +67,7 @@ import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 public class UnpackPluginMojo extends CleaningUnpackMojo {
 
     private static final String NAME_CLASSPATH_FILE = "classpath";
+    private static boolean reuseIndexes = false; // preliminary
     
     @Parameter(property = "unpack.plugins", required = false)
     private List<PluginItem> plugins;
@@ -719,7 +720,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             } else if (createIndex) {
                 LoaderIndex idx = new LoaderIndex();
                 String knownMsg = "";
-                if (index.isFile() && index.length() > 0) {
+                if (index.isFile() && index.length() > 0 && reuseIndexes) {
                     try {
                         // obtain index
                         idx = LoaderIndex.fromFile(index);
