@@ -47,7 +47,7 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
     @Parameter( required = false )
     private boolean asTest;
     
-    @Parameter( property = "mdep.createIndex", defaultValue = "true")
+    @Parameter( property = "mdep.createIndex", defaultValue = "false")
     private boolean createIndex;
 
     @Override
@@ -69,6 +69,7 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
             }
         }
         super.doExecute();
+        File index = new File(targetDirectory, "jars" + (asTest ? "-test" : "") + "/classpath.idx");
         if (createIndex) {
             List<Path> jars = new ArrayList<>();
             File[] files = getOutputDirectory().listFiles();
@@ -77,7 +78,6 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
                     jars.add(f.toPath());
                 }
             }
-            File index = new File(targetDirectory, "jars" + (asTest ? "-test" : "") + "/classpath.idx");
             try {
                 long start = System.currentTimeMillis();
                 getLog().info("Indexing classes...");
@@ -91,6 +91,8 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
                 getLog().warn("Cannot write index " + index + ". Ignoring. " + e.getClass().getSimpleName() + " " 
                     + e.getMessage());
             }
+        } else {
+            index.delete();
         }
     }
 
