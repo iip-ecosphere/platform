@@ -67,7 +67,6 @@ import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 public class UnpackPluginMojo extends CleaningUnpackMojo {
 
     private static final String NAME_CLASSPATH_FILE = "classpath";
-    private static final String SUFFIX_INDEX = ".idx";
     
     @Parameter(property = "unpack.plugins", required = false)
     private List<PluginItem> plugins;
@@ -266,11 +265,15 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                     } else {
                         name = targetName + name.substring(NAME_CLASSPATH_FILE.length());
                     }
-                    classpathFiles.add(new ClasspathFile(item, name));
+                    if (!Layers.isIndexFile(name)) {
+                        classpathFiles.add(new ClasspathFile(item, name));
+                    }
                 } else { // else just collect with relative path
                     if (collectIfNotRelocate) {
-                        classpathFiles.add(new ClasspathFile(item, targetName + "/" + name, targetName, 
-                            pathSuffix));
+                        if (!Layers.isIndexFile(name)) {
+                            classpathFiles.add(new ClasspathFile(item, targetName + "/" + name, targetName, 
+                                pathSuffix));
+                        }
                     }
                 }
             }
@@ -654,6 +657,8 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             try {
                 if (relocate && !isSameFile(tgt, src)) {
                     rename(src, tgt);
+                    rename(new File(src.getPath() + LoaderIndex.INDEX_SUFFIX), 
+                        new File(tgt.getPath() + LoaderIndex.INDEX_SUFFIX));
                 }
                 FileInputStream fis = new FileInputStream(tgt);
                 List<String> contents = IOUtils.readLines(fis, Charset.defaultCharset());
@@ -703,8 +708,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
      */
     private void writeIndex(List<JarLocation> locs, File cpFile, boolean enable) {
         if (!Layers.isOsCpFile(cpFile)) {
-            File providedIndex = new File(cpFile.getParentFile(), NAME_CLASSPATH_FILE + SUFFIX_INDEX);
-            File index = new File(cpFile.toString() + SUFFIX_INDEX);
+            File index = new File(cpFile.toString() + LoaderIndex.INDEX_SUFFIX);
             if (!enable) {
                 index.delete();
                 try {
@@ -715,15 +719,18 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             } else if (createIndex) {
                 LoaderIndex idx = new LoaderIndex();
                 String knownMsg = "";
-                if (providedIndex.isFile() && providedIndex.length() > 0) {
+                if (index.isFile() && index.length() > 0) {
                     try {
                         // obtain index
-                        idx = LoaderIndex.fromFile(providedIndex);
+                        idx = LoaderIndex.fromFile(index);
                         // identify already known files, do not re-index them as provided
                         Map<String, JarLocation> locsByFile = new HashMap<>();
-                        locs.stream().map(l -> locsByFile.put(l.original, l));
+                        for (JarLocation l: locs) {
+                            locsByFile.put(l.toFile().getName(), l);
+                        }
                         for (String indexedFile : idx.getFiles()) {
-                            JarLocation l = locsByFile.get(indexedFile);
+                            File f = new File(indexedFile);
+                            JarLocation l = locsByFile.get(f.getName());
                             if (l != null) {
                                 locs.remove(l);
                             }
@@ -731,7 +738,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                         knownMsg = idx.getClassesCount() + " classes and " + idx.getResourcesCount() 
                             + " resources known. Reusing the information.";
                     } catch (IOException e) {
-                        getLog().warn("Cannot read provided loader index " + providedIndex + ": " + e.getMessage());
+                        getLog().warn("Cannot read provided loader index " + index + ": " + e.getMessage());
                     }
                 }
                 long start = System.currentTimeMillis();

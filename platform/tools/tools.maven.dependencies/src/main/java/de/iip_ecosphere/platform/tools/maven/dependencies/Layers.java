@@ -19,6 +19,8 @@ import java.util.Collections;
 
 import org.apache.maven.plugin.logging.Log;
 
+import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
+
 /**
  * Knows plugin artifact-layer-dependencies/exclusions.
  * 
@@ -130,8 +132,37 @@ public class Layers {
      * @return {@code true} for OS specific, {@code false} else
      */
     static boolean isOsCpFile(File file) {
-        String path = file.toString();
-        return path.endsWith("-win") || path.endsWith("-linux") || path.endsWith(".idx");
+        return isOsCpFile(file.toString());
     }
-    
+
+    /**
+     * Returns whether a classpath {@code file} is operating system specific.
+     * 
+     * @param file the file to check for
+     * @return {@code true} for OS specific, {@code false} else
+     */
+    static boolean isOsCpFile(String file) {
+        return file.endsWith("-win") || file.endsWith("-linux") || isIndexFile(file);
+    }
+
+    /**
+     * Returns whether {@code file} is an index file.
+     * 
+     * @param file the file to check for
+     * @return {@code true} for index, {@code false} else
+     */
+    static boolean isIndexFile(File file) {
+        return isIndexFile(file.toString());
+    }
+
+    /**
+     * Returns whether {@code file} is an index file.
+     * 
+     * @param file the file to check for
+     * @return {@code true} for index, {@code false} else
+     */
+    static boolean isIndexFile(String file) {
+        return file.endsWith(LoaderIndex.INDEX_SUFFIX);
+    }
+
 }
