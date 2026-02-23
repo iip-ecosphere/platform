@@ -128,17 +128,20 @@ export class IvmlFormatterService extends UtilsService {
       }
       result += "}";
     } else if (DataUtils.isIvmlRefTo(value._type)) {
-      result = `refBy(${value.value})`;
+      result = value.value ? `refBy(${value.value})` : "";
     } else if (this.isString(value.value) && value.value.startsWith(IVML_TYPE_PREFIX_enumeration)) { // ivml enums in internal notation
       result = value.value.replace(IVML_TYPE_PREFIX_enumeration, "");
     } else { // compound
       result = value._type + "{";
       let first = true;
       for (let elemt in value.value) {
-        if (!first) {
-          result += ",";
+        let elemtIvml = this.toIvml(value.value[elemt]);
+        if (elemtIvml) {
+          if (!first) {
+            result += ",";
+          }
+          result += elemt + "=" + elemtIvml;
         }
-        result += elemt + "=" + this.toIvml(value.value[elemt]);
         first = false;
       }
       result += "}";
@@ -875,7 +878,7 @@ export class IvmlFormatterService extends UtilsService {
    */
   private buildConstraintMessage(message: string): string {
     const match = message.match(/Constraints not satisfied:\[(.*?)\]/);
-    if (!match) return '';
+    if (!match) return message;
 
     const raw = match[1];
 
