@@ -109,6 +109,7 @@
                             </plugin>
                             <plugin>
                                 <artifactId>transport.spring.amqp</artifactId>
+                        <createIndex>false</createIndex> <!-- preliminary -->
                             </plugin>
                             <plugin>
                                 <artifactId>services.spring</artifactId>
@@ -117,6 +118,7 @@
                                    <append>support.log-slf4j-simple</append>
                                 </appends>
                                 <asTest>true</asTest>
+                        		<createIndex>false</createIndex> <!-- preliminary -->
                             </plugin>
                             <plugin>
                                 <artifactId>support.aas.basyx2</artifactId>
@@ -143,7 +145,6 @@
                         <relocate>true</relocate> <!-- needed to enable append -->
                         <relocateTarget>${project.build.directory}/jars</relocateTarget>
                         <version>${iip.version}</version>
-                        <createIndex>false</createIndex> <!-- preliminary -->
                     </configuration>
                 </execution>
 
