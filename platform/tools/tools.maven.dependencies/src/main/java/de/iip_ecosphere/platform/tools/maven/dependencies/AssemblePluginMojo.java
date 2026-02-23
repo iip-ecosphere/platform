@@ -148,6 +148,10 @@ public class AssemblePluginMojo extends AbstractMojo {
                 }                
             }
         }
+        cpFile = new File(dir, "classpath.idx");
+        if (cpFile.exists()) {
+            addFile(out, cpFile, "", false);
+        }
         return done;
     }
     

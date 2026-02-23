@@ -1,6 +1,8 @@
 # IIP-Ecosphere platform: Extended dependency plugin for Maven
 
-We use the `maven-dependency-plugin` for various tasks, e.g., to unpack Python code or the configuration model.  However, we do not limit ourselves to the target directory which may be cleaned up with `mvn clean` and other cleaning procedures do not work. So we decided to add a cleanup specification to `unpack` goal of maven-dependency-plugin provided by this package. Similarly, we need to add further non-classpath files to `build-classpath` when creating classpath files for platform instances. For convenience, we include further goals such as `delete` or `copy` of the original plugin we use them frequently in conjunction with `unpack`. Basic properties of the underlying maven dependendency plugin can be applied although not explicitly discussed here.
+We use the `maven-dependency-plugin` for various tasks, e.g., to unpack Python code or the configuration model.  However, we do not limit ourselves to the target directory which may be cleaned up with `mvn clean` and other cleaning procedures do not work. So we decided to add a cleanup specification to `unpack` goal of maven-dependency-plugin provided by this package. Similarly, we need to add further non-classpath files to `build-classpath` when creating classpath files for platform instances. For convenience, we include further goals such as `delete` or `copy` of the original plugin we use them frequently in conjunction with `unpack`. Basic properties of the underlying maven dependendency plugin can be applied although not explicitly discussed here. 
+
+For oktoflow plugins, we need the sequence `copy-plugin-dependencies`, `build-plugin-classpath` and `assemble-plugin`. For installing plugins, `unpack-plugins`.
 
 # generic goals
 
@@ -175,6 +177,9 @@ The `copy-plugin-dependencies` goal extends the ``copy-dependencies`` by pre-con
 
 The inherited setting ``excludeArtifactIds`` shall be configured in a way that prerequiste platform layers are excluded. Usually, the plugin detects and determins the respective artifact ids automatically.
 
+Further settings are:
+- `createIndex` (default `true`, user property `mdep.createIndex`) whether a classpath index file shall be created for the plugin
+
 ## assemble-plugin
 
 Creates a plugin-archive with classpath files from default directories (either ``${project.build.directory}/jars`` or ``${project.build.directory}/classes``) as well as the plugin jars and it's dependencies from jars (depending on `unpackMode`).
@@ -229,7 +234,13 @@ In the basic version, for testing, use
   </build>
   ```
 
-for installation just add `<relocate>true</relocate>` to the `configuration`. The `plugins` are extended `ArtifactItems` which you may use instead. However, a `plugin` allows a more concise notation as we set up the `version` to the global `version` in `configuration`, the `type` to `zip`, the `classifier` to `plugin`, `overWrite` to `true` and `outputDirectory` to `${project.build.directory}/oktoPlugins`. If in a `plugin` the `groupId` is not given, we set it automatically to `de.iip-ecosphere.platform`. A plugin may have `appends`, simple names of previously unpacked plugins that shall be merged in given sequence in the classpath of the actual plugin, e.g., to include intentionally excluded plugins, such as logging, which is decided/merged into for platform services/applications by the platform instantiation. Takes into account the prefix path and the unpack mode written by the `build-plugin-classpath` plugin. Further, a plugin may be just a test dependency (`asTest`, default `false`) or specify an overwriting `setupDescriptor` (default as packaged).
+for installation just add `<relocate>true</relocate>` to the `configuration`. The `plugins` are extended `ArtifactItems` which you may use instead. However, a `plugin` allows a more concise notation as 
+- we set up the `version` as the global `version` given in `configuration`, the `type` to `zip`, the `classifier` to `plugin`, `overWrite` to `true` and `outputDirectory` to `${project.build.directory}/oktoPlugins`. 
+- If in a `plugin` the `groupId` is not given, we set it automatically to `de.iip-ecosphere.platform`. 
+- A plugin may have `appends`, simple names of previously unpacked plugins that shall be merged in given sequence in the classpath of the actual plugin, e.g., to include intentionally excluded plugins, such as logging, which is decided/merged into for platform services/applications by the platform instantiation. Takes into account the prefix path and the unpack mode written by the `build-plugin-classpath` plugin. 
+- a plugin may be just a test dependency (`asTest`, default `false`).
+- specify an overwriting `setupDescriptor` (default as packaged).
+- if the global `createIndex` is enabled, a `plugin` may individually disable `createIndex` (default `true`).
 
 The sequence of the plguins as given in the POM execution configuration is taken as initial sequence for loading the plugins.
 

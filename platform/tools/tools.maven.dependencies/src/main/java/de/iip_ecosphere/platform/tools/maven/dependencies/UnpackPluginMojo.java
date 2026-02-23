@@ -67,6 +67,7 @@ import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 public class UnpackPluginMojo extends CleaningUnpackMojo {
 
     private static final String NAME_CLASSPATH_FILE = "classpath";
+    private static final String SUFFIX_INDEX = ".idx";
     
     @Parameter(property = "unpack.plugins", required = false)
     private List<PluginItem> plugins;
@@ -132,6 +133,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         private List<String> appends;
         private boolean asTest;
         private String setupDescriptor;
+        private boolean createIndex = true;
         
         /**
          * Returns whether this item has appends.
@@ -158,6 +160,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
      */
     private static class ClasspathFile {
         
+        private PluginItem item;
         private String name;
         private String origPath;
         private String pathSuffix;
@@ -165,20 +168,24 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         /**
          * Classpath file without need for moving.
          * 
+         * @param item the causing plugin item
          * @param name the name/path of the file
          */
-        private ClasspathFile(String name) {
+        private ClasspathFile(PluginItem item, String name) {
+            this.item = item;
             this.name = name;
         }
 
         /**
          * Classpath file with need for moving.
          * 
+         * @param item the causing plugin item
          * @param name the name/path of the file
          * @param origPath the original path the file is located in
          * @param pathSuffix path addition causing the move
          */
-        private ClasspathFile(String name, String origPath, String pathSuffix) {
+        private ClasspathFile(PluginItem item, String name, String origPath, String pathSuffix) {
+            this.item = item;
             this.name = name;
             this.origPath = origPath;
             this.pathSuffix = pathSuffix;
@@ -227,6 +234,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
      */
     private class RelocatingFileMapper implements FileMapper {
 
+        private PluginItem item;
         private String targetName;
         private String pathSuffix;
         private boolean collectIfNotRelocate;
@@ -234,12 +242,15 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         /**
          * Creates a relocating file mapper.
          * 
+         * @param item the originating plugin item
          * @param targetName the target name to map to
-         * @param pathSuffix optional path suffix for moving the target directory; underlying maven does not seem to 
-         * consider a changed target path in here
+         * @param pathSuffix optional path suffix for moving the target directory; underlying Maven does not seem to 
+         *     consider a changed target path in here
          * @param collectIfNotRelocate collect the file names if we are not relocating
          */
-        private RelocatingFileMapper(String targetName, String pathSuffix, boolean collectIfNotRelocate) {
+        private RelocatingFileMapper(PluginItem item, String targetName, String pathSuffix, 
+            boolean collectIfNotRelocate) {
+            this.item = item;
             this.targetName = targetName;
             this.pathSuffix = pathSuffix;
             this.collectIfNotRelocate = collectIfNotRelocate;
@@ -255,10 +266,10 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                     } else {
                         name = targetName + name.substring(NAME_CLASSPATH_FILE.length());
                     }
-                    classpathFiles.add(new ClasspathFile(name));
+                    classpathFiles.add(new ClasspathFile(item, name));
                 } else { // else just collect with relative path
                     if (collectIfNotRelocate) {
-                        classpathFiles.add(new ClasspathFile(targetName + "/" + name, targetName, 
+                        classpathFiles.add(new ClasspathFile(item, targetName + "/" + name, targetName, 
                             pathSuffix));
                     }
                 }
@@ -301,7 +312,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                 if (artId != null && artId.trim().length() > 0) { // if the generation does nonsense
                     getLog().info("Configuring plugin '" + artId + "' -> " + item.getOutputDirectory());
                     item.setFileMappers(new FileMapper[] {
-                        new RelocatingFileMapper(artId, "-" + getActualVersion(pl), true)}); // pl.hasAppends()
+                        new RelocatingFileMapper(pl, artId, "-" + getActualVersion(pl), true)}); // pl.hasAppends()
                     artifactItems.add(item);
                 }
             }
@@ -584,6 +595,20 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         cpToken = extractSuffix("target/jars", cpToken, cpToken); // the default
         return extractSuffix("target/", cpToken, cpToken); // plugin itself        
     }
+
+    /**
+     * Renames/moves {@code src} to {@code tgt}.
+     * 
+     * @param src the source file
+     * @param tgt the target file
+     * @throws IOException if moving fails
+     */
+    private static void rename(File src, File tgt) throws IOException {
+        if (src.exists()) {
+            FileUtils.deleteQuietly(tgt);
+            FileUtils.moveFile(src, tgt);
+        }
+    }
     
     /**
      * Relocates the unpacked files.
@@ -628,8 +653,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             }
             try {
                 if (relocate && !isSameFile(tgt, src)) {
-                    FileUtils.deleteQuietly(tgt);
-                    FileUtils.moveFile(src, tgt);
+                    rename(src, tgt);
                 }
                 FileInputStream fis = new FileInputStream(tgt);
                 List<String> contents = IOUtils.readLines(fis, Charset.defaultCharset());
@@ -661,7 +685,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                 if (relocate) {
                     FileUtils.deleteQuietly(src);
                 }
-                writeIndex(locs, tgt);
+                writeIndex(locs, tgt, cf.item.createIndex);
             } catch (IOException e) {
                 throw new MojoFailureException("Cannot postprocess " + src + ": " + e.getMessage());
             }
@@ -675,18 +699,48 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
      * 
      * @param locs the Jar locations to be turned into the index file
      * @param cpFile the associated classpath file to create the index for
+     * @param enable individual setting whether index shall be written
      */
-    private void writeIndex(List<JarLocation> locs, File cpFile) {
+    private void writeIndex(List<JarLocation> locs, File cpFile, boolean enable) {
         if (!Layers.isOsCpFile(cpFile)) {
-            File index = new File(cpFile.toString() + ".idx");
-            if (createIndex) {
-                long start = System.currentTimeMillis();
-                getLog().info("Indexing classes...");
+            File providedIndex = new File(cpFile.getParentFile(), NAME_CLASSPATH_FILE + SUFFIX_INDEX);
+            File index = new File(cpFile.toString() + SUFFIX_INDEX);
+            if (!enable) {
+                index.delete();
                 try {
-                    LoaderIndex idx = new LoaderIndex();
+                    FileUtils.touch(index);
+                } catch (IOException e) {
+                    getLog().warn("Cannot touch the loader index " + index + ": " + e.getMessage());
+                }
+            } else if (createIndex) {
+                LoaderIndex idx = new LoaderIndex();
+                String knownMsg = "";
+                if (providedIndex.isFile() && providedIndex.length() > 0) {
+                    try {
+                        // obtain index
+                        idx = LoaderIndex.fromFile(providedIndex);
+                        // identify already known files, do not re-index them as provided
+                        Map<String, JarLocation> locsByFile = new HashMap<>();
+                        locs.stream().map(l -> locsByFile.put(l.original, l));
+                        for (String indexedFile : idx.getFiles()) {
+                            JarLocation l = locsByFile.get(indexedFile);
+                            if (l != null) {
+                                locs.remove(l);
+                            }
+                        }
+                        knownMsg = idx.getClassesCount() + " classes and " + idx.getResourcesCount() 
+                            + " resources known. Reusing the information.";
+                    } catch (IOException e) {
+                        getLog().warn("Cannot read provided loader index " + providedIndex + ": " + e.getMessage());
+                    }
+                }
+                long start = System.currentTimeMillis();
+                getLog().info("Indexing classes..." + knownMsg);
+                try {
+                    idx = new LoaderIndex();
                     AtomicInteger exceptionCount = new AtomicInteger();
                     for (JarLocation loc: locs) {
-                        // handle exceptions tolerantly, sometimes class files are listed but not present/needed
+                        // handle exceptions tolerantly, sometimes class files are listed but optional
                         LoaderIndex.addToIndex(idx, loc.toFile(), loc.actual, 
                             ex -> {
                                 exceptionCount.incrementAndGet();

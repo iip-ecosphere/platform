@@ -13,12 +13,18 @@
 package de.iip_ecosphere.platform.tools.maven.dependencies;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+
+import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 
 /**
  * Reused build-classpath Mojo.
@@ -40,6 +46,9 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
 
     @Parameter( required = false )
     private boolean asTest;
+    
+    @Parameter( property = "mdep.createIndex", defaultValue = "true")
+    private boolean createIndex;
 
     @Override
     protected void doExecute() throws MojoExecutionException {
@@ -60,6 +69,29 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
             }
         }
         super.doExecute();
+        if (createIndex) {
+            List<Path> jars = new ArrayList<>();
+            File[] files = getOutputDirectory().listFiles();
+            for (File f : files) {
+                if (f.getName().endsWith(".jar")) {
+                    jars.add(f.toPath());
+                }
+            }
+            File index = new File(targetDirectory, "jars" + (asTest ? "-test" : "") + "/classpath.idx");
+            try {
+                long start = System.currentTimeMillis();
+                getLog().info("Indexing classes...");
+                LoaderIndex idx = LoaderIndex.createIndex(jars, 
+                    ex -> getLog().warn(ex.getClass().getSimpleName() + " " + ex.getMessage()));
+                LoaderIndex.toFile(idx, index);
+                getLog().info("Stored class index to " + index + " " + idx.getClassesCount() + " classes and " 
+                    + idx.getResourcesCount() + " resources in " + idx.getLocationsCount() + " locations in " 
+                    + (System.currentTimeMillis() - start) + " ms");
+            } catch (IOException e) {
+                getLog().warn("Cannot write index " + index + ". Ignoring. " + e.getClass().getSimpleName() + " " 
+                    + e.getMessage());
+            }
+        }
     }
 
 }

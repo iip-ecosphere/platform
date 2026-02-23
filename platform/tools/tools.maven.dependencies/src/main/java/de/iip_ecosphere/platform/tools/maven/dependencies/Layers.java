@@ -131,7 +131,7 @@ public class Layers {
      */
     static boolean isOsCpFile(File file) {
         String path = file.toString();
-        return path.endsWith("-win") || path.endsWith("-linux");
+        return path.endsWith("-win") || path.endsWith("-linux") || path.endsWith(".idx");
     }
     
 }

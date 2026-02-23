@@ -268,7 +268,7 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
         }
         if (!found) {
             logConsumer.accept("Class '" + descClass + "' ) in JSL descriptor " + desc 
-                + " not found in " + classDirList);
+                + " not found in " + classDirList + ", but it may be somewhere in the classpath.");
         }
         return found;
     }
