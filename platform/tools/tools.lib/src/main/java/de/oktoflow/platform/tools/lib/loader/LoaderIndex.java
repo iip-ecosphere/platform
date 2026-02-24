@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -40,6 +41,7 @@ public class LoaderIndex implements Serializable {
      * Defines the separator between multiple resources/locations as String.
      */
     public static final String RESOURCE_SEPARATOR = String.valueOf(RESOURCE_SEPARATOR_CHAR);
+    public static final Function<File, String> DEFAULT_FILE_LOCATION_PROVIDER = f -> f.toString();
     
     private static final long serialVersionUID = -3350988607004003802L;
 
@@ -48,7 +50,32 @@ public class LoaderIndex implements Serializable {
     private Map<String, String> locationReverseIndex = new HashMap<>();
     private Map<String, String> classIndex = new HashMap<>();
     private Map<String, String> resourceIndex = new HashMap<>();
+    private transient Function<File, String> fileLocationProvider = f -> f.toString();
 
+    /**
+     * Defines the file location provider, a function that turns a file into a location string. Only used/valid while 
+     * creating indexes. The location provider can be used to turn absolute jar file names into relative ones.
+     * 
+     * @param provider the provider, ignored if <b>null</b>
+     */
+    public void setFileLocationProvider(Function<File, String> provider) {
+        if (null != provider) {
+            fileLocationProvider = provider;
+        }
+    }
+    
+    /**
+     * Returns the file location provider.
+     * 
+     * @return the file location provider
+     */
+    public Function<File, String> getFileLocationProvider() {
+        if (fileLocationProvider == null) { // deserialization of older files
+            fileLocationProvider = DEFAULT_FILE_LOCATION_PROVIDER;
+        }
+        return fileLocationProvider;
+    }
+    
     /**
      * Creates an index for a given set of JAR files. Paths will be stored relatively to ease relocation.
      * Updates the {@link #files} list in the specified sequence of {@code jars}.
@@ -62,7 +89,7 @@ public class LoaderIndex implements Serializable {
     public static LoaderIndex createIndex(List<Path> jars, Consumer<IOException> consumer) throws IOException {
         return addToIndex(new LoaderIndex(), jars, consumer);
     }
-
+    
     /**
      * Adds the given {@code jars} to {@code index}. Paths will be stored relatively to ease relocation.
      * Updates the {@link #files} list in the specified sequence of {@code jars}.
@@ -96,8 +123,9 @@ public class LoaderIndex implements Serializable {
      */
     public static void addToIndex(LoaderIndex index, File jarFile, String location, Consumer<IOException> consumer) 
         throws IOException {
+        String jarLocation = index.getFileLocationProvider().apply(jarFile);
         if (null == location || location.length() == 0) {
-            location = jarFile.toString();
+            location = jarLocation;
         }
         try (JarFile jar = new JarFile(jarFile)) {
             Enumeration<JarEntry> entries = jar.entries();
@@ -117,7 +145,7 @@ public class LoaderIndex implements Serializable {
                     addToIndex(index, index.resourceIndex, name, location, true);
                 }
             }
-            index.files.add(jarFile.toString());
+            index.files.add(jarLocation);
         } catch (IOException e) {
             if (null == consumer) {
                 throw e;
@@ -320,6 +348,7 @@ public class LoaderIndex implements Serializable {
         String result = null;
         String loc = classIndex.get(cls);
         if (null != loc) {
+            loc = getFirstResourceLocation(loc);
             result = locationIndex.get(loc);
         }
         return result;
@@ -391,18 +420,32 @@ public class LoaderIndex implements Serializable {
     public Iterable<String> getFiles() {
         return files;
     }
-    
+
+    /**
+     * Substitutes locations in the location index and the files list by those given in {@code mapping}. Use this method
+     * to relocate the index. warns if substitutions do not exist.
+     * 
+     * @param mapping old-new file location mapping, shall be given with "/" as separator; unmatched entries will 
+     * be ignored
+     */
+    public void substituteLocations(Map<String, String> mapping) {
+        substituteLocations(mapping, false);
+    }
+
     /**
      * Substitutes locations in the location index and the files list by those given in {@code mapping}. Use this method
      * to relocate the index.
      * 
      * @param mapping old-new file location mapping, shall be given with "/" as separator; unmatched entries will 
      * be ignored
+     * @param warn emit warnings if substitutions do not exist
      */
-    public void substituteLocations(Map<String, String> mapping) {
-        for (String v : mapping.values()) {
-            if (!new File(v).exists()) {
-                System.out.println("WARNING: substitution " + v + " does not exist.");
+    public void substituteLocations(Map<String, String> mapping, boolean warn) {
+        if (warn) {
+            for (String v : mapping.values()) {
+                if (!new File(v).exists()) {
+                    System.out.println("WARNING: substitution " + v + " does not exist.");
+                }
             }
         }
         for (String oldVal : mapping.keySet()) {
