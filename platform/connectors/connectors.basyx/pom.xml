@@ -111,17 +111,17 @@
                     </configuration>
                 </execution>
                  <execution>
-                     <id>copy-dependencies</id>
-                     <phase>package</phase>
-                     <goals>
-                         <goal>copy-plugin-dependencies</goal>
-                     </goals>
-                 </execution>
-                 <execution>
                      <id>build-classpath-plugin</id>
                      <phase>prepare-package</phase>
                      <goals>
                          <goal>build-plugin-classpath</goal>
+                     </goals>
+                 </execution>
+                 <execution>
+                     <id>copy-dependencies</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>copy-plugin-dependencies</goal>
                      </goals>
                  </execution>
                  <execution>
