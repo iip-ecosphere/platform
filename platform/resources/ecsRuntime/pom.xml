@@ -112,6 +112,9 @@
                             <plugin>
                                 <artifactId>support.metrics-micrometer</artifactId>
                             </plugin>
+                            <plugin>
+                                <artifactId>support.ssh-sshd</artifactId>
+                            </plugin>                            
                         </plugins>
                         <version>${iip.version}</version>
                     </configuration>
