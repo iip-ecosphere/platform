@@ -14,7 +14,7 @@ template PythonMeshElementTemplate(Configuration config, PythonCodeArtifact targ
         initTypeAdd(cfg);
         String clsName = asTypeName(service.name);
         String ifName = "${clsName}Interface";
-        target.addImport("iip.Registry");
+        target.addImport("Registry");
         target.addImport("Version", "Version");
         target.addImport("Service", "ServiceState");
         target.addImport("Service", "ServiceKind");

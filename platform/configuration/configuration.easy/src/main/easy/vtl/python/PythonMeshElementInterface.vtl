@@ -51,7 +51,7 @@ template PythonMeshElementInterface(Configuration config, PythonCodeArtifact tar
     def main(Configuration config, PythonCodeArtifact target, MeshElement elt, String pkg) {
         String clsName = asTypeName(elt.name);
         target.addImport("AbstractService", "AbstractService");
-        target.addImport("iip.Registry");
+        target.addImport("Registry");
         target.addImport("Version", "Version");
         target.addImport("Service", "ServiceState");
         target.addImport("Service", "ServiceKind");
