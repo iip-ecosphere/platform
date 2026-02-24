@@ -12,6 +12,8 @@
 
 package de.iip_ecosphere.platform.tools.maven.dependencies;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -24,7 +26,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -48,6 +49,8 @@ import de.iip_ecosphere.platform.tools.maven.python.FilesetUtils;
 @Mojo( name = "assemble-plugin", inheritByDefault = false, requiresDependencyResolution = ResolutionScope.TEST,
     defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true )
 public class AssemblePluginMojo extends AbstractMojo {
+    
+    private static final int BUFFER_SIZE = 64 * 1024;
 
     @Parameter( property = "mdep.addTestArtifact", defaultValue = "false" )
     private boolean addTestArtifact;
@@ -77,7 +80,8 @@ public class AssemblePluginMojo extends AbstractMojo {
         File jarsDir = new File(targetDirectory, "jars" + (asTest ? "-test" : ""));
         getLog().info("Building " + outputFile);
         FileUtils.deleteQuietly(outputFile);
-        try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outputFile))) {
+        try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(outputFile), 
+            BUFFER_SIZE))) {
             File targetClasses = new File(targetDirectory, "classes");
             if (!addClasspathFiles(out, jarsDir)) { 
                 // initial style
@@ -164,12 +168,18 @@ public class AssemblePluginMojo extends AbstractMojo {
      */
     private void addFile(ZipOutputStream out, File file, String prefix, boolean deleteAfter) {
         if (file.exists()) {
-            try (FileInputStream fis = new FileInputStream(file)) {
+            try (BufferedInputStream fis = new BufferedInputStream(new FileInputStream(file))) {
                 String name = prefix + file.getName();
                 ZipEntry entry = new ZipEntry(name);
                 entry.setTime(file.lastModified());
                 out.putNextEntry(entry);
-                IOUtils.copy(fis, out);
+
+                byte[] buffer = new byte[BUFFER_SIZE];
+                int len;
+                while ((len = fis.read(buffer)) != -1) {
+                    out.write(buffer, 0, len);
+                }
+                
                 getLog().debug(" - Added " + file + " as " + name);
             } catch (IOException e) {
                 getLog().error("Cannot open " + file + ": " + e.getMessage());
