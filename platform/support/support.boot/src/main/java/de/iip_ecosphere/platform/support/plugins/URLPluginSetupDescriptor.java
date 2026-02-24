@@ -144,6 +144,7 @@ public class URLPluginSetupDescriptor implements PluginSetupDescriptor {
                         String u = LoaderIndex.normalize(Paths.get(url.toURI()).toString());
                         for (String loc : index.getLocations()) {
                             String l = LoaderIndex.normalize(loc);
+                            l = new File(l).getName();
                             if (u.endsWith(l)) {
                                 urlMapping.put(loc, u);
                             }
