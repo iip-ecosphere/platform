@@ -292,17 +292,17 @@
              <version>${project.version}</version>
              <executions>
                  <execution>
-                     <id>copy-dependencies</id>
-                     <phase>package</phase>
-                     <goals>
-                         <goal>copy-plugin-dependencies</goal>
-                     </goals>
-                 </execution>
-                 <execution>
                      <id>build-classpath-plugin</id>
                      <phase>package</phase> <!-- Eclipse autobuild -->
                      <goals>
                          <goal>build-plugin-classpath</goal>
+                     </goals>
+                 </execution>
+                 <execution>
+                     <id>copy-dependencies</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>copy-plugin-dependencies</goal>
                      </goals>
                  </execution>
                  <execution>

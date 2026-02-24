@@ -199,17 +199,17 @@
                     </configuration>
                  </execution>
                  <execution>
-                     <id>copy-dependencies</id>
-                     <phase>package</phase>
-                     <goals>
-                         <goal>copy-plugin-dependencies</goal>
-                     </goals>
-                 </execution>
-                 <execution>
                      <id>build-classpath-plugin</id>
                      <phase>package</phase> <!-- Eclipse autobuild -->
                      <goals>
                          <goal>build-plugin-classpath</goal>
+                     </goals>
+                 </execution>
+                 <execution>
+                     <id>copy-dependencies</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>copy-plugin-dependencies</goal>
                      </goals>
                  </execution>
                  <execution>
@@ -221,21 +221,21 @@
                  </execution>
                  
                  <execution>
-                     <id>copy-dependencies-test</id>
-                     <goals>
-                         <goal>copy-plugin-dependencies</goal>
-                     </goals>
-                     <phase>package</phase>
-                     <configuration>
-                       <asTest>true</asTest>
-                     </configuration>
-                 </execution>
-                 <execution>
                      <id>build-classpath-plugin-test</id>
                      <phase>package</phase>
                      <goals>
                          <goal>build-plugin-classpath</goal>
                      </goals>
+                     <configuration>
+                       <asTest>true</asTest>
+                     </configuration>
+                 </execution>
+                 <execution>
+                     <id>copy-dependencies-test</id>
+                     <goals>
+                         <goal>copy-plugin-dependencies</goal>
+                     </goals>
+                     <phase>package</phase>
                      <configuration>
                        <asTest>true</asTest>
                      </configuration>
