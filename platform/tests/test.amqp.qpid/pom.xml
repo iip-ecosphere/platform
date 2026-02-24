@@ -53,13 +53,6 @@
              <version>${project.version}</version>
              <executions>
                  <execution>
-                     <id>copy-dependencies</id>
-                     <goals>
-                         <goal>copy-plugin-dependencies</goal>
-                     </goals>
-                     <phase>package</phase>
-                 </execution>
-                 <execution>
                      <id>build-classpath-plugin</id>
                      <phase>compile</phase> <!-- Eclipse autobuild -->
                      <goals>
@@ -69,6 +62,13 @@
                          <setupDescriptor>Process</setupDescriptor>
                          <rollout>true</rollout>
                      </configuration>
+                 </execution>
+                 <execution>
+                     <id>copy-dependencies</id>
+                     <goals>
+                         <goal>copy-plugin-dependencies</goal>
+                     </goals>
+                     <phase>package</phase>
                  </execution>
                  <execution>
                      <id>assemble</id>
