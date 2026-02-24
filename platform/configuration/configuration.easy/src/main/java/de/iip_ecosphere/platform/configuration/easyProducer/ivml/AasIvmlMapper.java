@@ -1019,7 +1019,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
          * @param type the change type
          */
         private void addToMeshProject(DecisionVariableDeclaration var, ConfigurationChangeType type) {
-            meshProject.add(var);
+            meshProject.addBeforeFreeze(var);
             recordChange(var, type);
         }
 
@@ -1030,7 +1030,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
          * @param type the change type
          */
         private void addToAppProject(DecisionVariableDeclaration var, ConfigurationChangeType type) {
-            appProject.add(var);
+            appProject.addBeforeFreeze(var);
             recordChange(var, type);
         }
 

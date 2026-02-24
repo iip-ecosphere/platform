@@ -3,6 +3,7 @@ project PlatformConfiguration {
     import TechnicalSetup;
     import AllServices;
     import AllTypes;
+    import ServiceMeshPart*;
     import ApplicationPart*;
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
