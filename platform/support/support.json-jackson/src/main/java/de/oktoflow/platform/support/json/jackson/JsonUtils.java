@@ -365,8 +365,7 @@ public class JsonUtils {
     }
     
     /**
-     * Collects data on supported annotations ({@link ConfiguredName}, {@link JsonProperty} {@link Include}) for an 
-     * accessible object.
+     * Collects data on supported annotations ({@link ConfiguredName}) for an accessible object.
      * 
      * @param propName the property name
      * @param obj the accessible object
