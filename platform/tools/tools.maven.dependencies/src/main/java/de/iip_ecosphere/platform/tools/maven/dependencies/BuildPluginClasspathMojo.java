@@ -50,8 +50,6 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
     public static final String KEY_PLUGIN_IDS = "# pluginIds: ";
     public static final String KEY_SEQUENCE_NR = "# sequenceNr: ";
 
-    private final String prefix = "target/jars";
-   
     @Parameter( property = "mdep.addTestArtifact", defaultValue = "false" )
     private boolean addTestArtifact;
 
@@ -142,8 +140,8 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
         setOutputFile(new File(targetDirectory, "jars" + (asTest ? "-test" : "") + "/classpath"));
         setPrependGroupId(true);
         overWriteIfNewer = true;
-        setLocalRepoProperty(prefix);
-        setPrefix(prefix);
+        setLocalRepoProperty(Layers.DEFAULT_JAR_PREFIX);
+        setPrefix(Layers.DEFAULT_JAR_PREFIX);
         setFileSeparator("/");
         setPathSeparator(":");
         if (null == includeScope || includeScope.length() == 0) { // if not defined, default it
@@ -285,7 +283,7 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
      */
     private void composeBefores(Function<String, String> func) {
         List<String> befores = new ArrayList<>();
-        befores.add(KEY_PREFIX + (null != func ? func.apply(prefix) : prefix));
+        befores.add(KEY_PREFIX + (null != func ? func.apply(Layers.DEFAULT_JAR_PREFIX) : Layers.DEFAULT_JAR_PREFIX));
         befores.add(KEY_UNPACK_MODE + unpackMode);
         befores.add(KEY_SETUP_DESCRIPTOR + setupDescriptor);
         if (pluginIds != null && pluginIds.size() > 0) {

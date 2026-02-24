@@ -28,6 +28,8 @@ import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
  */
 public class Layers {
 
+    public static final String DEFAULT_JAR_PREFIX = "target/jars";
+
     private static final String[] LAYERS = {
         "tools.lib",
         "support.boot",

@@ -13,11 +13,15 @@
 package de.iip_ecosphere.platform.tools.maven.dependencies;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -27,7 +31,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 
 /**
- * Reused build-classpath Mojo.
+ * Reused copy-dependencies Mojo to enable plugin dependencies copy. build-plugin-classpath must be executed before.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -47,7 +51,7 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
     @Parameter( required = false )
     private boolean asTest;
     
-    @Parameter( property = "mdep.createIndex", defaultValue = "false")
+    @Parameter( property = "mdep.createIndex", defaultValue = "true")
     private boolean createIndex;
 
     @Override
@@ -69,31 +73,64 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
             }
         }
         super.doExecute();
+        File cpFile = new File(targetDirectory, "jars" + (asTest ? "-test" : "") + "/classpath");
         File index = new File(targetDirectory, "jars" + (asTest ? "-test" : "") + "/classpath.idx");
         if (createIndex) {
-            List<Path> jars = new ArrayList<>();
-            File[] files = getOutputDirectory().listFiles();
-            for (File f : files) {
-                if (f.getName().endsWith(".jar")) {
-                    jars.add(f.toPath());
+            List<Path> jars = getCpEntries(cpFile);
+            if (jars.size() > 0) {
+                try {
+                    long start = System.currentTimeMillis();
+                    getLog().info("Indexing classes...");
+                    LoaderIndex idx = new LoaderIndex();
+                    idx.setFileLocationProvider(f -> {
+                        String path = f.getPath();
+                        if (asTest) {
+                            path = path.replace(File.separator + "jars-test" + File.separator,
+                                File.separator + "jars" + File.separator);
+                        }
+                        return path;
+                    });
+                    LoaderIndex.addToIndex(idx, jars, 
+                        ex -> getLog().warn(ex.getClass().getSimpleName() + " " + ex.getMessage()));
+                    LoaderIndex.toFile(idx, index);
+                    getLog().info("Stored class index to " + index + " " + idx.getClassesCount() + " classes and " 
+                        + idx.getResourcesCount() + " resources in " + idx.getLocationsCount() + " locations in " 
+                        + (System.currentTimeMillis() - start) + " ms");
+                } catch (IOException e) {
+                    getLog().warn("Cannot write index " + index + ". Ignoring. " + e.getClass().getSimpleName() + " " 
+                        + e.getMessage());
                 }
-            }
-            try {
-                long start = System.currentTimeMillis();
-                getLog().info("Indexing classes...");
-                LoaderIndex idx = LoaderIndex.createIndex(jars, 
-                    ex -> getLog().warn(ex.getClass().getSimpleName() + " " + ex.getMessage()));
-                LoaderIndex.toFile(idx, index);
-                getLog().info("Stored class index to " + index + " " + idx.getClassesCount() + " classes and " 
-                    + idx.getResourcesCount() + " resources in " + idx.getLocationsCount() + " locations in " 
-                    + (System.currentTimeMillis() - start) + " ms");
-            } catch (IOException e) {
-                getLog().warn("Cannot write index " + index + ". Ignoring. " + e.getClass().getSimpleName() + " " 
-                    + e.getMessage());
             }
         } else {
             index.delete();
         }
+    }
+
+    /**
+     * Returns the classpath entries from the classpath file (must be built before).
+     * @param cpFile
+     * @return
+     */
+    private List<Path> getCpEntries(File cpFile) {
+        List<Path> result = new ArrayList<>();
+        try (FileInputStream fis = new FileInputStream(cpFile)) {
+            List<String> contents = IOUtils.readLines(fis, Charset.defaultCharset());
+            for (String line : contents) {
+                if (!line.startsWith("#")) {
+                    StringTokenizer tokenizer = new StringTokenizer(line, ";:");
+                    while (tokenizer.hasMoreTokens()) {
+                        String token = tokenizer.nextToken();
+                        if (asTest) {
+                            token = token.replace("/jars/", "/jars-test/");
+                        }
+                        result.add(new File(token).toPath());
+                    }
+                }
+            }
+        } catch (IOException e) {
+            getLog().error("Cannot locate '" + cpFile + "' - not creating index: " + e.getMessage());
+        }
+        return result;
     }
 
 }

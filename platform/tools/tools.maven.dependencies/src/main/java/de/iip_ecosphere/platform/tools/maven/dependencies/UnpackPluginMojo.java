@@ -67,7 +67,6 @@ import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 public class UnpackPluginMojo extends CleaningUnpackMojo {
 
     private static final String NAME_CLASSPATH_FILE = "classpath";
-    private static boolean reuseIndexes = false; // preliminary
     
     @Parameter(property = "unpack.plugins", required = false)
     private List<PluginItem> plugins;
@@ -691,7 +690,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                 if (relocate) {
                     FileUtils.deleteQuietly(src);
                 }
-                writeIndex(locs, tgt, cf.item.createIndex);
+                writeIndexes(locs, tgt, cf.item.createIndex);
             } catch (IOException e) {
                 throw new MojoFailureException("Cannot postprocess " + src + ": " + e.getMessage());
             }
@@ -701,13 +700,13 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
     }
     
     /**
-     * Writes the (optional) classloader index file.
+     * Writes the (optional) classloader index files.
      * 
      * @param locs the Jar locations to be turned into the index file
      * @param cpFile the associated classpath file to create the index for
      * @param enable individual setting whether index shall be written
      */
-    private void writeIndex(List<JarLocation> locs, File cpFile, boolean enable) {
+    private void writeIndexes(List<JarLocation> locs, File cpFile, boolean enable) {
         if (!Layers.isOsCpFile(cpFile)) {
             File index = new File(cpFile.toString() + LoaderIndex.INDEX_SUFFIX);
             if (!enable) {
@@ -720,7 +719,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             } else if (createIndex) {
                 LoaderIndex idx = new LoaderIndex();
                 String knownMsg = "";
-                if (index.isFile() && index.length() > 0 && reuseIndexes) {
+                if (index.isFile() && index.length() > 0) {
                     try {
                         // obtain index
                         idx = LoaderIndex.fromFile(index);
@@ -729,13 +728,17 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                         for (JarLocation l: locs) {
                             locsByFile.put(l.toFile().getName(), l);
                         }
+                        Map<String, String> urlMapping = new HashMap<>();
                         for (String indexedFile : idx.getFiles()) {
                             File f = new File(indexedFile);
                             JarLocation l = locsByFile.get(f.getName());
                             if (l != null) {
                                 locs.remove(l);
+                                urlMapping.put(indexedFile, l.toActual());
                             }
                         }
+                        idx.substituteLocations(urlMapping, false);
+                        
                         knownMsg = idx.getClassesCount() + " classes and " + idx.getResourcesCount() 
                             + " resources known. Reusing the information.";
                     } catch (IOException e) {
@@ -743,9 +746,8 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                     }
                 }
                 long start = System.currentTimeMillis();
-                getLog().info("Indexing classes..." + knownMsg);
+                getLog().info("Indexing classes..." + knownMsg + ". Indexing " + locs.size() + " jars.");
                 try {
-                    idx = new LoaderIndex();
                     AtomicInteger exceptionCount = new AtomicInteger();
                     for (JarLocation loc: locs) {
                         // handle exceptions tolerantly, sometimes class files are listed but optional
@@ -828,6 +830,15 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
          */
         File toFile() {
             return new File(original);
+        }
+        
+        /**
+         * Returns the actual location, either {@link #actual} or if not present {@link #original}.
+         * 
+         * @return the actual location
+         */
+        String toActual() {
+            return null == actual ? original : actual; 
         }
         
     }

@@ -2,7 +2,7 @@
 
 We use the `maven-dependency-plugin` for various tasks, e.g., to unpack Python code or the configuration model.  However, we do not limit ourselves to the target directory which may be cleaned up with `mvn clean` and other cleaning procedures do not work. So we decided to add a cleanup specification to `unpack` goal of maven-dependency-plugin provided by this package. Similarly, we need to add further non-classpath files to `build-classpath` when creating classpath files for platform instances. For convenience, we include further goals such as `delete` or `copy` of the original plugin we use them frequently in conjunction with `unpack`. Basic properties of the underlying maven dependendency plugin can be applied although not explicitly discussed here. 
 
-For oktoflow plugins, we need the sequence `copy-plugin-dependencies`, `build-plugin-classpath` and `assemble-plugin`. For installing plugins, `unpack-plugins`.
+For oktoflow plugins, we need the sequence `build-plugin-classpath` , `copy-plugin-dependencies` and `assemble-plugin`. For installing plugins, `unpack-plugins`.
 
 # generic goals
 
