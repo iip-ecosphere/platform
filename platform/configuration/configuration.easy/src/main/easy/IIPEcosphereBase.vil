@@ -38,6 +38,10 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
 
     String appStarterCls = "de.iip_ecosphere.platform.services.spring.loader.AppStarter";
 
+    Integer currentStep = -1;
+    Integer maxSteps = 0;
+    Boolean platformInstantiation = false;
+
     generateOsScripts(Configuration config, String pathName, String dir, String main, String desc, String pidName, String requires, String addJavaOpts="", String sysd="") = {
         vilTemplateProcessor("WinBatch", config, "${pathName}.bat", dir=dir, main=main, addJavaOpts=addJavaOpts);
         vilTemplateProcessor("LinuxBash", config, "${pathName}.sh", dir=dir, main=main, addJavaOpts=addJavaOpts);
@@ -129,6 +133,35 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
     logoutContainerRegistry(ContainerManager mgr) = {
     }
 
+    // ------------------------------------------ progress reporting -------------------------------------
+    
+    setMaxSteps(IIPEcosphere cfg, Boolean genApps, Integer furtherAppSteps, Integer platformSteps) = {
+        if (maxSteps == 0) { // if call from multiple entry points, take the first call
+            currentStep = -1;
+            // platformSteps usually 7 // broker, ecs, ecsSvc, svc, monitoring, ui, platform
+            if (platformInstantiation) {
+                maxSteps = maxSteps + platformSteps; 
+            }
+            if (genApps) {
+                if (cfg.sharedInterfaces) {
+                    maxSteps = maxSteps + 1;
+                }
+                if (getProperty("iip.easy.impl", "") <> "") {
+                    maxSteps = maxSteps + 1;
+                }
+                Integer appCount = getApplications().size();
+                Integer appSteps = 1 + 1 + furtherAppSteps; // interfaces, templates, app
+                maxSteps = maxSteps + appSteps * appCount;
+            }
+            // TODO container?
+            notifyProgress(currentStep, maxSteps, "Platform/App instantiation");
+        }
+    }
+    
+    advanceProgress(String description) = {
+        currentStep = currentStep + 1;
+        notifyProgress(currentStep, maxSteps, description);
+    }
     
     // ---------------------------- maven -----------------------------------
 

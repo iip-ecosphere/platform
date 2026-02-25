@@ -1,0 +1,77 @@
+import JavaBasics;
+import JavaMapping;
+import Basics;
+import MeshBasics;
+import IIPEcosphereBase;
+
+@advice(IIPEcosphere)
+vilScript Broker (Project source, Configuration config, Project target) {
+
+    generateBroker(Configuration config, Project target, Path brokerPath, Boolean enableZip, Boolean execMvn) = {
+        setMaxSteps(config, false, 0, 1);
+        IIPEcosphere cfg = config;
+
+        if (brokerPath.exists()) {
+            brokerPath.delete();
+        }
+        brokerPath.mkdir();
+        generateBrokerScripts(cfg, cfg.transportProtocol, brokerPath, execMvn);
+
+        if (enableZip and getBooleanValueSafe(cfg.zipBinaries, false)) {
+          zip("${target}", "${brokerPath}/brokerJars", "${target}/broker-bin.zip");
+          zip("${target}", "${brokerPath}/broker.*", "${target}/broker-bin.zip");
+          zip("${target}", "${brokerPath}/iip-broker.service", "${target}/broker-bin.zip");
+        }
+    }
+    
+    @DispatchBasis
+    generateBrokerScripts(Configuration config, TransportProtocol protocol, Path brokerPath, Boolean execMvn) = {
+        vilTemplateProcessor("NoBroker", config, "${brokerPath}/README.txt");
+    }
+    
+    @DispatchCase
+    generateBrokerScripts(Configuration config, TransportProtocolAMQP protocol, Path brokerPath, Boolean execMvn) = {
+        String addJavaOpts = toJvmMemLimitOpt(protocol.memLimit);
+        vilTemplateProcessor("AmqpPom", config, "${brokerPath}/pom.xml", ver=getStringValueSafe(protocol.brokerVer, "8.0.2"));
+        vilTemplateProcessor("AmqpLinuxSysd", config, "${brokerPath}/iip-broker.service", addJavaOpts=addJavaOpts);
+        vilTemplateProcessor("AmqpLinux", config, "${brokerPath}/broker.sh", addJavaOpts=addJavaOpts);
+        FileArtifact f = "${brokerPath}/broker.sh";
+        f.setExecutable(false);
+        vilTemplateProcessor("AmqpWin", config, "${brokerPath}/broker.bat", addJavaOpts=addJavaOpts);
+        Path c = "${brokerPath}/src/test";
+        c.mkdir();
+        vilTemplateProcessor("AmqpConf", config, "${c}/config.json");
+        if (execMvn) {
+            mvn(brokerPath);
+        }
+    }
+
+    @DispatchCase
+    generateBrokerScripts(Configuration config, TransportProtocolMQTTv3 protocol, Path brokerPath, Boolean execMvn) = {
+        generateBrokerScriptsHiveMq(config, getStringValueSafe(protocol.brokerVer, "2020.4"), protocol, brokerPath, execMvn);
+    }
+
+    @DispatchCase
+    generateBrokerScripts(Configuration config, TransportProtocolMQTTv5 protocol, Path brokerPath, Boolean execMvn) = {
+        generateBrokerScriptsHiveMq(config, getStringValueSafe(protocol.brokerVer, "2020.4"), protocol, brokerPath, execMvn);
+    }
+    
+    generateBrokerScriptsHiveMq(Configuration config, String brokerVer, TransportProtocol protocol, Path brokerPath, Boolean execMvn) = {
+        String addJavaOpts = toJvmMemLimitOpt(protocol.memLimit);
+        vilTemplateProcessor("MqttPom", config, "${brokerPath}/pom.xml", ver=brokerVer);
+        vilTemplateProcessor("MqttLinuxSysd", config, "${brokerPath}/iip-broker.service", addJavaOpts=addJavaOpts);
+        vilTemplateProcessor("MqttLinux", config, "${brokerPath}/broker.sh", addJavaOpts=addJavaOpts);
+        FileArtifact f = "${brokerPath}/broker.sh";
+        f.setExecutable(false);
+        vilTemplateProcessor("MqttWin", config, "${brokerPath}/broker.bat", addJavaOpts=addJavaOpts);
+        Path c = "${brokerPath}/src/test";
+        c.mkdir();
+        vilTemplateProcessor("MqttConf", config, "${c}/config.xml");
+        c = "${c}/extensions";
+        c.mkdir();
+        if (execMvn) {
+            mvn(brokerPath);
+        }
+    }
+
+}

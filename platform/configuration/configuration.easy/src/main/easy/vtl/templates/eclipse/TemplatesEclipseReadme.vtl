@@ -42,12 +42,15 @@ Typical build steps:
 - Configure your application and generate application interfaces (done).
 - Implement your services
 - `mvn -P App install`.
+- If built in the context of a platform installation, you may rely on the platform broker for testing. Else, the 
+  template also contains a broker setup in `target/gen` where before use fist `mvn install` must be called.
 - Test your services / application. Helper command line executions are hooked into the POM.
 - Generate application integration code.
 - Create a deployment plan and upload it into the artifacts folder of the platform.
 - Run your application.
  
-For testing the connectors/services individually or the application locally, please start the configured broker first. 
+For testing the connectors/services individually or the application locally, either rely on the platform broker (if 
+intended/available) or please build/start the configured broker in `target/gen` first. 
 Following maven commands are generated, but may require individual customization, e.g., through environment properties.
 Also input files (see `src/test/resources`) require renaming and adjustments.
 - `mvn -P Exec dependency:copy@app exec:java@app` (also `run.bat`/`run.sh`) downloads and runs the full application after it was built with all services locally without the platform.

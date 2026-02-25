@@ -2,6 +2,7 @@ import JavaBasics;
 import JavaMapping;
 import Basics;
 import MeshBasics;
+import Broker;
 import IIPEcosphereBase;
 insert IIPEcospherePart*;
 
@@ -11,10 +12,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     // Paths now in IIPEcosphereBase
     
     Boolean tests = true;
-    Boolean platformInstantiation = false;
     setOf(String) usedServiceTypes = {};
-    Integer currentStep = -1;
-    Integer maxSteps = 0;
     mapOf(String, sequenceOf(String)) appJsl = {};
     
     main(Project source, Configuration config, Project target) = {
@@ -31,36 +29,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         setMaxSteps(config, true, 1, 7);
         generatePlatform(source, config, target); // first for container
         generateApps(source, config, target);
-    }
-    
-    // ------------------------------------------ progress reporting -------------------------------------
-    
-    setMaxSteps(IIPEcosphere cfg, Boolean genApps, Integer furtherAppSteps, Integer platformSteps) = {
-        if (maxSteps == 0) { // if call from multiple entry points, take the first call
-            currentStep = -1;
-            // platformSteps usually 7 // broker, ecs, ecsSvc, svc, monitoring, ui, platform
-            if (platformInstantiation) {
-                maxSteps = maxSteps + platformSteps; 
-            }
-            if (genApps) {
-                if (cfg.sharedInterfaces) {
-                    maxSteps = maxSteps + 1;
-                }
-                if (getProperty("iip.easy.impl", "") <> "") {
-                    maxSteps = maxSteps + 1;
-                }
-                Integer appCount = getApplications().size();
-                Integer appSteps = 1 + 1 + furtherAppSteps; // interfaces, templates, app
-                maxSteps = maxSteps + appSteps * appCount;
-            }
-            // TODO container?
-            notifyProgress(currentStep, maxSteps, "Platform/App instantiation");
-        }
-    }
-    
-    advanceProgress(String description) = {
-        currentStep = currentStep + 1;
-        notifyProgress(currentStep, maxSteps, description);
     }
     
     // ---------------------------------------- generating AAS impls -------------------------------------
@@ -320,6 +288,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/build.bat", forBuild=true, forRun=false);
                 vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/updateModel.bat", forBuild=false, forRun=false);
                 vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/run.bat", forBuild=false, forRun=true);
+                generateBroker(config, target, "${appRoot}/target/gen/broker", false, false);
+                
                 // currently no separate templates
                 Path vsCodeSettings = "${appRoot}/.vscode";
                 vsCodeSettings.mkdir();
@@ -2379,21 +2349,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     
     // ------------------------------------------ generating instantiated platform artifacts -------------------------------------------------------
 
+    // called from instantiation, don't change signature
     generateBroker(Project source, Configuration config, Project target) = {
-        setMaxSteps(config, false, 0, 1);
-        IIPEcosphere cfg = config;
-
-        if (brokerRoot.exists()) {
-            brokerRoot.delete();
-        }
-        brokerRoot.mkdir();
-        generateBrokerScripts(cfg, cfg.transportProtocol);
-
-        if (getBooleanValueSafe(cfg.zipBinaries, false)) {
-          zip("${target}", "${brokerRoot}/brokerJars", "${target}/broker-bin.zip");
-          zip("${target}", "${brokerRoot}/broker.*", "${target}/broker-bin.zip");
-          zip("${target}", "${brokerRoot}/iip-broker.service", "${target}/broker-bin.zip");
-        }
+        generateBroker(config, target, brokerRoot, true, true);
     }
     
     generateEcsRuntime(Path path, Configuration config, EcsDevice deviceType) = {
@@ -2595,50 +2553,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             String clsName = pluginToClassName(pl);
             vilTemplateProcessor("JavaPluginSetupDescriptor", config, "${componentRoot}/src/main/java/de/oktoflow/plugins/${clsName}PluginSetupDescriptor.java", 
                 clsName=clsName, plugin=pl, resource="${clsName}.plugin", pkg="de.oktoflow.plugins");
-            // TODO plugin JSLs
         }*/
     }    
-    
-    generateBrokerScripts(Configuration config, TransportProtocol protocol) = {
-        vilTemplateProcessor("NoBroker", config, "${brokerRoot}/README.txt");
-    }
-    
-    generateBrokerScripts(Configuration config, TransportProtocolAMQP protocol) = {
-        String addJavaOpts = toJvmMemLimitOpt(protocol.memLimit);
-        vilTemplateProcessor("AmqpPom", config, "${brokerRoot}/pom.xml", ver=getStringValueSafe(protocol.brokerVer, "8.0.2"));
-        vilTemplateProcessor("AmqpLinuxSysd", config, "${brokerRoot}/iip-broker.service", addJavaOpts=addJavaOpts);
-        vilTemplateProcessor("AmqpLinux", config, "${brokerRoot}/broker.sh", addJavaOpts=addJavaOpts);
-        FileArtifact f = "${brokerRoot}/broker.sh";
-        f.setExecutable(false);
-        vilTemplateProcessor("AmqpWin", config, "${brokerRoot}/broker.bat", addJavaOpts=addJavaOpts);
-        Path c = "${brokerRoot}/src/test";
-        c.mkdir();
-        vilTemplateProcessor("AmqpConf", config, "${c}/config.json");
-        mvn(brokerRoot);
-    }
-
-    generateBrokerScripts(Configuration config, TransportProtocolMQTTv3 protocol) = {
-        generateBrokerScriptsHiveMq(config, getStringValueSafe(protocol.brokerVer, "2020.4"), protocol);
-    }
-
-    generateBrokerScripts(Configuration config, TransportProtocolMQTTv5 protocol) = {
-        generateBrokerScriptsHiveMq(config, getStringValueSafe(protocol.brokerVer, "2020.4"), protocol);
-    }
-    
-    generateBrokerScriptsHiveMq(Configuration config, String brokerVer, TransportProtocol protocol) = {
-        String addJavaOpts = toJvmMemLimitOpt(protocol.memLimit);
-        vilTemplateProcessor("MqttPom", config, "${brokerRoot}/pom.xml", ver=brokerVer);
-        vilTemplateProcessor("MqttLinuxSysd", config, "${brokerRoot}/iip-broker.service", addJavaOpts=addJavaOpts);
-        vilTemplateProcessor("MqttLinux", config, "${brokerRoot}/broker.sh", addJavaOpts=addJavaOpts);
-        FileArtifact f = "${brokerRoot}/broker.sh";
-        f.setExecutable(false);
-        vilTemplateProcessor("MqttWin", config, "${brokerRoot}/broker.bat", addJavaOpts=addJavaOpts);
-        Path c = "${brokerRoot}/src/test";
-        c.mkdir();
-        vilTemplateProcessor("MqttConf", config, "${c}/config.xml");
-        c = "${c}/extensions";
-        c.mkdir();
-        mvn(brokerRoot);
-    }
 
 }
