@@ -11,7 +11,7 @@
   <span style="flex: 1 1 auto"></span>
   <span>
     <span *ngIf="feedback == ''">
-      <button mat-icon-button class="button okto-button" *ngIf="!type && !refinedTypes else addButton" color="success" (click)="create()" disable>
+      <button mat-icon-button class="button okto-button" *ngIf="!type && !refinedTypes else addButton" color="success" (click)="create()" disable [matTooltip]="getTooltipText('Create', category)">
         <mat-icon>done</mat-icon>
       </button>
       <ng-template #addButton>

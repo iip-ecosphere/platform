@@ -23,7 +23,7 @@ mat-raised-button color="success"
       </div>
       -->
 
-      <span *ngIf="currentTab != '' && tab.tabName != 'Setup'" [matTooltip]="getTooltipText('Create')">
+      <span *ngIf="currentTab != '' && tab.tabName != 'Setup'" [matTooltip]="getTooltipText('Create', currentTab)">
         <span *ngIf="meta && meta.value">
           <mat-form-field appearance="outline">
             <mat-select id="typeSelect" [(value)]="selectedType">
@@ -84,7 +84,7 @@ mat-raised-button color="success"
           </td>
 
           <td class="cell-with-button" style="width:3%;">
-            <button id="data.btnEdit" mat-icon-button class="okto-button" (click)="edit(item)" [matTooltip]="getTooltipText('Edit')">
+            <button id="data.btnEdit" mat-icon-button class="okto-button" (click)="edit(item)" [matTooltip]="getTooltipText('Edit', currentTab)">
               <mat-icon>menu_open</mat-icon>
             </button>
           </td>
@@ -97,7 +97,7 @@ mat-raised-button color="success"
               </button>
             </span>
             <ng-template #elseNotDone>
-              <button id="data.btnDelete" mat-icon-button class="okto-button" (click)="del(item)" [matTooltip]="getTooltipText('Delete')">
+              <button id="data.btnDelete" mat-icon-button class="okto-button" (click)="del(item)" [matTooltip]="getTooltipText('Delete', currentTab)">
                 <mat-icon>delete</mat-icon>
               </button>
             </ng-template>

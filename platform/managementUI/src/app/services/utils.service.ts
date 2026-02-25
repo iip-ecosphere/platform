@@ -226,6 +226,23 @@ export class Utils {
     };
   }
 
+  /**
+   * Returns the tab-specific tooltip text for the given action (prefixed).
+   * 
+   * @param action the action 
+   * @returns the tooltip text
+   */
+  public getTooltipText(action: string, currentTab: string) {
+    let entryType = currentTab.toLowerCase();
+    if (entryType.endsWith("ies")) {
+      entryType = entryType.slice(0, -3).concat("y");
+    } else if (entryType.endsWith("es") && /(s|x|z|ch|sh)es$/.test(entryType)) {
+      entryType = entryType.slice(0, -2);
+    } else if (entryType.endsWith("s")) {
+      entryType = entryType.slice(0, -1);
+    }
+    return `${action} ${entryType}`;
+  }
 }
 
 /**

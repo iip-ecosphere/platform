@@ -19,7 +19,7 @@
     {{ getDisplayName(input) }} 
     <span *ngIf="fieldsMeta && fieldsMeta.value">
       <mat-form-field appearance="outline">
-        <mat-select id="typeSelect" [(value)]="selectedType">
+        <mat-select [matTooltip]="input.description[0].text" id="typeSelect" [(value)]="selectedType">
           <mat-option *ngFor="let type of fieldsMeta?.value" [value]="type">
             {{ type.idShort }}
           </mat-option>
@@ -32,7 +32,7 @@
       <app-subeditor-button [meta]="meta" [input]="input" [selectedType]="selectedType" matIcon="add" (saveEvent)="onChildSaveEvent($event)"></app-subeditor-button>
     </span>
     <ng-template #other>
-      <button mat-icon-button class="itemButton" (click)="selectElement()" id="ref-select.inputName.btn-add">
+      <button [matTooltip]="input.description[0].text" mat-icon-button class="itemButton" (click)="selectElement()" id="ref-select.inputName.btn-add">
         <mat-icon>add</mat-icon>
       </button>
     </ng-template>
@@ -53,7 +53,7 @@
           <td>
             <div *ngIf="references[0]">
               <mat-form-field appearance="outline" class="inputField">
-                <mat-select [(value)]="selectedRef" id="ref-select.input.select">
+                <mat-select [matTooltip]="input.description[0].text" [(value)]="selectedRef" id="ref-select.input.select">
                   <mat-option *ngFor="let ref of references" [value]="ref"> <!-- (click)="addFromRef()" -->
                     {{ getElementDisplayName(ref, false) }}
                   </mat-option>

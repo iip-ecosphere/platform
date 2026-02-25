@@ -162,12 +162,18 @@ export class ListComponent extends Utils implements OnInit {
   }
 
   public async getDisplayData(tabName: string, metaProject: string | null, submodelElement: string | null) {
-    this.currentTab = tabName
-    this.selectedType = undefined;
+    if (this.currentTab != tabName) {
+      this.selectedType = undefined;
+      this.currentTab = tabName;
+    }
     if (this.metaBackup) {
       this.meta = this.ivmlFormatter.filterMeta(this.metaBackup, this.currentTab);
       if (this.meta && this.meta.value && this.meta.value?.length > 0) {
-        this.selectedType = this.meta.value[0]; // TODO sort, select most frequent/plausible
+        if (this.selectedType) {
+          this.selectedType = this.meta.value.find(value => value.idShort == this.selectedType?.idShort)
+        } else {
+          this.selectedType = this.meta.value[0]; // TODO sort, select most frequent/plausible
+        }
       }
     }
 
@@ -217,6 +223,7 @@ export class ListComponent extends Utils implements OnInit {
       this.filteredData = this.prefilter(metaProject)
     }
     this.filteredData = DataUtils.filterMetaTemplate(this.filteredData);
+    this.filteredData.sort((a: { idShort: string; }, b: { idShort: string; }) => (a.idShort ?? '').localeCompare(b.idShort ?? ''))
   }
 
   /**It returns items with given metaProject */
@@ -500,22 +507,6 @@ export class ListComponent extends Utils implements OnInit {
     // TODO feedback
   }
 
-  /**
-   * Returns the tab-specific tooltip text for the given action (prefixed).
-   * 
-   * @param action the action 
-   * @returns the tooltip text
-   */
-  public getTooltipText(action: string) {
-    let entryType = this.currentTab.toLowerCase();
-    if (entryType.endsWith("es")) {
-      entryType = entryType.substring(0, entryType.length - 2);
-    } else if (entryType.endsWith("s")) {
-      entryType = entryType.substring(0, entryType.length - 1);
-    }
-    return `${action} ${entryType}`;
-  }
-
   /*public createMesh() {
     console.log("IMPLEMENT CREATE MESH");
     // TODO
@@ -585,7 +576,7 @@ export class ListComponent extends Utils implements OnInit {
       }
     );
     const tempSub = this.websocketService.getMsgSubject().subscribe((value: string) => {
-      if (value.includes(appId)) {
+      if (value.includes('"id":"Configuration"')) {
         snackRef.dismiss();
         tempSub.unsubscribe();
       }
@@ -639,7 +630,7 @@ export class ListComponent extends Utils implements OnInit {
       }
     );
     const tempSub = this.websocketService.getMsgSubject().subscribe((value: string) => {
-      if (value.includes("Configuration")) {
+      if (value.includes('"id":"Configuration"')) {
         snackRef.dismiss();
         tempSub.unsubscribe();
       }
