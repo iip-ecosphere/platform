@@ -64,6 +64,7 @@ project TechnicalSetup {
     
     // ---------- generation setup ------------
     
+    sharedInterfaces = true;
     //setup instDir, javaExe if you plan to use the Linux service descriptors - list variables in freeze block
     //setup modelBaseFile and (if required) modelName/configFolder to provide AAS access for the UI  - list variables in freeze block
 
