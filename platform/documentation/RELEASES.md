@@ -17,7 +17,6 @@
 
 In progress:
 * [#189](https://github.com/iip-ecosphere/platform/issues/189): Revise documentation
-* [#164](https://github.com/iip-ecosphere/platform/issues/164): Management UI improvements
 
 Improvements:
 * Support for JDK 21 based on Eclipse 2024-06.
@@ -30,6 +29,7 @@ Improvements:
 * Code templates contain bash and batch scripts for building the app as well as a python source mapping for VScode
 * Reduced logging during execution of all-in-one examples
 * New INFLUX DB v3 connector for ReGaP.
+* [#164](https://github.com/iip-ecosphere/platform/issues/164): Management UI improvements
 * [#170](https://github.com/iip-ecosphere/platform/issues/170): Enable plugins/BaSyx2
 * [#181](https://github.com/iip-ecosphere/platform/issues/181): Allow MIMO containers
 * [#166](https://github.com/iip-ecosphere/platform/issues/166): Upgrade Angular for UI.
