@@ -218,6 +218,19 @@ public class SpringStartup {
      */
     private static void loadPlugins(String[] args) {
         Starter.transferArgsToEnvironment(args);
+        final String pluginsDirDflt = "target";
+        // similar to Starter.loadOktoPlugins() but disable plugin loading if there are none in default dirs -> legacy
+        String pluginsDir = System.getProperty(Starter.PARAM_IIP_APP_PLUGINS, pluginsDirDflt);
+        if (pluginsDir.equals(pluginsDirDflt)) { // if set differently, we assume that this is intentional and "ok"
+            File pluginParent = new File(pluginsDir);
+            File plugins = new File(pluginParent, "plugins");
+            if (!plugins.isDirectory()) { // testing fallback
+                plugins = new File(pluginParent, "oktoPlugins");
+                if (!plugins.isDirectory()) {
+                    System.setProperty(Starter.PARAM_IIP_APP_PLUGINS, Starter.PARAM_IIP_APP_PLUGINS_NO_PLUGINS);
+                }
+            } 
+        }
         Starter.loadOktoPlugins();
         PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE); // local plugins
     }
