@@ -1,5 +1,12 @@
 <div *ngIf="errorMsg">{{ errorMsg }}</div>
-<div *ngIf="errorMsg"> Please check CORS and reload the page</div>
+<div *ngIf="errorMsg">
+  Various reasons may lead to this message:
+  <ul>
+    <li>The backend server (AAS repository, AAS submodel repository) may not yet be up. Depending on the installation, it could be just a matter of time until it is completely started. It might also be necessary that you have to start it before using the oktoflow management UI.</li>
+    <li>Your network settings may be incorrect. Although you may have used static IP addresses, in particular on Windows the software may just grab the first or an outdated network interface, which could be a disabled WiFi connection. If you experience this, please consider setting up network masks in the IVML configuration to point oktoflow to the correct networks/interfaces.</li>
+    <li>The CORS (Cross-Origin Resource Sharing) of your installation may not be set up correctly. Typically, oktoflow works when instantiated it's default CORS settings. In the extreme case, a browser plugin could allow for temporary resolution of this issue.</li>
+  </ul>  
+  As stated above, in the easiest case it is just a matter of time. So if it may be the first reason (e.g., in the development container), please try reloading the page until the required server processes are up. If this does not help, please contact the oktoflow team with detailed information.</div>
 <div *ngIf="Data && Data.submodelElements">
   <div  class="container">
     <div *ngFor="let element of Data.submodelElements" class="element">
