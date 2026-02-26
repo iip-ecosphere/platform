@@ -31,6 +31,7 @@ import de.iip_ecosphere.platform.support.IOUtils;
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 
 /**
  * Manages plugins to separate overlapping classpaths and dependencies of alternatives and optionals.
@@ -397,7 +398,9 @@ public class PluginManager {
             if (f.isDirectory()) { // test unpacking with contained jars
                 cpFile = new File(f, "classpath"); // by convention
             } else { // resolved, relocated
-                if (!f.getName().endsWith("-win") && !f.getName().endsWith("-linux")) {
+                String name = f.getName();
+                if (!name.endsWith("-win") && !name.endsWith("-linux") && !name.endsWith(LoaderIndex.INDEX_SUFFIX) 
+                    && !name.endsWith(".jar")) {
                     cpFile = f;
                 }
             }
