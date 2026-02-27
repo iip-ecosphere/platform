@@ -65,7 +65,7 @@ RUN apt-get update && apt-get install -y python3-pip
 RUN python3 -m pip install websockets==11.0.2 pyyaml==6.0 pyflakes==3.2.0
 
 # ------ Installing platform dependencies ---------------------------------------------
-RUN touch /root/platform/artifacts/ && chmod -f 777 /root/platform/artifacts/
+RUN mkdir -p /root/platform/artifacts && chmod -f 777 /root/platform/artifacts
 RUN mvn -f /root/platform/Install/pom.xml -P DepsOnly install
 
 # ------ intalling newer version of firefox -------------------------------------------
