@@ -62,11 +62,11 @@ RUN tar xzpvf apache-maven-3.9.7-bin.tar.gz
 RUN ln -s $PWD/apache-maven-3.9.7/bin/mvn /usr/bin/mvn
 # py dependencies
 RUN apt-get update && apt-get install -y python3-pip
-RUN python3 -m pip install websockets==11.0.2 pyyaml=6.0 pyflakes=3.2.0
+RUN python3 -m pip install websockets==11.0.2 pyyaml==6.0 pyflakes==3.2.0
 
 # ------ Installing platform dependencies ---------------------------------------------
+RUN touch /root/platform/artifacts/ && chmod -f 777 /root/platform/artifacts/
 RUN mvn -f /root/platform/Install/pom.xml -P DepsOnly install
-RUN chmod -f 777 /root/platform/artifacts/
 
 # ------ intalling newer version of firefox -------------------------------------------
 RUN apt-get update && apt-get install -y \
