@@ -12,7 +12,6 @@
 
 package de.oktoflow.platform.tools.lib.loader;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -109,30 +108,12 @@ public class IndexClassloader extends URLClassLoader {
                 throw new ClassNotFoundException(name);
             }
             try (InputStream in = jar.getInputStream(entry)) {
-                byte[] bytes = readAllBytes(in);
+                byte[] bytes = LoaderIndex.readAllBytes(in);
                 return defineClass(name, bytes, 0, bytes.length);
             }
         } catch (IllegalArgumentException | IOException e) {
             throw new ClassNotFoundException(name, e);
         }
-    }
-    
-    /**
-     * As long as readAllBytes is not available on InputStream. Do not use IOUtils
-     * here as plugin may not be loaded.
-     * 
-     * @param in the input stream
-     * @return the read bytes
-     * @throws IOException if reading fails
-     */
-    private static byte[] readAllBytes(InputStream in) throws IOException {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        int nRead;
-        byte[] data = new byte[16384];
-        while ((nRead = in.read(data, 0, data.length)) != -1) {
-            buffer.write(data, 0, nRead);
-        }
-        return buffer.toByteArray();
     }
 
     @Override

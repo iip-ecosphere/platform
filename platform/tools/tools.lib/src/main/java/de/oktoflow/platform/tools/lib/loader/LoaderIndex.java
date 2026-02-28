@@ -2,12 +2,15 @@ package de.oktoflow.platform.tools.lib.loader;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -19,6 +22,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
 
 /**
  * Represents the class loader index.
@@ -119,31 +123,22 @@ public class LoaderIndex implements Serializable {
      *   use the relative path of {@code jarFile} instead
      * @param consumer optional exception consumer to tolerantly handle IO exceptions, exceptions are thrown if 
      *     <b>null</b>
+     * @return the number of processed/added entries
      * @throws IOException if {@code jarFile} cannot be opened
      */
-    public static void addToIndex(LoaderIndex index, File jarFile, String location, Consumer<IOException> consumer) 
+    public static int addToIndex(LoaderIndex index, File jarFile, String location, Consumer<IOException> consumer) 
         throws IOException {
         String jarLocation = index.getFileLocationProvider().apply(jarFile);
         if (null == location || location.length() == 0) {
             location = jarLocation;
         }
+        int entryCount = 0;
         try (JarFile jar = new JarFile(jarFile)) {
             Enumeration<JarEntry> entries = jar.entries();
             while (entries.hasMoreElements()) {
                 JarEntry entry = entries.nextElement();
-                String name = entry.getName();
-                if (entry.isDirectory()) {
-                    addToIndex(index, index.resourceIndex, name, location, true);
-                    continue;
-                } else if (name.endsWith(".class")) {
-                    // Convert to fully qualified class name
-                    String className = name
-                            .replace('/', '.')
-                            .replaceAll("\\.class$", "");
-                    addToIndex(index, index.classIndex, className, location, true);
-                } else {
-                    addToIndex(index, index.resourceIndex, name, location, true);
-                }
+                addEntry(index, entry, jarLocation);
+                entryCount++;
             }
             index.files.add(jarLocation);
         } catch (IOException e) {
@@ -153,8 +148,78 @@ public class LoaderIndex implements Serializable {
                 consumer.accept(e);
             }
         }
+        return entryCount;
     }
-    
+
+    /**
+     * Adds the given {@code stream} to {@code index}. Updates the {@link #files} list by adding {@code jarFile}.
+     * 
+     * @param index the index
+     * @param stream the stream to index
+     * @param location optional actual location, ignored if <b>null</b> or empty
+     * @param consumer optional exception consumer to tolerantly handle IO exceptions, exceptions are thrown if 
+     *     <b>null</b>
+     * @return the number of processed/added entries
+     * @throws IOException if {@code jarFile} cannot be opened
+     */
+    public static int addToIndex(LoaderIndex index, InputStream stream, String location, 
+            Consumer<IOException> consumer) throws IOException {
+        return addToIndex(index, new JarInputStream(stream), location, consumer);
+    }
+
+    /**
+     * Adds the given {@code jarStream} to {@code index}. Updates the {@link #files} list by adding {@code jarFile}.
+     * 
+     * @param index the index
+     * @param jarStream the stream to index
+     * @param location optional actual location, ignored if <b>null</b> or empty
+     * @param consumer optional exception consumer to tolerantly handle IO exceptions, exceptions are thrown if 
+     *     <b>null</b>
+     * @return the number of processed/added entries
+     * @throws IOException if {@code jarFile} cannot be opened
+     */
+    public static int addToIndex(LoaderIndex index, JarInputStream jarStream, String location, 
+        Consumer<IOException> consumer) throws IOException {
+        JarEntry entry;
+        int entryCount = 0;
+        try {
+            while ((entry = jarStream.getNextJarEntry()) != null) {
+                addEntry(index, entry, location);
+                entryCount++;
+            }
+            index.files.add(location);
+        } catch (IOException e) {
+            if (null == consumer) {
+                throw e;
+            } else {
+                consumer.accept(e);
+            }
+        }
+        return entryCount;
+    }
+
+    /**
+     * Adds a jar entry to {@code index}.
+     * 
+     * @param index the index to modify
+     * @param entry the JarEntry to process
+     * @param location the location of the JarEntry
+     */
+    private static void addEntry(LoaderIndex index, JarEntry entry, String location) {
+        String name = entry.getName();
+        if (entry.isDirectory()) {
+            addToIndex(index, index.resourceIndex, name, location, true);
+        } else if (name.endsWith(".class")) {
+            // Convert to fully qualified class name
+            String className = name
+                    .replace('/', '.')
+                    .replaceAll("\\.class$", "");
+            addToIndex(index, index.classIndex, className, location, true);
+        } else {
+            addToIndex(index, index.resourceIndex, name, location, true);
+        }
+    }
+
     /**
      * Adds the resource {@code name} in {@code location} to {@code map} and adjusts the location index in 
      * {@code index}.
@@ -200,49 +265,32 @@ public class LoaderIndex implements Serializable {
     }
     
     /**
-     * Relocates an index instance.
-     * 
-     * @param index the index
-     * @param prefix the path prefix indicating a path to relocate
-     * @param replacement the replacement for prefix if prefix was found at the beginning of a path
-     */
-    public static void relocateIndex(LoaderIndex index, String prefix, String replacement) {
-        relocateIndex(index.classIndex, prefix, replacement);
-        relocateIndex(index.resourceIndex, prefix, replacement);
-    }
-
-    /**
-     * Relocates an index map.
-     * 
-     * @param index the index map, entry values may be modified as a side effect
-     * @param prefix the path prefix indicating a path to relocate
-     * @param replacement the replacement for prefix if prefix was found at the beginning of a path
-     */
-    private static void relocateIndex(Map<String, String> index, String prefix, String replacement) {
-        for (Map.Entry<String, String> entry : index.entrySet()) {
-            String path = entry.getValue();
-            if (path.startsWith(prefix)) {
-                entry.setValue(replacement + path.substring(prefix.length()));
-            }
-        }
-    }
-    
-    /**
      * Reads an index file, basically via serialization.
      * 
      * @param indexFile the index file
-     * @return the index object
+     * @return the index
      * @throws IOException if the file cannot be read
      */
     public static LoaderIndex fromFile(File indexFile) throws IOException {
+        return fromStream(new FileInputStream(indexFile));
+    }
+
+    /**
+     * Reads an index file, basically via serialization.
+     * 
+     * @param stream the stream containing the index file
+     * @return the index
+     * @throws IOException if the stream cannot be read
+     */
+    public static LoaderIndex fromStream(InputStream stream) throws IOException {
         try (ObjectInputStream ois = new ObjectInputStream(
-                new BufferedInputStream(new FileInputStream(indexFile)))) {
+                new BufferedInputStream(stream))) {
             return (LoaderIndex) ois.readObject();
         } catch (ClassNotFoundException e) {
             throw new IOException(e.getMessage(), e);
         }
     }
-    
+
     /**
      * Saves {@code index} to {@code file}.
      * 
@@ -251,8 +299,18 @@ public class LoaderIndex implements Serializable {
      * @throws IOException if the index cannot be written
      */
     public static void toFile(LoaderIndex index, File file) throws IOException {
-        try (ObjectOutputStream oos = new ObjectOutputStream(
-                new BufferedOutputStream(new FileOutputStream(file)))) {
+        toStream(index, new FileOutputStream(file));
+    }
+    
+    /**
+     * Saves {@code index} to {@code stream}.
+     * 
+     * @param index the index to write
+     * @param stream the stream to write to
+     * @throws IOException if the index cannot be written
+     */
+    public static void toStream(LoaderIndex index, OutputStream stream) throws IOException {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(stream))) {
             oos.writeObject(index);
         }
     }
@@ -355,6 +413,22 @@ public class LoaderIndex implements Serializable {
     }
 
     /**
+     * Returns the (first) location of the specified resource {@code res}.
+     * 
+     * @param res the resource
+     * @return the location, may be <b>null</b> if either resource or location is unknown
+     */
+    public String getResourceLocation(String res) {
+        String result = null;
+        String loc = resourceIndex.get(res);
+        if (null != loc) {
+            loc = getFirstResourceLocation(loc);
+            result = locationIndex.get(loc);
+        }
+        return result;
+    }
+
+    /**
      * Returns the location(s) of the specified resource {@code res}.
      * 
      * @param res the resource
@@ -381,6 +455,25 @@ public class LoaderIndex implements Serializable {
     public static String getFirstResourceLocation(String locStr) {
         int i = locStr.indexOf(RESOURCE_SEPARATOR_CHAR);
         return i < 0 ? locStr : locStr.substring(0, i);
+    }
+    
+    
+    /**
+     * As long as readAllBytes is not available on InputStream. Do not use IOUtils
+     * here as plugin may not be loaded.
+     * 
+     * @param in the input stream
+     * @return the read bytes
+     * @throws IOException if reading fails
+     */
+    public static byte[] readAllBytes(InputStream in) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        int nRead;
+        byte[] data = new byte[16384];
+        while ((nRead = in.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+        }
+        return buffer.toByteArray();
     }
     
     /**
@@ -419,6 +512,37 @@ public class LoaderIndex implements Serializable {
      */
     public Iterable<String> getFiles() {
         return files;
+    }
+
+    /**
+     * Relocates an index instance.
+     * 
+     * @param index the index
+     * @param prefix the path to be prepended before each path
+     */
+    public static void relocateIndex(LoaderIndex index, String prefix) {
+        Map<String, String> mapping = new HashMap<>();
+        for (String f : index.files) {
+            mapping.put(f, prefix + f);
+        }
+        index.substituteLocations(mapping);
+    }
+
+    /**
+     * Relocates an index instance.
+     * 
+     * @param index the index
+     * @param prefix the path prefix indicating a path to relocate
+     * @param replacement the replacement for prefix if prefix was found at the beginning of a path
+     */
+    public static void relocateIndex(LoaderIndex index, String prefix, String replacement) {
+        Map<String, String> mapping = new HashMap<>();
+        for (String f : index.files) {
+            if (f.startsWith(prefix)) {
+                mapping.put(f, replacement + f.substring(prefix.length()));
+            }
+        }
+        index.substituteLocations(mapping);
     }
 
     /**
