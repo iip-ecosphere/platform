@@ -23,6 +23,7 @@ import java.util.function.Function;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
+import java.util.regex.Pattern;
 
 /**
  * Represents the class loader index.
@@ -31,6 +32,11 @@ import java.util.jar.JarInputStream;
  */
 public class LoaderIndex implements Serializable {
 
+    /**
+     * Introduces the Java file name suffix for class files.
+     */
+    public static final String CLASS_SUFFIX = ".class";
+    
     /**
      * Introduces the "default" file name suffix for index files.
      */
@@ -47,6 +53,8 @@ public class LoaderIndex implements Serializable {
     public static final String RESOURCE_SEPARATOR = String.valueOf(RESOURCE_SEPARATOR_CHAR);
     public static final Function<File, String> DEFAULT_FILE_LOCATION_PROVIDER = f -> f.toString();
     
+    private static final Pattern RESOURCE_SPLIT_PATTERN =
+        Pattern.compile(Pattern.quote(String.valueOf(RESOURCE_SEPARATOR)));
     private static final long serialVersionUID = -3350988607004003802L;
 
     private List<String> files = new ArrayList<>();
@@ -427,6 +435,52 @@ public class LoaderIndex implements Serializable {
         }
         return result;
     }
+    
+    /**
+     * Returns the location denoted by the specified location identifier.
+     * 
+     * @param loc the location identifier
+     * @return the location, may be <b>null</b> if the identifier is not known
+     */
+    public String getLocation(String loc) {
+        return locationIndex.get(loc);
+    }
+
+    /**
+     * Obtains the resource locations, alternatively taking class file names as resources.
+     * 
+     * @param name the resource/class name
+     * @return the resource location identifier(s), may be separated by {@link LoaderIndex#RESOURCE_SEPARATOR}
+     * @see #splitResourceLocations(String)
+     * @see #getFirstResourceLocation(String)
+     * @see #getLocation(String)
+     */
+    static String resolveResourceLocationIdentifiers(String name, Map<String, String> resourceIndex, 
+        Map<String, String> classIndex) {
+        String locStr = resourceIndex.get(name);
+        if (null == locStr && name.endsWith(CLASS_SUFFIX)) {
+            String modName = name.substring(0, name.length() - CLASS_SUFFIX.length()).replace('/', '.');
+            locStr = classIndex.get(modName);
+            if (null == locStr) {
+                // Spring 2.4 behavior package$Class for non-inner classes
+                locStr = classIndex.get(modName.replace('$', '/')); 
+            }
+        }    
+        return locStr;
+    }
+    
+    /**
+     * Obtains the resource location, alternatively taking class file names as resources.
+     * 
+     * @param name the resource/class name
+     * @return the resource location identifier(s), may be separated by {@link LoaderIndex#RESOURCE_SEPARATOR}
+     * @see #splitResourceLocations(String)
+     * @see #getFirstResourceLocation(String)
+     * @see #getLocation(String)
+     */
+    public String resolveResourceLocationIdentifiers(String name) {
+        return resolveResourceLocationIdentifiers(name, resourceIndex, classIndex);
+    }
 
     /**
      * Returns the location(s) of the specified resource {@code res}.
@@ -438,12 +492,22 @@ public class LoaderIndex implements Serializable {
         String[] result = null;
         String loc = resourceIndex.get(res);
         if (null != loc) {
-            result = loc.split(RESOURCE_SEPARATOR);
+            result = splitResourceLocations(loc);
             for (int r = 0; r < result.length; r++) {
                 result[r] = locationIndex.get(result[r]);
             }
         }
         return result;
+    }
+
+    /**
+     * Returns all resource locations in {@code locStr}.
+     * 
+     * @param locStr the locations string
+     * @return the locations
+     */
+    public static String[] splitResourceLocations(String locStr) {
+        return RESOURCE_SPLIT_PATTERN.split(locStr);
     }
     
     /**

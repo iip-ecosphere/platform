@@ -42,7 +42,6 @@ import java.util.jar.JarFile;
  */
 public class IndexClassloader extends URLClassLoader {
     
-    private static final String CLASS_SUFFIX = ".class";
     private final List<String> files;
     private final Map<String, String> locationIndex;
     private final Map<String, String> classIndex;
@@ -102,7 +101,7 @@ public class IndexClassloader extends URLClassLoader {
         Path jarPath = Paths.get(jarPathStr);
         try {
             JarFile jar = jarCache.computeIfAbsent(jarPath, this::openJar);
-            String entryName = name.replace('.', '/') + CLASS_SUFFIX;
+            String entryName = name.replace('.', '/') + LoaderIndex.CLASS_SUFFIX;
             JarEntry entry = jar.getJarEntry(entryName);
             if (null == entry) {
                 throw new ClassNotFoundException(name);
@@ -118,7 +117,7 @@ public class IndexClassloader extends URLClassLoader {
 
     @Override
     public URL findResource(String name) {
-        String locStr = getResourceLocation(name);
+        String locStr = LoaderIndex.resolveResourceLocationIdentifiers(name, resourceIndex, classIndex);
         if (null == locStr) {
             return null;
         }
@@ -149,33 +148,14 @@ public class IndexClassloader extends URLClassLoader {
             return null;
         }
     }
-    
-    /**
-     * Obtains the resource location, alternatively taking class file names as resources.
-     * 
-     * @param name the resource/class name
-     * @return the resource location(s), may be separated by {@link LoaderIndex#RESOURCE_SEPARATOR}
-     */
-    private String getResourceLocation(String name) {
-        String locStr = resourceIndex.get(name);
-        if (null == locStr && name.endsWith(CLASS_SUFFIX)) {
-            String modName = name.substring(0, name.length() - CLASS_SUFFIX.length()).replace('/', '.');
-            locStr = classIndex.get(modName);
-            if (null == locStr) {
-                // Spring 2.4 behavior package$Class for non-inner classes
-                locStr = classIndex.get(modName.replace('$', '/')); 
-            }
-        }    
-        return locStr;
-    }
 
     @Override
     public Enumeration<URL> findResources(String name) throws IOException {
-        String locStr = getResourceLocation(name);
+        String locStr = LoaderIndex.resolveResourceLocationIdentifiers(name, resourceIndex, classIndex);
         if (null == locStr) {
             return null;
         }
-        String[] locStrs = locStr.split(LoaderIndex.RESOURCE_SEPARATOR);
+        String[] locStrs = LoaderIndex.splitResourceLocations(locStr);
         List<URL> result = new ArrayList<URL>();
         for (int l = 0; l < locStrs.length; l++) {
             String jarPathStr = locationIndex.get(locStrs[l]);
