@@ -64,6 +64,10 @@ RUN ln -s $PWD/apache-maven-3.9.7/bin/mvn /usr/bin/mvn
 RUN apt-get update && apt-get install -y python3-pip
 RUN python3 -m pip install websockets==11.0.2 pyyaml==6.0 pyflakes==3.2.0
 
+# ------ JAVA_HOME --------------------------------------------------------------------
+ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+ENV PATH=$JAVA_HOME/bin:$PATH
+
 # ------ Installing platform dependencies ---------------------------------------------
 RUN mkdir -p /root/platform/artifacts && chmod -f 777 /root/platform/artifacts
 RUN mvn -f /root/platform/Install/pom.xml -P DepsOnly install
