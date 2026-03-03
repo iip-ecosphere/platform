@@ -32,7 +32,7 @@ import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.MachineConnectorSupportedQueries;
 import de.iip_ecosphere.platform.connectors.AbstractPluginConnectorDescriptor;
-import de.iip_ecosphere.platform.connectors.AbstractThreadedConnector;
+import de.iip_ecosphere.platform.connectors.AbstractThreadedQueuingConnector;
 import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
 import de.iip_ecosphere.platform.connectors.events.SimpleTimeseriesQuery;
 import de.iip_ecosphere.platform.connectors.events.StringTriggerQuery;
@@ -56,7 +56,8 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 @MachineConnector(hasModel = false, supportsModelStructs = false, supportsEvents = false, specificSettings = 
     {"DATABASE", "MEASUREMENT", "TAGS", "BATCH", "BASETIME"})
 @MachineConnectorSupportedQueries({StringTriggerQuery.class, SimpleTimeseriesQuery.class})
-public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, Object, CO, CI, InfluxModelAccess> {
+public class InfluxConnector<CO, CI> 
+    extends AbstractThreadedQueuingConnector<Object, Object, CO, CI, InfluxModelAccess> {
 
     public static final String NAME = "INFLUX-v3";
     private static final Logger LOGGER = LoggerFactory.getLogger(InfluxConnector.class);
@@ -172,6 +173,7 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
                     if (tok.getType() == TokenType.ISSUED) {
                         client = InfluxDBClient.getInstance(url, tok.getTokenDataAsCharArray(), database);
                         LOGGER.info("INFLUX connected to {} by token", url);
+                        startQueueProcessing();
                     } else {
                         LOGGER.error("INFLUX connector cannot handle identity token type {}!", tok.getType());
                     }
@@ -188,6 +190,7 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
 
     @Override
     protected void disconnectImpl() throws IOException {
+        stopQueueProcessing();
         if (null != client) {
             try {
                 client.close();

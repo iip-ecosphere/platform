@@ -39,7 +39,7 @@ import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.MachineConnectorSupportedQueries;
 import de.iip_ecosphere.platform.connectors.AbstractPluginConnectorDescriptor;
-import de.iip_ecosphere.platform.connectors.AbstractThreadedConnector;
+import de.iip_ecosphere.platform.connectors.AbstractThreadedQueuingConnector;
 import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
 import de.iip_ecosphere.platform.connectors.events.SimpleTimeseriesQuery;
 import de.iip_ecosphere.platform.connectors.events.StringTriggerQuery;
@@ -63,7 +63,8 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 @MachineConnector(hasModel = false, supportsModelStructs = false, supportsEvents = false, specificSettings = 
     {"ORG", "BUCKET", "MEASUREMENT", "TAGS", "BATCH", "BASETIME"})
 @MachineConnectorSupportedQueries({StringTriggerQuery.class, SimpleTimeseriesQuery.class})
-public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, Object, CO, CI, InfluxModelAccess> {
+public class InfluxConnector<CO, CI> 
+    extends AbstractThreadedQueuingConnector<Object, Object, CO, CI, InfluxModelAccess> {
 
     public static final String NAME = "INFLUX";
     private static final Logger LOGGER = LoggerFactory.getLogger(InfluxConnector.class);
@@ -198,6 +199,7 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
                     LOGGER.error("INFLUX not connected!");
                 } else {
                     ensureBucket();
+                    startQueueProcessing();
                 }
             } catch (Exception e) {
                 LOGGER.error("INFLUX connection failed: {}", e.getMessage());
@@ -247,6 +249,7 @@ public class InfluxConnector<CO, CI> extends AbstractThreadedConnector<Object, O
     
     @Override
     protected void disconnectImpl() throws IOException {
+        stopQueueProcessing();
         if (null != client) {
             client.close();
             client = null;
