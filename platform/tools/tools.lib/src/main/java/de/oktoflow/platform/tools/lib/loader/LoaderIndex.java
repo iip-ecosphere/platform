@@ -647,6 +647,9 @@ public class LoaderIndex implements Serializable {
         for (int f = 0; f < files.size(); f++) {
             String loc  = normalize(files.get(f).toString());
             String newLoc = mapping.get(loc);
+            if (null == newLoc) { // fallback, required for test integration
+                newLoc = mapping.get(files.get(f).toString());
+            }
             if (null != newLoc) {
                 files.set(f, newLoc);
             }
