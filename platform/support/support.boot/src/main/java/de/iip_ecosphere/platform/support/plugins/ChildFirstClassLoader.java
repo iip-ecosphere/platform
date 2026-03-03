@@ -32,6 +32,10 @@ public class ChildFirstClassLoader extends ClassLoader implements IdentifyingCla
     
     private ChildClassLoader childClassLoader;
     
+    static {
+        registerAsParallelCapable();
+    }
+
     /**
      * Creates a child-first classloader using the context class loader of the current thread as parent.
      * 
