@@ -36,7 +36,8 @@ import org.junit.runners.Suite;
     AbstractThreadedConnectorTest.class,
     AbstractTypeMappingModelAccessTest.class,
     ConnectorExtensionDescriptorTest.class,
-    ConnectorPluginDescriptorTest.class
+    ConnectorPluginDescriptorTest.class,
+    SharedBufferTest.class
 })
 public class AllTests {
 }
