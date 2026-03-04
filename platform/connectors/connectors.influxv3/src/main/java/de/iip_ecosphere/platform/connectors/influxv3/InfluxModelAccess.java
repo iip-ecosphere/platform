@@ -260,14 +260,24 @@ public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
                 if (batch.size() == batchSize) {
                     connector.getClient().writePoints(batch);
                     batch.clear();
-                } else {
-                    batch.add(writePoint);
-                }
+                } 
+                batch.add(freezeWritePoint());
             } else {
-                connector.getClient().writePoint(writePoint);
+                connector.getClient().writePoint(freezeWritePoint());
             }
             clearPoint();
         }
+    }
+    
+    /**
+     * Freezes/swaps the write point. Returns the actual write point and enforces a new one.
+     * 
+     * @return the write point
+     */
+    private Point freezeWritePoint() {
+        Point pnt = writePoint;
+        writePoint = null;
+        return pnt;
     }
     
     /**
