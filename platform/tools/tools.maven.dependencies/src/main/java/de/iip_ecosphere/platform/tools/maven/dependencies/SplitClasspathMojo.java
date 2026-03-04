@@ -43,6 +43,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
+import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
+
 /**
  * A mojo that splits classpaths into main and app classpaths based on contained file name parts. Handlers spring
  * app package as well as oktoflow classpath jars.
@@ -60,6 +62,9 @@ public class SplitClasspathMojo extends AbstractMojo {
 
     @Parameter( property = "mdep.skip", defaultValue = "false", required = false )
     private boolean skip;
+
+    @Parameter( property = "mdep.createIndex", defaultValue = "true")
+    private boolean createIndex;
 
     @Parameter( required = false )
     private List<String> mainPatterns;
@@ -172,6 +177,64 @@ public class SplitClasspathMojo extends AbstractMojo {
         }
         return compressed;
     }
+    
+    /**
+     * Represents classpaths and indexes.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private class Classpaths {
+
+        private Path mainPath;
+        private Path appPath = null;
+        private StringBuilder main = new StringBuilder();
+        private StringBuilder app = new StringBuilder();
+        private Path mainIndexPath;
+        private Path appIndexPath;
+        private LoaderIndex mainIndex = null;
+        private LoaderIndex appIndex = null;
+
+        /**
+         * Stores all data.
+         * 
+         * @throws IOException if storing fails
+         */
+        private void store() throws IOException {
+            if (null != appPath) {
+                Files.writeString(mainPath, main.toString());
+                Files.writeString(appPath, app.toString());
+                toStream(mainIndex, mainIndexPath);
+                toStream(appIndex, appIndexPath);
+            }
+        }
+        
+        /**
+         * Initializes the indexes and sets the index paths for ZIP split class loading. Takes the file system from 
+         * {@link #mainPath} or {@link #appPath}, respectively. Disabled if {@link SplitClasspathMojo#createIndex} is 
+         * {@code false}.
+         */
+        private void setIndexPaths() {
+            if (createIndex) {
+                mainIndex = new LoaderIndex();
+                mainIndexPath = mainPath.getFileSystem().getPath(mainPath.toString() + LoaderIndex.INDEX_SUFFIX);
+                appIndex = new LoaderIndex();
+                appIndexPath = appPath.getFileSystem().getPath(appPath.toString() + LoaderIndex.INDEX_SUFFIX);
+            }
+        }
+        
+        /**
+         * Initializes the indexes and sets the index paths for Spring split class loading. Takes the file system from 
+         * {@link #mainPath}. Disabled if {@link SplitClasspathMojo#createIndex} is 
+         * {@code false}.
+         */
+        private void setSpringIndexPaths() {
+            if (createIndex) {
+                appIndex = new LoaderIndex();
+                appIndexPath = mainPath.getFileSystem().getPath("/BOOT-INF/classpath-app-okto.idx");
+            }
+        }
+        
+    }
 
     /**
      * Processes a given file.
@@ -184,22 +247,20 @@ public class SplitClasspathMojo extends AbstractMojo {
         getLog().info("Using compression: " + compressed);
         try (FileSystem fs = FileSystems.newFileSystem(file.toPath(), 
             Map.of("compressionMethod", compressed ? "DEFLATED" : "STORED"))) {
-            Path mainPath;
-            Path appPath = null;
-            StringBuilder main = new StringBuilder();
-            StringBuilder app = new StringBuilder();
+            Classpaths cp = new Classpaths();
 
-            mainPath = fs.getPath("/classpath");
-            if (Files.exists(mainPath)) {
+            cp.mainPath = fs.getPath("/classpath");
+            if (Files.exists(cp.mainPath)) {
                 getLog().info("Processing " + file + " as classpath JAR archive");
-                appPath = fs.getPath("/classpath-app");
-                List<String> lines = IOUtils.readLines(Files.newInputStream(mainPath), Charset.defaultCharset());
+                cp.appPath = fs.getPath("/classpath-app");
+                cp.setIndexPaths();
+                List<String> lines = IOUtils.readLines(Files.newInputStream(cp.mainPath), Charset.defaultCharset());
                 for (String line: lines) {
                     if (line.startsWith("#")) {
-                        main.append(line);
-                        main.append("\n");
-                        app.append(line);
-                        app.append("\n");
+                        cp.main.append(line);
+                        cp.main.append("\n");
+                        cp.app.append(line);
+                        cp.app.append("\n");
                     } else {
                         String sep = ":";
                         StringTokenizer tokenizer = new StringTokenizer(line, sep);
@@ -208,13 +269,16 @@ public class SplitClasspathMojo extends AbstractMojo {
                         while (tokenizer.hasMoreTokens()) {
                             String token = tokenizer.nextToken();
                             StringBuilder target;
+                            LoaderIndex targetIndex;
                             boolean sepBefore;
                             if (isMainFile(token, true)) {
-                                target = main;
+                                target = cp.main;
+                                targetIndex = cp.mainIndex;
                                 sepBefore = !firstMain;
                                 firstMain = false;
                             } else {
-                                target = app;
+                                target = cp.app;
+                                targetIndex = cp.appIndex;
                                 sepBefore = !firstApp;
                                 firstApp = false;
                             }
@@ -222,28 +286,30 @@ public class SplitClasspathMojo extends AbstractMojo {
                                 target.append(sep);
                             }
                             target.append(token);
+                            addToIndex(targetIndex, fs.getPath(token), token);
                         }
-                        main.append("\n");
-                        app.append("\n");
+                        cp.main.append("\n");
+                        cp.app.append("\n");
                     }
                 }
             } else {
-                mainPath = fs.getPath("/BOOT-INF/classpath.idx");
-                if (Files.exists(mainPath)) {
+                cp.mainPath = fs.getPath("/BOOT-INF/classpath.idx");
+                if (Files.exists(cp.mainPath)) {
                     getLog().info("Processing " + file + " as spring app JAR archive");
-                    appPath = fs.getPath("/BOOT-INF/classpath-app.idx");
+                    cp.appPath = fs.getPath("/BOOT-INF/classpath-app.idx");
                     Path libAppPath = fs.getPath("/BOOT-INF/lib-app");
                     if (!Files.isDirectory(libAppPath)) {
                         Files.createDirectory(libAppPath);
                     }
-                    List<String> lines = IOUtils.readLines(Files.newInputStream(mainPath), Charset.defaultCharset());
+                    cp.setSpringIndexPaths();
+                    List<String> lines = IOUtils.readLines(Files.newInputStream(cp.mainPath), Charset.defaultCharset());
                     for (String line: lines) {
                         StringBuilder target;
                         if (isMainFile(line, false)) { // spring boot loader implicitly there
-                            target = main;
+                            target = cp.main;
                         } else {
-                            target = app;
-                            line = processSpringLine(fs, line);
+                            target = cp.app;
+                            line = processSpringLine(fs, line, cp.appIndex);
                         }
                         target.append(line);
                         target.append("\n");
@@ -251,15 +317,40 @@ public class SplitClasspathMojo extends AbstractMojo {
                     postProcessSpringJar(fs);
                 }
             }
-            if (null != appPath) {
-                Files.writeString(mainPath, main.toString());
-                Files.writeString(appPath, app.toString());
-            }
+            cp.store();
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage());
         }
     }
+
+    /**
+     * Stores a loader index to {@code path}. Disabled if {@link #createIndex} is {@code false}.
+     * 
+     * @param index the index, may be <b>null</b>, ignored then
+     * @param path the path to store the index to
+     * @throws IOException if storing fails
+     */
+    private void toStream(LoaderIndex index, Path path) throws IOException {
+        if (null != index && createIndex) {
+            LoaderIndex.toStream(index, Files.newOutputStream(path));
+        }
+    }
     
+    /**
+     * Adds the contents of {@code path} to {@code index}. Disabled if {@link #createIndex} is {@code false}.
+     * 
+     * @param index the index, may be <b>null</b>, ignored then
+     * @param path
+     * @param location
+     * @throws IOException
+     */
+    private void addToIndex(LoaderIndex index, Path path, String location) throws IOException {
+        if (null != index && createIndex) {
+            LoaderIndex.addToIndex(index, Files.newInputStream(path), location, 
+                e -> getLog().warn("Cannot index " + path + ": " + e.getMessage()));
+        }
+    }
+
     /**
      * Cleans up left-over files.
      */
@@ -281,11 +372,12 @@ public class SplitClasspathMojo extends AbstractMojo {
      * @return the potentially modified line
      * @throws IOException if moving files fails
      */
-    private String processSpringLine(FileSystem fs, String line) throws IOException {
+    private String processSpringLine(FileSystem fs, String line, LoaderIndex index) throws IOException {
         if (line.startsWith("- \"") && line.endsWith("\"")) {
             String src = line.substring(3, line.length() - 1);
             String tgt = src.replace("BOOT-INF/lib/", "BOOT-INF/lib-app/");
             Path srcPath = fs.getPath(src);
+            addToIndex(index, srcPath, tgt);
             Path tgtPath = fs.getPath(tgt);
             Files.move(srcPath, tgtPath, StandardCopyOption.REPLACE_EXISTING);
             line = "- \"" + tgt + "\"";

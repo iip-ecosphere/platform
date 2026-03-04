@@ -289,7 +289,7 @@ The example applies the split-classpath plugin in the package phase of that POM 
 - `mainPatterns` (default prefix artifactIds for core platform components) specifies components that shall stay in their place, i.e., be part of the initial classloading. All other not named components are separated for isolated classloading, either in a different classpath file (ZIP) or in a different folder (Spring)
 - `skip` (default `false`, user property `mdep.skip`, inherited from original maven plugin) skips the execution of this plugin.
 - `keepClasses` (default empty) defining file (sub-)paths for classes that shall reside in the main class loader rather than being moved into isolated classloading; introduced only for very specific testing situations
-
+- `createIndex` (default `true`, user property `mdep.createIndex`) whether a classpath index file shall be created for the plugin
 
 # Missing
 
