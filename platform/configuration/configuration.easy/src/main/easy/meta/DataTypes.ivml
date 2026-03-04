@@ -258,7 +258,7 @@ project DataTypes {
 
     compound FloatIndexTypeType refines FloatTypeType {
     }
-    LongIndexTypeType FloatIndexType = {
+    FloatIndexTypeType FloatIndexType = {
         name = "FloatIndex"
     };
 
