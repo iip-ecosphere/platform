@@ -122,6 +122,21 @@
                             </prepends>
                         </configuration>
                       </execution>
+                       <execution>
+                           <id>copy-dependencies</id>
+                           <goals>
+                               <goal>copy-dependencies</goal>
+                           </goals>
+                        <phase>test-compile</phase>
+                           <configuration>
+                               <prependGroupId>false</prependGroupId>
+                               <outputDirectory>${project.build.directory}/appJars</outputDirectory>
+                               <overWriteReleases>false</overWriteReleases>
+                               <overWriteSnapshots>true</overWriteSnapshots>
+                               <overWriteIfNewer>true</overWriteIfNewer>
+                               <includeScope>compile</includeScope>
+                           </configuration>
+                       </execution>
                     </executions>
                </plugin>              
               <plugin>
@@ -256,42 +271,6 @@
                     <artifactId>dependency-plugin</artifactId>
                     <version>${iip.version}</version>
                     <executions>
-                       <execution>
-                           <id>copy-dependencies</id>
-                           <goals>
-                               <goal>copy-dependencies</goal>
-                           </goals>
-                        <phase>test-compile</phase>
-                           <configuration>
-                               <prependGroupId>false</prependGroupId>
-                               <outputDirectory>${project.build.directory}/appJars</outputDirectory>
-                               <overWriteReleases>false</overWriteReleases>
-                               <overWriteSnapshots>true</overWriteSnapshots>
-                               <overWriteIfNewer>true</overWriteIfNewer>
-                               <includeScope>compile</includeScope>
-                           </configuration>
-                       </execution>
-<!--                      <execution>
-                        <id>build-classpath</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                          <goal>build-classpath</goal>
-                        </goals>
-                        <configuration>
-                            <outputFile>${project.build.directory}/test-classes/classpath</outputFile>
-                            <prependGroupId>false</prependGroupId>
-                            <localRepoProperty>jars</localRepoProperty>
-                            <prefix>jars</prefix>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                            <fileSeparator>/</fileSeparator>
-                            <pathSeparator>:</pathSeparator>
-                            <includeScope>compile</includeScope>
-                            <prepends>
-                              <prepend>${project.artifactId}-${project.version}.jar</prepend>
-                              <prepend>${project.artifactId}-${project.version}-tests.jar</prepend>
-                            </prepends>
-                        </configuration>
-                      </execution>-->
                         <execution>
                             <id>postprocess</id>
                             <goals>
