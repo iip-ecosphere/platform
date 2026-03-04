@@ -56,6 +56,15 @@ public class IndexClassloader extends URLClassLoader {
      * Creates an indexed classloader.
      * 
      * @param index the index instance
+     */
+    public IndexClassloader(LoaderIndex index) {
+        this(index, null);
+    }
+
+    /**
+     * Creates an indexed classloader.
+     * 
+     * @param index the index instance
      * @param parent the parent class loader for delegation
      */
     public IndexClassloader(LoaderIndex index, ClassLoader parent) {
