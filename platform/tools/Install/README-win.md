@@ -3,7 +3,14 @@
 ### Prepare the server
 >Please note that the software versions may have changed. The most current versions are listed in the platform prerequisites documentation: [Prerequisites](https://github.com/iip-ecosphere/platform/blob/main/platform/documentation/PREREQUISITES.md).
 
-On the server, where we will build and instantiate the platform also for the devices, install the programs unzip, Java JDK (version 17 or up due to some limitations of used dependencies), maven (version 3.9.13) and docker (version 20.10.7):
+On the device, where we will build and instantiate the platform also for the devices, install the programs unzip, Java JDK (version 17 or up due to some limitations of used dependencies), maven (version 3.9.13) and docker (version 20.10.7):
+
+Please verify first whether the required software is already available and whether the required versions are present:
+
+    java -version
+    mvn -version
+    
+If either command fails, please install the software as indicated below.    
 
 For Java 17, please execute
 
