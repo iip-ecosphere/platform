@@ -158,11 +158,13 @@ public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
     
     @Override
     public void setLongIndex(String qName, long value) throws IOException {
-        writePointTime = Instant.ofEpochMilli(value);
+        initPoint();
+        writePointTime = Instant.ofEpochMilli(connector.toTimestamp(value));
     }    
 
     @Override
     public void setFloatIndex(String qName, float value) throws IOException {
+        initPoint();
         writePointTime = Instant.ofEpochMilli(connector.toTimestamp(value));
     }    
 
@@ -202,7 +204,7 @@ public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
         if (connector.getTags().contains(qName)) {
             writePoint.addTag(prefix + qName, value);
         } else {
-            writePoint.addField(qName, value);
+            writePoint.addField(prefix + qName, value);
         }
     }
 
@@ -222,7 +224,7 @@ public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
             Object time = readValues.get(FIELD_TIME);
             if (time instanceof Instant) {
                 Instant instant = (Instant) time;
-                result = instant.getEpochSecond();
+                result = connector.fromTimestampAsLong(instant.getEpochSecond());
             }
         }
         if (null == result) {
@@ -238,7 +240,7 @@ public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
             Object time = readValues.get(FIELD_TIME);
             if (time instanceof Instant) {
                 Instant instant = (Instant) time;
-                result = connector.fromTimestamp(instant.getEpochSecond());
+                result = connector.fromTimestampAsFloat(instant.getEpochSecond());
             }
         }
         if (null == result) {
@@ -264,24 +266,13 @@ public class InfluxModelAccess extends AbstractTypeMappingModelAccess {
                     writeApi.writePoints(batch);
                     batch.clear();
                 } 
-                batch.add(freezeWritePoint());
+                batch.add(writePoint);
             } else {
                 WriteApiBlocking writeApi = connector.getClient().getWriteApiBlocking();
-                writeApi.writePoint(freezeWritePoint());
+                writeApi.writePoint(writePoint);
             }
             clearPoint();
         }
-    }
-
-    /**
-     * Freezes/swaps the write point. Returns the actual write point and enforces a new one.
-     * 
-     * @return the write point
-     */
-    private Point freezeWritePoint() {
-        Point pnt = writePoint;
-        writePoint = null;
-        return pnt;
     }
     
     /**

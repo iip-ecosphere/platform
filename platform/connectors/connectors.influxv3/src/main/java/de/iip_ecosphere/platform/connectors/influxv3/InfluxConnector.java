@@ -452,15 +452,21 @@ public class InfluxConnector<CO, CI>
     /**
      * Turns a float time into a timestamp considering {@link #baseTime} if specified. May loose decimal places.
      * 
-     * @param float the received float value
+     * @param value the received float value
      * @return the time stamp
      */
     long toTimestamp(float value) {
-        long result = (long) value;
-        if (baseTime > 0) {
-            result += baseTime;
-        }
-        return result;
+        return toTimestamp((long) value);
+    }
+
+    /**
+     * Turns a float time into a timestamp considering {@link #baseTime} if specified. May loose decimal places.
+     * 
+     * @param value the received float value
+     * @return the time stamp
+     */
+    long toTimestamp(long value) {
+        return baseTime > 0 ? value + baseTime : value;
     }
 
     /**
@@ -469,12 +475,18 @@ public class InfluxConnector<CO, CI>
      * @param value the timestamp
      * @return the float value
      */
-    float fromTimestamp(long value) {
-        long result = value;
-        if (baseTime > 0) {
-            result -= baseTime;
-        }
-        return result;
+    float fromTimestampAsFloat(long value) {
+        return fromTimestampAsLong(value);
+    }
+
+    /**
+     * Turns a timestamp into a öong considering {@link #baseTime} if specified. 
+     * 
+     * @param value the timestamp
+     * @return the float value
+     */
+    long fromTimestampAsLong(long value) {
+        return baseTime > 0 ? value - baseTime : value;
     }
 
 }
