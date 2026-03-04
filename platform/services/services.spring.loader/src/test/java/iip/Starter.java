@@ -25,6 +25,8 @@ import de.iip_ecosphere.platform.support.FileUtils;
  * @author Holger Eichelberger, SSE
  */
 public class Starter {
+    
+    // checkstyle: stop exception type check
 
     /**
      * Runs the starter.
@@ -41,11 +43,26 @@ public class Starter {
         }
         tmpFile.delete();
         try {
-            System.out.println("Writing to file " + tmpFile);
-            Files.writeString(tmpFile.toPath(), "iip.Starter", StandardCharsets.UTF_8);        
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            System.out.println("Context loader:  " + Thread.currentThread().getContextClassLoader());            
+            System.out.println("Own classloader: " + Starter.class.getClassLoader());            
+            try { // some tests also involving parent classloader delegation
+                System.out.println(loader.loadClass("org.springframework.core.Constants"));
+                System.out.println(loader.getResource("META-INF/spring.factories"));
+                System.out.println(loader.getResource("de/iip_ecosphere/platform/services/environment/spring/"
+                    + "metricsProvider/MetricsProviderRestService.class"));
+                System.out.println(loader.loadClass("de.iip_ecosphere.platform.transport.connectors."
+                    + "TransportParameter"));
+            } catch (Throwable t) {
+                t.printStackTrace(System.out);
+            }
+            System.out.println("Writing to file  " + tmpFile);
+            Files.writeString(tmpFile.toPath(), "iip.Starter", StandardCharsets.UTF_8);
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
     }
+    
+    // checkstyle: resume exception type check
 
 }

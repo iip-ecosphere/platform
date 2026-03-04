@@ -61,6 +61,16 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
           </dependency>
+        <dependency> <!-- just for "realistic" setup -->
+         <groupId>de.iip-ecosphere.platform</groupId>
+         <artifactId>services.environment</artifactId>
+         <version>${project.version}</version>
+        </dependency>
+        <dependency> <!-- just for "realistic" setup -->
+         <groupId>de.iip-ecosphere.platform</groupId>
+         <artifactId>services.environment.spring</artifactId>
+         <version>${project.version}</version>
+        </dependency>
         </dependencies>
         <build>
           <plugins>
@@ -86,6 +96,34 @@
                       </execution>
                    </executions>
               </plugin>
+               <plugin>
+                    <groupId>de.iip-ecosphere.platform</groupId>
+                    <artifactId>dependency-plugin</artifactId>
+                    <version>${iip.version}</version>
+                    <executions>
+                      <execution>
+                        <id>build-classpath</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                          <goal>build-classpath</goal>
+                        </goals>
+                        <configuration>
+                            <outputFile>${project.build.directory}/test-classes/classpath</outputFile>
+                            <prependGroupId>false</prependGroupId>
+                            <localRepoProperty>jars</localRepoProperty>
+                            <prefix>jars</prefix>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <fileSeparator>/</fileSeparator>
+                            <pathSeparator>:</pathSeparator>
+                            <includeScope>compile</includeScope>
+                            <prepends>
+                              <prepend>${project.artifactId}-${project.version}.jar</prepend>
+                              <prepend>${project.artifactId}-${project.version}-tests.jar</prepend>
+                            </prepends>
+                        </configuration>
+                      </execution>
+                    </executions>
+               </plugin>              
               <plugin>
                <groupId>org.springframework.boot</groupId>
                <artifactId>spring-boot-maven-plugin</artifactId>
@@ -131,28 +169,6 @@
                   </execution>
                 </executions>
               </plugin>
-              <plugin>
-                 <groupId>org.apache.maven.plugins</groupId>
-                 <artifactId>maven-assembly-plugin</artifactId>
-                 <version>3.7.1</version>
-                 <executions>
-                     <execution>
-                         <id>make-serviceAssembly</id>
-                         <phase>process-test-classes</phase>
-                         <goals>
-                             <goal>single</goal>
-                         </goals>
-                         <configuration>
-                             <descriptors>
-                                 <descriptor>src/test/assembly/serviceZipAssembly.xml</descriptor>
-                             </descriptors>
-                             <!--<finalName>${project.build.finalName}-spring</finalName>-->
-                             <appendAssemblyId>true</appendAssemblyId>
-                             <attach>true</attach>
-                         </configuration>
-                     </execution>
-                 </executions>
-                </plugin>
                <plugin> 
                   <groupId>de.iip-ecosphere.platform</groupId>
                   <artifactId>invoker-plugin</artifactId>
@@ -183,6 +199,28 @@
                       </execution>
                   </executions>
               </plugin>
+              <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-assembly-plugin</artifactId>
+                 <version>3.7.1</version>
+                 <executions>
+                     <execution>
+                         <id>make-serviceAssembly</id>
+                         <phase>process-test-classes</phase>
+                         <goals>
+                             <goal>single</goal>
+                         </goals>
+                         <configuration>
+                             <descriptors>
+                                 <descriptor>src/test/assembly/serviceZipAssembly.xml</descriptor>
+                             </descriptors>
+                             <!--<finalName>${project.build.finalName}-spring</finalName>-->
+                             <appendAssemblyId>true</appendAssemblyId>
+                             <attach>true</attach>
+                         </configuration>
+                     </execution>
+                 </executions>
+                </plugin>
               <plugin>
                    <artifactId>maven-antrun-plugin</artifactId>
                    <version>3.1.0</version>
@@ -233,7 +271,7 @@
                                <includeScope>compile</includeScope>
                            </configuration>
                        </execution>
-                      <execution>
+<!--                      <execution>
                         <id>build-classpath</id>
                         <phase>test-compile</phase>
                         <goals>
@@ -252,9 +290,8 @@
                               <prepend>${project.artifactId}-${project.version}.jar</prepend>
                               <prepend>${project.artifactId}-${project.version}-tests.jar</prepend>
                             </prepends>
-                          <!-- configure the plugin here -->
                         </configuration>
-                      </execution>
+                      </execution>-->
                         <execution>
                             <id>postprocess</id>
                             <goals>

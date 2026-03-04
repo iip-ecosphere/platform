@@ -11,6 +11,8 @@ import java.util.concurrent.ExecutionException;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.ZipUtils;
+import de.iip_ecosphere.platform.support.plugins.StreamGobbler;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -102,16 +104,9 @@ public class LoaderTest {
         cmd.add("-Dokto.loader.app=" + extracted.getAbsolutePath()); // may exist or not
         cmd.add("de.iip_ecosphere.platform.services.spring.loader.AppStarter");
         cmd.add(testFile.getAbsolutePath());
-        Process proc = new ProcessBuilder(cmd)
-            .directory(extracted.getAbsoluteFile())
-            .inheritIO()
-            .start();
-        try {
-            proc = proc.onExit().get();
-        } catch (ExecutionException | InterruptedException e) {
-            Assert.fail(e.getMessage());
-        }
-        Assert.assertEquals("Process not successful", 0, proc.exitValue());
+        int exitValue = startAndWaitFor(new ProcessBuilder(cmd)
+            .directory(extracted.getAbsoluteFile()));
+        Assert.assertEquals("Process not successful", 0, exitValue);
         Assert.assertTrue("No test output file " + testFile, testFile.exists());
         System.out.println();
     }
@@ -128,18 +123,31 @@ public class LoaderTest {
         cmd.add("-jar");
         cmd.add(jar.toString());
         cmd.add(testFile.getAbsolutePath());
-        Process proc = new ProcessBuilder(cmd)
-            .directory(new File("").getAbsoluteFile())
-            .inheritIO()
-            .start();
-        try {
-            proc.onExit().get();
-        } catch (ExecutionException | InterruptedException e) {
-            Assert.fail(e.getMessage());
-        }
-        Assert.assertEquals("Process not successful", 0, proc.exitValue());
+        int exitValue = startAndWaitFor(new ProcessBuilder(cmd)
+            .directory(new File("").getAbsoluteFile()));
+        Assert.assertEquals("Process not successful", 0, exitValue);
         Assert.assertTrue("No test output file " + testFile, testFile.exists());
         System.out.println();
+    }
+
+    /**
+     * Starts the process described by {@code builder}, attaches a {@link StreamGobbler}, waits for it and returns
+     * the exit value.
+     * 
+     * @param builder the builder
+     * @return the exit value
+     * @throws IOException if creating the process fails
+     */
+    private int startAndWaitFor(ProcessBuilder builder) throws IOException {
+        Process proc = builder.start();
+        StreamGobbler.attach(proc);
+        int exitValue = 0;
+        try {
+            exitValue = proc.waitFor();
+        } catch (InterruptedException e) {
+            Assert.fail(e.getMessage());
+        }
+        return exitValue;
     }
 
 }

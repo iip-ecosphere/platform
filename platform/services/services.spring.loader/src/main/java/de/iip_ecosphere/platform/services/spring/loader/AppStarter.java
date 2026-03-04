@@ -25,15 +25,19 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.jar.JarFile;
@@ -49,8 +53,10 @@ import org.springframework.boot.loader.archive.JarFileArchive;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.plugins.ChildClassLoader;
 import de.iip_ecosphere.platform.support.plugins.ChildFirstClassLoader;
+import de.iip_ecosphere.platform.support.plugins.ChildFirstIndexClassLoader;
 import de.iip_ecosphere.platform.support.plugins.ChildFirstURLClassLoader;
 import de.iip_ecosphere.platform.support.plugins.FindClassClassLoader;
+import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 
 import org.springframework.boot.loader.archive.Archive.EntryFilter;
 
@@ -154,6 +160,7 @@ public class AppStarter {
         
         private Archive archive;
         private ClassPathIndexFile classPathIndex;
+        private LoaderIndex loaderIndex;
         
         /**
          * Creates the launcher by accessing the archive and trying to read the classpath index file.
@@ -204,6 +211,11 @@ public class AppStarter {
                 if (null != ent) {
                     result = new ClassPathIndexFile(ClassPathIndexFile.asFile(archive.getUrl()), 
                         ClassPathIndexFile.loadLines(jf.getInputStream(ent)));
+                }
+                // added, a bit hacky
+                ent = jf.getEntry("BOOT-INF/classpath-app-okto.idx");
+                if (null != ent) {
+                    this.loaderIndex = LoaderIndex.fromStream(jf.getInputStream(ent));
                 }
                 jf.close();
                 if (null == ent) {
@@ -321,7 +333,8 @@ public class AppStarter {
          * @return {@code true} for search candidate, {@code false} else
          */
         protected boolean isSearchCandidate(Archive.Entry entry) {
-            return entry.getName().startsWith("BOOT-INF/");
+            return entry.getName().startsWith("BOOT-INF/classes-app/") 
+                || entry.getName().startsWith("BOOT-INF/lib-app/");
         }
         
         /**
@@ -421,14 +434,126 @@ public class AppStarter {
          * @throws Exception if creating the class loader fails
          */
         protected ClassLoader createClassLoader(URL[] urls) throws Exception {
-            if (ChildFirstClassLoader.useChildFirst()) {
+            /*if (ChildFirstClassLoader.useChildFirst()) {
                 return new ChildFirstLaunchedURLClassLoader(isExploded(), getArchive(), urls, 
                     getClass().getClassLoader());
+            } else {*/
+            if (loaderIndex != null) {
+                return new ChildIndexedUrlClassLoader("jar:" + getArchive().getUrl().toString(), urls, loaderIndex, 
+                    getClass().getClassLoader());
             } else {
-                return new LaunchedURLClassLoader(isExploded(), getArchive(), urls, getClass().getClassLoader());
+                return new ChildFirstURLClassLoader(urls, getClass().getClassLoader());
             }
+            //}
         }
         
+    }
+    
+    /**
+     * A delegating child-first classloader.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    static class ChildIndexedUrlClassLoader extends ChildFirstClassLoader {
+        
+        /**
+         * Creates a child-first classloader.
+         * 
+         * @param urls the URLs to load classes from
+         * @param parent the parent class loader
+         */
+        public ChildIndexedUrlClassLoader(String url, URL[] urls, LoaderIndex index, ClassLoader parent) {
+            super(p -> new IndexedUrlClassLoader(url, urls, index, p), parent);
+        }
+        
+    }    
+    
+    /**
+     * Creates an indexed child-firstclass loader taking into account the first given URL as it contains directly 
+     * stored classes/resources.
+     */
+    static class IndexedUrlClassLoader extends URLClassLoader implements ChildClassLoader {
+
+        private LoaderIndex index;
+        private URL[] urls;
+        private String url;
+
+        static {
+            registerAsParallelCapable();
+        }
+
+        /**
+         * Creates an indexed class loader still taking into account the first given URL as it contains directly 
+         * stored classes/resources.
+         * 
+         * @param url the URL of the file containing the jars
+         * @param urls the original URLs pointing into {@code url}
+         * @param index the loader index
+         * @param parent the parent class loader
+         */
+        public IndexedUrlClassLoader(String url, URL[] urls, LoaderIndex index, ClassLoader parent) {
+            super(Arrays.copyOf(urls, 1), parent); // take over the first
+            this.index = index;
+            this.url = url;
+            this.urls = urls;
+        }
+        
+        @Override
+        public URL[] getURLs() { // for ClassGraph
+            return urls;
+        }
+
+        @Override
+        public Class<?> findClass(String name) throws ClassNotFoundException {
+            Class<?> result = findLoadedClass(name);
+            if (result != null) {
+                return result;
+            }
+            String loc = index.getClassLocation(name);
+            if (null != loc) {
+                String n = name.replace(".", "/") + ".class";
+                try {
+                    URL clsUrl = new URL(url + "!/" + loc + "!/" + n);
+                    try (InputStream in = clsUrl.openStream()) {
+                        byte[] bytes = LoaderIndex.readAllBytes(in);
+                        return defineClass(name, bytes, 0, bytes.length);
+                    }
+                } catch (IOException e) {
+                }
+            }
+            return super.findClass(name);
+        }
+        
+        @Override
+        public URL findResource(String name) {
+            String loc = index.resolveResourceLocationIdentifiers(name);
+            if (null != loc) {
+                loc = LoaderIndex.getFirstResourceLocation(loc); // only the first one here
+                try {
+                    return new URL(url + "!/" + index.getLocation(loc) + "!/" + name);
+                } catch (IOException e) {
+                }
+            }
+            return super.findResource(name);
+        }
+        
+        @Override
+        public Enumeration<URL> findResources(String name) throws IOException {
+            String loc = index.resolveResourceLocationIdentifiers(name);
+            if (null != loc) {
+                String[] locs = LoaderIndex.splitResourceLocations(loc);
+                List<URL> result = new ArrayList<URL>();
+                for (String l : locs) {
+                    try {
+                        result.add(new URL(url + "!/" + index.getLocation(l) + "!/" + name));
+                    } catch (IOException e) {
+                    }
+                }
+                return Collections.enumeration(result);
+            }
+            return super.findResources(name);
+        }
+
     }
     
     /**
@@ -439,6 +564,12 @@ public class AppStarter {
     static class ChildLaunchedURLClassLoader extends LaunchedURLClassLoader implements ChildClassLoader {
         
         private FindClassClassLoader realParent;
+        private Map<String, URL> resourceIndex = new HashMap<>();
+        private Map<String, List<URL>> resourcesIndex = new HashMap<>();
+        
+        static {
+            registerAsParallelCapable();
+        }
 
         /**
          * Creates an instance with delegation to the real parent class loader.
@@ -447,13 +578,23 @@ public class AppStarter {
          * @param realParent the real parent class loader
          */
         public ChildLaunchedURLClassLoader(boolean exploded, Archive rootArchive, URL[] urls, 
-            FindClassClassLoader realParent) {
+            ClassLoader realParent) {
             super(exploded, rootArchive, urls, null);
-            this.realParent = realParent;
+            this.realParent = new FindClassClassLoader(realParent);
         }
                 
         @Override
         public URL getResource(String name) {
+            return resourceIndex.computeIfAbsent(name, this::computeResource);
+        }
+        
+        /**
+         * Computes the value of {@link #getResource(String)} if not already known.
+         * 
+         * @param name the name of the resource
+         * @return the resource, may be <b>null</b>
+         */
+        private URL computeResource(String name) {
             URL result = findResource(name);
             if (null == result) {
                 result = realParent.getResource(name);
@@ -463,13 +604,20 @@ public class AppStarter {
         
         @Override
         public Enumeration<URL> getResources(String name) throws IOException {
-            Enumeration<URL> result = findResources(name);
-            if (null == result) {
-                result = realParent.getResources(name);
+            List<URL> tmp;
+            if (resourcesIndex.containsKey(name)) {
+                tmp = resourcesIndex.get(name);
+            } else {
+                Enumeration<URL> result = findResources(name);
+                if (null == result) {
+                    result = realParent.getResources(name);
+                }
+                tmp = Collections.list(result);
+                resourcesIndex.put(name, tmp);
             }
-            return result;
+            return null == tmp ? Collections.emptyEnumeration() : Collections.enumeration(tmp);
         }
-        
+
         // the other getResource methods in ClassLoader rely on these two
         
         @Override
@@ -498,7 +646,7 @@ public class AppStarter {
                 // may also fail if there is eg no logger, the try super
             }
             try {
-                // first try to use the URLClassLoader findClass
+                // first try to use the LaunchedURLClassLoader findClass
                 return super.findClass(name);
             } catch (ClassNotFoundException e) {
                 // if that fails, we ask our real parent classloader to load the class (we give up)
@@ -513,7 +661,7 @@ public class AppStarter {
      * @author Holger Eichelberger, SSE
      */
     static class ChildFirstLaunchedURLClassLoader extends ChildFirstClassLoader {
-
+        
         /**
          * Creates a child-first classloader.
          * 
@@ -709,10 +857,20 @@ public class AppStarter {
             if (cpFile.isDirectory()) {
                 cpFile = new File(cpFile, APP_CLASSPATH);
             }
-            try {
-                cp = new FileInputStream(cpFile);
-            } catch (IOException e) {
-                // not found, ok
+            if (cpFile.isFile()) {
+                File cpParentFile = cpFile.getParentFile();
+                File cpIndexFile = new File(cpParentFile, cpFile.getName() + LoaderIndex.INDEX_SUFFIX);
+                if (cpIndexFile.isFile()) {
+                    LoaderIndex index = LoaderIndex.fromFile(cpIndexFile);
+                    LoaderIndex.relocateIndex(index, cpParentFile.toString() + "/");
+                    loader = new ChildFirstIndexClassLoader(index, loader);
+                }
+            } else {
+                try {
+                    cp = new FileInputStream(cpFile);
+                } catch (IOException e) {
+                    // not found, ok
+                }
             }
         }
         if (cp != null) { // legacy loading
@@ -727,7 +885,6 @@ public class AppStarter {
                         cpUrls.add(f.toURI().toURL());
                     }
                     loader = new ChildFirstURLClassLoader(cpUrls.toArray(new URL[cpUrls.size()]), loader);
-                    //loader = new URLClassLoader(cpUrls.toArray(new URL[cpUrls.size()]), loader);
                     break;
                 }
                 try {
