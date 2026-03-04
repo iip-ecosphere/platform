@@ -40,6 +40,10 @@ To restart the container and attach to its console output, use:
 
 ## Inside the container
 
+> **Note:** All components start automatically when the container is launched.  
+> Initial startup may take up to a minute. During this time, some services (e.g., the management UI) might not be immediately available.  
+> If a page does not load right away, wait briefly and refresh the browser.
+
 <img src="devCont1.png" alt="Architecture overview" width="600">
 	
 The container provides a full Linux desktop environment accessible via the browser.
@@ -70,7 +74,3 @@ Monitoring services are accessible at: `localhost:9090` and `localhost:9091`.
 
 <img src="devCont5.png" alt="monitoring" width="600">
 
-
-> **Note:** Booting all components may take a few seconds. If services are not immediately available, refresh the page after a short wait. 
-
-**Enjoy! :)**

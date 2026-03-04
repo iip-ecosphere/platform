@@ -21,7 +21,7 @@ sudo ln -s $PWD/apache-maven-3.9.7/bin/mvn /usr/bin/mvn
 sudo apt install docker.io -y
 ```
 
-Please also set the environment variable `JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/`. The actual path of your Java installation may vary depending on your processor architecture, i.e., it could also end with `java-17-openjdk-i386/`.
+Please also set the environment variable `JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/`. The actual path of your Java installation may vary depending on your processor architecture, i.e., it could also end with `java-17-openjdk-i386/.
 
 By default, Docker requires root permissions to execute functions. If you want to use docker as “normal” user, execute
 
@@ -70,6 +70,36 @@ Also install the required python packages
     
 
 If more than one Python version is installed, please ensure that you install the packages into the right version, e.g., by prefixing `python3.9` with the actual path. In this case, please also set the environment variable ``IIP_PYTHON`` to the intended Python executable.
+
+### Verify installation
+
+After installing the required software, verify that the correct versions are being used:
+
+```bash
+java -version
+mvn -version
+```
+
+#### Handling existing installations
+
+If another version of Java or Maven is already installed on your system, you have two options:
+
+1. Remove the existing installation and install the required version.
+2. Keep the existing installation and configure your environment to use the required version for the platform.
+
+For example, to use a locally installed Maven version:
+```bash
+export M2_HOME=/path/to/apache-maven-3.9.7
+export PATH=$M2_HOME/bin:$PATH
+```
+
+Or the desired Java version:
+```bash
+export JAVA_HOME=/path/to/jdk-17
+export PATH=$JAVA_HOME/bin:$PATH
+```
+
+>Note: These environment variable settings apply only to the current shell session. To make them permanent, add them to your ~/.bashrc or ~/.profile.
 
 ### Distributed Setup
 Distributed setup refers to the execution of the platform components on edge devices such as PLCs, instead of a single central machine. The execution can be directly on the device OS or in containers. 
