@@ -20,6 +20,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    LongIndexTest.class,
+    FloatIndexTest.class,
     ConnectorParameterTest.class,
     ConnectorTest.class,
     ConnectorsAasTest.class,

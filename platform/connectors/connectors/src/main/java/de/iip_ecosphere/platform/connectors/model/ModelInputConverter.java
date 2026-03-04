@@ -172,12 +172,12 @@ public class ModelInputConverter implements InputConverter<Object> {
 
     @Override
     public long toLongIndex(Object data) throws IOException {
-        return (long) data;
+        return ((LongIndex) data).getValue();
     }
 
     @Override
     public float toFloatIndex(Object data) throws IOException {
-        return (float) data;
+        return ((FloatIndex) data).getValue();
     }
 
 }

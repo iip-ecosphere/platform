@@ -62,6 +62,8 @@ public abstract class AbstractTypeMappingModelAccess extends AbstractModelAccess
         setters.put(Short.class, (n, v) -> setShort(n, (Short) v));
         setters.put(Boolean.class, (n, v) -> setBoolean(n, (Boolean) v));
         setters.put(String.class, (n, v) -> setString(n, (String) v));
+        setters.put(LongIndex.class, (n, v) -> setLongIndex(n, ((LongIndex) v).getValue()));
+        setters.put(FloatIndex.class, (n, v) -> setFloatIndex(n, ((FloatIndex) v).getValue()));
     }
 
     @Override

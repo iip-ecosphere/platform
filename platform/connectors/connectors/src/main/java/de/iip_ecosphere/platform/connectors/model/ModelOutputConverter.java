@@ -140,12 +140,12 @@ public class ModelOutputConverter implements OutputConverter<Object> {
 
     @Override
     public Object fromLongIndex(long data) throws IOException {
-        return data;
+        return new LongIndex(data);
     }
 
     @Override
     public Object fromFloatIndex(float data) throws IOException {
-        return data;
+        return new FloatIndex(data);
     }
 
 }
