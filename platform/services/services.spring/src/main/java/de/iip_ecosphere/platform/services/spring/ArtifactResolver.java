@@ -31,6 +31,8 @@ import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.oktoflow.platform.tools.lib.loader.IndexClassloader;
+import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 
 /**
  * Resolves artifacts to classpaths or class loaders.
@@ -43,6 +45,7 @@ public class ArtifactResolver {
     private List<URL> jars = null;
     private File classpathArtifact;
     private SpringCloudArtifactDescriptor artifact;
+    private LoaderIndex index;
 
     /**
      * Creates an artifact resolver for {@code artifact}.
@@ -70,6 +73,7 @@ public class ArtifactResolver {
                 FileUtils.listFiles(classpathArtifact, f -> f.isDirectory() || f.getName().endsWith(".jar"), 
                     f -> jarFiles.add(f));
                 File tmp = new File(classpathArtifact, CLASSPATH_FILE);
+                File idxFile = new File(classpathArtifact, CLASSPATH_FILE + LoaderIndex.INDEX_SUFFIX);
                 if (tmp.exists()) {
                     getLogger().info("Considering classpath file {}", tmp);
                     classpathArtifact = tmp;
@@ -103,6 +107,7 @@ public class ArtifactResolver {
                     // the "app" is usually not in jars
                     jarFiles.addAll(jarFilesSorted);
                 }
+                loadIndex(idxFile, jarFiles);
                 jars = new ArrayList<URL>();
                 for (File f : jarFiles) {
                     addUrlSafe(jars, f);
@@ -110,6 +115,35 @@ public class ArtifactResolver {
                 getLogger().info("Jars in classpath for {}: {}", artId, jars);
             } catch (IOException e) {
                 getLogger().warn("Cannot unpack ZIP {}. Classloading may fail", jar, e.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Tries to load the classpath index if available.
+     * 
+     * @param idxFile the index file
+     * @param jarFiles the jar files in the classpath (for index substitution)
+     */
+    private void loadIndex(File idxFile, List<File> jarFiles) {
+        if (idxFile.isFile() && idxFile.length() > 0) {
+            try {
+                index = LoaderIndex.fromFile(idxFile);
+                Map<String, File> jarsByFile = new HashMap<>();
+                for (File j: jarFiles) {
+                    jarsByFile.put(j.getName(), j);
+                }
+                Map<String, String> mapping = new HashMap<>();
+                for (String indexedFile : index.getFiles()) {
+                    File f = new File(indexedFile);
+                    File j = jarsByFile.get(f.getName());
+                    if (j != null) {
+                        mapping.put(indexedFile, j.toString());
+                    }
+                }
+                index.substituteLocations(mapping);
+            } catch (IOException e) {
+                getLogger().info("While loading index {}: {}", idxFile, e.getMessage());        
             }
         }
     }
@@ -235,8 +269,13 @@ public class ArtifactResolver {
                 // use loader as fallback
             }
         } else {
-            getLogger().info("Creating URL classloader for {}", jars);
-            loader = new URLClassLoader(jars.toArray(new URL[jars.size()]));
+            if (index != null) {
+                getLogger().info("Creating indexed classloader for {}", jars);
+                loader = new IndexClassloader(index);
+            } else {
+                getLogger().info("Creating URL classloader for {}", jars);
+                loader = new URLClassLoader(jars.toArray(new URL[jars.size()]));
+            }
         }
         return loader;
     }
