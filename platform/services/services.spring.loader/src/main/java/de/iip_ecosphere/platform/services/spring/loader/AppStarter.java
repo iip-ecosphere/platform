@@ -106,7 +106,6 @@ public class AppStarter {
         }
     }
 
-
     /**
      * An accessible Jar Launcher if we need an (usual) root classloader.
      * 
@@ -504,7 +503,7 @@ public class AppStarter {
         }
 
         @Override
-        public Class<?> findClass(String name) throws ClassNotFoundException {
+        public synchronized Class<?> findClass(String name) throws ClassNotFoundException {
             Class<?> result = findLoadedClass(name);
             if (result != null) {
                 return result;
