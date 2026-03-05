@@ -44,6 +44,7 @@ import de.iip_ecosphere.platform.support.setup.CmdLine;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
 import de.iip_ecosphere.platform.support.plugins.PluginManager.PluginFilter;
+import de.iip_ecosphere.platform.support.plugins.PluginSetup;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.setup.InstalledDependenciesSetup;
 import de.iip_ecosphere.platform.support.logging.Logger;
@@ -319,7 +320,7 @@ public class Starter {
             String clsName = CmdLine.getArg(args, PARAM_IIP_START_SERVER, "");
             if (clsName.length() > 0) {
                 try {
-                    Class<?> cls = Class.forName(clsName); 
+                    Class<?> cls = PluginSetup.getClassLoader().loadClass(clsName); 
                     Object o;
                     try {
                         o = cls.getConstructor(String[].class).newInstance((Object) args);
