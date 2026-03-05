@@ -31,7 +31,6 @@ import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
-import de.iip_ecosphere.platform.support.plugins.PluginSetup;
 import de.oktoflow.platform.tools.lib.loader.IndexClassloader;
 import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 
@@ -261,7 +260,7 @@ public class ArtifactResolver {
      * @return the class loader
      */
     public ClassLoader determineArtifactClassLoader() {
-        ClassLoader loader = PluginSetup.getClassLoader();
+        ClassLoader loader = SpringCloudServiceManager.class.getClassLoader();
         String artId = artifact.getId();
         File jar = artifact.getJar();
         if (isSpringJar()) { 
