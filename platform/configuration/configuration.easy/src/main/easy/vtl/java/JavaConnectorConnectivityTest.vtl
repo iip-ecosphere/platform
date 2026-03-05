@@ -71,8 +71,8 @@ template JavaConnectorConnectivityTest(IIPEcosphere config, JavaCodeArtifact tar
             addSerializerRegistration(mainClsMain, platfOut);
             addCallback(mainCls, platfIn, "callback");
             mainClsMain
-                .addCall("ResourceLoader.registerResourceResolver")
-                    .addNewArgument("de.iip_ecosphere.platform.support.resources.FolderResourceResolver.FolderResourceResolver")
+                .addCall("de.iip_ecosphere.platform.support.resources.ResourceLoader.registerResourceResolver", JavaCodeImportScope.CLASS)
+                    .addNewArgument("de.iip_ecosphere.platform.support.resources.FolderResourceResolver")
                     .addStringArgument(".");
             
             mainClsMain.addEmptyLine();
@@ -88,7 +88,7 @@ template JavaConnectorConnectivityTest(IIPEcosphere config, JavaCodeArtifact tar
             init.arg("${clsName}.createConnectorAdapter()");
             mainClsMain.var("de.iip_ecosphere.platform.connectors.Connector" + connGen, "conn").initializer(init);
             mainClsMain.SystemOutPrintln().addStringArgument("Connector fields (if accessible):");
-            mainClsMain.addCall("de.iip_ecosphere.platform.connectors.ConnectorField.printFields").(c|{
+            mainClsMain.addCall("de.iip_ecosphere.platform.connectors.ConnectorField.printFields", JavaCodeImportScope.CLASS).(c|{
                 c.addCallArgument("conn.enumerateFields").addStringArgument("");
                 c.addArgument("System.out");
             });
