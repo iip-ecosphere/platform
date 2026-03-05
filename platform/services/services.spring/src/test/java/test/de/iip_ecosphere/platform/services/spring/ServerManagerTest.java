@@ -54,6 +54,7 @@ public class ServerManagerTest {
         SpringCloudServiceSetup oldSetup = SpringInstances.getConfig();
         SpringCloudServiceSetup setup = new SpringCloudServiceSetup();
         setup.setDownloadDir(FileUtils.getTempDirectory());
+        setup.setPluginsFolder("target/oktoPlugins");
         SpringInstances.setConfig(setup);
 
         System.out.println("\nTesting JAR:");

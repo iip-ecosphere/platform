@@ -31,6 +31,7 @@ import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.plugins.PluginSetup;
 import de.oktoflow.platform.tools.lib.loader.IndexClassloader;
 import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 
@@ -45,7 +46,7 @@ public class ArtifactResolver {
     private List<URL> jars = null;
     private File classpathArtifact;
     private SpringCloudArtifactDescriptor artifact;
-    private LoaderIndex index;
+    private LoaderIndex appIndex;
 
     /**
      * Creates an artifact resolver for {@code artifact}.
@@ -73,7 +74,8 @@ public class ArtifactResolver {
                 FileUtils.listFiles(classpathArtifact, f -> f.isDirectory() || f.getName().endsWith(".jar"), 
                     f -> jarFiles.add(f));
                 File tmp = new File(classpathArtifact, CLASSPATH_FILE);
-                File idxFile = new File(classpathArtifact, CLASSPATH_FILE + LoaderIndex.INDEX_SUFFIX);
+                //File idxFile = new File(classpathArtifact, CLASSPATH_FILE + LoaderIndex.INDEX_SUFFIX);
+                File appIdxFile = new File(classpathArtifact, CLASSPATH_FILE + "-app" + LoaderIndex.INDEX_SUFFIX);
                 if (tmp.exists()) {
                     getLogger().info("Considering classpath file {}", tmp);
                     classpathArtifact = tmp;
@@ -107,7 +109,7 @@ public class ArtifactResolver {
                     // the "app" is usually not in jars
                     jarFiles.addAll(jarFilesSorted);
                 }
-                loadIndex(idxFile, jarFiles);
+                appIndex = loadIndex(appIdxFile, jarFiles);
                 jars = new ArrayList<URL>();
                 for (File f : jarFiles) {
                     addUrlSafe(jars, f);
@@ -125,7 +127,8 @@ public class ArtifactResolver {
      * @param idxFile the index file
      * @param jarFiles the jar files in the classpath (for index substitution)
      */
-    private void loadIndex(File idxFile, List<File> jarFiles) {
+    private LoaderIndex loadIndex(File idxFile, List<File> jarFiles) {
+        LoaderIndex index = null;
         if (idxFile.isFile() && idxFile.length() > 0) {
             try {
                 index = LoaderIndex.fromFile(idxFile);
@@ -146,6 +149,7 @@ public class ArtifactResolver {
                 getLogger().info("While loading index {}: {}", idxFile, e.getMessage());        
             }
         }
+        return index;
     }
 
     /**
@@ -257,7 +261,7 @@ public class ArtifactResolver {
      * @return the class loader
      */
     public ClassLoader determineArtifactClassLoader() {
-        ClassLoader loader = SpringCloudServiceManager.class.getClassLoader();
+        ClassLoader loader = PluginSetup.getClassLoader();
         String artId = artifact.getId();
         File jar = artifact.getJar();
         if (isSpringJar()) { 
@@ -269,9 +273,9 @@ public class ArtifactResolver {
                 // use loader as fallback
             }
         } else {
-            if (index != null) {
+            if (appIndex != null) {
                 getLogger().info("Creating indexed classloader for {}", jars);
-                loader = new IndexClassloader(index);
+                loader = new IndexClassloader(appIndex, loader);
             } else {
                 getLogger().info("Creating URL classloader for {}", jars);
                 loader = new URLClassLoader(jars.toArray(new URL[jars.size()]));
