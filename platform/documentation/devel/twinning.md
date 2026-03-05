@@ -15,20 +15,19 @@ If the real device/machine is not accessible as needed or you want to test an ok
 `docker run --rm --name opc-ua-sim -p 49947:49947 iotechsys/opc-ua-sim:1.2 -l /example-scripts/simulation.lua`
 - To run the container browser, use the following command:
 `docker run -d --name opc-ua-browser -p 8080:8080 iotechsys/opc-ua-browser`
-- Open your web browser on `http://localhost:8080
+- Open your web browser on http://localhost:8080
 - Open this `url opc.tcp://xxx.xxx.xxx.xxx:49947/`, where `xxx.xxx.xxx.xxx` is your IP address.
 
 ### Customizing the OPC UA structure
 
-The instruction above generates a default example provided by IOTech Systems. To use it with different structure/data, you need to create a custom simulation Lua script. For using a custom simulation Lua script, please follow the [tutorial and example](https://docs.iotechsys.com/edge-xrt21/simulators/opc-ua/simulator/lua-scripting.html). This is a brief summary:
+The instruction above generates a default example provided by IOTech Systems. To use it with different structure/data, you need to create a custom simulation Lua script. For creating and using a custom simulation Lua script, please follow the [tutorial and example](https://docs.iotechsys.com/edge-xrt21/simulators/opc-ua/simulator/lua-scripting.html). This is a brief summary:
 - Create a folder in the current directory with the name ``lua-scripts`` and put the custom simulation Lua script in it.
 - To run OPC UA simulation with a custom simulation Lua script, use the following command (without security authentication):
 `docker run --rm --name opc-ua-sim -p 49947:49947 -v $(pwd)/lua-scripts/:/docker-lua-scripts/ iotechsys/opc-ua-sim:1.2 -l /docker-lua-scripts/custom.script.lua` where `custom.script.lua` is the name of a custom simulation Lua script and `$(pwd)` is a  Linux command to obtain the current directory (`%cd%` on Windows).
 
 ### Example for the ReGaP virtual sensor app
 
-Use the [custom simulation Lua script](examples/custom.script.lua):
-- `custom.script.lua` is the custom simulation Lua script
+Use this [custom simulation Lua script](examples/custom.script.lua), here are the key points of the custom simulation Lua script:
 -	Create a variable `actSpeed` with `Double` type
 ```lua
     actSpeed_variant = Variant.new(DataType.DOUBLE)
