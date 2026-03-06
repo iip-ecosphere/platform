@@ -112,6 +112,7 @@
                                  <destFileName>pyIf.zip</destFileName>
                              </artifactItem>
                          </artifactItems>
+                         <force>true</force>
                      </configuration>
                  </execution>
                </executions>
