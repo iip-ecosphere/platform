@@ -112,7 +112,13 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
     @Parameter(property = "okto.mvn.home", required = false) 
     private String oktoMvnHome;
 
-    @Parameter(property = "skipTests", required = false) 
+    @Parameter(property = "maven.invoker.skip", required = false) 
+    private boolean skip;
+
+    @Parameter(property = "skipInvocation", required = false, defaultValue = "false") 
+    private boolean skipInvocation;
+    
+    @Parameter(property = "skipTests", required = false, defaultValue = "false") 
     private String skipTests;
 
     @Parameter(property = "maven.test.skip", required = false, defaultValue = "false") 
@@ -416,6 +422,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
     
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if (skip || skipInvocation) {
+            return;
+        }
         CapturingOutputHandler outputHandler = new CapturingOutputHandler(System.out);
         final InvocationRequest request = createInvocationRequest();
         request.setOutputHandler(outputHandler);

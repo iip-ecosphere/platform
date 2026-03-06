@@ -6,7 +6,7 @@ This package binds with `invoke` in life-cycle phase `validate`, with `install` 
 
 The following example demonstrates the application of this plugin. We declare two profiles, `EasyGen` and `Main`. `EasyGen` shall be executed from `Main` (and explicitly via command line). The `Main` profile is declared to be activated by default and uses this plugin to define an execution on the `EasyGen` profile for phase `process-sources`. When executing `mvn`, the `Main` profile will be executed, which in turn executes `EasyGen`. Please be careful to not invoke the profile in which this plugin is declared, which may lead to an endless loop.
 
-This plugin passes through the property `python-compile.hashDir` (also as environment variable ``PYTHON_COMPILE_HASHDIR``) for our Python "compiler" and the environment variable ``MAVEN_SETTINGS_PATH`` or local Maven settings paths as new value of ``MAVEN_SETTINGS_PATH`` (passing through global and local Maven settings path if ``MAVEN_SETTINGS_PATH`` is not given).
+This plugin passes through the property `python-compile.hashDir` (also as environment variable `PYTHON_COMPILE_HASHDIR`) for our Python "compiler" and the environment variable `MAVEN_SETTINGS_PATH` or local Maven settings paths as new value of `MAVEN_SETTINGS_PATH` (passing through global and local Maven settings path if `MAVEN_SETTINGS_PATH` is not given).
 
 
   ```xml
@@ -66,8 +66,10 @@ This plugin passes through the property `python-compile.hashDir` (also as enviro
 The plugin supports the following configuration settings:
   - `invokeGoals` the mandatory goals to be invoked, each stated in an own element `invokeGoal`
   - `invokeProfiles` optional profiles to be invoked, each stated in an own element `invokeProfile` (default: not given)
-  - `skipIfExists` (default ``, user property `invoker.skipIfExists`) skips the execution if the file exists. If it does not exist, touch the file after successful execution.
-  - `executeIfExists` (default ``, user property `invoker.executeIfExists`) enforces the execution if the file exists. The file will be deleted after successful execution.
+  - `skip` (default `false`, user property `maven.invoker.skip`) skips the execution.
+  - `skipInvocation` (default `false`, user property `skipInvocation`) skips the execution (alias of `skip`).
+  - `skipIfExists` (default `""`, user property `invoker.skipIfExists`) skips the execution if the file exists. If it does not exist, touch the file after successful execution.
+  - `executeIfExists` (default `""`, user property `invoker.executeIfExists`) enforces the execution if the file exists. The file will be deleted after successful execution.
   - `disableJava` (default `false`, user property `disableJava`) sets system properties to disable Java compilation, Java test compilation, test execution and Javadoc generation. Helpful shortcut for executing generation profiles.
   - `skipTests` and `maven.test.skip` are passed through, disabling tests (explicit `disableJavaTests`, default false, user property `disableJavaTests`).
   - `maven.build.cache.enabled` (default: not given) is passed through.
