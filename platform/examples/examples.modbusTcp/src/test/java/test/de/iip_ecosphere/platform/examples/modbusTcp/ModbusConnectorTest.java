@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import de.iip_ecosphere.platform.examples.modbusTcp.ModbusServer;
@@ -60,6 +61,7 @@ public class ModbusConnectorTest {
      */
     @Test
     public void manualConnectorTest() throws IOException {
+        Assume.assumeTrue(Boolean.getBoolean(System.getProperty("test.enable.modbus", "true")));
 
         System.out.println("manualConnectorTest()");
 
@@ -89,6 +91,7 @@ public class ModbusConnectorTest {
      */
     @Test
     public void generatedConnectorTest() throws IOException {
+        Assume.assumeTrue(Boolean.getBoolean(System.getProperty("test.enable.modbus", "true")));
 
         System.out.println("generatedConnectorTest()");
 
@@ -117,6 +120,7 @@ public class ModbusConnectorTest {
      */
     @Test
     public void generatedConnectorSentronTest() throws IOException {
+        Assume.assumeTrue(Boolean.getBoolean(System.getProperty("test.enable.modbus", "true")));
 
         System.out.println("generatedConnectorSentronTest()");
 
