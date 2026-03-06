@@ -12,19 +12,10 @@
 
 package test.de.iip_ecosphere.platform.examples.python;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.support.NetUtils;
-import de.iip_ecosphere.platform.support.PythonUtils;
-import de.iip_ecosphere.platform.support.TimeUtils;
 import org.junit.Assert;
 
 /**

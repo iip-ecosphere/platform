@@ -44,8 +44,9 @@ public class SimplePythonCondaVenvReceiverImpl extends SimplePythonCondaVenvData
 
     @Override
     public void processPythonVenvTestOutput(PythonVenvTestOutput data) {
-        System.out.printf("RECEIVED id=%d val1=%.2f val2=%.2f conf=%.2f pred=%b processedBy='%s and %s'%n", data.getId(), data.getValue1(), 
-            data.getValue2(), data.getConfidence(), data.getPrediction(), data.getEnv1(), data.getEnv2());
+        System.out.printf("RECEIVED id=%d val1=%.2f val2=%.2f conf=%.2f pred=%b processedBy='%s and %s'%n", 
+            data.getId(), data.getValue1(), data.getValue2(), data.getConfidence(), data.getPrediction(), 
+            data.getEnv1(), data.getEnv2());
     }
 
 }

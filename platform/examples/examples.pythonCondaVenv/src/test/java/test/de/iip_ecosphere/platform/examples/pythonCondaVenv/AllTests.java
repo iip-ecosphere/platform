@@ -20,7 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    ExamplePythonServiceTest.class
+    ExamplePythonCondaVenvServiceTest.class
 })
 public class AllTests {
 }
