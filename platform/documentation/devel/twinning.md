@@ -6,7 +6,8 @@ If the real device/machine is not accessible as needed or you want to test an ok
 
 ###	Introduction
 
--	We use a Docker image provided by [IOTech Systems](https://iotechsys.com/)
+-	We use Docker images provided by [IOTech Systems](https://iotechsys.com/)
+-	The licence to use Docker images provided by IOTech Systems are free for academic purposes (non-commercial use). 
 -	The guide to use the simulation Docker container is the [simulator overview](https://docs.iotechsys.com/edge-xrt21/simulators/opc-ua/simulator/overview.html)
 -	To browse the OPC UA, we use another Docker image provided by IOTech Systems, the [opcua browser](https://docs.iotechsys.com/edge-opcuabrowser10/installation/installation.html). 
 
@@ -57,4 +58,37 @@ Server.addVariableNode (actSpeed)
 ```lua
 actSpeed_variant:setScalar(actSpeed_variant:getScalar() + 1)
 actSpeed:updateValue()
+```
+
+For Ivml models in the application:
+-	Below the ivml model for the output type for the connector
+```
+RecordType OpCuaOutput = {
+  name = "OpCuaOutput",
+  fields = {
+    Field {
+      name = "actSpeed",
+      type = refBy(DoubleType),
+      cachingTime=CACHE_NONE
+    }
+  }
+};
+```
+
+-	Below the ivml model for the OPC UA connector 
+```
+OpcUaV1Connector myOpcUaConn = {
+  id = "myOpcUaConn",
+  name = "myOpcUaConn",
+  description = "This is the OPC UA connector.",
+  ver = "0.1.0",
+  host = "xxx.xxx.xxx.xxx", //local IP address
+  port = 49947,
+  samplingPeriod = 1000,
+  kind = ServiceKind::SOURCE_SERVICE,
+  input = {{type=refBy(Empty)}},
+  output = {{type=refBy(OpCuaOut)}},
+  inInterface = {{type=refBy(Empty)}},
+  outInterface = {{type=refBy(OpCuaOut), path="Objects/Sinumerik/Channel/Spindle/"}}
+};
 ```
