@@ -128,7 +128,9 @@ public class TimeUtils {
             }
             
         });
-        Commons.getInstance().registerDateConverters();
+        if (Commons.getInstance() != null) { // for service tests that do no plugin loading
+            Commons.getInstance().registerDateConverters();
+        }
         registerConverter(new AbstractDateConverter<LocalDateTime>(LocalDateTime.class) {
 
             @Override
