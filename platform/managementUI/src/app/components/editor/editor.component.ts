@@ -190,6 +190,7 @@ export class EditorComponent extends Utils implements OnInit {
    */
   public saveEventHandler(event: SaveEvent) {
     let prop; // sub-level editor comes from an existing property, shall exist
+    let name = '';
     if (this.type && this.type.value) {
       prop = DataUtils.getProperty(this.type?.value, event.idShort);
     } else {
@@ -209,6 +210,10 @@ export class EditorComponent extends Utils implements OnInit {
     let resultProp: any = {};
     for (let entry in event.value) {
       let src = event.value[entry];
+      if (src.value.hasOwnProperty("varValue") && src.value.varValue == "varValue") {
+        name = src.value.name;
+        src.value = src.value.idShort;
+      } 
       if (host.value.hasOwnProperty(entry)) {
         host.value[entry] = src.value;
       } else {
@@ -235,7 +240,7 @@ export class EditorComponent extends Utils implements OnInit {
       } 
       
       prop.value.push({value : resultProp, 
-                       name: resultProp?.name?.value ?? resultProp?.value?.value, 
+                       name: resultProp?.name?.value || resultProp?.value?.value || name, 
                        _type: DataUtils.stripGenericType(type)});
     }
   }

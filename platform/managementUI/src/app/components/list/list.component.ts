@@ -223,7 +223,6 @@ export class ListComponent extends Utils implements OnInit {
       this.filteredData = this.prefilter(metaProject)
     }
     this.filteredData = DataUtils.filterMetaTemplate(this.filteredData);
-    this.filteredData.sort((a: { idShort: string; }, b: { idShort: string; }) => (a.idShort ?? '').localeCompare(b.idShort ?? ''))
   }
 
   /**It returns items with given metaProject */
@@ -313,16 +312,28 @@ export class ListComponent extends Utils implements OnInit {
       });
       rowEntry.varValue = val;
       resultFn(rowEntry);
-      result.push(rowEntry)
+      result.push(rowEntry);
     }
-    return result;
+    return result.sort((a: { idShort: string; }, b: { idShort: string; }) => (a.idShort ?? '').localeCompare(b.idShort ?? ''));
   }
 
   /**
    * Filters the row data/display data for the types category.
    */
   public filterTypes() {
-    this.filteredData = this.createRows(this.filteredData, (row, rowType) => true, rowResult => { });
+    let temp: any = [];
+    let name: any;
+    this.filteredData = this.createRows(this.filteredData, (row, rowType) => {
+      if (row.idShort == "name") {
+        name = row.value[0].value
+      }
+      this.composeValueByFilter(row, temp, this.paramToDisplay);
+      return true;
+    }, r => {
+      r.idShort = name;
+      r.value = temp;
+      temp = [];
+    });
   }
 
   /**

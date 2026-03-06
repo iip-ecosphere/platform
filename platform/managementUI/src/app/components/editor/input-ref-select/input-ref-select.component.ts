@@ -24,6 +24,7 @@ export class InputRefSelectComponent extends Utils implements OnInit {
   isSetOf = false;
   isSequenceOf = false;
   refTo = '';
+  selectRefName = '';
   references: Resource[] = [];
   selectedRef: configMeta | undefined;
   selector: boolean = false;
@@ -156,9 +157,9 @@ export class InputRefSelectComponent extends Utils implements OnInit {
   public addFromRef() {
     if (this.selectedRef && this.selectedRef.idShort) {
       if (this.isSetOf) {
-        this.input.value.push(this.selectedRef.idShort);
+        this.input.value.push(this.getReferenceVarValue(this.selectedRef) ?? this.selectedRef.idShort);
       } else {
-        this.input.value = this.selectedRef.idShort;
+        this.input.value = this.getReferenceVarValue(this.selectedRef) ?? this.selectedRef.idShort;
       }
     }
   }
@@ -250,6 +251,20 @@ export class InputRefSelectComponent extends Utils implements OnInit {
     // Optionally, do something with the event first
     this.saveEvent.emit(event); // forwards to grandparent
   }
+
+  getReferenceVarValue(reference: any): any {
+    if (reference?.value) {
+      let values = DataUtils.getProperty(reference.value, "name");
+      if (values) {
+        let varValue = DataUtils.getProperty(values.value, "varValue").value;
+        if (varValue) {
+          return ({name: varValue, idShort: reference.idShort, varValue: "varValue"});
+        }
+      } 
+    }
+    return reference.idShort;
+  }
+
 }
 
 export interface SaveEvent {
@@ -261,4 +276,3 @@ export interface SaveEvent {
 function findFieldType(_type: any, value: ResourceAttribute[]): Resource | undefined {
   return value.find(fieldType => fieldType.idShort === _type);
 }
-

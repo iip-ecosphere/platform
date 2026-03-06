@@ -136,6 +136,10 @@ export class Utils {
       let idShort = '';
       if (this.isArray(element.value)) {
         let temp = element.value?.find((item: { idShort: string; }) => item.idShort == 'varValue');
+        if (temp ==  undefined) {
+          temp = element.value?.find((item: { idShort: string; }) => item.idShort == 'name');
+          temp = temp?.value?.find((item: { idShort: string; }) => item.idShort == 'varValue');
+        }
         if (temp && temp.idShort) {
           idShort = temp.value;
         } else {

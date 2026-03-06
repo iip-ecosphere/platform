@@ -97,6 +97,7 @@ describe('UtilsService', () => {
     expect(service.getElementDisplayName({name:"abc"}, false)).toBe("abc");
     // AAS config value
     expect(service.getElementDisplayName({value:[{idShort:"name"}, {idShort:"varValue", value: "abc"}]}, false)).toBe("abc");
+    expect(service.getElementDisplayName({value:[{idShort:"name", value:[{idShort:"varValue", value: "abc"}]}]}, false)).toBe("abc");
     expect(service.getElementDisplayName({idShort:"outer", value:[{idShort:"name"}]}, false)).toBe("outer");
     expect(service.getElementDisplayName({idShort:"name"}, false)).toBe("name");
     // editor IVML value
