@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 import de.oktoflow.platform.tools.lib.PythonUtils;
 
 /**
@@ -41,6 +42,7 @@ public class ExamplePythonServiceTest {
      */
     @Test
     public void testService() throws IOException, InterruptedException {
+        PluginManager.loadPlugins();
         int port = NetUtils.getEphemeralPort();
         Process python = createPythonProcess(new File("src/test/python"), "__init__.py", "--port", 
             String.valueOf(port));
