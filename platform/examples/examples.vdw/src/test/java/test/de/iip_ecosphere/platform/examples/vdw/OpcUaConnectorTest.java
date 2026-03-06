@@ -17,7 +17,6 @@ import java.io.IOException;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.examples.vdw.ManualConnector;
-import de.iip_ecosphere.platform.support.NetUtils;
 
 /**
  * Tests the connector parts/plugins for the VDW OPC UA server.
@@ -33,7 +32,7 @@ public class OpcUaConnectorTest {
      */
     @Test
     public void testConnector() throws IOException {
-        org.junit.Assume.assumeFalse(NetUtils.getOwnHostname().startsWith("jenkins"));
+        org.junit.Assume.assumeTrue(Boolean.getBoolean(System.getProperty("test.enable.umati", "true")));
         ManualConnector.main();
     }
     
