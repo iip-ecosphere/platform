@@ -12,6 +12,7 @@ For installation and first steps, see [install guide](platform/documentation/INS
 
 ## News
 
+* Release of octoflow version 0.8 planned for mid of March, 2026.
 * Updated (more agile) documentation of [configuration concepts](documentation/concepts/concepts.MD) as well as completely revised [platform handbook](documentation/PlatformHandbook.pdf)
 * New INFLUX DB v3 connector for ReGaP.
 * Ongoing Management UI improvements
