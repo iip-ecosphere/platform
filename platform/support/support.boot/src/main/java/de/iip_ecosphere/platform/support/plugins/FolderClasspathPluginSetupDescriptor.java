@@ -38,7 +38,9 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescriptor {
 
     public static final String KEY_SETUP_DESCRIPTOR = "# setupDescriptor: ";
+    public static final String KEY_UNPACK_MODE = "# unpackMode: ";
     public static final String KEY_PLUGIN_IDS = "# pluginIds: ";
+    public static final String KEY_REPO_DIR = "# repoDir: ";
 
     private File installDir;
     private boolean descriptorOnly;
@@ -249,8 +251,12 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
     public static ClasspathFile readClasspathFile(InputStream in, File base) throws IOException {
         ClasspathFile result = new ClasspathFile();
         List<String> contents = IOUtils.readLines(in);
+        String unpackMode = null;
         for (String line : contents) {
             if (line.startsWith("#")) {
+                if (line.startsWith(KEY_UNPACK_MODE)) {
+                    unpackMode = line.substring(KEY_UNPACK_MODE.length()).trim();
+                }
                 if (line.startsWith(KEY_SETUP_DESCRIPTOR)) {
                     result.setupDescriptor = line.substring(KEY_SETUP_DESCRIPTOR.length()).trim();
                 }
@@ -263,9 +269,18 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
                     }
                 }
             } else {
-                StringTokenizer tokenizer = new StringTokenizer(line, ":;");
-                while (tokenizer.hasMoreTokens()) {
-                    result.entries.add(new File(base, tokenizer.nextToken()));
+                String delim = ":;"; // both, assuming no absolute paths
+                if (null != unpackMode && "RESOLVE".equals(unpackMode.toUpperCase())) {
+                    delim = File.pathSeparator;
+                }
+                StringTokenizer tokenizer = new StringTokenizer(line, delim);
+                while (tokenizer.hasMoreTokens()) { // relocate with KEY_REPO_DIR -> LoaderIndex?
+                    String token = tokenizer.nextToken();
+                    File f = new File(token);
+                    if (!f.isAbsolute()) {
+                        f = new File(base, token);
+                    }
+                    result.entries.add(f);
                 }
             }
         }
