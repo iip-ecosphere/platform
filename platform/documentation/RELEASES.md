@@ -2,6 +2,8 @@
 
 ### Already For the next release
 
+In progress:
+
 * [#189](https://github.com/iip-ecosphere/platform/issues/179): Clean up container VTL scripts
 * [#189](https://github.com/iip-ecosphere/platform/issues/182): Try optimizing container sizes
 * [#189](https://github.com/iip-ecosphere/platform/issues/183): Enable AAS metamodel v3 in mgmt UI
@@ -15,8 +17,7 @@
 
 ### Version 0.8.0 (consolidation, ReGaP basics, JDK 17/JDK 21/Angular19/Python 3.11):
 
-In progress:
-* [#189](https://github.com/iip-ecosphere/platform/issues/189): Revise documentation
+Release is expected for mid of March, 2026.
 
 Improvements:
 * Support for JDK 21 based on Eclipse 2024-06.
@@ -29,6 +30,7 @@ Improvements:
 * Code templates contain bash and batch scripts for building the app as well as a python source mapping for VScode
 * Reduced logging during execution of all-in-one examples
 * New INFLUX DB v3 connector for ReGaP.
+* [#189](https://github.com/iip-ecosphere/platform/issues/189): Revise documentation
 * [#164](https://github.com/iip-ecosphere/platform/issues/164): Management UI improvements
 * [#170](https://github.com/iip-ecosphere/platform/issues/170): Enable plugins/BaSyx2
 * [#181](https://github.com/iip-ecosphere/platform/issues/181): Allow MIMO containers
