@@ -45,6 +45,10 @@ public class CleanTemp {
                 delete |= name.startsWith("undertow-docbase");
                 delete |= name.startsWith("java-server");
                 delete |= name.startsWith("basyx-temp");
+                delete |= name.startsWith("art_");
+                delete |= name.startsWith("hivemq_");
+                delete |= name.startsWith("support.updater-test_");
+                delete |= name.startsWith("support-boot");
                 if (delete) {
                     if (simulate) {
                         System.out.println("May delete " + f);
