@@ -586,10 +586,22 @@ export class IvmlFormatterService extends UtilsService {
               if (editorInput.defaultValue === '{}') {
                 editorInput.defaultValue = '';
               }
-              let ivmlValue = (type?.value?.length ? type.value : editorInput.defaultValue) || "";
-              if (selMetaTypeKind === MTK_compound && this.isArray(ivmlValue)) {
-                ivmlValue = DataUtils.getPropertyValue(ivmlValue, input.idShort);
+              let ivmlValue;
+              if (this.isArray(type?.value)) {
+                ivmlValue = (type?.value?.length ? type.value : editorInput.defaultValue) || "";
+              } else {
+                ivmlValue = (type?.value ? type.value : editorInput.defaultValue) || "";
               }
+
+              if (selectedType.idShort == type?.type) {
+                if (selMetaTypeKind === MTK_compound && this.isArray(ivmlValue)) {
+                  ivmlValue = DataUtils.getPropertyValue(ivmlValue, input.idShort);
+                }
+              } else {
+                ivmlValue = editorInput.defaultValue ?? '';
+              }
+
+              
               let initial;
               if (this.isObject(ivmlValue) && ivmlValue && input.idShort in ivmlValue) {
                 // compound instances may be passed in as object with properties, those being undefined are defaults
