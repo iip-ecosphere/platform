@@ -169,6 +169,35 @@
         </activation>
         
           <build>
+            <pluginManagement>
+              <plugins>
+                <plugin> <!-- on eclipse MAVEN_HOME is never set (correctly), causing the invoker to fail -->
+                  <groupId>org.eclipse.m2e</groupId>
+                  <artifactId>lifecycle-mapping</artifactId>
+                  <version>1.0.0</version>
+                  <configuration>
+                    <lifecycleMappingMetadata>
+                      <pluginExecutions>
+                        <pluginExecution>
+                          <pluginExecutionFilter>
+                            <groupId>de.iip-ecosphere.platform</groupId>
+                            <artifactId>invoker-plugin</artifactId>
+                            <versionRange>${project.version}</versionRange>
+                            <goals>
+                              <goal>invoke</goal>
+                            </goals>
+                          </pluginExecutionFilter>
+                          <action>
+                            <ignore/>
+                          </action>
+                        </pluginExecution>
+                      </pluginExecutions>
+                    </lifecycleMappingMetadata>
+                  </configuration>
+                </plugin>
+              </plugins>
+            </pluginManagement>
+          
             <plugins>
               <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
