@@ -21,7 +21,7 @@ sudo ln -s $PWD/apache-maven-3.9.7/bin/mvn /usr/bin/mvn
 sudo apt install docker.io -y
 ```
 
-Please also set the environment variable `JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/`. The actual path of your Java installation may vary depending on your processor architecture, i.e., it could also end with `java-17-openjdk-i386/.
+Please also set the environment variable `JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/`. The actual path of your Java installation may vary depending on your processor architecture, i.e., it could also end with `java-17-openjdk-i386/`. To be on the safe side, please set also `M2_HOME` to the installation directory of maven and, if you plan to use a different local repository than `~/.m2/repository` then please set `M2_REPO` to that directory as oktoflow may rely at runtime on the libraries stored there.
 
 By default, Docker requires root permissions to execute functions. If you want to use docker as “normal” user, execute
 

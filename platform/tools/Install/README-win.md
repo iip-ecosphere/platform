@@ -30,6 +30,8 @@ For Maven 3.9.7 is not installed, please execute
      SET MAVEN_HOME=%cd%\apache-maven-3.9.7
      setx Path "%Path%;%MAVEN_HOME%\bin"
      SET Path=%Path%;%MAVEN_HOME%\bin
+
+If you plan to use a different local repository than `~/.m2/repository` then please set `M2_REPO` to that directory as oktoflow may rely at runtime on the libraries stored there.
      
 For Python 3.9, please execute 
 
