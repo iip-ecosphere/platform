@@ -35,7 +35,8 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
-import de.iip_ecosphere.platform.tools.maven.dependencies.Resolver.UnpackMode;
+import de.oktoflow.platform.tools.lib.loader.Constants;
+import de.oktoflow.platform.tools.lib.loader.Constants.UnpackMode;
 
 /**
  * Specialized mojo for building plugin classpath files.
@@ -45,14 +46,6 @@ import de.iip_ecosphere.platform.tools.maven.dependencies.Resolver.UnpackMode;
 @Mojo( name = "build-plugin-classpath", requiresDependencyResolution = ResolutionScope.TEST, 
     defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true )
 public class BuildPluginClasspathMojo extends BuildClasspathMojo {
-
-    public static final String KEY_PREFIX = "# prefix: ";
-    public static final String KEY_UNPACK_MODE = "# unpackMode: ";
-    public static final String KEY_SETUP_DESCRIPTOR = "# setupDescriptor: ";
-    public static final String KEY_PLUGIN_IDS = "# pluginIds: ";
-    public static final String KEY_SEQUENCE_NR = "# sequenceNr: ";
-    public static final String KEY_ARTIFACTS = "# artifacts: ";
-    public static final String KEY_REPO_DIR = "# repoDir: ";
 
     @Parameter( property = "mdep.addTestArtifact", defaultValue = "false" )
     private boolean addTestArtifact;
@@ -290,11 +283,12 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
      */
     private void composeBefores(Function<String, String> func) {
         List<String> befores = new ArrayList<>();
-        befores.add(KEY_PREFIX + (null != func ? func.apply(Layers.DEFAULT_JAR_PREFIX) : Layers.DEFAULT_JAR_PREFIX));
-        befores.add(KEY_UNPACK_MODE + unpackMode);
-        befores.add(KEY_SETUP_DESCRIPTOR + setupDescriptor);
+        befores.add(Constants.KEY_PREFIX 
+            + (null != func ? func.apply(Layers.DEFAULT_JAR_PREFIX) : Layers.DEFAULT_JAR_PREFIX));
+        befores.add(Constants.KEY_UNPACK_MODE + unpackMode);
+        befores.add(Constants.KEY_SETUP_DESCRIPTOR + setupDescriptor);
         if (pluginIds != null && pluginIds.size() > 0) {
-            befores.add(KEY_PLUGIN_IDS + String.join(", ", pluginIds));
+            befores.add(Constants.KEY_PLUGIN_IDS + String.join(", ", pluginIds));
         }
         try {
             Set<Artifact> artifacts = getResolvedDependencies(true);
@@ -306,7 +300,7 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
                     getProject().getVersion(), "compile", "jar", "tests", null));
             }
             artList.addAll(artifacts);
-            befores.add(KEY_ARTIFACTS + artList
+            befores.add(Constants.KEY_ARTIFACTS + artList
                 .stream()
                 .map(a -> a.getGroupId() + ":" + a.getArtifactId() + ":" + Resolver.typeClassifier(a) 
                     + a.getBaseVersion() + Resolver.optionalMarker(a))

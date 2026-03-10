@@ -55,7 +55,8 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 
-import de.iip_ecosphere.platform.tools.maven.dependencies.Resolver.UnpackMode;
+import de.oktoflow.platform.tools.lib.loader.Constants;
+import de.oktoflow.platform.tools.lib.loader.Constants.UnpackMode;
 import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 
 /**
@@ -438,8 +439,8 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                         String prefix = null;
                         for (String line : contents) {
                             if (line.startsWith("#")) {
-                                prefix = extractSuffix(BuildPluginClasspathMojo.KEY_PREFIX, line, prefix);
-                                String arts = extractSuffix(BuildPluginClasspathMojo.KEY_ARTIFACTS, line, null);
+                                prefix = extractSuffix(Constants.KEY_PREFIX, line, prefix);
+                                String arts = extractSuffix(Constants.KEY_ARTIFACTS, line, null);
                                 if (null != arts) {
                                     buildArtifactsMapping(arts);
                                     if (artifacts != null) {
@@ -483,8 +484,8 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                     contents = IOUtils.readLines(fis, Charset.defaultCharset());
                     for (int l = 0; l < contents.size(); l++) {
                         String line = contents.get(l);
-                        if (line.startsWith(BuildPluginClasspathMojo.KEY_SETUP_DESCRIPTOR)) {
-                            contents.set(l, BuildPluginClasspathMojo.KEY_SETUP_DESCRIPTOR + pl.setupDescriptor);
+                        if (line.startsWith(Constants.KEY_SETUP_DESCRIPTOR)) {
+                            contents.set(l, Constants.KEY_SETUP_DESCRIPTOR + pl.setupDescriptor);
                         }
                     }
                 } catch (IOException e) {
@@ -675,21 +676,21 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                 List<String> contents = IOUtils.readLines(fis, Charset.defaultCharset());
                 fis.close();
                 PrintStream out = new PrintStream(new FileOutputStream(tgt));
-                out.println(BuildPluginClasspathMojo.KEY_SEQUENCE_NR + seqNr);
+                out.println(Constants.KEY_SEQUENCE_NR + seqNr);
                 String prefix = null;
                 String mode = null;
                 List<JarLocation> locs = new ArrayList<>();
                 for (String line : contents) {
                     if (line.startsWith("#")) {
-                        prefix = extractSuffix(BuildPluginClasspathMojo.KEY_PREFIX, line, prefix);
-                        mode = extractSuffix(BuildPluginClasspathMojo.KEY_UNPACK_MODE, line, mode);
+                        prefix = extractSuffix(Constants.KEY_PREFIX, line, prefix);
+                        mode = extractSuffix(Constants.KEY_UNPACK_MODE, line, mode);
                         line = handleArtifacts(cpFile, line);
                         out.println(line);
                     } else {
                         Tokenizer tokenizer = new Tokenizer(line);
                         if (mode != null && Resolver.toUnpackMode(mode) == UnpackMode.RESOLVE) {
                             tokenizer.sep = File.pathSeparator; // resolved will be absolute paths, use correct sep
-                            out.println(BuildPluginClasspathMojo.KEY_REPO_DIR + resolver.getLocalRepoBaseDir());
+                            storeBaseDir(out);
                         }
                         prefix = fixPrefix(prefix, tokenizer);
                         if (relocate) {
@@ -714,6 +715,17 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         }
         return modes;
     }
+
+    /**
+     * Stores the base dir in a classpath stream.
+     * 
+     * @param out the classpath stream
+     */
+    private void storeBaseDir(PrintStream out) {
+        if (!resolveAndCopy) {
+            out.println(Constants.KEY_BASE_DIR + Constants.VAL_BASE_DIR_MVN);
+        }
+    }
     
     /**
      * Handles a potential {@link BuildPluginClasspathMojo#KEY_ARTIFACTS} entry.
@@ -724,8 +736,8 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
      *    {@link #artifactAppends}, the modified line with appended artifacts, else {@code line}
      */
     private String handleArtifacts(String cpFile, String line) {
-        if (line.startsWith(BuildPluginClasspathMojo.KEY_ARTIFACTS)) {
-            String artifacts = extractSuffix(BuildPluginClasspathMojo.KEY_ARTIFACTS, line, null);
+        if (line.startsWith(Constants.KEY_ARTIFACTS)) {
+            String artifacts = extractSuffix(Constants.KEY_ARTIFACTS, line, null);
             buildArtifactsMapping(artifacts);
             if (artifacts != null) {
                 String add = artifactAppends.get(cpFile);
@@ -1186,6 +1198,10 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                 }
             } else { // leave it where it is
                 resolved = res.getAbsolutePath();
+                String prefix = repoSession.getLocalRepository().getBasedir() + File.separator; 
+                if (resolved.startsWith(prefix)) {
+                    resolved = resolved.substring(prefix.length());
+                }
             }
         } catch (ArtifactResolutionException e) {
             getLog().warn("Cannot resolve to artifact, keeping path: " + path);

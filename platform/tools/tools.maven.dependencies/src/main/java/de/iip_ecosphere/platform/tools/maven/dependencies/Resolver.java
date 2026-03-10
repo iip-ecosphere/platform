@@ -35,6 +35,9 @@ import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 
+import de.oktoflow.platform.tools.lib.loader.Constants;
+import de.oktoflow.platform.tools.lib.loader.Constants.UnpackMode;
+
 /**
  * Simple re-usable Maven artifact resolver.
  * 
@@ -42,19 +45,13 @@ import org.eclipse.aether.resolution.ArtifactResult;
  */
 class Resolver {
 
-    public static final String DEFAULT_UNPACK_MODE = "RESOLVE"; // -> TODO "resolve", see toUnpackMode()
+    public static final String DEFAULT_UNPACK_MODE = "RESOLVE"; // -> Constants.UnpackMode, Mojo defaults
     public static final String COORD_OPTIONAL_MARKER = ":optional";
 
     private Log log;
     private List<RemoteRepository> remoteRepositories;
     private RepositorySystemSession repoSession;
     private RepositorySystem repoSystem;
-    
-    enum UnpackMode {
-        JARS,
-        SNAPSHOTS,
-        RESOLVE
-    }
     
     /**
      * Creates a resolver instance.
@@ -298,6 +295,16 @@ class Resolver {
     // checkstyle: resume parameter number check
 
     /**
+     * Turns a string to an unpack mode.
+     * 
+     * @param mode the string, may be <b>null</b>, leading to a default value
+     * @return the unpack mode
+     */
+    public static UnpackMode toUnpackMode(String mode) {
+        return Constants.toUnpackMode(mode, UnpackMode.RESOLVE);
+    }
+
+    /**
      * The log.
      * 
      * @return the log
@@ -349,25 +356,6 @@ class Resolver {
             break;
         }
         return add;
-    }
-    
-    /**
-     * Turns a string to an unpack mode.
-     * 
-     * @param mode the string, may be <b>null</b> then the unpack mode of {@link #DEFAULT_UNPACK_MODE}
-     * @return the unpack mode
-     */
-    static UnpackMode toUnpackMode(String mode) {
-        UnpackMode result;
-        if (null == mode) {
-            mode = DEFAULT_UNPACK_MODE;
-        }
-        try {
-            result = UnpackMode.valueOf(mode);
-        } catch (IllegalArgumentException ex) {
-            result = UnpackMode.JARS;
-        }
-        return result;
     }
 
     /**

@@ -36,8 +36,8 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.shared.model.fileset.FileSet;
 
-import de.iip_ecosphere.platform.tools.maven.dependencies.Resolver.UnpackMode;
 import de.iip_ecosphere.platform.tools.maven.python.FilesetUtils;
+import de.oktoflow.platform.tools.lib.loader.Constants.UnpackMode;
 
 /**
  * Assembles the plugin. Planned to reuse maven-assembly-single, but fails with some injection error.

@@ -22,12 +22,17 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import de.iip_ecosphere.platform.support.IOUtils;
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.oktoflow.platform.tools.lib.loader.Constants;
+import de.oktoflow.platform.tools.lib.loader.Constants.UnpackMode;
 
 /**
  * Default plugin setup descriptor based based on loading from a project folder containing jars and the 
@@ -36,11 +41,6 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
  * @author Holger Eichelberger, SSE
  */
 public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescriptor {
-
-    public static final String KEY_SETUP_DESCRIPTOR = "# setupDescriptor: ";
-    public static final String KEY_UNPACK_MODE = "# unpackMode: ";
-    public static final String KEY_PLUGIN_IDS = "# pluginIds: ";
-    public static final String KEY_REPO_DIR = "# repoDir: ";
 
     private File installDir;
     private boolean descriptorOnly;
@@ -241,6 +241,25 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
     }
     
     /**
+     * Reads a classpath setting from {@code line}.
+     * 
+     * @param line the line to read from
+     * @param key the value prefix key to be recognized
+     * @param valueConsumer optional value consumer (called only) if there is a value, may be <b>null</b> for none
+     * @return the actual value, may be <b>null</b> for none
+     */
+    private static String readSetting(String line, String key, Consumer<String> valueConsumer) {
+        String result = null;
+        if (line.startsWith(key)) {
+            result = line.substring(key.length()).trim();
+            if (valueConsumer != null) {
+                valueConsumer.accept(result);
+            }
+        }
+        return result;
+    }
+    
+    /**
      * Reads and parses a given classpath file.
      * 
      * @param in the input stream
@@ -251,18 +270,16 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
     public static ClasspathFile readClasspathFile(InputStream in, File base) throws IOException {
         ClasspathFile result = new ClasspathFile();
         List<String> contents = IOUtils.readLines(in);
-        String unpackMode = null;
+        AtomicReference<String> unpackMode = new AtomicReference<>(null);
+        AtomicReference<String> baseDir = new AtomicReference<>(null);
         for (String line : contents) {
             if (line.startsWith("#")) {
-                if (line.startsWith(KEY_UNPACK_MODE)) {
-                    unpackMode = line.substring(KEY_UNPACK_MODE.length()).trim();
-                }
-                if (line.startsWith(KEY_SETUP_DESCRIPTOR)) {
-                    result.setupDescriptor = line.substring(KEY_SETUP_DESCRIPTOR.length()).trim();
-                }
-                if (line.startsWith(KEY_PLUGIN_IDS)) {
+                readSetting(line, Constants.KEY_UNPACK_MODE, r -> unpackMode.set(r));
+                readSetting(line, Constants.KEY_SETUP_DESCRIPTOR, r -> result.setupDescriptor = r);
+                readSetting(line, Constants.KEY_BASE_DIR, r -> baseDir.set(r));
+                String tmp = readSetting(line, Constants.KEY_PLUGIN_IDS, null);
+                if (null != tmp) {
                     result.pluginIds = new ArrayList<>();
-                    String tmp = line.substring(KEY_SETUP_DESCRIPTOR.length()).trim();
                     StringTokenizer t = new StringTokenizer(tmp, ",");
                     while (t.hasMoreTokens()) {
                         result.pluginIds.add(t.nextToken().trim());
@@ -270,11 +287,15 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
                 }
             } else {
                 String delim = ":;"; // both, assuming no absolute paths
-                if (null != unpackMode && "RESOLVE".equals(unpackMode.toUpperCase())) {
+                if (null != unpackMode 
+                    && UnpackMode.RESOLVE == Constants.toUnpackMode(unpackMode.get(), UnpackMode.RESOLVE)) {
                     delim = File.pathSeparator;
+                    if (Constants.VAL_BASE_DIR_MVN.equals(baseDir.get())) {
+                        base = new File(OsUtils.getEnv("M2_REPO", System.getProperty("user.home") + "/.m2/repository"));
+                    }
                 }
                 StringTokenizer tokenizer = new StringTokenizer(line, delim);
-                while (tokenizer.hasMoreTokens()) { // relocate with KEY_REPO_DIR -> LoaderIndex?
+                while (tokenizer.hasMoreTokens()) { 
                     String token = tokenizer.nextToken();
                     File f = new File(token);
                     if (!f.isAbsolute()) {
