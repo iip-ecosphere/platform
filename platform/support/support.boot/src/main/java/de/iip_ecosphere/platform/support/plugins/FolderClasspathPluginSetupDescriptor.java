@@ -289,7 +289,10 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
                 String delim = ":;"; // both, assuming no absolute paths
                 if (null != unpackMode 
                     && UnpackMode.RESOLVE == Constants.toUnpackMode(unpackMode.get(), UnpackMode.RESOLVE)) {
-                    delim = File.pathSeparator;
+                    if (line.startsWith("/") || (line.length() > 2 && Character.isAlphabetic(line.charAt(0)) 
+                        && Character.isDigit(line.charAt(1)))) { // if not relative; local plugin mode
+                        delim = File.pathSeparator;
+                    }
                     if (Constants.VAL_BASE_DIR_MVN.equals(baseDir.get())) {
                         base = new File(OsUtils.getEnv("M2_REPO", System.getProperty("user.home") + "/.m2/repository"));
                     }
