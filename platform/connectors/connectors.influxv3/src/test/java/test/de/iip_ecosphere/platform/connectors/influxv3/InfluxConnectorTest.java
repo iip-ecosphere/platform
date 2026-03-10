@@ -184,7 +184,7 @@ public class InfluxConnectorTest {
     /**
      * Turns an INFLUX object value to an int.
      * 
-     * @param fields the point fields to read the value from
+     * @param point the point fields to read the value from
      * @param field the field to read the value from
      * @param dflt a default value if the stored object does not exist or cannot be converted
      * @return the int value or {@code dflt}
