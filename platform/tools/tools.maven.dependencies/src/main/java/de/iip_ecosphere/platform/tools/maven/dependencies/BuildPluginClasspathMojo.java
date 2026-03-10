@@ -21,8 +21,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -49,9 +51,14 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
     public static final String KEY_SETUP_DESCRIPTOR = "# setupDescriptor: ";
     public static final String KEY_PLUGIN_IDS = "# pluginIds: ";
     public static final String KEY_SEQUENCE_NR = "# sequenceNr: ";
+    public static final String KEY_ARTIFACTS = "# artifacts: ";
+    public static final String KEY_REPO_DIR = "# repoDir: ";
 
     @Parameter( property = "mdep.addTestArtifact", defaultValue = "false" )
     private boolean addTestArtifact;
+
+    @Parameter( property = "mdep.excludeTestArtifact", defaultValue = "false" )
+    private boolean excludeTestArtifact;
 
     @Parameter( property = "mdep.unpackMode", defaultValue = Resolver.DEFAULT_UNPACK_MODE )
     private UnpackMode unpackMode;
@@ -153,7 +160,7 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
         }
         List<String> prepends = new ArrayList<>();
         prepends.add(composeMyArtifact("", "jar"));
-        if (addTestArtifact || asTest) {
+        if ((addTestArtifact || asTest) && !excludeTestArtifact) {
             prepends.add(composeMyArtifact("tests", "jar")); // default Maven classifier
         }
         setPrepends(prepends);
@@ -289,7 +296,25 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
         if (pluginIds != null && pluginIds.size() > 0) {
             befores.add(KEY_PLUGIN_IDS + String.join(", ", pluginIds));
         }
+        try {
+            Set<Artifact> artifacts = getResolvedDependencies(true);
+            List<Artifact> artList = new ArrayList<>();
+            artList.add(new DefaultArtifact(getProject().getGroupId(), getProject().getArtifactId(), 
+                    getProject().getVersion(), "compile", "jar", "", null));
+            if ((addTestArtifact || asTest) && !excludeTestArtifact) {
+                artList.add(new DefaultArtifact(getProject().getGroupId(), getProject().getArtifactId(), 
+                    getProject().getVersion(), "compile", "jar", "tests", null));
+            }
+            artList.addAll(artifacts);
+            befores.add(KEY_ARTIFACTS + artList
+                .stream()
+                .map(a -> a.getGroupId() + ":" + a.getArtifactId() + ":" + Resolver.typeClassifier(a) 
+                    + a.getBaseVersion() + Resolver.optionalMarker(a))
+                .collect(Collectors.joining(",")));
+        } catch (MojoExecutionException e) {
+            getLog().warn("Cannot compose artifacts list: " + e.getMessage());
+        }
         setBefores(befores);
     }
-        
+    
 }

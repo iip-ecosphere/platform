@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -120,6 +121,8 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
     
     private Map<String, List<String>> pluginAppends = new HashMap<>();
     private Resolver resolver;
+    private Map<String, String> artifactMapping = new HashMap<>();
+    private Map<String, String> artifactAppends = new HashMap<>();
     
     /**
      * Represents a plugin, an extended artifact.
@@ -427,6 +430,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         for (PluginItem pl : plugins) {
             if (pl.hasAppends()) {
                 List<String> result = new ArrayList<>();
+                String artifacts = null;
                 for (String name: pl.appends) {
                     File cpFile = getCpFile(name);
                     try (FileInputStream fis = new FileInputStream(cpFile)) {
@@ -435,6 +439,15 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                         for (String line : contents) {
                             if (line.startsWith("#")) {
                                 prefix = extractSuffix(BuildPluginClasspathMojo.KEY_PREFIX, line, prefix);
+                                String arts = extractSuffix(BuildPluginClasspathMojo.KEY_ARTIFACTS, line, null);
+                                if (null != arts) {
+                                    buildArtifactsMapping(arts);
+                                    if (artifacts != null) {
+                                        artifacts += "," + arts;
+                                    } else {
+                                        artifacts = arts;
+                                    }
+                                }
                             } else {
                                 Tokenizer tokenizer = new Tokenizer(line);
                                 prefix = fixPrefix(prefix, tokenizer);
@@ -452,6 +465,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                     }
                 }
                 pluginAppends.put(pl.getArtifactId(), result);
+                artifactAppends.put(pl.getArtifactId(), artifacts);
             }
         }
     }
@@ -633,8 +647,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             } catch (IOException e) {
                 throw new MojoFailureException("Cannot move unpacked files: " + e.getMessage());
             }
-            // cleanup
-            FileUtils.deleteQuietly(new File(tgtDir, "target"));
+            FileUtils.deleteQuietly(new File(tgtDir, "target")); // cleanup
         } 
         int seqNr = 1;
         for (ClasspathFile cf : classpathFiles) {
@@ -642,14 +655,12 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             String cpFile = cf.getName();
             File src;
             File tgt;
-            if (relocate) {
-                // move from jars/target and jars/target/jars to jars
+            if (relocate) { // move from jars/target and jars/target/jars to jars
                 src = new File(relocateTarget, cpFile);
                 tgt = new File(pluginDir, cpFile);
                 tgt.mkdirs();
                 getLog().info("Rewriting classpath file " + src + " to " + tgt);
-            } else {
-                // just rewrite the same file by appending
+            } else { // just rewrite the same file by appending
                 src = getOutputDir(cpFile);
                 tgt = src;
                 getLog().info("Rewriting classpath file " + src);
@@ -672,9 +683,14 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                     if (line.startsWith("#")) {
                         prefix = extractSuffix(BuildPluginClasspathMojo.KEY_PREFIX, line, prefix);
                         mode = extractSuffix(BuildPluginClasspathMojo.KEY_UNPACK_MODE, line, mode);
+                        line = handleArtifacts(cpFile, line);
                         out.println(line);
                     } else {
                         Tokenizer tokenizer = new Tokenizer(line);
+                        if (mode != null && Resolver.toUnpackMode(mode) == UnpackMode.RESOLVE) {
+                            tokenizer.sep = File.pathSeparator; // resolved will be absolute paths, use correct sep
+                            out.println(BuildPluginClasspathMojo.KEY_REPO_DIR + resolver.getLocalRepoBaseDir());
+                        }
                         prefix = fixPrefix(prefix, tokenizer);
                         if (relocate) {
                             locs.addAll(processCpLineRelocation(cpFile, mode, out, tokenizer, prefix, relocateTarget));
@@ -697,6 +713,56 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             seqNr++;
         }
         return modes;
+    }
+    
+    /**
+     * Handles a potential {@link BuildPluginClasspathMojo#KEY_ARTIFACTS} entry.
+     * 
+     * @param cpFile the classpath file as key for {@link #artifactAppends}
+     * @param line the actual classpath line to process
+     * @return if it is an {@link BuildPluginClasspathMojo#KEY_ARTIFACTS} entry and there are appends in 
+     *    {@link #artifactAppends}, the modified line with appended artifacts, else {@code line}
+     */
+    private String handleArtifacts(String cpFile, String line) {
+        if (line.startsWith(BuildPluginClasspathMojo.KEY_ARTIFACTS)) {
+            String artifacts = extractSuffix(BuildPluginClasspathMojo.KEY_ARTIFACTS, line, null);
+            buildArtifactsMapping(artifacts);
+            if (artifacts != null) {
+                String add = artifactAppends.get(cpFile);
+                if (null != add) {
+                    line += "," + add;
+                }
+            }
+        }
+        return line;
+    }
+    
+    /**
+     * If artifacts information is available, builds a mapping from usual artifact JAR file names to artifact names.
+     * As not all artifacts may have maven-complient groupIds, this shall ease the resolution of class file names to 
+     * artifact names and thus the maven-based resolution of files.
+     * 
+     * @param artifacts the artifacts from the classpath file, comma separated maven coordinates, may be <b>null</b> 
+     *     for none
+     */
+    private void buildArtifactsMapping(String artifacts) {
+        if (null != artifacts && artifacts.length() > 0) {
+            StringTokenizer tokens = new StringTokenizer(artifacts, ",");
+            while (tokens.hasMoreTokens()) { // as in copy plugin dependencies/build plugin classpath
+                String token = tokens.nextToken();
+                DefaultArtifact art = new DefaultArtifact(Resolver.removeOptionalMarker(token));            
+                String file = art.getGroupId();
+                file += "." + art.getArtifactId();
+                file += "-" + art.getVersion();
+                String cl = art.getClassifier();
+                if (cl != null && cl.length() > 0 && !"runtime".equalsIgnoreCase(cl) 
+                    && !"compile".equalsIgnoreCase(cl)) {
+                    file += "-" + art.getClassifier();
+                }
+                file += "." + art.getExtension();
+                artifactMapping.put(file, token);
+            }
+        }
     }
     
     /**
@@ -738,7 +804,6 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                             }
                         }
                         idx.substituteLocations(urlMapping, false);
-                        
                         knownMsg = idx.getClassesCount() + " classes and " + idx.getResourcesCount() 
                             + " resources known. Reusing the information.";
                     } catch (IOException e) {
@@ -751,18 +816,25 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                     AtomicInteger exceptionCount = new AtomicInteger();
                     for (JarLocation loc: locs) {
                         // handle exceptions tolerantly, sometimes class files are listed but optional
-                        LoaderIndex.addToIndex(idx, loc.toFile(), loc.actual, 
+                        File jf = loc.toFile();
+                        if (!jf.exists() && loc.actual != null) { // resolved, relocated
+                            jf = new File(loc.actual);
+                        }
+                        LoaderIndex.addToIndex(idx, jf, loc.actual, 
                             ex -> {
                                 exceptionCount.incrementAndGet();
                                 getLog().warn(ex.getClass().getSimpleName() + " " + ex.getMessage());
                             });
                     }
-                    if (exceptionCount.get() < locs.size() // not only exceptions, we found classes or resources
+                    if (exceptionCount.get() <= locs.size() // not only exceptions, we found classes or resources
                         && idx.getClassesCount() + idx.getResourcesCount() > 0) { // resort to usual classloader
                         LoaderIndex.toFile(idx, index);
                         getLog().info("Stored class index to " + index + " " + idx.getClassesCount() + " classes and " 
                             + idx.getResourcesCount() + " resources in " + idx.getLocationsCount() + " locations in " 
                             + (System.currentTimeMillis() - start) + " ms");
+                    } else {
+                        getLog().info("Did not store index as " + exceptionCount.get() 
+                            + " is more than number of appended libraries " + locs.size()); 
                     }
                 } catch (IOException e) {
                     getLog().error("Cannot write index file " + index + ": " + e.getClass().getSimpleName() 
@@ -950,9 +1022,10 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             token = token.replace("target/", "jars/");
         }
         if (isModeResolve(mode)) {
+            String origToken = token;
             token = stripPrefix(prefix, token);
             token = resolve(token, jarFolder);
-            locations.add(new JarLocation(token));
+            locations.add(new JarLocation(origToken, token));
         } else {
             locations.add(new JarLocation(jarFolder.toString() + "/../" + token, token));
         }
@@ -991,25 +1064,47 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
     }
    
     /**
-     * Parses a classpath path back into a maven artifact.
+     * Parses a classpath path into a maven artifact, if available using {@link #artifactMapping}.
      * 
      * @param path the path
+     * @param optional receives the optional marker (modified as side effect)
      * @return the artifact
      */
-    private DefaultArtifact parsePath(String path) {
-        String groupId = "";
-        String artifactId = "";
-        String version = "";
-        String type = "";
-        String classifier = "";
+    private DefaultArtifact parsePath(String path, AtomicBoolean optional) {
+        DefaultArtifact result = null;
         // there might be a file path before
         int pos = path.lastIndexOf('/');
         if (pos > 0) {
             path = path.substring(pos + 1);
         }
-        artifactId = path;
-        // split from backwards
-        pos = artifactId.lastIndexOf('.');
+        String coord = artifactMapping.get(path);
+        if (null != coord) {
+            String origCoord = coord;
+            coord = Resolver.removeOptionalMarker(origCoord);
+            optional.set(origCoord.length() != coord.length());
+            result = new DefaultArtifact(coord);            
+        }
+        if (null == result) {
+            result = parsePathBwd(path);
+        }
+        return result;
+    }
+    
+    /**
+     * Parses a classpath path from right-to-left into a maven artifact.
+     * 
+     * @param path the path
+     * @return the artifact
+     */
+    private DefaultArtifact parsePathBwd(String path) {
+        String groupId = "";
+        String artifactId = path;
+        String version = "";
+        String type = "";
+        String classifier = "";
+
+        // split backwards
+        int pos = artifactId.lastIndexOf('.');
         if (pos > 0) { // extension
             type = artifactId.substring(pos + 1);
             artifactId = artifactId.substring(0, pos);
@@ -1043,8 +1138,9 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             groupId = artifactId.substring(0, pos);
             artifactId = artifactId.substring(pos + 1);
         }
-        return new DefaultArtifact(groupId, artifactId, classifier, type, version);            
+        return new DefaultArtifact(groupId, artifactId, classifier, type, version);
     }
+
     
     /**
      * Returns the position of the "." after the groupId in {@code name}.
@@ -1073,7 +1169,8 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
     private String resolve(String path, File jarFolder) {
         String resolved = path;
         try {
-            DefaultArtifact artifact = parsePath(path);
+            AtomicBoolean optional = new AtomicBoolean(false);
+            DefaultArtifact artifact = parsePath(path, optional);
             File res = resolver.resolve(artifact);
             if (resolveAndCopy && jarFolder != null) {
                 File tgt = new File(jarFolder, res.getName());
@@ -1081,8 +1178,10 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                     try {
                         FileUtils.copyFile(res, tgt);
                     } catch (IOException e) {
-                        getLog().error("Cannot copy resolved artifact '" + artifact + "' from '" + res + "' to '" 
-                            + tgt + "' - ignoring: " + e.getMessage());
+                        if (!optional.get()) {
+                            getLog().error("Cannot copy resolved artifact '" + artifact + "' from '" + res + "' to '" 
+                                + tgt + "' - ignoring: " + e.getMessage());
+                        }
                     }
                 }
             } else { // leave it where it is

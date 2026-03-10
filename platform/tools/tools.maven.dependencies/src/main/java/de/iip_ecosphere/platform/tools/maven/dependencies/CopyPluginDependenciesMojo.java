@@ -73,6 +73,10 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
             }
         }
         super.doExecute();
+        Layers.copyGroupArtifact(targetDirectory, null, "jar", getProject(), getLog());
+        if (asTest) {
+            Layers.copyGroupArtifact(targetDirectory, "tests", "jar", getProject(), getLog());
+        }
         File cpFile = new File(targetDirectory, "jars" + (asTest ? "-test" : "") + "/classpath");
         File index = new File(targetDirectory, "jars" + (asTest ? "-test" : "") + "/classpath.idx");
         if (createIndex) {

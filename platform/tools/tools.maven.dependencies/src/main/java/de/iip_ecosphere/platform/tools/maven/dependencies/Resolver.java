@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,8 @@ import org.eclipse.aether.resolution.ArtifactResult;
  */
 class Resolver {
 
-    public static final String DEFAULT_UNPACK_MODE = "JARS"; // -> TODO "resolve", see toUnpackMode()
+    public static final String DEFAULT_UNPACK_MODE = "RESOLVE"; // -> TODO "resolve", see toUnpackMode()
+    public static final String COORD_OPTIONAL_MARKER = ":optional";
 
     private Log log;
     private List<RemoteRepository> remoteRepositories;
@@ -107,6 +109,15 @@ class Resolver {
             result = "";
         }
         return result;
+    }
+    
+    /**
+     * Returns the base directory of the local repository.
+     * 
+     * @return the base directory
+     */
+    File getLocalRepoBaseDir() {
+        return repoSession.getLocalRepository().getBasedir();
     }
 
     /**
@@ -357,6 +368,62 @@ class Resolver {
             result = UnpackMode.JARS;
         }
         return result;
+    }
+
+    /**
+     * Returns an optional type/classifier specification for Maven coordinates.
+     * 
+     * @param art the artifact to take the data from
+     * @return the type/classifier infix specification or an empty string
+     */
+    static String typeClassifier(Artifact art) {
+        boolean typeGiven = art.getType() != null && art.getType().length() > 0;
+        boolean classifierGiven = art.getClassifier() != null && art.getClassifier().length() > 0;
+        return typeGiven && classifierGiven ? art.getType() + ":" + art.getClassifier() + ":" : "";
+    }
+
+    /**
+     * Returns an optional Maven coordinate addon {@link #COORD_OPTIONAL_MARKER} indicating an optional dependency.
+     * 
+     * @param art the artifact to take the data from
+     * @return the addon or an empty string if not optional
+     * @see #removeOptionalMarker(String)
+     */
+    static String optionalMarker(Artifact art) {
+        return art.isOptional() ? COORD_OPTIONAL_MARKER : "";
+    }
+    
+    /**
+     * Removes a potential optional Maven coordinate addon indicating an optional dependency.
+     * 
+     * @param coord the coordinate
+     * @return the coordinate potentially with marker removed. There was a marker if input/output differs.
+     * @see #optionalMarker(Artifact)
+     */
+    static String removeOptionalMarker(String coord) {
+        if (coord.endsWith(COORD_OPTIONAL_MARKER)) {
+            coord.substring(0, coord.length() - COORD_OPTIONAL_MARKER.length());
+        }
+        return coord;
+    }
+
+    /**
+     * Removes the optional scope from an extended Maven coordinate.
+     * 
+     * @param coord the coordinate
+     * @param scopeConsumer the scope consumer, may be <b>null</b> for none
+     * @return the coordinate without scope
+     */
+    static String removeScope(String coord, Consumer<String> scopeConsumer) {
+        int pos = coord.lastIndexOf(':');
+        if (pos > 0 && pos < coord.length() - 1) {
+            String scope = coord.substring(pos + 1);
+            coord = coord.substring(pos);
+            if (null != scopeConsumer) {
+                scopeConsumer.accept(scope);
+            }
+        }
+        return coord;
     }
 
 }

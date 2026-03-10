@@ -13,11 +13,15 @@
 package de.iip_ecosphere.platform.tools.maven.dependencies;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.MavenProject;
 
 import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 
@@ -165,6 +169,43 @@ public class Layers {
      */
     static boolean isIndexFile(String file) {
         return file.endsWith(LoaderIndex.INDEX_SUFFIX);
+    }
+    
+    
+    /**
+     * Prepends the group id before an usual Maven artifact as we need it that way for resolution on unpacking.
+     * 
+     * @param targetDirectory the folder whether the file to prepend
+     * @param classifier optional classifier, may be <b>null</b> or empty for none
+     * @param type the artifact type/file extension (without ".")
+     * @param project the Maven project
+     * @return the prepended file
+     */
+    static File copyGroupArtifact(File targetDirectory, String classifier, String type, MavenProject project, Log log) {
+        String postfix = "";
+        if (classifier != null && classifier.length() > 0) {
+            postfix += "-" + classifier;
+        }
+        postfix += "." + type;
+        return prependGroupAndCopy(new File(targetDirectory, project.getArtifactId() + "-" 
+            + project.getVersion() + postfix), project, log);
+    }
+    
+    /**
+     * Prepends the group id before an usual Maven artifact as we need it that way for resolution on unpacking.
+     * 
+     * @param file the file to prepend, copy from
+     * @param project the Maven project
+     * @return the prepended file
+     */
+    static File prependGroupAndCopy(File file, MavenProject project, Log log) {
+        File result = new File(file.getParent(), project.getGroupId() + "." + file.getName());
+        try {
+            Files.copy(file.toPath(), result.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            log.error("While prepending groupId: " + e.getClass().getSimpleName() + " " + e.getMessage());
+        }
+        return result;
     }
 
 }
