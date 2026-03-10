@@ -11,6 +11,11 @@
   <!-- First build without (SSE) maven repository may required -Diip.build.initial=true and second build afterwards. -->
   
   <modules>
+     <!-- maven plugins -->
+     <module>tools/tools.lib</module>
+     <module>tools/tools.maven.python</module>
+     <module>tools/tools.maven.invoker</module>
+     <module>tools/tools.maven.dependencies</module>
      <!-- platform dependencies first -->
      <module>platformDependencies</module>
      <module>support/support.boot</module>
@@ -27,10 +32,6 @@
      <module>support.json-jackson</module>
      <module>support.http-apache</module>
      <module>support.bytecode-bytebuddy</module>
-     <!-- maven plugins -->
-     <module>tools/tools.maven.python</module>
-     <module>tools/tools.maven.invoker</module>
-     <module>tools/tools.maven.dependencies</module>
      <!-- test broker -->
      <module>tests/test.amqp.qpid</module>
      <module>tests/test.mqtt.hivemq</module>
@@ -38,9 +39,11 @@
      <!-- support layer -->
      <module>support/support.aas</module>
      <module>support/support.aas.basyx</module>
-     <module>support/support.aas.basyx.server</module>
+     <module>support/support.aas.basyx/support.aas.basyx.server</module>
      <module>support/support.aas.basyx1_0</module>
      <module>support/support.aas.basyx1_5</module>
+     <module>support/support.aas.basyx2/support.aas.basyx2.common</module>
+     <module>support/support.aas.basyx2/support.aas.basyx2.server</module>
      <module>support/support.aas.basyx2</module>
      <module>support/support.iip-aas</module>
      <module>support/support.dfltSysMetrics</module>
