@@ -79,7 +79,8 @@
                  </execution>                  
              </executions>
              <configuration>
-                 <addTestArtifact>true</addTestArtifact>
+                 <asTest>true</asTest>
+                 <excludeTestArtifact>true</excludeTestArtifact>
              </configuration>
          </plugin>
       </plugins>
