@@ -498,6 +498,7 @@ project DataTypes {
         iipVer;
         BaSyx10Plugin;
         BaSyx15Plugin;
+        EmptyRecord;
     };
     
 }
