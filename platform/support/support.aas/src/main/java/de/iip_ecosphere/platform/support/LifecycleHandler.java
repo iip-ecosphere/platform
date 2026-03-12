@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +29,8 @@ import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
+import de.iip_ecosphere.platform.support.plugins.PluginManager.PluginFilter;
+import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 
 /**
  * Aggregated methods for all known lifecycle descriptors. {@link LifecycleDescriptor} shall be declared via 
@@ -115,7 +118,7 @@ public class LifecycleHandler {
      * @param args the command line arguments to be considered during startup
      */
     public static void startup(String[] args) {
-        PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE); // preliminary
+        loadOktoPlugins(args);
         cmdArgs = args.clone();
         AtomicReference<String> pidFile = new AtomicReference<>();
         
@@ -168,6 +171,34 @@ public class LifecycleHandler {
             add = " Running until Ctrl-C.";
         }
         LoggerFactory.getLogger(LifecycleHandler.class).info("{}{}", MSG_STARTUP_COMPLETED, add);
+    }
+
+    /**
+     * Loads the oktoflow plugins.
+     * 
+     * @param args the command line arguments (if needed)
+     */
+    private static void loadOktoPlugins(String[] args) {
+        String pf = System.getProperty(AbstractSetup.PARAM_PLUGINS, "target");
+        File pluginParent = new File(pf);
+        File plugins = new File(pluginParent, "plugins");
+        if (!plugins.isDirectory()) { // testing fallback
+            plugins = new File(pluginParent, "oktoPlugins");
+            if (!plugins.isDirectory()) {
+                plugins = pluginParent;
+            }
+        } 
+        LoggerFactory.getLogger(LifecycleHandler.class).info("Using {} as oktoflow plugin directory", plugins);
+        if (plugins.isDirectory()) {
+            LoggerFactory.getLogger(LifecycleHandler.class).info("Trying to load oktoflow plugins from {}", plugins);
+            PluginFilter filter = info -> {
+                String name = info.getName();
+                boolean ok = true;
+                ok &= !name.startsWith("connector-"); // usually no connectors needed here
+                return ok;
+            };
+            PluginManager.loadAllFrom(plugins, filter, CurrentClassloaderPluginSetupDescriptor.INSTANCE);
+        }
     }
     
     /**
