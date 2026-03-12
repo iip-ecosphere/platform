@@ -321,6 +321,9 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
                         s = s.replace("${self-test}", selfTest);
                         tmp += s + pathSeparator;
                     }
+                    if (content.isEmpty() && tmp.length() > 0) {
+                        tmp = tmp.substring(0, tmp.length() - 1);
+                    }
                     content = tmp + content;
                 }
                 if (hasAppends) {

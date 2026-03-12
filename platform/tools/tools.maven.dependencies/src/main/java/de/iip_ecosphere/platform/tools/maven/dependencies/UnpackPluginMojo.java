@@ -728,11 +728,11 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
     }
     
     /**
-     * Handles a potential {@link BuildPluginClasspathMojo#KEY_ARTIFACTS} entry.
+     * Handles a potential {@link Constants#KEY_ARTIFACTS} entry.
      * 
      * @param cpFile the classpath file as key for {@link #artifactAppends}
      * @param line the actual classpath line to process
-     * @return if it is an {@link BuildPluginClasspathMojo#KEY_ARTIFACTS} entry and there are appends in 
+     * @return if it is an {@link Constants#KEY_ARTIFACTS} entry and there are appends in 
      *    {@link #artifactAppends}, the modified line with appended artifacts, else {@code line}
      */
     private String handleArtifacts(String cpFile, String line) {
