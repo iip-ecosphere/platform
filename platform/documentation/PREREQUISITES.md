@@ -4,7 +4,7 @@
 
 ## Hardware
 
-A full oktoflow installation including platform server, ECS-runtime/service manager and app(s) already runs on computers with
+A full oktoflow installation including platform server, ECS-runtime/service manager and app(s) already runs on computers with, e.g.
 
 - Intel i7-8665U CPU @ 1.90GHz, 4 cores
 - 10 GB RAM
@@ -14,7 +14,7 @@ A full oktoflow installation including platform server, ECS-runtime/service mana
     - around 2 GB for all platform services including one app
     - after an install run, around 2 GB for the local Maven repository (may be larger if you do not clean up snapshots)
 
-Of course, more resources are welcome, e.g., 10 cores, 32-64 GByte main memory or 2 TBytes Harddisk ;)
+Of course, more resources are welcome, e.g., 10 cores, 32-64 GByte main memory or 2 TBytes Harddisk ;) And, the more Python services or AI you use, the more resources might be needed, e.g., also GPUs or TPUs.
 
 The smallest device for running the ECS-runtime/service manager with a Python AI in a Docker container so far was a [Phoenix Contact AXC F 3152](https://www.phoenixcontact.com/de-ch/produkte/steuerung-axc-f-3152-1069208), with an Intel Atom x5 1.3 GHz (using one of two cores), 2GByte RAM, 2GByte extended HDD, there without local Maven repository.
 
