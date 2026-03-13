@@ -11,7 +11,7 @@ A full oktoflow installation including platform server, ECS-runtime/service mana
 - Windows 10, 11 or Linux (tested with Ubuntu 20.04.4 LTS, 22.04.5 LTS 64 bit), so far no insights for MacOS
 - 500 GB (hard disk) drive, at least sufficiently large for
     - Java JDK (320 MBytes) and Python (98 MBytes, may be larger dependent on needed modules or virtual environment)
-    - around 2 GB for all platform services including one app
+    - around 2 GB for 7 basic platform services and one app
     - after an install run, around 2 GB for the local Maven repository (may be larger if you do not clean up snapshots)
 
 Of course, more resources are welcome, e.g., 10 cores, 32-64 GByte main memory or 2 TBytes Harddisk ;) And, the more Python services or AI you use, the more resources might be needed, e.g., also GPUs or TPUs.
