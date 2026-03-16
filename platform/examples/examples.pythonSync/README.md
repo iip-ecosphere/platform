@@ -8,6 +8,8 @@ The application consists of three (micro)-services, which are composed in the co
   * An asynchronous receiver service emits the finally received (and classified/scored) data on the console.
 The communication in this example happens via MQTT v3. The instantiated broker requires JDK 11.
 
+This example intentionally builds with the new oktoflow plugins as regression test.
+
 This example consists of several pieces:
   * An IVML configuration for the application in `src/main/easy`.
   * An implementation of the Java services used in the application in `src/main/java`

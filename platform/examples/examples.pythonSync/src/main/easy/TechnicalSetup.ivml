@@ -60,6 +60,7 @@ project TechnicalSetup {
     
     sharedInterfaces = true;
     sharedArtifact = "de.iip-ecosphere.platform:apps.ExamplePythonSyncAppInterfaces:" + iipVer; // for testing all-in-one
+    withPlugins = false; // for plugin testing
 
     // ------------ freezing ------------------
     
@@ -87,6 +88,7 @@ project TechnicalSetup {
         managementUi;
         artifactsFolder;
         artifactsUriPrefix;
+        withPlugins;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 

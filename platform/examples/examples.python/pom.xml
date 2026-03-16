@@ -74,9 +74,9 @@
         <build>
           <plugins>
              <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-dependency-plugin</artifactId>
-               <version>3.2.0</version>
+               <groupId>de.iip-ecosphere.platform</groupId>
+               <artifactId>dependency-plugin</artifactId>
+               <version>${project.version}</version>
                <executions>
                  <execution>
                      <id>pythonSources</id>
@@ -107,6 +107,7 @@
                                  <destFileName>pyIf.zip</destFileName>
                              </artifactItem>
                          </artifactItems>
+                         <force>true</force>
                      </configuration>
                  </execution>
                </executions>
