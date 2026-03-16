@@ -159,7 +159,7 @@ public class SpringStartup {
         int adminPort = -1; // ephemeral
         String serviceProtocol = "";
 
-        loadPlugins(args);
+        loadPlugins(artifact, args);
         System.setProperty(NetworkManagerFactory.PROPERTY, PersistentLocalNetworkManagerDescriptor.class.getName());
         System.out.println("Spring Startup with args: " + Arrays.toString(args));
         System.out.println("System environment: " + System.getenv());
@@ -214,9 +214,10 @@ public class SpringStartup {
     /**
      * Loads the oktoflow plugins.
      * 
+     * @param artifact the artifact to execute
      * @param args the command line arguments
      */
-    private static void loadPlugins(String[] args) {
+    private static void loadPlugins(File artifact, String[] args) {
         Starter.transferArgsToEnvironment(args);
         final String pluginsDirDflt = "target";
         // similar to Starter.loadOktoPlugins() but disable plugin loading if there are none in default dirs -> legacy
@@ -230,6 +231,12 @@ public class SpringStartup {
                     System.setProperty(Starter.PARAM_IIP_APP_PLUGINS, Starter.PARAM_IIP_APP_PLUGINS_NO_PLUGINS);
                 }
             } 
+        } else { // try it from the artifact
+            File base = artifact.getParentFile();
+            File plugins = new File(base, "plugins");
+            if (plugins.exists()) {
+                System.setProperty(Starter.PARAM_IIP_APP_PLUGINS, plugins.getAbsolutePath());
+            }
         }
         Starter.loadOktoPlugins();
         PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE); // local plugins
