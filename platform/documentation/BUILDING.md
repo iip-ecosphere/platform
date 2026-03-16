@@ -38,7 +38,7 @@ The meta-model defines the configuration types as well as the actions for code g
   
 As a side effect, also this command creates the application code templates. The generated code template contains helper scripts for Windows/Linux (`updateModel.bat`, `updateModel.sh`) that ease the update of the meta model.
 
-As a shortcut for both, updating the platform, the meta-model and building the app, you may use on all-in-one examples `mvn -U -Dunpack.force=true install`.
+>Shortcut: Updating the platform, the meta-model and building the app, you may use on all-in-one examples `mvn -U -Dunpack.force=true install`.
 
 ## Using a different resource folder
 
