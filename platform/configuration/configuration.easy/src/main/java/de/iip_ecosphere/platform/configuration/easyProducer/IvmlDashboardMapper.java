@@ -697,6 +697,7 @@ public class IvmlDashboardMapper {
                 result = new RecordType();
                 result.name = IvmlUtils.getStringValue(var, "name", "");
                 IDecisionVariable recordIter = var;
+                // TODO nested fields get contained field as prefix, separator is currently _
                 while (recordIter != null && !recordIter.hasNullValue()) {
                     IDecisionVariable fields = recordIter.getNestedElement("fields");
                     for (int f = 0; f < fields.getNestedElementsCount(); f++) {

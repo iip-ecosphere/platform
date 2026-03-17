@@ -1,4 +1,5 @@
 import Basics;
+import JavaMapping;
 import JavaBasics;
 
 @advice(IIPEcosphere)
@@ -309,7 +310,18 @@ template MavenBasics(Configuration config, FileArtifact target) {
     // added v2->v3
     def XmlElement appendDependencies(XmlElement parent, sequenceOf(String) plugins, setOf(String) artifacts, String projectVersion, Boolean enable=true, String depElt="", Boolean includeOptPlugins=false, Boolean includeExclusions=true) {
         setOf(String) done = {};
+        String iipGroup = getIipGroup();
+        String basyxServer = "support.aas.basyx.server";
+        String basyxCoordPrefix = iipGroup + ":" + "support.aas.basyx" + ":";
+        String basyxServerCoordPrefix = iipGroup+":"+basyxServer+":";
+        String basyxServerCoord = basyxServerCoordPrefix + ":" + projectVersion;
         if (enable) {
+            for (String p : plugins) {
+                if (p.startsWith(basyxServerCoordPrefix)) {
+                    basyxServerCoord = p;
+                }
+            }
+            Boolean hasBasyxServer = plugins.remove(basyxServerCoord);
             for (String p: plugins) {
                 sequenceOf(String) parts = p.split("/");
                 p = parts.removeFirst();
@@ -334,11 +346,18 @@ template MavenBasics(Configuration config, FileArtifact target) {
                     }
                     XmlElement dep = appendArtifact(par, p, createDepElt=createDepElt);
                     // exclusions active only for dependencies, not for plugins (they care for that internally)
-                    if (parent.getName() == "dependencies" and parts.size() > 0 and includeExclusions) {
-                        XmlElement excls = new XmlElement(dep, "exclusions");
-                        for (String e : parts) {
-                            XmlElement excl = new XmlElement(excls, "exclusion");
-                            appendArtifact(excl, e, createDepElt=false);
+                    if (parent.getName() == "dependencies") {
+                        if (parts.size() > 0 and includeExclusions) {
+                            XmlElement excls = new XmlElement(dep, "exclusions");
+                            for (String e : parts) {
+                                XmlElement excl = new XmlElement(excls, "exclusion");
+                                appendArtifact(excl, e, createDepElt=false);
+                            }
+                        }
+                    } else { // plugins context; hack, special legacy case
+                        if (p.startsWith(basyxCoordPrefix) and hasBasyxServer) {
+                            XmlElement appends = new XmlElement(dep, "appends");
+                            new XmlElement(appends, "append", basyxServer);
                         }
                     }
                     done.add(p);
