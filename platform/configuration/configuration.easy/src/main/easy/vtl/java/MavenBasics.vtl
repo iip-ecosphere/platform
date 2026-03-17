@@ -321,7 +321,11 @@ template MavenBasics(Configuration config, FileArtifact target) {
                     basyxServerCoord = p;
                 }
             }
+            Boolean excludeBasyxServer = false;
             Boolean hasBasyxServer = plugins.remove(basyxServerCoord);
+            if (hasBasyxServer) { // if it was there, place it last if we shall exclude it during processing
+                plugins.add(basyxServerCoord);
+            }
             for (String p: plugins) {
                 sequenceOf(String) parts = p.split("/");
                 p = parts.removeFirst();
@@ -331,6 +335,9 @@ template MavenBasics(Configuration config, FileArtifact target) {
                     if (not(includeOptPlugins)) {
                         consider = false;
                     }
+                }
+                if (excludeBasyxServer and p == basyxServerCoord) {
+                    consider = false;
                 }
                 if (!done.includes(p) and consider) {
                     XmlElement par = parent;
@@ -358,6 +365,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
                         if (p.startsWith(basyxCoordPrefix) and hasBasyxServer) {
                             XmlElement appends = new XmlElement(dep, "appends");
                             new XmlElement(appends, "append", basyxServer);
+                            excludeBasyxServer = true;
                         }
                     }
                     done.add(p);
