@@ -355,6 +355,9 @@ public abstract class AasFactory {
     public static AasFactory getInstance() {
         if (DUMMY == instance) {
             Plugin<AasFactory> plugin = PluginManager.getPlugin(pluginId, AasFactory.class);
+            if (null == plugin) { // there is a plugin, the default is not there, plugin was not (yet) set to default
+                plugin = PluginManager.getPlugin(AasFactory.class);
+            }
             if (null != plugin) {
                 instance = plugin.getInstance();
                 emitFactoryInstanceNotice();
