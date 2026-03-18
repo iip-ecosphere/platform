@@ -51,6 +51,15 @@ public interface ConfigurationFactoryDescriptor {
         Consumer<Long> executionTimeConsumer);
     
     /**
+     * Creates a configuration to dashboard mapper instance.
+     * 
+     * @param warn a warning consumer (may be <b>null</b>, then the platform logger is used)
+     * @param info an information consumer (may be <b>null</b>, then the platform logger is used)
+     * @return the instance, may be <b>null</b> if no configuration plugin is available
+     */
+    public DashboardMapper createDashboardMapper(Consumer<String> warn, Consumer<String> info);
+    
+    /**
      * Hints the following executors regarding the apps to instantiate. Maven legacy.
      * 
      * @param apps the app ids as comma separated list or empty
