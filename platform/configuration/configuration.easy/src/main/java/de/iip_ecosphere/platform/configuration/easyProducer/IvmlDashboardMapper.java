@@ -25,7 +25,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
+import de.iip_ecosphere.platform.configuration.cfg.DashboardMapper;
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor.ExecutionMode;
 import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator.InstantiationConfigurer;
 import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator.NonCleaningInstantiationConfigurer;
@@ -70,7 +73,7 @@ import net.ssehub.easy.varModel.model.datatypes.IDatatype;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class IvmlDashboardMapper {
+public class IvmlDashboardMapper implements DashboardMapper {
 
     private File projectFolder;
     private AasFactory factory;
@@ -86,13 +89,31 @@ public class IvmlDashboardMapper {
     private transient int panelCount;
     private transient IDatatype aliasType;
     
+    private Consumer<String> warn = s -> getLogger().warn(s);
+    private Consumer<String> info = s -> getLogger().info(s);
+    
+    /**
+     * Creates a mapper instance for calling it through {@link DashboardMapper}.
+     * 
+     * @param warn a warning consumer (may be <b>null</b>, then the platform logger is used)
+     * @param info an information consumer (may be <b>null</b>, then the platform logger is used)
+     */
+    IvmlDashboardMapper(Consumer<String> warn, Consumer<String> info) {
+        if (warn != null) {
+            this.warn = warn;
+        }
+        if (info != null) {
+            this.info = info;
+        }
+    }
+    
     /**
      * Creates a mapper instance.
      * 
      * @param factory the AAS factory to use
      */
     @SuppressWarnings("unchecked")
-    public IvmlDashboardMapper(AasFactory factory, File projectFolder) {
+    private IvmlDashboardMapper(AasFactory factory, File projectFolder) {
         this.projectFolder = projectFolder;
         this.factory = factory;
         try {
@@ -131,8 +152,9 @@ public class IvmlDashboardMapper {
          * @param aas the created/temporary/provided AAS
          * @param submodel the created submodel
          * @param appId the oktoflow application id processed
+         * @throws ExecutionException if mapping fails
          */
-        public void consume(Aas aas, Submodel submodel, String appId);
+        public void consume(Aas aas, Submodel submodel, String appId) throws ExecutionException;
         
     }
 
@@ -268,8 +290,7 @@ public class IvmlDashboardMapper {
             try {
                 dp.mode = ObjectFitType.valueOf(fit.toUpperCase());
             } catch (IllegalArgumentException e) {
-                LoggerFactory.getLogger(IvmlDashboardMapper.class).warn("Cannot map fit value {}. Keeping NONE. "
-                    + "Reason: {}", fit, e.getMessage());
+                warn.accept("Cannot map fit value " + fit + ". Keeping NONE. " + "Reason: " + e.getMessage());
             }
         }
         return dp;
@@ -521,16 +542,16 @@ public class IvmlDashboardMapper {
                         token = tok.getTokenDataAsString();
                         break;
                     default:
-                        getLogger().warn("Cannot process token of type {} for authentication key {}", 
-                            tok.getType(), authKey);
+                        warn.accept("Cannot process token of type " + tok.getType() 
+                            + " for authentication key " + authKey);
                         break;
                     }
                 } else {
-                    getLogger().warn("No authentication token for authentication key {}", authKey);
+                    warn.accept("No authentication token for authentication key " + authKey);
                 }
                 createProperty(dbB, "token", Type.STRING, token, "InfluxDB token");
             } else {
-                getLogger().warn("No permission to export authentication token for authentication key {}", authKey);
+                warn.accept("No permission to export authentication token for authentication key " + authKey);
             }
         }
         dbB.build();
@@ -924,13 +945,11 @@ public class IvmlDashboardMapper {
                         }
                         panel.logo = "data:image/" + imageSpec + ";base64," + imageBase64;
                     } catch (IOException e) {
-                        LoggerFactory.getLogger(IvmlDashboardMapper.class).warn("While reading logo {}: {}", 
-                            logoSpec, e.getMessage());
+                        warn.accept("While reading logo logoSpec: " + e.getMessage());
                         panel.logo = null;
                     }
                 } else {
-                    LoggerFactory.getLogger(IvmlDashboardMapper.class).warn("While reading logo {}: no such "
-                        + "resource", logoSpec);
+                    warn.accept("While reading logo " + logoSpec + ": no such resource");
                     panel.logo = null;
                 }
             }
@@ -1051,16 +1070,42 @@ public class IvmlDashboardMapper {
         PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(
             new File(supportFolder + "/support.yaml-snakeyaml")));
         final String pluginId = "aas.basyx-2.0"; // AasFactory.DEFAULT_PLUGIN_ID
+
+        File metaModelFolder = null;
+        if (args.length >= 3) {
+            metaModelFolder = new File(args[2]);
+        }
+
+        run(args[0], new File(args[1]), metaModelFolder, null, pluginId, i -> getLogger().info(i));
+    }
+    
+    // checkstyle: stop parameter number check
+    
+    /**
+     * Maps the specified configuration to a dashboard specification.
+     * 
+     * @param ivmlModelName the name of the configuration model to load/parse
+     * @param projectFolder the folder where the configuration model can be found
+     * @param metaModelFolder optional folder where the meta model can be found, may be <b>null</b> for none
+     * @param outputFile optional output file where the dashboard specification shall be wrote to, if <b>null</b> a 
+     *     default location will be assumed
+     * @param pluginId the optional plugin id to use (must be loaded before)
+     * @param info information logging consumer
+     * @return the actual output location, may be {@code outputFile} if that was given before
+     * @throws ExecutionException if mapping fails
+     */
+    private static File run(String ivmlModelName, File projectFolder, File metaModelFolder, File outputFile, 
+        String pluginId, Consumer<String> info) throws ExecutionException {
+        AtomicReference<File> result = new AtomicReference<>(outputFile);
         AasFactory factory = getAasFactory(pluginId); 
         
         ConfigurationSetup setup = ConfigurationSetup.getSetup();
         EasySetup easySetup = setup.getEasyProducer();
         easySetup.reset();
-        File projectFolder = new File(args[1]);
-        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(args[0], 
+        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(ivmlModelName, 
             projectFolder, new File("gen")); // gen is actually not used
-        if (args.length >= 3) {
-            configurer.setIvmlMetaModelFolder(new File(args[2]));
+        if (null != metaModelFolder) {
+            configurer.setIvmlMetaModelFolder(metaModelFolder);
         }
         configurer.configure(setup);
         ConfigurationLifecycleDescriptor lcd = configurer.obtainLifecycleDescriptor();
@@ -1069,13 +1114,18 @@ public class IvmlDashboardMapper {
         ConfigurationManager.validateAndPropagate();
         try {
             new IvmlDashboardMapper(factory, projectFolder).process(cfg, null, (aas, sm, id) -> {
-                String fileName = id.replace(' ', '_');
-                File file = new File("target/" + fileName + ".json");
+                File file = result.get();
+                if (outputFile == null) {
+                    String fileName = id.replace(' ', '_');
+                    file = new File("target/" + fileName + ".json");
+                    file.getParentFile().mkdirs();
+                    result.set(file);
+                }
                 try {
                     factory.createPersistenceRecipe().writeTo(List.of(aas), file);
-                    getLogger().info("File {} written.", file);
+                    info.accept("File " + file + " written.");
                 } catch (IOException e) {
-                    getLogger().error("While writing {}: {}", file, e.getMessage());
+                    throw new ExecutionException("While writing " + file + ": " + e.getMessage(), e);
                 }
             });
         } catch (ModelQueryException e) {
@@ -1084,8 +1134,11 @@ public class IvmlDashboardMapper {
 
         lcd.shutdown();
         setup.getEasyProducer().reset();
+        return result.get();
     }
-    
+
+    // checkstyle: resume parameter number check
+
     /**
      * Returns the logger instance.
      * 
@@ -1098,18 +1151,27 @@ public class IvmlDashboardMapper {
     /**
      * Returns the AAS factory to use, based on {@code aasFactoryPluginId}.
      *
-     * @param aasFactoryPluginId the plugin id of the AAS factory to use
+     * @param aasFactoryPluginId the plugin id of the AAS factory to use, may be <b>null</b> or empty for default
      * @return the factory to use
      */
     private static AasFactory getAasFactory(String aasFactoryPluginId) {
         AasFactory factory;
-        Plugin<AasFactory> plugin = PluginManager.getPlugin(aasFactoryPluginId, AasFactory.class);
+        Plugin<AasFactory> plugin = null;
+        if (null != aasFactoryPluginId && aasFactoryPluginId.length() > 0) {
+            plugin = PluginManager.getPlugin(aasFactoryPluginId, AasFactory.class);
+        }
         if (null != plugin) {
             factory = plugin.getInstance();
         } else { // fallback
             factory = AasFactory.getInstance();
         }
         return factory;
+    }
+
+    @Override
+    public File mapConfigurationToDashboard(String ivmlModelName, File projectFolder, File metaModelFolder,
+        File outputFile, String pluginId) throws ExecutionException {
+        return run(ivmlModelName, projectFolder, metaModelFolder, outputFile, pluginId, info);
     }    
 
 }

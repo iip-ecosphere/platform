@@ -19,6 +19,7 @@ import java.util.function.Consumer;
 import de.iip_ecosphere.platform.configuration.cfg.AasChanges;
 import de.iip_ecosphere.platform.configuration.cfg.ConfigurationFactoryDescriptor;
 import de.iip_ecosphere.platform.configuration.cfg.ConfigurationSetup;
+import de.iip_ecosphere.platform.configuration.cfg.DashboardMapper;
 import de.iip_ecosphere.platform.configuration.cfg.PlatformInstantiation;
 import de.iip_ecosphere.platform.support.plugins.SingletonPluginDescriptor;
 
@@ -57,6 +58,11 @@ public class EasyConfigurationFactoryDescriptor extends SingletonPluginDescripto
     public PlatformInstantiation createInstantiator(File localRepo, Consumer<String> warn, Consumer<String> info,
         Consumer<Long> executionTimeConsumer) {
         return new PlatformInstantiatorExecutor(localRepo, warn, info, executionTimeConsumer);
+    }
+    
+    @Override
+    public DashboardMapper createDashboardMapper(Consumer<String> warn, Consumer<String> info) {
+        return new IvmlDashboardMapper(warn, info);
     }
     
     @Override
