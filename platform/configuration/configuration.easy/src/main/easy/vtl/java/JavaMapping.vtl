@@ -250,6 +250,16 @@ template JavaMapping(Configuration config, FileArtifact target) {
     def String aasProtocolName(AasProtocolVabHttp proto) {
         "VAB-HTTP";
     }
+
+    // added v2->v3
+    def String aasProtocolName(AasProtocolRest proto) {
+        "AAS-REST";
+    }
+
+    // added v2->v3
+    def String aasProtocolName(AasProtocolRestSecure proto) {
+        "AAS-REST";
+    }
     
     // ---------------------------------------------------------------
     
