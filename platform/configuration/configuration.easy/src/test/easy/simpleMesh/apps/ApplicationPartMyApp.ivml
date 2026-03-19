@@ -9,7 +9,8 @@ project ApplicationPartMyApp {
         name = "Simple Mesh Testing App",
         ver = "0.1.0",
         description = "",
-        services = {refBy(myMesh)}        
+        services = {refBy(myMesh)},
+        displayRows = {refBy(mainRow)}
     };
     
     freeze {

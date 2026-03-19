@@ -3,12 +3,24 @@ project AllTypes {
     import IIPEcosphere; 
     import AllConstants;
     
+    DisplayRow mainRow = {
+        name = "Main Row"   
+    };
+    
+    DisplayPanel mainPanel = {
+        name = "Main Panel",
+        displayRow = refBy(mainRow)
+    };    
+    
     RecordType rec1 = {
         name = "Rec1",
         fields = {
             Field {
                 name = "intField",
-                type = refBy(IntegerType)
+                type = refBy(IntegerType),
+                displayName = "Integer Data",
+                display = Display::TimeSeries,
+                displayPanel = {refBy(mainPanel)}
             }, Field {
                 name = "stringField",
                 type = refBy(StringType)

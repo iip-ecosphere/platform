@@ -4,7 +4,7 @@ import JavaMapping;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, sequenceOf(String) oktoPlugins, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, Boolean copyRuntimeDependencies=true) {
+template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, sequenceOf(String) oktoPlugins, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, Boolean copyRuntimeDependencies=true, Boolean mapDisplay=false) {
 
     def XmlElement appendSpringBootPlugin(XmlElement plugins, String version="2.4.2", String mainClass="") {
         XmlElement plugin = appendPlugin(plugins, "org.springframework.boot", "spring-boot-maven-plugin", version, false);
@@ -20,7 +20,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         }
     }
 
-    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, sequenceOf(String) oktoPlugins, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, Boolean copyRuntimeDependencies=true) {
+    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, sequenceOf(String) oktoPlugins, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, Boolean copyRuntimeDependencies=true, Boolean mapDisplay=false) {
         String iipGroup = "de.iip-ecosphere.platform";
         String gId = groupId;
         if (length(gId) == 0) {
@@ -142,7 +142,20 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             prependGroupId=false, prefix="jars", fileSeparator="/", pathSeparator=":", includeScope="runtime"); 
             
         appendCleanPlugin(plugins, include="*-bin.jar,*-spring.jar");
-        appendDeploymentPlugins(plugins, config);        
+        appendDeploymentPlugins(plugins, config);
+        
+        if (!ifArtifact and mapDisplay) {
+            XmlElement configPlugin = appendPlugin(plugins, "de.iip-ecosphere.platform", "configuration-plugin", projectVersion, false);
+            XmlElement configPluginExec = appendExecutions(configPlugin);
+            new XmlElement(configPluginExec, "id", "mapDashboard");
+            appendGoal(configPluginExec, "mapDashboard");
+            XmlElement configPluginCfg = appendConfiguration(configPluginExec);
+            new XmlElement(configPluginCfg, "projectDirectory", getResourcesFolder()+"/..");
+            new XmlElement(configPluginCfg, "outputFile", "\\${project.build.directory}/dashboard-" + toFolderName(appName) + ".json");
+            if (isDefined(config.dashboardPushURI) and config.dashboardPushURI <> "") {
+                new XmlElement(configPluginCfg, "postUrl", config.dashboardPushURI);
+            }
+        }
     }
 
 }

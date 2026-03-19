@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.configuration.easyProducer;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -30,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutionException;
@@ -1105,6 +1107,55 @@ public class IvmlDashboardMapper implements DashboardMapper {
     // checkstyle: stop parameter number check
     
     /**
+     * Creates the instantiation configurer.
+     * 
+     * @param ivmlModelName the name of the configuration model to load/parse
+     * @param projectFolder the folder where the configuration model can be found
+     * @param metaModelFolder optional folder where the meta model can be found, may be <b>null</b> for none
+     * @return the configurer
+     */
+    private static InstantiationConfigurer createConfigurer(String ivmlModelName, File projectFolder, 
+        File metaModelFolder) {
+        File tmp = new File(FileUtils.getTempDirectory(), "oktoflow2grafana.cfg");
+        List<File> additionalIvmlFolders = null;
+        if (tmp.exists()) {
+            Properties prop = new Properties();
+            try (FileInputStream fis = new FileInputStream(tmp)) {
+                prop.load(fis);
+                String t = prop.getProperty("modelFolder");
+                if (null != t) {
+                    projectFolder = new File(t);
+                }
+                t = prop.getProperty("additionalIvmlFolders");
+                if (null != t) {
+                    additionalIvmlFolders = new ArrayList<>();
+                    StringTokenizer addTokens = new StringTokenizer(t, ",;:");
+                    while (addTokens.hasMoreTokens()) {
+                        additionalIvmlFolders.add(new File(addTokens.nextToken()));
+                    }
+                }
+                t = prop.getProperty("metamodelFolder");
+                if (null != t) {
+                    metaModelFolder = new File(t);
+                }
+            } catch (IOException e) {
+                getLogger().error("Extra config file {} found, but ignoring it: {}", tmp, e.getMessage());
+            }
+        }
+        
+        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(ivmlModelName, 
+            projectFolder, new File("gen")); // gen is actually not used
+        if (null != metaModelFolder) {
+            configurer.setIvmlMetaModelFolder(metaModelFolder);
+        }
+        if (null != additionalIvmlFolders) {
+            additionalIvmlFolders.forEach(f -> configurer.addAdditionalIvmlFolder(f));
+        }
+
+        return configurer;
+    }
+    
+    /**
      * Maps the specified configuration to a dashboard specification.
      * 
      * @param ivmlModelName the name of the configuration model to load/parse
@@ -1125,11 +1176,7 @@ public class IvmlDashboardMapper implements DashboardMapper {
         ConfigurationSetup setup = ConfigurationSetup.getSetup();
         EasySetup easySetup = setup.getEasyProducer();
         easySetup.reset();
-        InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(ivmlModelName, 
-            projectFolder, new File("gen")); // gen is actually not used
-        if (null != metaModelFolder) {
-            configurer.setIvmlMetaModelFolder(metaModelFolder);
-        }
+        InstantiationConfigurer configurer = createConfigurer(ivmlModelName, projectFolder, metaModelFolder);
         configurer.configure(setup);
         ConfigurationLifecycleDescriptor lcd = configurer.obtainLifecycleDescriptor();
         lcd.startup(ExecutionMode.TOOLING, new String[0]); // shall register executor

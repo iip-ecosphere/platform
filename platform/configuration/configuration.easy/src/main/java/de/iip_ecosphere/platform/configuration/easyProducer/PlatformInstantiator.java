@@ -65,7 +65,9 @@ public class PlatformInstantiator {
         private String startRuleName = "mainCli";
         private Map<String, String> properties = new HashMap<>();
         private boolean emitReasonerWarnings = false;
-        
+        private List<File> additionalIvmlFolders = null;
+        private File testIvmlMetaModelFolder = null; // use the default in EasySetup
+
         /**
          * Creates a configurer instance.
          * 
@@ -104,8 +106,56 @@ public class PlatformInstantiator {
                     }
                 }
             }
+
+            int last = getLastArgsIndex(args);
+            if (args.length > last) {
+                testIvmlMetaModelFolder = fromArg(args[last + 1]);
+                if (args.length > last + 1) {
+                    for (int i = last + 2; i < args.length; i++) {
+                        addAdditionalIvmlFolder(fromArg(args[i]));
+                    }
+                }
+            }
         }
         
+        /**
+         * Sets a testing metamodel folder.
+         * 
+         * @param folder the folder
+         */
+        public void setTestIvmlMetamodelFolder(File folder) {
+            testIvmlMetaModelFolder = folder;
+        }
+
+        /**
+         * Returns the a testing metamodel folder.
+         * 
+         * @param folder the folder
+         */
+        public File getTestIvmlMetamodelFolder() {
+            return testIvmlMetaModelFolder;
+        }
+
+        /**
+         * Adds an additional IVML folder.
+         * 
+         * @param folder the folder
+         */
+        public void addAdditionalIvmlFolder(File folder) {
+            if (null == additionalIvmlFolders) {
+                additionalIvmlFolders = new ArrayList<>();
+            }
+            additionalIvmlFolders.add(folder);
+        }
+
+        /**
+         * Returns the additional IVML folders.
+         *  
+         * @return the additional IVML folders (may be <b>null</b> for none)
+         */
+        public List<File> getAdditionalIvmlFolders() {
+            return null != additionalIvmlFolders ? new ArrayList<>(additionalIvmlFolders) : null;
+        }
         
         /**
          * Returns the last command line argument index consumed by this configurer.
@@ -184,7 +234,13 @@ public class PlatformInstantiator {
                 }
                 args.add(ARG_PROPS_END);
             }
-                
+
+            args.add(toArg(testIvmlMetaModelFolder));
+            if (null != additionalIvmlFolders) {
+                for (int i = 0; i < additionalIvmlFolders.size(); i++) {
+                    args.add(toArg(additionalIvmlFolders.get(i)));
+                }
+            }
             return args.toArray(new String[args.size()]); 
         }
 
@@ -254,6 +310,12 @@ public class PlatformInstantiator {
                 outputFolder.mkdirs();
             }
             easySetup.setGenTarget(outputFolder);    
+            if (null != testIvmlMetaModelFolder) {
+                easySetup.setIvmlMetaModelFolder(testIvmlMetaModelFolder);
+            }
+            if (null != additionalIvmlFolders) {
+                easySetup.setAdditionalIvmlFolders(additionalIvmlFolders);
+            }
         }
         
         /**

@@ -240,8 +240,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 Boolean copyDependencies = enablesPackaging(a, AppPackagingSchema::ZipWithClasspath); // may be more...
                 // partition according to container strategy
                 String appVersion = getAppMvnVersion(a);
+                setOf(DisplayPanel) displayPanels = DisplayPanel.allInstances();
+                Boolean mapToDisplay = displayPanels.size() > 0; // initial, we may look deeper, also for the specific application
+                
                 vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, oktoPlugins=oktoPlugins, bins=bins, assemblies=assemblies, resources=resources, 
-                    starterCls=appStarterCls, appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests, copyRuntimeDependencies=copyDependencies);
+                    starterCls=appStarterCls, appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests, copyRuntimeDependencies=copyDependencies, mapDisplay=mapToDisplay);
                 vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
                 generatePlugins(cfg, appRoot);
                 mvn(appRoot);

@@ -13,12 +13,17 @@
 package test.de.iip_ecosphere.platform.configuration.easyProducer;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.configuration.easyProducer.EasySetup;
 import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiatorExecutor;
+import de.iip_ecosphere.platform.support.FileUtils;
 
 /**
  * Tests the SimpleMesh model.
@@ -38,6 +43,16 @@ public class IvmlSimpleMeshTests extends AbstractIvmlTests {
     @Test
     public void testSimpleMesh() throws ExecutionException, IOException {
         // mvn: stdout now in target/surefire-reports/<qualifiedClassName>-output.txt
+        File tmp = new File(FileUtils.getTempDirectory(), "oktoflow2grafana.cfg");
+        FileUtils.deleteQuietly(tmp);
+        Properties prop = new Properties();
+        prop.put("modelFolder", new File(MODEL_BASE_FOLDER, "simpleMesh").getAbsolutePath());
+        prop.put("additionalIvmlFolders", new File(MODEL_BASE_FOLDER, "common").getAbsolutePath());
+        prop.put("metamodelFolder", new File(EasySetup.getTestingEasyModelParent(), "src/main/easy").getAbsolutePath());
+        try (PrintStream out = new PrintStream(new FileOutputStream(tmp))) {
+            prop.store(out, "Temporarily created by testSimpleMesh");
+        }
+        
         File gen = new File(TEST_BASE_FOLDER, "SimpleMesh");
         PlatformInstantiatorExecutor.instantiate(
             genApps(new TestConfigurer("PlatformConfiguration", new File(MODEL_BASE_FOLDER, "simpleMesh"), gen)));

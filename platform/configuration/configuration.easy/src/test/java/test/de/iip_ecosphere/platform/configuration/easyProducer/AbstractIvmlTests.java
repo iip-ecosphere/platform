@@ -16,9 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -169,8 +167,6 @@ public abstract class AbstractIvmlTests extends TestWithPlugin {
      */
     public static class TestConfigurer extends InstantiationConfigurer {
 
-        private File ivmlMetaModelFolder = null; // use the default in EasySetup
-        private List<File> additionalIvmlFolders = null;
         private boolean exit = false;
         
         /**
@@ -198,15 +194,14 @@ public abstract class AbstractIvmlTests extends TestWithPlugin {
                 tgt.mkdirs();
                 // copy IVML metamodel and omit the managed configuration template
                 FileUtils.copyDirectory(src, tgt, f -> !f.toString().startsWith(srcCfgName), true); 
-                ivmlMetaModelFolder = tgt;
+                setTestIvmlMetamodelFolder(tgt);
             } catch (IOException e) {
                 Assert.fail("Cannot copy IVML meta model from " + src + " to " + tgt + ": " 
                     + e.getClass().getSimpleName() + " " + e.getMessage());
             }
             File commonIvml = relocateTestModel(new File(modelFolder.getParentFile(), "common"));
             if (commonIvml.exists()) {
-                additionalIvmlFolders = new ArrayList<>();
-                additionalIvmlFolders.add(commonIvml);
+                addAdditionalIvmlFolder(commonIvml);
             }
         }
         
@@ -218,16 +213,6 @@ public abstract class AbstractIvmlTests extends TestWithPlugin {
         public TestConfigurer(String[] args) {
             super(args);
             exit = true;
-            int last = super.getLastArgsIndex(args);
-            if (args.length > last) {
-                ivmlMetaModelFolder = fromArg(args[last + 1]);
-                if (args.length > last + 1) {
-                    additionalIvmlFolders = new ArrayList<>();
-                    for (int i = last + 2; i < args.length; i++) {
-                        additionalIvmlFolders.add(fromArg(args[i]));
-                    }
-                }
-            }
         }        
 
         @Override
@@ -238,21 +223,6 @@ public abstract class AbstractIvmlTests extends TestWithPlugin {
         @Override
         public boolean inTesting() {
             return true;
-        }
-
-        @Override
-        public String[] toArgs(boolean all) {
-            String[] tmp = super.toArgs(all);
-            String[] result = new String[tmp.length + 1 
-                 + (additionalIvmlFolders == null ? 0 : additionalIvmlFolders.size())];
-            System.arraycopy(tmp, 0, result, 0, tmp.length);
-            result[tmp.length] = toArg(ivmlMetaModelFolder);
-            if (null != additionalIvmlFolders) {
-                for (int i = 0; i < additionalIvmlFolders.size(); i++) {
-                    result[tmp.length + 1 + i] = toArg(additionalIvmlFolders.get(i));
-                }
-            }
-            return result;
         }
 
         @Override
@@ -304,12 +274,6 @@ public abstract class AbstractIvmlTests extends TestWithPlugin {
         @Override
         public void configure(ConfigurationSetup setup) {
             EasySetup easySetup = setup.getEasyProducer();
-            if (null != ivmlMetaModelFolder) {
-                easySetup.setIvmlMetaModelFolder(ivmlMetaModelFolder);
-            }
-            if (null != additionalIvmlFolders) {
-                easySetup.setAdditionalIvmlFolders(additionalIvmlFolders);
-            }
             super.configure(setup);
             easySetup.setLogLevel(EasyLogLevel.VERBOSE); // override for debugging
         }
@@ -326,16 +290,7 @@ public abstract class AbstractIvmlTests extends TestWithPlugin {
          * @return the meta model folder (may be <b>null</b> for none)
          */
         public File getIvmlMetaModelFolder() {
-            return ivmlMetaModelFolder;
-        }
-        
-        /**
-         * Returns the additional IVML folders.
-         *  
-         * @return the additional IVML folders (may be <b>null</b> for none)
-         */
-        public List<File> getAdditionalIvmlFolders() {
-            return null != additionalIvmlFolders ? new ArrayList<>(additionalIvmlFolders) : null;
+            return getTestIvmlMetamodelFolder();
         }
         
     }
