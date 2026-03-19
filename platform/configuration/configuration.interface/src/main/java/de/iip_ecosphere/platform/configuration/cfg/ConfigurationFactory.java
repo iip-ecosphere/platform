@@ -102,18 +102,15 @@ public class ConfigurationFactory {
      * Creates a platform instantiator instance.
      * 
      * @param localRepo the local Maven repository, may be <b>null</b>
-     * @param warn a warning message consumer
-     * @param info an information message consumer
      * @param executionTimeConsumer optional consumer for the (successful) process execution time, may be <b>null</b> 
      *     for none
      * @return the instantiation instance, may be <b>null</b> if no configuration plugin is available
      */
-    public static PlatformInstantiation createInstantiator(File localRepo, Consumer<String> warn, 
-        Consumer<String> info, Consumer<Long> executionTimeConsumer) {
+    public static PlatformInstantiation createInstantiator(File localRepo, Consumer<Long> executionTimeConsumer) {
         init();
         PlatformInstantiation result = null;
         if (null != desc) {
-            result = desc.createInstantiator(localRepo, warn, info, executionTimeConsumer);
+            result = desc.createInstantiator(localRepo, executionTimeConsumer);
         }
         return result;
     }
@@ -121,15 +118,13 @@ public class ConfigurationFactory {
     /**
      * Creates a configuration to dashboard mapper instance.
      * 
-     * @param warn a warning consumer (may be <b>null</b>, then the platform logger is used)
-     * @param info an information consumer (may be <b>null</b>, then the platform logger is used)
      * @return the instance, may be <b>null</b> if no configuration plugin is available
      */
-    public static DashboardMapper createDashboardMapper(Consumer<String> warn, Consumer<String> info) {
+    public static DashboardMapper createDashboardMapper() {
         init();
         DashboardMapper result = null;
         if (null != desc) {
-            result = desc.createDashboardMapper(warn, info);
+            result = desc.createDashboardMapper();
         }
         return result;
     }
