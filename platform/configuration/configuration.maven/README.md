@@ -149,6 +149,8 @@ The goals support the following configuration settings:
   - `plugins` (`-Dconfiguration.aasPlugins=...`, default `support.aas.basyx, support.aas.basyx2`) optional names of the okoflow AAS plugins to load.
   - `pluginId` (`-Dconfiguration.pluginId=...`, default ``) optional specification of the specific plugin ID of the AAS plugin to use for output. If not given, tries to load the default one or the one that is accessible.
   - `cleanTemp` (`-Dconfiguration.cleanTemp=...`, default `false`) optional setup whether temporarily extracted oktoflow plugions shall be kept or deleted after running this plugin.
+  - `skip` (`-Dconfiguration.skip=...`, default `false`) skips/disables this plugin.
+  - `skipMapDashboard` (`-Dconfiguration.skipMapDashboard=...`, default `false`) skips/disables this plugin.
 
 The plugin resolves the given `plugins` via Maven, if built to be resolved, then it also resolves the dependencies, rewrites the plugin setup and passes it on to the dashboard mapper for loading.
 

@@ -111,6 +111,12 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
     @Parameter(property = "configuration.cleanTemp", required = false, defaultValue = "false")
     private boolean cleanTemp;
 
+    @Parameter(property = "configuration.skip", required = false, defaultValue = "false")
+    private boolean skip;
+
+    @Parameter(property = "configuration.skipMapDashboard", required = false, defaultValue = "false")
+    private boolean skipMapDashboard;
+    
     private DependencyResolver resolver;
 
     @Override
@@ -135,6 +141,9 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
     
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if (skip || skipMapDashboard) {
+            return;
+        }
         resolver = new DependencyResolver(this);
         StringTokenizer plTokenizer = new StringTokenizer(plugins, ",");
         List<File> plugins = new ArrayList<>();
