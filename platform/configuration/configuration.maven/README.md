@@ -118,7 +118,7 @@ Further, the goals `generateAll`, `generateApps` and `generatePlatform` consider
 
 # Dashboard instantiation (oktoflow2grafana)
 
-The dashboard instantiation turns a platform configuration into an AAS JSON that the [oktoflow2grafana mapper](https://github.com/iip-ecosphere/oktoflow2grafana) can turn into an Influx database structure and a Grafana dashboard. It contributes the `mapDashboard` goal that can be configured as follows:
+The dashboard instantiation turns a platform configuration into an AAS JSON that the [oktoflow2grafana mapper](https://github.com/iip-ecosphere/oktoflow2grafana) can turn into an Influx database structure and a Grafana dashboard. It contributes the `mapDashboard` goal (default `package` phase) that can be configured as follows:
 
   ```xml
      <plugin>
@@ -148,6 +148,7 @@ The goals support the following configuration settings:
   - `metaModelDirectory` (`-Dconfiguration.metaModelDirectory=...`, default `target/easy`) optional setup of the location of the oktoflow IVML meta model.
   - `plugins` (`-Dconfiguration.aasPlugins=...`, default `support.aas.basyx, support.aas.basyx2`) optional names of the okoflow AAS plugins to load.
   - `pluginId` (`-Dconfiguration.pluginId=...`, default ``) optional specification of the specific plugin ID of the AAS plugin to use for output. If not given, tries to load the default one or the one that is accessible.
+  - `cleanTemp` (`-Dconfiguration.cleanTemp=...`, default `false`) optional setup whether temporarily extracted oktoflow plugions shall be kept or deleted after running this plugin.
 
 The plugin resolves the given `plugins` via Maven, if built to be resolved, then it also resolves the dependencies, rewrites the plugin setup and passes it on to the dashboard mapper for loading.
 

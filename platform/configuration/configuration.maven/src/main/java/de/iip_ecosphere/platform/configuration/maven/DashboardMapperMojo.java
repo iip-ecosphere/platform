@@ -60,7 +60,7 @@ import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
  * 
  * @author Holger Eichelberger, SSE
  */
-@Mojo(name = "mapDashboard", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
+@Mojo(name = "mapDashboard", defaultPhase = LifecyclePhase.PACKAGE)
 public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
 
     private static final boolean AS_PROCESS = true;
@@ -70,6 +70,12 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
     
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession session;
+    
+    @Parameter(defaultValue = "${plugin.groupId}", readonly = true)
+    private String pluginGroupId;
+
+    @Parameter(defaultValue = "${plugin.version}", readonly = true)
+    private String pluginVersion;    
 
     @Component
     private RepositorySystem repoSystem;
@@ -101,7 +107,10 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
 
     @Parameter(property = "configuration.postUrl", required = false, defaultValue = "")
     private String postUrl;
-    
+
+    @Parameter(property = "configuration.cleanTemp", required = false, defaultValue = "false")
+    private boolean cleanTemp;
+
     private DependencyResolver resolver;
 
     @Override
@@ -133,7 +142,7 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
             String plugin = plTokenizer.nextToken().trim();
             if (plugin.length() > 0) {
                 info("Resolving plugin " + plugin);
-                DefaultArtifact art = new DefaultArtifact(project.getGroupId(), plugin, project.getVersion(), 
+                DefaultArtifact art = new DefaultArtifact(pluginGroupId, plugin, pluginVersion, 
                     null, "zip", "plugin", null);
                 Artifact resolved = resolver.resolve(art);
                 boolean done = false;
@@ -160,18 +169,23 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
 
         try {
             DashboardMapper mapper = ConfigurationFactory.createDashboardMapper();
+            File procDir = toFile(projectDirectory, "");
+            File mmDir = toFile(metaModelDirectory);
+            File outFile = toFile(outputFile);
             if (AS_PROCESS) {
-                mapper.mapConfigurationToDashboardAsProcess(mainConfiguration, toFile(projectDirectory), 
-                    toFile(metaModelDirectory), toFile(outputFile), plugins, pluginId, postUrl);
+                mapper.mapConfigurationToDashboardAsProcess(mainConfiguration, procDir, 
+                    mmDir, outFile, plugins, pluginId, postUrl);
             } else  {
-                mapper.mapConfigurationToDashboard(mainConfiguration, toFile(projectDirectory), 
-                    toFile(metaModelDirectory), toFile(outputFile), pluginId, postUrl);
+                mapper.mapConfigurationToDashboard(mainConfiguration, procDir, 
+                    mmDir, outFile, pluginId, postUrl);
             }            
         } catch (ExecutionException e) {
 
             throw new MojoExecutionException(e.getMessage());
         }
-        plugins.forEach(p -> FileUtils.deleteQuietly(p));
+        if (cleanTemp) {
+            plugins.forEach(p -> FileUtils.deleteQuietly(p));
+        }
     }
     
     /**
@@ -184,7 +198,22 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
             PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(folder));
         }
     }
-    
+
+    /**
+     * Turns a string path into a file instance.
+     * 
+     * @param path the path, may be <b>null</b> or empty for none
+     * @param dflt the default path if path is empty or <b>null</b>
+     * @return the file instance, will be <b>null</b> if there was no path given
+     */
+    private File toFile(String path, String dflt) {
+        if (path == null || path.length() == 0) {
+            return new File(dflt);
+        } else {
+            return toFile(path);
+        }
+    }
+
     /**
      * Turns a string path into a file instance.
      * 
