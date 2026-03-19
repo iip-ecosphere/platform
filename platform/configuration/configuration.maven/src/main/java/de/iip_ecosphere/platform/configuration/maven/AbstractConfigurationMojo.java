@@ -434,6 +434,7 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        MavenLogger.install(getLog());
         adjustMavenHome();
         String resourcesDir = validateDirectory(makeAbsolute(getResourcesDirectory()));
         if (null == resourcesDir) {
@@ -487,8 +488,7 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
         if (lr != null) { // seems to fail at least in tests, usual fallback
             localRepo = lr.getBasedir();
         }
-        return ConfigurationFactory.createInstantiator(localRepo, w -> getLog().warn(w), 
-            i -> getLog().info(i), t -> recordExecutionTime(t));
+        return ConfigurationFactory.createInstantiator(localRepo, t -> recordExecutionTime(t));
     }
     
     /**

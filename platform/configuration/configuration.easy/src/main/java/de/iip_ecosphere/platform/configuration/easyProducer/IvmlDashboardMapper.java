@@ -12,9 +12,16 @@
 
 package de.iip_ecosphere.platform.configuration.easyProducer;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -24,9 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import de.iip_ecosphere.platform.configuration.cfg.DashboardMapper;
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor.ExecutionMode;
@@ -36,7 +44,9 @@ import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlGraphMapper
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlGraphMapper.IvmlGraphNode;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlUtils;
 import de.iip_ecosphere.platform.configuration.easyProducer.serviceMesh.ServiceMeshGraphMapper;
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.IOUtils;
+import de.iip_ecosphere.platform.support.JavaUtils;
 import de.iip_ecosphere.platform.support.StringUtils;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -52,9 +62,11 @@ import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.iip_aas.IipVersion;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
 import de.iip_ecosphere.platform.support.plugins.FolderClasspathPluginSetupDescriptor;
 import de.iip_ecosphere.platform.support.plugins.Plugin;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
+import de.iip_ecosphere.platform.support.plugins.StreamGobbler;
 import de.iip_ecosphere.platform.support.resources.MavenResourceResolver;
 import de.iip_ecosphere.platform.support.resources.OktoflowResourceResolver;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
@@ -75,6 +87,11 @@ import net.ssehub.easy.varModel.model.datatypes.IDatatype;
  */
 public class IvmlDashboardMapper implements DashboardMapper {
 
+    public static final String KEY_PLUGINS = "okto.dashboardMapper.plugins";
+    public static final String KEY_AAS_PLUGIN = "okto.dashboardMapper.pluginId";
+    public static final String KEY_OUTPUT = "okto.dashboardMapper.output";
+    public static final String KEY_POSTURL = "okto.dashboardMapper.postUrl";
+    
     private File projectFolder;
     private AasFactory factory;
     private Map<String, Object> unitMapping;
@@ -89,22 +106,10 @@ public class IvmlDashboardMapper implements DashboardMapper {
     private transient int panelCount;
     private transient IDatatype aliasType;
     
-    private Consumer<String> warn = s -> getLogger().warn(s);
-    private Consumer<String> info = s -> getLogger().info(s);
-    
     /**
      * Creates a mapper instance for calling it through {@link DashboardMapper}.
-     * 
-     * @param warn a warning consumer (may be <b>null</b>, then the platform logger is used)
-     * @param info an information consumer (may be <b>null</b>, then the platform logger is used)
      */
-    IvmlDashboardMapper(Consumer<String> warn, Consumer<String> info) {
-        if (warn != null) {
-            this.warn = warn;
-        }
-        if (info != null) {
-            this.info = info;
-        }
+    IvmlDashboardMapper() {
     }
     
     /**
@@ -290,7 +295,7 @@ public class IvmlDashboardMapper implements DashboardMapper {
             try {
                 dp.mode = ObjectFitType.valueOf(fit.toUpperCase());
             } catch (IllegalArgumentException e) {
-                warn.accept("Cannot map fit value " + fit + ". Keeping NONE. " + "Reason: " + e.getMessage());
+                getLogger().warn("Cannot map fit value {}. Keeping NONE. Reason: {}", fit, e.getMessage());
             }
         }
         return dp;
@@ -542,16 +547,16 @@ public class IvmlDashboardMapper implements DashboardMapper {
                         token = tok.getTokenDataAsString();
                         break;
                     default:
-                        warn.accept("Cannot process token of type " + tok.getType() 
-                            + " for authentication key " + authKey);
+                        getLogger().warn("Cannot process token of type {} for authentication key {}", 
+                            tok.getType() , authKey);
                         break;
                     }
                 } else {
-                    warn.accept("No authentication token for authentication key " + authKey);
+                    getLogger().warn("No authentication token for authentication key {}", authKey);
                 }
                 createProperty(dbB, "token", Type.STRING, token, "InfluxDB token");
             } else {
-                warn.accept("No permission to export authentication token for authentication key " + authKey);
+                getLogger().warn("No permission to export authentication token for authentication key {}", authKey);
             }
         }
         dbB.build();
@@ -945,11 +950,11 @@ public class IvmlDashboardMapper implements DashboardMapper {
                         }
                         panel.logo = "data:image/" + imageSpec + ";base64," + imageBase64;
                     } catch (IOException e) {
-                        warn.accept("While reading logo logoSpec: " + e.getMessage());
+                        getLogger().warn("While reading logo logoSpec: {}", e.getMessage());
                         panel.logo = null;
                     }
                 } else {
-                    warn.accept("While reading logo " + logoSpec + ": no such resource");
+                    getLogger().warn("While reading logo {}: no such resource", logoSpec);
                     panel.logo = null;
                 }
             }
@@ -1055,28 +1060,46 @@ public class IvmlDashboardMapper implements DashboardMapper {
      * @throws IOException if files cannot be located/written
      */
     private static void mainImpl(String[] args) throws ExecutionException, IOException {
-        // TODO determine plugin loading, currently setup for local loading
-        File support = new File("../../support").getCanonicalFile();
-        String supportFolder = support.toString();
-        // explicitly load plugins for now
-        File logPlugin = new File(supportFolder + "/support.log-slf4j-simple");
-        PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(
-            logPlugin));
-        logPlugin = new File(logPlugin, "\\target\\jars\\classpath");
-        PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(
-            new File(supportFolder + "/support.aas.basyx"), false, logPlugin));
-        PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(
-            new File(supportFolder + "/support.aas.basyx2"), false, logPlugin));
-        PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(
-            new File(supportFolder + "/support.yaml-snakeyaml")));
-        final String pluginId = "aas.basyx-2.0"; // AasFactory.DEFAULT_PLUGIN_ID
+        String plugins = System.getProperty(KEY_PLUGINS);
+        if (null == plugins) {
+            // TODO determine plugin loading, currently setup for local loading
+            File support = new File("../../support").getCanonicalFile();
+            String supportFolder = support.toString();
+            // explicitly load plugins for now
+            File logPlugin = new File(supportFolder + "/support.log-slf4j-simple");
+            PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(
+                logPlugin));
+            logPlugin = new File(logPlugin, "\\target\\jars\\classpath");
+            PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(
+                new File(supportFolder + "/support.aas.basyx"), false, logPlugin));
+            PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(
+                new File(supportFolder + "/support.aas.basyx2"), false, logPlugin));
+            PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(
+                new File(supportFolder + "/support.yaml-snakeyaml")));
+        } else {
+            StringTokenizer pls = new StringTokenizer(plugins, File.pathSeparator);
+            while (pls.hasMoreTokens()) {
+                File p = new File(pls.nextToken());
+                PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(p));
+            }
+            PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE);
+        }
+        
+        final String pluginId = System.getProperty(KEY_AAS_PLUGIN, "aas.basyx-2.0"); // AasFactory.DEFAULT_PLUGIN_ID
+        final String postUrl = System.getProperty(KEY_POSTURL);
+        
+        File outputFile = null;
+        String tmpOutput = System.getProperty(KEY_OUTPUT);
+        if (null != tmpOutput) {
+            outputFile = new File(tmpOutput);
+        }
 
         File metaModelFolder = null;
         if (args.length >= 3) {
             metaModelFolder = new File(args[2]);
         }
 
-        run(args[0], new File(args[1]), metaModelFolder, null, pluginId, i -> getLogger().info(i));
+        run(args[0], new File(args[1]), metaModelFolder, outputFile, pluginId, postUrl);
     }
     
     // checkstyle: stop parameter number check
@@ -1090,12 +1113,12 @@ public class IvmlDashboardMapper implements DashboardMapper {
      * @param outputFile optional output file where the dashboard specification shall be wrote to, if <b>null</b> a 
      *     default location will be assumed
      * @param pluginId the optional plugin id to use (must be loaded before)
-     * @param info information logging consumer
+     * @param postUrl post the result directly to a HTTP/REST API, may be <b>null</b> or empty for none
      * @return the actual output location, may be {@code outputFile} if that was given before
      * @throws ExecutionException if mapping fails
      */
     private static File run(String ivmlModelName, File projectFolder, File metaModelFolder, File outputFile, 
-        String pluginId, Consumer<String> info) throws ExecutionException {
+        String pluginId, String postUrl) throws ExecutionException {
         AtomicReference<File> result = new AtomicReference<>(outputFile);
         AasFactory factory = getAasFactory(pluginId); 
         
@@ -1123,7 +1146,8 @@ public class IvmlDashboardMapper implements DashboardMapper {
                 }
                 try {
                     factory.createPersistenceRecipe().writeTo(List.of(aas), file);
-                    info.accept("File " + file + " written.");
+                    getLogger().info("File {} written.", file);
+                    postToUrl(postUrl, file);
                 } catch (IOException e) {
                     throw new ExecutionException("While writing " + file + ": " + e.getMessage(), e);
                 }
@@ -1168,10 +1192,119 @@ public class IvmlDashboardMapper implements DashboardMapper {
         return factory;
     }
 
+    /**
+     * Adds a key-value pair in system property style to {@code args}.
+     * 
+     * @param key the key
+     * @param value the value
+     * @param args the argument list to be modified as a side effect
+     */
+    private void addSysProperty(String key, String value, List<String> args) {
+        args.add("-D" + key + "=" + value);
+    }
+
+    // checkstyle: stop parameter number check
+
     @Override
     public File mapConfigurationToDashboard(String ivmlModelName, File projectFolder, File metaModelFolder,
-        File outputFile, String pluginId) throws ExecutionException {
-        return run(ivmlModelName, projectFolder, metaModelFolder, outputFile, pluginId, info);
+        File outputFile, String pluginId, String postUrl) throws ExecutionException {
+        return run(ivmlModelName, projectFolder, metaModelFolder, outputFile, pluginId, postUrl);
+    }
+    
+    @Override
+    public void mapConfigurationToDashboardAsProcess(String ivmlModelName, File projectFolder, File metaModelFolder,
+        File outputFile, List<File> plugins, String pluginId, String postUrl) throws ExecutionException {
+        PlatformInstantiatorExecutor helper = new PlatformInstantiatorExecutor(null, null);
+
+        List<String> pArgs = new ArrayList<>();
+        pArgs.add(JavaUtils.getJavaBinaryPath("java"));
+        if (null != plugins) {
+            String plList = plugins
+                    .stream()
+                    .map(p -> p.getAbsolutePath())
+                    .collect(Collectors.joining(File.pathSeparator));
+            addSysProperty(KEY_PLUGINS, plList, pArgs);
+        }
+        if (null != postUrl && postUrl.length() > 0) {
+            addSysProperty(KEY_POSTURL, pluginId, pArgs);
+        }
+        if (null != pluginId && pluginId.length() > 0) {
+            addSysProperty(KEY_AAS_PLUGIN, pluginId, pArgs);
+        }
+        if (null == outputFile) {
+            outputFile = new File("mapper.json");
+        }
+        addSysProperty(KEY_OUTPUT, outputFile.getAbsolutePath(), pArgs);
+        File cpFile = null;
+        ClassLoader loader = getClass().getClassLoader();
+        List<String> cp = helper.createEasyClasspath(loader);
+        if (null != cp) {
+            String cpString = String.join(File.pathSeparator, cp);
+            cpFile = new File(FileUtils.getTempDirectory(), "config.cp-" + Thread.currentThread().getId());
+            try {
+                FileUtils.write(cpFile, "-cp " + cpString, Charset.defaultCharset());
+                pArgs.add("@" + cpFile.getAbsolutePath());
+            } catch (IOException e) {
+                pArgs.add("-cp");
+                pArgs.add(cpString);
+                getLogger().info("Cannot write args file. Falling back to classpath as argument. {}", e.getMessage());
+            }
+        }
+        try {
+            pArgs.add(IvmlDashboardMapper.class.getName());
+            pArgs.add(ivmlModelName);
+            pArgs.add(projectFolder.getAbsolutePath());
+            if (null != metaModelFolder) {
+                pArgs.add(metaModelFolder.getAbsolutePath());
+            }
+            getLogger().info("Calling oktoflow2grafana mapper as process with {}", pArgs);
+            //info.accept("cmd line: " + pArgs);
+            Process process = new ProcessBuilder(pArgs)
+                .start(); // inheritIO does not help
+            StreamGobbler.attach(process);
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                throw new ExecutionException("Mapping failed with exit code: " + exitCode, null);
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new ExecutionException(e.getMessage(), null);
+        }
+        FileUtils.deleteQuietly(cpFile);
     }    
+
+    // checkstyle: resume parameter number check
+    
+    /**
+     * Posts the contents of {@code file} to {@code url}.
+     * 
+     * @param url the REST API URL, may be <b>null</b> or empty for none
+     * @param file the file to read the data to push from
+     * @throws IOException if pushing fails
+     */
+    private static void postToUrl(String url, File file) throws IOException {
+        if (null != url && url.length() > 0) {
+            URL u = new URL(url);
+            URLConnection con = u.openConnection();
+            if (con instanceof HttpURLConnection) {
+                HttpURLConnection hcon = (HttpURLConnection) con;
+                hcon.setRequestMethod("POST");
+                //hcon.setRequestProperty("Accept", "application/json");
+                hcon.setDoOutput(true);
+                String data = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+                byte[] bdata = data.getBytes(StandardCharsets.UTF_8);
+                hcon.getOutputStream().write(bdata);
+                try (BufferedReader br = new BufferedReader(
+                    new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder response = new StringBuilder();
+                    String responseLine = null;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                    getLogger().info("Pushed {} to {}: {}", file, url, response.toString());
+                }
+                hcon.disconnect();
+            }
+        }
+    }
 
 }

@@ -32,6 +32,8 @@ import java.util.function.Consumer;
 import de.iip_ecosphere.platform.support.IOUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.JavaUtils;
+import de.iip_ecosphere.platform.support.logging.Logger;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.plugins.StreamGobbler;
 import de.iip_ecosphere.platform.configuration.cfg.PlatformInstantiation;
 import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator.InstantiationConfigurer;
@@ -45,11 +47,7 @@ import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator
  */
 public class PlatformInstantiatorExecutor implements PlatformInstantiation {
     
-    public static final Consumer<String> SYSOUT_CONSUMER = t -> System.out.println(t);
-
     private File localRepo;
-    private Consumer<String> warn;
-    private Consumer<String> info;
     private Consumer<Long> executionTimeConsumer;
     private String mainCls = PlatformInstantiator.class.getName();
     private boolean inTesting = false;
@@ -59,16 +57,11 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
      * Creates an executor instance.
      * 
      * @param localRepo the local Maven repository, may be <b>null</b>
-     * @param warn a warning message consumer
-     * @param info an information message consumer
      * @param executionTimeConsumer optional consumer for the (successful) process execution time, may be <b>null</b> 
      *     for none
      */
-    public PlatformInstantiatorExecutor(File localRepo, Consumer<String> warn, Consumer<String> info, 
-        Consumer<Long> executionTimeConsumer) {
+    public PlatformInstantiatorExecutor(File localRepo, Consumer<Long> executionTimeConsumer) {
         this.localRepo = localRepo;
-        this.warn = warn;
-        this.info = info;
         this.executionTimeConsumer = executionTimeConsumer;
     }
 
@@ -80,8 +73,7 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
      * @throws ExecutionException if the instantiation fails
      */
     public static void instantiate(InstantiationConfigurer configurer) throws ExecutionException {
-        PlatformInstantiatorExecutor executor = new PlatformInstantiatorExecutor(
-            null, SYSOUT_CONSUMER, SYSOUT_CONSUMER, null);
+        PlatformInstantiatorExecutor executor = new PlatformInstantiatorExecutor(null, null);
         executor.inTesting = configurer.inTesting();
         executor.mainCls = configurer.getMainClass();
         executor.properties = configurer.getProperties();
@@ -143,7 +135,7 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
             } catch (IOException e) {
                 pArgs.add("-cp");
                 pArgs.add(cpString);
-                info.accept("Cannot write args file. Falling back to classpath as argument. " + e.getMessage());
+                getLogger().info("Cannot write args file. Falling back to classpath as argument. {}", e.getMessage());
             }
         }
         if (null != tracingLevel) {
@@ -156,8 +148,9 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
             pArgs.add(createJvmArg("iip.resources", resourcesDir));
         }
         try {
-            info.accept("Calling platform instantiator as process with " + java.util.Arrays.toString(args) 
-                + ", tracing " + tracingLevel + (null == resourcesDir ? "" : ", resources dir " + resourcesDir));
+            getLogger().info("Calling platform instantiator as process with {}, tracing {}{}", 
+                java.util.Arrays.toString(args), tracingLevel, 
+                (null == resourcesDir ? "" : ", resources dir " + resourcesDir));
             long start = System.currentTimeMillis();
             pArgs.add(mainCls);
             Collections.addAll(pArgs, args);
@@ -200,9 +193,9 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
         if (null != resourcesDir) {
             System.setProperty("iip.resources", resourcesDir);
         }
-        info.accept("Calling platform instantiator with " + java.util.Arrays.toString(args) + ", tracing "
-            + tracingLevel + (null == resourcesDir ? "" : " and resources dir " + resourcesDir) + " and properties " 
-            + properties);
+        getLogger().info("Calling platform instantiator with {}, tracing {}{} and properties {}", 
+            java.util.Arrays.toString(args), tracingLevel, 
+            (null == resourcesDir ? "" : " and resources dir " + resourcesDir), properties);
         long start = System.currentTimeMillis();
         for (String key : properties.keySet()) {
             System.setProperty(key, properties.get(key));
@@ -261,10 +254,10 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
                     System.out.println("Classpath: " + result);
                 }
             } catch (IOException e) {
-                warn.accept("Cannot load EASy-Producer classpath file from resources: " + e.getMessage());    
+                getLogger().warn("Cannot load EASy-Producer classpath file from resources: {}", e.getMessage());    
             }
         } else {
-            warn.accept("Cannot load classpath file from resources");    
+            getLogger().warn("Cannot load classpath file from resources");    
         }
         return result;
     }
@@ -287,10 +280,19 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
                 }
                 result = new URLClassLoader(urls.toArray(new URL[urls.size()]), parent);
             } catch (MalformedURLException e) {
-                warn.accept("Cannot create EASy-Producer classpath: " + e.getMessage());    
+                getLogger().warn("Cannot create EASy-Producer classpath: {}", e.getMessage());    
             }
         }
         return result;
+    }
+    
+    /**
+     * Returns the logger instance.
+     * 
+     * @return the logger instance
+     */
+    private static Logger getLogger() {
+        return LoggerFactory.getLogger(PlatformInstantiatorExecutor.class);
     }
     
 }

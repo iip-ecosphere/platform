@@ -112,38 +112,69 @@ All goals take over the maven offline mode and pass it on to the instantiation f
 In addition, the goals `generateApps` and `generateAppsNoDeps` consider
   - `apps` (`-Dconfiguration.apps=...`) a comma separated list of application ids (as defined in the IVML configuration) to be build
 
-In addition, the goals `generateAll`, `generateApps` and `generatePlatform` consider
+Further, the goals `generateAll`, `generateApps` and `generatePlatform` consider
   - `checkChanged` in order to figure out whether the model, the meta model have changed to trigger an execution
   - `changeCheckArtifacts`, an optional String of space separated maven coordinates in format *groupId:artifactId[:type[:classifier]]:version* whose snapshots may trigger an execution if changed since the last build
+
+# Dashboard instantiation (oktoflow2grafana)
+
+The dashboard instantiation turns a platform configuration into an AAS JSON that the [oktoflow2grafana mapper](https://github.com/iip-ecosphere/oktoflow2grafana) can turn into an Influx database structure and a Grafana dashboard. It contributes the `mapDashboard` goal that can be configured as follows:
+
+  ```xml
+     <plugin>
+       <groupId>de.iip-ecosphere.platform</groupId>
+       <artifactId>configuration-plugin</artifactId>
+       <version>${project.version}</version>
+       <executions>
+           <execution>
+               <id>mapDashboard</id>
+               <goals>
+                   <goal>mapDashboard</goal>
+               </goals>
+               <configuration>
+                   <outputFile>...</outputFile>
+               </configuration>
+           </execution>
+
+       </executions>
+   </plugin>
+
+  ```
+The goals support the following configuration settings: 
+  - `projectDirectory` (`-Dconfiguration.projectDirectory=...`, default empty) the root directory of the project to map, expecting the IVML model in `src/main/easy`. If not given, the actual directory is assumed.
+  - `outputFile` (`-Dconfiguration.outputFile=...`, default empty) the optional JSON file to write. If not given, a default location in `target` is assumed.
+  - `postUrl` (`-Dconfiguration.postUrl=...`, default empty) the optional REST API URL where to post the JSON results to.
+  - `mainConfiguration` (`-Dconfiguration.mainConfiguration=...`, default `PlatformConfiguration`) the IVML name of the top-level configuration file.
+  - `metaModelDirectory` (`-Dconfiguration.metaModelDirectory=...`, default `target/easy`) optional setup of the location of the oktoflow IVML meta model.
+  - `plugins` (`-Dconfiguration.aasPlugins=...`, default `support.aas.basyx, support.aas.basyx2`) optional names of the okoflow AAS plugins to load.
+  - `pluginId` (`-Dconfiguration.pluginId=...`, default ``) optional specification of the specific plugin ID of the AAS plugin to use for output. If not given, tries to load the default one or the one that is accessible.
+
+The plugin resolves the given `plugins` via Maven, if built to be resolved, then it also resolves the dependencies, rewrites the plugin setup and passes it on to the dashboard mapper for loading.
 
 # Platform application testing
 
 Testing a generated application typically requires starting the communication broker (possibly on an emphemeral port) and the the application in a time-framed manner and to check the application output for some patterns indicating that the application is working. Within the configuration plugin, a minimal Maven setup looks like:
 
   ```xml
-  <build>
-      <plugins>
-         <plugin>
-            <groupId>de.iip-ecosphere.platform</groupId>
-            <artifactId>configuration-plugin</artifactId>
-            <version>${project.version}</version>
-            <executions>
-                <!-- executions from above before, in particular generateApps -->
-                <execution>
-                    <id>testApp</id>
-                    <goals>
-                        <goal>testApp</goal>
-                    </goals>
-                    <configuration>
-                        <logRegExprs>
-                            <logRegExpr>.*RECEIVED.*</logRegExpr>
-                        </logRegExprs>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-     </plugins>
-  </build>
+     <plugin>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <artifactId>configuration-plugin</artifactId>
+        <version>${project.version}</version>
+        <executions>
+            <!-- executions from above before, in particular generateApps -->
+            <execution>
+                <id>testApp</id>
+                <goals>
+                    <goal>testApp</goal>
+                </goals>
+                <configuration>
+                    <logRegExprs>
+                        <logRegExpr>.*RECEIVED.*</logRegExpr>
+                    </logRegExprs>
+                </configuration>
+            </execution>
+        </executions>
+    </plugin>
   ```
   
 The `testApp` goal (default phase `package`, can be seen as integration test but our invoker disables tests to avoid conflicts with app in one-shot-projects) allows for testing an oktoflow application either via `mvn exec:java@app` or through a given command. In case of maven, passes on the value of the environment variable `MAVEN_SETTINGS_PATH` or if not given the maven user settings as user settings file location. Starts the required broker and may start platform services. This goal supports the following configuration settings: 
@@ -194,35 +225,31 @@ The `testApp` goal (default phase `package`, can be seen as integration test but
 This artifact also contains the `process` goal (default `compile` phase) for executing processes.
 
   ```xml
-  <build>
-      <plugins>
-         <plugin>
-            <groupId>de.iip-ecosphere.platform</groupId>
-            <artifactId>configuration-plugin</artifactId>
-            <version>${project.version}</version>
-            <executions>
-                <!-- executions from above above where applicable -->
-                <execution>
-                    <id>process</id>
-                    <goals>
-                        <goal>process</goal>
-                    </goals>
-                    <configuration>
-                        <processes>
-                            <process>
-                                <description>...</description>
-                                <cmd>...</cmd>
-                                <args>
-                                   <arg>...</arg>
-                                </args>
-                            </process>
-                        </processes>
-                    </configuration>                    
-                </execution>
-            </executions>
-        </plugin>
-     </plugins>
-  </build>
+     <plugin>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <artifactId>configuration-plugin</artifactId>
+        <version>${project.version}</version>
+        <executions>
+            <!-- executions from above above where applicable -->
+            <execution>
+                <id>process</id>
+                <goals>
+                    <goal>process</goal>
+                </goals>
+                <configuration>
+                    <processes>
+                        <process>
+                            <description>...</description>
+                            <cmd>...</cmd>
+                            <args>
+                               <arg>...</arg>
+                            </args>
+                        </process>
+                    </processes>
+                </configuration>                    
+            </execution>
+        </executions>
+    </plugin>
   ```
 
 The goal can be configured as follows
@@ -290,24 +317,20 @@ It can be set up as follows:
 For pragmatic reasons, this artifact also contains the `ngBuild` goal (default `compile` phase) for building angular applications. ``npm`` and ``ng`` are eventually qualified with the value from the ``nodejs``setting, the value in the environment variable ``NODEJS_HOME`` or the first PATH entry containing ``nodejs``.
 
   ```xml
-  <build>
-      <plugins>
-         <plugin>
-            <groupId>de.iip-ecosphere.platform</groupId>
-            <artifactId>configuration-plugin</artifactId>
-            <version>${project.version}</version>
-            <executions>
-                <!-- executions from above above where applicable -->
-                <execution>
-                    <id>ngBuild</id>
-                    <goals>
-                        <goal>ngBuild</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
-     </plugins>
-  </build>
+     <plugin>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <artifactId>configuration-plugin</artifactId>
+        <version>${project.version}</version>
+        <executions>
+            <!-- executions from above above where applicable -->
+            <execution>
+                <id>ngBuild</id>
+                <goals>
+                    <goal>ngBuild</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
   ```
 
 It can be configured by:
@@ -319,25 +342,21 @@ It can be configured by:
 For pragmatic reasons, this artifact also contains the `ngTest` goal (default `test` phase) for building angular applications. ``npm`` and ``ng`` are eventually qualified with the value from the ``nodejs``setting, the value in the environment variable ``NODEJS_HOME`` or the first PATH entry containing ``nodejs``.
 
   ```xml
-  <build>
-      <plugins>
-         <plugin>
-            <groupId>de.iip-ecosphere.platform</groupId>
-            <artifactId>configuration-plugin</artifactId>
-            <version>${project.version}</version>
-            <executions>
-                <!-- executions from above above where applicable -->
-                <execution>
-                    <id>ngTest</id>
-                    <goals>
-                        <goal>ngTest</goal>
-                    </goals>
-                    <!-- configuration may go here -->
-                </execution>
-            </executions>
-        </plugin>
-     </plugins>
-  </build>
+     <plugin>
+        <groupId>de.iip-ecosphere.platform</groupId>
+        <artifactId>configuration-plugin</artifactId>
+        <version>${project.version}</version>
+        <executions>
+            <!-- executions from above above where applicable -->
+            <execution>
+                <id>ngTest</id>
+                <goals>
+                    <goal>ngTest</goal>
+                </goals>
+                <!-- configuration may go here -->
+            </execution>
+        </executions>
+    </plugin>
   ```
 
 It can be configured by:

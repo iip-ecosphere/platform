@@ -55,14 +55,13 @@ public class EasyConfigurationFactoryDescriptor extends SingletonPluginDescripto
     }
 
     @Override
-    public PlatformInstantiation createInstantiator(File localRepo, Consumer<String> warn, Consumer<String> info,
-        Consumer<Long> executionTimeConsumer) {
-        return new PlatformInstantiatorExecutor(localRepo, warn, info, executionTimeConsumer);
+    public PlatformInstantiation createInstantiator(File localRepo,Consumer<Long> executionTimeConsumer) {
+        return new PlatformInstantiatorExecutor(localRepo, executionTimeConsumer);
     }
     
     @Override
-    public DashboardMapper createDashboardMapper(Consumer<String> warn, Consumer<String> info) {
-        return new IvmlDashboardMapper(warn, info);
+    public DashboardMapper createDashboardMapper() {
+        return new IvmlDashboardMapper();
     }
     
     @Override
