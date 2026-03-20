@@ -56,6 +56,7 @@ public class IvmlSimpleMeshTests extends AbstractIvmlTests {
         File gen = new File(TEST_BASE_FOLDER, "SimpleMesh");
         PlatformInstantiatorExecutor.instantiate(
             genApps(new TestConfigurer("PlatformConfiguration", new File(MODEL_BASE_FOLDER, "simpleMesh"), gen)));
+        FileUtils.deleteQuietly(tmp);
         assertAllFiles(gen);
         assertTemplateZip(gen, "impl.SimpleMeshTestingApp");
     }

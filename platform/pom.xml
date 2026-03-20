@@ -106,9 +106,9 @@
      <module>reusableIntelligentServices/kiServices.rapidminer.rtsa</module>
      <!-- configuration -->
      <module>configuration/configuration.interface</module>
+     <module>configuration/configuration.maven</module>
      <module>configuration/configuration.easy</module>
      <module>configuration/configuration</module>
-     <module>configuration/configuration.maven</module>
      <module>configuration/configuration.defaultLib</module>
      <!-- platform services, CLI, AAS -->
      <module>platform</module>

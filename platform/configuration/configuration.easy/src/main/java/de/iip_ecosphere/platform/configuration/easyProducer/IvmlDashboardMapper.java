@@ -677,8 +677,14 @@ public class IvmlDashboardMapper implements DashboardMapper {
             result.organization = IvmlUtils.getStringValue(var, "organization", "");
             result.bucket = IvmlUtils.getStringValue(var, "bucket", "");
             result.measurement = IvmlUtils.getStringValue(var, "measurement", "");
-            result.host = IvmlUtils.getStringValue(var, "host", null);
-            result.port = IvmlUtils.getIntValue(var, "port", -1);
+            result.host = IvmlUtils.getStringValue(var, "containerHost", null);
+            if (null == result.host) {
+                result.host = IvmlUtils.getStringValue(var, "host", null);
+            }
+            result.port = IvmlUtils.getIntValue(var, "containerPort", -1);
+            if (result.port < 0) {
+                result.port = IvmlUtils.getIntValue(var, "port", -1);
+            }
             
             IDecisionVariable security = var.getNestedElement("security");
             if (null != security) {
@@ -1119,6 +1125,7 @@ public class IvmlDashboardMapper implements DashboardMapper {
         File tmp = new File(FileUtils.getTempDirectory(), "oktoflow2grafana.cfg");
         List<File> additionalIvmlFolders = null;
         if (tmp.exists()) {
+            getLogger().info("Taking setup information from {}, overriding command line", tmp);
             Properties prop = new Properties();
             try (FileInputStream fis = new FileInputStream(tmp)) {
                 prop.load(fis);

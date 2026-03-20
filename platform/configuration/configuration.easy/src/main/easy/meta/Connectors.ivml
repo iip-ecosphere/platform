@@ -157,6 +157,8 @@ project Connectors {
                   defaultValue="" // interpreted by ConnectorServiceWrapper as not set
                }
            };
+           String containerHost = null;
+           EphemeralPort containerPort = -1;
        }
        Constraint inputHandlersOk = inputHandlers->forAll(h|handlerOk(h, self));
        Constraint dataTimeProviderOk = providerOk(dataTimeDiffProvider, self);
