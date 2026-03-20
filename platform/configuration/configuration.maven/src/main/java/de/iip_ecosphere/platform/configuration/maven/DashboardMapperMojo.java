@@ -114,7 +114,7 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
     @Parameter(property = "configuration.skip", required = false, defaultValue = "false")
     private boolean skip;
 
-    @Parameter(property = "configuration.skipMapDashboard", required = false, defaultValue = "false")
+    @Parameter(property = "configuration.skipMapDashboard", required = false, defaultValue = "true")
     private boolean skipMapDashboard;
     
     private DependencyResolver resolver;
