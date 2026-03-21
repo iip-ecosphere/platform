@@ -93,5 +93,7 @@ The plugin supports the following configuration settings:
   - `changeTracking` a fileset with directory, includes, excludes of files for which changes shall enable/prevent an execution. If not given, a default set will be assumed including `pom.xml`, `src/**/*.java`, `src/**/*.py`, `src/**/*.yaml`, `src/**/*.yml`, `src/**/*.json`. Will be considered only, if `changeTrackingHashFile` is given.
   - `changeTrackingHashFile` the file storing the MD5 hashes for `changeTracking`.
   - `invoker.debug` pass through Maven debug flag (default `false`)
+  - `configTracingLevel` (default unset, user-property `configuration.tracingLevel`) passes on the configuration tracing level
+  - `configSkipMapDashboard` (default unset, user-property `configuration.skipMapDashboard`) passes on whether the dashboard mapper shall be skipped
   
 The plugin takes over the system properties of the original request, in particular `-Dunpack.force` and passes them to the invoked maven processes.
