@@ -35,7 +35,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import de.iip_ecosphere.platform.configuration.cfg.DashboardMapper;
@@ -93,8 +92,10 @@ public class IvmlDashboardMapper implements DashboardMapper {
     public static final String KEY_AAS_PLUGIN = "okto.dashboardMapper.pluginId";
     public static final String KEY_OUTPUT = "okto.dashboardMapper.output";
     public static final String KEY_POSTURL = "okto.dashboardMapper.postUrl";
+    public static final String KEY_INCONTAINER = "okto.dashboardMapper.inContainer";
     
     private File projectFolder;
+    private boolean inContainer;
     private AasFactory factory;
     private Map<String, Object> unitMapping;
     private String targetMapping = "grafana";
@@ -112,17 +113,21 @@ public class IvmlDashboardMapper implements DashboardMapper {
      * Creates a mapper instance for calling it through {@link DashboardMapper}.
      */
     IvmlDashboardMapper() {
+        this.inContainer = true;
     }
     
     /**
      * Creates a mapper instance.
      * 
      * @param factory the AAS factory to use
+     * @param projectFolder the project folder containing the model
+     * @param inContainer whether container values shall be preferred
      */
     @SuppressWarnings("unchecked")
-    private IvmlDashboardMapper(AasFactory factory, File projectFolder) {
+    private IvmlDashboardMapper(AasFactory factory, File projectFolder, boolean inContainer) {
         this.projectFolder = projectFolder;
         this.factory = factory;
+        this.inContainer = inContainer;
         try {
             unitMapping = Yaml.getInstance().loadMapping(ResourceLoader.getResourceAsStream(
                 "semanticIdDashboard.yml"));   
@@ -677,11 +682,11 @@ public class IvmlDashboardMapper implements DashboardMapper {
             result.organization = IvmlUtils.getStringValue(var, "organization", "");
             result.bucket = IvmlUtils.getStringValue(var, "bucket", "");
             result.measurement = IvmlUtils.getStringValue(var, "measurement", "");
-            result.host = IvmlUtils.getStringValue(var, "containerHost", null);
+            result.host = inContainer ? IvmlUtils.getStringValue(var, "containerHost", null) : null;
             if (null == result.host) {
                 result.host = IvmlUtils.getStringValue(var, "host", null);
             }
-            result.port = IvmlUtils.getIntValue(var, "containerPort", -1);
+            result.port = inContainer ? IvmlUtils.getIntValue(var, "containerPort", -1) : -1;
             if (result.port < 0) {
                 result.port = IvmlUtils.getIntValue(var, "port", -1);
             }
@@ -1093,21 +1098,20 @@ public class IvmlDashboardMapper implements DashboardMapper {
             PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE);
         }
         
-        final String pluginId = System.getProperty(KEY_AAS_PLUGIN, "aas.basyx-2.0"); // AasFactory.DEFAULT_PLUGIN_ID
-        final String postUrl = System.getProperty(KEY_POSTURL);
+        MapperParams params = new MapperParams(args[0], new File(args[1]))
+            .setPluginId(System.getProperty(KEY_AAS_PLUGIN, "aas.basyx-2.0")) // AasFactory.DEFAULT_PLUGIN_ID
+            .setPostUrl(System.getProperty(KEY_POSTURL))
+            .setInContainer(Boolean.valueOf(System.getProperty(KEY_INCONTAINER, "true")));
         
-        File outputFile = null;
         String tmpOutput = System.getProperty(KEY_OUTPUT);
-        if (null != tmpOutput) {
-            outputFile = new File(tmpOutput);
+        if (null != tmpOutput) { // otherwise dflt is null
+            params.setOutputFile(new File(tmpOutput)); 
         }
-
-        File metaModelFolder = null;
         if (args.length >= 3) {
-            metaModelFolder = new File(args[2]);
+            params.setMetaModelFolder(new File(args[2]));
         }
 
-        run(args[0], new File(args[1]), metaModelFolder, outputFile, pluginId, postUrl);
+        run(params);
     }
     
     // checkstyle: stop parameter number check
@@ -1165,54 +1169,48 @@ public class IvmlDashboardMapper implements DashboardMapper {
     /**
      * Maps the specified configuration to a dashboard specification.
      * 
-     * @param ivmlModelName the name of the configuration model to load/parse
-     * @param projectFolder the folder where the configuration model can be found
-     * @param metaModelFolder optional folder where the meta model can be found, may be <b>null</b> for none
-     * @param outputFile optional output file where the dashboard specification shall be wrote to, if <b>null</b> a 
-     *     default location will be assumed
-     * @param pluginId the optional plugin id to use (must be loaded before)
-     * @param postUrl post the result directly to a HTTP/REST API, may be <b>null</b> or empty for none
+     * @param params the mapper parameter
      * @return the actual output location, may be {@code outputFile} if that was given before
      * @throws ExecutionException if mapping fails
      */
-    private static File run(String ivmlModelName, File projectFolder, File metaModelFolder, File outputFile, 
-        String pluginId, String postUrl) throws ExecutionException {
-        AtomicReference<File> result = new AtomicReference<>(outputFile);
-        AasFactory factory = getAasFactory(pluginId); 
+    private static File run(MapperParams params) throws ExecutionException {
+        AasFactory factory = getAasFactory(params.getPluginId()); 
         
         ConfigurationSetup setup = ConfigurationSetup.getSetup();
         EasySetup easySetup = setup.getEasyProducer();
         easySetup.reset();
-        InstantiationConfigurer configurer = createConfigurer(ivmlModelName, projectFolder, metaModelFolder);
+        InstantiationConfigurer configurer = createConfigurer(params.getMainModelName(), params.getModelFolder(), 
+            params.getMetaModelFolder());
         configurer.configure(setup);
         ConfigurationLifecycleDescriptor lcd = configurer.obtainLifecycleDescriptor();
         lcd.startup(ExecutionMode.TOOLING, new String[0]); // shall register executor
         Configuration cfg = ConfigurationManager.getIvmlConfiguration();
         ConfigurationManager.validateAndPropagate();
         try {
-            new IvmlDashboardMapper(factory, projectFolder).process(cfg, null, (aas, sm, id) -> {
-                File file = result.get();
-                if (outputFile == null) {
-                    String fileName = id.replace(' ', '_');
-                    file = new File("target/" + fileName + ".json");
-                    file.getParentFile().mkdirs();
-                    result.set(file);
-                }
-                try {
-                    factory.createPersistenceRecipe().writeTo(List.of(aas), file);
-                    getLogger().info("File {} written.", file);
-                    postToUrl(postUrl, file);
-                } catch (IOException e) {
-                    throw new ExecutionException("While writing " + file + ": " + e.getMessage(), e);
-                }
-            });
+            new IvmlDashboardMapper(factory, params.getModelFolder(), params.isInContainer())
+                .process(cfg, null, (aas, sm, id) -> {
+                    File file = params.getOutputFile();
+                    if (params.getOutputFile() == null) {
+                        String fileName = id.replace(' ', '_');
+                        file = new File("target/" + fileName + ".json");
+                        file.getParentFile().mkdirs();
+                        params.setOutputFile(file);
+                    }
+                    try {
+                        factory.createPersistenceRecipe().writeTo(List.of(aas), file);
+                        getLogger().info("File {} written.", file);
+                        postToUrl(params.getPostUrl(), file);
+                    } catch (IOException e) {
+                        throw new ExecutionException("While writing " + file + ": " + e.getMessage(), e);
+                    }
+                });
         } catch (ModelQueryException e) {
             throw new ExecutionException(e);
         }
 
         lcd.shutdown();
         setup.getEasyProducer().reset();
-        return result.get();
+        return params.getOutputFile();
     }
 
     // checkstyle: resume parameter number check
@@ -1257,17 +1255,14 @@ public class IvmlDashboardMapper implements DashboardMapper {
         args.add("-D" + key + "=" + value);
     }
 
-    // checkstyle: stop parameter number check
-
     @Override
-    public File mapConfigurationToDashboard(String ivmlModelName, File projectFolder, File metaModelFolder,
-        File outputFile, String pluginId, String postUrl) throws ExecutionException {
-        return run(ivmlModelName, projectFolder, metaModelFolder, outputFile, pluginId, postUrl);
+    public File mapConfigurationToDashboard(MapperParams params) throws ExecutionException {
+        return run(params);
     }
     
     @Override
-    public void mapConfigurationToDashboardAsProcess(String ivmlModelName, File projectFolder, File metaModelFolder,
-        File outputFile, List<File> plugins, String pluginId, String postUrl) throws ExecutionException {
+    public void mapConfigurationToDashboardAsProcess(MapperParams params, List<File> plugins) 
+        throws ExecutionException {
         PlatformInstantiatorExecutor helper = new PlatformInstantiatorExecutor(null, null);
 
         List<String> pArgs = new ArrayList<>();
@@ -1279,12 +1274,14 @@ public class IvmlDashboardMapper implements DashboardMapper {
                     .collect(Collectors.joining(File.pathSeparator));
             addSysProperty(KEY_PLUGINS, plList, pArgs);
         }
-        if (null != postUrl && postUrl.length() > 0) {
-            addSysProperty(KEY_POSTURL, pluginId, pArgs);
+        if (params.hasPostUrl()) {
+            addSysProperty(KEY_POSTURL, params.getPostUrl(), pArgs);
         }
-        if (null != pluginId && pluginId.length() > 0) {
-            addSysProperty(KEY_AAS_PLUGIN, pluginId, pArgs);
+        if (params.hasPluginId()) {
+            addSysProperty(KEY_AAS_PLUGIN, params.getPluginId(), pArgs);
         }
+        addSysProperty(KEY_INCONTAINER, String.valueOf(inContainer), pArgs);
+        File outputFile = params.getOutputFile();
         if (null == outputFile) {
             outputFile = new File("mapper.json");
         }
@@ -1306,10 +1303,10 @@ public class IvmlDashboardMapper implements DashboardMapper {
         }
         try {
             pArgs.add(IvmlDashboardMapper.class.getName());
-            pArgs.add(ivmlModelName);
+            pArgs.add(params.getMainModelName());
             pArgs.add(projectFolder.getAbsolutePath());
-            if (null != metaModelFolder) {
-                pArgs.add(metaModelFolder.getAbsolutePath());
+            if (null != params.getMetaModelFolder()) {
+                pArgs.add(params.getMetaModelFolder().getAbsolutePath());
             }
             getLogger().info("Calling oktoflow2grafana mapper as process with {}", pArgs);
             //info.accept("cmd line: " + pArgs);
@@ -1326,8 +1323,6 @@ public class IvmlDashboardMapper implements DashboardMapper {
         FileUtils.deleteQuietly(cpFile);
     }    
 
-    // checkstyle: resume parameter number check
-    
     /**
      * Posts the contents of {@code file} to {@code url}.
      * 

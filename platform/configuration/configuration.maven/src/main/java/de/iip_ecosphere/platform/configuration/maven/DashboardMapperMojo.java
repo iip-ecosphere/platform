@@ -47,6 +47,7 @@ import org.eclipse.aether.RepositorySystemSession;
 
 import de.iip_ecosphere.platform.configuration.cfg.ConfigurationFactory;
 import de.iip_ecosphere.platform.configuration.cfg.DashboardMapper;
+import de.iip_ecosphere.platform.configuration.cfg.DashboardMapper.MapperParams;
 import de.iip_ecosphere.platform.configuration.maven.DependencyResolver.Caller;
 import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
 import de.iip_ecosphere.platform.support.plugins.FolderClasspathPluginSetupDescriptor;
@@ -116,7 +117,10 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
 
     @Parameter(property = "configuration.skipMapDashboard", required = false, defaultValue = "true")
     private boolean skipMapDashboard;
-    
+
+    @Parameter(property = "configuration.inContainer", required = false, defaultValue = "true")
+    private boolean inContainer;
+
     private DependencyResolver resolver;
 
     @Override
@@ -176,20 +180,20 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
         }
         MavenLogger.install(getLog());
 
+        DashboardMapper mapper = ConfigurationFactory.createDashboardMapper();
+        MapperParams params = new MapperParams(mainConfiguration, toFile(projectDirectory, ""))
+            .setMetaModelFolder(toFile(metaModelDirectory))
+            .setOutputFile(toFile(outputFile))
+            .setPluginId(pluginId)
+            .setPostUrl(postUrl)
+            .setInContainer(inContainer);
         try {
-            DashboardMapper mapper = ConfigurationFactory.createDashboardMapper();
-            File procDir = toFile(projectDirectory, "");
-            File mmDir = toFile(metaModelDirectory);
-            File outFile = toFile(outputFile);
             if (AS_PROCESS) {
-                mapper.mapConfigurationToDashboardAsProcess(mainConfiguration, procDir, 
-                    mmDir, outFile, plugins, pluginId, postUrl);
+                mapper.mapConfigurationToDashboardAsProcess(params, plugins);
             } else  {
-                mapper.mapConfigurationToDashboard(mainConfiguration, procDir, 
-                    mmDir, outFile, pluginId, postUrl);
+                mapper.mapConfigurationToDashboard(params);
             }            
         } catch (ExecutionException e) {
-
             throw new MojoExecutionException(e.getMessage());
         }
         if (cleanTemp) {

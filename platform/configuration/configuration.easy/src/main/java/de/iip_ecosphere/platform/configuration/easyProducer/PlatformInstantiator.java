@@ -130,7 +130,7 @@ public class PlatformInstantiator {
         /**
          * Returns the a testing metamodel folder.
          * 
-         * @param folder the folder
+         * @return the folder
          */
         public File getTestIvmlMetamodelFolder() {
             return testIvmlMetaModelFolder;
