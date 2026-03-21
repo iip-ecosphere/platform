@@ -65,10 +65,66 @@ We summarize now some helpful build flag, either realized by Maven or by oktoflo
 |  -o       |  *all*                    |                                    | offline, prevents updates; may speed up builds; depending on repository settings, may fail e.g., once a day as snapshot updates are required                         |
 |           | generate-sources, install | `-Dunpack.force`                   | forces/disables [resource](../tools/maven.dependences) update/unpacking, in particular oktoflow metamodel                                                            |
 |           | install, package          | `-Dconfiguration.skipMapDashboard` | enables/disables dashboard mapping ([configuration plugin](../configuration/configuration.maven))                                                                    |
-|           | install, package          | `-DskipTests`                      | disables Java tests                                                                                                                                                  |
+|           | install, package          | `-DskipTests`                      | Usual, non-invoker builds: disable Java tests                                                                                                                        |
+|           | install, package          | `-DdisableJavaTests`               | Invoker builds: disable Java tests                                                                                                                                   |
 |           | install, package          | `-Dconfiguration.tracingLevel`     | changes the tracing level of the platform instantiator, values `ALL`, `TOP` (the default), `FUNC`tion ([configuration plugin](../configuration/configuration.maven)) |
 |           | install, package          | `-Deasy.docker.skip`               | enables/disables Docker container building                                                                                                                           |
 |           | install, package          | `-Deasy.docker.failOnError`        | enables/disables ingoring Docker build failures                                                                                                                      |
 |           | install, package          | `-Dpython-compile.skip`            | enables/disables Python "compilation", i.e., syntax check                                                                                                            |
 |           | install, package          | `-Dpython-test.skip`               | enables/disables Python unit test execution                                                                                                                          |
 |           | install, package          | `-Dmaven.javadoc.skip`             | enables/disables Java documentation building                                                                                                                         | 
+
+## Determining the update behavior
+
+Go to your local Maven repository (usually in your home directory in the folder `.m2`) and modify the settings file there. If there is no settings file, you can create a new one as shown below (for always updating snapshots on the SSE maven repositories). To become effective, it is important that the repository ids are stated as in the platform dependencies pom.
+
+  ```xml
+    <settings xmlns=http://maven.apache.org/SETTINGS/1.1.0
+     xmlns:xsi=http://www.w3.org/2001/XMLSchema-instance
+     xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0
+      http://maven.apache.org/xsd/settings-1.1.0.xsd">
+    
+      <activeProfiles>
+        <activeProfile>github</activeProfile>
+      </activeProfiles>
+    
+      <profiles>
+        <profile>
+          <id>github</id>
+          <repositories>       
+           <repository>
+             <id>SSE-mvn</id>
+             <name>SSE</name>
+             <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
+             <layout>default</layout>
+             <releases>
+                <enabled>true</enabled>
+             </releases>
+             <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+             </snapshots>
+           </repository>
+          <repositories>
+          <pluginRepositories>
+            <pluginRepository>
+             <id>SSE-mvn-plugins</id>
+             <name>SSE Maven</name>
+             <url>https://projects.sse.uni-hildesheim.de/qm/maven</url>
+             <releases>
+                <enabled>true</enabled>
+             </releases>
+             <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+             </snapshots>
+            </pluginRepository>
+          </pluginRepositories>
+        </profile>
+       </profiles>
+     </settings>
+  ```
+
+If there is already a repositories section, please add the contents for the `SSE-mvn` repository as shown above. 
+
+For more information, please refer to the [Maven Settings Reference](https://maven.apache.org/settings.html).
