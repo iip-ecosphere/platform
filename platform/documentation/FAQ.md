@@ -96,7 +96,7 @@
 
 *Reason:* As long as the platform is in development, it is convenient have the most recent snapshot builds available. By default, snapshots are enabled only on the SSE Maven snapshot repository, not for other used Maven repositories. Over the time, we changed our strategy and in particular since version 0.7.0 fall back to the default update strategies (daily).
 
-*Solution:* You can decide on the update behavior, per build process using the maven switch `-U` or globally via the maven settings file (cf. [build command summary](BUILDING.md)).
+*Solution:* You can decide on the update behavior, per build process using the maven switch `-U` or globally via the maven settings file (cf. [build command summary](BUILDING.md#mvn-update-behavior)).
 
 ## My configuration settings do not affect the instantiation
 

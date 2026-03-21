@@ -75,6 +75,7 @@ We summarize now some helpful build flag, either realized by Maven or by oktoflo
 |           | install, package          | `-Dmaven.javadoc.skip`             | enables/disables Java documentation building                                                                                                                         | 
 
 ## Determining the update behavior
+<a name="mvn-update-behavior"></a>
 
 Go to your local Maven repository (usually in your home directory in the folder `.m2`) and modify the settings file there. If there is no settings file, you can create a new one as shown below (for always updating snapshots on the SSE maven repositories). To become effective, it is important that the repository ids are stated as in the platform dependencies pom.
 
