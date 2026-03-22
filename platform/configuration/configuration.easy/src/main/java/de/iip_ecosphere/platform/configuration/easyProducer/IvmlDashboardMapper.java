@@ -1304,7 +1304,7 @@ public class IvmlDashboardMapper implements DashboardMapper {
         try {
             pArgs.add(IvmlDashboardMapper.class.getName());
             pArgs.add(params.getMainModelName());
-            pArgs.add(projectFolder.getAbsolutePath());
+            pArgs.add(params.getModelFolder().getAbsolutePath());
             if (null != params.getMetaModelFolder()) {
                 pArgs.add(params.getMetaModelFolder().getAbsolutePath());
             }
