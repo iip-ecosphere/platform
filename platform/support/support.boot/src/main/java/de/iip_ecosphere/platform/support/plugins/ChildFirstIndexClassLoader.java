@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.support.plugins;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 
@@ -64,6 +65,15 @@ class ChildIndexClassLoader extends IndexClassloader implements ChildClassLoader
         Enumeration<URL> result = findResources(name);
         if (null == result) {
             result = realParent.getResources(name);
+        }
+        return result;
+    }
+    
+    @Override
+    public InputStream getResourceAsStream(String name) {
+        InputStream result = super.getResourceAsStream(name);
+        if (null == result) {
+            result = realParent.getResourceAsStream(name);
         }
         return result;
     }
