@@ -115,11 +115,14 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
     @Parameter(property = "configuration.skip", required = false, defaultValue = "false")
     private boolean skip;
 
-    @Parameter(property = "configuration.skipMapDashboard", required = false, defaultValue = "true")
+    @Parameter(property = "configuration.skipMapDashboard", required = false, defaultValue = "false")
     private boolean skipMapDashboard;
 
     @Parameter(property = "configuration.inContainer", required = false, defaultValue = "true")
     private boolean inContainer;
+
+    @Parameter(property = "configuration.failOnError", required = false, defaultValue = "false")
+    private boolean failOnError;
 
     private DependencyResolver resolver;
 
@@ -181,8 +184,9 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
         MavenLogger.install(getLog());
 
         DashboardMapper mapper = ConfigurationFactory.createDashboardMapper();
-        MapperParams params = new MapperParams(mainConfiguration, toFile(projectDirectory, ""))
-            .setMetaModelFolder(toFile(metaModelDirectory))
+        File prjDir = toFile(projectDirectory, "");
+        MapperParams params = new MapperParams(mainConfiguration, prjDir)
+            .setMetaModelFolder(toMetamodelDirectory(metaModelDirectory, prjDir))
             .setOutputFile(toFile(outputFile))
             .setPluginId(pluginId)
             .setPostUrl(postUrl)
@@ -194,7 +198,11 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
                 mapper.mapConfigurationToDashboard(params);
             }            
         } catch (ExecutionException e) {
-            throw new MojoExecutionException(e.getMessage());
+            if (failOnError) {
+                throw new MojoExecutionException(e.getMessage());
+            } else {
+                error(e.getMessage());
+            }
         }
         if (cleanTemp) {
             plugins.forEach(p -> FileUtils.deleteQuietly(p));
@@ -210,6 +218,44 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
         if (!AS_PROCESS) {
             PluginManager.registerPlugin(new FolderClasspathPluginSetupDescriptor(folder));
         }
+    }
+    
+    /**
+     * Turns the specified {@code path} into the metamodel directory. If absolute, take {@code path}. If not,
+     * try to validate {@code path}, alternatively "target/easy" and "src/main/easy" whether they can be found in 
+     * {@code projectDirectory} or one of its parent directories. This search is needed in particular for test setups
+     * where the actual meta model resides in a parent directory and we do not want to include that path in all uses
+     * of this plugin.
+     * 
+     * @param path the specified path, may be empty or <b>null</b> for none specified
+     * @param projectDirectory the project directory to start searching at
+     * @return the meta model folder
+     */
+    private File toMetamodelDirectory(String path, File projectDirectory) {
+        File result = null;
+        List<String> folders = new ArrayList<>();
+        folders.add("target/easy");
+        folders.add("src/main/easy");
+        if (path != null && path.length() > 0 && !folders.contains(path)) {
+            File tmp = new File(path);
+            if (tmp.isAbsolute()) {
+                result = tmp;
+            } else {
+                folders.add(path);
+            }
+        }            
+        File dir = projectDirectory;
+        while (result == null && dir != null) {
+            for (String f : folders) {
+                File tmp = new File(dir, f);
+                if (tmp.exists()) {
+                    result = tmp;
+                    break;
+                }
+            }
+            dir = dir.getParentFile();
+        }
+        return result;
     }
 
     /**
