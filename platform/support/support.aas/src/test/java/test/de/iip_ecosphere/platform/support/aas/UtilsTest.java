@@ -12,10 +12,13 @@
 
 package test.de.iip_ecosphere.platform.support.aas;
 
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.NoOpAasServer;
 import de.iip_ecosphere.platform.support.aas.types.common.EnumRegistry;
 import de.iip_ecosphere.platform.support.aas.types.common.Utils;
 
@@ -84,5 +87,18 @@ public class UtilsTest {
         Assert.assertEquals("test_another_Name", AasFactory.composeIdShort("test", "another", "Name"));
     }
     
+    /**
+     * Tests {@link NoOpAasServer}.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testNoOpAasServer() throws IOException {
+        NoOpAasServer server = new NoOpAasServer();
+        Assert.assertNotNull(server.start());
+        server.deploy(null);
+        server.deploy(null, null);
+        server.stop(true);
+    }
     
 }
