@@ -1185,6 +1185,9 @@ public class IvmlDashboardMapper implements DashboardMapper {
         ConfigurationLifecycleDescriptor lcd = configurer.obtainLifecycleDescriptor();
         lcd.startup(ExecutionMode.TOOLING, new String[0]); // shall register executor
         Configuration cfg = ConfigurationManager.getIvmlConfiguration();
+        if (null == cfg) {
+            throw new ExecutionException("Cannot load IVML model. Metamodel/model folder correct?", null);
+        }
         ConfigurationManager.validateAndPropagate();
         try {
             new IvmlDashboardMapper(factory, params.getModelFolder(), params.isInContainer())
