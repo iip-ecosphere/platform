@@ -131,24 +131,24 @@ class AbstractService(Service):
         if self.state == ServiceState.RUNNING:
             self.state = ServiceState.PASSIVATED # preliminary consider state machine
 
-# https://stackoverflow.com/questions/243836/how-to-copy-all-properties-of-an-object-to-another-object-in-python
-def transferData(source, target):
-    """Transfers data from the source data object to the target data object. The caller 
-       is responsible that the objects are sufficiently compatible. 
+    # https://stackoverflow.com/questions/243836/how-to-copy-all-properties-of-an-object-to-another-object-in-python
+    def transferData(source, target):
+        """Transfers data from the source data object to the target data object. The caller 
+           is responsible that the objects are sufficiently compatible. 
+        
+        Parameters:
+          - source -- the source object
+          - target -- the target object
+        """
+        target.__dict__ = source.__dict__.copy()    # just a shallow copy
     
-    Parameters:
-      - source -- the source object
-      - target -- the target object
-    """
-    target.__dict__ = source.__dict__.copy()    # just a shallow copy
-
-def createDataInstance(from_name, creator):
-    """Creates a data instance through mapping of from_name. Tries to find a creator mapping, if none uses the 
-       default one.
-    
-    Parameters:
-      - from_name -- the original data type name
-      - creator -- the default creator
-    """
-    func = Registry.typeSubst.get(from_name, creator)
-    return func()
+    def createDataInstance(from_name, creator):
+        """Creates a data instance through mapping of from_name. Tries to find a creator mapping, if none uses the 
+           default one.
+        
+        Parameters:
+          - from_name -- the original data type name
+          - creator -- the default creator
+        """
+        func = Registry.typeSubst.get(from_name, creator)
+        return func()
