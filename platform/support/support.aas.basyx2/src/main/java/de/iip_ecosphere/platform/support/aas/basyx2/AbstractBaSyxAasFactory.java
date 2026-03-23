@@ -27,6 +27,7 @@ import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.aas.DeploymentRecipe;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.OperationsProvider;
 import de.iip_ecosphere.platform.support.aas.PersistenceRecipe;
@@ -35,6 +36,7 @@ import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.SimpleLocalProtocolCreator;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
+import de.iip_ecosphere.platform.support.aas.basyx2.common.BaSyxDeploymentRecipe;
 
 /**
  * AAS factory for BaSyx. Do not rename, this class is referenced in {@code META-INF/services}.
@@ -113,11 +115,6 @@ public abstract class AbstractBaSyxAasFactory extends AasFactory {
     public SubmodelBuilder createSubmodelBuilder(String idShort, String identifier) {
         return new BaSyxSubmodel.BaSyxSubmodelBuilder(null, idShort, identifier, null);
     }
-
-/*    @Override
-    protected ServerRecipe createDefaultServerRecipe() {
-        return new BaSyxServerRecipe();
-    }*/
     
     @Override
     public Registry obtainRegistry(SetupSpec spec) throws IOException {
@@ -129,10 +126,14 @@ public abstract class AbstractBaSyxAasFactory extends AasFactory {
         return obtainRegistry(spec);
     }
 
-/*    @Override
+    @Override
     public DeploymentRecipe createDeploymentRecipe(SetupSpec spec) {
-        return new BaSyxDeploymentRecipe(spec);
-    }*/
+        DeploymentRecipe result = super.createDeploymentRecipe(spec); // via server?
+        if (null == result) {
+            result = new BaSyxDeploymentRecipe(spec);
+        }
+        return result;
+    }
 
     @Override
     public PersistenceRecipe createPersistenceRecipe() {
