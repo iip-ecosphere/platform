@@ -126,9 +126,47 @@ public class SnakeYaml extends de.iip_ecosphere.platform.support.yaml.Yaml {
         if (null == cls) {
             result = new Yaml(representer);
         } else {
-            result = new Yaml(new Constructor(cls), representer);
+            result = new Yaml(new FocusedConstructor(cls), representer);
         }
         return result;
+    }
+    
+    /**
+     * Extends snakeyaml's constructor by loading via the class loader of the specified class, not
+     * just via the context classloader.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class FocusedConstructor extends Constructor {
+        
+        private ClassLoader loader;
+        
+        /**
+         * Creates a constructor instance for the given class.
+         * 
+         * @param cls the class to construct for, primarily querying the class loader of {@code cls}
+         */
+        public FocusedConstructor(Class<? extends Object> cls) {
+            super(cls);
+            loader = cls.getClassLoader();
+        }
+        
+        @Override
+        protected Class<?> getClassForName(String name) throws ClassNotFoundException {
+            Class<?> cls = null;
+            if (null != loader) {
+                try {
+                    cls = loader.loadClass(name);
+                } catch (ClassNotFoundException e) {
+                    // may also consider PluginSetup.getClassLoader()
+                }
+            } 
+            if (null == cls) {
+                cls = super.getClassForName(name);
+            }
+            return cls;
+        }        
+
     }
     
     @Override
