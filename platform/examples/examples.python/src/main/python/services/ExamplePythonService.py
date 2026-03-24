@@ -1,3 +1,4 @@
+from AbstractService import AbstractService
 from datatypes.PythonTestInput import PythonTestInput
 from datatypes.PythonTestInputImpl import PythonTestInputImpl
 from datatypes.PythonTestOutput import PythonTestOutput
@@ -18,10 +19,8 @@ class ExamplePythonService(ExamplePythonServiceInterface):
         Parameters:
           - data -- the data to process
         """
-        result = PythonTestOutputImpl()
-        result.id = data.id
-        result.value1 = data.value1
-        result.value2 = data.value2
+        result = self.createPythonTestOutput()
+        AbstractService.transferData(data, result)
         result.confidence = random.uniform(0, 1)
         result.prediction = result.confidence > 0.75
         
