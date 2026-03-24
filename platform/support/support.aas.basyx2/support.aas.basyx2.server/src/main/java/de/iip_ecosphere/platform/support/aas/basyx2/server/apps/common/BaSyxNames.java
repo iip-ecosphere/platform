@@ -7,6 +7,8 @@ public class BaSyxNames {
         = "de.iip_ecosphere.platform.support.aas.basyx2.server";
     public static final String PACKAGE_PLUGIN_BASYX_SERVER_SECURITY 
         = PACKAGE_PLUGIN_BASYX_SERVER + ".apps.security";
+    public static final String PACKAGE_BASYX_AASENV = PACKAGE_BASYX + ".aasenvironment"; 
+    public static final String PACKAGE_BASYX_CONCEPTREPO = PACKAGE_BASYX + ".conceptdescriptionrepository";
 
     public static final String AAS_REGISTRY = "org.eclipse.digitaltwin.basyx.aasregistry.";
     public static final String AAS_REPOSITORY = "org.eclipse.digitaltwin.basyx.aasrepository.";

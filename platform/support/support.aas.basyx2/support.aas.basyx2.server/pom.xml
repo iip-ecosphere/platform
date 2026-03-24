@@ -195,6 +195,30 @@
         <artifactId>basyx.filerepository-backend</artifactId>
         <version>${basyx.version}</version>
     </dependency>
+    <!--aas discovery service -->
+    <dependency>
+        <groupId>org.eclipse.digitaltwin.basyx</groupId>
+        <artifactId>basyx.aasdiscoveryservice-backend-inmemory</artifactId>
+        <version>${basyx.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.eclipse.digitaltwin.basyx</groupId>
+        <artifactId>basyx.aasdiscoveryservice-http</artifactId>
+        <version>${basyx.version}</version>
+    </dependency>
+    <!-- aas env -->
+    <dependency>
+        <groupId>org.eclipse.digitaltwin.basyx</groupId>
+        <artifactId>basyx.aasenvironment-http</artifactId>
+        <version>${basyx.version}</version>
+    </dependency>
+    <!--concept desc repo -->
+    <dependency>
+        <groupId>org.eclipse.digitaltwin.basyx</groupId>
+        <artifactId>basyx.conceptdescriptionrepository-backend-inmemory</artifactId>
+        <version>${basyx.version}</version>
+    </dependency> 
+    
     
     <dependency>
         <groupId>org.springframework.boot</groupId>
