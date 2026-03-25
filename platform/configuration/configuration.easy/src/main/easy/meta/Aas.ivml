@@ -72,8 +72,8 @@ project Aas {
 
     // host "127.0.0.1" replaced by host IP if possible
     compound ImplAddress refines EphemeralServerAddress {
-        AasProtocol protocol = aasProtocol;
-        AasSchema schema = aasProtocol.schema;
+        AasProtocol protocol;
+        AasSchema schema;
         NonEmptyString host = "127.0.0.1";
         Boolean devicesAsEphemeral = true; // AAS container ports via svcMgr and container descriptor; else use device aasImplPort or as fallback aasImplServer.port
         String netmask = "";
@@ -89,6 +89,8 @@ project Aas {
     EndpointAddress smRegistryServer = null;
     aas == AasImpl::BaSyx2 implies isDefined(smRegistryServer);
     ImplAddress aasImplServer;
+    aasImplServer.protocol = aasProtocol; // explicit to force re-evaluation, does not happen for "default" values
+    aasImplServer.schema = aasProtocol.schema; // explicit to force re-evaluation, does not happen for "default" values
     isDefined(aasImplServer);
     
     Persistency aasPersistency = Persistency::INMEMORY;
