@@ -234,11 +234,14 @@ public class BasicSetupSpec implements SetupSpec {
             }
         } else {
             for (AasComponent c : AasComponent.values()) {
-                setups.get(c).state = spec.getSetup(c).getState();
-                setups.get(c).serverAddress = spec.getSetup(c).getServerAddress(); // may be endpoint
-                setups.get(c).endpoint = spec.getSetup(c).getEndpoint();
-                setups.get(c).keyStore = spec.getSetup(c).getKeyStore();
-                setups.get(c).authentication = spec.getSetup(c).getAuthentication();
+                ComponentSetup src = spec.getSetup(c);
+                if (src != null) {
+                    setups.get(c).state = src.getState();
+                    setups.get(c).serverAddress = src.getServerAddress(); // may be endpoint
+                    setups.get(c).endpoint = src.getEndpoint();
+                    setups.get(c).keyStore = src.getKeyStore();
+                    setups.get(c).authentication = src.getAuthentication();
+                }
             }
         }
         this.assetServerProtocol = spec.getAssetServerProtocol();
