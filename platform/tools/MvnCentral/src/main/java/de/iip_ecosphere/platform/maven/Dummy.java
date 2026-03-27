@@ -12,33 +12,10 @@
 
 package de.iip_ecosphere.platform.maven;
 
-import java.io.File;
-
 /**
- * Lists a directory so that excel can import it.
+ * In case that maven complains.
  * 
  * @author Holger Eichelberger, SSE
  */
-public class FileList {
-    
-    /**
-     * Lists a directory contents.
-     * 
-     * @param args the first argument is the directory to list
-     */
-    public static void main(String[] args) {
-        if (args.length != 1) {
-            System.out.println("Usage: dir");
-        } else {
-            File[] files = new File(args[0]).listFiles();
-            if (null != files) {
-                for (File f : files) {
-                    if (f.isFile()) {
-                        System.out.println(f.getName() + "|" + f.length());
-                    }
-                }
-            }
-        }
-    }
-
+public class Dummy {
 }
