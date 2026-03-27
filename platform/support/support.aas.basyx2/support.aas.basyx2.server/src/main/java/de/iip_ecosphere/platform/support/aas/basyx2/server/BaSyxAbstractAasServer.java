@@ -58,6 +58,8 @@ abstract class BaSyxAbstractAasServer implements AasServer {
     private ConfigurableApplicationContext smRepoCtx;
     private ConfigurableApplicationContext aasRegistryCtx;
     private ConfigurableApplicationContext smRegistryCtx;
+    private ConfigurableApplicationContext conceptRepoCtx;
+    private ConfigurableApplicationContext discoveryCtx;
     private List<IORunnable> actionsAfterStart;
     
     /**
@@ -94,11 +96,43 @@ abstract class BaSyxAbstractAasServer implements AasServer {
     protected abstract Class<?> getAasRepositoryAppClass();
 
     /**
+     * Returns the class to use implementing the AAS concept repository application/server. 
+     * 
+     * @return the class
+     */
+    protected abstract Class<?> getConceptRepoAppClass();
+
+    /**
+     * Returns the class to use implementing the AAS discovery application/server. 
+     * 
+     * @return the class
+     */
+    protected abstract Class<?> getDiscoveryAppClass();
+
+    /**
      * Returns an optional application context initializer for AAS repositories.
      * 
      * @return the initializer, may be <b>null</b> for none
      */
     protected ApplicationContextInitializer<ConfigurableApplicationContext> getAasRepositoryAppInitializer() {
+        return null;
+    }
+
+    /**
+     * Returns an optional application context initializer for AAS concept repository.
+     * 
+     * @return the initializer, may be <b>null</b> for none
+     */
+    protected ApplicationContextInitializer<ConfigurableApplicationContext> getConceptRepoAppInitializer() {
+        return null;
+    }
+
+    /**
+     * Returns an optional application context initializer for AAS discovery.
+     * 
+     * @return the initializer, may be <b>null</b> for none
+     */
+    protected ApplicationContextInitializer<ConfigurableApplicationContext> getDiscoveryAppInitializer() {
         return null;
     }
 
@@ -550,6 +584,28 @@ abstract class BaSyxAbstractAasServer implements AasServer {
         }
         return result;
     }
+
+    /**
+     * Creates a context with initialization if the {@code component} in {@code spec} shall start.
+     * 
+     * @param cls the class to create the context for (may be <b>null</b> for none)
+     * @param component the component to create the context for
+     * @param the context initializer, may be <b>null</b>
+     * @return the context (may be <b>null</b>)
+     * 
+     * @see #shallStart(State)
+     */
+    protected ConfigurableApplicationContext createContext(Class<?> cls, AasComponent component,
+        ApplicationContextInitializer<ConfigurableApplicationContext> initializer) {
+        ConfigurableApplicationContext result = null;
+        ComponentSetup setup = spec.getSetup(component);
+        if (shallStart(setup.getState())) {
+            result = createContext(cls, setup.getEndpoint().getPort(),
+                createConfigurer(initializer, spec.getSetup(component)), 
+                s -> spec.notifyAasRepositoryStateChange(s));
+        }
+        return result;
+    }
     
     @Override
     public void deploy(Aas aas) throws IOException {
@@ -573,6 +629,7 @@ abstract class BaSyxAbstractAasServer implements AasServer {
     static boolean shallStart(State state) {
         return state == State.STOPPED;
     }
+    
 
     @Override
     public AasServer start() {
@@ -601,6 +658,12 @@ abstract class BaSyxAbstractAasServer implements AasServer {
                         s -> spec.notifySubmodelRegistryStateChange(s));
                 spec.notifySubmodelRegistryStateChange(State.RUNNING);
             }
+        }
+        if (type == ServerType.COMBINED) {
+            conceptRepoCtx = createContext(getConceptRepoAppClass(), AasComponent.CONCEPT_REPOSITORY, 
+                getConceptRepoAppInitializer());
+            discoveryCtx = createContext(getDiscoveryAppClass(), AasComponent.DISCOVERY, 
+                getDiscoveryAppInitializer());
         }
         if (null != actionsAfterStart) {
             for (IORunnable a : actionsAfterStart) {
@@ -631,12 +694,24 @@ abstract class BaSyxAbstractAasServer implements AasServer {
         }
     }
 
+    /**
+     * Closes an application context.
+     * 
+     * @param ctx the context, may be <b>null</b> (ignored then)
+     * @param stateConsumer optional state consumer to be called when {@code ctx} is closed, may be <b>null</b>
+     */
+    void close(ConfigurableApplicationContext ctx, AasComponent component) {
+        close(ctx, s-> spec.getSetup(component).notifyStateChange(s));
+    }
+
     @Override
     public void stop(boolean dispose) {
         close(aasRepoCtx, s -> spec.notifyAasRepositoryStateChange(s));
         close(smRepoCtx, s -> spec.notifySubmodelRepositoryStateChange(s));
         close(aasRegistryCtx, s -> spec.notifyAasRegistryStateChange(s));
         close(smRegistryCtx, s -> spec.notifySubmodelRegistryStateChange(s));
+        close(conceptRepoCtx, AasComponent.CONCEPT_REPOSITORY);
+        close(discoveryCtx, AasComponent.DISCOVERY);
     }
 
 }

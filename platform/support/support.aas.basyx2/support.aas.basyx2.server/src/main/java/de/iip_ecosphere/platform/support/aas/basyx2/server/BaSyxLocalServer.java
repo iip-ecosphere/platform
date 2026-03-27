@@ -24,6 +24,8 @@ import de.iip_ecosphere.platform.support.aas.basyx2.server.apps.submodelReposito
 import de.iip_ecosphere.platform.support.aas.basyx2.server.apps.aasRegistry.AasRegistrySpringApp;
 import de.iip_ecosphere.platform.support.aas.basyx2.server.apps.aasRegistry.AasRegistrySpringAppInitializer;
 import de.iip_ecosphere.platform.support.aas.basyx2.server.apps.aasRepository.AasRepositorySpringApp;
+import de.iip_ecosphere.platform.support.aas.basyx2.server.apps.autodiscovery.AasAutodiscoverySpringApp;
+import de.iip_ecosphere.platform.support.aas.basyx2.server.apps.conceptRepository.ConceptRepositorySpringApp;
 
 /**
  * A local AAS server.
@@ -72,6 +74,16 @@ public class BaSyxLocalServer extends BaSyxAbstractAasServer {
     @Override
     protected ApplicationContextInitializer<ConfigurableApplicationContext> getSmRegistryAppInitializer() {
         return new SubmodelRegistrySpringAppInitializer();
+    }
+
+    @Override
+    protected Class<?> getConceptRepoAppClass() {
+        return ConceptRepositorySpringApp.class;
+    }
+
+    @Override
+    protected Class<?> getDiscoveryAppClass() {
+        return AasAutodiscoverySpringApp.class;
     }       
 
 }

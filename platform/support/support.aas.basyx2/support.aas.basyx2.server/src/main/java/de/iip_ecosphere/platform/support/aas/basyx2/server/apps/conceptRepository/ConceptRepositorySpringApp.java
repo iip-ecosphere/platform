@@ -1,6 +1,7 @@
 package de.iip_ecosphere.platform.support.aas.basyx2.server.apps.conceptRepository;
 
 import org.eclipse.digitaltwin.basyx.conceptdescriptionrepository.ConceptDescriptionRepository;
+import org.eclipse.digitaltwin.basyx.conceptdescriptionrepository.ConceptDescriptionRepositoryFactory;
 import org.eclipse.digitaltwin.basyx.conceptdescriptionrepository.backend.CrudConceptDescriptionRepositoryFactory;
 import org.eclipse.digitaltwin.basyx.conceptdescriptionrepository.backend.InMemoryConceptDescriptionBackend;
 import org.springframework.boot.SpringApplication;
@@ -47,15 +48,26 @@ public class ConceptRepositorySpringApp {
     }
     
     /**
+     * Returns the concept description factory.
+     * 
+     * @param backend the backend, as injected by {@link #backend()}
+     * @return the factory
+     */
+    @Bean 
+    public static ConceptDescriptionRepositoryFactory getConceptDescFactory(InMemoryConceptDescriptionBackend backend) {
+        return CrudConceptDescriptionRepositoryFactory.builder().backend(backend).buildFactory();
+    }
+    
+    /**
      * Returns the concept description repository service.
      * 
      * @param backend the backend, as injected by {@link #backend()}
-     * @return the disovery service
+     * @return the repository
      */
     @Primary
     @Bean 
     public static ConceptDescriptionRepository getConceptDescRepository(InMemoryConceptDescriptionBackend backend) {
-        return CrudConceptDescriptionRepositoryFactory.builder().backend(backend).create();
+        return getConceptDescFactory(backend).create();
     }
     
 }

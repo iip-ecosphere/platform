@@ -23,6 +23,7 @@ import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasServerFactoryDescriptor;
 import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
+import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
 import de.iip_ecosphere.platform.support.aas.basyx2.server.BaSyxLocalServer;
 import de.iip_ecosphere.platform.support.aas.basyx2.server.BaSyxServerFactoryDescriptor;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
@@ -58,6 +59,8 @@ public class BaSyxServerTest {
     public void testServers() {
         BasicSetupSpec spec = new BasicSetupSpec(new Endpoint(Schema.HTTP, ""), new Endpoint(Schema.HTTP, ""), 
             new Endpoint(Schema.HTTP, ""), new Endpoint(Schema.HTTP, ""));
+        spec.setEndpoint(AasComponent.CONCEPT_REPOSITORY, new Endpoint(Schema.HTTP, ""));
+        spec.setEndpoint(AasComponent.DISCOVERY, new Endpoint(Schema.HTTP, ""));
         BaSyxLocalServer server = new BaSyxLocalServer(spec, BaSyxLocalServer.ServerType.COMBINED, 
             LocalPersistenceType.INMEMORY);
         server.start();
