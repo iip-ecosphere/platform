@@ -1,0 +1,66 @@
+
+/**
+ * ******************************************************************************
+ * Copyright (c) {2025} The original author or authors
+ *
+ * All rights reserved. This program and the accompanying materials are made 
+ * available under the terms of the Eclipse Public License 2.0 which is available 
+ * at http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
+ ********************************************************************************/
+
+package de.oktoflow.platform.cmdTools;
+
+import java.io.File;
+
+import de.oktoflow.platform.cmdTools.MavenUtils.CleanupStatistics;
+
+/**
+ * Deletes dumps.
+ * 
+ * @author Holger Eichelberger, SSE
+ */
+public class CleanDumps {
+    
+    /**
+     * Deletes dump files.
+     * 
+     * @param args the first argument is the directory/file where to start cleaning
+     */
+    public static void main(String[] args) {
+        if (args.length != 1) {
+            System.out.println("Usage: directory/file");
+        } else {
+            CleanupStatistics statistics = new CleanupStatistics();
+            cleanDumps(new File(args[0]), statistics);
+            System.out.println("Cleaned up " + statistics.getFileCount() + " files with " 
+                + MavenUtils.humanReadableByteCount(statistics.getBytesCleared(), false) + " in summary.");
+        }
+    }
+    
+    /**
+     * Cleans indexes in {@code file} and subfolders.
+     * 
+     * @param file the file to look for indexes
+     * @param statistics cleanup statistics
+     */
+    private static void cleanDumps(File file, CleanupStatistics statistics) {
+        String path = file.toString().replace('\\', '/');
+        if (file.isDirectory()) {
+            File[] files = file.listFiles(); 
+            if (null != files) {
+                for (File f : files) {
+                    cleanDumps(f, statistics);
+                }
+            }
+        } else if (path.contains("target/surefire-reports") 
+            && (path.endsWith(".dump") || path.endsWith(".dumpstream"))) {
+            System.out.println("deleting " + file);
+            statistics.cleared(file);
+            file.delete();
+        }
+    }
+
+}
