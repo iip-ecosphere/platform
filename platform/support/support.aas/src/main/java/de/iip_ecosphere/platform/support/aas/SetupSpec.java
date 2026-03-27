@@ -54,12 +54,34 @@ public interface SetupSpec {
      */
     public enum AasComponent {
 
-        AAS_REGISTRY,
-        AAS_REPOSITORY,
-        SUBMODEL_REGISTRY,
-        SUBMODEL_REPOSITORY,
-        ASSET
+        AAS_REGISTRY(State.STOPPED),
+        AAS_REPOSITORY(State.STOPPED),
+        SUBMODEL_REGISTRY(State.STOPPED),
+        SUBMODEL_REPOSITORY(State.STOPPED),
+        ASSET(State.STOPPED),
+        CONCEPT_REPOSITORY(State.EXTERNAL), // keep "optional" for now
+        DISCOVERY(State.EXTERNAL); // keep "optional" for now
         // initial, to be extended
+        
+        private State initialState;
+        
+        /**
+         * Creates a "constant" instance.
+         * 
+         * @param initialState the initial state
+         */
+        private AasComponent(State initialState) {
+            this.initialState = initialState;
+        }
+
+        /**
+         * Returns the initial state.
+         * 
+         * @return the initial state
+         */
+        public State getInitialState() {
+            return initialState;
+        }
     }
     
     /**

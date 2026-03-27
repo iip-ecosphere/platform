@@ -51,6 +51,7 @@ public class BasicSetupSpec implements SetupSpec {
          */
         protected BasicComponentSetup(AasComponent component) {
             this.component = component;
+            this.state = component.getInitialState();
         }
         
         @Override
@@ -471,6 +472,22 @@ public class BasicSetupSpec implements SetupSpec {
         return setups.get(component);
     }
 
+    /**
+     * Explicitly sets the {@code enpoint} for the given {@code component}. Intended for initializing 
+     * setups that have no specific methods/constructors. Resets the state from {@link State#EXTERNAL} to 
+     * {@link State#STOPPED};
+     * 
+     * @param component the AAS component
+     * @param endpoint the endpoint
+     */
+    public void setEndpoint(AasComponent component, Endpoint endpoint) {
+        BasicComponentSetup setup = setups.get(component);
+        setup.endpoint = endpoint;
+        if (setup.state == State.EXTERNAL) {
+            setup.state = State.STOPPED;
+        }
+    }
+
     @Override
     public String toString() {
         String cr = System.lineSeparator();
@@ -479,7 +496,10 @@ public class BasicSetupSpec implements SetupSpec {
             + " - AAS repository:      " + toString(getSetup(AasComponent.AAS_REPOSITORY)) + cr
             + " - Submodel registry:   " + toString(getSetup(AasComponent.SUBMODEL_REGISTRY)) + cr
             + " - Submodel repository: " + toString(getSetup(AasComponent.SUBMODEL_REPOSITORY)) + cr
-            + " - Asset server:        " + toString(getSetup(AasComponent.ASSET)) + " @ '" + assetServerProtocol + "'";
+            + " - Asset server:        " + toString(getSetup(AasComponent.ASSET)) 
+                + " @ '" + assetServerProtocol + "'" + cr
+            + " - Concept directory:   " + toString(getSetup(AasComponent.CONCEPT_REPOSITORY)) + cr
+            + " - Discovery:           " + toString(getSetup(AasComponent.DISCOVERY)) + cr;
     }
 
 }
