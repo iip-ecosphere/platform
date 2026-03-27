@@ -599,7 +599,7 @@ abstract class BaSyxAbstractAasServer implements AasServer {
         ApplicationContextInitializer<ConfigurableApplicationContext> initializer) {
         ConfigurableApplicationContext result = null;
         ComponentSetup setup = spec.getSetup(component);
-        if (shallStart(setup.getState())) {
+        if (null != setup && shallStart(setup.getState())) {
             result = createContext(cls, setup.getEndpoint().getPort(),
                 createConfigurer(initializer, spec.getSetup(component)), 
                 s -> spec.notifyAasRepositoryStateChange(s));
