@@ -8,6 +8,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -141,13 +143,23 @@ public class PomReader {
         }
         
     }
-    
+
     /**
      * Returns the full classpath from a pom file.
      * @param file The pom file to read from.
      * @return The full classpath or NULL if no classpath was available.
      */
     public static PomInfo getInfo(File file) {
+        return getInfo(file, e -> System.out.println(e));
+    }
+
+    /**
+     * Returns the full classpath from a POM file.
+     * @param file The pom file to read from.
+     * @param errorConsumer consumes fatal errors, may be <b>null</b> for none
+     * @return The full classpath or <b>null</b> if no classpath was available.
+     */
+    public static PomInfo getInfo(File file, Consumer<String> errorConsumer) {
         
         //initialize
         final PomInfo info = new PomInfo();
@@ -198,10 +210,17 @@ public class PomReader {
                 public boolean wasModified() {
                     return false;
                 }
-                
+
+                @Override
+                public boolean wasIgnored() {
+                    return false;
+                }
+
             });
         } catch (IOException e) {
-            System.out.println("FAILED! " + e.getMessage());   
+            if (null != errorConsumer) {
+                errorConsumer.accept("FAILED! " + e.getMessage());
+            }
         }
         PomInfo result;
         //generate the full path if possible (example: de.uni-hildesheim.sse.ivml)
@@ -211,9 +230,7 @@ public class PomReader {
         } else {
             result = null;
         }
-        
         return result;
-        
     }
     
     /**
@@ -229,7 +246,14 @@ public class PomReader {
          * @return {@code true} for modified, {@code false} else
          */
         public boolean wasModified();
-        
+
+        /**
+         * Whether the POM was ignored.
+         * 
+         * @return {@code true} for ignored, {@code false} else
+         */
+        public boolean wasIgnored();
+
         /**
          * Called for the POM group id.
          * 
@@ -443,6 +467,12 @@ public class PomReader {
         }        
     }
     
+    public enum Result {
+        MODIFIED,
+        SKIPPED,
+        IGNORED
+    }
+    
     // checkstyle: stop parameter number check
 
     /**
@@ -454,18 +484,42 @@ public class PomReader {
      * @param oldParentPomVersion the old parent POM version (may be <b>null</b> to ignore)
      * @param newParentPomVersion the new parent POM version (may be <b>null</b> to ignore)
      * @param properties set of properties to be considered for POM version replacement
-     * @return whether {@code file} was modified
+     * @return whether/how {@code file} was modified
      * @throws IOException if reading/writing fails
      */
-    public static boolean replaceVersion(File file, String oldPomVersion, String newPomVersion, 
+    public static Result replaceVersion(File file, String oldPomVersion, String newPomVersion, 
         String oldParentPomVersion, String newParentPomVersion, Set<String> properties) throws IOException {
+        return replaceVersion(file, oldPomVersion, newPomVersion, 
+            oldParentPomVersion, newParentPomVersion, properties, null);
+    }
+
+    /**
+     * Replaces POM versions.
+     * 
+     * @param file the POM file
+     * @param oldPomVersion the old POM version (may be <b>null</b> to ignore)
+     * @param newPomVersion the new POM version (may be <b>null</b> to ignore)
+     * @param oldParentPomVersion the old parent POM version (may be <b>null</b> to ignore)
+     * @param newParentPomVersion the new parent POM version (may be <b>null</b> to ignore)
+     * @param properties set of properties to be considered for POM version replacement
+     * @param groupIdPattern optional pattern to match the group id (may be <b>null</b> to ignore)
+     * @return whether/how {@code file} was modified
+     * @throws IOException if reading/writing fails
+     */
+    public static Result replaceVersion(File file, String oldPomVersion, String newPomVersion, 
+        String oldParentPomVersion, String newParentPomVersion, Set<String> properties, 
+        Predicate<String> groupIdPattern) throws IOException {
         
         PomHandler handler = new PomHandler() {
             
             private boolean modified = false;
+            private boolean matchesGroupId = true;
 
             @Override
             public void handlePomGroupId(Node node, String groupId) {
+                if (null != groupIdPattern) {
+                    matchesGroupId = groupIdPattern.test(groupId);
+                }
             }
 
             @Override
@@ -474,7 +528,7 @@ public class PomReader {
 
             @Override
             public void handlePomVersion(Node node, String version) {
-                if (null != oldPomVersion && null != newPomVersion) {
+                if (null != oldPomVersion && null != newPomVersion && matchesGroupId) {
                     if (equalsSafe(version, oldPomVersion)) {
                         node.setTextContent(newPomVersion);
                         modified = true;
@@ -492,7 +546,7 @@ public class PomReader {
 
             @Override
             public void handleParentPomVersion(Node node, String version) {
-                if (null != oldParentPomVersion && null != newParentPomVersion) {
+                if (null != oldParentPomVersion && null != newParentPomVersion && matchesGroupId) {
                     if (equalsSafe(version, oldParentPomVersion)) {
                         node.setTextContent(newParentPomVersion);
                         modified = true;
@@ -506,7 +560,7 @@ public class PomReader {
             
             @Override
             public void handleProperty(Node node, String property) {
-                if (null != oldPomVersion && null != newPomVersion && properties.contains(property)) {
+                if (null != oldPomVersion && null != newPomVersion && properties.contains(property) && matchesGroupId) {
                     if (equalsSafe(node.getTextContent(), oldPomVersion)) {
                         node.setTextContent(newPomVersion);
                         modified = true;
@@ -519,11 +573,34 @@ public class PomReader {
                 return modified;
             }
 
+            @Override
+            public boolean wasIgnored() {
+                return null != groupIdPattern && !matchesGroupId;
+            }
+
         };
         readPom(file, handler);
-        return handler.wasModified();
+        return toResult(handler);
     }
 
     // checkstyle: resume parameter number check
+    
+    /**
+     * Turns handler results to a result constant.
+     * 
+     * @param handler the handler
+     * @return the result
+     */
+    private static Result toResult(PomHandler handler) {
+        Result result;
+        if (handler.wasModified()) {
+            result = Result.MODIFIED;
+        } else if (handler.wasIgnored()) {
+            result = Result.IGNORED;
+        } else {
+            result = Result.SKIPPED;
+        }
+        return result;
+    }
 
 }

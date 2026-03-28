@@ -23,6 +23,7 @@ import java.util.regex.PatternSyntaxException;
 
 import de.iip_ecosphere.platform.support.setup.CmdLine;
 import de.oktoflow.platform.cmdTools.PomReader.PomInfo;
+import de.oktoflow.platform.cmdTools.PomReader.Result;
 
 /**
  * Changes POM versions.
@@ -39,10 +40,12 @@ public class ChangePomVersion {
     private String newPomVersion;
     private String oldParentPomVersion;
     private String newParentPomVersion;
-    private Boolean simulate;
+    private boolean simulate;
+    private boolean verbose;
     
     private Predicate<String> incPattern;
     private Predicate<String> excPattern;
+    private Predicate<String> groupIdPattern;
     
     private Set<String> properties = new HashSet<>();
 
@@ -57,9 +60,23 @@ public class ChangePomVersion {
         newPomVersion = getArg(args, "newPOMVersion", "");
         oldParentPomVersion = getArg(args, "oldParentPOMVersion", "");
         newParentPomVersion = getArg(args, "newParentPOMVersion", "");
+        String tmp = getArg(args, "includeGroupId", null);
+        if (null != tmp && tmp.length() > 0) {
+            groupIdPattern = Pattern.compile(tmp).asPredicate();
+        }
+        tmp = getArg(args, "excludeGroupId", null);
+        if (null != tmp && tmp.length() > 0) {
+            Predicate<String> p = Pattern.compile(tmp).asPredicate();
+            if (null == groupIdPattern) {
+                groupIdPattern = p;
+            } else {
+                groupIdPattern.and(p.negate());
+            }
+        }
         String includes = getArg(args, "includes", "");
         String excludes = getArg(args, "excludes", ".*/gen/.*");
         simulate = CmdLine.getBooleanArgNoVal(args, "simulate", false);
+        verbose = CmdLine.getBooleanArgNoVal(args, "verbose", false);
         Collections.addAll(properties, getArg(args, "properties", "").replace(';', ':').split(":"));
         
         if (includes.length() == 0) {
@@ -107,25 +124,33 @@ public class ChangePomVersion {
      * @param file the file (not directory) to process
      */
     private void process(File file) {
-        System.out.print(file.getAbsolutePath() + ": ");
+        String prefix = file.getAbsolutePath() + ": ";
         if (simulate) {
-            PomInfo info = PomReader.getInfo(file);
+            PomInfo info = PomReader.getInfo(file, e -> System.out.println(prefix + e));
             if (null != info) {
-                if (PomReader.equalsSafe(info.getVersion(), oldPomVersion)) {
-                    System.out.println("not changed (version -> " + newPomVersion + ")");
-                } else if (PomReader.equalsSafe(info.getParentVersion(), oldParentPomVersion)) {
-                    System.out.println("not changed (parent -> " + newParentPomVersion + ")");
+                if (groupIdPattern == null || groupIdPattern.test(info.getGroupId())) {
+                    if (PomReader.equalsSafe(info.getVersion(), oldPomVersion)) {
+                        System.out.println(prefix + "would change version -> " + newPomVersion);
+                    } else if (PomReader.equalsSafe(info.getParentVersion(), oldParentPomVersion)) {
+                        System.out.println(prefix + "would change parent -> " + newParentPomVersion);
+                    } else {
+                        System.out.println(prefix + "not changed (-> wrong version)");
+                    }
                 } else {
-                    System.out.println("not changed (-> wrong version)");
+                    if (verbose) {
+                        System.out.println(prefix + "ignored");
+                    }
                 }
-            } 
+            } else {
+                System.out.println(prefix + "no path");
+            }
         } else {
             try {
-                PomReader.replaceVersion(file, oldPomVersion, newPomVersion, oldParentPomVersion, newParentPomVersion, 
-                    properties);
-                System.out.println("done");
+                Result res = PomReader.replaceVersion(file, oldPomVersion, newPomVersion, oldParentPomVersion, 
+                    newParentPomVersion, properties, groupIdPattern);
+                System.out.println(prefix + res.name().toLowerCase());
             } catch (IOException e) {
-                System.out.println(e.getMessage());
+                System.out.println(prefix + e.getMessage());
             }
         }
     }
@@ -181,6 +206,9 @@ public class ChangePomVersion {
             System.out.println(" --newPOMVersion=<ver>");
             System.out.println(" --oldParentPOMVersion=<ver>");
             System.out.println(" --newParentPOMVersion=<ver>");
+            System.out.println(" --includeGroupId=<regEx>");
+            System.out.println(" --excludeGroupId=<regEx>");
+            System.out.println(" --verbose=<boolean>");
             System.out.println(" --includes=.*/pom(-model)?.xml$; regEx match all paths with /");
             System.out.println(" --excludes=.*/gen/.*; regEx match all paths with /");
             System.out.println(" --properties=<str> : or ; separated list of properties to replace POM version");
