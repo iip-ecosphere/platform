@@ -12,15 +12,13 @@ For installation and first steps, see [install guide](platform/documentation/INS
 
 ## News
 
-* Release of octoflow version 0.8 planned for mid of March, 2026.
+* Release of octoflow version 0.8 planned for mid of April/March, 2026. Release-preparation started.
+* Management UI supports oktoflow app modeling and realization , from empty model to integrated app. ReGaP-Video will follow soon.
+* ReGaP: Influx/Grafana based dashboarding for oktoflow apps via [oktoflow2grafana](https://github.com/iip-ecosphere/oktoflow2grafana) is working.
 * Updated (more agile) documentation of [configuration concepts](documentation/concepts/concepts.MD) as well as completely revised [platform handbook](documentation/PlatformHandbook.pdf)
-* New INFLUX DB v3 connector for ReGaP.
-* Ongoing Management UI improvements
-* ReGaP: Influx/Grafana based dashboarding for oktoflow apps, integration of [oktoflow2grafana](https://github.com/iip-ecosphere/oktoflow2grafana).
-* For easing git checkouts: examples.hm22 and examples.emo23 have been moved to an own repository
+* INFLUX DB v3 connector for ReGaP.
 * Upcoming support for Asset Administration Shells metamodel v3 through BaSyx2
 * Support for Python 3.13 and virtual environments
-* Many interesting ideas and proto-requirements from the [ReGaP-community kickoff](https://regap.de/community-kickoff/). Initial contribution: file-based connector for CSV, JSON, etc.
 
 ## Public demonstrations
 
