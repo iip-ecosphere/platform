@@ -82,6 +82,19 @@ Please note that complex build processes, e.g., for examples or platform compone
 |           | install, package          | `-DdisablePython=<bool>`             | enables/disables Python building, i.e., "compilation" and tests                                                               | [invoker build plugin](../tools/tools.maven.invoker)               |
 |           | install, package          | `-DenableJavadoc=<bool>`             | enables/disables Java documentation building                                                                                  | [invoker build plugin](../tools/tools.maven.invoker)               |
 
+## Partial builds
+
+For testing, debugging etc. sometimes it is needed to specifically modify a certain component and try it out in context. Typically, it is sufficient to build that component locally and, depending on the usage context, also build the context component/app/platform and run the tests there. In more details
+
+* for usual platform components with non-invoker builds, execute `mvn install`, if you want to disable testing for that component, append `-DskipTests`.
+* for complex platform components, check out first the build sequence as stated in the respective `README.md` file. Some invoker-based examples:
+    * `support.aas.basyx.server` (in `support.basyx`) requires building `support.aas.basyx` first.
+    * `support.aas.basyx1_0` or `support.aas.basyx1_5` require building `support.aas.basyx` first.
+    * `support.aas.basyx2` has the following build sequence: `support.aas.basyx2.common` (in `support.aas.basyx2`), `support.aas.basyx2.server` (in `support.aas.basyx2`), `support.aas.basyx2` and if (plugin-)tests shall be executed also `support.aas.basyx2.plugintests` (in `support.aas.basyx2`)
+    * `configuration.easy` (containing the IVML meta model) requires a subsequent build of `configuration.configuration` (collecting all metamodels) to become effective. `configuration.easy` may require a build of `test.configuration.configuration` (in `configuration.easy`) if something was modified there.
+    
+Please note that local snapshots are typically overwritten by CI-built snapshots published after changes in github, i.e., your local build may be gone and has to be repeated if after your local build changes to github were committed and some build process on your machine requested an update of snapshots. For more information, see also the build process summary in the [platform handbook](PlatformHandbook.pdf).
+
 ## Determining the update behavior
 <a name="mvn-update-behavior"></a>
 
