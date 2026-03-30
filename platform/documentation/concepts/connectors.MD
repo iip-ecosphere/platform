@@ -144,13 +144,13 @@ In particular, `LongIndexType` may be used representing here a timestamp in ms s
 
 If the specified `bucket` does not exist, the connector will create it in the specified `organization` when a successful connection was established. However, the connector will not create the specified `organization` if it does not exist. If, e.g., permission reasons, `organization` or `bucket` cannot be accessed, further access will fail. 
 
-Please note that only Influx v1 allows for an `USERNAME` token taken from the identity store. n authenticated `InfluxConnector` for Influx v2 expects an issued token, e.g.,
+Please note that only Influx v1 allows for an `USERNAME` token taken from the identity store. An authenticated `InfluxConnector` for Influx v2 expects an issued token, e.g.,
 
 ```
 identities:
     "influxCloud": 
         type: ISSUED
-        tokenData: my-hidden-token
+        tokenData: my-hidden-token (usually 88 characters, ending with ==)
         tokenEncryptionAlgorithm: UTF-8
 ```
 
