@@ -1,35 +1,57 @@
-# Virtual testing/twinning
+# Virtual OPC-UA Connector
 
-If the real device/machine is not accessible as needed or you want to test an oktoflow connector/app prior to testing it on-site, a **virtual/simulated counterpart** could be helpful. While we focus on just providing a counterpart the offers an expected situation, a more precise approach might use a **virtual twin**.
+This guide explains how to simulate an OPC-UA endpoint and connect to it locally.
 
-## OPC UA: Create simplified OPC UA simulation using a Docker container.
+If the physical device/machine is unavailable — or you want to validate an oktoflow connector/app before going on-site — a **virtual/simulated counterpart** provides a practical testing environment. Note that this is a lightweight simulation that replicates expected behavior, not a full **digital twin**.
 
-###	Introduction
+## OPC UA: Create simplified OPC UA simulation using a Docker containers.
 
--	We use Docker images provided by [IOTech Systems](https://iotechsys.com/)
--	The licence to use Docker images provided by IOTech Systems are free for academic purposes (non-commercial use). 
--	The guide to use the simulation Docker container is the [simulator overview](https://docs.iotechsys.com/edge-xrt21/simulators/opc-ua/simulator/overview.html)
--	To browse the OPC UA, we use another Docker image provided by IOTech Systems, the [opcua browser](https://docs.iotechsys.com/edge-opcuabrowser10/installation/installation.html). 
+-	The OPC-UA endpoint and browser are provided by [IOTech Systems](https://iotechsys.com/) as Docker images.
+-	Docker images by IOTech Systems are free for academic purposes (non-commercial use).
+-	In addition to this documentation, refer to the official documentation: [OPC-UA Simulator](https://docs.iotechsys.com/edge-xrt21/simulators/opc-ua/simulator/overview.html) and [OPC-UA Browser](https://docs.iotechsys.com/edge-opcuabrowser10/installation/installation.html).
 
-### Brief instructions to use the container (without security authentication): 
-- To run the container simulation, use the following command:
-`docker run --rm --name opc-ua-sim -p 49947:49947 iotechsys/opc-ua-sim:1.2 -l /example-scripts/simulation.lua`
-- To run the container browser, use the following command:
-`docker run -d --name opc-ua-browser -p 8080:8080 iotechsys/opc-ua-browser`
-- Open your web browser on http://localhost:8080
-- Open this `url opc.tcp://xxx.xxx.xxx.xxx:49947/`, where `xxx.xxx.xxx.xxx` is your IP address.
+### Simulator (without security authentication): 
 
-### Customizing the OPC UA structure
+The OPC-UA simulator replicates a machine OPC-UA endpoint whose behavior is defined through a Lua script.
 
-The instruction above generates a default example provided by IOTech Systems. To use it with different structure/data, you need to create a custom simulation Lua script. For creating and using a custom simulation Lua script, please follow the [tutorial and example](https://docs.iotechsys.com/edge-xrt21/simulators/opc-ua/simulator/lua-scripting.html). This is a brief summary:
-- Create a folder in the current directory with the name ``lua-scripts`` and put the custom simulation Lua script in it.
-- To run OPC UA simulation with a custom simulation Lua script, use the following command (without security authentication):
-`docker run --rm --name opc-ua-sim -p 49947:49947 -v $(pwd)/lua-scripts/:/docker-lua-scripts/ iotechsys/opc-ua-sim:1.2 -l /docker-lua-scripts/custom.script.lua` where `custom.script.lua` is the name of a custom simulation Lua script and `$(pwd)` is a  Linux command to obtain the current directory (`%cd%` on Windows).
+Running a Docker container from the OPC-UA image with the pre-defined structure uses an example configuration (Provided by IOTech Systems):
+```bash
+docker run --rm --name opc-ua-sim -p 49947:49947 iotechsys/opc-ua-sim:1.2 -l /example-scripts/simulation.lua
+```
 
-### Example for the ReGaP virtual sensor app
+For Lua customization beyond the example, see the official [tutorial and examples](https://docs.iotechsys.com/edge-xrt21/simulators/opc-ua/simulator/lua-scripting.html).
 
-Use this [custom simulation Lua script](examples/custom.script.lua), here are the key points of the custom simulation Lua script:
--	Create a variable `actSpeed` with `Double` type
+### Browser
+
+The browser image visualizes an OPC-UA endpoint in the web browser.
+
+1. Running a Docker container from the browser image:
+```bash
+docker run -d --name opc-ua-browser -p 8080:8080 iotechsys/opc-ua-browser
+```
+
+2. Navigate to [http://localhost:8080](http://localhost:8080) in your web browser.
+
+3. Create a new connection to the simulator to inspect the OPC-UA endpoint. Enter the following connection URL:
+```
+opc.tcp://xxx.xxx.xxx.xxx:49947/
+```
+Replace `xxx.xxx.xxx.xxx` with your local IP address (`hostname -I` on Linux, `ipconfig` on Windows). The port `49947` is defined by the Docker run command and must match the port used in the IVML connector definition.
+
+### Customized OPC UA structure
+
+To use it with different structure/data, you need to create a custom simulation Lua script. For creating and using a custom simulation Lua script, please follow the [tutorial and example](https://docs.iotechsys.com/edge-xrt21/simulators/opc-ua/simulator/lua-scripting.html). This is a brief summary:
+1. Create a folder named `docker-lua-scripts` in the current directory and place the [custom simulation Lua script](examples/custom.script.lua) inside it.
+2. Running a Docker container from OPC-UA image with the custom Lua script `custom.script.lua` by mounting the script folder (`$(pwd)` is `%cd%` on Windows):
+
+```bash
+docker run --rm --name opc-ua-sim -p 49947:49947 -v $(pwd)/docker-lua-scripts/:/docker-lua-scripts/ iotechsys/opc-ua-sim:1.2 -l /docker-lua-scripts/custom.script.lua
+```
+
+#### Lua Script Structure
+The main components of the custom Lua script responsible for creating the structure and variables are as follows:
+
+-	Declare an `actSpeed` variable of type `Double`:
 ```lua
     actSpeed_variant = Variant.new(DataType.DOUBLE)
     actSpeed_variant:setScalar(0)
@@ -54,15 +76,18 @@ Channel_folder.addObjectNode (Spindle_folder)
 actSpeed = VariableNode.new(NodeId.newString("actSpeed",ns2), "actSpeed", Spindle_folder:getNodeId(), actSpeed_variant, AccessLevel.READ)
 Server.addVariableNode (actSpeed)
 ```
--	Update the `actSpeed` variable value periodically 
+-	Periodically update the `actSpeed` variable value: 
 ```lua
 actSpeed_variant:setScalar(actSpeed_variant:getScalar() + 1)
 actSpeed:updateValue()
 ```
 
-For Ivml models in the application:
--	Below the ivml model for the output type for the connector
-```
+## IVML connector and type definition
+
+To connect an application to the customized OPC-UA above, use the following IVML connector and type
+
+-	The output type for the OPC UA connector
+```ivml
 RecordType OpCuaOutput = {
   name = "OpCuaOutput",
   fields = {
@@ -75,8 +100,8 @@ RecordType OpCuaOutput = {
 };
 ```
 
--	Below the ivml model for the OPC UA connector 
-```
+-	The OPC UA connector
+```ivml
 OpcUaV1Connector myOpcUaConn = {
   id = "myOpcUaConn",
   name = "myOpcUaConn",
@@ -86,9 +111,10 @@ OpcUaV1Connector myOpcUaConn = {
   port = 49947,
   samplingPeriod = 1000,
   kind = ServiceKind::SOURCE_SERVICE,
-  input = {{type=refBy(Empty)}},
+  input = {{type=refBy(EmptyRecord)}},
   output = {{type=refBy(OpCuaOut)}},
-  inInterface = {{type=refBy(Empty)}},
+  inInterface = {{type=refBy(EmptyRecord)}},
   outInterface = {{type=refBy(OpCuaOut), path="Objects/Sinumerik/Channel/Spindle/"}}
 };
 ```
+
