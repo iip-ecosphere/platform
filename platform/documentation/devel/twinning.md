@@ -1,16 +1,22 @@
-# Virtual OPC-UA Connector
+# Virtual testing/twinning
+
+If the real device/machine is not accessible as needed or you want to test an oktoflow connector/app prior to testing it on-site, a **virtual/simulated counterpart** could be helpful. While we focus on just providing a counterpart the offers an expected situation, a more precise approach might use a **virtual twin**.
+
+As a initial step, we describe below how to apply virtual testing to a virtual OPC-UA server.
+
+## Virtual OPC-UA Server
 
 This guide explains how to simulate an OPC-UA endpoint and connect to it locally.
 
-If the physical device/machine is unavailable — or you want to validate an oktoflow connector/app before going on-site — a **virtual/simulated counterpart** provides a practical testing environment. Note that this is a lightweight simulation that replicates expected behavior, not a full **digital twin**.
+If the physical device/machine is unavailable - or you want to validate an oktoflow connector/app before going on-site - a **virtual/simulated counterpart** provides a practical testing environment. Note that this is a lightweight simulation that replicates expected behavior, not a full **digital twin**.
 
-## OPC UA: Create simplified OPC UA simulation using a Docker containers.
+### OPC UA: Create simplified OPC UA simulation using a Docker containers.
 
 -	The OPC-UA endpoint and browser are provided by [IOTech Systems](https://iotechsys.com/) as Docker images.
 -	Docker images by IOTech Systems are free for academic purposes (non-commercial use).
 -	In addition to this documentation, refer to the official documentation: [OPC-UA Simulator](https://docs.iotechsys.com/edge-xrt21/simulators/opc-ua/simulator/overview.html) and [OPC-UA Browser](https://docs.iotechsys.com/edge-opcuabrowser10/installation/installation.html).
 
-### Simulator (without security authentication): 
+#### Simulator (without security authentication): 
 
 The OPC-UA simulator replicates a machine OPC-UA endpoint whose behavior is defined through a Lua script.
 
@@ -21,7 +27,7 @@ docker run --rm --name opc-ua-sim -p 49947:49947 iotechsys/opc-ua-sim:1.2 -l /ex
 
 For Lua customization beyond the example, see the official [tutorial and examples](https://docs.iotechsys.com/edge-xrt21/simulators/opc-ua/simulator/lua-scripting.html).
 
-### Browser
+#### Browser
 
 The browser image visualizes an OPC-UA endpoint in the web browser.
 
@@ -38,7 +44,7 @@ opc.tcp://xxx.xxx.xxx.xxx:49947/
 ```
 Replace `xxx.xxx.xxx.xxx` with your local IP address (`hostname -I` on Linux, `ipconfig` on Windows). The port `49947` is defined by the Docker run command and must match the port used in the IVML connector definition.
 
-### Customized OPC UA structure
+#### Customized OPC UA server structure
 
 To use it with different structure/data, you need to create a custom simulation Lua script. For creating and using a custom simulation Lua script, please follow the [tutorial and example](https://docs.iotechsys.com/edge-xrt21/simulators/opc-ua/simulator/lua-scripting.html). This is a brief summary:
 1. Create a folder named `docker-lua-scripts` in the current directory and place the [custom simulation Lua script](examples/custom.script.lua) inside it.
@@ -48,7 +54,7 @@ To use it with different structure/data, you need to create a custom simulation 
 docker run --rm --name opc-ua-sim -p 49947:49947 -v $(pwd)/docker-lua-scripts/:/docker-lua-scripts/ iotechsys/opc-ua-sim:1.2 -l /docker-lua-scripts/custom.script.lua
 ```
 
-#### Lua Script Structure
+##### Lua Script Structure
 The main components of the custom Lua script responsible for creating the structure and variables are as follows:
 
 -	Declare an `actSpeed` variable of type `Double`:
@@ -82,7 +88,7 @@ actSpeed_variant:setScalar(actSpeed_variant:getScalar() + 1)
 actSpeed:updateValue()
 ```
 
-## IVML connector and type definition
+### IVML connector and type definition
 
 To connect an application to the customized OPC-UA above, use the following IVML connector and type
 
@@ -100,7 +106,7 @@ RecordType OpCuaOutput = {
 };
 ```
 
--	The OPC UA connector
+-	The OPC UA connector (using the pre-defined `EmptyRecord` type)
 ```ivml
 OpcUaV1Connector myOpcUaConn = {
   id = "myOpcUaConn",
