@@ -2,7 +2,7 @@
 
 If the real device/machine is not accessible as needed or you want to test an oktoflow connector/app prior to testing it on-site, a **virtual/simulated counterpart** could be helpful. While we focus on just providing a counterpart the offers an expected situation, a more precise approach might use a **virtual twin**.
 
-As a initial step, we describe below how to apply virtual testing to a virtual OPC-UA server.
+As a initial step, we describe below how to apply virtual testing to a virtual OPC-UA server. Further approaches may follow.
 
 ## Virtual OPC-UA Server
 
