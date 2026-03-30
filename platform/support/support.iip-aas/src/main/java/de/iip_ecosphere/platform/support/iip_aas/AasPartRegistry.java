@@ -124,6 +124,8 @@ public class AasPartRegistry {
     public static final int DEFAULT_SM_PORT = 8082;
     public static final int DEFAULT_REGISTRY_PORT = 8081; 
     public static final int DEFAULT_SM_REGISTRY_PORT = 8083;
+    public static final int DEFAULT_CONCEPT_REGISTRY_PORT = 8084;
+    public static final int DEFAULT_DISCOVERY_PORT = 8085;
     public static final int DEFAULT_PROTOCOL_PORT = 9000;
     public static final String DEFAULT_AAS_ENDPOINT = "";
     public static final String DEFAULT_REGISTRY_ENDPOINT = "registry";
@@ -183,18 +185,18 @@ public class AasPartRegistry {
 
         private EndpointHolder server = createAasEndpointHolder(AasPartRegistry.DEFAULT_SCHEMA, 
             DEFAULT_HOST, DEFAULT_PORT, DEFAULT_AAS_ENDPOINT);
-
         private EndpointHolder smServer = createAasEndpointHolder(AasPartRegistry.DEFAULT_SCHEMA, 
             DEFAULT_HOST, DEFAULT_SM_PORT, DEFAULT_AAS_ENDPOINT);
-        
         private EndpointHolder registry = createAasEndpointHolder(DEFAULT_SCHEMA, DEFAULT_HOST, 
             DEFAULT_REGISTRY_PORT, DEFAULT_REGISTRY_ENDPOINT);
-
         private EndpointHolder smRegistry = createAasEndpointHolder(DEFAULT_SCHEMA, DEFAULT_HOST, 
             DEFAULT_SM_REGISTRY_PORT, DEFAULT_REGISTRY_ENDPOINT);
-
         private ProtocolAddressHolder implementation = new ProtocolAddressHolder(Schema.IGNORE, 
             DEFAULT_HOST, DEFAULT_PROTOCOL_PORT, DEFAULT_PROTOCOL);
+        private EndpointHolder conceptRepository = createAasEndpointHolder(DEFAULT_SCHEMA, DEFAULT_HOST, 
+            DEFAULT_CONCEPT_REGISTRY_PORT, "concepts");
+        private EndpointHolder discovery = createAasEndpointHolder(DEFAULT_SCHEMA, DEFAULT_HOST, 
+            DEFAULT_DISCOVERY_PORT, "discovery");
         
         private String serverHost = NO_SPECIFIC_SERVER_HOST; // -> use what is stated in server/registry
         
@@ -240,9 +242,20 @@ public class AasPartRegistry {
              * @param endpoint the endpoint to wrap
              */
             private WrappingComponentSetup(Supplier<EndpointHolder> endpoint) {
-                this.endpoint = endpoint;
+                this(endpoint, State.STOPPED);
             }
-            
+
+            /**
+             * Creates a wrapping component setup for a given endpoint.
+             * 
+             * @param endpoint the endpoint to wrap
+             * @param state the initial state
+             */
+            private WrappingComponentSetup(Supplier<EndpointHolder> endpoint, State state) {
+                this.endpoint = endpoint;
+                this.state = state;
+            }
+
             @Override
             public Endpoint getEndpoint() {
                 return endpoint.get().getEndpoint();
@@ -329,7 +342,7 @@ public class AasPartRegistry {
         }
 
         /**
-         * Defines the AAS server information. [required by data mapper]
+         * Defines the AAS server information. [required by json, yaml]
          * 
          * @param aas the AAS server information
          */
@@ -339,7 +352,7 @@ public class AasPartRegistry {
         }
 
         /**
-         * Defines the submodel server information. [required by data mapper]
+         * Defines the submodel server information. [required by json, yaml]
          * 
          * @param aas the submodel server information
          */
@@ -350,7 +363,7 @@ public class AasPartRegistry {
         }
 
         /**
-         * Returns the AAS information. [required by data mapper]
+         * Returns the AAS information. [required by json, yaml]
          * 
          * @return the AAS information
          */
@@ -359,7 +372,7 @@ public class AasPartRegistry {
         }
 
         /**
-         * Returns the submodel information. [required by data mapper]
+         * Returns the submodel information. [required by json, yaml]
          * 
          * @return the submodel information
          */
@@ -395,7 +408,7 @@ public class AasPartRegistry {
         }
 
         /**
-         * Defines the AAS mode. [required by data mapper, snakeyaml]
+         * Defines the AAS mode. [required by json, yaml]
          * 
          * @param mode the AAS mode
          */
@@ -444,7 +457,7 @@ public class AasPartRegistry {
         }
         
         /**
-         * Defines the registry information. [required by data mapper, snakeyaml]
+         * Defines the registry information. [required by json, yaml]
          * 
          * @param registry the registry information
          */
@@ -454,7 +467,7 @@ public class AasPartRegistry {
         }
         
         /**
-         * Defines the registry information. [required by data mapper, snakeyaml]
+         * Defines the registry information. [required by json, yaml]
          * 
          * @param registry the registry information
          */
@@ -465,7 +478,7 @@ public class AasPartRegistry {
         }        
 
         /**
-         * Returns the implementation (server) information. [required by data mapper, snakeyaml]
+         * Returns the implementation (server) information. [required by json, yaml]
          * For convenience, the port number may be invalid and is turned then into an ephemeral port.
          * 
          * @return the implementation (server) information
@@ -475,7 +488,7 @@ public class AasPartRegistry {
         }
 
         /**
-         * Defines the implementation (server) information. [required by data mapper, snakeyaml]
+         * Defines the implementation (server) information. [required by json, yaml]
          * 
          * @param implementation the implementation (server) information
          */
@@ -484,7 +497,53 @@ public class AasPartRegistry {
         }
         
         /**
-         * Sets the access control to allow cross origin. [Snakeyaml]
+         * Returns the concept repository information. [required by json, yaml]
+         * For convenience, the port number may be invalid and is turned then into an ephemeral port.
+         * 
+         * @return the concept repository (server) information
+         */
+        public EndpointHolder getConceptRepository() {
+            return conceptRepository;
+        }
+
+        /**
+         * Defines the concept repository information. [required by json, yaml]
+         * For convenience, the port number may be invalid and is turned then into an ephemeral port.
+         * 
+         * @return the concept repository (server) information
+         */
+        public void setConceptRepository(EndpointHolder repository) {
+            this.conceptRepository = repository;
+            this.conceptRepository.setValidator(
+                RuntimeSetupEndpointValidator.create(r -> r.getConceptRepository(), false));
+            getSetup(AasComponent.DISCOVERY).notifyStateChange(State.EXTERNAL); // disabled, enable
+        }
+
+        /**
+         * Returns the discovery server information. [required by json, yaml]
+         * For convenience, the port number may be invalid and is turned then into an ephemeral port.
+         * 
+         * @return the discovery (server) information
+         */
+        public EndpointHolder getDiscovery() {
+            return discovery;
+        }
+
+        /**
+         * Defines the discovery information. [required by json, yaml]
+         * For convenience, the port number may be invalid and is turned then into an ephemeral port.
+         * 
+         * @return the discovery (server) information
+         */
+        public void setDiscovery(EndpointHolder discovery) {
+            this.discovery = discovery;
+            this.discovery.setValidator(
+                RuntimeSetupEndpointValidator.create(r -> r.getDiscovery(), false));
+            getSetup(AasComponent.DISCOVERY).notifyStateChange(State.EXTERNAL); // disabled, enable
+        }
+        
+        /**
+         * Sets the access control to allow cross origin. [json, yaml]
          * 
          * @param accessControlAllowOrigin the information to be placed in the HTTP header field 
          * "Access-Control-Allow-Origin"; the specific server or {@link DeploymentRecipe#ANY_CORS_ORIGIN}
@@ -505,7 +564,7 @@ public class AasPartRegistry {
         }
 
         /**
-         * Sets the plugin id of the AAS implementation. [Snakeyaml]
+         * Sets the plugin id of the AAS implementation. [json, yaml]
          * 
          * @param pluginId the plugin id of the AAS implementation
          */
@@ -620,6 +679,10 @@ public class AasPartRegistry {
                 }
                 
             });
+            setups.put(AasComponent.CONCEPT_REPOSITORY, 
+                new WrappingComponentSetup(() -> conceptRepository, State.EXTERNAL)); // for now, prevent start
+            setups.put(AasComponent.DISCOVERY, 
+                new WrappingComponentSetup(() -> discovery, State.EXTERNAL)); // for now, prevent start
         }        
         
         @Override

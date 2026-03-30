@@ -35,6 +35,8 @@ public class RuntimeSetup extends AbstractSetup {
     private String smRegistry;
     private String aasServer;
     private String smServer;
+    private String conceptRepository;
+    private String discovery;
 
     /**
      * Returns the AAS registry URI.
@@ -46,7 +48,7 @@ public class RuntimeSetup extends AbstractSetup {
     }
 
     /**
-     * Defines the AAS registry URI. [snakeyaml]
+     * Defines the AAS registry URI. [yaml]
      * 
      * @param aasRegistry the AAS registry URI to set
      */
@@ -64,7 +66,7 @@ public class RuntimeSetup extends AbstractSetup {
     }
 
     /**
-     * Defines the AAS registry URI. [snakeyaml]
+     * Defines the AAS registry URI. [yaml]
      * 
      * @param smRegistry the AAS registry URI to set
      */
@@ -82,7 +84,7 @@ public class RuntimeSetup extends AbstractSetup {
     }
 
     /**
-     * Defines the AAS server URI. [snakeyaml]
+     * Defines the AAS server URI. [yaml]
      * 
      * @param aasServer the aasServer URI to set
      */
@@ -100,7 +102,7 @@ public class RuntimeSetup extends AbstractSetup {
     }
 
     /**
-     * Defines the AAS server URI. [snakeyaml]
+     * Defines the AAS server URI. [yaml]
      * 
      * @param smServer the server URI to set
      */
@@ -108,6 +110,42 @@ public class RuntimeSetup extends AbstractSetup {
         this.smServer = smServer;
     }    
     
+    /**
+     * Returns the concept repository URI.
+     * 
+     * @return the concept repository URI (may be <b>null</b> for unknown)
+     */
+    public String getConceptRepository() {
+        return conceptRepository;
+    }
+    
+    /**
+     * Defines the concept repository URI. [yaml]
+     * 
+     * @param smServer the concept repository URI to set
+     */
+    public void setConceptRepository(String conceptRepository) {
+        this.conceptRepository = conceptRepository;
+    }
+    
+    /**
+     * Returns the AAS discovery URI.
+     * 
+     * @return the AAS discovery URI (may be <b>null</b> for unknown)
+     */
+    public String getDiscovery() {
+        return discovery;
+    }
+    
+    /**
+     * Defines the AAS discovery URI. [yaml]
+     * 
+     * @param smServer the discovery URI to set
+     */
+    public void setDiscovery(String discovery) {
+        this.discovery = discovery;
+    }
+
     /**
      * Returns the default location for the runtime setup file.
      * 
