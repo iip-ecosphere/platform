@@ -226,11 +226,14 @@ public class BasicSetupSpec implements SetupSpec {
         if (spec instanceof BasicSetupSpec) {
             this.from = (BasicSetupSpec) spec;
             for (AasComponent c : AasComponent.values()) {
-                setups.get(c).state = this.from.setups.get(c).state;
-                setups.get(c).serverAddress = this.from.setups.get(c).serverAddress;
-                setups.get(c).endpoint = this.from.setups.get(c).endpoint;
-                setups.get(c).keyStore = this.from.setups.get(c).keyStore;
-                setups.get(c).authentication = this.from.setups.get(c).authentication;
+                BasicComponentSetup src = this.from.setups.get(c);
+                if (src != null) {
+                    setups.get(c).state = src.state;
+                    setups.get(c).serverAddress = src.serverAddress;
+                    setups.get(c).endpoint = src.endpoint;
+                    setups.get(c).keyStore = src.keyStore;
+                    setups.get(c).authentication = src.authentication;
+                }
             }
         } else {
             for (AasComponent c : AasComponent.values()) {
