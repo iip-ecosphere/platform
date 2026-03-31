@@ -83,12 +83,12 @@ install_docker_version() {
 install_python_binary_version() {
     sudo apt update -y
     sudo apt install software-properties-common -y
-    sudo echo | add-apt-repository ppa:deadsnakes/ppa
+    sudo add-apt-repository -y ppa:deadsnakes/ppa
     sudo apt update -y
     sudo apt install python3.9 -y
-    sudo wget https://bootstrap.pypa.io/get-pip.py
+    $SUDO wget https://bootstrap.pypa.io/get-pip.py
     export IIP_PYTHON=$(which python3.9)
-    sudo $IIP_PYTHON get-pip.py
+    $SUDO $IIP_PYTHON get-pip.py
     echo "Python 3.9 installation completed."
 }
 
@@ -99,14 +99,14 @@ install_python_compile_sources_version() {
         libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
         libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev \
         libgdbm-dev liblzma-dev uuid-dev
-    sudo mkdir -p $CurPath/PyPaths/sources/python3.9
+    $SUDO mkdir -p $CurPath/PyPaths/sources/python3.9
     cd $CurPath/PyPaths/sources/python3.9
-    sudo wget https://www.python.org/ftp/python/${PYTHON_SHORT_VERSION}/Python-${PYTHON_SHORT_VERSION}.tgz
-    sudo tar xzf Python-${PYTHON_SHORT_VERSION}.tgz
+    $SUDO wget https://www.python.org/ftp/python/${PYTHON_SHORT_VERSION}/Python-${PYTHON_SHORT_VERSION}.tgz
+    $SUDO tar xzf Python-${PYTHON_SHORT_VERSION}.tgz
     cd Python-3.9.21
-    sudo ./configure --prefix=$CurPath/PyPaths/python3.9 --enable-optimizations --with-ensurepip=install
-    sudo make -j$(nproc)
-    sudo make altinstall
+    $SUDO ./configure --prefix=$CurPath/PyPaths/python3.9 --enable-optimizations --with-ensurepip=install
+    $SUDO make -j$(nproc)
+    $SUDO make altinstall
     echo "Python $PYTHON_SHORT_VERSION installation completed."
 }
 
@@ -153,9 +153,6 @@ install_completed() {
 
 # Start of platform installation
 
-echo "Oktoflow platform installation (Linux)"
-echo "For installing prerequisites, administrator permissions may be required!"
-
 OktJavaVersion=17
 OktMvnVersion=3.9.7
 OktPythonVersion=3.9.21
@@ -164,13 +161,44 @@ OktNodeVersion=22.14.0
 OktNpmVersion=10.9.2
 OktAngularVersion=19.2.5
 
-OktDepsOnly="$1"
+RunSudo=false
+SUDO=""
 
-if [ -n "$OktDepsOnly" ] && [ "$OktDepsOnly" != "DepsOnly" ]; then
-  echo "Error: Invalid argument '$OktDepsOnly'. Allowed argument is 'DepsOnly': Installing Only the dependencies of the Platform (Not the full Platform)."
-  exit 1
+while [[ "$#" -gt 0 ]]; do
+  case $1 in
+    --OktDepsOnly)
+      if [[ "$2" == "DepsOnly" ]]; then
+        OktDepsOnly="$2"
+      else
+        echo "Error: --OktDepsOnly must be 'DepsOnly'"
+        exit 1
+      fi
+      shift
+      ;;
+    --RunSudo)
+      if [[ "$2" == "true" || "$2" == "false" ]]; then
+        RunSudo="$2"
+      else
+        echo "Error: --RunSudo must be 'true' or 'false'"
+        exit 1
+      fi
+      shift
+      ;;
+    *) echo "Unknown parameter: $1"; 
+       echo "Allowed argument are "
+       echo "--OktDepsOnly DepsOnly: Installing Only the dependencies of the Platform (Not the full Platform)."
+       echo "--RunSudo true/false: Prefix all commands with sudo (default: false)."
+       exit 1 ;;
+  esac
+  shift
+done
+
+# set sudo variable
+if [[ "$RunSudo" == "true" ]]; then
+  SUDO="sudo"
 fi
 
+echo "Oktoflow platform installation (Linux)"
 echo "Installing prerequisites Java $OktJavaVersion, Maven version $OktMvnVersion, and Python version $OktPythonVersion"
 echo "This action will set and use Environment Variables"
 read -p "Do you want to install the prerequisites (skip only if already installed)? (y/n) " yn
@@ -230,7 +258,7 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
         read -p "Your runnable python3.9 or your Python the virtual environment: " PythonPath
     done
 
-    if [[ "$PythonPath" != "N" || "$PythonPath" != "n" ]]; then
+    if [[ "$PythonPath" != "N" && "$PythonPath" != "n" ]]; then
         while true; do
             read -p "You have Python installed in $PythonPath, correct (y/n)? " CheckPath
             case $CheckPath in
@@ -255,17 +283,17 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
             done
 
             if [[ "$Pythonyn" == "Y" || "$Pythonyn" == "y" ]]; then
-                echo "Please choose: (A) Take the most recent 3.9.x (untested), (B) Download source and compile 3.9.21 (It takes more time)."
+                echo "Please choose: (a) Take the most recent 3.9.x (untested), (b) Download source and compile 3.9.21 (It takes more time)."
                 while true; do
-                    read -p "Please choose how to install python (A/B): " PythonInstallModeab
+                    read -p "Please choose how to install python (a/b): " PythonInstallModeab
                     os_info=$(grep "^PRETTY_NAME=" /etc/os-release | cut -d= -f2- | tr -d '"')
                     if [[ "$os_info" == *"Debian GNU/Linux"* && ( "$PythonInstallModeab" == "A" || "$PythonInstallModeab" == "a" ) ]]; then
-                        echo "Detected Debian: $os_info. Debian does not support method (A) to install 3.9.x"
+                        echo "Detected Debian: $os_info. Debian does not support method (a) to install 3.9.x"
                     else
                         case $PythonInstallModeab in
                             [Aa]* ) break;;
                             [Bb]* ) break;;
-                            * ) echo "Please answer A or B.";;
+                            * ) echo "Please answer a or b.";;
                         esac
                     fi
                 done
@@ -414,6 +442,7 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
         echo "Installing the full version of the Platform"
     fi
 
+    echo "Note: Installing prerequisites in this script requires administrator privileges!"
     read -p "Press Enter to start the installation..."
 
     # Install Java version 17
@@ -434,8 +463,8 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
     # Install Maven version 3.9.7
     
     if ! [ -x "$(command -v mvn -version)" ]; then
-        sudo wget https://archive.apache.org/dist/maven/maven-3/3.9.7/binaries/apache-maven-3.9.7-bin.tar.gz
-        sudo tar xzpvf apache-maven-3.9.7-bin.tar.gz
+        $SUDO wget https://archive.apache.org/dist/maven/maven-3/3.9.7/binaries/apache-maven-3.9.7-bin.tar.gz
+        $SUDO tar xzpvf apache-maven-3.9.7-bin.tar.gz
     
         sudo ln -s $PWD/apache-maven-3.9.7/bin/mvn /usr/bin/mvn
     else
@@ -467,12 +496,12 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
         if ! [ -x "$(command -v $PythonPath --version)" ]; then
             install_python_binary_version
             export IIP_PYTHON=$(which python3.9)
-            sudo $IIP_PYTHON -m pip install pyflakes
+            $SUDO $IIP_PYTHON -m pip install pyflakes
         else
             case $Pythonyn in
                 [Yy]* ) install_python_binary_version;
                         export IIP_PYTHON=$(which python3.9);
-                        sudo $IIP_PYTHON -m pip install pyflakes;;
+                        $SUDO $IIP_PYTHON -m pip install pyflakes;;
                 [Nn]* ) echo "";;
             esac
         fi
@@ -487,7 +516,7 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
             case $Pythonyn in
                 [Yy]* ) install_python_compile_sources_version $OktPythonVersion;
                         export IIP_PYTHON=$CurPath/PyPaths/python3.9/bin/python3.9;
-                        sudo $IIP_PYTHON -m pip install pyflakes;;
+                        $SUDO $IIP_PYTHON -m pip install pyflakes;;
                 [Nn]* ) echo "";;
             esac
         fi
@@ -501,12 +530,15 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
     # Install Node.js version 22.x.0 and angular version 19
     
     case $Nodeyn in
-        [Yy]* ) sudo apt update && apt install -y curl gnupg && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && apt install -y nodejs;;
+        [Yy]* ) sudo apt update;
+                sudo apt install -y curl gnupg;
+                $SUDO curl -fsSL https://deb.nodesource.com/setup_22.x | sudo bash -;
+                sudo apt install -y nodejs;;
         [Nn]* ) echo "";;
     esac
 
     case $Angularyn in
-        [Yy]* ) sudo npm install -g @angular/cli@19.2.5;;
+        [Yy]* ) $SUDO npm install -g @angular/cli@19.2.5;;
         [Nn]* ) echo "";;
     esac
     
@@ -534,12 +566,12 @@ cat >daemon.json <<EOF
 EOF
                      
     case $Registryyn in
-        [Yy]* ) sudo sed -i $generationLineNumber' i \ \ \ \ };' src/main/easy/TechnicalSetup.ivml;
-                sudo sed -i $generationLineNumber' i \ \ \ \ \ \ \ \ registry = "'$localIP':5001"' src/main/easy/TechnicalSetup.ivml;
-                sudo sed -i $generationLineNumber' i \ \ \ \ containerManager = DockerContainerManager {' src/main/easy/TechnicalSetup.ivml;
-                sudo sed -i $generationLineNumber' i \ \ \ \ ' src/main/easy/TechnicalSetup.ivml;
-                sudo sed -i $generationLineNumber' i \ \ \ \ // ---------- Registry ------------' src/main/easy/TechnicalSetup.ivml;
-                sudo sed -i $generationLineNumber' i \ \ \ \ ' src/main/easy/TechnicalSetup.ivml;
+        [Yy]* ) $SUDO sed -i $generationLineNumber' i \ \ \ \ };' src/main/easy/TechnicalSetup.ivml;
+                $SUDO sed -i $generationLineNumber' i \ \ \ \ \ \ \ \ registry = "'$localIP':5001"' src/main/easy/TechnicalSetup.ivml;
+                $SUDO sed -i $generationLineNumber' i \ \ \ \ containerManager = DockerContainerManager {' src/main/easy/TechnicalSetup.ivml;
+                $SUDO sed -i $generationLineNumber' i \ \ \ \ ' src/main/easy/TechnicalSetup.ivml;
+                $SUDO sed -i $generationLineNumber' i \ \ \ \ // ---------- Registry ------------' src/main/easy/TechnicalSetup.ivml;
+                $SUDO sed -i $generationLineNumber' i \ \ \ \ ' src/main/easy/TechnicalSetup.ivml;
                 
                 sudo mv daemon.json /etc/docker/;
                 sudo systemctl restart docker;
@@ -553,9 +585,9 @@ EOF
     esac
     
     if [ -n "$OktDepsOnly" ] && [ "$OktDepsOnly" == "DepsOnly" ]; then
-        sudo mvn -P DepsOnly install
+        $SUDO mvn -P DepsOnly install
     else
-        sudo mvn install -Diip.easy.tracing=TOP
+        $SUDO mvn install -Diip.easy.tracing=TOP
     fi
 
     install_completed "$OktDepsOnly"
@@ -672,6 +704,7 @@ elif [ $yn == "n" ] || [ $yn == "N" ]; then
         echo "Installing the full version of the Platform"
     fi
 
+    echo "Note: Installing prerequisites in this script requires administrator privileges!"
     read -p "Press Enter to start the installation..."
 
     sudo apt-get update
@@ -681,12 +714,15 @@ elif [ $yn == "n" ] || [ $yn == "N" ]; then
     # Install Node.js version 22.x.0 and angular version 19
     
     case $Nodeyn in
-        [Yy]* ) sudo apt update && apt install -y curl gnupg && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && apt install -y nodejs;;
+        [Yy]* ) sudo apt update;
+                sudo apt install -y curl gnupg;
+                $SUDO curl -fsSL https://deb.nodesource.com/setup_22.x | sudo bash -;
+                sudo apt install -y nodejs;;
         [Nn]* ) echo "";;
     esac
 
     case $Angularyn in
-        [Yy]* ) sudo npm install -g @angular/cli@19.2.5;;
+        [Yy]* ) $SUDO npm install -g @angular/cli@19.2.5;;
         [Nn]* ) echo "";;
     esac
     
@@ -714,12 +750,12 @@ cat >daemon.json <<EOF
 EOF
                      
     case $Registryyn in
-        [Yy]* ) sudo sed -i $generationLineNumber' i \ \ \ \ };' src/main/easy/TechnicalSetup.ivml;
-                sudo sed -i $generationLineNumber' i \ \ \ \ \ \ \ \ registry = "'$localIP':5001"' src/main/easy/TechnicalSetup.ivml;
-                sudo sed -i $generationLineNumber' i \ \ \ \ containerManager = DockerContainerManager {' src/main/easy/TechnicalSetup.ivml;
-                sudo sed -i $generationLineNumber' i \ \ \ \ ' src/main/easy/TechnicalSetup.ivml;
-                sudo sed -i $generationLineNumber' i \ \ \ \ // ---------- Registry ------------' src/main/easy/TechnicalSetup.ivml;
-                sudo sed -i $generationLineNumber' i \ \ \ \ ' src/main/easy/TechnicalSetup.ivml;
+        [Yy]* ) $SUDO sed -i $generationLineNumber' i \ \ \ \ };' src/main/easy/TechnicalSetup.ivml;
+                $SUDO sed -i $generationLineNumber' i \ \ \ \ \ \ \ \ registry = "'$localIP':5001"' src/main/easy/TechnicalSetup.ivml;
+                $SUDO sed -i $generationLineNumber' i \ \ \ \ containerManager = DockerContainerManager {' src/main/easy/TechnicalSetup.ivml;
+                $SUDO sed -i $generationLineNumber' i \ \ \ \ ' src/main/easy/TechnicalSetup.ivml;
+                $SUDO sed -i $generationLineNumber' i \ \ \ \ // ---------- Registry ------------' src/main/easy/TechnicalSetup.ivml;
+                $SUDO sed -i $generationLineNumber' i \ \ \ \ ' src/main/easy/TechnicalSetup.ivml;
                 
                 sudo mv daemon.json /etc/docker/;
                 sudo systemctl restart docker;
@@ -733,9 +769,9 @@ EOF
     esac
     
     if [ -n "$OktDepsOnly" ] && [ "$OktDepsOnly" == "DepsOnly" ]; then
-        sudo mvn -P DepsOnly install
+        $SUDO mvn -P DepsOnly install
     else
-        sudo mvn install -Diip.easy.tracing=TOP
+        $SUDO mvn install -Diip.easy.tracing=TOP
     fi
 
     install_completed "$OktDepsOnly"
