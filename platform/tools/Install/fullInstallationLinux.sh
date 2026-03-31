@@ -130,6 +130,7 @@ install_completed() {
 
   if [ -n "$localOktDepsOnly" ] && [ "$localOktDepsOnly" == "DepsOnly" ]; then
     echo "Only the dependencies of the Platform was installed (Not the full Platform)"
+    echo "Run 'source ~/.bashrc' or open a new terminal to apply environment variables."
   else
     echo "The following commands were created in Platform\Install\gen:"
     echo "- broker/broker.sh starts the configured communication broker (cd needed)"
@@ -145,6 +146,7 @@ install_completed() {
     echo "the included application (cli.sh deploy artifacts/deployment.yaml). On a permanent installation, only" 
     echo "accessing the UI or the CLI is needed."
     echo "Please consult the installation overview for more information."
+    echo "Run 'source ~/.bashrc' or open a new terminal to apply environment variables."
   fi
 
 }
