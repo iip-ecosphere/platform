@@ -14,8 +14,10 @@ package de.oktoflow.platform.cmdTools;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -34,7 +36,9 @@ public class ChangePomVersion {
 
     public static final String PARAM_PREFIX = "--";
     public static final String PARAM_VALUE_SEP = "=";
-
+    private static final String SUFFIX_SNAPSHOT = "-SNAPSHOT";
+    private static final String SUFFIX_QUALIFIER = ".qualifier";
+    private static final String KEY_BUNDLE_VERSION = "Bundle-Version:";
     
     private String oldPomVersion;
     private String newPomVersion;
@@ -42,6 +46,7 @@ public class ChangePomVersion {
     private String newParentPomVersion;
     private boolean simulate;
     private boolean verbose;
+    private boolean modifyManifest;
     
     private Predicate<String> incPattern;
     private Predicate<String> excPattern;
@@ -77,6 +82,7 @@ public class ChangePomVersion {
         String excludes = getArg(args, "excludes", ".*/gen/.*");
         simulate = CmdLine.getBooleanArgNoVal(args, "simulate", false);
         verbose = CmdLine.getBooleanArgNoVal(args, "verbose", false);
+        modifyManifest = CmdLine.getBooleanArgNoVal(args, "modifyManifest", false);
         Collections.addAll(properties, getArg(args, "properties", "").replace(';', ':').split(":"));
         
         if (includes.length() == 0) {
@@ -148,11 +154,71 @@ public class ChangePomVersion {
             try {
                 Result res = PomReader.replaceVersion(file, oldPomVersion, newPomVersion, oldParentPomVersion, 
                     newParentPomVersion, properties, groupIdPattern);
-                System.out.println(prefix + res.name().toLowerCase());
+                String txt = prefix + res.name().toLowerCase();
+                if (Result.MODIFIED == res && modifyManifest) {
+                    String mf = "META-INF/MANIFEST.MF";
+                    Result mRes = replaceManifestVersion(new File(file.getParentFile(), mf), 
+                        oldPomVersion, newPomVersion);
+                    txt += " " + mf + " " + mRes.name().toLowerCase();
+                }
+                System.out.println(txt);
             } catch (IOException e) {
                 System.out.println(prefix + e.getMessage());
             }
         }
+    }
+    
+    /**
+     * Strips the suffix.
+     * 
+     * @param text the text to modify
+     * @param suffix the suffix to look for
+     * @return the text with suffix replaced
+     */
+    private static String stripSuffix(String text, String suffix) {
+        if (text.endsWith(suffix)) {
+            text = text.substring(0, text.length() - suffix.length());
+        }
+        return text;
+    }
+    
+    /**
+     * Replaces bundle versions in Manifest files.
+     * 
+     * @param file the file to modify
+     * @param oldVersion the old (mvn) version
+     * @param newVersion the new (mvn) version
+     * @return the result state
+     * @throws IOException if reading/writing fails
+     */
+    private static Result replaceManifestVersion(File file, String oldVersion, String newVersion) throws IOException {
+        Result result = Result.SKIPPED;
+        if (file.exists()) {
+            String oldVer = stripSuffix(oldVersion, SUFFIX_SNAPSHOT);
+            boolean oldVerSnapshot = oldVer.length() != oldVersion.length();
+            String newVer = stripSuffix(newVersion, SUFFIX_SNAPSHOT);
+            boolean newVerSnapshot = newVer.length() != newVersion.length();
+            // Manifest operates on hash, sequence may change
+            List<String> manifest = Files.readAllLines(file.toPath());
+            for (int l = 0; l < manifest.size(); l++) {
+                String line = manifest.get(l);
+                if (line.startsWith(KEY_BUNDLE_VERSION)) {
+                    String mfVersion = line.substring(KEY_BUNDLE_VERSION.length()).trim();
+                    String mfVer = stripSuffix(mfVersion, SUFFIX_QUALIFIER);
+                    boolean mfVerSnapshot = oldVer.length() != oldVersion.length();
+                    if (oldVerSnapshot == mfVerSnapshot && mfVer.equals(oldVer)) {
+                        line = KEY_BUNDLE_VERSION + " " + newVer;
+                        if (newVerSnapshot) {
+                            line += SUFFIX_QUALIFIER;
+                        }
+                        manifest.set(l, line);
+                        result = Result.MODIFIED;
+                    }
+                }
+            }
+            Files.write(file.toPath(), manifest);
+        }
+        return result;
     }
 
     /**
@@ -209,6 +275,7 @@ public class ChangePomVersion {
             System.out.println(" --includeGroupId=<regEx>");
             System.out.println(" --excludeGroupId=<regEx>");
             System.out.println(" --verbose=<boolean>");
+            System.out.println(" --modifyManifest=<boolean>");
             System.out.println(" --includes=.*/pom(-model)?.xml$; regEx match all paths with /");
             System.out.println(" --excludes=.*/gen/.*; regEx match all paths with /");
             System.out.println(" --properties=<str> : or ; separated list of properties to replace POM version");
