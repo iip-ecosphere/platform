@@ -61,7 +61,7 @@ Alternative dependencies within one component are marked by *.
 
 For virtualized execution, automated creation of containers
 
-- Docker in path
+- Docker 20.10.7 in path
 
 ### Web User Interface
 
