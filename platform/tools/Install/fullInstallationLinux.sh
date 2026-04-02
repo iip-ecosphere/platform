@@ -478,20 +478,6 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
         esac
     fi
     
-    # Install Docker version 20.10.7
-    
-    if ! [ -x "$(command -v docker --version)" ]; then
-        install_docker_version $OktDockerVersion
-    
-        sudo usermod -aG docker $USER
-    else
-        case $Dockeryn in
-            [Yy]* ) install_docker_version $OktDockerVersion;
-                    sudo usermod -aG docker $USER;;
-            [Nn]* ) echo "";;
-        esac
-    fi
-    
     # Install Python version 3.9
     
     if [[ "$PythonInstallModeab" == "A" || "$PythonInstallModeab" == "a" ]]; then
@@ -528,6 +514,14 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
         export IIP_PYTHON=$PythonPath;
         echo "export IIP_PYTHON=$PythonPath" >> ~/.bashrc
     fi
+    
+    # Install Docker version 20.10.7
+
+    case $Dockeryn in
+        [Yy]* ) install_docker_version $OktDockerVersion;
+                sudo usermod -aG docker $USER;;
+        [Nn]* ) echo "";;
+    esac
 
     # Install Node.js version 22.x.0 and angular version 19
     
