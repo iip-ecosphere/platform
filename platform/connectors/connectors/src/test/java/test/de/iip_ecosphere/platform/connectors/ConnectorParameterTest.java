@@ -54,6 +54,7 @@ public class ConnectorParameterTest {
         Assert.assertNull(params.getIdentityToken(ConnectorParameter.ANY_ENDPOINT));
         Assert.assertEquals(1, params.getSpecificSetting("XYZ"));
         Assert.assertNull(params.getSpecificSetting("XY1"));
+        Assert.assertEquals("dflt", params.getSpecificStringSetting("XY1", "dflt"));
         Assert.assertEquals("1", params.getSpecificStringSetting("XYZ"));
         Assert.assertNull(params.getSpecificStringSetting("XY1"));
         Assert.assertEquals(1, params.getSpecificIntSetting("XYZ").intValue());

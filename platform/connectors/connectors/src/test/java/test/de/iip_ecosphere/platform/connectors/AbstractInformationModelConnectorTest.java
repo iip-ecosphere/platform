@@ -25,6 +25,8 @@ import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
@@ -112,6 +114,7 @@ public abstract class AbstractInformationModelConnectorTest<D> implements InputC
      * @throws IOException in case that creating the connector fails
      */
     public void testConnector(boolean withNotifications) throws IOException {
+        NotificationMode mo = ActiveAasBase.setNotificationMode(NotificationMode.NONE);
         ConnectorTest.assertDescriptorRegistration(getConnectorDescriptor());
         AtomicReference<MachineData> md = new AtomicReference<MachineData>();
         AtomicInteger count = new AtomicInteger(0);
@@ -187,8 +190,8 @@ public abstract class AbstractInformationModelConnectorTest<D> implements InputC
         ConnectorTest.assertInstance(connector, false);
         LOGGER.info("Connector '" + connector.getName() + "' disconnected");
         afterActions(connector);
+        ActiveAasBase.setNotificationMode(mo);
     }
-
 
     /**
      * Blocks until a certain number of (accumulated) receptions is reached or fails after 4s.

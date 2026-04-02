@@ -598,15 +598,25 @@ public class ConnectorParameter {
     public Set<String> getSpecificSettingKeys() {
         return specificSettings.keySet();
     }
-    
+
     /**
-     * Returns a connector specific setting as String.
+     * Returns a connector specific setting as String with <b>null</b> as default value.
      * 
      * @param key the key of the setting as defined by the connect
      * @return the value, may be <b>null</b>
      */
     public String getSpecificStringSetting(String key) {
-        String result = null;
+        return getSpecificStringSetting(key, null);
+    }
+
+    /**
+     * Returns a connector specific setting as String.
+     * 
+     * @param key the key of the setting as defined by the connect
+     * @return the value, may be {@code dlft}
+     */
+    public String getSpecificStringSetting(String key, String dflt) {
+        String result = dflt;
         Object setting = specificSettings.get(key);
         if (null != setting) {
             result = setting.toString();
