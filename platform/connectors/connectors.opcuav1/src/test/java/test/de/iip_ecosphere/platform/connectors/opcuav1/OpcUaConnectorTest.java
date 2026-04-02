@@ -169,8 +169,6 @@ public class OpcUaConnectorTest extends AbstractOpcUaConnectorTest {
          * Creates instance.
          * 
          * @param withNotifications operate with/without notifications (for testing)
-         * @param sourceType the source type
-         * @param customizer the translator customizer
          */
         public VarDataOutputTranslator(boolean withNotifications) {
             this.withNotifications = withNotifications;
