@@ -471,8 +471,8 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
         sudo ln -s $PWD/apache-maven-3.9.7/bin/mvn /usr/bin/mvn
     else
         case $Mavenyn in
-            [Yy]* ) sudo wget https://archive.apache.org/dist/maven/maven-3/3.9.7/binaries/apache-maven-3.9.7-bin.tar.gz;
-                    sudo tar xzpvf apache-maven-3.9.7-bin.tar.gz;
+            [Yy]* ) $SUDO wget https://archive.apache.org/dist/maven/maven-3/3.9.7/binaries/apache-maven-3.9.7-bin.tar.gz;
+                    $SUDO tar xzpvf apache-maven-3.9.7-bin.tar.gz;
                     sudo ln -sf $PWD/apache-maven-3.9.7/bin/mvn /usr/bin/mvn;;
             [Nn]* ) echo "";;
         esac
@@ -513,7 +513,7 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
         if ! [ -x "$(command -v $PythonPath --version)" ]; then
             install_python_compile_sources_version $OktPythonVersion
             export IIP_PYTHON=$CurPath/PyPaths/python3.9/bin/python3.9
-            sudo $IIP_PYTHON -m pip install pyflakes
+            $SUDO $IIP_PYTHON -m pip install pyflakes
         else
             case $Pythonyn in
                 [Yy]* ) install_python_compile_sources_version $OktPythonVersion;
