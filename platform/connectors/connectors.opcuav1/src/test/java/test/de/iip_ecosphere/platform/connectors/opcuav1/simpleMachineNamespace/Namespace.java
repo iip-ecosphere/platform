@@ -64,6 +64,7 @@ import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.
 public class Namespace extends ManagedNamespaceWithLifecycle {
 
     public static final String NAMESPACE_URI = "urn:eclipse:milo:hello-world";
+    public static final String TOP_OBJECTS = "Objects";
     public static final String QNAME_TOP_FOLDER;
     public static final String QNAME_VAR_LOT_SIZE;
     public static final String QNAME_VAR_POWER_CONSUMPTION;
@@ -72,6 +73,16 @@ public class Namespace extends ManagedNamespaceWithLifecycle {
     public static final String QNAME_METHOD_START;
     public static final String QNAME_METHOD_END;
     public static final String VENDOR_NAME = "Phoenix Contact";
+
+    public static final String BNAME_ROOT = "BBTest";
+    public static final String Q_BNAME_ROOT = TOP_OBJECTS + OpcUaConnector.BROWSE_PATH_SEPARATOR_CHAR + BNAME_ROOT;
+    public static final String BNAME_FOLDER = "Folder";
+    public static final String Q_BNAME_FOLDER = 
+        Q_BNAME_ROOT + OpcUaConnector.BROWSE_PATH_SEPARATOR_CHAR + BNAME_FOLDER;
+    public static final String BNAME_VAR = "myVar";
+    public static final String Q_BNAME_VAR = 
+        Q_BNAME_FOLDER + OpcUaConnector.BROWSE_PATH_SEPARATOR_CHAR + BNAME_VAR;
+    public static final double BNAME_VAL = 0.01;
 
     private static final String NAME_TOP_FOLDER = "HelloWorld";
     private static final String NAME_VAR_LOT_SIZE = "lotSize";
@@ -168,6 +179,15 @@ public class Namespace extends ManagedNamespaceWithLifecycle {
         } catch (Exception e) {
             logger.warn("Failed to register custom struct type", e);
         }
+        
+        // IFW situation with browse path in browse name
+        folderNode = createFolder(null, BNAME_ROOT);
+        folderNode.setBrowseName(newQualifiedName(Q_BNAME_ROOT));
+        folderNode = createFolder(folderNode, BNAME_FOLDER);
+        folderNode.setBrowseName(newQualifiedName(Q_BNAME_FOLDER));
+        UaVariableNode var = createVariable(folderNode, BNAME_VAR, Identifiers.Double, new Variant(BNAME_VAL), 
+            AccessLevel.READ_WRITE);
+        var.setBrowseName(newQualifiedName(Q_BNAME_VAR));
     }
 
     // checkstyle: resume exception type check

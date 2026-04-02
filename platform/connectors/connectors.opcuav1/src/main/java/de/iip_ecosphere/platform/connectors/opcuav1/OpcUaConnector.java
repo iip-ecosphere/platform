@@ -118,7 +118,8 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 /**
  * Implements the generic OPC UA connector. Do not rename, this class is referenced in {@code META-INF/services}.
  * 
- * For custom types such as structs, the following must apply: <ul>
+ * For custom types such as structs, the following must apply: 
+ * <ul>
  *   <li>A class implements the datatype and its fields.</li>
  *   <li>The class declares an accessible static field named {@code BINARY_ENCODING_ID} of type 
  *       {@link ExpandedNodeId}.</li>
@@ -128,13 +129,20 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
  *   <li>Such custom types must be registered through {@link ModelAccess#registerCustomType(Class)} 
  *       in {@link ConnectorOutputTypeTranslator#initializeModelAccess()}.</li>
  * </ul>
+ * This connector accepts as specific setting
+ * <ul>
+ *   <li>{@value #SETTING_BROWSENAME_PREFIX}, an optional prefix before a simple node name to accept the found 
+ *       browse name as equivalent, e.g., the simpleNode name is "speed", the (default) prefix is "/" then it would
+ *       accept "/speed" as well as "mySys/myFolder/speed" as browse path in the browse name</li>
+ * </ul>
  * 
  * @param <CO> the output type to the IIP-Ecosphere platform
  * @param <CI> the input type from the IIP-Ecosphere platform
  * @author Holger Eichelberger, SSE
  * @author Jan Cepok, SSE
  */
-@MachineConnector(specificSettings = {}, supportsFieldEnumeration = true) // other default values sufficient
+@MachineConnector(specificSettings = {OpcUaConnector.SETTING_BROWSENAME_PREFIX}, 
+    supportsFieldEnumeration = true) // other default values sufficient
 public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, CO, CI> {
 
     /**
@@ -161,17 +169,29 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
      * Denotes the path separator for qualified model names.
      */
     public static final char SEPARATOR_CHAR = '/';
+
+    /**
+     * Denotes the OPC browse path separator (may differ from {@link #SEPARATOR_CHAR}).
+     */
+    public static final char BROWSE_PATH_SEPARATOR_CHAR = '/';
     
     /**
      * Denotes the path separator for qualified model names (as String).
      */
     public static final String SEPARATOR_STRING = "/";
     
+    /**
+     * Connector parameter setting for browse name prefix.
+     */
+    public static final String SETTING_BROWSENAME_PREFIX = "BROWSENAME_PREFIX";
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(OpcUaConnector.class);
     private static final DataItem DUMMY = new DataItem(null, null);
     private static final String FIELD_BINARY_ENCODING_ID = "BINARY_ENCODING_ID";
+
     private OpcUaClient client;
     private ConnectorParameter params;
+    private String browseNamePrefix;
     
     static { // preliminary
         TimeUtils.registerConverter(new TimeUtils.AbstractDateConverter<DateTime>(DateTime.class) {
@@ -281,6 +301,8 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
     protected void connectImpl(ConnectorParameter params) throws IOException {
         if (null == client) {
             this.params = params;
+            this.browseNamePrefix = params.getSpecificStringSetting(SETTING_BROWSENAME_PREFIX, 
+                "" + BROWSE_PATH_SEPARATOR_CHAR);            
             String endpointURL = getEndpointUrl(params);
             LOGGER.info("OPC UA connecting to {}", endpointURL);
             try {
@@ -922,7 +944,8 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
                     if (!this.nodes.containsKey(qn) && qn.contains(qName)) { // implicit caching
                         this.nodes.put(qn, new NodeCacheEntry(tmp));
                     }
-                    if (nodeName.equals(tmp.getBrowseName().getName())) {
+                    if (nodeName.equals(nn) || nn.endsWith(browseNamePrefix + nodeName)) {
+                        // or: browse name as browse path ends with node name (IFW, Sinumerik) 
                         if (null == remainder) {
                             List<? extends UaNode> childNodes = tmp.browseNodes();
                             // recursive approach
