@@ -305,17 +305,17 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
         fi
     else
         Pythonyn="Y";
-        echo "Please choose: (A) Take the most recent 3.9.x (untested), (B) Download source and compile 3.9.21 (It takes more time)."
+        echo "Please choose: (a) Take the most recent 3.9.x (untested), (b) Download source and compile 3.9.21 (It takes more time)."
         while true; do
             read -p "Please choose how to install python (A/B): " PythonInstallModeab
             os_info=$(grep "^PRETTY_NAME=" /etc/os-release | cut -d= -f2- | tr -d '"')
             if [[ "$os_info" == *"Debian GNU/Linux"* && ( "$PythonInstallModeab" == "A" || "$PythonInstallModeab" == "a" ) ]]; then
-                echo "Detected Debian: $os_info. Debian does not support method (A) to install 3.9.x"
+                echo "Detected Debian: $os_info. Debian does not support method (a) to install 3.9.x"
             else
                 case $PythonInstallModeab in
                     [Aa]* ) break;;
                     [Bb]* ) break;;
-                    * ) echo "Please answer A or B.";;
+                    * ) echo "Please answer a or b.";;
                 esac
             fi
         done
