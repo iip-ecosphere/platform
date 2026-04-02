@@ -38,17 +38,17 @@ Basically, a 'Connector' supports the following fields (in addition to those of 
 | artifact |  Mandatory maven artifact containing the connector protocol, may be empty. |     |
 | inInterface |  Mandatory types representing data to be written into the external data sink wrapped by the connector. |     |
 | outInterface |  Mandatory types representing data read from the external data source wrapped by the connector. |     |
-| operations |  Field-based data translation and assignment operations between inInterface / input and outInterface / output defining special semantics of the connector. | {}  |
-| inAdapterClass |  Optional fully qualified Java class names translating data from inInterface to input. If given, no code will be generated for this connector part. | "" |
-| outAdapterClass | Optional fully qualified Java class names translating data from outInterface to output. If given, no code will be generated for this connector part. | "" |
+| operations |  Field-based data translation and assignment operations between inInterface / input and outInterface / output defining special semantics of the connector. | `{}`  |
+| inAdapterClass |  Optional fully qualified Java class names translating data from inInterface to input. If given, no code will be generated for this connector part. | `""` |
+| outAdapterClass | Optional fully qualified Java class names translating data from outInterface to output. If given, no code will be generated for this connector part. | `""` |
 | encoding |  Text encoding | ASCII |
-| mapping | Field mapping between inInterface / input and outInterface / output. | {}  |
+| mapping | Field mapping between inInterface / input and outInterface / output. | `{}`  |
 | host | Mandatory network host to connect to. May be superseded by device AAS. |     |
 | port | Mandatory network port to connect to. May be superseded by device AAS. |     |
-| samplingPeriod | Time in milliseconds between polling two consecutive data samples. If 0, data is received via events, publish-subscribe, etc. | 0   |
-| security | Optional security settings pointing to the identity store of the application. | null |
-| mock |  Run the connector in mock mode, i.e., read input data from a specification file in the application resources. | false |
-| cacheMode |  Shall incoming data be compared to last data point and data only be ingested if differences based on hash codes or equality comparison are detected. | NONE |
+| samplingPeriod | Time in milliseconds between polling two consecutive data samples. If 0, data is received via events, publish-subscribe, etc. | `0`   |
+| security | Optional security settings pointing to the identity store of the application. | `null` |
+| mock |  Run the connector in mock mode, i.e., read input data from a specification file in the application resources. | `false` |
+| cacheMode |  Shall incoming data be compared to last data point and data only be ingested if differences based on hash codes or equality comparison are detected. | `CACHE_NONE` |
 | inputHandlers |  Optional plugins to react on data, e.g., to trigger a data-specific sampling request. |     |
 | dataTimeDiffProvider |  Optional plugins to adjust data ingestion time differences based on last data points data. |     |
 | deviceServiceKey | Optional name for service name to realize ad-hoc connectivity via the device AAS, may, e.g., override host and port. |     |
@@ -59,19 +59,25 @@ In addition, a `ChannelConnector` offers the following fields:
 
 | Field | Description | Default |
 | --- |  --- | --- |
-| machineFormatter |  Optional pre-defined formatter towards the external data sink, e.g., `JsonFormatter` or `TextLineFormatter`. | null |
-| machineParser | Optional pre-defined parser for data read from the external data source, e.g., `JsonParser` or `TextLineParser`. | null |
-| inSerializerClass |  Optional qualified Java classes turning application data into external data. If given, supersedes `machineFormatter`. | ""  |
-| outSerializerClass |  Optional qualified Java classes turning external data into application data. If given, supersedes `machineParser`. | "" |
-| inChannel |  Channel name/pattern for data written to the external sink. | "" |
-| outChannel |  Channel name/pattern for data read from the external source. | ""  |
+| machineFormatter |  Optional pre-defined formatter towards the external data sink, e.g., `JsonFormatter` or `TextLineFormatter`. | `null` |
+| machineParser | Optional pre-defined parser for data read from the external data source, e.g., `JsonParser` or `TextLineParser`. | `null` |
+| inSerializerClass |  Optional qualified Java classes turning application data into external data. If given, supersedes `machineFormatter`. | `""`  |
+| outSerializerClass |  Optional qualified Java classes turning external data into application data. If given, supersedes `machineParser`. | `""` |
+| inChannel |  Channel name/pattern for data written to the external sink. | `""` |
+| outChannel |  Channel name/pattern for data read from the external source. | `""`  |
 | outChannels |  Optional multiple name/pattern for data read from the external source. If given, supersedes `outChannel`. |     |
 
 While `JsonFormatter`/`JsonParser` do not require further information, `TextLineFormatter`/`TextLineParser` must be configured with a `separator`, e.g., "," for CSV, "\t" for TSV etc. If specified, `inSerializerClass` and `outSerializerClass` contribute to the pairing of `input`, `output`, `inInterface` and `outInterface`.
 
 ## OPC UA connector
 
-The OPC UA  connector is a model connector with no further fields. Regarding authentication, this connector supports `USERNAME`, `ISSUED`, `X509` and `ANONYMOUS` authentication tokens as well as TLS encryption.
+The OPC UA  connector is a model connector with the following additional fields:
+
+| Field | Description | Default |
+| --- | --- | --- |
+| browseNamePrefix |  Optional prefix string to be matched before the browse name of a UA node, undefined by default, may be set implicitly to `/` by the implementation. | `null` |
+
+Regarding authentication, this connector supports `USERNAME`, `ISSUED`, `X509` and `ANONYMOUS` authentication tokens as well as TLS encryption.
 
 `inInterface` or `outInterface` shall specify the `path` to an OPC node (_folder node, never a variable node_) where the fields/substructures of the respective `RecordType` are located. Currently, _a path never starts with a slash, it shall end with a slash and it always implicitly starts with `Root`_, i.e., a path like `/Root/Objects/PLCnext/Arp.Plc.Eclr/RobInstance01/` shown in some OPC UA tooling becomes `Objects/PLCnext/Arp.Plc.Eclr/RobInstance01/` in the model. The fields/substructures in the respective type must exactly match the browse names and data types as specified in the OPC server (the specification of NodeIds as we support it for IVML files derived from OPC specification XMLs may be made available here in one of the next versions of the platform.)
 
@@ -114,10 +120,10 @@ The Modbus/TCP connector communicates with devices such as industrial energy met
 
 | Field | Description | Default |
 | --- |  --- | --- |
-| port |  TCP communication port. | 502 |
-| unitId | The MODBUS unit id. | 1   |
-| timeout | Connection timeout in ms. | 1000 |
-| bigByteOrder | Big or little endian byte order of the connected device (true=big, false=little). | True |
+| port |  TCP communication port. | `502` |
+| unitId | The MODBUS unit id. | `1`   |
+| timeout | Connection timeout in ms. | `1000` |
+| bigByteOrder | Big or little endian byte order of the connected device (true=big, false=little). | `true` |
 
 Fields in input/output datatypes shall be of type `ModbusField` rather than `Field` providing the offset of the respective field into the register table of the connected device. In thurn, field types shall be the defined Modbus alias types such as `Modbus_int16` rather than the generic oktoflow types so that the types could be correctly mapped to byte lengths and values.
 
@@ -125,9 +131,9 @@ Fields in input/output datatypes shall be of type `ModbusField` rather than `Fie
 
 | Field |  Description | Default |
 | --- |  --- | --- |
-| ssl | Connect by http (false) or https (true). | true |
-| urlPath |  Path in the URL used to approach the database. | "" |
-| batchSize |  Number of data tuples to write at once. | 1   |
+| ssl | Connect by http (`false`) or https (`true`). | `true` |
+| urlPath |  Path in the URL used to approach the database. | `""` |
+| batchSize |  Number of data tuples to write at once. | `1`   |
 | measurement |  The name of the data tuple type. |     |
 | bucket |  The name of the data bucket. |     |
 | organization |  The organization holding the database |     |
@@ -138,7 +144,7 @@ Fields in in/output datatypes shall be of the specialized type `InfluxField` rat
 | Field | Description | Default |
 | --- |  --- | --- |
 | mappedName | name of the Influx field to use, instead of `name` | |
-| tag | is the field a tag | false |
+| tag | is the field a tag | `false` |
 
 In particular, `LongIndexType` may be used representing here a timestamp in ms since 1970-01-01T00:00:00Z that shall be used instead of the actual time when writing a data point. If not given, the actual (client) point in time when writing the data point is used instead. 
 
@@ -158,9 +164,9 @@ identities:
 
 | Field |  Description | Default |
 | --- |  --- | --- |
-| ssl | Connect by http (false) or https (true). | true |
-| urlPath |  Path in the URL used to approach the database. | "" |
-| batchSize |  Number of data tuples to write at once. | 1   |
+| ssl | Connect by http (false) or https (true). | `true` |
+| urlPath |  Path in the URL used to approach the database. | `""` |
+| batchSize |  Number of data tuples to write at once. | `1`   |
 | measurement |  The name of the data tuple type. |     |
 | database | The name of the database. |     |
 | baseTime | If float timestamps are provided and intended as elapsed time differences, specifies the time base in ms to obtain timestamps; may be 0 for the point in time when the app is started/the connector instance is created; disabled if not positive | -1|
@@ -173,14 +179,14 @@ The REST connector allows for connecting with REST data sources/sinks.
 
 | Field | Defined by | Description | Default |
 | --- | --- | --- | --- |
-| endpointPrefix |  Prefix path to be prepended before each field path. | ""  |
+| endpointPrefix |  Prefix path to be prepended before each field path. | `""`  |
 
 Fields in in/output datatypes shall be of the specialized type `RestField` rather than `Field`, which specifies dedicated REST endpoints for fields (if not the field name shall be used instead) or whether a field is considered a single value or a batch/set.
 
 | Field | Description | Default |
 | --- |  --- | --- |
-| endpoint | name of the specific endpoint | "" |
-| asSingleValue | read the data as single value or as batch | false |
+| endpoint | name of the specific endpoint | `""` |
+| asSingleValue | read the data as single value or as batch | `false` |
 
 ## File connector
 
@@ -188,8 +194,8 @@ The `FileConnector` makes that in local files available or writes to local files
 
 | Field |  Description | Default |
 | --- | --- | --- |
-| readFiles |  Connect by http (false) or https (true). | true |
-| writeFiles |  Path in the URL used to approach the database. | "" |
+| readFiles |  Connect by http (false) or https (true). | `true` |
+| writeFiles |  Path in the URL used to approach the database. | `""` |
 | dataTimeDiff |  Time between the ingestion of two subsequent data tuples taken from the input file. | `0`  |
 | skipFirstLine | Consider the first line as header and skip it | `false` |
 

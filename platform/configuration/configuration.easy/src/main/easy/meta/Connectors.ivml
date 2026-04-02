@@ -222,6 +222,7 @@ project Connectors {
        }
        assign (uiGroup = UiOptionalGroup2) to {
            String deviceServiceKey = "opcua";
+           String browseNamePrefix = null;
        }
    }
 

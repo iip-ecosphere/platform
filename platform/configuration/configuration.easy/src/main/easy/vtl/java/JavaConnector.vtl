@@ -889,6 +889,15 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
             r.call("setSpecificSetting").stringArg("PLUGINID").stringArg(plugin.id);
         }
     }
+
+    // added v2->v3 
+    @DispatchCase
+    def generateSpecificSettings(OpcUaV1Connector conn, JavaCodeMethodCall r) {
+        String browseNamePrefix = getStringValueSafe(conn.browseNamePrefix, "");
+        if (browseNamePrefix.size() > 0) {
+            r.call("setSpecificSetting").stringArg("BROWSENAME_PREFIX").stringArg(browseNamePrefix);
+        }
+    }
     
     @DispatchCase
     def generateSpecificSettings(SerialConnector conn, JavaCodeMethodCall r) {

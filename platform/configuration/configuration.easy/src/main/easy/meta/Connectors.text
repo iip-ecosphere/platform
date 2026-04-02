@@ -69,6 +69,7 @@ Connectors::OpcUaV1Connector::class = Refined/predefined class for the platform 
 Connectors::OpcUaV1Connector::artifact = Refined/predefined Mvn coordinates for the platform OPC connector.
 Connectors::OpcUaV1Connector::port = Refined/predefined default OPC port.
 Connectors::OpcUaV1Connector::deviceServiceKey = Refined/predefined default OPC service key for ad hoc connector data.
+Connectors::OpcUaV1Connector::browseNamePrefix = Optional prefix string to be matched before the browse name of a UA node, undefined by default, implicit "/".
 Connectors::OpcUaV1Connector::nameplateInfo = Refined/predefined AAS nameplate information for connector AAS.
 Connectors::AasConnector::class = Refined/predefined class for the platform OPC connector.
 Connectors::AasConnector::artifact = Refined/predefined Mvn coordinates for the platform OPC connector.
