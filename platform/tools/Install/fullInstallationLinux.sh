@@ -86,6 +86,7 @@ install_python_binary_version() {
     sudo add-apt-repository -y ppa:deadsnakes/ppa
     sudo apt update -y
     sudo apt install python3.9 -y
+    sudo apt install python3.9-distutils -y
     $SUDO wget https://bootstrap.pypa.io/get-pip.py
     export IIP_PYTHON=$(which python3.9)
     $SUDO $IIP_PYTHON get-pip.py
