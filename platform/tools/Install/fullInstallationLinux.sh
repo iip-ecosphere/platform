@@ -117,7 +117,7 @@ install_confirm() {
 
   case "$yn" in
     [Yy])
-      echo "Installing $name $version $yn"
+      echo "Installing $name $version"
       ;;
     [Ee])
       echo "$name is already installed with accepted version, $name $version"
@@ -307,7 +307,7 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
         Pythonyn="Y";
         echo "Please choose: (a) Take the most recent 3.9.x (untested), (b) Download source and compile 3.9.21 (It takes more time)."
         while true; do
-            read -p "Please choose how to install python (A/B): " PythonInstallModeab
+            read -p "Please choose how to install python (a/b): " PythonInstallModeab
             os_info=$(grep "^PRETTY_NAME=" /etc/os-release | cut -d= -f2- | tr -d '"')
             if [[ "$os_info" == *"Debian GNU/Linux"* && ( "$PythonInstallModeab" == "A" || "$PythonInstallModeab" == "a" ) ]]; then
                 echo "Detected Debian: $os_info. Debian does not support method (a) to install 3.9.x"
