@@ -184,4 +184,4 @@ GenericDateTimeTypeType MyTimeType = {
 ```
 
 and use it in `RecordType` definitions as `refBy(MyTimeType)`. The `name` must be unique among all types, the `format` is 
-stated according to [SimpleDateFormat](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/text/SimpleDateFormat.html).
+stated according to [SimpleDateFormat](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/text/SimpleDateFormat.html) and only applied by connectors.

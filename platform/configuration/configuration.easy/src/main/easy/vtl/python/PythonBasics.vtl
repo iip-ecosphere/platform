@@ -164,6 +164,11 @@ template PythonBasics(Configuration config, FileArtifact target) {
     }
 
     @DispatchCase
+    def String toTypeName(GenericDateTimeTypeType type) {
+        "datetime";
+    }
+
+    @DispatchCase
     def String toTypeName(ListType type) {
         "list[" + toTypeName(type.type) + "]";
     } 
