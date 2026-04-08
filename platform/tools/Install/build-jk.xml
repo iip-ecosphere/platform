@@ -29,7 +29,7 @@
             <fileset dir="." includes="gen/setPermissions.sh" />
             <fileset dir="." includes="container/**/*.*" excludes="container/DevContainer/**/*" />
             <fileset dir="." includes="resources/**/*.*" />
-            <fileset dir="." includes="fullInstallationLinux.sh" />
+            <!--<fileset dir="." includes="fullInstallationLinux.sh" />-->
             <fileset dir="." includes="fullInstallationWin.bat" />
             <fileset dir="." includes="summary.pdf" />
         </zip>
@@ -42,7 +42,7 @@
         	<tarfileset dir="." includes="container/**/*" excludes="**/*.sh, container/DevContainer/**/*" />
             <fileset dir="." includes="resources/**/*.*" />
             <tarfileset dir="." filemode="755" includes="fullInstallationLinux.sh" />
-            <fileset dir="." includes="fullInstallationWin.bat" />
+            <!--<fileset dir="." includes="fullInstallationWin.bat" />-->
             <fileset dir="." includes="summary.pdf" />
         </tar>
         <oscp todir="jenkins@projects.sse.uni-hildesheim.de:/var/www/oktoflow" trust="true" keyfile="${user.home}/.ssh/id_rsa">
