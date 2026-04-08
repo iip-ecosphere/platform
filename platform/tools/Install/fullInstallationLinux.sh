@@ -2,18 +2,33 @@
 
 set -e
 
+declare -A INSTALL_STATUS
+
+print_summary() {
+  echo ""
+  echo "========== INSTALLATION SUMMARY =========="
+
+  for key in "${!INSTALL_STATUS[@]}"; do
+    printf "%-10s : %s\n" "$key" "${INSTALL_STATUS[$key]}"
+  done
+
+  echo "=========================================="
+}
+
+trap 'summary; print_summary' EXIT
+
 # Installation functions
 
 install_docker_version() {
   DOCKER_SHORT_VERSION="$1"
+
   if [[ -z "$DOCKER_SHORT_VERSION" ]]; then
     echo "[ERROR] No Docker version provided."
-    echo "Usage: install_docker_version <version>, e.g., install_docker_version 20.10.7"
+    echo "Usage: install_docker_version <version>, e.g., install_docker_version 28.2.2"
+    INSTALL_STATUS["Docker"]="Failed"
     return 1
   fi
 
-  # Convert to full APT version prefix
-  DOCKER_VERSION="5:${DOCKER_SHORT_VERSION}~3-0"
   REPO_URL="https://download.docker.com/linux"
 
   # Detect OS and codename
@@ -21,63 +36,58 @@ install_docker_version() {
   OS_ID="${ID,,}"
   CODENAME="${VERSION_CODENAME:-$(lsb_release -cs)}"
 
-  echo "[INFO] Detected OS: $OS_ID, Codename: $CODENAME"
-
-  # Compose full package version
-  if [[ "$OS_ID" == "debian" || "$OS_ID" == "ubuntu" ]]; then
-    DOCKER_PKG_VERSION="${DOCKER_VERSION}~${OS_ID}-${CODENAME}"
-  else
+  if [[ "$OS_ID" != "ubuntu" && "$OS_ID" != "debian" ]]; then
     echo "[ERROR] Unsupported OS: $OS_ID"
+    INSTALL_STATUS["Docker"]="Failed"
     return 1
   fi
 
-  sudo apt update
-  sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release wget
+  echo "[INFO] Detected OS: $OS_ID ($CODENAME)"
+  echo "[INFO] Requested Docker version: $DOCKER_SHORT_VERSION"
 
+  # Install prerequisites
+  sudo apt update
+  sudo apt install -y ca-certificates curl gnupg lsb-release
+
+  # Add Docker GPG key
   sudo mkdir -p /etc/apt/keyrings
   curl -fsSL $REPO_URL/$OS_ID/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
+  # Add Docker repo
   echo \
-    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] $REPO_URL/$OS_ID \
-    $CODENAME stable" | \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+    $REPO_URL/$OS_ID $CODENAME stable" | \
     sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
   sudo apt update
 
-  if apt-cache madison docker-ce | grep -q "$DOCKER_PKG_VERSION"; then
-    echo "[INFO] Found Docker $DOCKER_PKG_VERSION in APT. Installing..."
-    sudo apt install -y \
-      docker-ce="$DOCKER_PKG_VERSION" \
-      docker-ce-cli="$DOCKER_PKG_VERSION" \
-      containerd.io
-  else
-    DOCKER_VERSION="${DOCKER_SHORT_VERSION}~3-0"
-    DOCKER_PKG_VERSION="${DOCKER_VERSION}~${OS_ID}-${CODENAME}"
+  # Dynamically find the correct full version string
+  DOCKER_PKG_VERSION=$(apt-cache madison docker-ce | grep "$DOCKER_SHORT_VERSION" | head -n1 | awk '{print $3}')
 
-    mkdir -p docker-debs && cd docker-debs
-
-    # Build Debian package URLs using Bullseye as fallback
-    BASE_URL="https://download.docker.com/linux/debian/dists/bullseye/pool/stable/amd64"
-    echo "[INFO] Downloading .deb packages for Docker $DOCKER_SHORT_VERSION..."
-    wget "$BASE_URL/containerd.io_1.4.6-1_amd64.deb"
-    wget "$BASE_URL/docker-ce-cli_${DOCKER_VERSION}~debian-bullseye_amd64.deb"
-    wget "$BASE_URL/docker-ce_${DOCKER_VERSION}~debian-bullseye_amd64.deb"
-    wget "$BASE_URL/docker-ce-rootless-extras_${DOCKER_VERSION}~debian-bullseye_amd64.deb"
-
-    echo "[INFO] Installing downloaded .deb packages..."
-    sudo apt install -y ./containerd.io_1.4.6-1_amd64.deb \
-                        ./docker-ce-cli_${DOCKER_VERSION}~debian-bullseye_amd64.deb \
-                        ./docker-ce_${DOCKER_VERSION}~debian-bullseye_amd64.deb \
-                        ./docker-ce-rootless-extras_${DOCKER_VERSION}~debian-bullseye_amd64.deb
-
-    cd ..
-    # rm -rf docker-debs  # Optional cleanup
+  if [[ -z "$DOCKER_PKG_VERSION" ]]; then
+    echo "[ERROR] Docker version $DOCKER_SHORT_VERSION not found in APT repository."
+    echo "[INFO] Available versions:"
+    apt-cache madison docker-ce
+    INSTALL_STATUS["Docker"]="Failed"
+    return 1
   fi
 
+  echo "[INFO] Installing Docker version: $DOCKER_PKG_VERSION"
+
+  # Install Docker
+  sudo apt install -y \
+    docker-ce="$DOCKER_PKG_VERSION" \
+    docker-ce-cli="$DOCKER_PKG_VERSION" \
+    containerd.io
+
+  # Enable + start service
   sudo systemctl enable docker
   sudo systemctl start docker
 
-  echo "Docker $DOCKER_SHORT_VERSION installation completed."
+  # Verify
+  docker --version
+
+  echo "[SUCCESS] Docker $DOCKER_SHORT_VERSION installed successfully."
 }
 
 install_python_binary_version() {
@@ -126,6 +136,71 @@ install_confirm() {
   esac
 }
 
+check_installed() {
+  local name="$1"
+  local expected="$2"
+  local required="$3"
+
+  local installed
+  installed=$(get_version "$name")
+
+  if [[ "$required" == "y" || "$required" == "Y" ]]; then
+    if [[ -z "$installed" ]]; then
+      INSTALL_STATUS["$name"]="Failed"
+    elif [[ "$installed" == "$expected" ]]; then
+      INSTALL_STATUS["$name"]="Installed ($installed)"
+    else
+      INSTALL_STATUS["$name"]="Version Mismatch (Installed: $installed, Expected: $expected)"
+    fi
+  elif [[ "$required" == "e" || "$required" == "E" ]]; then
+      INSTALL_STATUS["$name"]="Already Exist"
+  fi
+}
+
+get_version() {
+  local tool="$1"
+
+  case "$tool" in
+    Java)
+      java -version 2>&1 | grep -oP 'version "?(1\.)?\K\d+' || true
+      ;;
+
+    Maven)
+      mvn -version 2>&1 | grep "Apache Maven" | grep -oP '[0-9]+\.[0-9]+\.[0-9]+' || true
+      ;;
+
+    Python)
+      $IIP_PYTHON --version 2>&1 | grep -oP '[0-9]+\.[0-9]+\.[0-9]+' || true
+      ;;
+
+    Docker)
+      docker --version | grep -oP '[[:digit:]]{1,2}\.[[:digit:]]{1,2}\.[[:digit:]]{1,2}' | head -1
+      ;;
+
+    Node.js)
+      node --version 2>&1 | grep -oP '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true
+      ;;
+
+    Angular)
+      ng version 2>&1 | grep 'Angular CLI:' | awk '{print $3}' || true
+      ;;
+
+    *)
+      echo "unknown"
+      return 1
+      ;;
+  esac
+}
+
+summary() {
+    check_installed "Java" "$OktJavaVersion" "$Javayn"
+    check_installed "Maven" "$OktMvnVersion" "$Mavenyn"
+    check_installed "Python" "$OktPythonVersion" "$Pythonyn"
+    check_installed "Docker" "$OktDockerVersion" "$Dockeryn"
+    check_installed "Node.js" "$OktNodeVersion" "$Nodeyn"
+    check_installed "Angular" "$OktAngularVersion" "$Angularyn"
+}
+
 install_completed() {
   localOktDepsOnly="$1"
 
@@ -159,7 +234,7 @@ install_completed() {
 OktJavaVersion=17
 OktMvnVersion=3.9.7
 OktPythonVersion=3.9.21
-OktDockerVersion=20.10.7
+OktDockerVersion=28.1.1
 OktNodeVersion=22.14.0
 OktNpmVersion=10.9.2
 OktAngularVersion=19.2.5
@@ -535,7 +610,7 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
     esac
 
     case $Angularyn in
-        [Yy]* ) $SUDO npm install -g @angular/cli@19.2.5;;
+        [Yy]* ) sudo npm install -g @angular/cli@19.2.5;;
         [Nn]* ) echo "";;
     esac
     
@@ -719,7 +794,7 @@ elif [ $yn == "n" ] || [ $yn == "N" ]; then
     esac
 
     case $Angularyn in
-        [Yy]* ) $SUDO npm install -g @angular/cli@19.2.5;;
+        [Yy]* ) sudo npm install -g @angular/cli@19.2.5;;
         [Nn]* ) echo "";;
     esac
     
