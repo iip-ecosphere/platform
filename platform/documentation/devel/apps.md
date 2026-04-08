@@ -22,7 +22,7 @@ There are three ways to create an own application. These summaries are currently
 
 ### Based on an existing example:
 
-- Download an existing all-in-one application, e.g., [examples.python](../../examples/examples.python) or one matching described in the [examples collection](../examples/examples.md)
+- Download an existing all-in-one application, e.g., [examples.python](../../examples/examples.python) or one matching described in the [examples collection](../examples/examples.md). For `examples.python` we provide a [source package](https://https://projects.sse.uni-hildesheim.de/oktoflow/examples.python-src.zip).
 - Modify the configuration model in `src/main/easy`, details for the individual element are linked above
 - Run the code generation `mvn install` (may lead to compile or test errors as the code may not fit the application)
 - Change the application classes to include your specific code (or take the application code template in `target/gen/xx/templates` to implement new services using your code)

@@ -18,6 +18,18 @@ Of course, more resources are welcome, e.g., 10 cores, 32-64 GByte main memory o
 
 The smallest device for running the ECS-runtime/service manager with a Python AI in a Docker container so far was a [Phoenix Contact AXC F 3152](https://www.phoenixcontact.com/de-ch/produkte/steuerung-axc-f-3152-1069208), with an Intel Atom x5 1.3 GHz (using one of two cores), 2GByte RAM, 2GByte extended HDD, there without local Maven repository.
 
+So far, oktoflow was successfully installed in the following combinations:
+
+|------------------------------|-------------------------|--------------------|
+|                              |           Windows       |        Linux       |
+|------------------------------|-------------------------|--------------------|
+| native | :heavy_check_mark:  | :heavy_check_mark:      |                    |
+| Docker with Linux container  | WSL :heavy_check_mark:  | :heavy_check_mark: | 
+| Docker with Windows container|                 ?       |         -          | 
+| VM with Windows guest        |     :heavy_check_mark:  | :heavy_check_mark: |
+| VM with Linux guest          |     :heavy_check_mark:  | :heavy_check_mark: |
+
+
 ## Execution
 
 ### Basic setup
