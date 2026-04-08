@@ -24,7 +24,7 @@ So far, oktoflow was successfully installed in the following combinations:
 |------------------------------|-------------------------|--------------------|
 | native | :heavy_check_mark:  | :heavy_check_mark:      | :heavy_check_mark: |
 | Docker with Linux container  | WSL :heavy_check_mark:  | :heavy_check_mark: | 
-| Docker with Windows container|        :question:       |         :x:        | 
+| Docker with Windows container|            :x:          |         :x:        | 
 | VM with Windows guest        |     :heavy_check_mark:  | :heavy_check_mark: |
 | VM with Linux guest          |     :heavy_check_mark:  | :heavy_check_mark: |
 
