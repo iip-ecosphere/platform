@@ -8,7 +8,7 @@ mkdir -p "$LOG_DIR"
 
 
 # Install VSCode Python extension if missing
-code --install-extension ms-python.python --no-sandbox --user-data-dir=/root/.vscode || true
+yes | code --install-extension ms-python.python --no-sandbox --user-data-dir=/root/.vscode
 
 sleep 7
 echo ">>> Starting broker..."
