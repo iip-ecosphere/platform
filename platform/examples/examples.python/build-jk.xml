@@ -12,5 +12,15 @@
             <arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
             <arg value="-Dokto.mvn.home=${maven.bin.dir}/bin"/>
         </maven>
+		<!-- convenience: pack sources and deploy to projects -->
+        <delete file="target/examples.python-src.zip" failonerror="false"/> 
+        <zip destFile="target/examples.python-src.zip" basedir=".">
+        	<exclude name="target/**"/>
+        </zip>
+        <oscp todir="jenkins@projects.sse.uni-hildesheim.de:/var/www/oktoflow" trust="true" keyfile="${user.home}/.ssh/id_rsa">
+            <fileset dir=".">
+                <include name="target/examples.python-src.zip"/>
+            </fileset>
+        </oscp> 
 	</target>
 </project>
