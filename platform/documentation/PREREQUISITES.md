@@ -20,7 +20,6 @@ The smallest device for running the ECS-runtime/service manager with a Python AI
 
 So far, oktoflow was successfully installed in the following combinations:
 
-|------------------------------|-------------------------|--------------------|
 |                              |           Windows       |        Linux       |
 |------------------------------|-------------------------|--------------------|
 | native | :heavy_check_mark:  | :heavy_check_mark:      |                    |
