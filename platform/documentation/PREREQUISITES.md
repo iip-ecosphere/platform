@@ -22,9 +22,9 @@ So far, oktoflow was successfully installed in the following combinations:
 
 |                              |           Windows       |        Linux       |
 |------------------------------|-------------------------|--------------------|
-| native | :heavy_check_mark:  | :heavy_check_mark:      |                    |
+| native | :heavy_check_mark:  | :heavy_check_mark:      | :heavy_check_mark: |
 | Docker with Linux container  | WSL :heavy_check_mark:  | :heavy_check_mark: | 
-| Docker with Windows container|                 ?       |         -          | 
+| Docker with Windows container|        :question:       |         :x:        | 
 | VM with Windows guest        |     :heavy_check_mark:  | :heavy_check_mark: |
 | VM with Linux guest          |     :heavy_check_mark:  | :heavy_check_mark: |
 
