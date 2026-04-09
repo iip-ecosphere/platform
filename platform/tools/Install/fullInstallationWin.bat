@@ -8,7 +8,7 @@ echo "For installing prerequisites or Angular, administrator permissions may be 
 
 REM Check current Docker 
 
-set RecommendDocker=20.10.7
+set RecommendDocker=4.68.0
 set /a count = 0
 for /F "tokens=2 delims= " %%a in ('docker version') do (
    set /a count += 1
