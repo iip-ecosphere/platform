@@ -24,7 +24,7 @@ install_docker_version() {
 
   if [[ -z "$DOCKER_SHORT_VERSION" ]]; then
     echo "[ERROR] No Docker version provided."
-    echo "Usage: install_docker_version <version>, e.g., install_docker_version 28.2.2"
+    echo "Usage: install_docker_version <version>, e.g., install_docker_version 28.1.1"
     INSTALL_STATUS["Docker"]="Failed"
     return 1
   fi
