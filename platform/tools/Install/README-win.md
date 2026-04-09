@@ -48,7 +48,9 @@ Also install the required python packages
     python -m pip install websockets==11.0.2
     
 
-If docker 4.68.0 (recommended version) is not installed, please execute 
+Docker is not a required prerequisite, but if we want to use Docker containers provided by the platform, or to create Docker images for applications that require Docker.
+
+We recommend using Docker version 4.68.0, please execute 
 
     curl https://desktop.docker.com/win/main/amd64/223695/Docker%20Desktop%20Installer.exe -O DockerDesktopInstaller.exe
     rename "Docker%%20Desktop%%20Installer.exe" DockerDesktopInstaller.exe
