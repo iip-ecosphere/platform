@@ -73,7 +73,8 @@ Alternative dependencies within one component are marked by *.
 
 For virtualized execution, automated creation of containers
 
-- Docker 20.10.7 in path
+- For Linux, we recommend using Docker version 28.1.1 in path
+- For Windows, we recommend using Docker version 4.68.0
 
 ### Web User Interface
 
