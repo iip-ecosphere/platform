@@ -56,7 +56,7 @@ We recommend using Docker version 4.68.0, please execute
     rename "Docker%%20Desktop%%20Installer.exe" DockerDesktopInstaller.exe
     start /w "" "DockerDesktopInstaller.exe" install
     
-Please note that for executing Linux containers on Windows (as the containers created by the platform) the Windows Sub system for Linux (WSL) is required. Please follow the [WSL Installation Instructions](https://ubuntu.com/tutorials/install).
+Please note that for executing Linux containers on Windows (as the containers created by the platform) the Windows Sub system for Linux (WSL) is required. Please follow the [WSL Installation Instructions](https://learn.microsoft.com/en-us/windows/wsl/install-manual).
 
 For distributing containers created by the platform, we need a local Docker registry, in particular if services contain IPR-protected code. We install the registry on the server on port 5001 as follows:
 
