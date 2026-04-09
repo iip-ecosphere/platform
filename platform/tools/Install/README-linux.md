@@ -4,7 +4,6 @@
 For the platform to work, ensure that the required software is installed:
 - Java JDK (version 17 or higher, due to limitations of certain dependencies)
 - Apache Maven (version 3.9.7)
-- Docker (version 20.10.7)
 
 >Please note that the software versions may have changed. The most current versions are listed in the platform prerequisites documentation: [Prerequisites](https://github.com/iip-ecosphere/platform/blob/main/platform/documentation/PREREQUISITES.md).
 
@@ -16,33 +15,9 @@ sudo apt install openjdk-17-jdk-headless -y
 sudo wget https://archive.apache.org/dist/maven/maven-3/3.9.7/binaries/apache-maven-3.9.7-bin.tar.gz
 sudo tar xzpvf apache-maven-3.9.7-bin.tar.gz
 sudo ln -s $PWD/apache-maven-3.9.7/bin/mvn /usr/bin/mvn
-
-# Install Docker
-sudo apt install docker.io -y
 ```
 
 Please also set the environment variable `JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/`. The actual path of your Java installation may vary depending on your processor architecture, i.e., it could also end with `java-17-openjdk-i386/`. To be on the safe side, please set also `M2_HOME` to the installation directory of maven and, if you plan to use a different local repository than `~/.m2/repository` then please set `M2_REPO` to that directory as oktoflow may rely at runtime on the libraries stored there.
-
-By default, Docker requires root permissions to execute functions. If you want to use docker as “normal” user, execute
-
-     sudo usermod -aG docker $USER
-
-Log out and log back so that your group membership is re-evaluated. 
- 
-For distributing containers created by the platform, we need a local Docker registry, in particular if services contain IPR-protected code. We install the registry on the server on port 5001 as follows:
-
-    docker run -d \
-      --restart=always \
-      --name registry \
-      -e REGISTRY_HTTP_ADDR=0.0.0.0:5001 \
-      -p 5001:5001 \
-      registry:2
-
-In general, we recommend using a distinct server for this and to adjust the settings in the platform configuration.
-
-You may check if the Docker registry is running with:
-    
-    curl -sS http://0.0.0.0:5001/v2/_catalog
 
 If Python 3.9 is not installed, please execute:     
     sudo apt update -y
@@ -78,7 +53,77 @@ After installing the required software, verify that the correct versions are bei
 ```bash
 java -version
 mvn -version
+IIP_PYTHON -version
 ```
+
+## Docker
+
+Docker is not a required prerequisite, but if we want to use Docker containers provided by the platform, or to create Docker images for applications that require Docker.
+
+We recommend using Docker version 28.1.1, please execute
+
+```bash
+# Install prerequisites
+sudo apt update
+sudo apt install -y ca-certificates curl gnupg lsb-release
+
+# Detect OS and codename
+REPO_URL="https://download.docker.com/linux"
+source /etc/os-release
+OS_ID="${ID,,}"
+CODENAME="${VERSION_CODENAME:-$(lsb_release -cs)}"
+
+# Add Docker GPG key
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL $REPO_URL/$OS_ID/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+# Add Docker repo
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+  $REPO_URL/$OS_ID $CODENAME stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+
+# Dynamically find the correct full version string
+DOCKER_PKG_VERSION=$(apt-cache madison docker-ce | grep "28.1.1" | head -n1 | awk '{print $3}')
+
+# Install Docker
+sudo apt install -y \
+  docker-ce="$DOCKER_PKG_VERSION" \
+  docker-ce-cli="$DOCKER_PKG_VERSION" \
+  containerd.io
+
+# Enable + start service
+sudo systemctl enable docker
+sudo systemctl start docker
+```
+
+By default, Docker requires root permissions to execute functions. If you want to use docker as “normal” user, execute
+
+     sudo usermod -aG docker $USER
+
+### Verify installation
+
+```bash
+docker --version
+```
+
+Log out and log back so that your group membership is re-evaluated. 
+ 
+For distributing containers created by the platform, we need a local Docker registry, in particular if services contain IPR-protected code. We install the registry on the server on port 5001 as follows:
+
+    docker run -d \
+      --restart=always \
+      --name registry \
+      -e REGISTRY_HTTP_ADDR=0.0.0.0:5001 \
+      -p 5001:5001 \
+      registry:2
+
+In general, we recommend using a distinct server for this and to adjust the settings in the platform configuration.
+
+You may check if the Docker registry is running with:
+    
+    curl -sS http://0.0.0.0:5001/v2/_catalog
 
 #### Handling existing installations
 
