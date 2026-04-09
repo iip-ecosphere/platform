@@ -48,9 +48,9 @@ Also install the required python packages
     python -m pip install websockets==11.0.2
     
 
-If docker 20.10.7 (recommended version) is not installed, please execute 
+If docker 4.68.0 (recommended version) is not installed, please execute 
 
-    curl https://desktop.docker.com/win/main/amd64/65384/Docker%%20Desktop%%20Installer.exe -O DockerDesktopInstaller.exe
+    curl https://desktop.docker.com/win/main/amd64/223695/Docker%20Desktop%20Installer.exe -O DockerDesktopInstaller.exe
     rename "Docker%%20Desktop%%20Installer.exe" DockerDesktopInstaller.exe
     start /w "" "DockerDesktopInstaller.exe" install
     
