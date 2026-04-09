@@ -6,7 +6,7 @@
 
 A full oktoflow installation including platform server, ECS-runtime/service manager and app(s) already runs on computers with, e.g.
 
-- Intel i7-8665U CPU @ 1.90GHz, 4 cores
+- Intel i7-8665U CPU @ 1.90GHz, 4 cores (also other CPU architecturs shall be ok, e.g., ARM as long as there is a compliant Java/Python version)
 - 10 GB RAM
 - Windows 10, 11 or Linux (tested with Ubuntu 20.04.4 LTS, 22.04.5 LTS 64 bit), so far no insights for MacOS
 - 500 GB (hard disk) drive, at least sufficiently large for
