@@ -20,14 +20,15 @@ The smallest device for running the ECS-runtime/service manager with a Python AI
 
 So far, oktoflow was successfully installed in the following combinations:
 
-|                              |           Windows       |        Linux       |
-|------------------------------|-------------------------|--------------------|
-| native | :heavy_check_mark:  | :heavy_check_mark:      | :heavy_check_mark: |
-| Docker with Linux container  | WSL :heavy_check_mark:  | :heavy_check_mark: | 
-| Docker with Windows container|            :x:          |         :x:        | 
-| VM with Windows guest        |     :heavy_check_mark:  | :heavy_check_mark: |
-| VM with Linux guest          |     :heavy_check_mark:  | :heavy_check_mark: |
+|                              |           Windows       |        Linux       | MacOS              |
+|------------------------------|-------------------------|--------------------|--------------------|
+| native | :heavy_check_mark:  | :heavy_check_mark:      | :heavy_check_mark: |   :question:       |
+| Docker with Linux container  | WSL :heavy_check_mark:  | :heavy_check_mark: |   :question:       | 
+| Docker with Windows container|            :x:          |         :x:        |   :question:       |
+| VM with Windows guest        |     :heavy_check_mark:  | :heavy_check_mark: |   :question:       |
+| VM with Linux guest          |     :heavy_check_mark:  | :heavy_check_mark: |   :question:       |
 
+However, currently there is no experience with MacOS. Please let us know if you made experience with setups that are not indicated here.
 
 ## Execution
 
