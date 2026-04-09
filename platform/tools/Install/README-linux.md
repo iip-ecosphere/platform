@@ -22,30 +22,34 @@ Please also set the environment variable `JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 
 If Python 3.9 is not installed, please execute:
 ```bash
-    sudo apt update -y
-    sudo apt install software-properties-common -y
-    sudo add-apt-repository ppa:deadsnakes/ppa
-    sudo apt update 
-    sudo apt install python3.9 -y
-    sudo apt install -y python3.9-distutils
+# Install Python 3.9
+sudo apt update -y
+sudo apt install software-properties-common -y
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt update 
+sudo apt install python3.9 -y
+sudo apt install -y python3.9-distutils
 ```
 
 In case your OS does not support Python 3.9, try installing the source code and compiling it, or consider using a newer Python version.
 
 If pip is not working for Python 3.9, please execute
-     
-    sudo apt update -y
-    sudo wget https://bootstrap.pypa.io/get-pip.py
-    sudo python3.9 get-pip.py
+
+```bash
+sudo apt update -y
+sudo wget https://bootstrap.pypa.io/get-pip.py
+sudo python3.9 get-pip.py
+```
 
 Also install the required python packages
 
-    sudo python3.9 -m pip install numpy==1.20.1
-    sudo python3.9 -m pip install pickle4
-    sudo python3.9 -m pip install pyflakes==3.3.2
-    sudo python3.9 -m pip install PyYAML==6.0
-    sudo python3.9 -m pip install websockets==11.0.2
-    
+```bash
+sudo python3.9 -m pip install numpy==1.20.1
+sudo python3.9 -m pip install pickle4
+sudo python3.9 -m pip install pyflakes==3.3.2
+sudo python3.9 -m pip install PyYAML==6.0
+sudo python3.9 -m pip install websockets==11.0.2
+```
 
 If more than one Python version is installed, please ensure that you install the packages into the right version, e.g., by prefixing `python3.9` with the actual path. In this case, please also set the environment variable ``IIP_PYTHON`` to the intended Python executable.
 
