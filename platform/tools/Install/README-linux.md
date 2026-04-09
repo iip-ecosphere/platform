@@ -4,6 +4,7 @@
 For the platform to work, ensure that the required software is installed:
 - Java JDK (version 17 or higher, due to limitations of certain dependencies)
 - Apache Maven (version 3.9.7)
+- Python (version 3.9.21)
 
 >Please note that the software versions may have changed. The most current versions are listed in the platform prerequisites documentation: [Prerequisites](https://github.com/iip-ecosphere/platform/blob/main/platform/documentation/PREREQUISITES.md).
 
@@ -19,13 +20,15 @@ sudo ln -s $PWD/apache-maven-3.9.7/bin/mvn /usr/bin/mvn
 
 Please also set the environment variable `JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/`. The actual path of your Java installation may vary depending on your processor architecture, i.e., it could also end with `java-17-openjdk-i386/`. To be on the safe side, please set also `M2_HOME` to the installation directory of maven and, if you plan to use a different local repository than `~/.m2/repository` then please set `M2_REPO` to that directory as oktoflow may rely at runtime on the libraries stored there.
 
-If Python 3.9 is not installed, please execute:     
+If Python 3.9 is not installed, please execute:
+```bash
     sudo apt update -y
     sudo apt install software-properties-common -y
     sudo add-apt-repository ppa:deadsnakes/ppa
     sudo apt update 
     sudo apt install python3.9 -y
     sudo apt install -y python3.9-distutils
+```
 
 In case your OS does not support Python 3.9, try installing the source code and compiling it, or consider using a newer Python version.
 
