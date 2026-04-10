@@ -233,3 +233,19 @@ After changing the values, run `mvn install` on all affected all-in-one examples
 *Reason:* We defined basic date/time types like `DateTimeType` (corresponding to ISO-8061, see [LocalDateTime](https://docs.oracle.com/javase/8/docs/api/java/time/LocalDateTime.html)) and the `IEC61131_3DateTimeType` for IEC51131-3, but we cannot foresee, which data/time formats are adequate for you.
 
 *Solution:* We provide a generic date/time type for which you can specify the format (in Java meta-format). For details, see the [types configuration summary](concepts/types.MD).
+
+## The platform version is changing. What to do?
+
+*Symptom:* There is a new version of the platform and you are not receiving updates.
+
+*Reason:* Your platform installation, your service implementations and your app may depend on an older version of the platform.
+
+*Solution:* If you want to migrate to the newer version, you have to change the artifact coordinate of the platform in the build specification. Please see [versioning](devel/versioning.md).
+
+## I shall specify artifact coordinates in the configuration model. What is the format?
+
+*Symptom:* To specify the location where a service implementation can be found, artifact coordinates are needed (typically besides some form of naming within the coordinate, e.g., a fully qualified class name). Where do these coordinates come from? Is there a list?
+
+*Reason:* Artifact coordinates may be either defined by the platform, implicitly by a generated app code template (if you do not change its coordinate) or by you.
+
+*Solution:* Platform services and connectors are usually pre-defined in the configuration model so that the coordinates are used implicitly if you use these services or connectors, there is no need to know those coordinates. However, for your services, some background is needed: The format and conventions for artifact coordinates are explained in the [versioning document](devel/versioning.md). 
