@@ -14,7 +14,7 @@ To obtain a full coordinate, the parts are joined by colons in the sequence give
 
 >An example for an artifact coordinate is `de.iip-ecosphere.platform:support:0.7.1-SNAPSHOT`
 
-The Maven artifact coordinate system also allows for specifying (file) types or classifiers (e.g., `binary`, `plugin`, `easy`) indicating sub-artifats. This information is implicitly used by oktoflow and usually not relevant to the user.
+The Maven artifact coordinate system also allows for specifying (file) types or classifiers (e.g., `binary`, `plugin`, `easy`) indicating sub-artifacts. This information is implicitly used by oktoflow and usually not relevant to the user.
 
 ## Origin of Artifacts
 
@@ -22,7 +22,7 @@ Artifacts are created when a build process is executed. This may be locally on y
 
 When the platform state becomes stable, we perform from time to time a release. This requires changing the version of the artifacts from snapshot to release, re-building the artifacts so that they become available on the SSE Maven repository and, in an extra step, deploy relevant artifacts to the Maven Central server (then they become globally available even without naming the SSE Maven repository). As a final step, we tag the source code in github with a version tag can create a release there and re-build the platform with a new, subsequent snapshot version.
 
-The overall artifact build process also explains why locally build snapshot artifacts may suddenly be replaced by a different snapshot: When you have built a snapshot artifact locally and any other build process that requires that artifact is executed with update enabled (the default), it may override it by a more recent version built by our continuous integration. If you plan to work for a longer period with local snapshots, either disable updates (`-o` flag) or changing the global Maven settings) or keep an eye on the updated artifact and re-build your local artifacts when needed.
+The overall artifact build process also explains why locally build snapshot artifacts may suddenly be replaced by a different snapshot: When you have built a snapshot artifact locally and any other build process that requires that artifact is executed with update enabled (the default), it may override it by a more recent version built by our continuous integration. If you plan to work for a longer period with local snapshots, either disable updates ((`-o` flag) or changing the global Maven settings) or keep an eye on the updated artifact and re-build your local artifacts when needed.
 
 ## Artifact Coordinates in Apps
 
