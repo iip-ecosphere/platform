@@ -590,7 +590,7 @@ abstract class BaSyxAbstractAasServer implements AasServer {
      * 
      * @param cls the class to create the context for (may be <b>null</b> for none)
      * @param component the component to create the context for
-     * @param the context initializer, may be <b>null</b>
+     * @param initializer the context initializer, may be <b>null</b>
      * @return the context (may be <b>null</b>)
      * 
      * @see #shallStart(State)
@@ -698,7 +698,7 @@ abstract class BaSyxAbstractAasServer implements AasServer {
      * Closes an application context.
      * 
      * @param ctx the context, may be <b>null</b> (ignored then)
-     * @param stateConsumer optional state consumer to be called when {@code ctx} is closed, may be <b>null</b>
+     * @param component the setup component to be notified about the closing state change
      */
     void close(ConfigurableApplicationContext ctx, AasComponent component) {
         close(ctx, s-> spec.getSetup(component).notifyStateChange(s));
