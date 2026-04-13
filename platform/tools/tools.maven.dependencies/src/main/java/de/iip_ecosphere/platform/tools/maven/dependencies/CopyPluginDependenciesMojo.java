@@ -50,7 +50,10 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
 
     @Parameter( required = false )
     private boolean asTest;
-    
+
+    @Parameter( property = "mdep.clean", required = false, defaultValue = "false" )
+    private boolean clean;
+
     @Parameter( property = "mdep.createIndex", defaultValue = "true")
     private boolean createIndex;
 
@@ -72,10 +75,12 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
                 includeScope = "runtime";
             }
         }
+        cleanOutputDirectory();
         super.doExecute();
-        Layers.copyGroupArtifact(targetDirectory, null, "jar", getProject(), getLog());
+        List<File> additional = new ArrayList<>();
+        additional.add(Layers.copyGroupArtifact(targetDirectory, null, "jar", getProject(), getLog()));
         if (asTest) {
-            Layers.copyGroupArtifact(targetDirectory, "tests", "jar", getProject(), getLog());
+            additional.add(Layers.copyGroupArtifact(targetDirectory, "tests", "jar", getProject(), getLog()));
         }
         File cpFile = new File(targetDirectory, "jars" + (asTest ? "-test" : "") + "/classpath");
         File index = new File(targetDirectory, "jars" + (asTest ? "-test" : "") + "/classpath.idx");
@@ -108,6 +113,59 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
         } else {
             index.delete();
         }
+        emitOutputDirectorySize(additional);
+    }
+    
+    /**
+     * Cleans the output directory.
+     */
+    private void cleanOutputDirectory() {
+        if (clean && getOutputDirectory().exists()) {
+            File[] files = getOutputDirectory().listFiles();
+            if (null != files) {
+                getLog().info("Cleaning jars in " + getOutputDirectory());
+                for (File f : files) {
+                    if (f.getName().endsWith(".jar")) {
+                        f.delete();
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Emits size statistics for the output directory.
+     */
+    private void emitOutputDirectorySize(List<File> additional) {
+        List<File> files = new ArrayList<>();
+        files.addAll(additional);
+        File[] fs = getOutputDirectory().listFiles();
+        if (null != fs) {
+            for (File f : fs) { // usually not recursive
+                files.add(f);
+            }
+        }
+        long allSizes = 0;
+        long oktoSizes = 0;
+        long indexSizes = 0;
+        int allFileCount = 0;
+        int oktoFileCount = 0;
+        int indexFileCount = 0;
+        for (File f : files) { 
+            allSizes += f.length();
+            String name = f.getName();
+            allFileCount++;
+            if (name.startsWith("de.iip-ecosphere.") || name.startsWith("de.oktoflow.")) {
+                oktoSizes += f.length();
+                oktoFileCount++;
+            } else if (!name.endsWith(".jar")) {
+                indexSizes += f.length();
+                indexFileCount++;
+            }
+        }
+        getLog().info("Plugin size " + allSizes + " bytes in " + allFileCount + " files, among from oktoflow " 
+            + oktoSizes + " bytes in " + oktoFileCount + " JARs and " + indexSizes + " bytes in " + indexFileCount 
+            + " index file(s)");
     }
 
     /**

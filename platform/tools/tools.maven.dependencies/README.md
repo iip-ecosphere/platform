@@ -180,6 +180,8 @@ The inherited setting ``excludeArtifactIds`` shall be configured in a way that p
 
 Further settings are:
 - `createIndex` (default `true`, user property `mdep.createIndex`) whether a classpath index file shall be created for the plugin
+- `asTest` include test code (default `false`).
+- `clean` delete jars in target folder (default `false`, user properts `mdep.clean`).
 
 ## assemble-plugin
 
