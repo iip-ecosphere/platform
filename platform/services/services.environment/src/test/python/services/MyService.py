@@ -49,4 +49,4 @@ class MyService(MyServiceInterface):
         self.ingest(data)
 
 #registers itself
-MyService()
+#MyService() #environment shall detect this and register it automatically

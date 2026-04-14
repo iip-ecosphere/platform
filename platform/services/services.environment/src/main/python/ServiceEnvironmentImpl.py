@@ -192,7 +192,12 @@ def loadModules(modulesPath, modulesDir):
                 moduleName = modulesDir + "." + split[0]
                 #sys.stderr.write("loading " + moduleName + " in " + path + "\n")
                 try:
-                    importlib.import_module(moduleName)
+                    module = importlib.import_module(moduleName)
+                    # module shall register itself; fallback if somebody removed the registration call
+                    service = Registry.services.get(split[0])
+                    if service is None:
+                        cls = getattr(module, split[0])
+                        service = cls()
                     print("Python ServiceEnvironment [Info]: Loaded " + moduleName)
                 except ModuleNotFoundError as exception:
                     sys.stderr.write("Python ServiceEnvironment [Warn]: While loading " + moduleName + ": ModuleNotFoundError " + str(exception) + "\n")
