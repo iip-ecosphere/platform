@@ -194,10 +194,14 @@ def loadModules(modulesPath, modulesDir):
                 try:
                     module = importlib.import_module(moduleName)
                     # module shall register itself; fallback if somebody removed the registration call
+                    # works only if class name is set given in the model
                     service = Registry.services.get(split[0])
                     if service is None:
-                        cls = getattr(module, split[0])
-                        service = cls()
+                        try:
+                            cls = getattr(module, split[0])
+                            service = cls()
+                        except AttributeError:
+                            pass
                     print("Python ServiceEnvironment [Info]: Loaded " + moduleName)
                 except ModuleNotFoundError as exception:
                     sys.stderr.write("Python ServiceEnvironment [Warn]: While loading " + moduleName + ": ModuleNotFoundError " + str(exception) + "\n")
