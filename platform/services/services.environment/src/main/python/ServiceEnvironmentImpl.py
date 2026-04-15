@@ -124,10 +124,10 @@ def start(a):
     modulesPath = getArg(args.modulesPath)
     sys.path.append(modulesPath)
     # dynamically load (generated) modules
-    loadModules(modulesPath, getArg(args.datatypesPackage))
-    loadModules(modulesPath, getArg(args.serializersPackage))
-    loadModules(modulesPath, getArg(args.interfacesPackage))
-    loadModules(modulesPath, getArg(args.servicesPackage))
+    loadModules(modulesPath, getArg(args.datatypesPackage), False)
+    loadModules(modulesPath, getArg(args.serializersPackage), False)
+    loadModules(modulesPath, getArg(args.interfacesPackage), False)
+    loadModules(modulesPath, getArg(args.servicesPackage), True)
 
     #print("services:         " + str(Registry.services))
     #print("types:            " + str(Registry.types))
@@ -182,7 +182,7 @@ def getArg(arg):
    else:
        return arg
 
-def loadModules(modulesPath, modulesDir):
+def loadModules(modulesPath, modulesDir, asService):
     if len(modulesDir) > 0:
         path = modulesPath + "/" + modulesDir
         files = os.listdir(path)
@@ -193,15 +193,16 @@ def loadModules(modulesPath, modulesDir):
                 #sys.stderr.write("loading " + moduleName + " in " + path + "\n")
                 try:
                     module = importlib.import_module(moduleName)
-                    # module shall register itself; fallback if somebody removed the registration call
-                    # works only if class name is set given in the model
-                    service = Registry.services.get(split[0])
-                    if service is None:
-                        try:
-                            cls = getattr(module, split[0])
-                            service = cls()
-                        except AttributeError:
-                            pass
+                    if asService:
+                        # module shall register itself; fallback if somebody removed the registration call
+                        # works only if class name is set given in the model
+                        service = Registry.services.get(split[0])
+                        if service is None:
+                            try:
+                                cls = getattr(module, split[0])
+                                service = cls()
+                            except AttributeError as e:
+                                pass
                     print("Python ServiceEnvironment [Info]: Loaded " + moduleName)
                 except ModuleNotFoundError as exception:
                     sys.stderr.write("Python ServiceEnvironment [Warn]: While loading " + moduleName + ": ModuleNotFoundError " + str(exception) + "\n")
