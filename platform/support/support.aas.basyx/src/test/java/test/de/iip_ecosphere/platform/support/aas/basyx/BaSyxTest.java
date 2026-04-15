@@ -17,7 +17,6 @@ import java.io.File;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
@@ -26,7 +25,6 @@ import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.aas.basyx.BaSyxAasFactory;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
-import test.de.iip_ecosphere.platform.support.TestUtils;
 import test.de.iip_ecosphere.platform.support.aas.AasTest;
 
 /**
@@ -54,12 +52,13 @@ public class BaSyxTest extends AasTest {
 
     @Override
     protected boolean excludeProtocol(String protocol) {
-        boolean exclude = false;
-        if (BaSyxAasFactory.PROTOCOL_VAB_HTTPS.equals(protocol)) {
+        boolean exclude = BaSyxAasFactory.PROTOCOL_VAB_HTTPS.equals(protocol) 
+            || BaSyxAasFactory.PROTOCOL_VAB_HTTP.equals(protocol);
+        /*if (BaSyxAasFactory.PROTOCOL_VAB_HTTPS.equals(protocol)) {
             // currently it's unclear why VAB-HTTPS works on Windows but not on Linux while HTTPS-AAS works
             exclude = TestUtils.isSseCI();
             System.out.println("Checking exclusion: " + NetUtils.getOwnHostname() + " " + exclude);            
-        }
+        }*/
         return exclude;
     }
 

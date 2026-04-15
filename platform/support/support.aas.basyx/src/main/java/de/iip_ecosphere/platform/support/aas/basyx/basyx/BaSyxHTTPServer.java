@@ -510,7 +510,10 @@ public class BaSyxHTTPServer {
      */
     public void shutdown() {
         LOGGER.trace("Shutting down BaSyx HTTP Server...");
-
+        // JDBC cleanup, Tomcat classloading seams to take the wrong classloader for us in plugin
+        java.util.logging.Logger logger = java.util.logging.Logger.getLogger(
+            "org.apache.catalina.loader.WebappClassLoaderBase");
+        logger.setLevel(java.util.logging.Level.SEVERE);
         try {
             tomcat.stop();
             tomcat.destroy();
