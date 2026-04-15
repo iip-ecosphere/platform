@@ -13,6 +13,8 @@ package test.de.iip_ecosphere.platform.support.aas.basyx2.plugintest;
 import org.junit.runner.RunWith;
 
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
+import de.iip_ecosphere.platform.support.plugins.PluginManager;
 import junit.framework.TestSuite;
 import test.de.iip_ecosphere.platform.support.TestUtils;
 import static test.de.iip_ecosphere.platform.support.aas.TestWithPlugin.*;
@@ -26,20 +28,24 @@ import static test.de.iip_ecosphere.platform.support.aas.TestWithPlugin.*;
 public class AllTests {
     
     static {
-        enableLocalPlugins(false); // we need them relocated and appended/mixed
-        setInstallDir("target/plugins");
-        setupAASPlugins();
-        addPluginLocation("support", "support.log-slf4j-simple");
-        addPluginLocation("support", "support.processInfo-oshi");
-        addPluginLocation("support", "support.websocket-websocket");
-        addPluginLocation("support", "support.yaml-snakeyaml");
-        addPluginLocation("support", "support.commons-apache");
-        addPluginLocation("support", "support.bytecode-bytebuddy");
-        addPluginLocation("support", "support.json-jackson");
-        addPluginLocation("support", "support.rest-spark");
-        addPluginLocation("support", "support.aas.basyx2");
-        addPluginLocation("support/support.aas.basyx2", "support.aas.basyx2.server");
-        loadPlugins();
+        if (Boolean.valueOf(System.getProperty("okto.test.noPlugins", "false"))) {
+            PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE);
+        } else {
+            enableLocalPlugins(false); // we need them relocated and appended/mixed
+            setInstallDir("target/plugins");
+            setupAASPlugins();
+            addPluginLocation("support", "support.log-slf4j-simple");
+            addPluginLocation("support", "support.processInfo-oshi");
+            addPluginLocation("support", "support.websocket-websocket");
+            addPluginLocation("support", "support.yaml-snakeyaml");
+            addPluginLocation("support", "support.commons-apache");
+            addPluginLocation("support", "support.bytecode-bytebuddy");
+            addPluginLocation("support", "support.json-jackson");
+            addPluginLocation("support", "support.rest-spark");
+            addPluginLocation("support", "support.aas.basyx2");
+            addPluginLocation("support/support.aas.basyx2", "support.aas.basyx2.server");
+            loadPlugins();
+        }
     }
     
     /**
