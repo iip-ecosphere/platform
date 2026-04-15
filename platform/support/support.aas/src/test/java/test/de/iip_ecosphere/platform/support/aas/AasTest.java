@@ -114,7 +114,6 @@ public class AasTest {
     private static final String NAME_RBAC_PROPOPEN = "openProp";
     private static final String NAME_RBAC_OPOPEN = "openOp";
     
-    private static final ServerAddress VAB_SERVER = new ServerAddress(Schema.HTTP); // localhost, ephemeral
     private static final String URN_AAS = "urn:::AAS:::testMachines#";
     
     private static final LangString DESCRIPTION = new LangString("en", "A description");
@@ -379,22 +378,26 @@ public class AasTest {
         KeyStoreDescriptor ksd = getKeyStoreDescriptor(serverProtocol);
         registryEndpoint = createDependentEndpoint(aasServerAddress, "registry");
         BasicSetupSpec spec = new BasicSetupSpec(registryEndpoint, aasServerAddress, ksd, authDesc);
-        spec.setAssetServerAddress(VAB_SERVER, protocol);
+        ServerAddress vabServer = new ServerAddress(Schema.HTTP); // localhost, ephemeral
+        spec.setAssetServerAddress(vabServer, protocol);
         spec.setAssetServerKeystore(getKeyStoreDescriptor(protocol));
         spec.setAssetServerAuthentication(authDesc);
-        Aas aas = createAas(machine, spec, authDesc);
         Server ccServer = createOperationsServer(spec, machine, true);
         ccServer.start(); // required here by basyx-0.1.0-SNAPSHOT
         ProtocolServerBuilder builder = AasFactory.getInstance().createProtocolServerBuilder(spec);
-        Assert.assertTrue(builder.isAvailable(VAB_SERVER.getHost(), 5000));
+        Assert.assertTrue(builder.isAvailable(vabServer.getHost(), 5000));
 
+        long start = System.currentTimeMillis();
+        Aas aas = createAas(machine, spec, authDesc);
         httpServer = factory.createDeploymentRecipe(spec)
             .forRegistry()
             .deploy(aas)
             .createServer()
             .start();
-
         queryAas(spec, machine, authDesc);
+        System.out.println("TIME: testVabQuery protocols " + protocol + "/" + serverProtocol + " hasAuth " 
+            + (authDesc != null) + ": " + (System.currentTimeMillis() - start));
+        
         Server.stop(httpServer, true);
         Server.stop(ccServer, true);
     }
@@ -1054,15 +1057,27 @@ public class AasTest {
             op.invoke();
             if (!authenticated && !expectedSuccess 
                 && AasFactory.getInstance().supportsOperationExecutionAuthorization()) {
-                Assert.fail(opName + "shall not be executable due to missing permissions.");
+                assertOpFail(opName + "shall not be executable due to missing permissions.");
             }
         } catch (ExecutionException e) {
             if (authenticated) {
-                Assert.fail(opName + " shall not be failing due to granted permissions.");
+                assertOpFail(opName + " shall not be failing due to granted permissions.");
             }
             if (expectedSuccess) {
-                Assert.fail(opName + " shall not fail.");
+                assertOpFail(opName + " shall not fail.");
             }
+        }
+    }
+    
+    /**
+     * Fails for operation RBAC executions. May be disabled temporarily using {@code -Dokto.test.aas.failRbacOp}.
+     * 
+     * @param msg the fail message
+     */
+    private static void assertOpFail(String msg) {
+        Boolean canFail = Boolean.valueOf(System.getProperty("okto.test.aas.failRbacOp", "true"));
+        if (canFail) {
+            Assert.fail(msg);
         }
     }
     

@@ -12,6 +12,17 @@
 
 package test.de.iip_ecosphere.platform.support;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.runner.Description;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+import org.junit.runner.notification.RunListener;
+
 import de.iip_ecosphere.platform.support.NetUtils;
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.TestSuite;
@@ -51,5 +62,61 @@ public class TestUtils {
         }
         return suite;
     }    
+    
+    // checkstyle: stop exception type check
+    
+    private static class MyRunListener extends RunListener {
+        
+        private Map<String, Long> times = new HashMap<>();
+        private long start;
+     
+        @Override
+        public void testStarted(Description description) throws Exception {
+            start = System.currentTimeMillis();
+        }
+
+        @Override
+        public void testFinished(Description description) throws Exception {
+            long duration = System.currentTimeMillis() - start;
+            String cls = description.getClassName();
+            Long time = times.get(cls);
+            if (null == time) {
+                time = 0L;
+            }
+            time += duration;
+            times.put(cls, time);
+        }
+
+        @Override
+        public void testRunFinished(Result result) throws Exception {
+            System.out.println("Times: ");
+            List<String> keys = new ArrayList<>(times.keySet());
+            Collections.sort(keys);
+            for (String k: keys) {
+                System.out.println(" " + k + ": " + times.get(k) + " ms");
+            }
+        }
+        
+    }
+
+    // checkstyle: resume exception type check
+
+    /**
+     * Executes test cases with junit.
+     * 
+     * @param args the test suites/cases to run
+     */
+    public static void main(String[] args) {
+        JUnitCore core = new JUnitCore();
+        core.addListener(new MyRunListener());
+        for (String s: args) {
+            try {
+                Class<?> cls = Class.forName(s);
+                core.run(cls);
+            } catch (ClassNotFoundException e) {
+                System.out.println("Class " + s + " not found.");
+            }
+        }
+    }
 
 }

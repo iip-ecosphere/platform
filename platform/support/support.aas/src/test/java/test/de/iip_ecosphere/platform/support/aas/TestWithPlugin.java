@@ -24,7 +24,7 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
  */
 public class TestWithPlugin extends test.de.iip_ecosphere.platform.support.TestWithPlugin {
 
-    private static String aasPluginId = "aas.basyx-2.0"; // shall become the default id then
+    private static String aasPluginId = TestWithPluginSetup.getAasPluginId("aas.basyx-2.0"); // for now
     
     /**
      * Changes the AAS plugin Id used for testing.
@@ -48,9 +48,17 @@ public class TestWithPlugin extends test.de.iip_ecosphere.platform.support.TestW
      * Sets up the AAS plugins for testing.
      */
     public static void setupAASPlugins() {
-        addPluginLocation("support", "support.aas.basyx2", "support.log-slf4j-simple");
-        addPluginLocation("support/support.aas.basyx2", "support.aas.basyx2.server", "../support.log-slf4j-simple");
-        addPluginLocation("support", "support.aas.basyx", "support.log-slf4j-simple");
+        setAasPluginId(TestWithPluginSetup.getAasPluginId(null));
+        if (TestWithPluginSetup.isWithBasyx2()) {
+            addPluginLocation("support", "support.aas.basyx2", "support.log-slf4j-simple");
+            addPluginLocation("support/support.aas.basyx2", "support.aas.basyx2.server", "../support.log-slf4j-simple");
+        }
+        if (TestWithPluginSetup.isWithBasyx()) {
+            addPluginLocation("support", "support.aas.basyx", "support.log-slf4j-simple");
+            if (TestWithPluginSetup.isWithBasyxServer()) {
+                addPluginLocation("support/support.aas.basyx", "support.aas.basyx.server");
+            }
+        }
         addPluginLocation("support", "support.yaml-snakeyaml");
         addPluginLocation("support", "support.json-jackson");
         addPluginLocation("support", "support.commons-apache");
