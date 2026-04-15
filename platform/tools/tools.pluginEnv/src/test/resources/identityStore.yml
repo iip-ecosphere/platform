@@ -1,0 +1,25 @@
+name: support.aas.basyx2
+identities:
+    "amqp": 
+        type: USERNAME
+        userName: user
+        tokenData: pwd
+        tokenEncryptionAlgorithm: UTF-8
+    "ano":
+        type: ANONYMOUS
+    aas:
+        type: USERNAME
+        userName: user
+        tokenData: password
+        tokenEncryptionAlgorithm: UTF-8
+    aas-admin-1:
+        type: USERNAME
+        userName: admin
+        tokenData: password
+        tokenEncryptionAlgorithm: UTF-8
+    aas-user-1:
+        type: USERNAME
+        userName: user
+        tokenData: password
+        tokenEncryptionAlgorithm: UTF-8
+    
