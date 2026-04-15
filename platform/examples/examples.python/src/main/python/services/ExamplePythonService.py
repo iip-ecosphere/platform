@@ -9,9 +9,7 @@ import random
 class ExamplePythonService(ExamplePythonServiceInterface):
     """Example Python Service implementing generated interface."""
     
-    def __init__(self):
-        """Initializes the service.""" 
-        super().__init__()
+    # leaving out constructor, start/stop and registration as class name is exactly as in model
         
     def processPythonTestInput(self, data: PythonTestInput):
         """Asynchronous data processing method. Use self.ingest(data) to pass the result back to the data stream.
@@ -25,6 +23,3 @@ class ExamplePythonService(ExamplePythonServiceInterface):
         result.prediction = result.confidence > 0.75
         
         self.ingest(result) # asynchronous processing, call ingest from parent       
-
-#registers itself
-ExamplePythonService()
