@@ -44,7 +44,7 @@ public class AllTests {
             addPluginLocation("support", "support.processInfo-oshi");
             addPluginLocation("support", "support.websocket-websocket");
             addPluginLocation("support", "support.bytecode-bytebuddy");
-            loadPlugins();
+            loadPlugins(false);
         }
     }
 

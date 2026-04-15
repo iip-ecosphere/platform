@@ -21,6 +21,7 @@ import java.util.Map;
 import org.junit.runner.Description;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
+import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 
 import de.iip_ecosphere.platform.support.NetUtils;
@@ -94,6 +95,22 @@ public class TestUtils {
             Collections.sort(keys);
             for (String k: keys) {
                 System.out.println(" " + k + ": " + times.get(k) + " ms");
+            }
+        }
+
+        @Override
+        public void testFailure(Failure failure) throws Exception {
+            System.out.println("Test failure: " + failure.getMessage());
+            if (failure.getException() != null) {
+                failure.getException().printStackTrace(System.out);
+            }
+        }
+        
+        @Override
+        public void testAssumptionFailure(Failure failure) {
+            System.out.println("Test assumption failure: " + failure.getMessage());
+            if (failure.getException() != null) {
+                failure.getException().printStackTrace(System.out);
             }
         }
         
