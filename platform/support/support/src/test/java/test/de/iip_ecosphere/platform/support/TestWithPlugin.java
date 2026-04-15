@@ -159,6 +159,15 @@ public class TestWithPlugin {
      * Loads plugins statically.
      */
     public static void loadPlugins() {
+        loadPlugins(true);
+    }
+
+    /**
+     * Loads plugins statically.
+     * 
+     * @param notFoundWarning whether not-found warnings shall be issued
+     */
+    public static void loadPlugins(boolean notFoundWarning) {
         if (!loaded) {
             PluginManager.registerPlugin(CurrentClassloaderPluginSetupDescriptor.INSTANCE);
             loaded = true;
@@ -202,7 +211,7 @@ public class TestWithPlugin {
                         found = true;
                     }
                 }
-                if (!found) {
+                if (!found && notFoundWarning) {
                     LoggerFactory.getLogger(TestWithPlugin.class).info("No plugins found for {}. "
                         + "Test may fail.", loc.folder);
                 }
