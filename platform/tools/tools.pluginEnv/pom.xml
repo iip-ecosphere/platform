@@ -20,5 +20,18 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>3.0.0</version>
+          <configuration>
+              <mainClass>de.oktoflow.platform.tools.pluginEnv.Standalone</mainClass>
+          </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

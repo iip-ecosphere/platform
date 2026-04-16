@@ -119,7 +119,7 @@ public class Standalone {
                 List<String> lines = Files.readAllLines(f.toPath());
                 for (String l : lines) {
                     if (!l.startsWith("#")) {
-                        StringTokenizer tokens = new StringTokenizer(l, File.pathSeparator);
+                        StringTokenizer tokens = new StringTokenizer(l, ";:"); // even out windows/linux
                         while (tokens.hasMoreTokens()) {
                             String t = tokens.nextToken();
                             //System.out.println(t);
@@ -131,6 +131,9 @@ public class Standalone {
                             if (t.contains("snakeyaml") && t.contains("1.27")) {
                                 tMapped = "";
                             }
+                            /*if (t.contains("spring-boot") && t.contains("3.4.3")) { // basyx2-m8
+                                tMapped = "";
+                            }*/
                             if (tMapped != null) {
                                 if (tMapped.length() == 0) {
                                     t = null;
@@ -139,6 +142,7 @@ public class Standalone {
                                 }
                             }
                             if (t != null) {
+                                t = t.replace("\\", "/"); // even out windows/linux, File.separator -> printEntry
                                 printEntry(out, m2 + t);
                             }
                         }
