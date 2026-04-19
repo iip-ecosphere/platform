@@ -16,26 +16,31 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.IdentityTokenWithRole;
 import de.iip_ecosphere.platform.support.identities.IdentityToken;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Performs a web server configuration for tomcat.
@@ -44,10 +49,78 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
  */
 @Configuration
 @EnableWebSecurity
-public class ServerConfig {
+public class ServerConfig implements WebMvcConfigurer {
     
+    private static ThreadLocal<Object> principal = new ThreadLocal<>();
     @Autowired(required = false)
     private AuthenticationDescriptor authDesc;
+
+    /**
+     * Implements the authentication interceptor.
+     */
+    private HandlerInterceptor authInterceptor = new HandlerInterceptor() {
+        
+        private Map<String, IdentityTokenWithRole> users;
+        
+        @Override
+        public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) 
+            throws Exception {
+            if (null == users) {
+                users = new HashMap<>();
+                List<IdentityTokenWithRole> sUsers = authDesc.getServerUsers();
+                if (null != sUsers) {
+                    sUsers.forEach(u -> users.put(u.getUserName(), u));
+                }
+            }
+            
+            String authHeader = request.getHeader("Authorization");
+
+            principal.set(null);
+            if (authHeader != null && authHeader.startsWith("Basic ")) {
+                // Extract the Base64 part
+                String base64Credentials = authHeader.substring("Basic ".length());
+                byte[] decodedBytes = Base64.getDecoder().decode(base64Credentials);
+                String credentials = new String(decodedBytes);
+                
+                // credentials format is "username:password"
+                final String[] values = credentials.split(":", 2);
+                if (values.length == 2) {
+                    String username = values[0];
+                    String password = values[1];
+                    
+                    IdentityTokenWithRole token = users.get(username);
+                    if (null != token) {
+                        if (token.getTokenDataAsString().equals(password)) {
+                            principal.set(token.getRole().name());
+                            return true;                
+                        }
+                    }
+                }
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.addHeader("WWW-Authenticate", "Basic realm=\"DefaultRealm\"");
+                return false;
+            }
+
+            if (authDesc.requiresAnonymousAccess()) {
+                principal.set(AuthenticationDescriptor.DefaultRole.NONE.name());
+                return true;
+            }
+            // If we reach here, authentication failed
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.addHeader("WWW-Authenticate", "Basic realm=\"DefaultRealm\"");
+            return false;
+        }
+
+    };
+
+    /**
+     * Returns the security principal determined by the authentication interceptor.
+     * 
+     * @return the principal, may be <b>null</b>
+     */
+    public static Object getPrincipal() {
+        return principal.get();
+    }
     
     /**
      * Creates the servlet web server factory.
@@ -64,16 +137,16 @@ public class ServerConfig {
 
     // checkstyle: stop exception type check
 
-    /**
+    /*
      * Defines the security filter chain.
      * 
      * @param httpSecurity the security object
      * @return the modified/defined filter chain
      * @throws Exception if defining fails
      */
-    @Bean
+/*    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.securityMatcher("/**");
+        httpSecurity.securityMatcher("/**");        
         if (null != authDesc) {
             httpSecurity.authorizeHttpRequests(req -> {
                 req.requestMatchers("/error").permitAll();
@@ -82,14 +155,14 @@ public class ServerConfig {
                 } else {
                     req.anyRequest().authenticated();
                 }
-            });
+            });*/
             /*.formLogin(f -> f.loginPage("/login")
                 .permitAll()
             ).logout(l -> l.permitAll())*/
             //if (null != authDesc.getOAuth2Setup()) {
                 // TODO authDesc.getOAuth2Setup()
             //}
-            httpSecurity.httpBasic(Customizer.withDefaults());  // TODO conditional
+/*            httpSecurity.httpBasic(Customizer.withDefaults());  // TODO conditional
             if (authDesc.requiresAnonymousAccess()) {
                 AuthenticationDescriptor.Role role = AuthenticationDescriptor.DefaultRole.NONE;
                 httpSecurity.anonymous(c -> c.key(role.name()).authorities(role.name()).principal(role.name()));
@@ -103,10 +176,20 @@ public class ServerConfig {
                     .csrf(c -> c.ignoringRequestMatchers(r -> true));
             return httpSecurity.build();
         }
-    }
+    }*/
 
     // checkstyle: stop exception type check
-
+    
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        if (authDesc != null) {
+            // Apply this interceptor to all paths, or specific ones like "/api/**"
+            registry.addInterceptor(authInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/error", "/favicon.ico");
+        }
+    }
+    
     /**
      * Provides the user details service.
      * 

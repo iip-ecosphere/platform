@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx2;
 
+import java.net.http.HttpClient;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,7 @@ import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.net.HttpClientHelper;
 
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.model.ProtocolInformation;
 import org.eclipse.digitaltwin.basyx.submodelregistry.client.ApiClient;
@@ -37,6 +39,30 @@ import org.eclipse.digitaltwin.basyx.submodelregistry.client.model.Endpoint;
  */
 class SubmodelRegistryUtils {
 
+    /**
+     * Specialized {@link ApiClient} to prevent unneeded instances of Http client.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class SubmodelRegistryApiClient extends ApiClient {
+        
+        /**
+         * Creates an instance.
+         * 
+         * @param builder the HTTP client builder
+         */
+        public SubmodelRegistryApiClient(HttpClient.Builder builder) {
+            super(builder, null, null);
+            setObjectMapper(createDefaultObjectMapper());
+        }
+
+        @Override
+        public HttpClient getHttpClient() {
+            return HttpClientHelper.inContext(() -> super.getHttpClient());
+        }
+
+    }
+    
     /**
      * Returns the first endpoint from {@code desc}.
      * 
@@ -143,9 +169,9 @@ class SubmodelRegistryUtils {
      * @return the API instance
      */
     static SubmodelRegistryApi createRegistryApi(SetupSpec spec, String uri) {
-        return Tools.createApi(spec.getSetup(AasComponent.SUBMODEL_REGISTRY), 
-            uri, new ApiClient(), 
-            (b, c, i) -> c.setHttpClientBuilder(b).setRequestInterceptor(i), 
+        return Tools.getApi(spec.getSetup(AasComponent.SUBMODEL_REGISTRY), 
+            uri, h -> new SubmodelRegistryApiClient(h), 
+            (c, i) -> c.setRequestInterceptor(i), 
             (u, c) -> c.updateBaseUri(u), 
             (u, c) -> new SubmodelRegistryApi(c), 
             SubmodelRegistryApi.class);

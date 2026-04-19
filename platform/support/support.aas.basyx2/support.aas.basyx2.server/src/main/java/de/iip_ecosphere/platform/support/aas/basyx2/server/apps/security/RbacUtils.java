@@ -77,7 +77,10 @@ public class RbacUtils {
             @Override
             public List<String> getRoles() {
                 List<String> result = new ArrayList<>();
-                Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                Object principal = ServerConfig.getPrincipal();
+                if (null == principal) {
+                    principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                }
                 if (null == principal) { // shall not happen
                     Stream.of(AuthenticationDescriptor.Role.allAnonymous()).forEach(a -> result.add(a.name()));
                 } else if (principal instanceof User) {

@@ -12,7 +12,6 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx2.server.apps.submodelRepository;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.digitaltwin.basyx.aasrepository.AasRepositoryFactory;
@@ -60,9 +59,8 @@ import de.iip_ecosphere.platform.support.aas.basyx2.common.AssetServerKeyStoreDe
 import de.iip_ecosphere.platform.support.aas.basyx2.server.apps.common.BaSyxExceptionResolver;
 import de.iip_ecosphere.platform.support.aas.basyx2.server.apps.common.BaSyxNames;
 import de.iip_ecosphere.platform.support.aas.basyx2.server.apps.security.RbacUtils;
-import de.iip_ecosphere.platform.support.aas.basyx2.common.Tools;
+import de.iip_ecosphere.platform.support.net.HttpClientHelper;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
-import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Spring application for serving a submodel repository with spring. 
@@ -119,14 +117,9 @@ public class SubmodelRepositorySpringApp implements WebMvcConfigurer {
         if (kstore != null) {
             KeyStoreDescriptor ksd = kstore.getDescriptor();
             if (ksd.appliesToClient()) {
-                try {
-                    JdkClientHttpConnector httpConnector = new JdkClientHttpConnector(
-                        Tools.createHttpClient(ksd).build());
-                    builder = builder.clientConnector(httpConnector);
-                } catch (IOException e) {
-                    LoggerFactory.getLogger(SubmodelRepositorySpringApp.class).error(
-                        "While creating WebClient for SubmodelRepository, staying with https: {}", e.getMessage());
-                }
+                JdkClientHttpConnector httpConnector = new JdkClientHttpConnector(
+                    HttpClientHelper.createHttpClient(ksd).build());
+                builder = builder.clientConnector(httpConnector);
             }
         }
         if (null != authDesc) {

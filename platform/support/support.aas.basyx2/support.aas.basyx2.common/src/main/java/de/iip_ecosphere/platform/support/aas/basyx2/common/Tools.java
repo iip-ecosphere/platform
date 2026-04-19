@@ -12,19 +12,17 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx2.common;
 
-import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
-
-import javax.net.ssl.SSLContext;
-
+import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
+import de.iip_ecosphere.platform.support.net.HttpClientHelper;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
-import de.iip_ecosphere.platform.support.net.SslUtils;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.ComponentSetup;
-import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Some common utilities, e.g., for client/server.
@@ -32,6 +30,25 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
  * @author Holger Eichelberger, SSE
  */
 public class Tools {
+
+    private static Map<String, Object> cache = new HashMap<>();
+
+    /**
+     * Creates a client instance.
+     * @param <C> the client type
+     * @author Holger Eichelberger, SSE
+     */
+    public interface ClientSupplier<C> {
+        
+        /**
+         * Creates a client instance.
+         * 
+         * @param builder the HTTP builder
+         * @return the client instance
+         */
+        public C create(HttpClient.Builder builder);
+        
+    }
 
     /**
      * Consumes an HTTPClient builder and applies it to client.
@@ -43,10 +60,10 @@ public class Tools {
         /**
          * Applies {@code builder} to {@code client}.
          * 
-         * @param builder the builder
          * @param client the client
+         * @param interceptor the interceptor
          */
-        public void accept(HttpClient.Builder builder, C client, Consumer<HttpRequest.Builder> interceptor);
+        public void accept(C client, Consumer<HttpRequest.Builder> interceptor);
         
     }
 
@@ -99,9 +116,8 @@ public class Tools {
      * @param apiProvider creates the API instance
      * @return the API instance
      */
-    public static <A, C> A createApi(ComponentSetup setup, String uri, C client, 
-        HttpClientBuilderConsumer<C> builderConsumer, UriConsumer<C> uriConsumer, ApiProvider<A, C> apiProvider, 
-        Class<A> cls) {
+    public static <A, C> A createApi(ComponentSetup setup, String uri, ClientSupplier<C> clientSupplier, 
+        HttpClientBuilderConsumer<C> builderConsumer, UriConsumer<C> uriConsumer, ApiProvider<A, C> apiProvider) {
         de.iip_ecosphere.platform.support.Endpoint endpoint = setup.getEndpoint();
         KeyStoreDescriptor keystore = setup.getKeyStore();
         KeyStoreDescriptor ksd = null;
@@ -116,74 +132,58 @@ public class Tools {
                 AuthenticationDescriptor.authenticate((n, v) -> b.header(n, v), setup.getAuthentication());
             };
         }
-        try {
-            builderConsumer.accept(createHttpClient(ksd), client, interceptor);
-        } catch (IOException e) {
-            LoggerFactory.getLogger(Tools.class).error(
-                "While creating {}, creating http client failed: {}", cls.getName(), e.getMessage());
-        }
+        C client = clientSupplier.create(HttpClientHelper.createHttpClient(ksd));
+        builderConsumer.accept(client, interceptor);
         String u = null == uri ? endpoint.toServerUri() : uri;
         uriConsumer.accept(u, client);
         
         // TokenManager may go via interceptor
         return apiProvider.create(u, client);
     }
-
-    // checkstyle: resume parameter number check
     
     /**
-     * Creates a HTTP client builder from a keystore descriptor.
+     * Fetches an API instance from the cache.
      * 
-     * @param desc the descriptor
-     * @return the client builder
-     * @throws IOException if creating the SSL/TSL context from {@code desc} fails
+     * @param <A> the API type
+     * @param setup the component setup carrying endpoint, keystore, authentication
+     * @param uri specific URI, may be <b>null</b> for {@code endpoint}
+     * @param supplier the API instance supplier
+     * @return the API instance
      */
-    public static HttpClient.Builder createHttpClient(KeyStoreDescriptor desc) throws IOException {
-        SSLContext context = null;
-        Boolean oldHNV = null;
-        if (null != desc) {
-            context = SslUtils.createTlsContext(desc.getPath(), desc.getPassword(), desc.getAlias());
-            oldHNV = setJdkHostnameVerification(desc);
-        }
-        HttpClient.Builder result = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1);
-        if (null != context) {
-            result.sslContext(context);
-        } 
-        /* if (AUTHENTICATED) {
-            // authenticator sets header empty, requires challenge-response-auth 
-            result.authenticator(new Authenticator() {
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                }
-            });
-        }*/
-        if (null != oldHNV) {
-            setJdkHostnameVerification(oldHNV);
-        }
-        return result;
+    public static <A> A fromCache(ComponentSetup setup, String uri, Class<A> cls, Supplier<A> supplier) {
+        de.iip_ecosphere.platform.support.Endpoint endpoint = setup.getEndpoint();
+        String u = null == uri ? endpoint.toServerUri() : uri;
+        String key = cls.getName() + "-" + u;
+        return cls.cast(cache.computeIfAbsent(key, k -> supplier.get()));
     }
 
     /**
-     * Sets JDK HTTP/SSL hostname verification.
+     * Fetches an API instance from cache or creates it instance.
      * 
-     * @param desc the keystore descriptor indicating whether verification is enabled or disabled
-     * @return the value of the flag before, by default {@code false}
+     * @param <A> the API type
+     * @param <C> the client type
+     * @param setup the component setup carrying endpoint, keystore, authentication
+     * @param uri specific URI, may be <b>null</b> for {@code endpoint}
+     * @param builderConsumer applies the configured HTTPClient builder to the client
+     * @param uriConsumer applies the uri (either {@code uri} or {@code endpoint} to the client
+     * @param apiProvider creates the API instance
+     * @param cls the API class
+     * @return the API instance
      */
-    public static boolean setJdkHostnameVerification(KeyStoreDescriptor desc) {
-        return setJdkHostnameVerification(!desc.applyHostnameVerification());
+    public static <A, C> A getApi(ComponentSetup setup, String uri, ClientSupplier<C> client, 
+        HttpClientBuilderConsumer<C> builderConsumer, UriConsumer<C> uriConsumer, ApiProvider<A, C> apiProvider, 
+        Class<A> cls) {
+        return fromCache(setup, uri, cls, 
+            () -> createApi(setup, uri, client, builderConsumer, uriConsumer, apiProvider));
     }
 
+    // checkstyle: resume parameter number check
+
     /**
-     * Sets JDK HTTP/SSL hostname verification.
-     * 
-     * @param disable {@code true} the verification, {@code false} enables it
-     * @return the value of the flag before, by default {@code false}
+     * Clears the cache. [testing]
      */
-    public static boolean setJdkHostnameVerification(boolean disable) {
-        final String prop = "jdk.internal.httpclient.disableHostnameVerification";
-        boolean old = Boolean.valueOf(System.getProperty(prop, "false"));
-        System.setProperty(prop, String.valueOf(disable));
-        return old;
+    public static void clearCache() {
+        cache.clear();
     }
 
 }

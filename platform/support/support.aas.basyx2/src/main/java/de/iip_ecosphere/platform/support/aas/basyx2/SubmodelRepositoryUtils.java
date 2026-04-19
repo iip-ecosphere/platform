@@ -19,6 +19,9 @@ import org.eclipse.digitaltwin.basyx.submodelservice.client.internal.SubmodelSer
 
 import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
+import de.iip_ecosphere.platform.support.net.HttpClientHelper;
+
+import java.net.http.HttpClient;
 
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonMapperFactory;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.SimpleAbstractTypeResolverFactory;
@@ -33,6 +36,30 @@ import org.eclipse.digitaltwin.basyx.core.exceptions.ElementDoesNotExistExceptio
  */
 class SubmodelRepositoryUtils {
 
+    /**
+     * Specialized {@link ApiClient} to prevent unneeded instances of Http client.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class SubmodelRepositoryApiClient extends ApiClient {
+        
+        /**
+         * Creates an instance.
+         * 
+         * @param builder the HTTP client builder
+         */
+        public SubmodelRepositoryApiClient(HttpClient.Builder builder) {
+            super(builder, null, null);
+            setObjectMapper(new JsonMapperFactory().create(new SimpleAbstractTypeResolverFactory().create()));
+        }
+
+        @Override
+        public HttpClient getHttpClient() {
+            return HttpClientHelper.inContext(() -> super.getHttpClient());
+        }
+        
+    }
+    
     /**
      * Creates an API instance with default URL.
      * 
@@ -52,10 +79,9 @@ class SubmodelRepositoryUtils {
      * @return the API instance
      */
     static ConnectedSubmodelRepository createRepositoryApi(SetupSpec spec, String uri) {
-        return Tools.createApi(spec.getSetup(AasComponent.SUBMODEL_REPOSITORY), 
-            uri, new ApiClient().setObjectMapper(
-                new JsonMapperFactory().create(new SimpleAbstractTypeResolverFactory().create())), 
-            (b, c, i) -> c.setHttpClientBuilder(b).setRequestInterceptor(i), 
+        return Tools.getApi(spec.getSetup(AasComponent.SUBMODEL_REPOSITORY), uri, 
+            h -> new SubmodelRepositoryApiClient(h), 
+            (c, i) -> c.setRequestInterceptor(i), 
             (u, c) -> c.updateBaseUri(u), 
             (u, c) -> new ExtendedConnectedSubmodelRepository(u, new SubmodelRepositoryApi(c), spec), 
             ConnectedSubmodelRepository.class);
@@ -90,10 +116,9 @@ class SubmodelRepositoryUtils {
             throws ElementDoesNotExistException {
             try {
                 repoApi.getSubmodelById(submodelId, "", "");
-                return Tools.createApi(spec.getSetup(AasComponent.SUBMODEL_REPOSITORY), 
-                    getSubmodelUrl(submodelId), new ApiClient().setObjectMapper(
-                        new JsonMapperFactory().create(new SimpleAbstractTypeResolverFactory().create())), 
-                    (b, c, i) -> c.setHttpClientBuilder(b).setRequestInterceptor(i), 
+                return Tools.getApi(spec.getSetup(AasComponent.SUBMODEL_REPOSITORY), getSubmodelUrl(submodelId), 
+                    h -> new SubmodelRepositoryApiClient(h), 
+                    (c, i) -> c.setRequestInterceptor(i), 
                     (u, c) -> c.updateBaseUri(u), 
                     (u, c) -> new ConnectedSubmodelService(new SubmodelServiceApi(c)), 
                     ConnectedSubmodelService.class);

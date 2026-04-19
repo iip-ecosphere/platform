@@ -516,6 +516,7 @@ abstract class BaSyxAbstractAasServer implements AasServer {
             //result.addSpringSecurityDebugging();
             //result.addStartupBeanDebugging();
             //result.addJavaSslDebugging();
+            //result.addJavaHttpClientDebugging();
         }
         if (isJUnitTest()) {
             result.addTestingProfile();
@@ -641,7 +642,8 @@ abstract class BaSyxAbstractAasServer implements AasServer {
             }
             if (shallStart(spec.getSubmodelRepositoryState())) {
                 smRepoCtx = createContext(getSmRepositoryAppClass(), spec.getSubmodelRepositoryEndpoint().getPort(), 
-                    createConfigurer(getSmRepositoryAppInitializer(), spec.getSetup(AasComponent.SUBMODEL_REPOSITORY)), 
+                    createConfigurer(getSmRepositoryAppInitializer(), spec.getSetup(AasComponent.SUBMODEL_REPOSITORY))
+                        .addAssetServerKeystore(spec.getAssetServerKeyStore()), 
                         s -> spec.notifySubmodelRepositoryStateChange(s));
             }
         }
@@ -653,8 +655,7 @@ abstract class BaSyxAbstractAasServer implements AasServer {
             }
             if (shallStart(spec.getSubmodelRegistryState())) {
                 smRegistryCtx = createContext(getSmRegistryAppClass(), spec.getSubmodelRegistryEndpoint().getPort(), 
-                    createConfigurer(getSmRegistryAppInitializer(), spec.getSetup(AasComponent.SUBMODEL_REGISTRY))
-                        .addAssetServerKeystore(spec.getAssetServerKeyStore()), 
+                    createConfigurer(getSmRegistryAppInitializer(), spec.getSetup(AasComponent.SUBMODEL_REGISTRY)), 
                         s -> spec.notifySubmodelRegistryStateChange(s));
                 spec.notifySubmodelRegistryStateChange(State.RUNNING);
             }

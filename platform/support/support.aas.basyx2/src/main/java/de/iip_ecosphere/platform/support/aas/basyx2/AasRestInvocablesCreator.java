@@ -28,6 +28,7 @@ public class AasRestInvocablesCreator extends AbstractAasRestInvocablesCreator {
     private String id;
     private SetupSpec spec;
     private ConnectedSubmodelRepository smRepo = null;
+    private String schemaPrefix;
     
     /**
      * Creates an invocables creator instance.
@@ -37,6 +38,7 @@ public class AasRestInvocablesCreator extends AbstractAasRestInvocablesCreator {
     AasRestInvocablesCreator(SetupSpec spec) {
         this.spec = spec;
         ServerAddress addr = spec.getAssetServerAddress();
+        schemaPrefix = addr.getSchema().toUri();
         id = addr.getHost() + ":" + addr.getPort();
     }
 
@@ -47,7 +49,7 @@ public class AasRestInvocablesCreator extends AbstractAasRestInvocablesCreator {
 
     @Override
     protected String composeUrl(String suffix) {
-        return "http://" + id + "/" + suffix;
+        return schemaPrefix + id + "/" + suffix;
     }
 
     @Override

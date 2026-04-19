@@ -35,7 +35,7 @@ import test.de.iip_ecosphere.platform.support.aas.AasTest;
 public class BaSyxTest extends AasTest {
 
     @Override
-    protected KeyStoreDescriptor getKeyStoreDescriptor(String protocol) {
+    protected KeyStoreDescriptor getKeyStoreDescriptor(String protocol, String sndProtocol) {
         KeyStoreDescriptor result = null;
         if (BaSyxAasFactory.PROTOCOL_VAB_HTTPS.equals(protocol)) {
             File f = new File("./src/test/resources/keystore.jks");
@@ -46,7 +46,7 @@ public class BaSyxTest extends AasTest {
     }
     
     @Override
-    protected Schema getAasServerAddressSchema(String serverProtocol) {
+    protected Schema getAasServerAddressSchema(String serverProtocol, String assetProtocol) {
         return serverProtocol.length() > 0 ? Schema.HTTPS : Schema.HTTP; // works here, but too much assumption
     }    
 

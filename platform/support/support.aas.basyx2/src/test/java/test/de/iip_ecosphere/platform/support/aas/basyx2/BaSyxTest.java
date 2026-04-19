@@ -12,10 +12,13 @@
 
 package test.de.iip_ecosphere.platform.support.aas.basyx2;
 
+import java.io.File;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.Endpoint;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe.LocalPersistenceType;
@@ -24,6 +27,8 @@ import de.iip_ecosphere.platform.support.aas.Invokable;
 import de.iip_ecosphere.platform.support.aas.ServerRecipe;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
 import de.iip_ecosphere.platform.support.aas.basyx2.BaSyxAasFactory;
+import de.iip_ecosphere.platform.support.aas.basyx2.common.Tools;
+import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 import de.iip_ecosphere.platform.support.aas.Type;
 import test.de.iip_ecosphere.platform.support.aas.AasTest;
 import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
@@ -92,5 +97,34 @@ public class BaSyxTest extends AasTest {
         Assert.assertEquals(LocalPersistenceType.INMEMORY, 
             rcp.toPersistenceType(LocalPersistenceType.INMEMORY.name().toLowerCase()));
     }
+    
+    @Override
+    protected void authenticationChanged() {
+        Tools.clearCache();
+    }
+    
+    @Override
+    protected KeyStoreDescriptor getKeyStoreDescriptor(String protocol, String sndProtocol) {
+        KeyStoreDescriptor result = null;
+        // so far no SSL-REST, using REST if not default in test
+        if (BaSyxAasFactory.PROTOCOL_AAS_REST.equals(protocol) 
+            || BaSyxAasFactory.PROTOCOL_AAS_REST.equals(sndProtocol)) { 
+            File f = new File("./src/test/resources/keystore.jks");
+            System.out.println("Using Keystore: " + f.getAbsolutePath() + " " + f.exists());
+            result = new KeyStoreDescriptor(f, "a1234567", "tomcat"); // tomcat required by BaSyx
+        }
+        return result;
+    }
+    
+    @Override
+    protected Schema getAasServerAddressSchema(String serverProtocol, String assetProtocol) {
+        Schema result = Schema.HTTP;
+        // so far no SSL-REST, using REST if not default in test
+        if (BaSyxAasFactory.PROTOCOL_AAS_REST.equals(serverProtocol) 
+            || BaSyxAasFactory.PROTOCOL_AAS_REST.equals(assetProtocol)) { 
+            result = Schema.HTTPS;
+        }
+        return result;
+    }    
 
 }

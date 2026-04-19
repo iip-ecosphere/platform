@@ -14,6 +14,9 @@ package de.iip_ecosphere.platform.support.aas.basyx2;
 
 import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
+import de.iip_ecosphere.platform.support.net.HttpClientHelper;
+
+import java.net.http.HttpClient;
 
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.JsonMapperFactory;
 import org.eclipse.digitaltwin.aas4j.v3.dataformat.json.SimpleAbstractTypeResolverFactory;
@@ -27,7 +30,31 @@ import org.eclipse.digitaltwin.basyx.client.internal.ApiClient;
  * @author Holger Eichelberger, SSE
  */
 class AasRepositoryUtils {
-    
+
+    /**
+     * Specialized {@link ApiClient} to prevent unneeded instances of Http client.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class AasRepositoryApiClient extends ApiClient {
+        
+        /**
+         * Creates an instance.
+         * 
+         * @param builder the HTTP client builder
+         */
+        public AasRepositoryApiClient(HttpClient.Builder builder) {
+            super(builder, null, null);
+            setObjectMapper(new JsonMapperFactory().create(new SimpleAbstractTypeResolverFactory().create()));
+        }
+
+        @Override
+        public HttpClient getHttpClient() {
+            return HttpClientHelper.inContext(() -> super.getHttpClient());
+        }
+
+    }
+
     /**
      * Creates an API instance.
      * 
@@ -36,10 +63,9 @@ class AasRepositoryUtils {
      * @return the API instance
      */
     static ConnectedAasRepository createRepositoryApi(SetupSpec spec, String uri) {
-        return Tools.createApi(spec.getSetup(AasComponent.AAS_REPOSITORY), uri, 
-            new ApiClient().setObjectMapper(
-                new JsonMapperFactory().create(new SimpleAbstractTypeResolverFactory().create())), 
-            (b, c, i) -> c.setHttpClientBuilder(b).setRequestInterceptor(i), 
+        return Tools.getApi(spec.getSetup(AasComponent.AAS_REPOSITORY), uri, 
+            h -> new AasRepositoryApiClient(h), 
+            (c, i) -> c.setRequestInterceptor(i), 
             (u, c) -> c.updateBaseUri(u), 
             (u, c) -> new ConnectedAasRepository(u, new AssetAdministrationShellRepositoryApi(c)), 
             ConnectedAasRepository.class);

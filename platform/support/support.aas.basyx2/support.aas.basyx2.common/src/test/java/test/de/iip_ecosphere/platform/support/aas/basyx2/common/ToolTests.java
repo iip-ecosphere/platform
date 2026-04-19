@@ -24,6 +24,7 @@ import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.ComponentSetup;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.State;
 import de.iip_ecosphere.platform.support.aas.basyx2.common.Tools;
+import de.iip_ecosphere.platform.support.net.HttpClientHelper;
 import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 
 /**
@@ -64,19 +65,19 @@ public class ToolTests {
     }
 
     /**
-     * Tests {@link Tools).
+     * Tests {@link Tools}.
      */
     @Test
     public void testCreateHttpClientAndApi() throws IOException {
-        boolean verOld = Tools.setJdkHostnameVerification(true);
+        boolean verOld = HttpClientHelper.setJdkHostnameVerification(true);
         KeyStoreDescriptor desc = KeyStoreDescriptor.create("keystore", "tomcat", true, false);
         Assert.assertNotNull(desc);
-        Tools.setJdkHostnameVerification(desc);
-        HttpClient.Builder builder = Tools.createHttpClient(desc);
+        HttpClientHelper.setJdkHostnameVerification(desc);
+        HttpClient.Builder builder = HttpClientHelper.createHttpClient(desc);
         Assert.assertNotNull(builder);
         HttpClient client = builder.build();
         Assert.assertNotNull(client);
-        Tools.setJdkHostnameVerification(verOld);
+        HttpClientHelper.setJdkHostnameVerification(verOld);
 
         ComponentSetup setup = new ComponentSetup() {
             
@@ -105,14 +106,16 @@ public class ToolTests {
             }
         };
         
-        Api api = Tools.createApi(setup, null, new Api(), 
-            (b, c, i) -> { },      // configure, here nothing
+        Api api = Tools.getApi(setup, null, 
+            h -> new Api(), 
+            (c, i) -> { },      // configure, here nothing
             (u, c) -> c.setUri(u), // configure API with URI
             (u, c) -> new Api(c),  // if the API needs to be wrapped
             Api.class);
         
         Assert.assertNotNull(api);
         Assert.assertEquals(setup.getEndpoint().toServerUri(), api.uri);
+        Tools.clearCache();
     }
 
 }

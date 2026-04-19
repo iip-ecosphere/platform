@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx2;
 
+import java.net.http.HttpClient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +29,9 @@ import org.eclipse.digitaltwin.basyx.aasrepository.client.ConnectedAasRepository
 import de.iip_ecosphere.platform.support.aas.Aas;
 import de.iip_ecosphere.platform.support.aas.SetupSpec;
 import de.iip_ecosphere.platform.support.aas.SetupSpec.AasComponent;
+import de.iip_ecosphere.platform.support.aas.basyx2.common.Tools.ClientSupplier;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.net.HttpClientHelper;
 
 /**
  * Supporting methods for AAS registries. An own class is more convenient to separate the imports for descriptor, 
@@ -37,6 +40,34 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
  * @author Holger Eichelberger, SSE
  */
 public class AasRegistryUtils {
+
+    /**
+     * Specialized {@link ApiClient} to prevent unneeded instances of Http client.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class AasRegistryApiClient extends ApiClient {
+        
+        /**
+         * Creates an instance.
+         * 
+         * @param builder the HTTP client builder
+         */
+        public AasRegistryApiClient(HttpClient.Builder builder) {
+            super(builder, null, null);
+            setObjectMapper(createDefaultObjectMapper());
+        }
+        
+        @Override
+        public HttpClient getHttpClient() {
+            return HttpClientHelper.inContext(() -> super.getHttpClient());
+        }
+        
+    }
+    
+    private static final ClientSupplier<ApiClient> CLIENT_SUPPLIER = h -> {
+        return new AasRegistryApiClient(h);
+    };
 
     /**
      * Returns the first endpoint from {@code desc}.
@@ -168,8 +199,8 @@ public class AasRegistryUtils {
      * @return the API instance
      */
     static RegistryAndDiscoveryInterfaceApi createRegistryApi(SetupSpec spec, String uri) {
-        return Tools.createApi(spec.getSetup(AasComponent.AAS_REGISTRY), uri, new ApiClient(), 
-            (b, c, i) -> c.setHttpClientBuilder(b).setRequestInterceptor(i), 
+        return Tools.getApi(spec.getSetup(AasComponent.AAS_REGISTRY), uri, CLIENT_SUPPLIER, 
+            (c, i) -> c.setRequestInterceptor(i), 
             (u, c) -> c.updateBaseUri(u), 
             (u, c) -> new RegistryAndDiscoveryInterfaceApi(c), 
             RegistryAndDiscoveryInterfaceApi.class);
