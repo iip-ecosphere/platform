@@ -102,6 +102,7 @@ public class AssetRestServer implements Server {
             }
             server.start();
             setup.notifyStateChange(State.RUNNING);
+            LoggerFactory.getLogger(this).info("AAS-REST server started " + server.getClass().getName());
         }
         return this;
     }

@@ -39,6 +39,9 @@ public class AasRestInvocablesCreator extends AbstractAasRestInvocablesCreator {
         this.spec = spec;
         ServerAddress addr = spec.getAssetServerAddress();
         schemaPrefix = addr.getSchema().toUri();
+        if (null == schemaPrefix || schemaPrefix.length() == 0) {
+            schemaPrefix = "http://"; // fallback, also for VAB tests; VAB specified as Schema.IGNORE
+        }
         id = addr.getHost() + ":" + addr.getPort();
     }
 
