@@ -23,7 +23,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     PythonUtilsTest.class,
     ConstantsTest.class,
-    ChildFirstIndexedClassLoaderTest.class
+    IndexClassLoaderTest.class
 })
 public class AllTests {
 }

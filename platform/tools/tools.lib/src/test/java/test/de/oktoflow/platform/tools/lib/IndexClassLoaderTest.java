@@ -31,8 +31,23 @@ import org.junit.Assert;
  * @author Holger Eichelberger, SSE
  *
  */
-public class ChildFirstIndexedClassLoaderTest {
+public class IndexClassLoaderTest {
 
+    /**
+     * Extends for null returns.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class MyIndexClassloader extends IndexClassloader {
+        
+        /**
+         * Creates an indexed classloader.
+         */
+        protected MyIndexClassloader(LoaderIndex index) {
+            super(index, true);
+        }
+
+    }
     
     /**
      * Tests {@link IndexClassloader}.
@@ -74,6 +89,14 @@ public class ChildFirstIndexedClassLoaderTest {
         List<URL> res = Collections.list(loader.getResources(resName));
         Assert.assertEquals(2, res.size());
         Assert.assertNotNull(loader.getURLs()); // the construction here does not add URLs
+        loader.close();
+        
+        loader = new MyIndexClassloader(index);
+        cls = loader.loadClass(clsName);
+        Assert.assertNotNull(cls);
+        Assert.assertEquals(clsName, cls.getName());
+        cls = loader.loadClass("de.unknown.UnknownClass");
+        Assert.assertNull(cls);
         loader.close();
     }
     

@@ -47,6 +47,7 @@ public class IndexClassloader extends URLClassLoader {
     private final Map<String, String> classIndex;
     private final Map<String, String> resourceIndex;
     private final Map<Path, JarFile> jarCache = new ConcurrentHashMap<>();
+    private boolean returnNull = false;
 
     static {
         registerAsParallelCapable();
@@ -59,6 +60,19 @@ public class IndexClassloader extends URLClassLoader {
      */
     public IndexClassloader(LoaderIndex index) {
         this(index, null);
+    }
+
+    /**
+     * Creates an indexed classloader.
+     * 
+     * @param index the index instance
+     * @param returnNull whether the classloader shall return <b>null</b> instead of throwing an exception; if enabled, 
+     *   this breaks some method contracts, assuming that the caller handles this; particular intended for extending 
+     *   class loaders
+     */
+    protected IndexClassloader(LoaderIndex index, boolean returnNull) {
+        this(index);
+        this.returnNull = returnNull;
     }
 
     /**
@@ -85,6 +99,16 @@ public class IndexClassloader extends URLClassLoader {
     public IndexClassloader(File index, ClassLoader parent) throws IOException {
         this(LoaderIndex.fromFile(index), parent);
     }
+    
+    /**
+     * Returns whether {@code name} probably denotes a JDK class that shall be loaded by a JDK classloader.
+     * 
+     * @param name the qualified class name
+     * @return {@code true} for JDK class, {@code false} else
+     */
+    public static final boolean isJdkClass(String name) {
+        return name.startsWith("java.") || name.startsWith("javax.") || name.startsWith("sun.");        
+    }
 
     @Override
     public URL[] getURLs() { // for ClassGraph
@@ -103,7 +127,11 @@ public class IndexClassloader extends URLClassLoader {
     protected Class<?> findClass(String name) throws ClassNotFoundException {
         String locStr = classIndex.get(name);
         if (null == locStr) {
-            throw new ClassNotFoundException(name);
+            if (returnNull) {
+                return null;
+            } else {
+                throw new ClassNotFoundException(name);
+            }
         }
         locStr = LoaderIndex.getFirstResourceLocation(locStr); // only the first one here
         String jarPathStr = locationIndex.get(locStr);
@@ -113,14 +141,22 @@ public class IndexClassloader extends URLClassLoader {
             String entryName = name.replace('.', '/') + LoaderIndex.CLASS_SUFFIX;
             JarEntry entry = jar.getJarEntry(entryName);
             if (null == entry) {
-                throw new ClassNotFoundException(name);
+                if (returnNull) {
+                    return null;
+                } else {
+                    throw new ClassNotFoundException(name);
+                }
             }
             try (InputStream in = jar.getInputStream(entry)) {
                 byte[] bytes = LoaderIndex.readAllBytes(in);
                 return defineClass(name, bytes, 0, bytes.length);
             }
         } catch (IllegalArgumentException | IOException e) {
-            throw new ClassNotFoundException(name, e);
+            if (returnNull) {
+                return null;
+            } else {
+                throw new ClassNotFoundException(name, e);
+            }
         }
     }
 
