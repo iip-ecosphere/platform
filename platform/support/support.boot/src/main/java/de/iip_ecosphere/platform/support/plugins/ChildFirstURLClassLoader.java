@@ -17,6 +17,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
 
+import de.oktoflow.platform.tools.lib.loader.IndexClassloader;
+
 /**
  * A delegating child classloader to make internal methods accessible.
  * 
@@ -81,13 +83,12 @@ class ChildURLClassLoader extends URLClassLoader implements ChildClassLoader {
      * @throws ClassNotFoundException if the class cannot be found
      */
     public Class<?> findClassIntern(String name) throws ClassNotFoundException {
-        boolean isJava = name.startsWith("java.") || name.startsWith("javax."); // java is java
-        try {
-            if (isJava) {
+        if (IndexClassloader.isJdkClass(name)) {
+            try {
                 return realParent.loadClass(name);
+            } catch (ClassNotFoundException e) {
+                // may also fail if there is eg no logger, the try super
             }
-        } catch (ClassNotFoundException e) {
-            // may also fail if there is eg no logger, the try super
         }
         try {
             // first try to use the URLClassLoader findClass

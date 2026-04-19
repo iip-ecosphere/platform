@@ -15,7 +15,12 @@ package de.iip_ecosphere.platform.support.plugins;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
+
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 import de.oktoflow.platform.tools.lib.loader.IndexClassloader;
 import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
@@ -34,6 +39,12 @@ class ChildIndexClassLoader extends IndexClassloader implements ChildClassLoader
 
     static {
         registerAsParallelCapable();
+        try {
+            SSLContext.getDefault();
+            TrustManagerFactory.getDefaultAlgorithm();
+            KeyManagerFactory.getDefaultAlgorithm();
+        } catch (NoSuchAlgorithmException e) {
+        }
     }
     
     /**
@@ -43,7 +54,7 @@ class ChildIndexClassLoader extends IndexClassloader implements ChildClassLoader
      * @param realParent the real parent
      */
     public ChildIndexClassLoader(LoaderIndex index, FindClassClassLoader realParent) {
-        super(index, null);
+        super(index, true);
         this.realParent = realParent;
     }
     
@@ -84,11 +95,20 @@ class ChildIndexClassLoader extends IndexClassloader implements ChildClassLoader
     public Class<?> findClass(String name) throws ClassNotFoundException {
         Class<?> result = findLoadedClass(name); 
         if (null == result) {
+            if (isJdkClass(name)) {
+                try {
+                    return realParent.loadClass(name);
+                } catch (ClassNotFoundException e) {
+                    // may also fail if there is eg no logger, the try super
+                }
+            }
             try {
                 // first try to use the URLClassLoader findClass
                 result = super.findClass(name);
+                if (null == result) {
+                    result = realParent.loadClass(name);
+                }
             } catch (ClassNotFoundException e) {
-                // if that fails, we ask our real parent classloader to load the class (we give up)
                 result = realParent.loadClass(name);
             }
         }
