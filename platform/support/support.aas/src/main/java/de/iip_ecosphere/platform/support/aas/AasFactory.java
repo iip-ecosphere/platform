@@ -784,4 +784,10 @@ public abstract class AasFactory {
         return TestProviderDescriptor.getTests(index, getClass().getClassLoader());
     }
 
+    /**
+     * Clears temporary information, caches, etc.
+     */
+    public void clear() {
+    }
+
 }
