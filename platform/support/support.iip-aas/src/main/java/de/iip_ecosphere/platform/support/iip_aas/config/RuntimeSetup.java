@@ -122,7 +122,7 @@ public class RuntimeSetup extends AbstractSetup {
     /**
      * Defines the concept repository URI. [yaml]
      * 
-     * @param smServer the concept repository URI to set
+     * @param conceptRepository the concept repository URI to set
      */
     public void setConceptRepository(String conceptRepository) {
         this.conceptRepository = conceptRepository;
@@ -140,7 +140,7 @@ public class RuntimeSetup extends AbstractSetup {
     /**
      * Defines the AAS discovery URI. [yaml]
      * 
-     * @param smServer the discovery URI to set
+     * @param discovery the discovery URI to set
      */
     public void setDiscovery(String discovery) {
         this.discovery = discovery;

@@ -27,6 +27,7 @@ import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.LocalNetworkManagerWithParentAas;
 import de.iip_ecosphere.platform.support.iip_aas.NetworkManagerAas;
 import de.iip_ecosphere.platform.support.iip_aas.NetworkManagerAasClient;
+import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 import test.de.iip_ecosphere.platform.support.net.NetworkManagerTest;
 
 /**
@@ -34,7 +35,7 @@ import test.de.iip_ecosphere.platform.support.net.NetworkManagerTest;
  * 
  * @author Holger Eichelberger, SSE
  */
-public class NetworkManagerAasTest {
+public class NetworkManagerAasTest extends TestWithPlugin {
 
     /**
      * Tests the {@link NetworkManagerAas} by creating the complete platform AAS via the {@link AasPartRegistry}

@@ -509,8 +509,6 @@ public class AasPartRegistry {
         /**
          * Defines the concept repository information. [required by json, yaml]
          * For convenience, the port number may be invalid and is turned then into an ephemeral port.
-         * 
-         * @return the concept repository (server) information
          */
         public void setConceptRepository(EndpointHolder repository) {
             this.conceptRepository = repository;
@@ -532,8 +530,6 @@ public class AasPartRegistry {
         /**
          * Defines the discovery information. [required by json, yaml]
          * For convenience, the port number may be invalid and is turned then into an ephemeral port.
-         * 
-         * @return the discovery (server) information
          */
         public void setDiscovery(EndpointHolder discovery) {
             this.discovery = discovery;
