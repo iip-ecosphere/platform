@@ -74,6 +74,18 @@ export class Utils {
   }
 
   /**
+   * Returns the resolve a value out of an object.
+   * 
+   * @param value the object 
+   * @returns the value
+   */
+  private resolveValue(value: any) {
+    return value?.hasOwnProperty('varValue') && value.varValue === 'varValue'
+      ? value.idShort
+      : value;
+  }
+
+  /**
    * Returns the value of input considering the value transformation function of input.
    * 
    * @param input the input 
@@ -82,7 +94,10 @@ export class Utils {
   public getValue(input: editorInput | undefined) {
     let result = undefined;
     if (input) {
-      result = input.value;
+      result = DataUtils.isIvmlCollection(input.type)
+        ? input.value.map((value: any) => this.resolveValue(value))
+        : this.resolveValue(input.value);
+
       if (input.valueTransform) {
         result = !input.value ? null : input.valueTransform(input);
       }

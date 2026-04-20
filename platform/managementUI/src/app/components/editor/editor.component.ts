@@ -288,6 +288,10 @@ export class EditorComponent extends Utils implements OnInit {
     }
   }
 
+  /**
+   * Valicate the required fields for an input based on isRequired
+   * @returns Boolean 
+   */
   validateRequiredInputs(): boolean {
     let isValid = true;
   
@@ -310,4 +314,19 @@ export class EditorComponent extends Utils implements OnInit {
     return isValid;
   }
 
+
+  /**
+   * get the names for the different section in the component 
+   * @param uiGroupIndex the UI group index
+   * @returns the name of the section 
+   */
+  getSectionName(uiGroupIndex: number): string {
+    if (uiGroupIndex == 0) {
+      return "Advanced"
+    } else if (uiGroupIndex == 1) {
+      return "Expert"
+    } else {
+      return ""
+    }
+  }
 }

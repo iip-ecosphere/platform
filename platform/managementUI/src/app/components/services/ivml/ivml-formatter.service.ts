@@ -944,6 +944,7 @@ export class IvmlFormatterService extends UtilsService {
   */
 const reqTypes = [
   { cat: "Constants", metaRef: [] },
+  { cat: "Display", metaRef: ["DisplayRow", "DisplayPanel"] },
   { cat: "Types", metaRef: ["RecordType", "ArrayType"] },
   { cat: "Fields", metaRef: ["Field"] },
   { cat: "Dependencies", metaRef: ["Dependency"] },

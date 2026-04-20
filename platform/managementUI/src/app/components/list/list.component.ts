@@ -88,6 +88,7 @@ export class ListComponent extends Utils implements OnInit {
   expertTabsParam = [
     { tabName: "Setup", metaProject: "TechnicalSetup", submodelElement: null },
     { tabName: "Constants", metaProject: "AllConstants", submodelElement: null },
+    { tabName: "Display", metaProject: "AllTypes", submodelElement: null },
     { tabName: "Types", metaProject: "AllTypes", submodelElement: null },
     { tabName: "Dependencies", metaProject: "", submodelElement: "Dependency" },
     { tabName: "Nameplates", metaProject: null, submodelElement: "Manufacturer" },
@@ -147,10 +148,10 @@ export class ListComponent extends Utils implements OnInit {
   }
 
   private async populateMeta() {
-    this.metaBackup = await this.api.getMeta();
-    this.meta = this.ivmlFormatter.filterMeta(this.metaBackup, this.currentTab);
     let defaultTab = this.configExpertMode.expertMode ? this.defaultExpertTab : this.defaultNormalTab;
     const tabName = this.currentTab === '' ? defaultTab : this.currentTab;
+    this.metaBackup = await this.api.getMeta();
+    this.meta = this.ivmlFormatter.filterMeta(this.metaBackup, this.currentTab);
     const selectedTab = this.visibleTabs.find(tab => tab.tabName === tabName);
     if (selectedTab) {
       this.getDisplayData(selectedTab?.tabName, selectedTab?.metaProject, selectedTab?.submodelElement)
@@ -187,6 +188,7 @@ export class ListComponent extends Utils implements OnInit {
       case "Constants":
         this.filterConstants();
         break;
+      case "Display":
       case "Types":
         this.filterTypes();
         break;
@@ -235,7 +237,10 @@ export class ListComponent extends Utils implements OnInit {
             let val = String(valElemtSubmodelElement.value);
             if (valElemtSubmodelElement.idShort == "metaProject" &&
               (val == metaProject || val.startsWith(metaProject + "Part"))) { // part check for testing models
-              result.push(elemtSubmodelElement)
+                if (this.currentTab == 'Setup' || 
+                  (this.meta?.value?.find(val => val.idShort == DataUtils.getProperty(elemtSubmodelElement.value, MT_metaType)?.value))) {
+                  result.push(elemtSubmodelElement)
+                }
             }
           }
         }
@@ -302,7 +307,7 @@ export class ListComponent extends Utils implements OnInit {
       let val: any = [];
       let varName = DataUtils.getPropertyValue(tableRow.value, MT_metaVariable) || tableRow.idShort;
       let rowEntry = new RowEntry({ idShort: tableRow.idShort, varName: varName, varValue: val });
-      let rowType = tableRow.value[0].value
+      let rowType = DataUtils.getPropertyValue(tableRow.value, MT_metaType) //tableRow.value[0].value
       this.api.createRowValue(tableRow.value, val, true, row => {
         let result = rowFn(row, rowType);
         if (row.idShort == MT_metaType) {
@@ -323,15 +328,17 @@ export class ListComponent extends Utils implements OnInit {
   public filterTypes() {
     let temp: any = [];
     let name: any;
+    let type: any;
     this.filteredData = this.createRows(this.filteredData, (row, rowType) => {
       if (row.idShort == "name") {
         name = row.value[0].value
       }
+      type = rowType;
       this.composeValueByFilter(row, temp, this.paramToDisplay);
       return true;
     }, r => {
       r.idShort = name;
-      r.value = temp;
+      r.value = [{value: type}];
       temp = [];
     });
   }

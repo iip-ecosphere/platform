@@ -104,48 +104,54 @@ describe('ListComponent', () => {
     await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 1, expectedDataIdShort);
   });
 
+  it('should provide Display tab/data', async() => {
+    const expectedDataIdShort = ["mainPanel", "mainRow"] as string[];
+
+    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 2, expectedDataIdShort);
+  });
+
   it('should provide Types tab/data', async() => {
     const expectedDataIdShort = ["rec1"] as string[];
 
-    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 2, expectedDataIdShort);
+    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 3, expectedDataIdShort);
   });
 
   it('should provide Dependencies tab/data', async() => {
     const expectedDataIdShort = ["PYTHON3", "CONDA", "websocketsNoVersion", "flowrDependency", 
       "lxLibc6Compat"] as string[]; // just some
 
-    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 3, expectedDataIdShort);
+    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 4, expectedDataIdShort);
   });
 
   it('should provide Nameplates tab/data', async() => {
     const expectedDataIdShort = ["manufacturer_kiprotect", "manufacturer_rapidminer", "manufacturer_sse",
        "manufacturer_l3s", "manufacturer_mipTech", "manufacturer_NovoAITech"] as string[];
 
-    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 4, expectedDataIdShort);
+    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 5, expectedDataIdShort);
   });
 
   it('should provide Services tab/data', async() => {
     const expectedDataIdShort = ["mySourceService", "myReceiverService"] as string[];
 
-    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 5, expectedDataIdShort);
+    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 6, expectedDataIdShort);
   });
 
   it('should provide Servers tab/data', async() => {
     const expectedDataIdShort = ["myServer"] as string[];
 
-    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 6, expectedDataIdShort);
+    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 7, expectedDataIdShort);
   });
 
   it('should provide Meshes tab/data', async() => {
     const expectedDataIdShort = ["myMesh"] as string[];
 
-    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 7, expectedDataIdShort);
+    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 8, expectedDataIdShort);
   });
 
   it('should provide Applications tab/data', async() => {
     const expectedDataIdShort = ["myApp"] as string[];
 
-    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 8, expectedDataIdShort,);
+    await test(fixture, component, router, dialogSpy, dialogRefSpyObj, 9, expectedDataIdShort,);
   }, 120 * 60 * 1000);
 
   it('shall survive requesting non-existing information', async() => {
