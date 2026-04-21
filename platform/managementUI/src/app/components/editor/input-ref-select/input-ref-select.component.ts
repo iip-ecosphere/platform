@@ -156,7 +156,7 @@ export class InputRefSelectComponent extends Utils implements OnInit {
    */
   public addFromRef() {
     if (this.selectedRef && this.selectedRef.idShort) {
-      if (this.isSetOf) {
+      if (this.isSetOf || this.isSequenceOf) {
         this.input.value.push(this.getReferenceVarValue(this.selectedRef) ?? this.selectedRef.idShort);
       } else {
         this.input.value = this.getReferenceVarValue(this.selectedRef) ?? this.selectedRef.idShort;

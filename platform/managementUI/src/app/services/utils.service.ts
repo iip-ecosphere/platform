@@ -94,10 +94,7 @@ export class Utils {
   public getValue(input: editorInput | undefined) {
     let result = undefined;
     if (input) {
-      result = DataUtils.isIvmlCollection(input.type)
-        ? input.value.map((value: any) => this.resolveValue(value))
-        : this.resolveValue(input.value);
-
+      result = input.value;
       if (input.valueTransform) {
         result = !input.value ? null : input.valueTransform(input);
       }

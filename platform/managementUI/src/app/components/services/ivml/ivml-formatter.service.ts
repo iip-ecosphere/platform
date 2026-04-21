@@ -122,12 +122,18 @@ export class IvmlFormatterService extends UtilsService {
         } else if (elemt?.startsWith?.(IVML_TYPE_PREFIX_enumeration)){
           result += elemt.replace(IVML_TYPE_PREFIX_enumeration, "");
         } else {
+          if (elemt.hasOwnProperty('varValue') && elemt.varValue === 'varValue') {
+            elemt = elemt.idShort;
+          }
           result += DataUtils.isIvmlRefTo(DataUtils.stripGenericType(value._type)) ? `refBy(${elemt})` : elemt;
         }
         first = false;
       }
       result += "}";
     } else if (DataUtils.isIvmlRefTo(value._type)) {
+      if (value.value.hasOwnProperty('varValue') && value.value.varValue === 'varValue') {
+        value.value = value.value.idShort;
+      }
       result = value.value ? `refBy(${value.value})` : "";
     } else if (this.isString(value.value) && value.value.startsWith(IVML_TYPE_PREFIX_enumeration)) { // ivml enums in internal notation
       result = value.value.replace(IVML_TYPE_PREFIX_enumeration, "");
