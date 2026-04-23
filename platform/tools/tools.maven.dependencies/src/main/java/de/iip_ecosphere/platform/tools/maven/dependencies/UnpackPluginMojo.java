@@ -823,7 +823,7 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
                     }
                 }
                 long start = System.currentTimeMillis();
-                getLog().info("Indexing classes..." + knownMsg + ". Indexing " + locs.size() + " jars.");
+                getLog().info("Indexing classes..." + knownMsg + " Indexing " + locs.size() + " jars.");
                 try {
                     AtomicInteger exceptionCount = new AtomicInteger();
                     for (JarLocation loc: locs) {
@@ -1035,7 +1035,12 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         }
         if (isModeResolve(mode)) {
             String origToken = token;
+            String oToken = token;
             token = stripPrefix(prefix, token);
+            if (oToken.equals(token) && prefix.equals("target" + File.separator + "jars" + File.separator)) { 
+                // some test artifacts just have jars/
+                token = stripPrefix("jars" + File.separator, token);
+            }
             token = resolve(token, jarFolder);
             locations.add(new JarLocation(origToken, token));
         } else {
