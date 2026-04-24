@@ -33,7 +33,7 @@ public class Standalone {
 
     private static String m2 = System.getProperty("user.home") + "/.m2/repository/";
     private static File dir = new File("target/standalone");
-    private static String oktoVer = "0.7.1-SNAPSHOT";
+    private static String oktoVer = "0.8.0";
     private static boolean firstEntry = true;
     private static Map<String, String> mapping = new HashMap<>();
     
