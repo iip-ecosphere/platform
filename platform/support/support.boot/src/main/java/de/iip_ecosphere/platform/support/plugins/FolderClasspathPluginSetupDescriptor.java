@@ -98,6 +98,9 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
                 result = new File(folder, "target/jars/classpath" + suffix); // development, in project
             }
             if (!result.exists()) {
+                result = new File(folder, "target/jars-test/classpath" + suffix); // development, in test broker project
+            }
+            if (!result.exists()) {
                 result = new File(folder, "target/classes/classpath" + suffix); // development, in project
             }
         }
