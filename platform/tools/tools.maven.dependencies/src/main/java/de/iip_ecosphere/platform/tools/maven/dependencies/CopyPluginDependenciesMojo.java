@@ -28,6 +28,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
+import com.google.common.io.Files;
+
 import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 
 /**
@@ -120,8 +122,22 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
      * Cleans the output directory.
      */
     private void cleanOutputDirectory() {
-        if (clean && getOutputDirectory().exists()) {
-            File[] files = getOutputDirectory().listFiles();
+        if (clean) {
+            cleanDir(getOutputDirectory());
+            if (asTest) {
+                cleanDir(new File(getOutputDirectory(), "../jars-test"));
+            }
+        }
+    }
+    
+    /**
+     * Cleans the given output directory.
+     * 
+     * @param dir the directory to clean
+     */
+    private void cleanDir(File dir) {
+        if (dir.exists()) {
+            File[] files = dir.listFiles();
             if (null != files) {
                 getLog().info("Cleaning jars in " + getOutputDirectory());
                 for (File f : files) {
@@ -183,7 +199,20 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
                     while (tokenizer.hasMoreTokens()) {
                         String token = tokenizer.nextToken();
                         if (asTest) {
+                            String origToken = token;
                             token = token.replace("/jars/", "/jars-test/");
+                            // for now, resulting classpath file points to jars; move the jars there
+                            if (!origToken.equals(token)) {                            
+                                File srcFile = new File(outputDirectory, token);
+                                File tgtFile = new File(outputDirectory, origToken);
+                                if (!tgtFile.exists() || tgtFile.lastModified() < srcFile.lastModified()) {
+                                    try {
+                                        Files.copy(srcFile, tgtFile);
+                                    } catch (IOException e) {
+                                        getLog().warn("Cannot copy dependency " + token + ": " + e.getMessage());
+                                    }
+                                }
+                            }
                         }
                         result.add(new File(token).toPath());
                     }
