@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>services.spring.loader</artifactId>
@@ -9,7 +9,7 @@
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependenciesSpring</artifactId>
-     <version>0.7.1-SNAPSHOT</version>
+     <version>0.8.0</version>
      <relativePath/>
   </parent>
 
@@ -85,10 +85,9 @@
                          </goals>
                          <configuration>
                             <target>
-                               <jar file="${project.build.directory}/${project.artifactId}-${project.version}.jar" basedir="${project.build.directory}/classes"/>
-                               <copy file="${project.build.directory}/${project.artifactId}-${project.version}.jar" 
-                                   tofile="${project.build.directory}/test/loader.jar" overwrite="true"/>
-                               <copy todir="${project.build.directory}/classes" overwrite="true">
+                               <jar basedir="${project.build.directory}/classes" file="${project.build.directory}/${project.artifactId}-${project.version}.jar"/>
+                               <copy file="${project.build.directory}/${project.artifactId}-${project.version}.jar" overwrite="true" tofile="${project.build.directory}/test/loader.jar"/>
+                               <copy overwrite="true" todir="${project.build.directory}/classes">
                                   <fileset dir="${project.build.directory}/test-classes"/>
                                </copy>
                             </target>
@@ -276,13 +275,12 @@
                          </goals>
                          <configuration>
                             <target>
-                               <copy file="${project.build.directory}/${project.artifactId}-${project.version}-spring.zip" tofile="${project.build.directory}/test/test-spring.zip" overwrite="true"/>
-                               <copy file="${project.build.directory}/${project.artifactId}-${project.version}-spring.zip" tofile="${project.build.directory}/test/test-spring-orig.zip" overwrite="true"/>
-                               <copy file="${project.build.directory}/spring/${project.artifactId}-${project.version}.jar" tofile="${project.build.directory}/test/test-spring.jar" overwrite="true"/>
-                               <copy file="${project.build.directory}/spring/${project.artifactId}-${project.version}.jar" tofile="${project.build.directory}/test/test-spring-orig.jar" overwrite="true"/>
+                               <copy file="${project.build.directory}/${project.artifactId}-${project.version}-spring.zip" overwrite="true" tofile="${project.build.directory}/test/test-spring.zip"/>
+                               <copy file="${project.build.directory}/${project.artifactId}-${project.version}-spring.zip" overwrite="true" tofile="${project.build.directory}/test/test-spring-orig.zip"/>
+                               <copy file="${project.build.directory}/spring/${project.artifactId}-${project.version}.jar" overwrite="true" tofile="${project.build.directory}/test/test-spring.jar"/>
+                               <copy file="${project.build.directory}/spring/${project.artifactId}-${project.version}.jar" overwrite="true" tofile="${project.build.directory}/test/test-spring-orig.jar"/>
 
-                               <copy file="${project.build.directory}/test/loader.jar" overwrite="true"
-                                   tofile="${project.build.directory}/${project.artifactId}-${project.version}.jar"/>
+                               <copy file="${project.build.directory}/test/loader.jar" overwrite="true" tofile="${project.build.directory}/${project.artifactId}-${project.version}.jar"/>
                                <delete dir="${project.build.directory}/classes/iip"/>
                                <delete dir="${project.build.directory}/classes/test"/>
                                <delete file="${project.build.directory}/classes/classpath"/>

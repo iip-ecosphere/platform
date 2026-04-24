@@ -55,7 +55,7 @@ public class EasyConfigurationFactoryDescriptor extends SingletonPluginDescripto
     }
 
     @Override
-    public PlatformInstantiation createInstantiator(File localRepo,Consumer<Long> executionTimeConsumer) {
+    public PlatformInstantiation createInstantiator(File localRepo, Consumer<Long> executionTimeConsumer) {
         return new PlatformInstantiatorExecutor(localRepo, executionTimeConsumer);
     }
     

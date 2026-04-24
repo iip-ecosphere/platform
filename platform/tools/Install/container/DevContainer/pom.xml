@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>DevContainer</artifactId>
 
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependenciesSpring</artifactId> <!-- preliminary-->
-     <version>0.7.1-SNAPSHOT</version>
+     <version>0.8.0</version>
      <relativePath/>
   </parent>
   
@@ -60,16 +60,14 @@
 
         </plugins>
     </build>
-    </project>
-  <!--
+    </project><!--
   <properties>
       <iip.resources>resources</iip.resources>
       <iip.model>PlatformConfiguration</iip.model>
       <iip.modelDir>src/main/easy</iip.modelDir>
       <iip.outputDir>gen</iip.outputDir>
   </properties>
--->
-  <!-- required for container building on github when release is not already in Mvn central 
+--><!-- required for container building on github when release is not already in Mvn central 
   <repositories>       
     <repository>
       <id>SSE-mvn</id> 
@@ -117,8 +115,7 @@
        </snapshots>
      </pluginRepository>
   </pluginRepositories>
--->
-<!--
+--><!--
   <profiles>
     <profile>
       <id>DepsOnly</id>
@@ -127,10 +124,7 @@
         <maven.test.skip>true</maven.test.skip>
         <maven.javadoc.skip>true</maven.javadoc.skip>
       </properties>
-      -->
-      <!-- just force platform dependencies -->
-      <!-- executed as process, EASy-dependencies may be mitigated by maven and missing -->
-      <!--
+      --><!-- just force platform dependencies --><!-- executed as process, EASy-dependencies may be mitigated by maven and missing --><!--
       <dependencies>
         <dependency> 
             <artifactId>configuration.easy</artifactId>
@@ -144,16 +138,14 @@
      <activation>
         <activeByDefault>true</activeByDefault>
      </activation>
-  -->
-  <!--
+  --><!--
       <dependencies>
         <dependency>
             <artifactId>configuration.configuration</artifactId>
             <groupId>de.iip-ecosphere.platform</groupId>
             <version>${project.version}</version>
         </dependency>
-        -->
-        <!-- executed as process, EASy-dependencies may be mitigated by maven and missing 
+        --><!-- executed as process, EASy-dependencies may be mitigated by maven and missing 
         <dependency> 
             <artifactId>configuration.easy</artifactId>
             <groupId>de.iip-ecosphere.platform</groupId>
@@ -176,5 +168,3 @@
     </profile>
   </profiles>    
   -->
-  
-

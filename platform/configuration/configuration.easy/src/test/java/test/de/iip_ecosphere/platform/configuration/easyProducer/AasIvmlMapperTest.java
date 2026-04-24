@@ -12,6 +12,8 @@
 
 package test.de.iip_ecosphere.platform.configuration.easyProducer;
 
+import static org.junit.Assume.assumeFalse;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -182,6 +184,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
      */
     @Test
     public void testAasIvmlMapper() throws ExecutionException {
+        assumeFalse(AbstractIvmlTests.isIipBuildInitial()); // first build, allow for initialization
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
         GraphFormat format = new DrawflowGraphFormat();
@@ -495,6 +498,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
      */
     @Test
     public void testGetVariable() throws ExecutionException {
+        assumeFalse(AbstractIvmlTests.isIipBuildInitial()); // first build, allow for initialization
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
@@ -516,6 +520,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
      */
     @Test
     public void testChangeValues() throws ExecutionException, IOException {
+        assumeFalse(AbstractIvmlTests.isIipBuildInitial()); // first build, allow for initialization
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
@@ -555,6 +560,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
      */
     @Test
     public void testChangeGraph() throws IOException, ExecutionException {
+        assumeFalse(AbstractIvmlTests.isIipBuildInitial()); // first build, allow for initialization
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
@@ -647,6 +653,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
      */
     @Test
     public void testCreateDeleteVariable() throws IOException, ExecutionException {
+        assumeFalse(AbstractIvmlTests.isIipBuildInitial()); // first build, allow for initialization
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
@@ -697,6 +704,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
      */
     @Test
     public void testGetTemplates() throws IOException, ExecutionException {
+        assumeFalse(AbstractIvmlTests.isIipBuildInitial()); // first build, allow for initialization
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
@@ -721,6 +729,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
      */
     @Test
     public void testRenameVariable() throws IOException, ExecutionException, ModelQueryException {
+        assumeFalse(AbstractIvmlTests.isIipBuildInitial()); // first build, allow for initialization
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
@@ -750,6 +759,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
      */
     @Test
     public void testInstantiateInterfaces() throws IOException, ExecutionException, ModelQueryException {
+        assumeFalse(AbstractIvmlTests.isIipBuildInitial()); // first build, allow for initialization
         File gen = FileUtils.createTmpFolder("okto-instantiate");
         File arts = FileUtils.createTmpFolder("okto-artifacts");
         File artsOrig = ConfigurationSetup.getSetup().getArtifactsFolder();
@@ -781,6 +791,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
      */
     @Test
     public void testInstantiateTemplate() throws IOException, ExecutionException, ModelQueryException {
+        assumeFalse(AbstractIvmlTests.isIipBuildInitial()); // first build, allow for initialization
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
@@ -807,6 +818,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
      */
     @Test
     public void getOpenTemplateVariables() throws IOException, ExecutionException, ModelQueryException {
+        assumeFalse(AbstractIvmlTests.isIipBuildInitial()); // first build, allow for initialization
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
         ConfigurationLifecycleDescriptor lcd = startEasyValidate(configurer);
@@ -901,6 +913,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
      */
     @Test
     public void testGetVariableName() {
+        assumeFalse(AbstractIvmlTests.isIipBuildInitial()); // first build, allow for initialization
         varNames.clear();
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());
@@ -943,6 +956,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
      */
     @Test
     public void testImports() throws ExecutionException {
+        assumeFalse(AbstractIvmlTests.isIipBuildInitial()); // first build, allow for initialization
         varNames.clear();
         InstantiationConfigurer configurer = new NonCleaningInstantiationConfigurer(MODEL_NAME, 
             ivmlFolder, FileUtils.getTempDirectory());

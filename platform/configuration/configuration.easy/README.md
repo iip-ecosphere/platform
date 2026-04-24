@@ -175,6 +175,16 @@ Some of the test models include the RapidMiner RTSA integration. As RTSA is an I
 
 **Hint:** If tests are failing on your side due to a missing Docker installation, you may prevent this by `-Deasy.docker.failOnError=false`.
 
+## Initial build
+
+   ```
+   export iipbuildinitial=true
+   mvn -P Cfg install -DskipTests
+   mvn -P Cfg install
+   export iipbuildinitial=false
+   mvn install 
+   ```
+
 ## Tests
 
 For further steps, test implementation/execution is here while the model is taken from configuration (src/main/easy, src/test/easy) and results are written there into target/gen.
