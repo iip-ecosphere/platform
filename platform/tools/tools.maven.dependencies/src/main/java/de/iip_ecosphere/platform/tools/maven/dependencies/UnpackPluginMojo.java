@@ -1037,9 +1037,10 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             String origToken = token;
             String oToken = token;
             token = stripPrefix(prefix, token);
-            if (oToken.equals(token) && prefix.equals("target" + File.separator + "jars" + File.separator)) { 
+            if (oToken.equals(token) && (prefix.equals("target/jars/") || prefix.equals("target\\jars\\"))) { 
                 // some test artifacts just have jars/
-                token = stripPrefix("jars" + File.separator, token);
+                token = stripPrefix("jars/", token);
+                token = stripPrefix("jars\\", token);
             }
             token = resolve(token, jarFolder);
             locations.add(new JarLocation(origToken, token));

@@ -80,6 +80,7 @@
              </executions>
              <configuration>
                  <asTest>true</asTest>
+                 <unpackMode>JARS</unpackMode>
 <!--                 <excludeTestArtifact>true</excludeTestArtifact>-->
              </configuration>
          </plugin>
