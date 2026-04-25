@@ -90,7 +90,7 @@
                            <outputDirectory>${project.build.directory}/pyEnv</outputDirectory>
                            <destFileName>pyEnv.zip</destFileName>
                        </artifactItem>
-                       <artifactItem>
+                       <!--<artifactItem>
                            <groupId>de.iip-ecosphere.platform</groupId>
                            <artifactId>apps.AppInterfacesContainerCreation</artifactId>
                            <version>${project.version}</version>
@@ -99,7 +99,7 @@
                            <overWrite>true</overWrite>
                            <outputDirectory>${project.build.directory}/pySrc</outputDirectory>
                            <destFileName>pyIf.zip</destFileName>
-                       </artifactItem>
+                       </artifactItem>-->
                    </artifactItems>
                </configuration>
            </execution>
