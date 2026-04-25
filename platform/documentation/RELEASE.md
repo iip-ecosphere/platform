@@ -4,6 +4,7 @@ For performing a release...
 * Release/deploy EASy-Producer and change the snapshot versions in the platform to that version
 * Deploy software that is not in Maven Central, e.g., alert manager and its logger.
 * Inform all developing parties that a release is on the way and no commits shall be done until the release is completed (assuming that all involved parties were informed before that outstanding commits shall be done so that the release can happen in a clean CI state).
+* Save relevant artifacts: install, documentation, container
 * Change the (non-SNAPSHOT) version number using the `ChangePomVersion` tool in `MvnCentral`, e.g., `java ChangePomVersion <pathToPlatform> --oldParentPOMVersion=0.7.1-SNAPSHOT --newParentPOMVersion=0.8.0 --oldPOMVersion=0.7.1-SNAPSHOT --newPOMVersion=0.8.0 --properties=iip.version --excludes=.*[/,\\]target[/,\\].*` Change manually
   - the version number in `DataTypes.ivml` in `configuration.configuration`. 
   - the version number in `tools.pluginEnv`
@@ -75,6 +76,7 @@ For performing a release...
 * Finalize platform, prepare record on Zenodo
 * **Check** platform dependencies installation POM in **Install** package! 
 * First, commit `tooks.lib` and the maven plugins in `tool`, then platform dependencies, then `support` and the rest. In most of the other cases, only changes to the POM parent entry are required. 
+* Change version of IIP-examples and commit
 
 * Get gnupgp and obtain a public/private keypair.
 * Prepare your maven `settings.xml` so that a server entry for `ossrh-iip` with credentials from the project administration and a profile for `ossrh-iip` pointing to your GPG installation are defined.
@@ -99,10 +101,10 @@ For performing a release...
     * `docker image ls`
     * `docker tag <id> iipecosphere/platform:cli.<ver>`
     * `docker tag <id> iipecosphere/platform:platform_all.<ver>`
-    * `docker tag <id> iipecosphere/platform:dev-container.<ver>`
+    * `docker tag <id> iipecosphere/dev-container:<ver>`
     * `docker login -u iipecosphere`
     * `docker push iipecosphere/platform:cli.<ver>`
     * `docker push iipecosphere/platform:platform_all.<ver>`
-    * `docker push iipecosphere/platform:dev-container.<ver>`
+    * `docker push iipecosphere/dev-container:<ver>`
     * `docker logout`
 * Inform all developing parties that the release is done, everybody shall update their workspaces, refresh their Maven dependencies and development can continue.
