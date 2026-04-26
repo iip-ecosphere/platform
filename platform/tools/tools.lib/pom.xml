@@ -6,7 +6,7 @@
   <groupId>de.iip-ecosphere.platform</groupId>
   <artifactId>tools.lib</artifactId>
   <packaging>jar</packaging>
-  <version>0.8.0</version>
+  <version>0.8.1-SNAPSHOT</version>
   <name>Basic oktoflow tools library</name>
   <description>Basic oktoflow tools library.</description>
   <url>https://www.oktoflow.de</url>
