@@ -77,19 +77,16 @@ For performing a release...
 * **Check** platform dependencies installation POM in **Install** package! 
 * First, commit `tooks.lib` and the maven plugins in `tool`, then platform dependencies, then `support` and the rest. In most of the other cases, only changes to the POM parent entry are required. 
 * Change version of IIP-examples and commit
+* Check the CI that all builds are completed, all required plugins are there. Generated test-apps or examples will not be released.
+* Deploy to Maven central. On the deployment machine
+  - Hint: we cannot deploy `test.simpleStream.spring` as Maven Central does not understand split classpath and also not `ecsRuntime.lxc` unless EASy deploys jlxc components
+  - Get gnupgp and obtain a public/private keypair.
+  - Copy `deployCentral.sh` and `insert.txt` from [`MavenCentral`](../tools/MvnCentral)
+  - Prepare your `settings.sh`
+  - Execute script `deployCentral.sh`.
+  - Log in to `central.sonatype.com`, validate the validation. If no validation errors occur, deploy the deployment.
 
-* Get gnupgp and obtain a public/private keypair.
-* Prepare your maven `settings.xml` so that a server entry for `ossrh-iip` with credentials from the project administration and a profile for `ossrh-iip` pointing to your GPG installation are defined.
-* Download the [`MavenCentral`](../tools/MvnCentral) deployment project from the tools folder in the github repository.
-    * Check the `pom.xml` so that all relevant top-level components are mentioned.
-    * Check the `deploy.bat`.
-
-* Temporarily disable `IvmlTests.testSerializerConfig1` for release/first compilation of next snapshot, e.g., in the CI set `-Diip.build.initial=true`. Commit the changes along the sequence of build dependencies. To speed up, bulk commits of higher parts such as `connectors` may be done but then require manual interruption of unwanted builds.
-* Check the CI that all builds are completed. Generated test-apps or examples will not be released.
 * Create a new version tag on github.
-* Execute the POM in `MavenCentral` so that all artifacts are downloaded.
-* Execute `deployment.bat` in `MavenCentral`.
-* Log into Maven Central Sonatype nexus and close the current staging repository. If no validation errors occur, deploy that repository.
 * Change the POM version number to the next SNAPSHOT version number. Change also the version number in `DataTypes.ivml` in `configuration.configuration`. First, commit the platform dependencies. In most of the other cases, only changes to the POM parent entry are required. 
 * Commit the changes along the sequence of build dependencies. To speed up, bulk commits of higher parts such as `connectors` may be done but then require manual interruption of unwanted builds.
 * If required, change back the EASy-Producer dependencies to the desired snapshot version.
