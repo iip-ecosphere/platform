@@ -134,6 +134,10 @@ template Basics(Configuration config, FileArtifact target) {
     def String getResourcesFolder() {
         getProperty("iip.resources", "./resources");
     }
+    
+    def Boolean isInTest() {
+        getProperty("iip.tests", "false") == "true";
+    }
 	
 	def setOf(MeshElement) nextMeshNodes(MeshElement elt, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
 	    getNextMeshNodes(elt, mappedMesh);
