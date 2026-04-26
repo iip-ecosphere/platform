@@ -12,7 +12,7 @@ For installation and first steps, see [install guide](platform/documentation/INS
 
 ## News
 
-* Release of octoflow version 0.8 planned for mid of April/March, 2026. Release-preparation started.
+* 2026/04/26: Release of octoflow version 0.8. The artifacts are published to [Maven Central](https://mvnrepository.com/artifact/de.iip-ecosphere.platform), the platform handbook to [Zenodo](https://zenodo.org/records/8429785) and the containers on [Dockerhub](https://hub.docker.com/u/iipecosphere) after they are re-built based on this tag. Versioned installation can be found [here](https://projects.sse.uni-hildesheim.de/oktoflow/). Preparing `0.8.1-SNAPSHOT`.
 * Management UI supports oktoflow app modeling and realization , from empty model to integrated app. ReGaP-Video will follow soon.
 * ReGaP: Influx/Grafana based dashboarding for oktoflow apps via [oktoflow2grafana](https://github.com/iip-ecosphere/oktoflow2grafana) is working.
 * Updated (more agile) documentation of [configuration concepts](documentation/concepts/concepts.MD) as well as completely revised [platform handbook](documentation/PlatformHandbook.pdf)
