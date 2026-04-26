@@ -2,7 +2,7 @@
 
 For performing a release...
 * Release/deploy EASy-Producer and change the snapshot versions in the platform to that version
-* Deploy software that is not in Maven Central, e.g., alert manager and its logger.
+* Deploy software that is not in Maven Central, e.g., alert manager and its logger, jlxd in EASy-Producer.
 * Inform all developing parties that a release is on the way and no commits shall be done until the release is completed (assuming that all involved parties were informed before that outstanding commits shall be done so that the release can happen in a clean CI state).
 * Save relevant artifacts: install, documentation, container
 * Change the (non-SNAPSHOT) version number using the `ChangePomVersion` tool in `MvnCentral`, e.g., `java ChangePomVersion <pathToPlatform> --oldParentPOMVersion=0.7.1-SNAPSHOT --newParentPOMVersion=0.8.0 --oldPOMVersion=0.7.1-SNAPSHOT --newPOMVersion=0.8.0 --properties=iip.version --excludes=.*[/,\\]target[/,\\].*` Change manually
@@ -76,7 +76,7 @@ For performing a release...
 * Finalize platform, prepare record on Zenodo
 * **Check** platform dependencies installation POM in **Install** package! 
 * First, commit `tooks.lib` and the maven plugins in `tool`, then platform dependencies, then `support` and the rest. In most of the other cases, only changes to the POM parent entry are required. 
-* Change version of IIP-examples and commit
+* Change version of IIP-examples to corresponding release commit
 * Check the CI that all builds are completed, all required plugins are there. Generated test-apps or examples will not be released.
 * Deploy to Maven central. On the deployment machine
   - Hint: we cannot deploy `test.simpleStream.spring` as Maven Central does not understand split classpath and also not `ecsRuntime.lxc` unless EASy deploys jlxc components
@@ -86,8 +86,9 @@ For performing a release...
   - Execute script `deployCentral.sh`.
   - Log in to `central.sonatype.com`, validate the validation. If no validation errors occur, deploy the deployment.
 
-* Create a new version tag on github.
-* Change the POM version number to the next SNAPSHOT version number. Change also the version number in `DataTypes.ivml` in `configuration.configuration`. First, commit the platform dependencies. In most of the other cases, only changes to the POM parent entry are required. 
+* Create a new version tag for platform, IIP-Examples and oktoflow2grafana on github.
+* Change the POM version number to the next SNAPSHOT number. Change also the version number in `DataTypes.ivml` in `configuration.configuration`. First, commit the platform dependencies. In most of the other cases, only changes to the POM parent entry are required. 
+* Change POM version of IIP-examples to next SNAPSHOT and commit
 * Commit the changes along the sequence of build dependencies. To speed up, bulk commits of higher parts such as `connectors` may be done but then require manual interruption of unwanted builds.
 * If required, change back the EASy-Producer dependencies to the desired snapshot version.
 * Reactivate `IvmlTests.testSerializerConfig1`, e.g. setting in the CI `-Diip.build.initial=false`.

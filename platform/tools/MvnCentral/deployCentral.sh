@@ -239,7 +239,7 @@ DeployArtifact "${PREFIX}" "security.services.kodex" "$OKTO_VERSION" "java bin p
 DeployArtifact "${PREFIX}" "ecsRuntime" "$OKTO_VERSION" "java"
 DeployArtifact "${PREFIX}" "ecsRuntime.docker" "$OKTO_VERSION" "java plugin"
 #depends on jlxc-snapshots, deploy with EASY before (!)
-#DeployArtifact "${PREFIX}" "ecsRuntime.lxc" "$OKTO_VERSION" "java plugin"
+DeployArtifact "${PREFIX}" "ecsRuntime.lxc" "$OKTO_VERSION" "java plugin"
 #not part of release -> check whether all Mvn artifacts are created
 #DeployArtifact "${PREFIX}" "ecsRuntime.kubernetes" "$OKTO_VERSION" "java plugin"
 

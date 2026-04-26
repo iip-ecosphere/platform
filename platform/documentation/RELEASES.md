@@ -15,9 +15,9 @@ In progress:
 * [#189](https://github.com/iip-ecosphere/platform/issues/184): Support venv on mvn Python tooling
 * [#180](https://github.com/iip-ecosphere/platform/issues/180): Add application templates
 
-### Version 0.8.0 (consolidation, ReGaP basics, JDK 17/JDK 21/Angular19/Python 3.11):
+### Version 0.8.0 (2026/04/26):
 
-Release is expected for mid of March, 2026.
+Topics: consolidation, ReGaP basics, JDK 17/JDK 21/Angular19/Python 3.11
 
 Improvements:
 * Support for JDK 21 based on Eclipse 2024-06.
