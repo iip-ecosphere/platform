@@ -38,20 +38,26 @@ DownloadArtifact() {
    local FILE="$2"
 
    wget ${URL} -O ${FILE}
-   if [[ "$URL" == *.pom ]]; then
-       #is it a POM
-       LINE=$(awk '/<license>/{print NR; exit}' ${FILE})
-       #does it have the license, author, SCM stuff included; if yes, parent pom and leave it, if no insert it -> central
-       if [[ -z "${LINE}" ]]; then
-           #if no license, include it before closing tag
-           echo "INSERTING insert.txt into ${FILE}"
-           LINE=$(awk '/<\/project>/{line=NR} END{print line}' ${FILE})
-           sed -i "${LINE}e cat ${SCRIPTDIR_ABS}/insert.xml" ${FILE}
-       fi
+   local exit_code=$?
+   if [[ $exit_code -eq 0 ]]; then
+	   if [[ "$URL" == *.pom ]]; then
+		   #is it a POM
+		   LINE=$(awk '/<license>/{print NR; exit}' ${FILE})
+		   #does it have the license, author, SCM stuff included; if yes, parent pom and leave it, if no insert it -> central
+		   if [[ -z "${LINE}" ]]; then
+			   #if no license, include it before closing tag
+			   echo "INSERTING insert.txt into ${FILE}"
+			   LINE=$(awk '/<\/project>/{line=NR} END{print line}' ${FILE})
+			   sed -i "${LINE}e cat ${SCRIPTDIR_ABS}/insert.txt" ${FILE}
+		   fi
+	   fi
+	   $SIGNCMD ${FILE}
+	   md5sum ${FILE} | awk '{print $1}' > ${FILE}.md5
+	   sha1sum ${FILE} | awk '{print $1}' > ${FILE}.sha1
+   else
+       # wget touches always, even if failure
+       rm ${FILE}
    fi
-   #$SIGNCMD ${FILE}
-   #md5sum ${FILE} | awk '{print $1}' > ${FILE}.md5
-   #sha1sum ${FILE} | awk '{print $1}' > ${FILE}.sha1
 }
 
 # --- Function Definition ---
@@ -93,57 +99,71 @@ DeployArtifact() {
         local JAR="${ARTIFACTPREFIX}.jar"
         local SOURCES="${ARTIFACTPREFIX}-sources.jar"
         local JAVADOC="${ARTIFACTPREFIX}-javadoc.jar"
+        local TESTS="${ARTIFACTPREFIX}-tests.jar"
+        local TESTSOURCES="${ARTIFACTPREFIX}-test-sources.jar"
+        local TESTJAVADOC="${ARTIFACTPREFIX}-test-javadoc.jar"
         DownloadArtifact "${FULL_URL_PREFIX}/${JAR}" "${ADIR}/${LOCAL_FILE_PREFIX}${JAR}"
         DownloadArtifact "${FULL_URL_PREFIX}/${SOURCES}" "${ADIR}/${LOCAL_FILE_PREFIX}${SOURCES}"
         DownloadArtifact "${FULL_URL_PREFIX}/${JAVADOC}" "${ADIR}/${LOCAL_FILE_PREFIX}${JAVADOC}"
+        DownloadArtifact "${FULL_URL_PREFIX}/${TEST}" "${ADIR}/${LOCAL_FILE_PREFIX}${TESTS}"
+        DownloadArtifact "${FULL_URL_PREFIX}/${TESTSOURCES}" "${ADIR}/${LOCAL_FILE_PREFIX}${TESTSOURCES}"
+        DownloadArtifact "${FULL_URL_PREFIX}/${TESTJAVADOC}" "${ADIR}/${LOCAL_FILE_PREFIX}${TESTJAVADOC}"
     fi
     if [[ "$MODE" == *"plugin"* ]]; then
         local PLUGIN="${ARTIFACTPREFIX}-plugin.zip"
+        local PLUGINTEST="${ARTIFACTPREFIX}-plugin-test.zip"
         DownloadArtifact "${FULL_URL_PREFIX}/${PLUGIN}" "${ADIR}/${LOCAL_FILE_PREFIX}${PLUGIN}"
+        DownloadArtifact "${FULL_URL_PREFIX}/${PLUGINTEST}" "${ADIR}/${LOCAL_FILE_PREFIX}${PLUGINTEST}"
     fi
     if [[ "$MODE" == *"core"* ]]; then
         local CORE="${ARTIFACTPREFIX}-core.jar"
-        DownloadArtifact "${FULL_URL_PREFIX}/${PLUGIN}" "${ADIR}/${LOCAL_FILE_PREFIX}${CORE}"
+        DownloadArtifact "${FULL_URL_PREFIX}/${CORE}" "${ADIR}/${LOCAL_FILE_PREFIX}${CORE}"
     fi
     if [[ "$MODE" == *"bin"* ]]; then
         local BIN="${ARTIFACTPREFIX}-bin.zip"
-        DownloadArtifact "${FULL_URL_PREFIX}/${PLUGIN}" "${ADIR}/${LOCAL_FILE_PREFIX}${BIN}"
+        DownloadArtifact "${FULL_URL_PREFIX}/${BIN}" "${ADIR}/${LOCAL_FILE_PREFIX}${BIN}"
     fi
     if [[ "$MODE" == *"python"* ]]; then
         local PYTHON="${ARTIFACTPREFIX}-python.zip"
-        DownloadArtifact "${FULL_URL_PREFIX}/${PLUGIN}" "${ADIR}/${LOCAL_FILE_PREFIX}${PYTHON}"
+        DownloadArtifact "${FULL_URL_PREFIX}/${PYTHON}" "${ADIR}/${LOCAL_FILE_PREFIX}${PYTHON}"
     fi
     if [[ "$MODE" == *"easy"* ]]; then
         local EASY="${ARTIFACTPREFIX}-easy.zip"
         local EASYTEST="${ARTIFACTPREFIX}-easy-test.zip"
         local TEMPLATE="${ARTIFACTPREFIX}-template.zip"
-        DownloadArtifact "${FULL_URL_PREFIX}/${PLUGIN}" "${ADIR}/${LOCAL_FILE_PREFIX}${EASY}"
-        DownloadArtifact "${FULL_URL_PREFIX}/${PLUGIN}" "${ADIR}/${LOCAL_FILE_PREFIX}${EASYTEST}"
-        DownloadArtifact "${FULL_URL_PREFIX}/${PLUGIN}" "${ADIR}/${LOCAL_FILE_PREFIX}${TEMPLATE}"
+        DownloadArtifact "${FULL_URL_PREFIX}/${EASY}" "${ADIR}/${LOCAL_FILE_PREFIX}${EASY}"
+        DownloadArtifact "${FULL_URL_PREFIX}/${EASYTEST}" "${ADIR}/${LOCAL_FILE_PREFIX}${EASYTEST}"
+        DownloadArtifact "${FULL_URL_PREFIX}/${TEMPLATE}" "${ADIR}/${LOCAL_FILE_PREFIX}${TEMPLATE}"
     fi
     if [[ "$MODE" == *"spring"* ]]; then
         local SPRING="${ARTIFACTPREFIX}-spring.zip"
-        DownloadArtifact "${FULL_URL_PREFIX}/${PLUGIN}" "${ADIR}/${LOCAL_FILE_PREFIX}${SPRING}"
+        DownloadArtifact "${FULL_URL_PREFIX}/${SPRING}" "${ADIR}/${LOCAL_FILE_PREFIX}${SPRING}"
+    fi
+    if [[ "$MODE" == *"full"* ]]; then
+        local FULL="${ARTIFACTPREFIX}-full.zip"
+        DownloadArtifact "${FULL_URL_PREFIX}/${FULL}" "${ADIR}/${LOCAL_FILE_PREFIX}${FULL}"
     fi
     if [[ "$MODE" == *"artifacts"* ]]; then
         local ARTIFACTS="${ARTIFACTPREFIX}-artifacts.zip"
-        DownloadArtifact "${FULL_URL_PREFIX}/${PLUGIN}" "${ADIR}/${LOCAL_FILE_PREFIX}${ARTIFACTS}"
+        DownloadArtifact "${FULL_URL_PREFIX}/${ARTIFACTS}" "${ADIR}/${LOCAL_FILE_PREFIX}${ARTIFACTS}"
     fi
 }
 
 # --- Artifact Deployment ---
 
 # deploy the individual artifacts
-DeployArtifact "${PREFIX}" "platformDependencies" "$OKTO_VERSION" "pomOnly"
-DeployArtifact "${PREFIX}" "platformDependenciesBOM" "$OKTO_VERSION" "pomOnly"
-DeployArtifact "${PREFIX}" "platformDependenciesSpring" "$OKTO_VERSION" "pomOnly"
 
 DeployArtifact "${PREFIX}" "tools.lib" "$OKTO_VERSION" "java"
 DeployArtifact "${PREFIX}" "dependency-plugin" "$OKTO_VERSION" "mvn"
 DeployArtifact "${PREFIX}" "invoker-plugin" "$OKTO_VERSION" "mvn"
 DeployArtifact "${PREFIX}" "maven-python" "$OKTO_VERSION" "mvn"
 
+DeployArtifact "${PREFIX}" "platformDependencies" "$OKTO_VERSION" "pomOnly"
+DeployArtifact "${PREFIX}" "platformDependenciesBOM" "$OKTO_VERSION" "pomOnly"
+DeployArtifact "${PREFIX}" "platformDependenciesSpring" "$OKTO_VERSION" "pomOnly"
+
 DeployArtifact "${PREFIX}" "libs.ads" "$OKTO_VERSION" "java"
+
 DeployArtifact "${PREFIX}" "support.boot" "$OKTO_VERSION" "java"
 DeployArtifact "${PREFIX}" "support" "$OKTO_VERSION" "java"
 DeployArtifact "${PREFIX}" "support.aas" "$OKTO_VERSION" "java"
@@ -153,11 +173,12 @@ DeployArtifact "${PREFIX}" "support.yaml-snakeyaml" "$OKTO_VERSION" "java plugin
 DeployArtifact "${PREFIX}" "support.websocket-websocket" "$OKTO_VERSION" "java plugin"
 DeployArtifact "${PREFIX}" "support.ssh-sshd" "$OKTO_VERSION" "java plugin"
 DeployArtifact "${PREFIX}" "support.rest-spark" "$OKTO_VERSION" "java plugin"
-DeployArtifact "${PREFIX}" "support.processInfo-OSHI" "$OKTO_VERSION" "java plugin"
+DeployArtifact "${PREFIX}" "support.processInfo-oshi" "$OKTO_VERSION" "java plugin"
 DeployArtifact "${PREFIX}" "support.metrics-micrometer" "$OKTO_VERSION" "java plugin"
 DeployArtifact "${PREFIX}" "support.json-jackson" "$OKTO_VERSION" "java plugin"
 DeployArtifact "${PREFIX}" "support.http-apache" "$OKTO_VERSION" "java plugin"
 DeployArtifact "${PREFIX}" "support.bytecode-bytebuddy" "$OKTO_VERSION" "java plugin"
+
 DeployArtifact "${PREFIX}" "support.dfltSysMetrics" "$OKTO_VERSION" "java plugin"
 DeployArtifact "${PREFIX}" "support.metrics.plcNext" "$OKTO_VERSION" "java plugin"
 DeployArtifact "${PREFIX}" "support.metrics.bitmotec" "$OKTO_VERSION" "java plugin"
@@ -178,12 +199,12 @@ DeployArtifact "${PREFIX}" "transport.amqp" "$OKTO_VERSION" "java plugin"
 DeployArtifact "${PREFIX}" "transport.mqttv3" "$OKTO_VERSION" "java plugin"
 DeployArtifact "${PREFIX}" "transport.mqttv5" "$OKTO_VERSION" "java plugin"
 DeployArtifact "${PREFIX}" "transport.spring" "$OKTO_VERSION" "java"
-DeployArtifact "${PREFIX}" "transport.spring.generic" "$OKTO_VERSION" "java"
 DeployArtifact "${PREFIX}" "transport.spring.amqp" "$OKTO_VERSION" "java"
-DeployArtifact "${PREFIX}" "transport.spring.mqttv3" "$OKTO_VERSION" "java"
-DeployArtifact "${PREFIX}" "transport.spring.mqttv5" "$OKTO_VERSION" "java"
+DeployArtifact "${PREFIX}" "transport.spring.generic" "$OKTO_VERSION" "java"
 DeployArtifact "${PREFIX}" "transport.spring.hivemqv3" "$OKTO_VERSION" "java"
 DeployArtifact "${PREFIX}" "transport.spring.hivemqv5" "$OKTO_VERSION" "java"
+DeployArtifact "${PREFIX}" "transport.spring.mqttv3" "$OKTO_VERSION" "java"
+DeployArtifact "${PREFIX}" "transport.spring.mqttv5" "$OKTO_VERSION" "java"
 
 DeployArtifact "${PREFIX}" "test.mqtt.hivemq" "$OKTO_VERSION" "java"
 DeployArtifact "${PREFIX}" "test.mqtt.moquette" "$OKTO_VERSION" "java"
@@ -204,20 +225,21 @@ DeployArtifact "${PREFIX}" "connectors.influx" "$OKTO_VERSION" "java plugin"
 DeployArtifact "${PREFIX}" "connectors.influxv3" "$OKTO_VERSION" "java plugin"
 
 DeployArtifact "${PREFIX}" "services.environment" "$OKTO_VERSION" "java python"
-DeployArtifact "${PREFIX}" "services.spring.loader" "$OKTO_VERSION" "java"
 DeployArtifact "${PREFIX}" "services.environment.spring" "$OKTO_VERSION" "java"
+DeployArtifact "${PREFIX}" "services.spring.loader" "$OKTO_VERSION" "java spring"
 DeployArtifact "${PREFIX}" "services" "$OKTO_VERSION" "java"
-DeployArtifact "${PREFIX}" "test.simpleStream.spring" "$OKTO_VERSION" "java spring"
+#DeployArtifact "${PREFIX}" "test.simpleStream.spring" "$OKTO_VERSION" "java spring full"
 DeployArtifact "${PREFIX}" "services.spring" "$OKTO_VERSION" "java plugin"
 
 DeployArtifact "${PREFIX}" "kiServices.functions" "$OKTO_VERSION" "java python"
-DeployArtifact "${PREFIX}" "kiServices.rapidminer.rtsa" "$OKTO_VERSION" "java"
+DeployArtifact "${PREFIX}" "kiServices.rapidminer.rtsa" "$OKTO_VERSION" "java plugin" 
 DeployArtifact "${PREFIX}" "kiServices.rapidminer.rtsaFake" "$OKTO_VERSION" "java"
-DeployArtifact "${PREFIX}" "security.services.kodex" "$OKTO_VERSION" "java bin"
+DeployArtifact "${PREFIX}" "security.services.kodex" "$OKTO_VERSION" "java bin plugin" 
 
 DeployArtifact "${PREFIX}" "ecsRuntime" "$OKTO_VERSION" "java"
 DeployArtifact "${PREFIX}" "ecsRuntime.docker" "$OKTO_VERSION" "java plugin"
-DeployArtifact "${PREFIX}" "ecsRuntime.lxc" "$OKTO_VERSION" "java plugin"
+#depends on jlxc-snapshots, deploy with EASY before (!)
+#DeployArtifact "${PREFIX}" "ecsRuntime.lxc" "$OKTO_VERSION" "java plugin"
 #not part of release -> check whether all Mvn artifacts are created
 #DeployArtifact "${PREFIX}" "ecsRuntime.kubernetes" "$OKTO_VERSION" "java plugin"
 
@@ -235,8 +257,9 @@ DeployArtifact "${PREFIX}" "platform" "$OKTO_VERSION" "java"
 DeployArtifact "${PREFIX}" "configuration.interface" "$OKTO_VERSION" "java"
 DeployArtifact "${PREFIX}" "configuration.easy" "$OKTO_VERSION" "java plugin easy"
 DeployArtifact "${PREFIX}" "apps.ServiceImpl" "$OKTO_VERSION" "java artifacts"
-DeployArtifact "${PREFIX}" "configuration.configuration" "$OKTO_VERSION" "java"
+DeployArtifact "${PREFIX}" "configuration.configuration" "$OKTO_VERSION" "java easy"
 DeployArtifact "${PREFIX}" "configuration-plugin" "$OKTO_VERSION" "mvn"
+DeployArtifact "${PREFIX}" "configuration.defaultLib" "$OKTO_VERSION" "java"
 
 DeployArtifact "${PREFIX}" "managementUi" "$OKTO_VERSION" "java bin"
 
@@ -248,10 +271,10 @@ DeployArtifact "${PREFIX}" "managementUi" "$OKTO_VERSION" "java bin"
 
 SCRIPT_DIR=$PWD
 cd $BASEDIR
-rm -f ${SCRIPT_DIR}/easy.zip
-zip -r ${SCRIPT_DIR}/easy.zip .
+rm -f ${SCRIPT_DIR}/oktoflow.zip
+zip -r ${SCRIPT_DIR}/oktoflow.zip .
 cd $SCRIPT_DIR
 
-#curl --request POST --verbose --header "Authorization: Bearer ${BEARER}" --form bundle=@easy.zip "https://central.sonatype.com/api/v1/publisher/upload?publishingType=USER_MANAGED&name=easy"
+curl --request POST --verbose --header "Authorization: Bearer ${BEARER}" --form bundle=@oktoflow.zip "https://central.sonatype.com/api/v1/publisher/upload?publishingType=USER_MANAGED&name=oktoflow"
 
 echo -e "\n\nDeployment process finished."

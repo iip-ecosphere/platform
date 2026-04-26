@@ -1,10 +1,3 @@
-# IIP-Ecosphere platform: Maven Central Deployment / Utilities
+# oktoflow platform: Maven Central Deployment / Utilities
 
-This project contains an all-project dependencies POM as well as a Windows script to deploy all platform components to Maven central. Relying on a POM and a batch script may be a bit strange, but the CI process having individual tasks/responsibilities does not really fit to Maven structures, even not to a modules POM. For the full process, please refer to the [Deployment Guidelines](../../documentation/RELEASE.md). 
-
-Moreover, this project contains two Maven utilities:
-* `de.iip_ecosphere.platform.maven.CleanMvnSnapshots` removes outdated snapshot versions leaving the latest 3 snapshots.
-* `de.iip_ecosphere.platform.maven.ChangePomVersion` changes POM/parent POM versions. Please check platform dependencies installation in Install package!
-* `de.iip_ecosphere.platform.maven.CleanMvnArtifacts` removes artifacts according to version/snapshot specification from a workspace or a maven repository.
-
-Please note that programs in here shall be self-contained and not rely on (inner) platform dependencies. Further, this project is not subject to CI.
+This project contains a script to deploy oktoflow to Maven central. The previous Maven-based approach does not work with Maven Central anymore and causes build time effects in Eclipse.
