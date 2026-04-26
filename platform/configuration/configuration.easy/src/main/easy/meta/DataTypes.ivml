@@ -5,7 +5,7 @@ project DataTypes {
     annotate BindingTime bindingTime = BindingTime::compile to .;
     annotate Integer uiGroup = UiMandatoryGroup1 to .; 
     
-    NonEmptyString iipVer = "0.8.0"; // Maven version of platform
+    NonEmptyString iipVer = "0.8.1-SNAPSHOT"; // Maven version of platform
     const String mvnIipGroup = "de.iip-ecosphere.platform";
     
     typedef EphemeralPort Integer with (EphemeralPort >= -1 and EphemeralPort <= 65535);

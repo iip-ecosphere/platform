@@ -21,6 +21,7 @@ For performing a release...
   - `support.commons-apache`
   - `support.yaml-snakeyaml`
   - `support.json-jackson`
+  - `support` 
   - `support.ssh-sshd`
   - `support.rest-spark`
   - `support.http-apache`
@@ -28,17 +29,16 @@ For performing a release...
   - `support.processInfo-oshi`
   - `support.meter-micrometer`
   - `support.bytecode-bytebuddy`
+  - `support.aas`
   - `support.sysmetrics.bitmotec`
   - `support.sysmetrics.plcnext`
-  - `support` 
-  - `support.aas`
-  - `support.iip-aas`
   - `support.aas.basyx`
   - `support.aas.basyx.server`
   - `support.aas.basyx1_0`
   - `support.aas.basyx2.commons`
   - `support.aas.basyx2.server`
   - `support.aas.basyx2`
+  - `support.iip-aas`
   - `transport`
   - `test.amqp.qpid`
   - `test.mqtt.moquette`
@@ -85,7 +85,6 @@ For performing a release...
   - Prepare your `settings.sh`
   - Execute script `deployCentral.sh`.
   - Log in to `central.sonatype.com`, validate the validation. If no validation errors occur, deploy the deployment.
-
 * Create a new version tag for platform, IIP-Examples and oktoflow2grafana on github.
 * Change the POM version number to the next SNAPSHOT number. Change also the version number in `DataTypes.ivml` in `configuration.configuration`. First, commit the platform dependencies. In most of the other cases, only changes to the POM parent entry are required. 
 * Change POM version of IIP-examples to next SNAPSHOT and commit
