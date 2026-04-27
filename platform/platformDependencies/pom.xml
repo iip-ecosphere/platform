@@ -229,6 +229,7 @@
     <maven.build.cache.exclude.value.4>null</maven.build.cache.exclude.value.4> <!-- Docker cfg bug -->
     
     <maven.build.cache.enabled>false</maven.build.cache.enabled> <!--  fails on windows -->
+    <surefireProcessTimeout>3600</surefireProcessTimeout>
   </properties>
 
   <repositories>       
@@ -423,8 +424,9 @@
           <includes> <!-- suites only, allow for multiple suites (Spring binders)  -->
             <include>**/AllTests*.class</include>
           </includes>
-          <forkedProcessTimeoutInSeconds>3600</forkedProcessTimeoutInSeconds>
+          <forkedProcessTimeoutInSeconds>${surefireProcessTimeout}</forkedProcessTimeoutInSeconds>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
+           <argLine>${surefireArgLine}</argLine>
         </configuration>
         <dependencies>
           <!-- Force using the latest JUnit 47 provider, consider also in lib dependencies; seems also to work with
