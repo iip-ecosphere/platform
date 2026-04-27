@@ -174,6 +174,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
 
     @Parameter(property = "iip.ciBuildId", defaultValue = "") 
     private String buildId;
+    
+    @Parameter(property = "iip.tests", defaultValue = "") 
+    private String iipTests;
 
     @Parameter(property = "okto.test.easy.model.parent", defaultValue = "") 
     private String oktoModelParent;
@@ -309,6 +312,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
         sysProperties.put("python-test.skip", String.valueOf(value));
         if (buildId != null && buildId.length() > 0) { // CI defined build id for time collector
             sysProperties.put("iip.ciBuildId", buildId);
+        }
+        if (iipTests != null && iipTests.length() > 0) { // CI defined build id for model tests
+            sysProperties.put("iip.tests", iipTests);
         }
         if (oktoModelParent != null && oktoModelParent.length() > 0) {
             sysProperties.put("okto.test.easy.model.parent", oktoModelParent);
