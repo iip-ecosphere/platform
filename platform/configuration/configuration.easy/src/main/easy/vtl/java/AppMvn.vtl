@@ -144,7 +144,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         appendCleanPlugin(plugins, include="*-bin.jar,*-spring.jar");
         appendDeploymentPlugins(plugins, config);
         
-        /*if (!ifArtifact and mapDisplay and !isInTest()) {
+        if (!ifArtifact and mapDisplay and !isInTest()) {
             XmlElement configPlugin = appendPlugin(plugins, "de.iip-ecosphere.platform", "configuration-plugin", projectVersion, false);
             XmlElement configPluginExec = appendExecutions(configPlugin);
             new XmlElement(configPluginExec, "id", "mapDashboard");
@@ -155,7 +155,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             if (isDefined(config.dashboardPushURI) and config.dashboardPushURI <> "") {
                 new XmlElement(configPluginCfg, "postUrl", config.dashboardPushURI);
             }
-        }*/
+        }
     }
 
 }
