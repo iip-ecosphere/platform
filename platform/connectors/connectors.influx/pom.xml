@@ -16,7 +16,7 @@
 	
 	<properties>
 	    <powermock.version>2.0.9</powermock.version>
-	    <argLine>--add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED</argLine>
+	    <surefireArgLine>--add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED</surefireArgLine>
 	</properties>
 
 	<dependencies>
