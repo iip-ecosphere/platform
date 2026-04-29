@@ -55,6 +55,7 @@ public class PlatformAas implements AasContributor {
     public static final String NAME_PROPERTY_VERSION = "version";
     public static final String NAME_PROPERTY_RELEASE = "isRelease";
     public static final String NAME_PROPERTY_BUILDID = "buildId";
+    public static final String NAME_PROPERTY_STARTTIME = "startTime";
     public static final String NAME_OPERATION_SNAPSHOTAAS = "snapshotAas";
     public static final String NAME_OPERATION_RESOLVE_SEMANTICID = "resolveSemanticId";
     public static final String NAME_PROPERTY_ID = "Id";
@@ -123,6 +124,9 @@ public class PlatformAas implements AasContributor {
             smB.createPropertyBuilder(NAME_PROPERTY_BUILDID)
                 .setValue(Type.STRING, versionInfo.getBuildId())
                 .setSemanticId(Irdi.AAS_IRDI_PROPERTY_IDENTIFIER)
+                .build(auth);
+            smB.createPropertyBuilder(NAME_PROPERTY_STARTTIME)
+                .setValue(Type.AAS_INTEGER, System.currentTimeMillis())
                 .build(auth);
             smB.createOperationBuilder(NAME_OPERATION_SNAPSHOTAAS)
                 .addInputVariable("id", Type.STRING)
