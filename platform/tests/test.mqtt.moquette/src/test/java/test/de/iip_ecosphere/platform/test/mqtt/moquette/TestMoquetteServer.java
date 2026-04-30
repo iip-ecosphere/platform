@@ -15,14 +15,16 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.log4j.BasicConfigurator;
-import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
-import io.moquette.BrokerConstants;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import io.moquette.broker.config.IConfig;
 import test.de.iip_ecosphere.platform.transport.AbstractTestServer;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /**
  * A simple embedded Moquette-based MQTT test server for testing/experiments. This class works with Java 8.
@@ -85,6 +87,8 @@ public class TestMoquetteServer extends AbstractTestServer {
     @Override
     public Server start() {
         if (null == mqttBroker) {
+            Logger.getLogger("io.moquette").setLevel(Level.OFF);
+            Logger.getLogger("io.netty").setLevel(Level.OFF);
             //File hiveTmp = FileUtils.createTmpFolder("moquette_v3");
 
             Properties properties = new Properties();
@@ -94,22 +98,24 @@ public class TestMoquetteServer extends AbstractTestServer {
             File cfgDir = getConfigDir("./src/test");
             File f = new File(cfgDir, "keystore.jks");
             if (f.exists()) {
-                properties.setProperty(BrokerConstants.JKS_PATH_PROPERTY_NAME, f.getAbsolutePath());
-                properties.setProperty(BrokerConstants.SSL_PROVIDER, "JDK");
-                properties.setProperty(BrokerConstants.KEY_STORE_TYPE, "jks");
-                properties.setProperty(BrokerConstants.KEY_STORE_PASSWORD_PROPERTY_NAME, KEYSTORE_PASSWORD);
-                properties.setProperty(BrokerConstants.KEY_MANAGER_PASSWORD_PROPERTY_NAME, KEYSTORE_PASSWORD);
-                properties.setProperty(BrokerConstants.SSL_PORT_PROPERTY_NAME, String.valueOf(addr.getPort()));
-                properties.setProperty(BrokerConstants.PORT_PROPERTY_NAME, String.valueOf(NetUtils.getEphemeralPort()));
+                properties.setProperty(IConfig.JKS_PATH_PROPERTY_NAME, f.getAbsolutePath());
+                properties.setProperty(IConfig.SSL_PROVIDER, "JDK");
+                properties.setProperty(IConfig.KEY_STORE_TYPE, "jks");
+                properties.setProperty(IConfig.KEY_STORE_PASSWORD_PROPERTY_NAME, KEYSTORE_PASSWORD);
+                properties.setProperty(IConfig.KEY_MANAGER_PASSWORD_PROPERTY_NAME, KEYSTORE_PASSWORD);
+                properties.setProperty(IConfig.SSL_PORT_PROPERTY_NAME, String.valueOf(addr.getPort()));
+                properties.setProperty(IConfig.PORT_PROPERTY_NAME, String.valueOf(NetUtils.getEphemeralPort()));
             } else {
-                properties.setProperty(BrokerConstants.PORT_PROPERTY_NAME, String.valueOf(addr.getPort()));
+                properties.setProperty(IConfig.PORT_PROPERTY_NAME, String.valueOf(addr.getPort()));
             }
             if (Authenticator.isInitialized()) {
-                properties.setProperty(BrokerConstants.AUTHENTICATOR_CLASS_NAME, Authenticator.class.getName());
+                properties.setProperty(IConfig.AUTHENTICATOR_CLASS_NAME, Authenticator.class.getName());
             }
+            properties.setProperty(IConfig.ENABLE_TELEMETRY_NAME, "false");
             mqttBroker = new io.moquette.broker.Server();
             try {
                 mqttBroker.startServer(properties);
+                LoggerFactory.getLogger(getClass()).info("Moquette broker started");
             } catch (IOException e) {
                 LoggerFactory.getLogger(getClass()).error(e.getMessage());
                 mqttBroker = null;
