@@ -51,7 +51,7 @@ sudo python3.9 -m pip install PyYAML==6.0
 sudo python3.9 -m pip install websockets==11.0.2
 ```
 
-> Multiple python versions
+Multiple python versions
 > If more than one Python version is installed, please ensure that you install the packages into the right version, e.g., by prefixing `python3.9` with the actual path. In this case, please also set the environment variable ``IIP_PYTHON`` to the intended Python executable.
 >
 > ```bash
