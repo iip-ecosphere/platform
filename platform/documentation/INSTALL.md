@@ -136,4 +136,4 @@ Text-based interface allowing users to interact with the platform by issuing com
 
 ## Further information
 
-For further information on using the individual parts, please consult the platform [Handbook](../documentation/PlatformHandbook.pdf) linked on the [Main Page](../../README.md).
+For further information on using the individual parts, please consult the platform [Handbook](../documentation/PlatformHandbook.pdf).
