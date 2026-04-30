@@ -40,6 +40,8 @@ import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 import test.de.iip_ecosphere.platform.support.fakeAas.FactoryTest;
@@ -352,6 +354,7 @@ public class ConnectorTest extends TestWithPlugin {
      * @throws IOException shall not occur
      */
     private void testModelConnector(boolean withEvents) throws IOException {
+        NotificationMode mo = ActiveAasBase.setNotificationMode(NotificationMode.NONE);
         assertDescriptorRegistration(MyModelConnector.Descriptor.class);
         ConnectorParameter params = ConnectorParameterBuilder.newBuilder("", 1234).build();
         ConnectorInputTypeTranslator<Command, Object> in = new ModelInputTranslator(); 
@@ -398,6 +401,7 @@ public class ConnectorTest extends TestWithPlugin {
         instance.disconnect();
         assertInstance(instance, false);
         instance.dispose();
+        ActiveAasBase.setNotificationMode(mo);
     }
 
     /**
@@ -436,6 +440,7 @@ public class ConnectorTest extends TestWithPlugin {
      */
     @Test
     public void testChannelConnector() throws IOException {
+        NotificationMode mo = ActiveAasBase.setNotificationMode(NotificationMode.NONE);
         assertDescriptorRegistration(MyChannelConnector.Descriptor.class);
         ProductJsonSerializer outSer = new ProductJsonSerializer();
         CommandJsonSerializer inSer = new CommandJsonSerializer();
@@ -495,6 +500,7 @@ public class ConnectorTest extends TestWithPlugin {
         instance.disconnectSafe();
         assertInstance(instance, false);
         instance.dispose();
+        ActiveAasBase.setNotificationMode(mo);
     }
 
 }

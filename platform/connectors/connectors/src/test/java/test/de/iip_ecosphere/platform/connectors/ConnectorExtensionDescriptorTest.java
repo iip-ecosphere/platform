@@ -23,6 +23,8 @@ import de.iip_ecosphere.platform.connectors.ConnectorExtensionDescriptor.Default
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.connectors.types.AbstractProtocolAdapter;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.jsl.ExcludeFirst;
 import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
@@ -152,12 +154,14 @@ public class ConnectorExtensionDescriptorTest extends TestWithPlugin {
      */
     @Test
     public void testExtension() throws IOException {
+        NotificationMode mo = ActiveAasBase.setNotificationMode(NotificationMode.NONE);        
         MyConnector conn = new MyConnector();
         conn.setInstanceIdentification(ID); // required, shall be done by code generation
         Assert.assertNull(conn.extensionValue); // nothing happened
         conn.connect(ConnectorParameterBuilder.newBuilder("localhost", 0).build());
         Assert.assertEquals(VALUE, conn.extensionValue); // value is there
         conn.disconnect();
+        ActiveAasBase.setNotificationMode(mo);
     }
     
 }

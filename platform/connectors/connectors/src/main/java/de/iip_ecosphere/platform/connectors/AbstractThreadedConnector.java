@@ -120,11 +120,13 @@ public abstract class AbstractThreadedConnector<O, I, CO, CI, M extends ModelAcc
             
             @Override
             public void run() {
-                // alternative: ThreadLocal, but per connector - be careful with static
-                List<Thread> threads = new ArrayList<>(accesses.keySet());
-                for (Thread t : threads) {
-                    if (!t.isAlive()) {
-                        accesses.remove(t).dispose();
+                if (accesses.size() > 0) {
+                    // alternative: ThreadLocal, but per connector - be careful with static
+                    List<Thread> threads = new ArrayList<>(accesses.keySet());
+                    for (Thread t : threads) {
+                        if (!t.isAlive()) {
+                            accesses.remove(t).dispose();
+                        }
                     }
                 }
             }
