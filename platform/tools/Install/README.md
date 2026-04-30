@@ -1,16 +1,26 @@
 # oktoflow platform: Install Support
 
-This package supports the installation of the oktoflow platform. It contains step-wise installation scripts. All technical prerequisites are listed in [prerequisites document](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/PREREQUISITES.md).
+This package supports the installation of the oktoflow platform with step-wise installation scripts. All technical requirements are listed in [Prerequisites](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/PREREQUISITES.md).
+
+(Downloading the installation package: [Windows](https://projects.sse.uni-hildesheim.de/oktoflow/install.zip) and for [Linux](https://projects.sse.uni-hildesheim.de/oktoflow/install.tar.gz))
 
 ## Fast developer startup (examples only)
-If you only want to execute the provided examples without installing the full platform, run:
+If you only want to execute the provided examples without installing the full platform, run the following command in the extracted installation package folder:
 
     mvn -P DepsOnly install
 
-This option installs only the platform dependencies required to build and run the examples. Components such as the Management UI or Service Manager are not installed. This significantly reduces setup time and is intended for convenience during development and experimentation.
+This option installs only the platform dependencies required to build and run the examples. Components such as the Management UI or Service Manager are not installed, reducing setup time for development and experimentation.
+
+> Execution note:
+>
+> You first need installing the dependencies for [Windows](https://github.com/iip-ecosphere/platform/blob/main/platform/tools/Install/README-win.md) or [Linux](https://github.com/iip-ecosphere/platform/blob/main/platform/tools/Install/README-linux.md)
+
 
 ## Full Installation
 
+In contrast to the manual installation (next section), we provide scripts automating the manual installation.
+
+### General Notes
 The platform can be installed on Windows and on Linux. Please note that special characters like whitespaces in folder names (in particular on Windows) may cause the installation or execution of the platform or examples to fail. The following steps are described and tested for Ubuntu 20.04.1 Linux. Installation on other Linux distributions or Windows may require adjustments.
 
 The platform is intended for distributed installation. In this explanation we exemplify such a distribution in terms of two machines: 
@@ -55,13 +65,13 @@ You can also pass the `DepsOnly` argument to install **only platform dependencie
 fullInstallationWin.bat DepsOnly
 ```
 
-> Please note that the full platform installation may take some time. Unlike traditional software downloads, the installation script does not simply install pre-built binaries. Instead, it generates a platform installation  installation that matches your chosen configuration and components. That’s a core feature of oktoflow: **every installation is “custom-built”** for your setup, rather than downloading a precompiled, one-size-fits-all binary.
+> Please note that the full platform installation may take some time. Unlike traditional software downloads, the installation script does not simply install pre-built binaries. Instead, it generates a platform installation that matches your chosen configuration and components. That's a core feature of oktoflow: **every installation is “custom-built”** for your setup, rather than downloading a precompiled, one-size-fits-all binary.
 
 #### Special Case: Platform Installation Uses the Wrong Python
 
 If you already have installed a different version of Python, the platform installation may grab the wrong installation, miss packages and fail. In that case, please set the environment variable ``IIP_PYTHON`` to the intended Python executable and re-instantiate the platform (in the folder `Platform/Install` execute `mvn install`).
 
-## Manual Installation
+### Manual Installation
 
 Detailed step-by-step installation instructions are available for:
 
@@ -78,6 +88,9 @@ In general, there are several decisions that you may make now, e.g., the transpo
 #### Where will the central server be located? (required)
 
 As stated before, we assume that this will be 147.172.178.145, which is already the default IP in the platform configuration. If you want to use any other address, please open ``src/main/easy/TechnicalSetup.ivml``, search for ``platformServer`` (or 147.172.178.145) and adjust the IP there by the IP of your server.
+
+
+
 
 #### Do you want the platform to create containers? (optional)
 
@@ -168,6 +181,12 @@ To enable these settings, please go into the freeze-part at the end of ``Technic
     mavenDeployType;
     
 Please note that the actual authentication information is stated in the Maven ``settings.xml`` file, which is outside the scope of the platform. For more details, see e.g. [a description here](https://www.baeldung.com/maven-deploy-nexus).
+
+
+
+
+
+
 
 ## Instantiate the platform
 

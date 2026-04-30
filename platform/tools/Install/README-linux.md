@@ -22,7 +22,7 @@ Please also set the environment variable `JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 
 If Python 3.9 is not installed, please execute:
 ```bash
-# Install Python 3.9
+# Install Python 3.9 (e,g., for Ubuntu)
 sudo apt update -y
 sudo apt install software-properties-common -y
 sudo add-apt-repository ppa:deadsnakes/ppa
@@ -51,7 +51,14 @@ sudo python3.9 -m pip install PyYAML==6.0
 sudo python3.9 -m pip install websockets==11.0.2
 ```
 
-If more than one Python version is installed, please ensure that you install the packages into the right version, e.g., by prefixing `python3.9` with the actual path. In this case, please also set the environment variable ``IIP_PYTHON`` to the intended Python executable.
+> Multiple python versions
+> If more than one Python version is installed, please ensure that you install the packages into the right version, e.g., by prefixing `python3.9` with the actual path. In this case, please also set the environment variable ``IIP_PYTHON`` to the intended Python executable.
+>
+> ```bash
+> which python3.9
+> export IIP_PYTHON=$(which python3.9)
+> $IIP_PYTHON -version
+> ```
 
 ### Verify installation
 
@@ -60,7 +67,7 @@ After installing the required software, verify that the correct versions are bei
 ```bash
 java -version
 mvn -version
-IIP_PYTHON -version
+$IIP_PYTHON -version
 ```
 
 ## Docker
