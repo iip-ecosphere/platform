@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.support.dfltSysMetrics;
 
 import de.iip_ecosphere.platform.support.OsUtils;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
 import jcuda.CudaException;
 import jcuda.driver.CUdevice;
@@ -31,6 +32,7 @@ public class DefaultSystemMetrics implements SystemMetrics {
     public static final SystemMetrics INSTANCE = new DefaultSystemMetrics();
     
     private static oshi.SystemInfo sysInfo;
+    private static boolean cudaWarn = false;
 
     /**
      * Prevents external creation.
@@ -56,8 +58,8 @@ public class DefaultSystemMetrics implements SystemMetrics {
     @Override
     public int getNumGpuCores() {
         int result = 0;
-        JCudaDriver.setExceptionsEnabled(true);
         try {
+            JCudaDriver.setExceptionsEnabled(true);
             JCudaDriver.cuInit(0);
     
             CUdevice device = new CUdevice();
@@ -70,6 +72,11 @@ public class DefaultSystemMetrics implements SystemMetrics {
                 device
             );
             result = smCount[0];
+        } catch (UnsatisfiedLinkError e) {
+            if (!cudaWarn) {
+                LoggerFactory.getLogger(DefaultSystemMetrics.class).warn("{}, defaulting to 0", e.getMessage());
+                cudaWarn = true;
+            }
         } catch (CudaException e) {
             result = 0;
         }
