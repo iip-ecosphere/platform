@@ -12,13 +12,14 @@
 
 package de.iip_ecosphere.platform.support.dfltSysMetrics;
 
-import com.profesorfalken.jsensors.JSensors;
-import com.profesorfalken.jsensors.model.components.Components;
-import com.profesorfalken.jsensors.model.components.Cpu;
-import com.profesorfalken.jsensors.model.sensors.Temperature;
-
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
+import jcuda.CudaException;
+import jcuda.driver.CUdevice;
+import jcuda.driver.CUdevice_attribute;
+import jcuda.driver.JCudaDriver;
+import oshi.hardware.HardwareAbstractionLayer;
+import oshi.hardware.Sensors;
 
 /**
  * Default system metrics with a basic non-JDK provided metrics implementation.
@@ -29,7 +30,7 @@ public class DefaultSystemMetrics implements SystemMetrics {
 
     public static final SystemMetrics INSTANCE = new DefaultSystemMetrics();
     
-    private Components components = JSensors.get.components();
+    private static oshi.SystemInfo sysInfo;
 
     /**
      * Prevents external creation.
@@ -44,30 +45,40 @@ public class DefaultSystemMetrics implements SystemMetrics {
 
     @Override
     public float getCpuTemperature() {
-        float result = 0;
-        float count = 0;
-        // just the average CPUs temperature for now
-        if (components.cpus != null) {
-            for (Cpu cpu : components.cpus) {
-                if (cpu.sensors != null) {
-                    for (Temperature tmp : cpu.sensors.temperatures) {
-                        result += tmp.value;
-                    }
-                }
-            }
+        if (null == sysInfo) {
+            sysInfo = new oshi.SystemInfo();
         }
-        return count == 0 ? INVALID_CELSIUS_TEMPERATURE : result / count;
+        HardwareAbstractionLayer hal = sysInfo.getHardware();
+        Sensors sensors = hal.getSensors();
+        return (float) sensors.getCpuTemperature();
     }
     
     @Override
     public int getNumGpuCores() {
-        return null != components.gpus ? components.gpus.size() : 0;
+        int result = 0;
+        JCudaDriver.setExceptionsEnabled(true);
+        try {
+            JCudaDriver.cuInit(0);
+    
+            CUdevice device = new CUdevice();
+            JCudaDriver.cuDeviceGet(device, 0);
+    
+            int[] smCount = {0};
+            JCudaDriver.cuDeviceGetAttribute(
+                smCount,
+                CUdevice_attribute.CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT,
+                device
+            );
+            result = smCount[0];
+        } catch (CudaException e) {
+            result = 0;
+        }
+        return result;
     }
     
     @Override
     public int getNumCpuCores() {
-        // for consistency, neiter seems to work on VMs
-        return null != components.cpus ? components.cpus.size() : OsUtils.getNumCpuCores();
+        return OsUtils.getNumCpuCores();
     }
 
 }

@@ -20,10 +20,15 @@
       <version>${project.version}</version>
     </dependency>   
     <dependency>
-      <groupId>com.profesorfalken</groupId>
-	  <artifactId>jSensors</artifactId>
-	  <version>2.2.1</version>
-	</dependency>
+        <groupId>com.github.oshi</groupId>
+        <artifactId>oshi-core</artifactId>
+        <version>6.1.6</version>
+    </dependency>
+    <dependency>
+        <groupId>org.jcuda</groupId>
+        <artifactId>jcuda</artifactId>
+        <version>12.6.0</version>
+    </dependency>
   
     <dependency>
       <groupId>junit</groupId>
