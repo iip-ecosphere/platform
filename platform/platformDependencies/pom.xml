@@ -180,7 +180,7 @@
     <junit.version>4.12</junit.version>
     <rabbitmq.version>5.15.0</rabbitmq.version>
     <com.hivemq.version>2024.6</com.hivemq.version>
-    <io.moquette.version>0.13</io.moquette.version>
+    <io.moquette.version>0.17</io.moquette.version>
     <org.apache.qpid.version>9.0.0</org.apache.qpid.version>
     <com.google.guava.version>33.2.0-jre</com.google.guava.version>
     <com.fasterxml.jackson.jackson-bom.version>2.11.4</com.fasterxml.jackson.jackson-bom.version>
