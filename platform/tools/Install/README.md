@@ -2,7 +2,7 @@
 
 This package supports the installation of the oktoflow platform with step-wise installation scripts. All technical requirements are listed in [Prerequisites](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/PREREQUISITES.md).
 
-(Downloading the installation package: [Windows](https://projects.sse.uni-hildesheim.de/oktoflow/install.zip) and for [Linux](https://projects.sse.uni-hildesheim.de/oktoflow/install.tar.gz))
+(Downloading the installation package: for [Windows](https://projects.sse.uni-hildesheim.de/oktoflow/install.zip) and for [Linux](https://projects.sse.uni-hildesheim.de/oktoflow/install.tar.gz))
 
 ## Fast developer startup (examples only)
 If you only want to execute the provided examples without installing the full platform, run the following command in the extracted installation package folder:
@@ -18,7 +18,7 @@ This option installs only the platform dependencies required to build and run th
 
 ## Full Installation
 
-In contrast to the manual installation (next section), we provide scripts automating the manual installation.
+In contrast to the [manual installation](#manual-installation), we also provide [scripts](#installation-by-script) automating the manual installation.
 
 ### General Notes
 The platform can be installed on Windows and on Linux. Please note that special characters like whitespaces in folder names (in particular on Windows) may cause the installation or execution of the platform or examples to fail. The following steps are described and tested for Ubuntu 20.04.1 Linux. Installation on other Linux distributions or Windows may require adjustments.
