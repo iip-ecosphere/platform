@@ -31,10 +31,27 @@ public class MyService extends AbstractService {
      * Creates an instance.
      */
     public MyService() {
-        super("1234", "MyService", new Version("1.2.3"), "Default Service", true, 
-            true, ServiceKind.TRANSFORMATION_SERVICE);
+        this(ServiceKind.TRANSFORMATION_SERVICE);
     }
-    
+
+    /**
+     * Creates an instance.
+     * 
+     * @param kind the service kind
+     */
+    public MyService(ServiceKind kind) {
+        this("1234", kind);
+    }
+
+    /**
+     * Creates an instance.
+     * 
+     * @param kind the service kind
+     */
+    public MyService(String sId, ServiceKind kind) {
+        super(sId, "MyService", new Version("1.2.3"), "Default Service", true, true, kind);
+    }
+
     @Override
     public void migrate(String resourceId) throws ExecutionException {
         throw new ExecutionException("not implemented", null); // for now

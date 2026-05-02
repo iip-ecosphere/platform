@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.services.environment;
 
 import java.net.URI;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -28,6 +29,9 @@ import de.iip_ecosphere.platform.support.Version;
  * @author Holger Eichelberger, SSE
  */
 public interface Service extends ParameterConfigurerProvider, ServiceBase {
+    
+    public static final Comparator<Service> START_COMPARATOR = (s1, s2) 
+        -> ServiceKind.START_COMPARATOR.compare(s1.getKind(), s2.getKind());
     
     /**
      * The name of the service.

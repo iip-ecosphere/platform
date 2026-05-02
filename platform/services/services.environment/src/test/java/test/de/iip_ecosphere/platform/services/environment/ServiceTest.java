@@ -14,7 +14,12 @@ package test.de.iip_ecosphere.platform.services.environment;
 
 import de.iip_ecosphere.platform.services.environment.AbstractService;
 import de.iip_ecosphere.platform.services.environment.Service;
+import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -78,6 +83,43 @@ public class ServiceTest {
             ServiceBase.validateApplicationInstanceId(""));
         Assert.assertEquals("id", 
             ServiceBase.validateApplicationInstanceId("id"));
+    }
+    
+    /**
+     * Tests {@link ServiceKind#START_COMPARATOR}.
+     */
+    @Test
+    public void testServiceComparator() {
+        Assert.assertTrue(ServiceKind.TRANSFORMATION_SERVICE.before(ServiceKind.SOURCE_SERVICE, false));
+        Assert.assertFalse(ServiceKind.TRANSFORMATION_SERVICE.before(ServiceKind.TRANSFORMATION_SERVICE, false));
+        Assert.assertTrue(ServiceKind.TRANSFORMATION_SERVICE.before(ServiceKind.TRANSFORMATION_SERVICE, true));
+
+        Assert.assertTrue(ServiceKind.SOURCE_SERVICE.after(ServiceKind.SINK_SERVICE, false));
+        Assert.assertFalse(ServiceKind.SOURCE_SERVICE.after(ServiceKind.SOURCE_SERVICE, false));
+        Assert.assertTrue(ServiceKind.SOURCE_SERVICE.after(ServiceKind.SOURCE_SERVICE, true));
+
+        List<ServiceKind> kinds = new ArrayList<>(List.of(ServiceKind.SOURCE_SERVICE, ServiceKind.SOURCE_SERVICE, 
+            ServiceKind.TRANSFORMATION_SERVICE, ServiceKind.PROBE_SERVICE, ServiceKind.SINK_SERVICE));
+        Collections.sort(kinds, ServiceKind.START_COMPARATOR);
+        for (int i = 0; i < kinds.size() - 1; i++) {
+            ServiceKind k1 = kinds.get(i);
+            ServiceKind k2 = kinds.get(i + 1);
+            Assert.assertTrue(k1.before(k2, true));
+        }
+        
+        List<Service> services = new ArrayList<>();
+        services.add(new MyService("so1", ServiceKind.SOURCE_SERVICE));
+        services.add(new MyService("so2", ServiceKind.SOURCE_SERVICE));
+        services.add(new MyService("tr1", ServiceKind.TRANSFORMATION_SERVICE));
+        services.add(new MyService("pr1", ServiceKind.PROBE_SERVICE));
+        services.add(new MyService("si1", ServiceKind.SINK_SERVICE));
+        services.add(new MyService("si2", ServiceKind.SINK_SERVICE));
+        Collections.sort(services, Service.START_COMPARATOR);
+        for (int s = 0; s < services.size() - 1; s++) {
+            Service s1 = services.get(s);
+            Service s2 = services.get(s + 1);
+            Assert.assertTrue(s1.getKind().before(s2.getKind(), true));
+        }
     }
     
 }
