@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.services.environment.spring;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -121,6 +122,7 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
             YamlArtifact art = YamlArtifact.readFromYaml(ResourceLoader.getResourceAsStream("deployment.yml"));
             List<Service> services = createServices(art);
             if (null != services) { 
+                Collections.sort(services, Service.START_COMPARATOR);
                 ServiceMapper mapper = new ServiceMapper(Starter.getProtocolBuilder());
                 for (Service service : services) {
                     mapService(mapper, service, true); // used by testing, may require individual information
