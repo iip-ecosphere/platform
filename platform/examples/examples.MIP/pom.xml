@@ -100,7 +100,7 @@
                              </artifactItem>
                              <artifactItem>
                                  <groupId>de.iip-ecosphere.platform</groupId>
-                                 <artifactId>apps.AppInterfacesContainerCreation</artifactId>
+                                 <artifactId>apps.ExampleMIPAppInterfaces</artifactId>
                                  <version>${project.version}</version>
                                  <type>zip</type>
                                  <classifier>python</classifier>
