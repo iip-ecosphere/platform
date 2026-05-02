@@ -41,8 +41,9 @@ import de.iip_ecosphere.platform.support.plugins.PluginManager;
  * Spring Cloud Stream emulating startup code. Considers system properties ({@value Starter#PROPERTY_JAVA8} 
  * and {@value #PROPERTY_ARGS}) as well as command line arguments {@value #ARG_BROKER_PORT} (broker port to use) 
  * and {@link #ARG_STOP} (auto-stop time in ms). In contrast to a startup of an application with the platform
- * and the service manager, services are started here in arbitrary sequence without considering their dependencies.
- * Testing input shall consider a certain startup time before causing actions.
+ * and the service manager, services are started here in default startup sequence (sinks, transformers/monitors, 
+ * sources) without considering their dependencies. Testing input shall consider a certain startup time before 
+ * causing actions.
  * 
  * @author Holger Eichelberger, SSE
  */
