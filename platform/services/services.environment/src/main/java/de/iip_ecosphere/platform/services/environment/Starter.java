@@ -32,6 +32,7 @@ import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
@@ -100,6 +101,7 @@ public class Starter {
     private static boolean oktoPluginsLoaded = false;
     private static Consumer<ProtocolServerBuilder> cmdServerConfigurer = null;
     private static Runnable afterPluginInitializer = null;
+    private static int maxServiceStartWaitingTime = 5000;
     
     /**
      * Defines a starter plugin.
@@ -650,6 +652,10 @@ public class Starter {
                                 getLogger().error("Service autostop '{}': {}", service.getId(), e.getMessage());
                             }
                         }));
+                    }
+                    if (maxServiceStartWaitingTime > 0) {
+                        TimeUtils.waitFor(() -> service.getState() != ServiceState.RUNNING 
+                            && service.getState() != ServiceState.FAILED, maxServiceStartWaitingTime, 500);
                     }
                 } catch (ExecutionException e) {
                     getLogger().error("Service autostart '{}': {}", service.getId(), e.getMessage());
