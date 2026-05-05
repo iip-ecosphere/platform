@@ -49,7 +49,7 @@ export class Utils {
    * @param value the value to test 
    * @returns true for string, false else
    */
-  public isString(value: any) {
+  public isString(value: any): value is string{
     return (typeof value === 'string');
   }
 

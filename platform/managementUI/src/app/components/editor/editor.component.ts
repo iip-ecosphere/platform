@@ -89,7 +89,7 @@ export class EditorComponent extends Utils implements OnInit {
     let newMetaValues = this.meta!.value;
     if (newMetaValues && newMetaValues.length == 1) {
       this.selectedType = newMetaValues[0];
-      this.generateInputs();
+      await this.generateInputs();
     }
   }
 
@@ -117,9 +117,16 @@ export class EditorComponent extends Utils implements OnInit {
     return displayName;
   }
 
-  public generateInputs() {
+  public async generateInputs() {
     const selectedType = this.selectedType as configMetaContainer;
     this.ivmlType = selectedType.idShort
+    for (const val of selectedType.value) {
+        let fieldType = DataUtils.getPropertyValue(val.value, "type");
+        if (DataUtils.isIvmlRefTo(fieldType)) {
+          fieldType = DataUtils.stripGenericType(DataUtils.isIvmlCollection(fieldType) ? DataUtils.stripGenericType(fieldType) : fieldType);
+          await this.ivmlFormatter.getCacheType(fieldType);
+        }
+    }
     this.uiGroups = this.ivmlFormatter.calculateUiGroups(selectedType, this.type, this.meta, this.metaBackup);
   }
 

@@ -139,8 +139,9 @@ export class InputRefSelectComponent extends Utils implements OnInit {
     }
   }
 
-  public async getConfigurationType(type: string) {
-    const response = await this.api.getConfiguredElements(type);
+  public async getConfigurationType(type: string) {  
+    let response = (await this.ivmlFormatter.getCacheType(type));
+
     if (response && response.value) {
       response.value = DataUtils.filterMetaTemplate(response.value);
       for (let dep of response.value) {
@@ -199,10 +200,13 @@ export class InputRefSelectComponent extends Utils implements OnInit {
     let uiGroups = this.ivmlFormatter.calculateUiGroupsInf(input, this.meta);
     let parts = this.ivmlFormatter.partitionUiGroups(uiGroups);
     let dialogRef = this.subDialog.open(EditorComponent, this.configureDialog('80%', '80%', parts));
-    dialogRef.componentInstance.type = input;
-    dialogRef.componentInstance.metaBackup = this.meta;
+    let component = dialogRef.componentInstance;
+    component.type = input;
+    component.metaBackup = this.meta;
+    component.topLevel = false;
+    component.saveEvent = this.saveEvent;
     if (varName) {
-      dialogRef.componentInstance.variableName = varName;
+      component.variableName = varName;
     }
   }
 

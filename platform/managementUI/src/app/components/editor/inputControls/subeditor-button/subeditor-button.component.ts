@@ -62,7 +62,7 @@ export class SubeditorButtonComponent extends Utils implements OnInit {
         return true;
       } else {
         const Abstract = DataUtils.getProperty(typeMeta.value, MT_metaAbstract);
-        if(Abstract.value && typeMeta.idShort) {
+        if(Abstract?.value && typeMeta.idShort) {
           this.getRefinedTypes(typeMeta.idShort);
           return false;
         } else if(!this.hasInputFields(typeMeta)){

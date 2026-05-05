@@ -209,6 +209,10 @@ export interface AddressPart {
   }]
 }
 
+export interface CacheEntry<T> {
+  timestamp: number;
+  data: T;
+}
 // -------------  collection of status messages -----------------
 
 export interface statusCollection {

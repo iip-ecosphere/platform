@@ -228,7 +228,7 @@ async function test(fixture: ComponentFixture<EditorComponent>, component: Edito
   }*/
   for (let typeProp of typeProps.filter(p => p.input)) {
     component.selectedType = component.meta?.value?.find(type => type.idShort === typeProp.name);
-    component.generateInputs();
+    await component.generateInputs();
 
     await fixture.detectChanges();
     await fixture.whenRenderingDone();
