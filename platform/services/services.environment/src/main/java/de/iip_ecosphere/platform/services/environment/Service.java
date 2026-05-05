@@ -218,5 +218,19 @@ public interface Service extends ParameterConfigurerProvider, ServiceBase {
     public default <T> Supplier<T> getTypeCreator(Class<T> cls, Supplier<T> creator) {
         return creator;
     }
+    
+    /**
+     * Starts data ingestion. If ingestion is already started, calling this method shall not have any effect. 
+     * [mocking, testing]
+     */
+    public default void startData() {
+    }
+
+    /**
+     * Stops data ingestion. If ingestion is already stopped, calling this method shall not have any effect. 
+     * [mocking, testing]
+     */
+    public default void stopData() {
+    }
 
 }

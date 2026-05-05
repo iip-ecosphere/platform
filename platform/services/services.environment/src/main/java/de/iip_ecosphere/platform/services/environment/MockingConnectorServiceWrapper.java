@@ -55,6 +55,7 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
     private ReceptionCallback<CI> inputCallback;
     private Supplier<ConnectorParameter> connParamSupplier;
     private boolean enableNotifications;
+    private boolean pollingEnabled;
     private String fileName;
     private DataRunnable dataRunnable;
     private CachingStrategy cachingStrategy;
@@ -62,6 +63,19 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
     private DataRecorder recorder;    
     private Map<String, Object> storage;
     private int notificationInterval = 0;
+    private boolean autoStartData;
+
+    /**
+     * Creates a service wrapper instance with auto-starting data ingestion.
+     * 
+     * @param yaml the service information as read from YAML
+     * @param connector the connector instance to wrap
+     * @param connParamSupplier the connector parameter supplier for connecting the underlying connector
+     */
+    public MockingConnectorServiceWrapper(YamlService yaml, Connector<O, I, CO, CI> connector, 
+        Supplier<ConnectorParameter> connParamSupplier) {
+        this(yaml, connector, connParamSupplier, true);
+    }
     
     /**
      * Creates a service wrapper instance.
@@ -69,12 +83,14 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
      * @param yaml the service information as read from YAML
      * @param connector the connector instance to wrap
      * @param connParamSupplier the connector parameter supplier for connecting the underlying connector
+     * @param autoStartData enable/disable auto-starting data (
      */
     @SuppressWarnings("unchecked")
     public MockingConnectorServiceWrapper(YamlService yaml, Connector<O, I, CO, CI> connector, 
-        Supplier<ConnectorParameter> connParamSupplier) {
+        Supplier<ConnectorParameter> connParamSupplier, boolean autoStartData) {
         super(yaml, connector, connParamSupplier);
         this.connParamSupplier = connParamSupplier;
+        this.autoStartData = autoStartData;
         cachingStrategy = CachingStrategy.createInstance(connector.getCachingStrategyCls());
         cachingStrategy.setCacheMode(connParamSupplier.get().getCacheMode());
         connectorOutType = connector.getConnectorOutputType();
@@ -253,20 +269,30 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
     public void setState(ServiceState state) throws ExecutionException {
         doSetState(state);
         if (ServiceState.STARTING == state) {
-            if (enableNotifications) {
-                startDataThread();
+            if (autoStartData && (enableNotifications || pollingEnabled)) {
+                startData();
             }
             doSetState(ServiceState.RUNNING);
         } else if (ServiceState.STOPPING == state) {
-            if (null != dataRunnable) {
-                dataRunnable.stop();
-            }
-            dataRunnable = null;
+            stopData();
             callback = null;
             doSetState(ServiceState.STOPPED);
             if (null != recorder) {
                 recorder.close();
             }
+        }
+    }
+
+    @Override
+    public void startData() {
+        startDataThread();
+    }
+
+    @Override
+    public void stopData() {
+        if (null != dataRunnable) {
+            dataRunnable.stop();
+            dataRunnable = null;
         }
     }
     
@@ -285,7 +311,11 @@ public class MockingConnectorServiceWrapper<O, I, CO, CI> extends ConnectorServi
     @Override
     public void enablePolling(boolean enablePolling) {
         if (!enableNotifications && enablePolling) {
-            startDataThread();
+            if (getState() == ServiceState.RUNNING) {
+                startDataThread();
+            } else {
+                pollingEnabled = true;
+            }
         }
     }
 

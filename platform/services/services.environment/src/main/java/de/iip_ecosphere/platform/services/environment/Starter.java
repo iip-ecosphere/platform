@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.services.environment.testing.TestBroker;
@@ -457,6 +459,15 @@ public class Starter {
     }
     
     /**
+     * Returns whether service autostart is enabled.
+     * 
+     * @return {@code true} if autostartis enabled, {@code false} if autostart is disabled
+     */
+    public static boolean getServiceAutostart() {
+        return serviceAutostart;
+    }
+    
+    /**
      * Enables/disable shutdown hooks on service autostarts for service autostops. Enabled by default. Shall be called 
      * before {@code #main(String[])}. [testing]
      * 
@@ -474,6 +485,21 @@ public class Starter {
      */
     public static Service getMappedService(String serviceId) {
         return null == serviceId ? null : mappedServices.get(serviceId);
+    }
+    
+    /**
+     * Calls {@link Service#startData()} if either {@code enable} is <b>null</b> or {@code enable} leads to 
+     * {@code true} for the actual number of mapped services.
+     * 
+     * @param enable optional predicate over the number of actually mapped services
+     */
+    public static void startDataForMappedServices(Predicate<Integer> enable) {
+        if (null == enable || enable.test(mappedServices.size())) {
+            List<Service> services = new ArrayList<>(mappedServices.values());
+            for (Service s : services) {
+                s.startData();
+            }
+        }
     }
     
     /**

@@ -39,20 +39,35 @@ public class MockingMultiConnectorServiceWrapper extends MultiConnectorServiceWr
     private Map<Class<?>, IOIterator<?>> triggerIterators = new HashMap<>();
     private Supplier<ConnectorParameter> connParamSupplier;
     private boolean enableNotifications;
+    private boolean pollingEnabled;
     private DataRunnable dataRunnable;
     private DataRecorder recorder;    
     private Map<String, Object> storage;
     private int notificationInterval = 0;
-    
+    private boolean autoStartData;
+
     /**
-     * Creates a service wrapper instance.
+     * Creates a service wrapper instance with auto-starting data ingestion.
      * 
      * @param yaml the service information as read from YAML
      * @param connParamSupplier the connector parameter supplier for connecting the underlying connector
      */
     public MockingMultiConnectorServiceWrapper(YamlService yaml, Supplier<ConnectorParameter> connParamSupplier) {
+        this(yaml, connParamSupplier, true);
+    }
+
+    /**
+     * Creates a service wrapper instance.
+     * 
+     * @param yaml the service information as read from YAML
+     * @param connParamSupplier the connector parameter supplier for connecting the underlying connector
+     * @param autoStartData enable/disable auto-starting data (
+     */
+    public MockingMultiConnectorServiceWrapper(YamlService yaml, Supplier<ConnectorParameter> connParamSupplier, 
+        boolean autoStartData) {
         super(yaml, connParamSupplier);
         this.connParamSupplier = connParamSupplier;
+        this.autoStartData = autoStartData;
         recorder = createDataRecorder();
     }
 
@@ -263,20 +278,30 @@ public class MockingMultiConnectorServiceWrapper extends MultiConnectorServiceWr
     public void setState(ServiceState state) throws ExecutionException {
         doSetState(state);
         if (ServiceState.STARTING == state) {
-            if (enableNotifications) {
-                startDataThread();
+            if (autoStartData && (enableNotifications || pollingEnabled)) {
+                startData();
             }
             doSetState(ServiceState.RUNNING);
         } else if (ServiceState.STOPPING == state) {
-            if (null != dataRunnable) {
-                dataRunnable.stop();
-            }
-            dataRunnable = null;
+            stopData();
             callbacks.clear();
             doSetState(ServiceState.STOPPED);
             if (null != recorder) {
                 recorder.close();
             }
+        }
+    }
+    
+    @Override
+    public void startData() {
+        startDataThread();
+    }
+
+    @Override
+    public void stopData() {
+        if (null != dataRunnable) {
+            dataRunnable.stop();
+            dataRunnable = null;
         }
     }
     
@@ -295,7 +320,11 @@ public class MockingMultiConnectorServiceWrapper extends MultiConnectorServiceWr
     @Override
     public void enablePolling(boolean enablePolling) {
         if (!enableNotifications && enablePolling) {
-            startDataThread();
+            if (getState() == ServiceState.RUNNING) {
+                startDataThread();
+            } else {
+                pollingEnabled = true;
+            }
         }
     }
 
