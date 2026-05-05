@@ -18,8 +18,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -33,13 +35,16 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
 
 import de.iip_ecosphere.platform.services.environment.Service;
+import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceMapper;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
+import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsExtractorRestClient;
 import de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
 import de.iip_ecosphere.platform.support.yaml.Yaml;
 import de.iip_ecosphere.platform.support.yaml.YamlFile;
@@ -67,10 +72,13 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
     public static final String OPT_SPRING_BINDINGS_PREFIX = "spring.cloud.stream.bindings.";
     public static final String OPT_SPRING_BINDER_POSTFIX = ".binder";
     public static final String EXTERNAL_BINDER_NAME = "external";
+    private static final String DEPLOYMENT_DESC = "deployment.yml";
     
     private static ConfigurableApplicationContext ctx;
     private static Environment environment;
     private static int port = 8080; // assumed default
+    private static List<ServiceForMapping> startupSequence;
+    private static int expectedServiceCount;
     
     @Autowired
     private ServerProperties serverProperties;
@@ -119,7 +127,7 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
         try {
             // assuming that deployment.yml variants for testing contain the same service descriptions (modulo 
             // technical information)
-            YamlArtifact art = YamlArtifact.readFromYaml(ResourceLoader.getResourceAsStream("deployment.yml"));
+            YamlArtifact art = YamlArtifact.readFromYaml(ResourceLoader.getResourceAsStream(DEPLOYMENT_DESC));
             List<Service> services = createServices(art);
             if (null != services) { 
                 Collections.sort(services, Service.START_COMPARATOR);
@@ -132,6 +140,85 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
         } catch (IOException e) {
             System.out.println("Cannot find service descriptor/start command server.");
         }
+    }
+    
+    /**
+     * Represents a service that shall be mapped.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class ServiceForMapping {
+        
+        private String id;
+        private AtomicReference<Runnable> mapping = new AtomicReference<>();
+
+        /**
+         * Creates the service that shall be mapped.
+         * 
+         * @param id the service id
+         */
+        private ServiceForMapping(String id) {
+            this.id = id;
+        }
+        
+        @Override
+        public String toString() {
+            return id;
+        }
+        
+    }
+    
+    /**
+     * In {@link #getServiceAutostart() autostart mode}, determine an enforced service startup sequence.
+     * 
+     * Requires {@link #parse(String...)} to be executed before.
+     */
+    private static void determineStartupSequence() {
+        List<ServiceForMapping> startupSeq = null;
+        try {
+            YamlArtifact art = YamlArtifact.readFromYaml(ResourceLoader.getResourceAsStream(DEPLOYMENT_DESC));
+            List<YamlService> services = art.getServices();
+            Collections.sort(services, (s1, s2) 
+                -> ServiceKind.START_COMPARATOR.compare(s1.getKind(), s2.getKind()));
+            startupSeq = Collections.synchronizedList(services.stream()
+                .filter(s -> s.isTopLevel()) // family but no family elements
+                .map(s -> new ServiceForMapping(s.getServiceId()))
+                .collect(Collectors.toList()));
+            expectedServiceCount = startupSeq.size();
+        } catch (IOException e) {
+            LoggerFactory.getLogger(Starter.class).warn("Cannot determine services (count, sequence) to be started. "
+                + "Mocking data ingestion may fail as {} cannot be found: {}", DEPLOYMENT_DESC, e.getMessage());
+        }
+        if (getServiceAutostart() && startupSeq != null) {
+            // only in testing, only in a single JVM!
+            startupSequence = startupSeq;
+            LoggerFactory.getLogger(Starter.class).info("Enforcing startup sequence {}", startupSequence);
+            // spring cloud stream does not support explicit startup sequences; messages among services would be one
+            // option, but so far we need it only for testing; thread enforces "start" in specified sequence
+            // as runnable calls mapping which sets services to STARTING and waits until RUNNING or FAILURE
+            new Thread(() -> {
+                while (true) {
+                    int nullCount = 0;
+                    for (int i = 0; i < startupSequence.size(); i++) {
+                        ServiceForMapping s = startupSequence.get(i);
+                        if (s != null) {
+                            Runnable mapping = s.mapping.get();
+                            if (mapping != null) {
+                                startupSequence.set(i, null);
+                                mapping.run();
+                            }
+                        } else {
+                            nullCount++;
+                        }
+                    }
+                    if (nullCount == startupSequence.size()) {
+                        break;
+                    }
+                    TimeUtils.sleep(300);
+                }
+            }).start();
+        }
+        
     }
 
     /**
@@ -298,12 +385,57 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
             return result;
         });
         Starter.parse(args);
+        determineStartupSequence();
         if (!startServer(args)) {
             parseExternConnections(args, e -> Transport.addGlobalRoutingKey(e));
             getSetup(); // ensure instance
             args = augmentByAppId(args);
             runPlugin(args);
         } // else starts server in parse
+    }
+
+    /**
+     * Maps a service through the default mapper and the default metrics client. [Convenience method for generation]
+     * By default, do autostart.
+     * 
+     * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
+     * 
+     * @see #determineStartupSequence()
+     */
+    public static void mapService(Service service) {
+        mapService(service, null);
+    }
+    
+    /**
+     * Maps a service through the default mapper and the default metrics client. [Convenience method for generation]
+     * By default, do autostart.
+     * 
+     * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
+     * @param after code to be executed after mapping, may be <b>null</b>
+     * 
+     * @see #determineStartupSequence()
+     */
+    public static void mapService(Service service, Runnable after) {
+        if (null != startupSequence) {
+            String serviceId = service.getId();
+            for (int i = 0; i < startupSequence.size(); i++) {
+                ServiceForMapping s = startupSequence.get(i);
+                if (s != null && s.mapping.get() == null && s.id.equals(serviceId)) {
+                    s.mapping.set(() -> {
+                        de.iip_ecosphere.platform.services.environment.Starter.mapService(service);
+                        if (null != after) {
+                            after.run();
+                        }
+                    });
+                }
+            }
+        } else {
+            de.iip_ecosphere.platform.services.environment.Starter.mapService(service);
+            if (null != after) {
+                after.run();
+            }
+        }
+        startDataForMappedServices(c -> expectedServiceCount > 0 && c == expectedServiceCount);
     }
     
 }
