@@ -20,6 +20,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+    ListSplitterTest.class,
     PythonCompileTest.class,
     PythonTestTest.class,
     PythonUtilsTest.class

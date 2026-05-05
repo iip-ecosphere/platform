@@ -18,8 +18,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -56,7 +60,8 @@ public class PythonCompileMojo extends AbstractLoggingMojo {
     private String hashDir;
 
     @Parameter(property = "python-compile.ignoreText", required = false, 
-        defaultValue = "imported but unused;is assigned to but never used;redefinition of unused")
+        defaultValue = "imported but unused;is assigned to but never used;"
+            + "redefinition of unused;is unused:;SyntaxWarning: invalid escape sequence")
     private String ignoreText;
     
     @Parameter(property = "python.binary", required = false, defaultValue = "")
@@ -64,6 +69,39 @@ public class PythonCompileMojo extends AbstractLoggingMojo {
 
     @Parameter(property = "python.pythonArgs", required = false, defaultValue = "")
     private String pythonArgs;
+
+    /**
+     * Estimates the maximum command line length.
+     * 
+     * @param pythonExecutable the python executable to use
+     * @param separator the separator between arguments
+     * @return the maximum command line length
+     */
+    private int maxCmdLength(String pythonExecutable, String separator) {
+        // https://learn.microsoft.com/en-us/troubleshoot/windows-client/shell-experience/
+        //   command-line-string-limitation
+        // https://serverfault.com/questions/163371/linux-command-line-character-limit
+        int maxLength = SystemUtils.IS_OS_WINDOWS ? 8191 : 128 * 1024;
+        // estimate maxlength, take potentially longest command to reduce maximum
+        String[] cmdPrefix = PythonUtils.insertArgs(new String[]{pythonExecutable, "-m", "py_compile"}, 
+            1, pythonArgs);
+        maxLength -= String.join(separator, cmdPrefix).length() + 1;
+        return maxLength;
+    }
+
+    /**
+     * Outputs {@code flist}.
+     * 
+     * @param flist the files list to be emitted
+     */
+    private void info(List<String> flist) {
+        if (flist.size() == 1) { // style before multiple files per python call
+            getLog().info("Testing Python syntax: " + flist.get(0));
+        } else {
+            getLog().info("Testing Python syntax:");
+            flist.forEach(f -> getLog().info(" - " + f));
+        }
+    }
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -83,19 +121,29 @@ public class PythonCompileMojo extends AbstractLoggingMojo {
             String output = "";
             String errorLine = "";
             boolean pyflakesExists = true;
-            for (File f : fcd.checkHashes(pythonFiles)) {
-                getLog().info("Testing Python syntax: " + f.getAbsolutePath());
+            List<String> files = fcd.checkHashes(pythonFiles)
+                .stream()
+                .map(f -> f.getAbsolutePath())
+                .collect(Collectors.toList());
+            final String separator = " ";
+            int maxLength = maxCmdLength(pythonExecutable, separator);
+            List<List<String>> filesLists = ListSplitter.splitByLength(files, separator.length(), maxLength);
+            
+            for (List<String> flist : filesLists) {
+                info(flist);
+                
                 if (pyflakesExists) {
-                    String[] cmd = {pythonExecutable, "-m", "pyflakes",  f.getAbsolutePath()}; 
+                    String[] cmd = {pythonExecutable, "-m", "pyflakes"}; 
+                    cmd = join(cmd, flist);
                     cmd = PythonUtils.insertArgs(cmd, 1, pythonArgs);
                     output += runPythonTest(cmd);
                     if (output.contains("No module named")) {
                         pyflakesExists = !output.contains("pyflakes");
                     }
-    
                 } 
                 if (!pyflakesExists) {
-                    String[] cmd = {pythonExecutable, "-m", "py_compile", f.getAbsolutePath()};
+                    String[] cmd = {pythonExecutable, "-m", "py_compile"};
+                    cmd = join(cmd, flist);
                     cmd = PythonUtils.insertArgs(cmd, 1, pythonArgs);
                     output += runPythonTest(cmd);
                 }
@@ -125,7 +173,7 @@ public class PythonCompileMojo extends AbstractLoggingMojo {
                         getLog().info(filteredOutput);
                     }
                     if (failure && failOnError) {
-                        fcd.remove(f);
+                        fcd.removeAll(flist); // a bit coarse grained
                         fcd.writeHashFile(); // only if ok
                         throw new MojoExecutionException(errorLine);
                     }
@@ -133,8 +181,26 @@ public class PythonCompileMojo extends AbstractLoggingMojo {
             }
             fcd.writeHashFile(); // only if ok
         } else {
-            getLog().info("Skipping Python compiler execution");
+            getLog().info("Skipping Python syntax check");
         }
+    }
+    
+    /**
+     * Joins an {@code array} and a {@code list} to an array.
+     * 
+     * @param array the array, may be <b>null</b>
+     * @param list the list (may be <b>null</b>
+     * @return the joined array
+     */
+    private static String[] join(String[] array, List<String> list) {
+        if (array == null) {
+            return list.toArray(new String[0]);
+        }
+        if (list == null) {
+            return array;
+        }
+        return Stream.concat(Arrays.stream(array), list.stream())
+            .toArray(String[]::new);
     }
 
     /**
@@ -152,6 +218,7 @@ public class PythonCompileMojo extends AbstractLoggingMojo {
         isError &= !line.contains("but never used");
         isError &= !line.contains("is unused"); // since Nov'25
         isError &= !line.contains("is never assigned in scope"); // since Nov'25
+        isError &= !line.contains("SyntaxWarning:"); // since May'26
         return isError;
     }
     

@@ -99,6 +99,24 @@ public class FileChangeDetector {
     }
 
     /**
+     * Removes {@code files} from the hashes.
+     * 
+     * @param files the files to remove
+     */
+    public void removeAll(List<String> files) {
+        files.forEach(f -> remove(new File(f)));
+    }
+
+    /**
+     * Removes {@code files} from the hashes.
+     * 
+     * @param files the files to remove
+     */
+    public void removeFiles(List<File> files) {
+        files.forEach(f -> remove(f));
+    }
+
+    /**
      * Removes {@code file} from the hashes.
      * 
      * @param file the file to remove
