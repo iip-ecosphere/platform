@@ -6,7 +6,7 @@ import de.uni_hildesheim.sse.easy.loader.framework.Log.LoaderLogger;
 import net.ssehub.easy.basics.logger.ILogger;
 
 /**
- * SLF4J-to-EASy logging adapter.
+ * EASy-to-oktoflow logging adapter.
  * 
  * @author Holger Eichelberger, SSE
  */

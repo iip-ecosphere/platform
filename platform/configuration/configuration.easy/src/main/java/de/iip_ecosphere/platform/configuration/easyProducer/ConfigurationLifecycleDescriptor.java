@@ -138,6 +138,10 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             if (emit && level.ordinal() < LogLevel.WARN.ordinal()) { // emit warn/error anyway
                 emit = !noEasyLogging.contains(clazz.getName());
             }
+            if (emit && clazz.getSimpleName().equals("YamlFileArtifact") && msg.contains("While reading") 
+                && msg.contains(File.separator + "resources")) {
+                emit = false; // yml
+            }
             return emit;
         }
 

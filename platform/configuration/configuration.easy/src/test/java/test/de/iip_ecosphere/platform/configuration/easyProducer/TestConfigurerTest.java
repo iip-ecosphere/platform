@@ -42,6 +42,7 @@ public class TestConfigurerTest extends TestWithPlugin {
         String[] args = t.toArgs(true);
         System.out.println(Arrays.toString(args));
         TestConfigurer t1 = new TestConfigurer(args);
+        t1.clearProperties();
         Assert.assertTrue(t1.getProperties().isEmpty());
         Assert.assertEquals(ivmlMeta, t1.getIvmlMetaModelFolder());
         Assert.assertEquals(addIvml, t1.getAdditionalIvmlFolders());

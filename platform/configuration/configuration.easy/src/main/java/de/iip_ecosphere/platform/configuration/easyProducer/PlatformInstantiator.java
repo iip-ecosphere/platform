@@ -24,6 +24,7 @@ import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecyc
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.collector.Collector;
+import de.iip_ecosphere.platform.support.identities.YamlIdentityFile;
 import de.iip_ecosphere.platform.support.logging.LogLevel;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
@@ -45,6 +46,7 @@ public class PlatformInstantiator {
     public static final String KEY_PROPERTY_TRACING = "iip.easy.tracing";
     public static final String KEY_PROPERTY_MVNARGS = "iip.easy.mvnArgs";
     public static final String KEY_PROPERTY_APPS = "iip.easy.apps";
+    public static final String KEY_PROPERTY_TEST = "iip.tests";
     private static final String ARG_PROPS_START = "props>";
     private static final String ARG_PROPS_END = "<props";
     private static int exitCode = 0;
@@ -394,6 +396,7 @@ public class PlatformInstantiator {
             LoggerFactory.getLogger(Transport.class).setLevel(LogLevel.OFF);
             LoggerFactory.getLogger(StatusCache.class).setLevel(LogLevel.OFF);
             LoggerFactory.getLogger(ConfigurationSetup.class).setLevel(LogLevel.OFF);
+            LoggerFactory.getLogger(YamlIdentityFile.class).setLevel(LogLevel.OFF);
         }
         
         /**
@@ -427,6 +430,17 @@ public class PlatformInstantiator {
             System.out.println(ex.getMessage());
             exitCode = 1;
         }
+
+        /**
+         * Takes over a system property.
+         * 
+         * @param key the key denoting the system property
+         */
+        public void takeOverSystemProperty(String key) {
+            if (System.getProperty(key) != null) {
+                setProperty(key, System.getProperty(key));
+            }
+        }
         
         /**
          * Sets a JVM system property for execution.
@@ -437,6 +451,13 @@ public class PlatformInstantiator {
         public InstantiationConfigurer setProperty(String key, String value) {
             properties.put(key, value);
             return this;
+        }
+        
+        /**
+         * Clears the JVM system properties. [testing]
+         */
+        public void clearProperties() {
+            properties.clear();
         }
 
         /**
