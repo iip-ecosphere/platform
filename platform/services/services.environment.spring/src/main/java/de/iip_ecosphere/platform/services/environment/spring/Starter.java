@@ -199,11 +199,12 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
             new Thread(() -> {
                 while (true) {
                     int nullCount = 0;
+                    // find the first non-null that can be mapped
                     for (int i = 0; i < startupSequence.size(); i++) {
                         ServiceForMapping s = startupSequence.get(i);
                         if (s != null) {
                             Runnable mapping = s.mapping.get();
-                            if (mapping != null) {
+                            if (mapping != null && nullCount == i) {
                                 startupSequence.set(i, null);
                                 mapping.run();
                             }
