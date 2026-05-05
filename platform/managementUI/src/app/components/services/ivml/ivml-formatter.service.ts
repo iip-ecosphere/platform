@@ -1,5 +1,5 @@
 //import { type } from 'os';
-import { InputVariable, primitiveDataTypes, IVML_TYPE_PREFIX_enumeration, JsonPlatformOperationResult, IvmlRecordValue, IVML_TYPE_String, IVML_TYPE_Boolean, IvmlValue, UserFeedback, uiGroup, configMetaContainer, MT_metaTypeKind, MTK_enum, configMetaEntry, editorInput, Resource, metaTypes, DR_displayName, MTK_derived, MT_metaRefines, MT_metaDefault, MTK_compound, MT_metaAbstract, MTK_primitive, MTK_langString, IVML_TYPE_NonEmptyString, MT_metaRequired } from 'src/interfaces';
+import { InputVariable, primitiveDataTypes, IVML_TYPE_PREFIX_enumeration, JsonPlatformOperationResult, IvmlRecordValue, IVML_TYPE_String, IVML_TYPE_Boolean, IvmlValue, UserFeedback, uiGroup, configMetaContainer, MT_metaTypeKind, MTK_enum, configMetaEntry, editorInput, Resource, metaTypes, DR_displayName, MTK_derived, MT_metaRefines, MT_metaDefault, MTK_compound, MT_metaAbstract, MTK_primitive, MTK_langString, IVML_TYPE_NonEmptyString, MT_metaRequired, CacheEntry } from 'src/interfaces';
 import { Injectable } from '@angular/core';
 import { AAS_OP_PREFIX_SME, AAS_TYPE_STRING, ApiService, GRAPHFORMAT_DRAWFLOW, IDSHORT_SUBMODEL_CONFIGURATION } from '../../../services/api.service';
 import { DataUtils, EditorPartition, UtilsService } from '../../../services/utils.service';
@@ -14,7 +14,9 @@ export class IvmlFormatterService extends UtilsService {
   }
 
   nonVisibleValues = ["optional"]
-
+  private typesCache = new Map<string, CacheEntry<any>>();
+  private platformStartTime: number = 0;
+  
   /**
    * Creates a configuration variable.
    * 
@@ -75,6 +77,9 @@ export class IvmlFormatterService extends UtilsService {
     const response = await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_CONFIGURATION,
       AAS_OP_PREFIX_SME + opName, params);
     let exception = this.api.getPlatformResponse(response);
+    if (!exception || Object.keys(exception).length === 0) {
+      this.typesCache.clear();
+    }
     return this.getFeedback(exception, successText);
   }
 
@@ -416,6 +421,96 @@ export class IvmlFormatterService extends UtilsService {
   }
 
   /**
+   * Update the data in the cache for specific type
+   */
+  public async getCacheType(type: string): Promise<any> {
+    // Change RecordType into DataType since it refines it
+    type = type === "RecordType" ? "DataType" : type;
+    let response = (await this.getValidCachedType(type))?.data;
+    if (!response) {
+      response = await this.api.getConfiguredElements(type);
+      if (response) {
+        this.updateCacheType(type, response);
+      }
+    }
+    return response;
+  }
+
+  /**
+   * Get a property from platform data
+   * 
+   * @param property a property to search in platform data
+   * @returns the property value
+   */
+  public async updatePlatformStartTime() {
+    const response = await this.api.getPlatformData();
+    const startTime = response.find(
+        item => item.idShort === 'startTime');
+    this.platformStartTime = startTime?.value;
+  }
+
+  /**
+   * get a valid data in the cache for specific type
+   * 
+   * @param timestamp timestamp for the cache to refresh it
+   * @param type the type of the data to cache
+   */
+  public async getValidCachedType(type: string) : Promise<CacheEntry<any> | undefined> {
+    const result = this.typesCache.get(type);
+    
+    if (!result) return undefined;
+
+    await this.updatePlatformStartTime();
+    if (result.timestamp < this.platformStartTime) return undefined;
+
+    return result;
+  }
+
+  /**
+   * Update the data in the cache for specific type
+   * 
+   * @param timestamp timestamp for the cache to refresh it
+   * @param type the type of the data to cache
+   */
+  public updateCacheType(type: string, data: any) {
+    this.typesCache.set(type, {data: data, timestamp: Date.now()});
+  }
+
+  /**
+   * Update the data in the cache for specific type
+   * 
+   * @param value the value to map with the cache
+   * @param type the type of the data to cache
+   */
+  public mappingTypeWithCache(value: any, type: string) {
+    if (!value) return value;
+
+    if (this.isArray(value)) {
+      value.forEach(val => {
+        val = this.mappingTypeWithCache(val, type);
+      });
+    } else if (value && this.isObject(value)){
+      if (value.value) {
+        value.name = this.mappingTypeWithCache(value.value, DataUtils.stripGenericType(type));
+      }
+      return value
+    } 
+
+    if (!this.isString(value)) return value;
+
+    const cacheData = this.typesCache.get(type);
+
+    if (!cacheData) return value;
+
+    const mappedType = DataUtils.getPropertyValue(cacheData.data.value, value);
+    if (mappedType) {
+      const mappedName = DataUtils.getPropertyValue(mappedType, "name");
+      return DataUtils.getPropertyValue(mappedName, "varValue");
+    }
+    return value;
+  }
+
+  /**
    * Calculates UI groups based on inferred (selected type) information.
    * 
    * @param type the editor input type
@@ -609,9 +704,21 @@ export class IvmlFormatterService extends UtilsService {
 
               
               let initial;
-              if (this.isObject(ivmlValue) && ivmlValue && input.idShort in ivmlValue) {
+              if (!this.isArray(ivmlValue) && this.isObject(ivmlValue) && ivmlValue) {
                 // compound instances may be passed in as object with properties, those being undefined are defaults
                 ivmlValue = ivmlValue[input.idShort];
+                if (this.isString(ivmlValue)) {
+                  let tempValue: string = ivmlValue;
+                  let valueName = meta?.value?.find(type => type.idShort === tempValue);
+                  if (valueName) {
+                    ivmlValue = valueName.value
+                  }
+                }
+                
+              
+                if (!this.isArray(ivmlValue) && ivmlValue && this.isObject(ivmlValue)) {
+                  ivmlValue = ivmlValue["value"]
+                }
                 if (!ivmlValue) {
                   ivmlValue = editorInput.defaultValue;
                 }
@@ -645,6 +752,17 @@ export class IvmlFormatterService extends UtilsService {
                 } else {
                   initial = ivmlValue; // input is just the value
                 }
+              }
+
+              if (DataUtils.isIvmlRefTo(editorInput.type)) {
+                let fieldType = DataUtils.stripGenericType(DataUtils.isIvmlCollection(editorInput.type) ?
+                                                           DataUtils.stripGenericType(editorInput.type) : 
+                                                           editorInput.type);
+                
+                // Change RecordType into DataType since it refines it
+                fieldType = fieldType === "RecordType" ? "DataType" : fieldType;
+
+                initial = this.mappingTypeWithCache(initial, fieldType);
               }
               editorInput.value = initial;
               if (!uiGroupCompare) {
