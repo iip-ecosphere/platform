@@ -41,3 +41,4 @@ From time to time we release a new version of the platform. How does this impact
 Initially there is no impact as we keep the older versions online. However, you will not receive any updates of platform coordinates, but this may be fine. If you want to change the version of your platform, there are two steps to be done
 - For the platform, obtain an installation package for the new version and re-install the platform.
 - For apps, adjust the version number of the platform in the build specifications of your services and your app. Usually, you will find the platform version in the `<parent>` element of the build specification.
+Rebuild apps and, if required, examples enforcing an update of the meta-model of the new version (e.g., `-Dunpack=force`) also causing a re-build of the interfaces.

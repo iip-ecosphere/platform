@@ -46,9 +46,11 @@ The default folder for resources to be packaged directly into application artifa
 
 ## Platform
 
-Ensure that the Maven platformDependencies are installed (see [install](../../tools/Install))
+Ensure that the Maven `platformDependencies` are installed (see [install](../../tools/Install))
 
   * `mvn install`, for component updates `mvn -U install`
+  
+For running tests with plugins (tests are implied in `mvn install`) within the git workspace, please build all required plugins stated in the respective pom first. If built in the git workspace, the tests try to do a shortcut using the local JARs rather than those from Maven, which fails if there are no local builds.
 
 ## Failures
 

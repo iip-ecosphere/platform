@@ -15,6 +15,9 @@ In progress:
 * [#189](https://github.com/iip-ecosphere/platform/issues/184): Support venv on mvn Python tooling
 * [#180](https://github.com/iip-ecosphere/platform/issues/180): Add application templates
 
+Improvements:
+* Determined start sequence for standalone apps/tests: sinks, transformers/probes, sources
+
 ### Version 0.8.0 (2026/04/26):
 
 Topics: consolidation, ReGaP basics, JDK 17/JDK 21/Angular19/Python 3.11
