@@ -17,6 +17,7 @@ In progress:
 
 Improvements:
 * Determined start sequence for standalone apps/tests: sinks, transformers/probes, sources
+* Improved type display consistency in managementUI
 
 ### Version 0.8.0 (2026/04/26):
 
