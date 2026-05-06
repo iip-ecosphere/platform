@@ -181,7 +181,7 @@ public abstract class AbstractIvmlTests extends TestWithPlugin {
          */
         public TestConfigurer(String ivmlModelName, File modelFolder, File outputFolder) {
             super(ivmlModelName, relocateTestModel(modelFolder), outputFolder);
-            takeOverSystemProperty(PlatformInstantiator.KEY_PROPERTY_TEST);
+            //takeOverSystemProperty(PlatformInstantiator.KEY_PROPERTY_TEST);
             if (isIipBuildInitial()) {
                 super.setStartRuleName("generateInterfaces");
             }
