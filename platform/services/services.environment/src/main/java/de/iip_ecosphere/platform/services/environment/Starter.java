@@ -81,6 +81,7 @@ public class Starter {
     public static final String PARAM_IIP_TEST_AASREG_PORT = "iip.test.aasRegistry.port";
     public static final String PARAM_IIP_TEST_SMREG_PORT = "iip.test.smRegistry.port";
     public static final String PARAM_IIP_TEST_SERVICE_AUTOSTART = "iip.test.service.autostart";
+    public static final String PARAM_IIP_ENFORCE_START_SEQUENCE = "iip.service.enforcestartsequence";
     public static final String ARG_AAS_NOTIFICATION = "iip.test.aas.notification";
     public static final String PROPERTY_JAVA8 = "iip.test.java8";
     public static final String IIP_TEST = "iip.test";
@@ -93,6 +94,7 @@ public class Starter {
     private static Map<String, Integer> servicePorts = new HashMap<>();
     private static Map<String, Service> mappedServices = new HashMap<>();
     private static boolean serviceAutostart = false; // shall be off, done by platform, only for testing
+    private static boolean enforceStartSequence = true; // default since 0.8.1
     private static boolean onServiceAutostartAttachShutdownHook = true;
     private static int transportPort = -1; // -1 -> use configured one
     private static String transportHost = null;
@@ -461,12 +463,21 @@ public class Starter {
     /**
      * Returns whether service autostart is enabled.
      * 
-     * @return {@code true} if autostartis enabled, {@code false} if autostart is disabled
+     * @return {@code true} if autostart is enabled, {@code false} if autostart is disabled
      */
     public static boolean getServiceAutostart() {
         return serviceAutostart;
     }
-    
+
+    /**
+     * Returns whether the service start sequence shall be enforced.
+     * 
+     * @return {@code true} if the sequence shall be enforced, {@code false} if else
+     */
+    public static boolean enforceStartSequence() {
+        return enforceStartSequence;
+    }
+
     /**
      * Enables/disable shutdown hooks on service autostarts for service autostops. Enabled by default. Shall be called 
      * before {@code #main(String[])}. [testing]
@@ -565,6 +576,8 @@ public class Starter {
         appId = CmdLine.getArg(args, PARAM_IIP_APP_ID, "");
         setAasNotificationMode(args, null); // keep default unless specified differently
         serviceAutostart = getBooleanArg(args, PARAM_IIP_TEST_SERVICE_AUTOSTART, serviceAutostart);
+        enforceStartSequence = getBooleanArg(args, PARAM_IIP_ENFORCE_START_SEQUENCE, serviceAutostart) 
+            || OsUtils.getBooleanProperty(PARAM_IIP_ENFORCE_START_SEQUENCE, true);
         String protocol = getArg(args, PARAM_IIP_PROTOCOL, AasFactory.DEFAULT_PROTOCOL);
         boolean found = false;
         for (String p : factory.getProtocols()) {

@@ -189,7 +189,7 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
             LoggerFactory.getLogger(Starter.class).warn("Cannot determine services (count, sequence) to be started. "
                 + "Mocking data ingestion may fail as {} cannot be found: {}", DEPLOYMENT_DESC, e.getMessage());
         }
-        if (getServiceAutostart() && startupSeq != null) {
+        if (enforceStartSequence() && getServiceAutostart() && startupSeq != null) {
             // only in testing, only in a single JVM!
             startupSequence = startupSeq;
             LoggerFactory.getLogger(Starter.class).info("Enforcing startup sequence {}", startupSequence);
