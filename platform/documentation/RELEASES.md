@@ -19,6 +19,9 @@ Improvements:
 * Determined start sequence for standalone apps/tests: sinks, transformers/probes, sources
 * Improved type display consistency in managementUI
 
+Changes:
+* In particular if the start sequence state above is activated, source services shall not ingest data before/outside the `RUNNING` state 
+
 ### Version 0.8.0 (2026/04/26):
 
 Topics: consolidation, ReGaP basics, JDK 17/JDK 21/Angular19/Python 3.11
