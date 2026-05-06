@@ -13,8 +13,10 @@
 package de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest;
 
 import java.io.InputStream;
+import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
+import de.iip_ecosphere.platform.services.environment.ServiceState;
 import iip.datatypes.RoutingCommand;
 import iip.datatypes.RoutingTestData;
 import iip.datatypes.RoutingTestDataImpl;
@@ -48,11 +50,15 @@ public class SourceImpl extends MyRoutingSourceImpl {
     
     @Override
     public RoutingTestData produceRoutingTestData() {
-        RoutingTestDataImpl result = new RoutingTestDataImpl();
-        result.setSerNr(counter++);
-        result.setStringField("data");
-        System.out.println("Input: " + result);
-        return result;
+        if (ServiceState.RUNNING == getState()) {
+            RoutingTestDataImpl result = new RoutingTestDataImpl();
+            result.setSerNr(counter++);
+            result.setStringField("data");
+            System.out.println("Input: " + result);
+            return result;
+        } else {
+            return null;
+        }
     }
 
     @Override
