@@ -56,6 +56,7 @@ public class OsUtilsTest {
         Assert.assertNull(OsUtils.getEnv("iip.nonsense1"));
         
         Assert.assertFalse(OsUtils.getBooleanPropertyOrEnv("iip.nonsense1", false));
+        Assert.assertFalse(OsUtils.getBooleanProperty("iip.nonsense1", false));
     }
     
     /**
