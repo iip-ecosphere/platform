@@ -23,6 +23,7 @@ import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacRule;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
+import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -171,6 +172,12 @@ public class BaSyxISubmodel extends AbstractSubmodel<ISubmodel> {
         @Override
         public SubmodelBuilder rbac(AuthenticationDescriptor auth) {
             return this; // usually not needed
+        }
+        
+        @Override
+        public SubmodelElementContainerBuilder setDescription(LangString... description) {
+            // does not seem to exist
+            return this;
         }
 
     }

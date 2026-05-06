@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.support.aas.basyx2;
 import de.iip_ecosphere.platform.support.aas.Aas.AasBuilder;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacAction;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.Role;
+import de.iip_ecosphere.platform.support.aas.LangString;
 
 import java.io.IOException;
 import java.util.List;
@@ -205,6 +206,12 @@ public class BaSyxSubmodel extends AbstractSubmodel<org.eclipse.digitaltwin.aas4
         @Override
         public SubmodelBuilder rbac(AuthenticationDescriptor auth) {
             return this; // usually not needed
+        }
+
+        @Override
+        public SubmodelElementContainerBuilder setDescription(LangString... description) {
+            instance.getSubmodel().setDescription(Tools.translate(description));
+            return this;
         }
 
     }

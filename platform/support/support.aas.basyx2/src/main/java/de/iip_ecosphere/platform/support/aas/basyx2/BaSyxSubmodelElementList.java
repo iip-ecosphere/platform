@@ -39,6 +39,7 @@ import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity;
+import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property;
@@ -367,6 +368,12 @@ public class BaSyxSubmodelElementList extends BaSyxSubmodelElement implements Su
          */
         void setPropagation(boolean propagate) {
             this.propagate = propagate;            
+        }
+
+        @Override
+        public SubmodelElementListBuilder setDescription(LangString... description) {
+            list.setDescription(Tools.translate(description));
+            return this;
         }
         
     }
