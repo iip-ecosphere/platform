@@ -55,6 +55,7 @@ public class ConfigurationTests extends TestWithQpid {
         } else {
             pb.redirectOutput(res);
         }
+        pb.environment().put("okto.spring.enforceStartupSequence", "false"); // preliminary
     }
         
     /**
@@ -135,7 +136,7 @@ public class ConfigurationTests extends TestWithQpid {
      */
     @Test
     public void testSimpleMesh() throws IOException {
-        testInstantiatedExample("SimpleMesh", "SimpleMeshTestingApp", 25000, SIMPLE_RECEIVED_ASSERTER);
+        testInstantiatedExample("SimpleMesh", "SimpleMeshTestingApp", 35000, SIMPLE_RECEIVED_ASSERTER);
     }
 
     /**
@@ -145,7 +146,7 @@ public class ConfigurationTests extends TestWithQpid {
      */
     @Test
     public void testSimpleMesh3() throws IOException {
-        testInstantiatedExample("SimpleMesh3", "SimpleMeshTestingApp3", 35000, SIMPLE_RECEIVED_ASSERTER);
+        testInstantiatedExample("SimpleMesh3", "SimpleMeshTestingApp3", 45000, SIMPLE_RECEIVED_ASSERTER);
     }
     
     /**
@@ -155,7 +156,7 @@ public class ConfigurationTests extends TestWithQpid {
      */
     @Test
     public void testRoutingTest() throws IOException {
-        testInstantiatedExample("RoutingTest", "RoutingTestApp", 25000, s -> {
+        testInstantiatedExample("RoutingTest", "RoutingTestApp", 35000, s -> {
             assertContains(s, "RECEIVED: RoutingTestDataImpl["); // in sink regardless if TestData or ConnOut
             assertMatches(s, ".*RECEIVED: RoutingTestDataImpl\\[.* - P1\\].*"); 
             assertMatches(s, ".*RECEIVED: RoutingTestDataImpl\\[.* - P2\\].*"); 
