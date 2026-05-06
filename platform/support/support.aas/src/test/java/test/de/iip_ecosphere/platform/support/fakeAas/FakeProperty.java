@@ -12,9 +12,6 @@
 
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
@@ -37,7 +34,6 @@ public class FakeProperty extends FakeElement implements Property {
     private Object value;
     @SuppressWarnings("unused")
     private Type type;
-    private Map<String, LangString> description;
     
     /**
      * A fake property builder.
@@ -108,14 +104,7 @@ public class FakeProperty extends FakeElement implements Property {
 
         @Override
         public PropertyBuilder setDescription(LangString... description) {
-            if (description.length > 0) {
-                instance.description = new HashMap<>();
-                for (LangString d : description) {
-                    instance.description.put(d.getLanguage(), d);
-                }
-            } else {
-                instance.description = null;
-            }
+            instance.setDescription(description);
             return this;
         }
 
@@ -149,11 +138,6 @@ public class FakeProperty extends FakeElement implements Property {
     @Override
     public void setValue(Object value) throws ExecutionException {
         this.value = value;
-    }
-
-    @Override
-    public Map<String, LangString> getDescription() {
-        return Collections.unmodifiableMap(description);
     }
 
 }

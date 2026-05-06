@@ -45,6 +45,14 @@ public interface SubmodelElementCollection extends SubmodelElement, ElementsAcce
          */
         public SubmodelElementCollectionBuilder setSemanticId(String refValue);
         
+        /**
+         * Sets the description in terms of language strings.
+         * 
+         * @param description the description
+         * @return <b>this</b>
+         */
+        public SubmodelElementCollectionBuilder setDescription(LangString... description);
+        
         @Override
         public default SubmodelElementCollectionBuilder rbac(AuthenticationDescriptor auth, Role[] roles, 
             RbacAction... actions) {

@@ -462,6 +462,7 @@ public class AasTest {
             NAME_SUBMODELC_OUTER);
         SubmodelElementCollectionBuilder smcBuilderInner = smcBuilderOuter.createSubmodelElementCollectionBuilder(
             NAME_SUBMODELC_INNER);
+        smcBuilderInner.setDescription(DESCRIPTION);
         smcBuilderInner.createPropertyBuilder(NAME_VAR_SUBMODELC_INNER_VAR).setType(Type.AAS_INTEGER)
             .setDescription(DESCRIPTION).build();
         smcBuilderInner.createPropertyBuilder(NAME_VAR_SUBMODELC_INNER_INT).setValue(Type.INTEGER, 1).build();
@@ -499,7 +500,7 @@ public class AasTest {
             .rbacAll(authDesc)
             .build();
         Assert.assertNotNull(aas.getSubmodel("sub_add"));
-        subAdd.createSubmodelElementListBuilder("sub_coll").build();
+        subAdd.createSubmodelElementListBuilder("sub_coll").setDescription(DESCRIPTION).build();
         Assert.assertNotNull(aas.getSubmodel("sub_add").getSubmodelElementList("sub_coll"));
         submodel.createSubmodelElementCollectionBuilder("sub_coll2").build();
         Assert.assertNotNull(submodel.getSubmodelElementCollection("sub_coll2"));

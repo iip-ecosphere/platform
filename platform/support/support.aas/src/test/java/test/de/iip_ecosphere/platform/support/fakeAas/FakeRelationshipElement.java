@@ -12,10 +12,6 @@
 
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Reference;
@@ -30,7 +26,6 @@ public class FakeRelationshipElement extends FakeElement implements Relationship
 
     private FakeReference first;
     private FakeReference second;
-    private Map<String, LangString> description;
     
     /**
      * A fake relationship builder.
@@ -64,14 +59,7 @@ public class FakeRelationshipElement extends FakeElement implements Relationship
         
         @Override
         public RelationshipElementBuilder setDescription(LangString... description) {
-            if (description.length > 0) {
-                instance.description = new HashMap<>();
-                for (LangString d : description) {
-                    instance.description.put(d.getLanguage(), d);
-                }
-            } else {
-                instance.description = null;
-            }
+            instance.setDescription(description);
             return this;
         }
         
@@ -98,11 +86,6 @@ public class FakeRelationshipElement extends FakeElement implements Relationship
     @Override
     public void accept(AasVisitor visitor) {
         visitor.visitRelationshipElement(this);
-    }
-
-    @Override
-    public Map<String, LangString> getDescription() {
-        return Collections.unmodifiableMap(description);
     }
 
     @Override

@@ -140,6 +140,22 @@ public interface SubmodelElementContainerBuilder {
      * @return the sub-model collection builder
      */
     public SubmodelElementContainerBuilder createSubmodelElementContainerBuilder(String idShort);
+
+    /**
+     * Sets the semantic ID of the submodel element collection in terms of a reference.
+     * 
+     * @param refValue the reference value (supported: irdi:<i>irdiValue</i>)
+     * @return <b>this</b>
+     */
+    public SubmodelElementContainerBuilder setSemanticId(String refValue);
+    
+    /**
+     * Sets the description in terms of language strings.
+     * 
+     * @param description the description
+     * @return <b>this</b>
+     */
+    public SubmodelElementContainerBuilder setDescription(LangString... description);
     
     /**
      * Returns the parent builder.

@@ -28,6 +28,7 @@ import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
 import de.iip_ecosphere.platform.support.aas.DataElement;
 import de.iip_ecosphere.platform.support.aas.DeferredBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity;
+import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.Operation;
 import de.iip_ecosphere.platform.support.aas.Property;
 import de.iip_ecosphere.platform.support.aas.Reference;
@@ -202,6 +203,12 @@ public class FakeSubmodelElementCollection extends FakeElement implements Submod
         @Override
         public SubmodelElementCollectionBuilder rbac(AuthenticationDescriptor auth) {
             return this; // usually not needed
+        }
+
+        @Override
+        public SubmodelElementCollectionBuilder setDescription(LangString... description) {
+            instance.setDescription(description);
+            return this;
         }        
         
     }

@@ -12,7 +12,12 @@
 
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import de.iip_ecosphere.platform.support.aas.Element;
+import de.iip_ecosphere.platform.support.aas.LangString;
 
 /**
  * Implements a basis fake element.
@@ -23,6 +28,7 @@ public abstract class FakeElement implements Element {
 
     private String idShort;
     private String semanticId;
+    private Map<String, LangString> description;
     
     /**
      * Creates the instance.
@@ -62,6 +68,44 @@ public abstract class FakeElement implements Element {
      */
     public void setSemanticId(String semanticId) {
         this.semanticId = semanticId;
+    }
+
+    /**
+     * Sets the description in terms of language strings.
+     * 
+     * @param description the description
+     * @return <b>this</b>
+     */
+    public void setDescription(LangString... description) {
+        if (description.length > 0) {
+            this.description = new HashMap<>();
+            for (LangString d : description) {
+                this.description.put(d.getLanguage(), d);
+            }
+        } else {
+            this.description = null;
+        }
+    }
+
+    /**
+     * Adds a single description.
+     * 
+     * @param text the description
+     */
+    public void addDescription(LangString text) {
+        if (null == description) {
+            this.description = new HashMap<>();
+        }
+        description.put(text.getLanguage(), text);
+    }
+    
+    /**
+     * Returns the description of the element.
+     * 
+     * @return the description
+     */
+    public Map<String, LangString> getDescription() {
+        return null == description ? null : Collections.unmodifiableMap(description);
     }
 
 }

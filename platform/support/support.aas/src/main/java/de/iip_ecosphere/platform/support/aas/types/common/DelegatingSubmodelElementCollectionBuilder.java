@@ -19,6 +19,7 @@ import de.iip_ecosphere.platform.support.aas.BlobDataElement.BlobDataElementBuil
 import de.iip_ecosphere.platform.support.aas.Entity.EntityBuilder;
 import de.iip_ecosphere.platform.support.aas.Entity.EntityType;
 import de.iip_ecosphere.platform.support.aas.FileDataElement.FileDataElementBuilder;
+import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.MultiLanguageProperty.MultiLanguagePropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
@@ -210,6 +211,12 @@ public class DelegatingSubmodelElementCollectionBuilder extends DelegatingSubmod
     @Override
     public DelegatingSubmodelElementCollectionBuilder setAuthenticationDescriptor(AuthenticationDescriptor authDesc) {
         super.setAuthenticationDescriptor(authDesc);
+        return this;
+    }
+
+    @Override
+    public SubmodelElementCollectionBuilder setDescription(LangString... description) {
+        delegate.setDescription(description);
         return this;
     }
 

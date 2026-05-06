@@ -45,6 +45,14 @@ public interface SubmodelElementList extends SubmodelElement, ElementsAccess {
          */
         public SubmodelElementListBuilder setSemanticId(String refValue);
         
+        /**
+         * Sets the description in terms of language strings.
+         * 
+         * @param description the description
+         * @return <b>this</b>
+         */
+        public SubmodelElementListBuilder setDescription(LangString... description);
+        
         @Override
         public default SubmodelElementListBuilder rbac(AuthenticationDescriptor auth, Role[] roles, 
             RbacAction... actions) {

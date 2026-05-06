@@ -12,10 +12,6 @@
 
 package test.de.iip_ecosphere.platform.support.fakeAas;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import de.iip_ecosphere.platform.support.aas.AasVisitor;
 import de.iip_ecosphere.platform.support.aas.LangString;
 import de.iip_ecosphere.platform.support.aas.MultiLanguageProperty;
@@ -27,8 +23,6 @@ import de.iip_ecosphere.platform.support.aas.MultiLanguageProperty;
  */
 public class FakeMultiLanguageProperty extends FakeElement implements MultiLanguageProperty {
 
-    private Map<String, LangString> description = new HashMap<>();;
-    
     /**
      * A fake property builder.
      * 
@@ -58,14 +52,7 @@ public class FakeMultiLanguageProperty extends FakeElement implements MultiLangu
         
         @Override
         public MultiLanguagePropertyBuilder setDescription(LangString... description) {
-            if (description.length > 0) {
-                instance.description = new HashMap<>();
-                for (LangString d : description) {
-                    instance.description.put(d.getLanguage(), d);
-                }
-            } else {
-                instance.description = null;
-            }
+            instance.setDescription(description);
             return this;
         }
         
@@ -76,7 +63,7 @@ public class FakeMultiLanguageProperty extends FakeElement implements MultiLangu
 
         @Override
         public MultiLanguagePropertyBuilder addText(LangString text) {
-            instance.description.put(text.getLanguage(), text);
+            instance.addDescription(text);
             return this;
         }
         
@@ -94,11 +81,6 @@ public class FakeMultiLanguageProperty extends FakeElement implements MultiLangu
     @Override
     public void accept(AasVisitor visitor) {
         visitor.visitMultiLanguageProperty(this);
-    }
-
-    @Override
-    public Map<String, LangString> getDescription() {
-        return Collections.unmodifiableMap(description);
     }
 
 }
