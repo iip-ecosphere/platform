@@ -181,7 +181,9 @@ public abstract class AbstractIvmlTests extends TestWithPlugin {
          */
         public TestConfigurer(String ivmlModelName, File modelFolder, File outputFolder) {
             super(ivmlModelName, relocateTestModel(modelFolder), outputFolder);
-            //takeOverSystemProperty(PlatformInstantiator.KEY_PROPERTY_TEST);
+            if (Boolean.valueOf(System.getProperty(PlatformInstantiator.KEY_PROPERTY_TEST, "false"))) {
+                setProperty("iip.skipConfigPlugin", "true");
+            }
             if (isIipBuildInitial()) {
                 super.setStartRuleName("generateInterfaces");
             }

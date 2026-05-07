@@ -42,6 +42,7 @@ import net.ssehub.easy.varModel.model.ContainableModelElement;
 import net.ssehub.easy.varModel.model.DecisionVariableDeclaration;
 import net.ssehub.easy.varModel.model.IDecisionVariableContainer;
 import net.ssehub.easy.varModel.model.IvmlDatatypeVisitor;
+import net.ssehub.easy.varModel.model.ModelElement;
 import net.ssehub.easy.varModel.model.Project;
 import net.ssehub.easy.varModel.model.AttributeAssignment.Assignment;
 import net.ssehub.easy.varModel.model.datatypes.Compound;
@@ -138,7 +139,7 @@ class TypeMapper {
     }
 
     /**
-     * Adds an AAS type kind property.
+     * Adds an AAS type kind property and sets the description if an IVML comment is available.
      * 
      * @param typeB the type builder
      * @param type the type
@@ -147,6 +148,12 @@ class TypeMapper {
     public static void addTypeKind(SubmodelElementContainerBuilder typeB, IDatatype type, 
         Function<String, String> metaShortId) {
         addTypeKind(typeB, IvmlTypeKind.asTypeKind(type), metaShortId);
+        if (type instanceof ModelElement) { // for contained types, e.g., compound
+            String comment = ModelInfo.getCommentSafe((ModelElement) type);
+            if (comment != null && comment.length() > 0) {
+                typeB.setDescription(new LangString(AasIvmlMapper.getLang(), comment));
+            }
+        }
     }
     
     /**

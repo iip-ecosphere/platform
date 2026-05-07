@@ -620,8 +620,8 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
 
     // initial/experimental
     @DispatchCase
-    def getFieldPath(UAFieldType field, String nameOrPath) {
-        if (getProperty("iip.experimental.opcNodeId", "").length() > 0 and isDefined(field.nodeId) and field.nodeId <> null) {
+    def getFieldPath(OpcUaField field, String nameOrPath) {
+        if (isDefined(field.nodeId) and field.nodeId <> null) {
             NodeId nid = field.nodeId;
             '"nameSpaceIndex = ${nid.nameSpaceIndex}, identifier = ${nid.identifier}"';
         } else {
@@ -636,8 +636,8 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
 
     // initial/experimental
     @DispatchCase
-    def getTypePath(UABaseType type, String nameOrPath) {
-        if (getProperty("iip.experimental.opcNodeId", "").length() > 0 and isDefined(type.nodeId) and type.nodeId <> null) {
+    def getTypePath(OpcUaRecordType type, String nameOrPath) {
+        if (isDefined(type.nodeId) and type.nodeId <> null) {
             NodeId nid = type.nodeId;
             '"nameSpaceIndex = ${nid.nameSpaceIndex}, identifier = ${nid.identifier}"';
         } else {

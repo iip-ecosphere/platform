@@ -1,0 +1,8 @@
+OpcUaBaseTypes::NodeId::identifier = Numeric identifier of the OPC UA node id.
+OpcUaBaseTypes::NodeId::nameSpaceIndex = Namespace index of the OPC UA node id.
+OpcUaBaseTypes::OpcUaRecordType = Specialized OPC UA record type with NodeId.
+OpcUaBaseTypes::OpcUaRecordType::nodeId = Node id of the OPC UA element.
+OpcUaBaseTypes::OpcUaField = Specialized OPC UA field type with NodeId.
+OpcUaBaseTypes::OpcUaField::nodeId = Node id of the OPC UA element.
+OpcUaBaseTypes::OpcUaEnumType = Specialized OPC UA enumeration type with NodeId.
+OpcUaBaseTypes::OpcUaEnumType::nodeId = Node id of the OPC UA element.

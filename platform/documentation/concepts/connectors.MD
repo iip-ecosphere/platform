@@ -83,6 +83,33 @@ Regarding authentication, this connector supports `USERNAME`, `ISSUED`, `X509` a
 
 As the underlying implementation only provides rather coarse-grained (model-level) OPC Events, it is currently mandatory to specify a `samplingPeriod` to obtain data. Please also take into account that `Field` as a default caching time of `CACHE_ALWAYS` (static fields), i.e., for dynamically changing fields `CACHE_NONE` or a meaningful caching time for your application must be specified.
 
+Optionally, the OPC UA connector allows to specify OPC UA NodeIds, using the specialized types.
+
+A `NodeId` consist of
+
+| Field | Description | Default |
+| --- | --- | --- |
+| identifier     | Numeric identifier of the OPC UA node id. | |
+| nameSpaceIndex | Namespace index of the OPC UA node id. | |
+
+A `OpcUaRecordType` refines `RecordType` for specifying the NodeId of the corresponding OPC UA node/folder. The additional fields are:
+
+| Field | Description | Default |
+| --- | --- | --- |
+| nodeId | Optional NodeId. | | 
+
+A `OpcUaField` refines `Field` for specifying the NodeId of a field, i.e., the corresponding OPC UA variable node. The additional fields are:
+
+| Field | Description | Default |
+| --- | --- | --- |
+| nodeId | Optional NodeId. | | 
+
+A `OpcUaEnumType` refines `EnumType` for specifying the NodeId of the enumeration type. The defined enumeration is for use within an oktoflow app and must match the respective OPC UA enumeration. The additional fields are:
+
+| Field | Description | Default |
+| --- | --- | --- |
+| nodeId | Optional NodeId. | | 
+
 ## AAS connector
 
 The Asset Administration Shell (AAS) connector is a model connector that supports the following additional fields:

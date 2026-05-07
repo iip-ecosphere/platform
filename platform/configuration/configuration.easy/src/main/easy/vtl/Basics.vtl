@@ -136,7 +136,7 @@ template Basics(Configuration config, FileArtifact target) {
     }
     
     def Boolean isInTest() {
-        getProperty("iip.tests", "false") == "true";
+        getProperty("iip.skipConfigPlugin", "false") == "true";
     }
 	
 	def setOf(MeshElement) nextMeshNodes(MeshElement elt, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {

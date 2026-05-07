@@ -1,0 +1,28 @@
+project OpcUaBaseTypes {
+
+    import DataTypes;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    compound NodeId {
+        Integer nameSpaceIndex;
+        Integer identifier;
+    }
+   
+    compound OpcUaRecordType refines RecordType {
+        NodeId nodeId;
+    }
+   
+    compound OpcUaField refines Field {
+        NodeId nodeId;
+    }   
+
+    compound OpcUaEnumType refines EnumType {
+        NodeId nodeId;
+    }
+    
+    freeze {
+        .;
+    };
+    
+}

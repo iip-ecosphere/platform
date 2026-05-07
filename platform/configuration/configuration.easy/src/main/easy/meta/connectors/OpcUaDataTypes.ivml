@@ -1,16 +1,10 @@
 project OpcUaDataTypes {
 
-    import DataTypes;
+    import OpcUaBaseTypes;
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
-
     enum NodeClass {UAObject, UAObjectType, UAVariable, UAVariableType, UADataType, UAMethod};
-    
-    compound NodeId {
-		Integer nameSpaceIndex;
-		Integer identifier;
-    }
     
     typedef OpcLocalizedText String;
     
@@ -26,9 +20,8 @@ project OpcUaDataTypes {
 		name = "UnsignedInteger"
     };
     
-    compound UABaseType refines RecordType {
+    compound UABaseType refines OpcUaRecordType {
         self.isTypeOf(UABaseType) implies fields.size() == 0;
-        NodeId nodeId;
 		NodeClass nodeClass;
 		String browseName;
 		String displayName;
@@ -86,8 +79,7 @@ project OpcUaDataTypes {
         String description = "";
     }
 
-    compound UAFieldType refines Field {
-		NodeId nodeId;
+    compound UAFieldType refines OpcUaField {
 		NodeClass nodeClass;
 		String browseName;
 		String displayName;
@@ -108,8 +100,7 @@ project OpcUaDataTypes {
     compound UAFieldMethodType refines UAFieldType {
     }
 
-    compound UAEnumType refines EnumType {
-		NodeId nodeId;
+    compound UAEnumType refines OpcUaEnumType {
 		NodeClass nodeClass;
 		String browseName;
 		String displayName;
