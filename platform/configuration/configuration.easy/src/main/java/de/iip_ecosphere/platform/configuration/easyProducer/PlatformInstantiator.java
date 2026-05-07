@@ -25,6 +25,7 @@ import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.collector.Collector;
 import de.iip_ecosphere.platform.support.identities.YamlIdentityFile;
+import de.iip_ecosphere.platform.support.identities.YamlIdentityStore;
 import de.iip_ecosphere.platform.support.logging.LogLevel;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
@@ -396,6 +397,7 @@ public class PlatformInstantiator {
             LoggerFactory.getLogger(Transport.class).setLevel(LogLevel.OFF);
             LoggerFactory.getLogger(StatusCache.class).setLevel(LogLevel.OFF);
             LoggerFactory.getLogger(ConfigurationSetup.class).setLevel(LogLevel.OFF);
+            LoggerFactory.getLogger(YamlIdentityStore.class).setLevel(LogLevel.OFF);
             LoggerFactory.getLogger(YamlIdentityFile.class).setLevel(LogLevel.OFF);
         }
         
