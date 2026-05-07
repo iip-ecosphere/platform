@@ -69,7 +69,7 @@ public class PythonCompileMojo extends AbstractLoggingMojo {
 
     @Parameter(property = "python.pythonArgs", required = false, defaultValue = "")
     private String pythonArgs;
-
+    
     /**
      * Estimates the maximum command line length.
      * 
@@ -213,6 +213,7 @@ public class PythonCompileMojo extends AbstractLoggingMojo {
         // Unused import are not supposed to fail the build
         // are there pyflake options to disable those warnings
         boolean isError = true;
+        isError &= !line.startsWith(" "); // since May'26, failures start with file path
         isError &= !line.contains("import");
         isError &= !line.contains("redefinition");
         isError &= !line.contains("but never used");
