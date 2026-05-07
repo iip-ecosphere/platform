@@ -37,6 +37,7 @@ import org.springframework.stereotype.Component;
 import de.iip_ecosphere.platform.services.environment.Service;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import de.iip_ecosphere.platform.services.environment.ServiceMapper;
+import de.iip_ecosphere.platform.services.environment.ServiceState;
 import de.iip_ecosphere.platform.services.environment.YamlArtifact;
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.metricsAas.MetricsExtractorRestClient;
@@ -213,6 +214,7 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
                         }
                     }
                     if (nullCount == startupSequence.size()) {
+                        startDataForMappedServices();
                         break;
                     }
                     TimeUtils.sleep(300);
@@ -423,7 +425,8 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
                 ServiceForMapping s = startupSequence.get(i);
                 if (s != null && s.mapping.get() == null && s.id.equals(serviceId)) {
                     s.mapping.set(() -> {
-                        de.iip_ecosphere.platform.services.environment.Starter.mapService(service);
+                        de.iip_ecosphere.platform.services.environment.Starter.mapService(service, 
+                            service.getKind() != ServiceKind.SOURCE_SERVICE);
                         if (null != after) {
                             after.run();
                         }
@@ -436,6 +439,13 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
                 after.run();
             }
         }
+        startDataForMappedServices();
+    }
+
+    /**
+     * Starts data for mapped services, delayed {@link ServiceState#RUNNING}.
+     */
+    private static void startDataForMappedServices() {
         startDataForMappedServices(c -> expectedServiceCount > 0 && c == expectedServiceCount);
     }
     
