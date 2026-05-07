@@ -8,7 +8,7 @@
     <!-- deploy to SSE Mvn repo -->
 	<target name="maven"> 
 	    <maven pomFile="pom.xml" goal="deploy">
-		  <arg value="-Diip.test.java8=/usr/lib/jvm/java-8-openjdk-amd64/bin/java"/>
+		  <arg value="-Diip.test.java8=${JAVA8_HOME}/bin/java"/>
 	    </maven>
 	</target>
 </project>
