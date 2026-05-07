@@ -152,6 +152,7 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
         
         private String id;
         private AtomicReference<Runnable> mapping = new AtomicReference<>();
+        private AtomicReference<Runnable> after = new AtomicReference<>();
 
         /**
          * Creates the service that shall be mapped.
@@ -208,16 +209,20 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
                             if (mapping != null && nullCount == i) {
                                 startupSequence.set(i, null);
                                 mapping.run();
+                                Runnable after = s.after.get();
+                                if (after != null) {
+                                    after.run();
+                                }
                             }
                         } else {
                             nullCount++;
                         }
                     }
+                    TimeUtils.sleep(300);
                     if (nullCount == startupSequence.size()) {
                         startDataForMappedServices();
                         break;
                     }
-                    TimeUtils.sleep(300);
                 }
             }).start();
         }
@@ -427,10 +432,8 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
                     s.mapping.set(() -> {
                         de.iip_ecosphere.platform.services.environment.Starter.mapService(service, 
                             service.getKind() != ServiceKind.SOURCE_SERVICE);
-                        if (null != after) {
-                            after.run();
-                        }
                     });
+                    s.after.set(after);
                 }
             }
         } else {
@@ -438,8 +441,8 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
             if (null != after) {
                 after.run();
             }
+            startDataForMappedServices();
         }
-        startDataForMappedServices();
     }
 
     /**
