@@ -87,6 +87,7 @@ IEEE 28th International Conference on Emerging Technologies and Factory Automati
 
 ## Contributing Student Works
 
+* Monika Staciwa, Model-Driven Development of State-Machine-Based Applications for the oktoflow IIoT Platform, MSc thesis, 2026
 * Ahmed Gamal Attia Mansour Salem, Design, Implementation and Evaluation of an Angular-based Configurator for oktoflow connectors, MSc thesis, 2025
 * Monika Staciwa, AAS alternatives for Industry 4.0/IIoT platform oktoflow, MSc project thesis, 2025
 * Christian Nikolajew, REST Konnektor für die oktoflow-Plattform, BSc thesis, 2024
