@@ -446,7 +446,8 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
      * Starts data for mapped services, delayed {@link ServiceState#RUNNING}.
      */
     private static void startDataForMappedServices() {
-        startDataForMappedServices(c -> expectedServiceCount > 0 && c == expectedServiceCount);
+        // it's ok if it maps more services...
+        startDataForMappedServices(c -> expectedServiceCount > 0 && c >= expectedServiceCount);
     }
     
 }
