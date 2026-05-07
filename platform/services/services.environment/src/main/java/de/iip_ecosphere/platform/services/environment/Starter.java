@@ -81,7 +81,7 @@ public class Starter {
     public static final String PARAM_IIP_TEST_AASREG_PORT = "iip.test.aasRegistry.port";
     public static final String PARAM_IIP_TEST_SMREG_PORT = "iip.test.smRegistry.port";
     public static final String PARAM_IIP_TEST_SERVICE_AUTOSTART = "iip.test.service.autostart";
-    public static final String PARAM_IIP_ENFORCE_START_SEQUENCE = "iip.service.enforcestartsequence";
+    public static final String PARAM_IIP_ENFORCE_START_SEQUENCE = "okto.service.enforcestartsequence";
     public static final String ARG_AAS_NOTIFICATION = "iip.test.aas.notification";
     public static final String PROPERTY_JAVA8 = "iip.test.java8";
     public static final String IIP_TEST = "iip.test";
