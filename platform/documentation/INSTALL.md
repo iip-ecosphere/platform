@@ -5,6 +5,7 @@ This document summarizes how to install and run the oktoflow platform. We discus
 > **Important**  
 > Before installation, ensure that the required technical requirements are met [Required Software](PREREQUISITES.md).
 
+For an overview, please see the [ReGaP oktoflow installation flowchart](https://regap.de/community-assets/oktoflow-Installations-Flowchart/).
 
 ## Installation from scratch
 
