@@ -508,6 +508,9 @@ public class Starter {
         if (null == enable || enable.test(mappedServices.size())) {
             List<Service> services = new ArrayList<>(mappedServices.values());
             for (Service s : services) {
+                if (s.getKind() == ServiceKind.SOURCE_SERVICE) {
+                    autostartService(s);
+                }
                 s.startData();
             }
         }
@@ -670,7 +673,8 @@ public class Starter {
      * 
      * @param mapper the service mapper instance (may be <b>null</b>, no mapping will happen then)
      * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
-     * @param enableAutostart whether service autostart shall be performed if {@code}, e.g., not for family members
+     * @param enableAutostart whether service autostart shall be performed 
+     * @see #autostartService(Service)
      */
     public static void mapService(ServiceMapper mapper, Service service, boolean enableAutostart) {
         if (null != service && service.getId() != null) {
@@ -678,32 +682,43 @@ public class Starter {
             if (null != mapper && null != Starter.getProtocolBuilder()) {
                 mapper.mapService(service);
             }
-            if (serviceAutostart && enableAutostart && service.isTopLevel()) {
-                try {
-                    getLogger().info("Service autostart: '{}' '{}'", service.getId(), service.getClass().getName());
-                    service.setState(ServiceState.STARTING);
-                    if (onServiceAutostartAttachShutdownHook) {
-                        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                            try {
-                                System.out.println("Service autostop: " + service.getId());
-                                service.setState(ServiceState.STOPPING);
-                            } catch (ExecutionException e) {
-                                getLogger().error("Service autostop '{}': {}", service.getId(), e.getMessage());
-                            }
-                        }));
-                    }
-                    if (maxServiceStartWaitingTime > 0) {
-                        TimeUtils.waitFor(() -> service.getState() != ServiceState.RUNNING 
-                            && service.getState() != ServiceState.FAILED, maxServiceStartWaitingTime, 500);
-                    }
-                } catch (ExecutionException e) {
-                    getLogger().error("Service autostart '{}': {}", service.getId(), e.getMessage());
-                }
+            if (enableAutostart) {
+                autostartService(service);
             }
         }  else {
             if (null == setup || setup.getNotifyServiceNull()) {
                 Throwable t = new Throwable("NO EXCEPTION/DEBUGGING: Service null or Service id null");
                 t.printStackTrace(System.out);
+            }
+        }
+    }
+
+    /**
+     * Auto-starts the specified service (if {@link #serviceAutostart} and {@link Service#isTopLevel()}.
+     * 
+     * @param service the service to be started
+     */
+    public static void autostartService(Service service) {
+        if (serviceAutostart && service.isTopLevel()) {
+            try {
+                getLogger().info("Service autostart: '{}' '{}'", service.getId(), service.getClass().getName());
+                service.setState(ServiceState.STARTING);
+                if (onServiceAutostartAttachShutdownHook) {
+                    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                        try {
+                            System.out.println("Service autostop: " + service.getId());
+                            service.setState(ServiceState.STOPPING);
+                        } catch (ExecutionException e) {
+                            getLogger().error("Service autostop '{}': {}", service.getId(), e.getMessage());
+                        }
+                    }));
+                }
+                if (maxServiceStartWaitingTime > 0) {
+                    TimeUtils.waitFor(() -> service.getState() != ServiceState.RUNNING 
+                        && service.getState() != ServiceState.FAILED, maxServiceStartWaitingTime, 500);
+                }
+            } catch (ExecutionException e) {
+                getLogger().error("Service autostart '{}': {}", service.getId(), e.getMessage());
             }
         }
     }
