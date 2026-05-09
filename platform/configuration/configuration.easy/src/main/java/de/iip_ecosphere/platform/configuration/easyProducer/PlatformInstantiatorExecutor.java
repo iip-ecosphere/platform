@@ -228,7 +228,7 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
         InputStream cpIn = loader.getResourceAsStream(cpFile);
         if (null != cpIn) {
             if (null == localRepo) { // usual fallback
-                String tmp = System.getenv("M2_HOME");
+                String tmp = System.getenv("M2_REPO");
                 if (null == tmp) {
                     tmp = System.getProperty("user.home") + "/.m2/repository";
                 }
