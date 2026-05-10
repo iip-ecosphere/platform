@@ -18,6 +18,7 @@ In progress:
 Improvements:
 * Determined start sequence for standalone apps/tests: sinks, transformers/probes, sources
 * Improved type display consistency in managementUI
+* Support for Linux symlinks in file paths, in particular for the configuration models
 
 Changes:
 * In particular if the start sequence state above is activated, source services shall not ingest data before/outside the `RUNNING` state 
