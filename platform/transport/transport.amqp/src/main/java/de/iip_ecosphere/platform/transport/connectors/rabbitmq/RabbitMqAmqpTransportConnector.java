@@ -66,14 +66,18 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
      * @throws IOException if stream operations cannot be carried out
      */
     private void checkStream(String stream, boolean send) throws IOException {
-        if (!isStreamKnown(stream)) {
-            channel.exchangeDeclare(stream, BuiltinExchangeType.FANOUT, false, true, null);
-            registerStream(stream);
-        }
-        if (!send && queueStream.get(stream) == null) {
-            Queue.DeclareOk qRes = channel.queueDeclare();
-            queueStream.put(stream, qRes.getQueue()); 
-            channel.queueBind(qRes.getQueue(), stream, "");
+        try {
+            if (!isStreamKnown(stream)) {
+                channel.exchangeDeclare(stream, BuiltinExchangeType.FANOUT, false, true, null);
+                registerStream(stream);
+            }
+            if (!send && queueStream.get(stream) == null) {
+                Queue.DeclareOk qRes = channel.queueDeclare();
+                queueStream.put(stream, qRes.getQueue()); 
+                channel.queueBind(qRes.getQueue(), stream, "");
+            }
+        } catch (AlreadyClosedException e) {
+            // ok, let's forget about that
         }
     }
     
@@ -114,19 +118,27 @@ public class RabbitMqAmqpTransportConnector extends AbstractTransportConnector {
             //channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
         };
         String tag = UUID.randomUUID().toString();
-        channel.basicConsume(queueStream.get(stream), true, tag, deliverCallback, consumerTag -> { });
-        tags.put(stream, tag);
+        try {
+            channel.basicConsume(queueStream.get(stream), true, tag, deliverCallback, consumerTag -> { });
+            tags.put(stream, tag);
+        } catch (AlreadyClosedException e) {
+            // ok, let's forget about that
+        }
     }
 
     @Override
     public void unsubscribe(String stream, boolean delete) throws IOException {
         super.unsubscribe(stream, delete);
-        String tag = tags.remove(stream);
-        if (null != tag) {
-            channel.basicCancel(tag);
-        }
-        if (delete) {
-            channel.queueDeleteNoWait(stream, true, false);
+        try {
+            String tag = tags.remove(stream);
+            if (null != tag) {
+                channel.basicCancel(tag);
+            }
+            if (delete) {
+                channel.queueDeleteNoWait(stream, true, false);
+            }
+        } catch (AlreadyClosedException e) {
+            // ok, let's forget about that
         }
     }
     
