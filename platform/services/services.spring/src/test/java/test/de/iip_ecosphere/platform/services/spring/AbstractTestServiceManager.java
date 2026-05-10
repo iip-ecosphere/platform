@@ -363,6 +363,7 @@ public class AbstractTestServiceManager extends AbstractTest {
         Assert.assertNotNull(sub);
         sub.accept(new AasPrintVisitor());
         
+        TimeUtils.sleep(500); // not yet processed?
         Map<String, Predicate<Object>> expectedMetrics = new HashMap<>();
         expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_TOTAL, POSITIVE_GAUGE_VALUE);
         expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_USAGE, POSITIVE_GAUGE_VALUE);
