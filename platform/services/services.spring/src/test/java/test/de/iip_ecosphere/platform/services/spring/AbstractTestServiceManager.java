@@ -363,7 +363,6 @@ public class AbstractTestServiceManager extends AbstractTest {
         Assert.assertNotNull(sub);
         sub.accept(new AasPrintVisitor());
         
-        TimeUtils.sleep(500); // not yet processed?
         Map<String, Predicate<Object>> expectedMetrics = new HashMap<>();
         expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_TOTAL, POSITIVE_GAUGE_VALUE);
         expectedMetrics.put(MetricsAasConstants.SYSTEM_MEMORY_USAGE, POSITIVE_GAUGE_VALUE);
@@ -476,7 +475,7 @@ public class AbstractTestServiceManager extends AbstractTest {
             Assert.fail("While reading receiver log: " + e.getMessage());
         }
     }
-    
+     
     /**
      * Asserts the existence of selected AAS metrics and/or their values.
      * 
@@ -488,24 +487,45 @@ public class AbstractTestServiceManager extends AbstractTest {
      */
     protected void assertMetrics(String[] ids, Map<String, Predicate<Object>> expected) 
         throws IOException, ExecutionException {
+        int retries = 2; // often it is done in the first round, sometimes it takes a bit longer
+        String message = null;
         Aas aas = AasPartRegistry.retrieveIipAas();
         Submodel sub = aas.getSubmodel(ServicesAas.NAME_SUBMODEL);
         Assert.assertNotNull(sub);
-        sub.accept(new AasPrintVisitor());
-        SubmodelElementCollection services = sub.getSubmodelElementCollection(ServicesAas.NAME_COLL_SERVICES);
-        Assert.assertNotNull(sub);
-        for (String id: ids) {
-            SubmodelElementCollection service = services.getSubmodelElementCollection(AasUtils.fixId(id));
-            Assert.assertNotNull(service);
-            for (Map.Entry<String, Predicate<Object>> ent : expected.entrySet()) {
-                Property prop = service .getProperty(ent.getKey());
-                Assert.assertNotNull(ent.getKey() + " missing", prop);
-                Predicate<Object> pred = ent.getValue();
-                if (null != pred) {
-                    Object val = prop.getValue();
-                    Assert.assertTrue("Test for " + ent.getKey() + " failed", pred.test(val));
+        do {
+            sub.accept(new AasPrintVisitor());
+            SubmodelElementCollection services = sub.getSubmodelElementCollection(ServicesAas.NAME_COLL_SERVICES);
+            Assert.assertNotNull(sub);
+            for (String id: ids) {
+                SubmodelElementCollection service = services.getSubmodelElementCollection(AasUtils.fixId(id));
+                Assert.assertNotNull(service);
+                for (Map.Entry<String, Predicate<Object>> ent : expected.entrySet()) {
+                    Property prop = service .getProperty(ent.getKey());
+                    if (prop == null) {
+                        message = ent.getKey() + " missing";
+                        break;
+                    }
+                    Predicate<Object> pred = ent.getValue();
+                    if (null != pred) {
+                        Object val = prop.getValue();
+                        if (!pred.test(val)) {
+                            message = "Test for " + ent.getKey() + " failed";
+                            break;
+                        }
+                    }
                 }
             }
+            if (message == null) {
+                break;
+            }
+            if (retries > 0) {
+                TimeUtils.sleep(500);
+                message = null;
+            }
+            retries--;
+        } while (retries > 0);
+        if (null != message) {
+            Assert.fail(message);
         }
     }
     
