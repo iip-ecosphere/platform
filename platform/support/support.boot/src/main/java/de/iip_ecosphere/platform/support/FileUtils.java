@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.function.Consumer;
@@ -34,6 +35,9 @@ import de.iip_ecosphere.platform.support.commons.Commons;
  * @author Holger Eichelberger, SSE
  */
 public class FileUtils {
+
+    // allow use before plugin loading
+    private static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("win"); 
     
     /**
      * Preventing external creation.
@@ -589,4 +593,55 @@ public class FileUtils {
         return size;
     }
     
+    /**
+     * Resolves a file or a symlink.
+     * 
+     * @param file the file to be resolved
+     * @return the resolved file or {@code file} if it cannot be resolved
+     */
+    public static final File resolve(File file) {
+        if (file != null && !IS_WINDOWS) {
+            try {
+                file = file.toPath().toRealPath().toFile();
+            } catch (IOException | SecurityException | UnsupportedOperationException | InvalidPathException e) {
+                // return file
+            }
+        }
+        return file;
+    }
+
+    /**
+     * Resolves files/symlinks.
+     * 
+     * @param files the files to be resolved, may be <b>null</b>
+     * @return the resolved files or <b>null</b>
+     * @see #resolve(File...)
+     */
+    public static final File[] resolve(File... files) {
+        if (null != files) {
+            for (int i = 0; i < files.length; i++) {
+                files[i] = resolve(files[i]);
+            }
+        }
+        return files;
+    }
+
+    /**
+     * Lists files in {@code file} after resolving {@code file} and its contained files.
+     * 
+     * @param file the file to list the files for, may be <b>null</b>
+     * @return the resolved contained files
+     * @see #resolve(File)
+     * @see #resolve(File...)
+     */
+    public static final File[] listFiles(File file) {
+        File[] result;
+        if (null != file) {
+            result = resolve(resolve(file).listFiles());
+        } else {
+            result = null;
+        }
+        return result;
+    }
+
 }

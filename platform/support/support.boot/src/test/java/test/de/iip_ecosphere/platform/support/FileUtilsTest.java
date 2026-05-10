@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -231,6 +232,28 @@ public class FileUtilsTest {
     public void folderSizeTest() {
         Assert.assertEquals(0, FileUtils.getFolderSize(null));
         Assert.assertTrue(FileUtils.getFolderSize(new File(".")) > 0);
+    }
+    
+    /**
+     * Tests {@link FileUtils#resolve(File)}, {@link FileUtils#resolve(File...)} and {@link FileUtils#listFiles(File)}.
+     */
+    public void testResolve() {
+        Assert.assertNull(FileUtils.resolve((File) null));
+        Assert.assertNull(FileUtils.resolve((File[]) null));
+        
+        File f = new File("src/test/resources");
+        File res = FileUtils.resolve(f);
+        Assert.assertNotNull(res);
+        Assert.assertTrue(res.isDirectory());
+        File[] resFiles = FileUtils.resolve(res.listFiles());
+        Assert.assertNotNull(resFiles);
+        Assert.assertTrue(resFiles.length > 0);
+        Stream.of(resFiles).anyMatch(g -> g.isFile());
+
+        File[] resFiles2 = FileUtils.listFiles(f);
+        Assert.assertNotNull(resFiles2);
+        Assert.assertTrue(resFiles2.length > 0);
+        Assert.assertArrayEquals(resFiles, resFiles2);
     }
 
 }
