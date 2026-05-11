@@ -319,6 +319,11 @@ public class AdsConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         }
 
         @Override
+        public int getInteger(String qName) throws IOException {
+            return comm.readDIntByName(basePath + qName);
+        }
+
+        @Override
         public int getInt(String qName) throws IOException {
             return comm.readDIntByName(basePath + qName);
         }
