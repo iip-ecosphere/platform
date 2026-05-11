@@ -196,6 +196,8 @@ public interface InputParser<T> {
      */
     public interface InputConverter<T> {
 
+        // > map all methods to model access, with same naming schema
+
         /**
          * Converts parsed data returned by {@link ParseResult} to byte.
          * 
@@ -424,6 +426,8 @@ public interface InputParser<T> {
          * @throws IOException if conversion fails
          */
         public float toFloatIndex(T data) throws IOException;
+        
+        // > map all methods to model access, with same naming schema
 
     }
     

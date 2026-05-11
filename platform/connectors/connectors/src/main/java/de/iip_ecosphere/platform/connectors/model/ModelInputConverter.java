@@ -41,6 +41,8 @@ public class ModelInputConverter implements InputConverter<Object> {
     protected ModelInputConverter() {
     }
     
+    // > map all methods to model access, with same naming schema
+    
     @Override
     public int toInteger(Object data) throws IOException {
         return (int) data;
@@ -179,5 +181,7 @@ public class ModelInputConverter implements InputConverter<Object> {
     public float toFloatIndex(Object data) throws IOException {
         return ((FloatIndex) data).getValue();
     }
+    
+    // > map all methods to model access, with same naming schema
 
 }

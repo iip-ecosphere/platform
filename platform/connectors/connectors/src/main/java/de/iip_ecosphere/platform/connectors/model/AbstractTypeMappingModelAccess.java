@@ -79,7 +79,7 @@ public abstract class AbstractTypeMappingModelAccess extends AbstractModelAccess
     // default implementation would cause infinite loop if not overridden
     
     @Override
-    public abstract void setInt(String qName, int value) throws IOException;
+    public abstract void setInt(String qName, int value) throws IOException;  // TODO clean up -> Integer
 
     @Override
     public abstract void setLong(String qName, long value) throws IOException;

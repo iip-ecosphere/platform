@@ -56,6 +56,8 @@ public interface OutputFormatter<T> {
      */
     public interface OutputConverter<T> {
 
+        // > map all methods to model access, with same naming schema
+        
         /**
          * Converts data from byte to the output format.
          * 
@@ -271,6 +273,8 @@ public interface OutputFormatter<T> {
          * @throws IOException if conversion fails
          */
         public T fromFloatIndex(float data) throws IOException;
+        
+        // > map all methods to model access, with same naming schema
 
     }
 

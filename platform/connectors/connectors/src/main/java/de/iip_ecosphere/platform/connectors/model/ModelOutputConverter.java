@@ -40,6 +40,8 @@ public class ModelOutputConverter implements OutputConverter<Object> {
      */
     protected ModelOutputConverter() {
     }
+    
+    // > map all methods to model access, with same naming schema
 
     @Override
     public Object fromInteger(int data) throws IOException {
@@ -147,5 +149,7 @@ public class ModelOutputConverter implements OutputConverter<Object> {
     public Object fromFloatIndex(float data) throws IOException {
         return new FloatIndex(data);
     }
+    
+    // > map all methods to model access, with same naming schema
 
 }
