@@ -426,7 +426,7 @@
           </includes>
           <forkedProcessTimeoutInSeconds>${surefireProcessTimeout}</forkedProcessTimeoutInSeconds>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
-           <argLine>${surefireArgLine}</argLine>
+           <argLine>@{argLine} ${surefireArgLine}</argLine>
         </configuration>
         <dependencies>
           <!-- Force using the latest JUnit 47 provider, consider also in lib dependencies; seems also to work with
