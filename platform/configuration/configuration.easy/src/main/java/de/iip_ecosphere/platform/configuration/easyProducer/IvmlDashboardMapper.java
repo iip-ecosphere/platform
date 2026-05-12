@@ -1338,9 +1338,11 @@ public class IvmlDashboardMapper implements DashboardMapper {
             URL u = new URL(url);
             URLConnection con = u.openConnection();
             if (con instanceof HttpURLConnection) {
+                final String contentType = "application/json";
                 HttpURLConnection hcon = (HttpURLConnection) con;
                 hcon.setRequestMethod("POST");
-                //hcon.setRequestProperty("Accept", "application/json");
+                hcon.setRequestProperty("Content-Type", contentType);
+                //hcon.setRequestProperty("Accept", contentType);
                 hcon.setDoOutput(true);
                 String data = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
                 byte[] bdata = data.getBytes(StandardCharsets.UTF_8);
