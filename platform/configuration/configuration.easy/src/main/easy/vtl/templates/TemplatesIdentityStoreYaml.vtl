@@ -34,6 +34,14 @@ template TemplatesIdentityStoreYaml(IIPEcosphere config, FileArtifact target, Ap
           .addValue("tokenData", entry.password)
           .addValue("tokenEncryptionAlgorithm", "UTF-8");
     }
+
+    @DispatchCase
+    def genEntry(IssuedAppIdentityStoreEntry entry, YamlNode ids) {
+        ids.addObject(entry.name)
+          .addValue("type", "ISSUED")
+          .addValue("tokenData", entry.issuedData)
+          .addValue("tokenEncryptionAlgorithm", "UTF-8");
+    }
     
     def main(IIPEcosphere config, FileArtifact target, Application app) {
         String appName = getAppMvnName(app);

@@ -227,6 +227,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
     @Override
     public void startup(String[] args) {
         try {
+            long t1 = System.currentTimeMillis();
             Slf4EasyLogger logger = new Slf4EasyLogger();
             Log.setLogger(logger);
             EASyLoggerFactory.INSTANCE.setLogger(logger);
@@ -244,9 +245,13 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             try {
                 EasyExecutor exec = createExecutor(easySetup, executionMode);
                 ConfigurationManager.setExecutor(exec);
-                getLogger().info("EASy-Producer models loaded");
-                StatusCache.start();
-                getLogger().info("Status cache started");
+                long t2 = System.currentTimeMillis();
+                getLogger().info("EASy-Producer models loaded in {} ms", t2 - t1);
+                if (executionMode != ExecutionMode.TOOLING) {
+                    t1 = t2;
+                    StatusCache.start();
+                    getLogger().info("Status cache started in {} ms", System.currentTimeMillis() - t1);
+                }
             } catch (ModelManagementException e) {
                 getLogger().error("Cannot set model locations. Configuration capabilities may be disabled. " 
                     + e.getMessage(), e);

@@ -42,6 +42,10 @@ project Applications {
         NonEmptyString userName;
         NonEmptyString password;
     }
+
+    compound IssuedAppIdentityStoreEntry refines AppIdentityStoreEntry {
+        NonEmptyString issuedData;
+    }
         
     compound Application refines VersionedElement {
         Id id;

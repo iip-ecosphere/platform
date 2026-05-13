@@ -30,6 +30,8 @@ project DataTypes {
     const Integer UiOptionalGroup1 = -100;
     const Integer UiMandatoryGroup2 = 200;
     const Integer UiOptionalGroup2 = -200;
+    const Integer UiMandatoryGroup3 = 300;
+    const Integer UiOptionalGroup3 = -300;
     
     def String mvnVersion(OktoVersion ver, Boolean snapshot) = 
        if (snapshot) then ver + "-SNAPSHOT" else ver endif;
@@ -149,6 +151,7 @@ project DataTypes {
     
     const Integer CACHE_ALWAYS = -1;
     const Integer CACHE_NONE = 0;
+    Integer defaultFieldCachingTime = CACHE_ALWAYS;
     
     enum Display { TimeSeries, Gauge, BarChart, Table, Stat, Piechart }; // Image is implicit
     enum DisplayPanelFit { None, Contain, Cover, Fill };
@@ -185,7 +188,7 @@ project DataTypes {
                 setOf(refTo(DisplayPanel)) displayPanel = null;
             }
         }
-        Integer cachingTime = CACHE_ALWAYS;
+        Integer cachingTime = defaultFieldCachingTime;
         Constraint isNameOk = isNameOk(self);
     }
     

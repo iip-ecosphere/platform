@@ -234,9 +234,7 @@ public class ConfigurationManager {
      */
     public static void loadIvmlModel(EasyExecutor executor) {
         try {
-            long start = System.currentTimeMillis();
             executor.loadIvmlModel();
-            getLogger().info("Loaded EASy-Producer models in {} ms", System.currentTimeMillis() - start);
         } catch (ModelManagementException e) {
             getLogger().error("Cannot load EASy-Producer models: " + e.getMessage());
         }

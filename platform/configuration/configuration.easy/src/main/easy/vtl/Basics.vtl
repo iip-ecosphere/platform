@@ -363,5 +363,76 @@ template Basics(Configuration config, FileArtifact target) {
     def Boolean withoutPlugins(IIPEcosphere config) {
         not(withPlugins(config));
     }
+    
+    // collecting record types
+    
+    // added v2->v3
+    def collectRecordTypes(ServiceBase s, setOf(RecordType) result) {
+        collectRecTypes(s, result); // no dynamic dispatch between VIL/VTL        
+    }
+    
+    // added v2->v3
+    @DispatchBasis
+    def collectRecTypes(ServiceBase s, setOf(RecordType) result) {
+        collectRecordIOTypes(s.input, result);
+        collectRecordIOTypes(s.output, result);
+    }
+
+    // added v2->v3
+    @DispatchCase
+    def collectRecTypes(Connector c, setOf(RecordType) result) {
+        collectRecordIOTypes(c.input, result);
+        collectRecordIOTypes(c.output, result);
+        collectRecordIOTypes(c.inInterface, result);
+        collectRecordIOTypes(c.outInterface, result);
+    }
+    
+    // added v2->v3
+    def collectRecordIOTypes(sequenceOf(IOType) types, setOf(RecordType) result) {
+        for (IOType t : types) { // strange, shall work with foreach and dispatch
+            collectRecordType(resolveType(t), result);
+        }        
+    }
+
+    // added v2->v3
+    @DispatchBasis
+    def collectRecordType(DataType t, setOf(RecordType) result) {
+        // do nothing        
+    }
+
+    // added v2->v3
+    @DispatchCase
+    def collectRecordType(PrimitiveType t, setOf(RecordType) result) {
+        // do nothing        
+    }
+
+    // added v2->v3
+    @DispatchCase
+    def collectRecordType(AliasType t, setOf(RecordType) result) {
+        collectRecordType(t.represents, result);  
+    }
+
+    // added v2->v3
+    @DispatchCase
+    def collectRecordType(ListType t, setOf(RecordType) result) {
+        collectRecordType(t.type, result);  
+    }
+
+    // added v2->v3
+    @DispatchCase
+    def collectRecordType(ArrayType t, setOf(RecordType) result) {
+        collectRecordType(t.type, result);  
+    }
+
+    // added v2->v3
+    @DispatchCase
+    def collectRecordType(RecordType t, setOf(RecordType) result) {
+        if (result.excludes(t)) {
+            result.add(t);
+            for (Field f : t.fields) {
+                collectRecordType(f.type, result);            
+            }
+        }
+    }
         
 }
