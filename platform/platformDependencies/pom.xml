@@ -373,6 +373,7 @@
           <detectJavaApiLink>false</detectJavaApiLink> 
           <detectOfflineLinks>false</detectOfflineLinks>
           <doclint>all,-missing</doclint>
+          <quiet>true</quiet>
         </configuration>
         <executions>
           <execution>
