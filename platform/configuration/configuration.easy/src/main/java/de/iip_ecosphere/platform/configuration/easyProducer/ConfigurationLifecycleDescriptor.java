@@ -241,11 +241,14 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             doFilterLogs = easySetup.getLogLevel() == EasyLogLevel.NORMAL;
             doLogging = !doFilterLogs;
             loader.startup();
+            long t2 = System.currentTimeMillis();
+            getLogger().info("EASy-Producer started in {} ms", t2 - t1);
+            t1 = t2;
             doLogging = true;
             try {
                 EasyExecutor exec = createExecutor(easySetup, executionMode);
                 ConfigurationManager.setExecutor(exec);
-                long t2 = System.currentTimeMillis();
+                t2 = System.currentTimeMillis();
                 getLogger().info("EASy-Producer models loaded in {} ms", t2 - t1);
                 if (executionMode != ExecutionMode.TOOLING) {
                     t1 = t2;
