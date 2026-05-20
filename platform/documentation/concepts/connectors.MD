@@ -242,4 +242,4 @@ The `MQTTv5` connector is a channel connector with no further fields. Formatters
 
 ## MQTT connector
 
-The `MQTT` connector is a channel connector which selects dynamically between `MQTTv3` and `MQTTv5` connector. The MQTT connector has no further fields. Formatters and parsers can be applied as described for the `FileConnector`. This connector supports authentication and encryption as provided by the underlying connector.
+The `MQTT` connector is a channel connector which selects dynamically between `MQTTv3` and `MQTTv5` connector based on information provided by the underlying device, e.g., usually via an AAS. The MQTT connector has no further fields. Formatters and parsers can be applied as described for the `FileConnector`. This connector supports authentication and encryption as provided by the underlying connector. 
