@@ -24,6 +24,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -36,8 +37,34 @@ import de.iip_ecosphere.platform.support.commons.Commons;
  */
 public class FileUtils {
 
-    // allow use before plugin loading
-    private static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("win"); 
+    private static final Function<File, File> FILE_RESOLVER;
+    private static final Function<File[], File[]> FILES_RESOLVER;
+    
+    static {
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+            FILE_RESOLVER = file -> file;
+            FILES_RESOLVER = files -> files;
+        } else {
+            FILE_RESOLVER = file -> {
+                if (file != null) {
+                    try {
+                        file = file.toPath().toRealPath().toFile();
+                    } catch (IOException | SecurityException | UnsupportedOperationException | InvalidPathException e) {
+                        // return file
+                    }
+                }
+                return file;
+            };
+            FILES_RESOLVER = files -> {
+                if (null != files) {
+                    for (int i = 0; i < files.length; i++) {
+                        files[i] = resolve(files[i]);
+                    }
+                }
+                return files;
+            };
+        }
+    }
     
     /**
      * Preventing external creation.
@@ -600,14 +627,7 @@ public class FileUtils {
      * @return the resolved file or {@code file} if it cannot be resolved
      */
     public static final File resolve(File file) {
-        if (file != null && !IS_WINDOWS) {
-            try {
-                file = file.toPath().toRealPath().toFile();
-            } catch (IOException | SecurityException | UnsupportedOperationException | InvalidPathException e) {
-                // return file
-            }
-        }
-        return file;
+        return FILE_RESOLVER.apply(file);
     }
 
     /**
@@ -618,12 +638,7 @@ public class FileUtils {
      * @see #resolve(File...)
      */
     public static final File[] resolve(File... files) {
-        if (null != files) {
-            for (int i = 0; i < files.length; i++) {
-                files[i] = resolve(files[i]);
-            }
-        }
-        return files;
+        return FILES_RESOLVER.apply(files);
     }
 
     /**
