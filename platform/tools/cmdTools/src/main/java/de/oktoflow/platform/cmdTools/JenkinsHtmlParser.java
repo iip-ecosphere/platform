@@ -1,3 +1,15 @@
+/**
+ * ******************************************************************************
+ * Copyright (c) {2026} The original author or authors
+ *
+ * All rights reserved. This program and the accompanying materials are made 
+ * available under the terms of the Eclipse Public License 2.0 which is available 
+ * at http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
+ ********************************************************************************/
+
 package de.oktoflow.platform.cmdTools;
 
 import org.jsoup.Jsoup;
@@ -9,24 +21,45 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/**
+ * Parses Jenkins overview pages, in particular tasks and related build id and build time.
+ * 
+ * @author Holger Eichelberger, SSE
+ */
 public class JenkinsHtmlParser {
 
+    /**
+     * A parse result.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
     private static class ParseResult {
         private int value;
         private String text;
     }
     
+    /**
+     * Parses a (time) unit.
+     * 
+     * @param text the text to parse
+     * @param units  the available units
+     * @return the parse result
+     */
     private static ParseResult parseUnit(String text, String... units) {
         ParseResult result = new ParseResult();
         text = text.trim();
         for (String u : units) {
             if (text.endsWith(u)) {
                 text = text.substring(0, text.length() - u.length()).trim();
-                int pos = text.length() -1 ;
-                while (pos > 0 && Character.isDigit(text.charAt(pos))) {
+                int pos = text.length() - 1;
+                while (pos > 0 && (Character.isDigit(text.charAt(pos)) || text.charAt(pos) == '.')) {
                     pos--;
                 }
                 String number = text.substring(pos).trim();
+                int dot = number.indexOf('.');
+                if (dot > 0) {
+                    number = number.substring(0, dot);
+                }
                 result.value = Integer.parseInt(number);
                 text = text.substring(0, text.length() - number.length());
             }
@@ -35,6 +68,12 @@ public class JenkinsHtmlParser {
         return result;
     }
     
+    /**
+     * Parses time.
+     * 
+     * @param text the text to be parsed
+     * @return the time
+     */
     private static int parseTime(String text) {
         ParseResult ms = parseUnit(text, "ms");
         ParseResult sec = parseUnit(ms.text, "Sekunden", "Sekunde");
@@ -43,6 +82,12 @@ public class JenkinsHtmlParser {
         return min.value * 60 * 1000 + sec.value * 1000 + ms.value;
     }
 
+    /**
+     * Parses a Jenkins HTML page.
+     * 
+     * @param args the command line arguments, first the file to be parsed, second optional the output file
+     * @throws IOException if the file cannot be read
+     */
     public static void main(String[] args) throws IOException {
         if (args.length < 1 || args.length > 2) {
             System.out.println("Usage: file.html [out.csv]");
