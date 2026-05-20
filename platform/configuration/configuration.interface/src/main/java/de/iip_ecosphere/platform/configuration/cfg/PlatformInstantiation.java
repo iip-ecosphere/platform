@@ -47,4 +47,12 @@ public interface PlatformInstantiation {
     public void executeAsProcess(ClassLoader loader, String resourcesDir, String tracingLevel, 
         String mvnArgs, String... args) throws ExecutionException;
     
+    /**
+     * Sets a JVM system property for execution.
+     * 
+     * @param key the key
+     * @param value the value
+     */
+    public void setProperty(String key, String value);
+    
 }

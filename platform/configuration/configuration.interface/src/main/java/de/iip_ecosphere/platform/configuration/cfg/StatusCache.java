@@ -34,6 +34,7 @@ import de.iip_ecosphere.platform.transport.status.StatusMessage;
  */
 public class StatusCache {
     
+    private static boolean started = false;
     private static Map<String, Map<String, String>> serviceStates = Collections.synchronizedMap(new HashMap<>());
     private static ReceptionCallback<StatusMessage> statusCallback = new ReceptionCallback<StatusMessage>() {
 
@@ -152,16 +153,19 @@ public class StatusCache {
      * Starts the status cache.
      */
     public static void start() {
-        TransportConnector conn = Transport.getConnector();
-        if (null != conn) {
-            try {
-                conn.setReceptionCallback(StatusMessage.STATUS_STREAM, statusCallback);
-            } catch (IOException e) {
-                LoggerFactory.getLogger(StatusCache.class).warn("While attaching StatusCache: {}", e.getMessage());
+        if (!started) {
+            TransportConnector conn = Transport.getConnector();
+            if (null != conn) {
+                try {
+                    conn.setReceptionCallback(StatusMessage.STATUS_STREAM, statusCallback);
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(StatusCache.class).warn("While attaching StatusCache: {}", e.getMessage());
+                }
+            } else {
+                LoggerFactory.getLogger(StatusCache.class).warn("No transport connector. Cannot attach StatusCache. No "
+                    + "status updates for UI");
             }
-        } else {
-            LoggerFactory.getLogger(StatusCache.class).warn("No transport connector. Cannot attach StatusCache. No "
-                + "status updates for UI");
+            started = true;
         }
     }
 
@@ -169,13 +173,16 @@ public class StatusCache {
      * Stops the status cache.
      */
     public static void stop() {
-        TransportConnector conn = Transport.getConnector();
-        if (null != conn) {
-            try {
-                conn.detachReceptionCallback(StatusMessage.STATUS_STREAM, statusCallback);
-            } catch (IOException e) {
-                LoggerFactory.getLogger(StatusCache.class).warn("While detaching StatusCache: {}", e.getMessage());
+        if (started) {
+            TransportConnector conn = Transport.getConnector();
+            if (null != conn) {
+                try {
+                    conn.detachReceptionCallback(StatusMessage.STATUS_STREAM, statusCallback);
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(StatusCache.class).warn("While detaching StatusCache: {}", e.getMessage());
+                }
             }
+            started = false;
         }
     }
 
