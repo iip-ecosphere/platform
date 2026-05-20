@@ -164,6 +164,7 @@
                <modelDirectory>${iip.modelDir}</modelDirectory>
                <metaModelDirectory>${iip.metaModelDir}</metaModelDirectory>
                <outputDirectory>${iip.outputDir}</outputDirectory>
+               <allServices>true</allServices>
            </configuration>
        </plugin>
       <plugin>
