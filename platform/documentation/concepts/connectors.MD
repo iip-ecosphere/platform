@@ -67,7 +67,7 @@ In addition, a `ChannelConnector` offers the following fields:
 | outChannel |  Channel name/pattern for data read from the external source. | `""`  |
 | outChannels |  Optional multiple name/pattern for data read from the external source. If given, supersedes `outChannel`. |     |
 
-While `JsonFormatter`/`JsonParser` do not require further information, `TextLineFormatter`/`TextLineParser` must be configured with a `separator`, e.g., "," for CSV, "\t" for TSV etc. If specified, `inSerializerClass` and `outSerializerClass` contribute to the pairing of `input`, `output`, `inInterface` and `outInterface`.
+While `JsonFormatter`/`JsonParser` do not require further information, `TextLineFormatter`/`TextLineParser` must be configured with a `separator`, e.g., "," for CSV, "\t" for TSV etc. If specified, `inSerializerClass` and `outSerializerClass` contribute to the pairing of `input`, `output`, `inInterface` and `outInterface`. Channel connectors must specify their input channel (`inChannel`) and their output channel (either `outChannel` or `outChannels`).
 
 ## OPC UA connector
 
