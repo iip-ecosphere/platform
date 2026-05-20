@@ -199,6 +199,8 @@ project Connectors {
        Constraint mustHaveFormatter = machineFormatter <> null;
        Constraint inSerializerClassSize = inSerializerClass.size() > 0 implies inSerializerClass.size() == inInterface.size();
        Constraint outSerializerClassSize = outSerializerClass.size() > 0 implies outSerializerClass.size() == outInterface.size();
+       Constraint inChannelSpecified = isDefined(inChannel) and size(inChannel) > 0;
+       Constraint outChannelSpecified = (isDefined(outChannel) and size(outChannel) > 0) or (isDefined(outChannels) and outChannels.size() > 0);
    }
 
    // marker type for connectors that are not fully implemented and need some code generation
