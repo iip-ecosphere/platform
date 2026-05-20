@@ -608,4 +608,14 @@ public abstract class AbstractIvmlTests extends TestWithPlugin {
         return cfg.setProperty(PlatformInstantiator.KEY_PROPERTY_TRACING, level);
     }
 
+    /**
+     * Helper method to force creating all declared services, not focusing on specified services only.
+     * 
+     * @param cfg the configurer instance
+     * @return {@code cfg}
+     */
+    public static InstantiationConfigurer allServices(InstantiationConfigurer cfg) {
+        return cfg.setProperty("okto.easy.allServices", "true");
+    }
+
 }

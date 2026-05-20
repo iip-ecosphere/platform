@@ -41,7 +41,7 @@ public class IvmlKodexMeshTests extends AbstractIvmlTests {
         // mvn: stdout now in target/surefire-reports/<qualifiedClassName>-output.txt
         File gen = new File(TEST_BASE_FOLDER, "KodexMesh");
         PlatformInstantiatorExecutor.instantiate(
-            genApps(new TestConfigurer("KodexMesh", new File(MODEL_BASE_FOLDER, "single"), gen)));
+            genApps(allServices(new TestConfigurer("KodexMesh", new File(MODEL_BASE_FOLDER, "single"), gen))));
 
         File base = new File(gen, "ApplicationInterfaces");
         File srcMain = new File(base, "src/main");
