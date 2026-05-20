@@ -96,27 +96,12 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
         return result;
     }
     
-    /**
-     * Sets a JVM system property for execution.
-     * 
-     * @param key the key
-     * @param value the value
-     */
+    @Override
     public void setProperty(String key, String value) {
         properties.put(key, value);
     }
         
-    /**
-     * Executes the platform instantiator directly within an own JVM. This may be required if there are significant
-     * library overlaps that can also not resolved by creating a dedicated classloader.
-     * 
-     * @param loader the class loader to load the classpath resource file
-     * @param resourcesDir the optional resources directory for the instantiation
-     * @param tracingLevel the tracing level for the instantiation
-     * @param mvnArgs optional maven arguments for the instantiation (may be <b>null</b> for none)
-     * @param args the instantiator arguments
-     * @see #createEasyClassLoader(ClassLoader)
-     */
+    @Override
     public void executeAsProcess(ClassLoader loader, String resourcesDir, String tracingLevel, 
         String mvnArgs, String... args) throws ExecutionException {
         List<String> pArgs = new ArrayList<>();
@@ -171,17 +156,7 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
         FileUtils.deleteQuietly(cpFile);
     }
     
-    /**
-     * Executes the platform instantiator through an on class loader within this JVM. This may fail if there are 
-     * significant library overlaps that can also not resolved by creating a dedicated classloader.
-     * 
-     * @param loader the class loader to load the classpath resource file
-     * @param resourcesDir the optional resources directory for the instantiation
-     * @param tracingLevel the tracing level for the instantiation
-     * @param mvnArgs optional maven arguments for the instantiation (may be <b>null</b> for none)
-     * @param args the instantiator arguments
-     * @see #createEasyClassLoader(ClassLoader)
-     */
+    @Override
     public void execute(ClassLoader loader, String resourcesDir, String tracingLevel, 
         String mvnArgs, String... args) throws ExecutionException {
         if (null != tracingLevel) {
