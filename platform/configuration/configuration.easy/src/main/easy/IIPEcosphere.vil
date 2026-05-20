@@ -2149,6 +2149,11 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         collectRestTypes(type.type, result, used);
     }
 
+    @DispatchCase
+    collectRestTypes(ListType type, setOf(RecordType) result, setOf(RecordType) used) = {
+        collectRestTypes(type.type, result, used);
+    }
+
     @DispatchBasis
     addUsedType(Field field, setOf(RecordType) result, setOf(RecordType) used) = {
         collectRestTypes(field.type, result, used);

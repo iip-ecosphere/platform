@@ -372,7 +372,7 @@ public class PlatformInstantiator {
          * @return {@code true} for clean, {@code false} else
          */
         protected boolean cleanOutputFolder() {
-            return true;
+            return !ConfigurationLifecycleDescriptor.INCREMENTAL;
         }
         
         /**

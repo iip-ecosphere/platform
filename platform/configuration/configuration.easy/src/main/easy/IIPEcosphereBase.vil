@@ -188,11 +188,15 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
         maven("${path}", args, false);
     }
     
+    setOf(Application) getDefinedApplications() = {
+        Application.allInstances()->select(a|not(isInTemplate(a)));
+    }
+    
     setOf(Application) getApplications() = {
         setOf(String) selectedApplications = getProperty("iip.easy.apps", "")
             .split(",")->reject(s|s.trim().length()==0) // for "" the result will be "", prune this
             .toSet();
-        setOf(Application) applications = Application.allInstances()->select(a|not(isInTemplate(a)));
+        setOf(Application) applications = getDefinedApplications();
         if (selectedApplications.size() > 0) {
             applications = applications->select(a|selectedApplications.includes(a.id));
         }
@@ -209,12 +213,28 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
     }
     
     setOf(RecordType) getRecordTypes() = {
-        setOf(RecordType) recordTypes = RecordType.allInstances();
+        setOf(RecordType) recordTypes = {};
+        String impl = getProperty("okto.easy.allServices", "false");
+        if (impl.equalsIgnoreCase("false")) {
+            //setOf(ServiceBase) services = getServiceTypes();
+            setOf(ServiceBase) services = {};
+            setOf(Application) applications = getDefinedApplications();
+            for (Application a : applications) {
+                for (ServiceMesh m: a.services) {
+                    mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
+                    setOf(MeshElement) nodes = m.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
+                    nodes->forEach(n|services.add(n.impl));
+                }
+            }
+            services->forEach(s | collectRecordTypes(s, recordTypes));
+        } else {
+            recordTypes = RecordType.allInstances();
+        }
         recordTypes.remove(AasGenericSubmodelElementCollection);
         recordTypes.remove(AasGenericEntityType);
         recordTypes->select(r|not(isInTemplate(r)));
     }
-    
+
     setOf(ServiceBase) getServiceTypes() = {
         setOf(ServiceBase) serviceTypes = ServiceBase.allInstances();
         serviceTypes->select(s|not(isInTemplate(s)));

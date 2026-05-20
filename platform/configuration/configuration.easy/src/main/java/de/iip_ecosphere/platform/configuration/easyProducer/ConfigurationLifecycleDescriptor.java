@@ -39,6 +39,7 @@ import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
  */
 public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
 
+    public static final boolean INCREMENTAL = false;
     private static Set<String> noEasyLogging = new HashSet<>();
 
     private ManifestLoader loader;
@@ -291,6 +292,8 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
      */
     public static EasyExecutor createExecutor(EasySetup easySetup, ExecutionMode executionMode) 
         throws ModelManagementException {
+        EasyExecutor.enablePrepareArtifactsDefault(INCREMENTAL);
+        EasyExecutor.enableIncrementalInstantiation(INCREMENTAL);
         getLogger().info("Setting up configuration base: {}", easySetup.getBase());
         getLogger().info("Setting up configuration meta model: {}", easySetup.getIvmlMetaModelFolder());
         getLogger().info("Setting up configuration model name: {}", easySetup.getIvmlModelName());
