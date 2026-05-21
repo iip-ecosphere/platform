@@ -618,4 +618,14 @@ public abstract class AbstractIvmlTests extends TestWithPlugin {
         return cfg.setProperty("okto.easy.allServices", "true");
     }
 
+    /**
+     * Helper method to force creating all declared services, not focusing on specified services only.
+     * 
+     * @param cfg the configurer instance
+     * @return {@code cfg}
+     */
+    public static InstantiationConfigurer allTypes(InstantiationConfigurer cfg) {
+        return cfg.setProperty("okto.easy.allTypes", "true");
+    }
+
 }
