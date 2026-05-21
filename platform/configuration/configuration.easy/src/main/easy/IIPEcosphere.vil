@@ -523,7 +523,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         String outName = asTypeName(getTypeName(outTypeT));
         JavaPath connClassFqn = conn.class;
         clsName = connClassFqn.getName();
-        vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${clsName}-${outName}.json.tmpl", elt=no);
+        vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${clsName}_${outName}.json.tmpl", elt=no);
     }
 
     @DispatchCase
