@@ -107,6 +107,9 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
     @Parameter(property = "configuration.checkChanged", required = false, defaultValue = "false")
     private boolean checkChanged;
 
+    @Parameter(property = "configuration.allTypes", required = false, defaultValue = "false")
+    private boolean allTypes;
+
     @Parameter(property = "configuration.allServices", required = false, defaultValue = "false")
     private boolean allServices;
 
@@ -450,6 +453,9 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
         if (isModelDirectoryValid()) {
             if (enableRun(metaModelDir, modelDir, outputDir)) {
                 PlatformInstantiation executor = createExecutor();
+                if (allTypes) {
+                    executor.setProperty("okto.easy.allTypes", "true");
+                }
                 if (allServices) {
                     executor.setProperty("okto.easy.allServices", "true");
                 }

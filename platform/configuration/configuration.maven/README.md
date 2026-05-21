@@ -107,6 +107,7 @@ The goals support the following configuration settings:
   - `force` (default `true`,`-Dconfiguration.force=...`) force the execution irrespective of file dates and `-Dunpack.force`
   - `asProcess` (default `true`) executes the platform instantiator in an own JVM process rather than within the Maven process. Although there are measures to separate the class loading of EASy-Producer/the configuration module from the caller, it seems that Maven loads some Google modules rather deeply into the JVM, which then collide with required xText dependencies. Thus, an execution as process is more bullet-proof.
   - `allServices` (default `false`) whether all services shall be considered for instantiation rather than those that are specified as part of apps and their service meshes
+  - `allTypes` (default `false`) whether all types shall be considered for instantiation rather than those that are specified as part of apps and their service meshes, may take precedence over `allServices`
   
 All goals take over the maven offline mode and pass it on to the instantiation for further consideration in maven sub-calls.
   
