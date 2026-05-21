@@ -186,6 +186,7 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[]
             for (String out : getOutputChannels()) {
                 try {
                     waitForCompletion(client.subscribe(out, MqttQoS.AT_LEAST_ONCE.value()));
+                    LoggerFactory.getLogger(getClass()).info("Subscribed to: {}", out);
                 } catch (MqttException e) {
                     throw new IOException(e);
                 }
