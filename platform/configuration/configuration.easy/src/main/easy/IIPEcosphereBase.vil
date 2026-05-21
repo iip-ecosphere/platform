@@ -214,18 +214,9 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
     
     setOf(RecordType) getRecordTypes() = {
         setOf(RecordType) recordTypes = {};
-        String impl = getProperty("okto.easy.allServices", "false");
+        String impl = getProperty("okto.easy.allTypes", "false");
         if (impl.equalsIgnoreCase("false")) {
-            //setOf(ServiceBase) services = getServiceTypes();
-            setOf(ServiceBase) services = {};
-            setOf(Application) applications = getDefinedApplications();
-            for (Application a : applications) {
-                for (ServiceMesh m: a.services) {
-                    mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
-                    setOf(MeshElement) nodes = m.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
-                    nodes->forEach(n|services.add(n.impl));
-                }
-            }
+            setOf(ServiceBase) services = getServiceTypes();
             services->forEach(s | collectRecordTypes(s, recordTypes));
         } else {
             recordTypes = RecordType.allInstances();
@@ -236,7 +227,20 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
     }
 
     setOf(ServiceBase) getServiceTypes() = {
-        setOf(ServiceBase) serviceTypes = ServiceBase.allInstances();
+        String impl = getProperty("okto.easy.allServices", "false");
+        setOf(ServiceBase) serviceTypes = {};
+        if (impl.equalsIgnoreCase("false")) {
+            setOf(Application) applications = getDefinedApplications();
+            for (Application a : applications) {
+                for (ServiceMesh m: a.services) {
+                    mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
+                    setOf(MeshElement) nodes = m.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
+                    nodes->forEach(n|serviceTypes.add(n.impl));
+                }
+            }
+        } else {
+            serviceTypes = ServiceBase.allInstances();
+        }
         serviceTypes->select(s|not(isInTemplate(s)));
     }
     
