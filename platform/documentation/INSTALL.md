@@ -115,7 +115,7 @@ Please note that accessing, starting, and stopping containers or services requir
 This was a rather simple scenario involving one combined server and compute node. The more nodes are involved, the less this manual approach is feasible. For this purpose, the platform supports so-called deployment plans, which assign services from artifacts to resources. A deployment plan can be set into force with the command `deploy <path/URI>` and stopped with `undeploy <path/URI>`. These are also the basic management operations of the platform user interface. You will find more information on the deployment plans in the documentation of the [CLI](../platform/README.md).
 
 ### Fruther containers
-Besides the platform demonstration containers described above, there is also the [oktoflow devellopment container](devel/dev-container.md) that contains a platform instance and integrated development environments.
+Besides the platform demonstration containers described above, there is also the [oktoflow development container](devel/dev-container.md) that contains a platform instance and integrated development environments.
 
 ## Further information
 For further information on using the individual parts, please consult the platform [Handbook](../documentation/PlatformHandbook.pdf) or the [Glossary](GLOSSARY.md).
