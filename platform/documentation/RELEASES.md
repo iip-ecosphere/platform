@@ -4,21 +4,24 @@
 
 In progress:
 
+* [#185](https://github.com/iip-ecosphere/platform/issues/185): Performance improvements
+* [#180](https://github.com/iip-ecosphere/platform/issues/180): Add application templates to UI
+* [#189](https://github.com/iip-ecosphere/platform/issues/183): Enable AAS metamodel v3 in mgmt UI
+* [#189](https://github.com/iip-ecosphere/platform/issues/188): On-demand IVML imports
 * [#189](https://github.com/iip-ecosphere/platform/issues/179): Clean up container VTL scripts
 * [#189](https://github.com/iip-ecosphere/platform/issues/182): Try optimizing container sizes
-* [#189](https://github.com/iip-ecosphere/platform/issues/183): Enable AAS metamodel v3 in mgmt UI
 * [#189](https://github.com/iip-ecosphere/platform/issues/187): Integrate expression editor
-* [#189](https://github.com/iip-ecosphere/platform/issues/188): On-demand IVML imports
-* [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 * [#122](https://github.com/iip-ecosphere/platform/issues/122): Transparent encryption, RBAC on AAS (incl. UI authentication)
-* [#185](https://github.com/iip-ecosphere/platform/issues/185): Performance improvements
 * [#189](https://github.com/iip-ecosphere/platform/issues/184): Support venv on mvn Python tooling
-* [#180](https://github.com/iip-ecosphere/platform/issues/180): Add application templates
+* [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 
 Improvements:
 * Determined start sequence for standalone apps/tests: sinks, transformers/probes, sources
 * Improved type display consistency in managementUI
 * Support for Linux symlinks in file paths, in particular for the configuration models
+* [#190](https://github.com/iip-ecosphere/platform/issues/190): Integration of oktoflo2grafana
+* [#193](https://github.com/iip-ecosphere/platform/issues/193): Improve OPC integration
+* [#195](https://github.com/iip-ecosphere/platform/issues/195): Templates contain wrong file names for connectors, issue persists for 0versions .7.1-SNAPSHOT, 0.8.0
 
 Changes:
 * In particular if the start sequence state above is activated, source services shall not ingest data before/outside the `RUNNING` state 
