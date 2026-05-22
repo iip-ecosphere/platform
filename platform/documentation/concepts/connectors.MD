@@ -240,13 +240,17 @@ To ease the application, pre-defined `FileConnector` types are `JsonFileConnecto
 
 ## MQTTv3 connector
 
-The `MQTTv3` connector is a channel connector with no further fields. Formatters and parsers can be applied as described for the `FileConnector`. This connector supports `USERNAME` authentication tokens and TLS encryption. 
+The `MQTTv3` connector is a channel connector with no further fields. Channel names correspond to the channel/topic names on the MQTT broker, hierarchical names are separated by "/".
+
+Formatters and parsers can be applied as described for the `FileConnector`. This connector supports `USERNAME` authentication tokens and TLS encryption. 
 
 The `MipMqttV3Connector` is an example of a pre-configured connector with fixed input/output types. The connector is part of oktoflow's default library.
 
 ## MQTTv5 connector
 
-The `MQTTv5` connector is a channel connector with no further fields. Formatters and parsers can be applied as described for the `FileConnector`. This connector supports `USERNAME` authentication tokens and TLS encryption. 
+The `MQTTv5` connector is a channel connector with no further fields. Channel names correspond to the channel/topic names on the MQTT broker, hierarchical names are separated by "/".
+
+Formatters and parsers can be applied as described for the `FileConnector`. This connector supports `USERNAME` authentication tokens and TLS encryption. 
 
 ## MQTT connector
 
