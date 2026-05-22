@@ -62,6 +62,9 @@ project Applications {
             Boolean createContainer = false;
             Boolean debug = false;
             Boolean withDocs = false;
+            Boolean allTypes = false;
+            Boolean allServices = false;
+            Boolean buildIncremental = false;
             String cmdArg; // for now, comma separated
             setOf(refTo(Server)) servers = {}; // additional server instances to be started
             setOf(AppPackagingSchema) packaging = { AppPackagingSchema::SpringFat };

@@ -46,6 +46,7 @@ public class PlatformInstantiator {
 
     public static final String KEY_PROPERTY_TRACING = "iip.easy.tracing";
     public static final String KEY_PROPERTY_MVNARGS = "iip.easy.mvnArgs";
+    public static final String KEY_PROPERTY_INCREMENTAL = "easy.vil.incremental"; // maps to EASy-Producer
     public static final String KEY_PROPERTY_APPS = "iip.easy.apps";
     public static final String KEY_PROPERTY_TEST = "iip.tests";
     private static final String ARG_PROPS_START = "props>";

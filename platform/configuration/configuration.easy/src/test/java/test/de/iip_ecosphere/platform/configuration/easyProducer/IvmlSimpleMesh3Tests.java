@@ -40,7 +40,8 @@ public class IvmlSimpleMesh3Tests extends AbstractIvmlTests {
         // mvn: stdout now in target/surefire-reports/<qualifiedClassName>-output.txt
         File gen = new File(TEST_BASE_FOLDER, "SimpleMesh3");
         PlatformInstantiatorExecutor.instantiate(
-            genApps(new TestConfigurer("PlatformConfiguration", new File(MODEL_BASE_FOLDER, "simpleMesh3"), gen)));
+            incremental(
+                genApps(new TestConfigurer("PlatformConfiguration", new File(MODEL_BASE_FOLDER, "simpleMesh3"), gen))));
         assertAllFiles(gen);
         assertTemplateZip(gen, "impl.SimpleMeshTestingApp3");
     }

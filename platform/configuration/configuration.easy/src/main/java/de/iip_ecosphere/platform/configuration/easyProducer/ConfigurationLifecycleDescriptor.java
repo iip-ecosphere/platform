@@ -19,6 +19,7 @@ import java.util.Set;
 
 import de.iip_ecosphere.platform.configuration.cfg.StatusCache;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.uni_hildesheim.sse.easy.loader.ManifestLoader;
@@ -39,7 +40,8 @@ import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
  */
 public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
 
-    public static final boolean INCREMENTAL = false;
+    public static final boolean INCREMENTAL 
+        = OsUtils.getBooleanProperty(PlatformInstantiator.KEY_PROPERTY_INCREMENTAL, false);
     private static Set<String> noEasyLogging = new HashSet<>();
 
     private ManifestLoader loader;

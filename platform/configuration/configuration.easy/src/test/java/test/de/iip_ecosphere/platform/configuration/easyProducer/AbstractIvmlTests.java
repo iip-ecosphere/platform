@@ -627,5 +627,15 @@ public abstract class AbstractIvmlTests extends TestWithPlugin {
     public static InstantiationConfigurer allTypes(InstantiationConfigurer cfg) {
         return cfg.setProperty("okto.easy.allTypes", "true");
     }
+    
+    /**
+     * Helper method to enable incremental building.
+     * 
+     * @param cfg the configurer instance
+     * @return {@code cfg}
+     */
+    public static InstantiationConfigurer incremental(InstantiationConfigurer cfg) {
+        return cfg.setProperty(PlatformInstantiator.KEY_PROPERTY_INCREMENTAL, "true");
+    }
 
 }

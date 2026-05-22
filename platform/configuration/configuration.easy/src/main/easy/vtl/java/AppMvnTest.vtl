@@ -5,9 +5,9 @@ import MeshBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(AssemblyInfo) assemblies, sequenceOf(String) oktoPlugins, Boolean springPackaging=true, String groupId="", Boolean withDocs=true) {
+template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(AssemblyInfo) assemblies, sequenceOf(String) oktoPlugins, Boolean springPackaging=true, String groupId="", Boolean withDocs=true, Boolean allTypes=false, Boolean allServices=false, Boolean incremental=false) {
 
-    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(AssemblyInfo) assemblies, sequenceOf(String) oktoPlugins, Boolean springPackaging=true, String groupId="", Boolean withDocs=true) {
+    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, sequenceOf(MeshElement) nodes, String appName, String appVersion, String appDescription, Boolean tests, setOf(AssemblyInfo) assemblies, sequenceOf(String) oktoPlugins, Boolean springPackaging=true, String groupId="", Boolean withDocs=true, Boolean allTypes=false, Boolean allServices=false, Boolean incremental=false) {
         String iipGroup = "de.iip-ecosphere.platform";
         String gId = groupId;
         if (length(gId) == 0) {
@@ -43,9 +43,11 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         XmlElement profile = new XmlElement(profiles, "profile");
         new XmlElement(profile, "id", "App");
         new XmlElement(new XmlElement(profile, "activation"), "activeByDefault", "true");
-        if (not(withDocs)) {
-            new XmlElement(new XmlElement(profile, "properties"), "maven.javadoc.skip", "true");
-        }
+        XmlElement profileProperties = new XmlElement(profile, "properties");
+        new XmlElement(profileProperties, "maven.javadoc.skip", not(withDocs));
+        new XmlElement(profileProperties, "configuration.allServices", allServices);
+        new XmlElement(profileProperties, "configuration.allTypes", allTypes);
+        new XmlElement(profileProperties, "configuration.incremental", incremental);
         
         XmlElement dep = createDependencies(profile);
         
