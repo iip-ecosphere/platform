@@ -313,6 +313,8 @@ public class AdsConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
             throw new IOException("Not implemented " + qName); // see @MachineConnector
         }
         
+        // get with types
+        
         @Override
         public Object get(String qName) throws IOException {
             throw new IOException("Shall not be called"); // see @MachineConnector
@@ -357,6 +359,8 @@ public class AdsConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
         public String getString(String qName) throws IOException {
             return comm.readStringByName(basePath + qName);
         }
+        
+        // set with types
 
         @Override
         public void set(String qName, Object value) throws IOException {
@@ -398,6 +402,49 @@ public class AdsConnector<CO, CI> extends AbstractConnector<Object, Object, CO, 
             comm.writeStringByName(basePath + qName, value);
         }
 
+
+        // probably only those are needed; lifetimes ignored, no caching here
+        
+        @Override
+        public int getInteger(String qName, int lifetime) throws IOException {
+            return comm.readDIntByName(basePath + qName);
+        }
+
+        @Override
+        public int getInt(String qName, int lifetime) throws IOException {
+            return comm.readDIntByName(basePath + qName);
+        }
+
+        @Override
+        public float getFloat(String qName, int lifetime) throws IOException {
+            return comm.readRealByName(basePath + qName);
+        }
+
+        @Override
+        public double getDouble(String qName, int lifetime) throws IOException {
+            return comm.readLRealByName(basePath + qName);
+        }
+
+        @Override
+        public long getLong(String qName, int lifetime) throws IOException {
+            return comm.readLIntByName(basePath + qName);
+        }
+
+        @Override
+        public short getShort(String qName, int lifetime) throws IOException {
+            return comm.readIntByName(basePath + qName);
+        }
+
+        @Override
+        public byte getByte(String qName, int lifetime) throws IOException {
+            return comm.readSIntByName(basePath + qName);
+        }
+
+        @Override
+        public String getString(String qName, int lifetime) throws IOException {
+            return comm.readStringByName(basePath + qName);
+        }
+        
         // checkstyle: resume exception type check
 
         @SuppressWarnings("unchecked")
