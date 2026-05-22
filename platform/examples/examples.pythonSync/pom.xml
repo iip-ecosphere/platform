@@ -244,6 +244,7 @@
 	                <outputDirectory>${iip.gen}</outputDirectory>
                     <metaModelDirectory>${project.build.directory}/easy</metaModelDirectory>
                     <modelDirectory>src/main/easy</modelDirectory>
+                    <incremental>true</incremental>
 	            </configuration>
 	        </plugin>
           </plugins>
