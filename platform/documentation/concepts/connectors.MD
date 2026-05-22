@@ -53,6 +53,10 @@ Basically, a 'Connector' supports the following fields (in addition to those of 
 | dataTimeDiffProvider |  Optional plugins to adjust data ingestion time differences based on last data points data. |     |
 | deviceServiceKey | Optional name for service name to realize ad-hoc connectivity via the device AAS, may, e.g., override host and port. |     |
 
+The basic wiring of a connector is:
+* outInterface -> output -> app
+* inInterface <- input <- app
+
 Entries in `input` and `output` are matched pairwise with the corresponding entries in `inInterface` and `outInterface` as well as `inAdapterClass` and `outAdapterClass`. Typically, the number of matching tuples is determined by `inInterface` and `outInterface`. The remaining entries in `input` and `output` are treated separately, e.g., as backwards/broadcasting input (for input handlers / connector triggers).
 
 In addition, a `ChannelConnector` offers the following fields:
@@ -66,6 +70,10 @@ In addition, a `ChannelConnector` offers the following fields:
 | inChannel |  Channel name/pattern for data written to the external sink. | `""` |
 | outChannel |  Channel name/pattern for data read from the external source. | `""`  |
 | outChannels |  Optional multiple name/pattern for data read from the external source. If given, supersedes `outChannel`. |     |
+
+The basic wiring of a channel connector is:
+* outInterface -> outChannel(s) -> output -> app
+* inInterface <- inChannel <- input <- app
 
 While `JsonFormatter`/`JsonParser` do not require further information, `TextLineFormatter`/`TextLineParser` must be configured with a `separator`, e.g., "," for CSV, "\t" for TSV etc. If specified, `inSerializerClass` and `outSerializerClass` contribute to the pairing of `input`, `output`, `inInterface` and `outInterface`. Channel connectors must specify their input channel (`inChannel`) and their output channel (either `outChannel` or `outChannels`).
 
