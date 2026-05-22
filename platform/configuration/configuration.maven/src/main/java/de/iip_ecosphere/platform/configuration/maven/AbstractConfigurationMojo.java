@@ -113,6 +113,9 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
     @Parameter(property = "configuration.allServices", required = false, defaultValue = "false")
     private boolean allServices;
 
+    @Parameter(property = "configuration.incremental", required = false, defaultValue = "false")
+    private boolean incremental;
+
     @Parameter(property = "configuration.changeCheckArtifacts", required = false, defaultValue = "")
     private String changeCheckArtifacts;
 
@@ -458,6 +461,9 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
                 }
                 if (allServices) {
                     executor.setProperty("okto.easy.allServices", "true");
+                }
+                if (incremental) {
+                    executor.setProperty("easy.vil.incremental", "true");
                 }
                 try {
                     if (asProcess) {
