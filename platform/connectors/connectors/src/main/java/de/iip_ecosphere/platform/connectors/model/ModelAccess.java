@@ -113,7 +113,7 @@ public interface ModelAccess {
     
     // map all methods of model input converter, naming schema 
     //  <Type-as-InputConverter> get<Type-as-InputConverter>(String name, ...) with additional params as in 
-    //  the converter
+    //  the converter; may be, we can also get rid off the operations with no lifetime paramater
 
     /**
      * Returns a byte property value.
@@ -125,6 +125,19 @@ public interface ModelAccess {
      */
     public default byte getByte(String qName) throws IOException {
         return getInputConverter().toByte(get(qName));
+    }
+    
+    /**
+     * Returns a byte property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default byte getByte(String qName, int lifetime) throws IOException {
+        return getInputConverter().toByte(get(qName, lifetime));
     }
 
     /**
@@ -143,12 +156,38 @@ public interface ModelAccess {
      * Returns an int property value.
      * 
      * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default int getInteger(String qName, int lifetime) throws IOException {
+        return getInputConverter().toInteger(get(qName, lifetime));
+    }
+
+    /**
+     * Returns an int property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
      * @return the property value
      * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
      */
     public default int getInt(String qName) throws IOException {
         return getInputConverter().toInteger(get(qName));
+    }
+
+    /**
+     * Returns an int property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default int getInt(String qName, int lifetime) throws IOException {
+        return getInputConverter().toInteger(get(qName, lifetime));
     }
 
     /**
@@ -164,6 +203,19 @@ public interface ModelAccess {
     }
 
     /**
+     * Returns a long property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default long getLong(String qName, int lifetime) throws IOException {
+        return getInputConverter().toLong(get(qName, lifetime));
+    }
+
+    /**
      * Returns a short property value.
      * 
      * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
@@ -173,6 +225,19 @@ public interface ModelAccess {
      */
     public default short getShort(String qName) throws IOException {
         return getInputConverter().toShort(get(qName));
+    }
+
+    /**
+     * Returns a short property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default short getShort(String qName, int lifetime) throws IOException {
+        return getInputConverter().toShort(get(qName, lifetime));
     }
 
     /**
@@ -188,6 +253,19 @@ public interface ModelAccess {
     }
 
     /**
+     * Returns a byte property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default String getString(String qName, int lifetime) throws IOException {
+        return getInputConverter().toString(get(qName, lifetime));
+    }
+    
+    /**
      * Returns a double property value.
      * 
      * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
@@ -197,6 +275,19 @@ public interface ModelAccess {
      */
     public default double getDouble(String qName) throws IOException {
         return getInputConverter().toDouble(get(qName));
+    }
+
+    /**
+     * Returns a double property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default double getDouble(String qName, int lifetime) throws IOException {
+        return getInputConverter().toDouble(get(qName, lifetime));
     }
 
     /**
@@ -212,6 +303,19 @@ public interface ModelAccess {
     }
 
     /**
+     * Returns a float property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default float getFloat(String qName, int lifetime) throws IOException {
+        return getInputConverter().toFloat(get(qName, lifetime));
+    }
+
+    /**
      * Returns a big integer property value.
      * 
      * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
@@ -222,7 +326,20 @@ public interface ModelAccess {
     public default BigInteger getBigInteger(String qName) throws IOException {
         return getInputConverter().toBigInteger(get(qName));
     }
-    
+
+    /**
+     * Returns a big integer property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default BigInteger getBigInteger(String qName, int lifetime) throws IOException {
+        return getInputConverter().toBigInteger(get(qName, lifetime));
+    }
+
     /**
      * Returns a big decimal property value.
      * 
@@ -236,6 +353,19 @@ public interface ModelAccess {
     }
 
     /**
+     * Returns a big decimal property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default BigDecimal getBigDecimal(String qName, int lifetime) throws IOException {
+        return getInputConverter().toBigDecimal(get(qName, lifetime));
+    }
+
+    /**
      * Returns a byte property value.
      * 
      * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
@@ -245,6 +375,32 @@ public interface ModelAccess {
      */
     public default boolean getBoolean(String qName) throws IOException {
         return getInputConverter().toBoolean(get(qName));
+    }
+
+    /**
+     * Returns a byte property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default boolean getBoolean(String qName, int lifetime) throws IOException {
+        return getInputConverter().toBoolean(get(qName, lifetime));
+    }
+
+    /**
+     * Returns a int array property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default int[] getIntegerArray(String qName, int lifetime) throws IOException {
+        return getInputConverter().toIntegerArray(get(qName, lifetime));
     }
 
     /**
@@ -263,6 +419,19 @@ public interface ModelAccess {
      * Returns a String array property value.
      * 
      * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default String[] getStringArray(String qName, int lifetime) throws IOException {
+        return getInputConverter().toStringArray(get(qName, lifetime));
+    }
+
+    /**
+     * Returns a String array property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
      * @return the property value
      * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
      * {@link MachineConnector#supportsModelProperties()} is {@code false})
@@ -270,7 +439,7 @@ public interface ModelAccess {
     public default String[] getStringArray(String qName) throws IOException {
         return getInputConverter().toStringArray(get(qName));
     }
-    
+
     /**
      * Returns a double array property value.
      * 
@@ -282,7 +451,20 @@ public interface ModelAccess {
     public default double[] getDoubleArray(String qName) throws IOException {
         return getInputConverter().toDoubleArray(get(qName));
     }
-    
+
+    /**
+     * Returns a double array property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default double[] getDoubleArray(String qName, int lifetime) throws IOException {
+        return getInputConverter().toDoubleArray(get(qName, lifetime));
+    }
+
     /**
      * Returns a byte array property value.
      * 
@@ -293,6 +475,19 @@ public interface ModelAccess {
      */
     public default byte[] getByteArray(String qName) throws IOException {
         return getInputConverter().toByteArray(get(qName));
+    }
+
+    /**
+     * Returns a byte array property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default byte[] getByteArray(String qName, int lifetime) throws IOException {
+        return getInputConverter().toByteArray(get(qName, lifetime));
     }
 
     /**
@@ -309,6 +504,20 @@ public interface ModelAccess {
     }
 
     /**
+     * Returns a date property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @param format the target date format (see {@link TimeUtils})
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default Date getDate(String qName, int lifetime, String format) throws IOException {
+        return getInputConverter().toDate(get(qName, lifetime), format);
+    }
+
+    /**
      * Returns a local date time property value.
      * 
      * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
@@ -319,6 +528,20 @@ public interface ModelAccess {
      */
     public default LocalDateTime getLocalDateTime(String qName, String format) throws IOException {
         return getInputConverter().toLocalDateTime(get(qName), format);
+    }
+
+    /**
+     * Returns a local date time property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @param format the target date format (see {@link TimeUtils})
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default LocalDateTime getLocalDateTime(String qName, int lifetime, String format) throws IOException {
+        return getInputConverter().toLocalDateTime(get(qName, lifetime), format);
     }
 
     /**
@@ -336,6 +559,22 @@ public interface ModelAccess {
     }
 
     /**
+     * Returns an enum property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @param format the target date format (see {@link TimeUtils})
+     * @param enumType enumeration target type
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default <E extends Enum<E> & IipEnum> E getEnum(String qName, int lifetime, Class<E> enumType) 
+        throws IOException {
+        return getInputConverter().toEnum(get(qName, lifetime), enumType);
+    }
+
+    /**
      * Returns a list property value.
      * 
      * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
@@ -346,6 +585,20 @@ public interface ModelAccess {
      */
     public default <E> List<E> getList(String qName, Class<E> eltCls) throws IOException {
         return getInputConverter().toList(get(qName), eltCls);
+    }
+
+    /**
+     * Returns a list property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @param eltCls the element type class
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default <E> List<E> getList(String qName, int lifetime, Class<E> eltCls) throws IOException {
+        return getInputConverter().toList(get(qName, lifetime), eltCls);
     }
 
     /**
@@ -360,7 +613,22 @@ public interface ModelAccess {
     public default <E> List<QualifiedElement<E>> getElementList(String qName, Class<E> eltCls) throws IOException {
         return getInputConverter().toElementList(get(qName), eltCls);
     }
-    
+
+    /**
+     * Returns an element list property value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @param eltCls the element type class
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default <E> List<QualifiedElement<E>> getElementList(String qName, int lifetime, Class<E> eltCls) 
+        throws IOException {
+        return getInputConverter().toElementList(get(qName, lifetime), eltCls);
+    }
+
     /**
      * Returns an object value.
      * 
@@ -374,6 +642,19 @@ public interface ModelAccess {
     }
     
     /**
+     * Returns an object value.
+     * 
+     * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @return the property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default Object getObject(String qName, int lifetime) throws IOException {
+        return getInputConverter().toObject(get(qName, lifetime));
+    }
+
+    /**
      * Returns a long index/timestamp property value.
      * 
      * @param qName the qualified name of the index/timestamp property (composed using {@link #getQSeparator()}).
@@ -383,6 +664,19 @@ public interface ModelAccess {
      */
     public default long getLongIndex(String qName) throws IOException {
         return getInputConverter().toLongIndex(get(qName));
+    }
+
+    /**
+     * Returns a long index/timestamp property value.
+     * 
+     * @param qName the qualified name of the index/timestamp property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @return the index/timestamp property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default long getLongIndex(String qName, int lifetime) throws IOException {
+        return getInputConverter().toLongIndex(get(qName, lifetime));
     }
 
     /**
@@ -396,7 +690,20 @@ public interface ModelAccess {
     public default float getFloatIndex(String qName) throws IOException {
         return getInputConverter().toFloatIndex(get(qName));
     }
-    
+
+    /**
+     * Returns a float index/timestamp property value.
+     * 
+     * @param qName the qualified name of the index/timestamp property (composed using {@link #getQSeparator()}).
+     * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
+     * @return the index/timestamp property value
+     * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
+     * {@link MachineConnector#supportsModelProperties()} is {@code false})
+     */
+    public default float getFloatIndex(String qName, int lifetime) throws IOException {
+        return getInputConverter().toFloatIndex(get(qName, lifetime));
+    }
+
     // Input converter end
     
     /**
