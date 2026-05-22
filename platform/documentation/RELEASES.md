@@ -1,7 +1,5 @@
 # oktoflow platform: Releases
 
-### Already For the next release
-
 In progress:
 
 * [#185](https://github.com/iip-ecosphere/platform/issues/185): Performance improvements
@@ -14,6 +12,8 @@ In progress:
 * [#122](https://github.com/iip-ecosphere/platform/issues/122): Transparent encryption, RBAC on AAS (incl. UI authentication)
 * [#189](https://github.com/iip-ecosphere/platform/issues/184): Support venv on mvn Python tooling
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
+
+### Version 0.8.1 (Fall '26)
 
 Improvements:
 * Determined start sequence for standalone apps/tests: sinks, transformers/probes, sources
