@@ -21,7 +21,7 @@ Improvements:
 * Support for Linux symlinks in file paths, in particular for the configuration models
 * [#190](https://github.com/iip-ecosphere/platform/issues/190): Integration of oktoflo2grafana
 * [#193](https://github.com/iip-ecosphere/platform/issues/193): Improve OPC integration
-* [#195](https://github.com/iip-ecosphere/platform/issues/195): Templates contain wrong file names for connectors, issue persists for 0versions .7.1-SNAPSHOT, 0.8.0
+* [#195](https://github.com/iip-ecosphere/platform/issues/195): Templates contain wrong file names for connectors, issue persists for versions 0.7.1-SNAPSHOT, 0.8.0
 
 Changes:
 * In particular if the start sequence state above is activated, source services shall not ingest data before/outside the `RUNNING` state 
