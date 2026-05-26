@@ -95,5 +95,6 @@ The plugin supports the following configuration settings:
   - `invoker.debug` pass through Maven debug flag (default `false`)
   - `configTracingLevel` (default unset, user-property `configuration.tracingLevel`) passes on the configuration tracing level
   - `configSkipMapDashboard` (default unset, user-property `configuration.skipMapDashboard`) passes on whether the dashboard mapper shall be skipped
+  - `omitProperties` (default `false`, user property `omitProperties`) omit most of the maven system settings, let the invoked POM decide
   
 The plugin takes over the system properties of the original request, in particular `-Dunpack.force` and passes them to the invoked maven processes.

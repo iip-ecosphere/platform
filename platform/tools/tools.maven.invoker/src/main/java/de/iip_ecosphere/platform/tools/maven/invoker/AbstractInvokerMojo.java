@@ -151,6 +151,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
     @Parameter(property = "maven.javadoc.skip", defaultValue = "false") 
     private boolean mavenJavadocSkip;
 
+    @Parameter(property = "omitProperties", defaultValue = "false") 
+    private boolean omitProperties;
+
     @Parameter(property = "maven.assembly.skip", defaultValue = "false") 
     private boolean mavenAssemblySkip;
 
@@ -278,38 +281,40 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
                 }
             }
         }
-        boolean value = (!enableJavadoc || mavenJavadocSkip);
-        request.addShellEnvironment("MAVEN_ARGS", "-Dmaven.javadoc.skip=" + value); // pass on 2 mvn levels
-        sysProperties.put("maven.javadoc.skip", String.valueOf(value));
-        sysProperties.put("assembly.skipAssembly", String.valueOf(mavenAssemblySkip));
-        sysProperties.put("maven.source.skip", String.valueOf(mavenSourceSkip));
-        if (unpackForce && !sysProperties.containsKey("unpack.force")) {
-            sysProperties.put("unpack.force", "true");
+        if (!omitProperties) {
+            boolean value = (!enableJavadoc || mavenJavadocSkip);
+            request.addShellEnvironment("MAVEN_ARGS", "-Dmaven.javadoc.skip=" + value); // pass on 2 mvn levels
+            sysProperties.put("maven.javadoc.skip", String.valueOf(value));
+            sysProperties.put("assembly.skipAssembly", String.valueOf(mavenAssemblySkip));
+            sysProperties.put("maven.source.skip", String.valueOf(mavenSourceSkip));
+            if (unpackForce && !sysProperties.containsKey("unpack.force")) {
+                sysProperties.put("unpack.force", "true");
+            }
+            if (configForce && !sysProperties.containsKey("configuration.force")) {
+                sysProperties.put("configuration.force", "true");
+            }
+            value = (disableJava || disableBuild);
+            sysProperties.put("maven.main.skip", String.valueOf(value));
+            sysProperties.put("maven.javadoc.skip", String.valueOf(value));
+            if (null == skipTests) {
+                value = mavenTestSkip;
+            } else {
+                value = Boolean.valueOf(skipTests);
+            }
+            value = value || disableJava || disableBuild || disableJavaTests;
+            sysProperties.put("maven.test.skip", String.valueOf(value));
+            sysProperties.put("skipTests", String.valueOf(value)); // maven.test.skip might be sufficient
+            setAsProperty(sysProperties, "maven.build.cache.enabled", mavenBuildCacheEnabled);
+            setAsProperty(sysProperties, "easy.docker.failOnError", easyDockerFailOnError);
+            setAsProperty(sysProperties, "easy.docker.skip", easyDockerSkip);
+            setAsProperty(sysProperties, "configuration.tracingLevel", configTracingLevel);
+            setAsProperty(sysProperties, "configuration.skipMapDashboard", configSkipMapDashboard);
+            value = (disablePython || disableBuild);
+            sysProperties.put("python-compile.skip", String.valueOf(value));
+            sysProperties.put("python-test.skip", String.valueOf(value));
+            value = disablePythonTests;
+            sysProperties.put("python-test.skip", String.valueOf(value));
         }
-        if (configForce && !sysProperties.containsKey("configuration.force")) {
-            sysProperties.put("configuration.force", "true");
-        }
-        value = (disableJava || disableBuild);
-        sysProperties.put("maven.main.skip", String.valueOf(value));
-        sysProperties.put("maven.javadoc.skip", String.valueOf(value));
-        if (null == skipTests) {
-            value = mavenTestSkip;
-        } else {
-            value = Boolean.valueOf(skipTests);
-        }
-        value = value || disableJava || disableBuild || disableJavaTests;
-        sysProperties.put("maven.test.skip", String.valueOf(value));
-        sysProperties.put("skipTests", String.valueOf(value)); // maven.test.skip might be sufficient
-        setAsProperty(sysProperties, "maven.build.cache.enabled", mavenBuildCacheEnabled);
-        setAsProperty(sysProperties, "easy.docker.failOnError", easyDockerFailOnError);
-        setAsProperty(sysProperties, "easy.docker.skip", easyDockerSkip);
-        setAsProperty(sysProperties, "configuration.tracingLevel", configTracingLevel);
-        setAsProperty(sysProperties, "configuration.skipMapDashboard", configSkipMapDashboard);
-        value = (disablePython || disableBuild);
-        sysProperties.put("python-compile.skip", String.valueOf(value));
-        sysProperties.put("python-test.skip", String.valueOf(value));
-        value = disablePythonTests;
-        sysProperties.put("python-test.skip", String.valueOf(value));
         if (buildId != null && buildId.length() > 0) { // CI defined build id for time collector
             sysProperties.put("iip.ciBuildId", buildId);
         }
