@@ -126,6 +126,9 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
     @Parameter(required = false, defaultValue = "true")
     private boolean asProcess;
 
+    @Parameter(property = "configuration.skip", required = false, defaultValue = "false")
+    private boolean skip;
+
     /**
      * The home directory of the Maven installation to use for the forked builds. Defaults to the current Maven
      * installation.
@@ -443,6 +446,10 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if (skip) {
+            getLog().info("Execution skipped");
+            return;
+        }
         MavenLogger.install(getLog());
         adjustMavenHome();
         String resourcesDir = validateDirectory(makeAbsolute(getResourcesDirectory()));
