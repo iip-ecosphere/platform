@@ -109,6 +109,7 @@ The goals support the following configuration settings:
   - `allServices` (default `false`, `-Dconfiguration.allTypes=...`) whether all services shall be considered for instantiation rather than those that are specified as part of apps and their service meshes
   - `allTypes` (default `false`, `-Dconfiguration.allServices=...`) whether all types shall be considered for instantiation rather than those that are specified as part of apps and their service meshes, may take precedence over `allServices`
   - `incremental` (default `false`, `-Dconfiguration.incremental=...`) whether incremental builds rather than full builds with cleanup shall be performed
+  - `skip` (default `false``, `-Dconfiguration.skip=...`) whether the configuration build plugin shall be executed/skipped
   
 All goals take over the maven offline mode and pass it on to the instantiation for further consideration in maven sub-calls.
   
