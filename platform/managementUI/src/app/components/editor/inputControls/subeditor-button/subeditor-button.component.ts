@@ -38,15 +38,18 @@ export class SubeditorButtonComponent extends Utils implements OnInit {
   public openSubeditor(type: editorInput, selectedType: Resource | undefined) {
     if (this.meta) {
       type.type = getFieldType(type.type, selectedType);
+      const typeMeta = DataUtils.getProperty(this.meta.value!, DataUtils.stripGenericType(type.type));
+      if (this.ivmlFormatter.isAbstract(typeMeta) /*&& !this.ivmlFormatter.isMetaRef(typeMeta)*/) {
+          const refinedTypes = DataUtils.getRefinedTypes(typeMeta.idShort, this.meta);
+          if (refinedTypes.length > 0) {
+            type.type = refinedTypes[0].idShort ?? type.type;
+          }
+      }
       let uiGroups = this.ivmlFormatter.calculateUiGroupsInf(type, this.meta);
       let parts = this.ivmlFormatter.partitionUiGroups(uiGroups);
       let dialogRef = this.subDialog.open(EditorComponent, this.configureDialog('80%', '80%', parts));
       let component = dialogRef.componentInstance;
-      if (this.refinedTypes[0]) {
-        component.refinedTypes = this.refinedTypes;
-      } else {
-        component.type = type;
-      }
+      component.type = type;
       component.metaBackup = this.meta;
       component.dialog = dialogRef;
       component.topLevel = false;
@@ -61,9 +64,8 @@ export class SubeditorButtonComponent extends Utils implements OnInit {
         this.errorMsg = 'ERROR: Metadata not found in Configuration'
         return true;
       } else {
-        const Abstract = DataUtils.getProperty(typeMeta.value, MT_metaAbstract);
-        if(Abstract?.value && typeMeta.idShort) {
-          this.getRefinedTypes(typeMeta.idShort);
+        if(this.ivmlFormatter.isAbstract(typeMeta) && typeMeta.idShort) {
+          this.refinedTypes = DataUtils.getRefinedTypes(typeMeta.idShort, this.meta);
           return false;
         } else if(!this.hasInputFields(typeMeta)){
           this.errorMsg = 'ERROR: Configuration does not provide input fields for non abstract type'
@@ -73,30 +75,6 @@ export class SubeditorButtonComponent extends Utils implements OnInit {
     }
     this.errorMsg = '';
     return false;
-  }
-
-  private getRefinedTypes(searchTerm: string) {
-    if (this.meta && this.meta.value) {
-      let refinedTypes = [];
-      for (const type of this.meta.value) {
-        const refined = DataUtils.getProperty(type.value, MT_metaRefines);
-        if (refined && refined.value != '') {
-          if (searchTerm === refined.value) {
-            const abstract = DataUtils.getProperty(type.value, MT_metaAbstract);
-            if(abstract && abstract.value && type.idShort) {
-              this.getRefinedTypes(type.idShort);
-            } else {
-              refinedTypes.push(type);
-            }
-          }
-        }
-      }
-      if (!refinedTypes[0]) {
-        console.warn('No refined types found for abstract type ' + searchTerm);
-      } else {
-        this.refinedTypes = this.refinedTypes.concat(refinedTypes);
-      }
-    }
   }
 
   private hasInputFields(meta: ResourceAttribute) {
@@ -131,11 +109,15 @@ export interface SaveEvent {
 }
 
 function getFieldType(type: string, selectedType: Resource | undefined): string {
-  if (selectedType && selectedType.idShort?.includes("Field")) {
-    let innerType = DataUtils.stripGenericType(type)
-    if (innerType !== selectedType) {
-      return type.replace(innerType, selectedType.idShort);
+  if (selectedType && selectedType.idShort) {
+    if (!DataUtils.isIvmlSimpleType(type)) {
+      let innerType = DataUtils.stripGenericType(type)
+      if (innerType !== selectedType.idShort) {
+        return type.replace(innerType, selectedType.idShort);
+      }
+    } else {
+      return selectedType.idShort;
     }
-  } 
-  return type
+  }
+  return type;
 }

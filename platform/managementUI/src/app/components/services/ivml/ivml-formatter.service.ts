@@ -958,7 +958,7 @@ export class IvmlFormatterService extends UtilsService {
 
   /** Returns false when metaAbstract is false or
    * there is no attribute "metaAbstract" */
-  private isAbstract(item: any) {
+  public isAbstract(item: any) {
     let abstract = DataUtils.getPropertyValue(item.value, MT_metaAbstract);
     if (abstract) {
       return true
