@@ -120,6 +120,92 @@ The delete goal allows to just delete files and directories. At it's core, it is
   </build>
   ```
 
+## touch goal
+
+Touches a file.
+
+  ```xml
+  <build>
+      <plugins>
+         <plugin>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>dependency-plugin</artifactId>
+            <version>${project.version}</version>
+            <executions>
+                <execution>
+                    <id>touch</id>
+                    <goals>
+                        <goal>touch</goal>
+                    </goals>
+                    <phase>deploy</phase>
+                    <configuration>
+                        <file>target/deployed</file>
+                        <deleteBefore>false</deleteBefore>
+                        <skip>false</skip>
+                    </configuration>
+                </execution>
+            <executions>
+        </plugin>
+     </plugins>
+  </build>
+  ```
+  
+Further settings:
+- `skip` (default `false`, user setting `-Dtouch.skip`) skips the execution 
+- `file` (default unset, required, user setting `-Dtouch.file`) the file to touch
+- `deleteBefore` (default `false`, required, user setting `-Dtouch.deleteBefore`) whether the ``file`` shall be deleted before touching
+
+## update-archive goal
+
+Updates a zips/jars. All updates are specified as `update` structure, denoting the `file` to update, the `fileUpdates`
+for that `file`, whether the update shall happen `inplace` (default `true`, else on `target` if given or a temporary 
+copy) and whether the update shall be more or less `quiet` (default `true`). In addition, `verbose`may be set to 
+emit/prevent additional output. The actual updates file (actual or 
+temporary) is stored in the environment variable denoted  by `id` (if `id` is given, default is `""`). 
+
+A file update consists of a `target` path into the `file` and a `source` denoting the file to be used as content. A 
+file update may just overwrite the `target` or, contained file by file, the contents of `target` (`updateContents`).
+
+  ```xml
+  <build>
+      <plugins>
+         <plugin>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>dependency-plugin</artifactId>
+            <version>${project.version}</version>
+            <executions>
+                <execution>
+                    <id>update</id>
+                    <goals>
+                        <goal>update-archive</goal>
+                    </goals>
+                    <phase>package</phase>
+                    <configuration>
+                        <updates>
+                            <update>
+                                <id>myJar</id>
+                                <file>target/myJar.jar</file>
+                                <fileUpdates>
+                                    <fileUpdate>
+                                        <target>resources/python.zip</target>
+                                        <source>target/myproject-python.zip</source>
+                                        <updateContents>true</updateContents>
+                                    </fileUpdate>
+                                </fileUpdates>
+                                <inplace>true</inplace>
+                                <quiet>true</quiet>
+                            </update>
+                        </updates>
+                    </configuration>
+                </execution>
+            <executions>
+        </plugin>
+     </plugins>
+  </build>
+  ```
+  
+Further settings:
+- `skip` (default `false`, user setting `-DupdateArchive.skip`) skips the execution 
 
 # plugin goals
 
