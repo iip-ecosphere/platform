@@ -225,7 +225,7 @@ Fields in in/output datatypes shall be of the specialized type `RestField` rathe
 
 ## File connector
 
-The `FileConnector` makes that in local files available or writes to local files, respectively. This is in particular helpful for initial testing of applications, but also required, in particular with CSV format in the energy metering domain. The `FileConnector` is a `ChannelConnector` and, thus, allows for serializers and parsers/formatters to be set up, i.e., to turn the file connector into, e.g., a JSON, a TSV or a CSV connector.
+The `FileConnector` makes that in local files available or writes to local files, respectively. This is in particular helpful for initial testing of applications, but also required, in particular with CSV format in the energy metering domain. The `FileConnector` is a `ChannelConnector` and, thus, allows for serializers and parsers/formatters to be set up. Please note that the `FileConnector` is a generic type intended for platform extensions and so requires this setup, i.e., you have to know the respetive artifacts and classes. In contrast, there are pre-configured file connector types that already turn a generic `FileConnector` into, e.g., a JSON, a TSV or a CSV connector. Before directly relying on the `FileConnector` please refer first to the more specific file connector types.
 
 | Field |  Description | Default |
 | --- | --- | --- |
