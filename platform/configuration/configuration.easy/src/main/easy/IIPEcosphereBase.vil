@@ -1,6 +1,7 @@
 import JavaBasics;
 import JavaMapping;
 import Basics;
+import ServiceBasics;
 import MeshBasics;
 
 @advice(IIPEcosphere)
@@ -235,7 +236,10 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
                 for (ServiceMesh m: a.services) {
                     mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
                     setOf(MeshElement) nodes = m.sources->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
-                    nodes->forEach(n|serviceTypes.add(n.impl));
+                    for (MeshElement n : nodes) {
+                        ServiceBase s = n.impl;
+                        addServiceType(s, serviceTypes);
+                    }
                 }
             }
         } else {

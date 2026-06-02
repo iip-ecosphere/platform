@@ -120,5 +120,36 @@ template ServiceBasics(Configuration config, FileArtifact target) {
     def collectRecordType(RecordType type, setOf(RecordType) result) {
         result.add(type);
     }   
+
+    def addServiceType(ServiceBase service, setOf(ServiceBase) serviceTypes) {
+        addService(service, serviceTypes);
+    }
+        
+    @DispatchBasis
+    def addService(ServiceBase service, setOf(ServiceBase) serviceTypes) {
+        serviceTypes.add(service);
+    }
+
+    @DispatchCase
+    def addService(ServiceFamily service, setOf(ServiceBase) serviceTypes) {
+        serviceTypes.add(service);
+        for (Service s : service.members) {
+            addService(s, serviceTypes);
+        }
+    }
+
+    @DispatchCase
+    def addService(SubServiceMesh service, setOf(ServiceBase) serviceTypes) {
+        for (MeshConnector c : service.sources) {
+            setOf(MeshElement) tmp = {};
+            tmp.add(c.next);
+            mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};
+            setOf(MeshElement) nodes = tmp->closure(MeshElement e|nextMeshNodes(e, mappedMesh));
+            for (MeshElement n : nodes) {
+                addService(n.impl, serviceTypes);
+            }
+        }
+    }    
+    
     
 }
