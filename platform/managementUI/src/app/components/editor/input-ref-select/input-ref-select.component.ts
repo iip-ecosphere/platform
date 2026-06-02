@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
-import { Resource, editorInput, configMeta, metaTypes, DR_type, IvmlRecordValue, ResourceAttribute } from 'src/interfaces';
+import { Resource, editorInput, configMeta, metaTypes, DR_type, IvmlRecordValue, ResourceAttribute, MT_metaAbstract, MT_metaType } from 'src/interfaces';
 import { DataUtils, EditorPartition, Utils, WIDTH_CARD, WIDTH_CARD_GRID } from 'src/app/services/utils.service';
 import { EditorComponent } from '../editor.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -39,14 +39,26 @@ export class InputRefSelectComponent extends Utils implements OnInit {
   }
 
   async ngOnInit() {
-    if (this.meta && this.input.name === "fields") {
-      this.fieldsMeta = this.ivmlFormatter.filterMeta(this.meta, 'Fields');
-      if (this.fieldsMeta && this.fieldsMeta.value && this.fieldsMeta.value?.length > 0) {
-        if (this.isArray(this.input.value)) {
-          this.selectedType = findFieldType(this.input.value[0]._type, this.fieldsMeta.value)
-        } else {
-          this.selectedType = this.fieldsMeta.value[0]
-        }
+    let refinedTypes;
+    if (this.meta) {
+      const typeMeta = DataUtils.getProperty(this.meta.value!, DataUtils.stripGenericType(this.input.type));      
+      if (typeMeta && this.ivmlFormatter.isAbstract(typeMeta) /*&& !this.ivmlFormatter.isMetaRef(typeMeta)*/) {
+        refinedTypes = DataUtils.getRefinedTypes(typeMeta.idShort, this.meta);
+        this.fieldsMeta = this.ivmlFormatter.filterMeta(this.meta, '');
+        refinedTypes?.forEach(type => {
+          this.fieldsMeta?.value?.push(type);
+        });
+      } else if (this.input.name === "fields") {
+        this.fieldsMeta = this.ivmlFormatter.filterMeta(this.meta, 'Fields');
+      }
+    }
+
+    if (this.fieldsMeta && this.fieldsMeta.value && this.fieldsMeta.value?.length > 0) {
+      this.fieldsMeta.value = this.fieldsMeta?.value?.sort((a, b) => (a.idShort ?? '').localeCompare(b.idShort ?? ''));
+      if (this.isArray(this.input.value)) {
+        this.selectedType = findFieldType(this.input.value[0]._type, this.fieldsMeta.value)
+      } else {
+        this.selectedType = this.fieldsMeta.value[0]
       }
     }
     if (!this.selector) {
@@ -96,13 +108,35 @@ export class InputRefSelectComponent extends Utils implements OnInit {
       let comp = dialog.componentInstance;
       // transfer relevant values
       comp.selector = true;
-      comp.references = DataUtils.deepCopy(this.references).sort((a, b) => (a.idShort ?? '').localeCompare(b.idShort ?? ''));
+      comp.references = DataUtils.deepCopy(this.filterSelectedType()).sort((a, b) => (a.idShort ?? '').localeCompare(b.idShort ?? ''));
       comp.activeTextinput = this.activeTextinput;
       comp.input = DataUtils.deepCopy(this.input);
       // link to this as parent and record dialog for closing
       comp.parent = this;
       comp.dialog = dialog;
     }
+  }
+
+  /**
+   * Filter the parent IVML reference/collection based on the selectedType.
+   */
+  filterSelectedType(): Resource[] {
+    let result: Resource[] = [];
+    if (this.selectedType) {
+      for (let index = 0; index < this.references.length; index++) {
+        const ref = this.references[index];
+        if (ref.value) {
+          let metaType = DataUtils.getPropertyValue(ref.value, MT_metaType);
+          if (metaType == this.selectedType.idShort || DataUtils.checkRefinedParents(metaType, this.meta, this.selectedType)) {
+            result.push(ref)
+          }
+        }
+      }
+    } else {
+      result = result.concat(this.references)
+    }
+    
+    return result;
   }
 
   private async init(type: string) {

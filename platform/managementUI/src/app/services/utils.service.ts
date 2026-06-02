@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { editorInput, uiGroup } from 'src/interfaces';
+import { editorInput, MT_metaAbstract, MT_metaRefines, MT_metaType, Resource, ResourceAttribute, uiGroup } from 'src/interfaces';
 
 // for naming conventions, keep utility methods here
 /**
@@ -224,6 +224,11 @@ export class Utils {
             c = 2; // simple fixed two column layout for now
             r = Math.ceil(part.count / c);
           }
+        } else {
+          if (part.columns == 2) {
+            c = 2;
+            r = part.count;
+          }
         }
         rows += r;
         cols = Math.max(c, cols);
@@ -339,6 +344,16 @@ export class DataUtils {
    */
   public static startsWith(value: any, prefix: string) {
     return String(value).trim().startsWith(prefix);
+  }
+
+  /**
+   * Returns whether the given value denotes an IVML type without set, sequence, ref, or collection.
+   * 
+   * @param value the value to check 
+   * @returns true for a simple type (wihtout set, sequence, ref, or collection), false else
+   */
+  public static isIvmlSimpleType(value: any) {
+    return !(value.includes("(") && value.includes(")"));
   }
 
   /**
@@ -633,6 +648,53 @@ export class DataUtils {
     return result;
   }
 
+  public static checkRefinedParents(type: string, meta: Resource | undefined, selectedType: Resource) : boolean{
+      if (meta && meta.value) {
+      const metaParent = meta.value.find(val => val.idShort == type);
+      if (metaParent) {
+        const metaRefines = DataUtils.getPropertyValue(metaParent.value, MT_metaRefines);
+        if (metaRefines == selectedType.idShort) {
+          return true;
+        }
+        const abstract = DataUtils.getProperty(metaParent?.value, MT_metaAbstract);
+        if (abstract && abstract.value) {
+          return false
+        } else {
+          return this.checkRefinedParents(metaRefines, meta, selectedType);
+        }
+      }
+    }
+
+    return false;
+  }
+  
+  public static getRefinedTypes(searchTerm: string, meta: Resource | undefined) : ResourceAttribute[]{
+    if (meta && meta.value) {
+      let refinedTypes: ResourceAttribute[] = [];
+      for (const type of meta.value) {
+        const refined = DataUtils.getProperty(type.value, MT_metaRefines);
+        if (refined && refined.value != '') {
+          if (refined.value.split(',').map((v: string) => v.trim()).includes(searchTerm)) {
+            const abstract = DataUtils.getProperty(type.value, MT_metaAbstract);
+            if(abstract && abstract.value && type.idShort) {
+              let tempTypes = this.getRefinedTypes(type.idShort, meta);
+              if (tempTypes) {
+                refinedTypes = refinedTypes.concat(tempTypes);
+              }
+            } else {
+              refinedTypes.push(type);
+            }
+          }
+        }
+      }
+      if (!refinedTypes[0]) {
+        console.warn('No refined types found for abstract type ' + searchTerm);
+      } else {
+        return refinedTypes;
+      }
+    }
+    return [];
+  }
 }
 
 /**
