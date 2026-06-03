@@ -73,9 +73,6 @@ public class TestAasIvmlModel {
             System.out.println("CfgModelName cfgFolder [meshVariables*]");
         } else {
             TestOperation op = args.length > 2 ? new ListGraphs() : new CreateVar();
-            TestWithPlugin.setAasPluginId("aas.basyx-1.3");
-            TestWithPlugin.setupAASPlugins();
-            TestWithPlugin.loadPlugins();
             EasySetup ep = ConfigurationSetup.getSetup(false).getEasyProducer();
             File modelFolder = new File("src/main/easy");
             File cfgFolder = new File(args[1]);
@@ -94,6 +91,10 @@ public class TestAasIvmlModel {
                 System.out.println("No model loaded");
                 System.exit(1);
             }
+
+            TestWithPlugin.setAasPluginId("aas.basyx-1.3");
+            TestWithPlugin.setupAASPlugins();
+            TestWithPlugin.loadPlugins();
 
             Configuration cfg = ConfigurationManager.getVilConfiguration();
             GraphFormat format = new DrawflowGraphFormat();

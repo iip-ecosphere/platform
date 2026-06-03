@@ -115,6 +115,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     public static final String OP_CREATE_CONSTANT = "createConstantVariable";
     public static final String OP_DELETE_VARIABLE = "deleteVariable";
     public static final String OP_RENAME_VARIABLE = "renameVariable";
+    public static final String OP_UPDATE_ARTIFACTS = "updateArtifactsAsync";
     public static final String OP_GEN_INTERFACES = "genInterfacesAsync";
     public static final String OP_GEN_APPS_NO_DEPS = "genAppsNoDepsAsync";
     public static final String OP_GEN_APPS = "genAppsAsync";
@@ -425,6 +426,17 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 return null;
             }, getAasOperationCompletedListener())
         );
+
+        bindInstantiationOperations(sBuilder);
+        bindTemplateOperations(sBuilder);
+    }
+
+    /**
+     * Binds the AAS instantiation operations (ensure static lambda functions).
+     * 
+     * @param sBuilder the server builder
+     */
+    private static void bindInstantiationOperations(ProtocolServerBuilder sBuilder) {
         // generate Interfaces, generate Templates
         sBuilder.defineOperation(OP_GEN_APPS, 
             new JsonResultWrapper(a -> {
@@ -449,9 +461,16 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                     , a);
             })
         );
-        bindTemplateOperations(sBuilder);
+        sBuilder.defineOperation(OP_UPDATE_ARTIFACTS, 
+            new JsonResultWrapper(a -> {
+                return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
+                    // second param optional, may be empty -> null
+                    p -> getAasIvmlMapper().updateArtifacts(AasUtils.readString(p))
+                    , a);
+            })
+        );
     }
-    
+
     /**
      * Binds the AAS template operations (ensure static lambda functions).
      * 
@@ -496,6 +515,46 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             }, getAasOperationCompletedListener())
         );
     }    
+
+    /**
+     * Updates artifacts of an application.
+     * 
+     * @param appName the application name (denoting the output folder)
+     * @return <b>null</b> always
+     * @throws ExecutionException if the update operation fails
+     */
+    public Object updateArtifacts(String appName) throws ExecutionException {
+        TaskData lastTaskData = TaskUtils.getLastTaskData(); // may be wrong thread
+        if (null == lastTaskData) { // fallback
+            lastTaskData = TaskRegistry.getTaskData();
+        }
+        TaskData beforeTaskData = ConfigurationManager.setTaskData(lastTaskData);
+        Object result = null;
+        try {
+            String appFolder = PseudoString.firstToUpperCase(PseudoString.toIdentifier(appName));
+            File target = new File(ConfigurationSetup.getSetup().getEasyProducer().getGenTarget(), appFolder);
+            if (!target.isDirectory()) {
+                throw new ExecutionException("Cannot update artifacts. Target folder for '" + appName 
+                    + "' does not exist. Instantiate the app before.", null);
+            }
+            String mvn = System.getProperty("easy.maven.home", null);
+            if (null == mvn) {
+                mvn = "mvn";
+            } else {
+                mvn = new File(mvn, "bin/mvn").getAbsolutePath(); 
+            }
+            Process proc = new ProcessBuilder(mvn, "-P", "App, Art", "deploy")
+                .inheritIO()
+                .directory(target)
+                .start();
+            proc.waitFor();
+        } catch (IOException | InterruptedException e) {
+            throw new ExecutionException(e);
+        } finally {
+            ConfigurationManager.setTaskData(beforeTaskData);
+        }
+        return result;
+    }
     
     /**
      * Instantiates according to the given {@code configurer}.
@@ -523,7 +582,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         }
         System.setProperty("KEY_PROPERTY_TRACING", "TOP");
         PlatformInstantiator.setTraceFilter();
-        ConfigurationManager.cleanGenTarget();
+        //ConfigurationManager.cleanGenTarget();
         long start = System.currentTimeMillis();
         if (null != appId && appId.length() > 0) {
             System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, appId);
@@ -1620,6 +1679,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             .build(Type.STRING, aDesc);
         createOperationBuilder(smBuilder, OP_GEN_INTERFACES, iCreator)
             .addInputVariable("appId", Type.STRING)
+            .build(Type.STRING, aDesc);
+        createOperationBuilder(smBuilder, OP_UPDATE_ARTIFACTS, iCreator)
+            .addInputVariable("appName", Type.STRING)
             .build(Type.STRING, aDesc);
 
         createOperationBuilder(smBuilder, OP_GET_TEMPLATES, iCreator)
