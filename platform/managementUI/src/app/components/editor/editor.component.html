@@ -10,7 +10,7 @@
 
   <span style="flex: 1 1 auto"></span>
   <span>
-    <span *ngIf="feedback == ''">
+    <span *ngIf="!isFeedbackSuccessful()">
       <button mat-icon-button class="button okto-button" *ngIf="!type && !refinedTypes else addButton" color="success" (click)="create()" disable [matTooltip]="getTooltipText('Create', category)">
         <mat-icon>done</mat-icon>
       </button>
@@ -26,6 +26,10 @@
     </button>
   </span>
 </mat-toolbar>
+
+<div *ngIf="feedback != ''" class="feedback">
+  <div [innerHTML]="feedback"></div>
+</div>
 
 <!--
 <div *ngIf="numOfItemsInMeta > 1; else singleItem"> multiple items
@@ -229,6 +233,4 @@
   </ng-template>
 </div>-->
 
-<div *ngIf="feedback != ''" class="feedback">
-  <div [innerHTML]="feedback"></div>
-</div>
+

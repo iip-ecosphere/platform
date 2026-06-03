@@ -40,7 +40,8 @@ export class EditorComponent extends Utils implements OnInit {
   showRequiredMsg = false;
   variableName = '';
   ivmlType: string = "";
-  feedback: string = ""
+  feedback: string = "";
+  requestFeedback: UserFeedback = {feedback: '', successful: false};
   topLevel: boolean = true;
   saveEvent: EventEmitter<SaveEvent> | null = null;
 
@@ -138,6 +139,7 @@ export class EditorComponent extends Utils implements OnInit {
    * Called when creating a new variable is requested from the editor.
    */
   public async create() {
+    this.handleFeedback({feedback: '', successful: false});
     if (!this.validateRequiredInputs()) {
       return; // stops async function
     }
@@ -149,11 +151,16 @@ export class EditorComponent extends Utils implements OnInit {
     if (primitiveDataTypes.includes(this.ivmlType)) {
       delete creationData["name"];
     }
+
     if (this.selectedType?.idShort == "Application") {
-      this.handleFeedback(await this.ivmlFormatter.createApp(variableName, creationData));
+      this.requestFeedback = await this.ivmlFormatter.createApp(variableName, creationData);
     } else {
-      this.handleFeedback(await this.ivmlFormatter.createVariable(variableName, creationData, this.ivmlType));
+      this.requestFeedback = await this.ivmlFormatter.createVariable(variableName, creationData, this.ivmlType);
     }
+    if (!this.isFeedbackSuccessful()) {
+      this.showInputs = true;
+    }
+    this.handleFeedback(this.requestFeedback);
   }
 
   /**
@@ -167,6 +174,7 @@ export class EditorComponent extends Utils implements OnInit {
    * Called from the editor to save the entered values into type.value. This may be called in the top-level editor or a sub-level editor.
    */
   public async save() {
+    this.handleFeedback({feedback: '', successful: false});
     if (!this.validateRequiredInputs()) {
       return; // stops async function
     }
@@ -181,7 +189,11 @@ export class EditorComponent extends Utils implements OnInit {
             delete complexType["name"];
             delete complexType["isConst"];
           }
-          this.handleFeedback(await this.ivmlFormatter.setVariable(this.variableName, complexType, this.ivmlType));
+          this.requestFeedback = await this.ivmlFormatter.setVariable(this.variableName, complexType, this.ivmlType);
+          if (!this.isFeedbackSuccessful()) {
+            this.showInputs = true;
+          }
+          this.handleFeedback(this.requestFeedback);
         } else if (this.saveEvent) {
           this.saveEvent.emit({ idShort: this.type.name, value: complexType, multipleInputs: this.type.multipleInputs });
         }
@@ -321,6 +333,13 @@ export class EditorComponent extends Utils implements OnInit {
     return isValid;
   }
 
+  /**
+   * Check if the feedback is successful
+   * @returns Boolean 
+   */
+  isFeedbackSuccessful(): boolean {
+    return this.requestFeedback.successful;
+  }
 
   /**
    * get the names for the different section in the component 

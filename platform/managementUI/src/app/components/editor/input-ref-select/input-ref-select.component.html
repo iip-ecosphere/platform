@@ -21,7 +21,7 @@
       <mat-form-field appearance="outline">
         <mat-select [matTooltip]="input.description[0].text" id="typeSelect" [(value)]="selectedType">
           <mat-option *ngFor="let type of fieldsMeta?.value" [value]="type">
-            {{ type.idShort }}
+            {{ fixAbstractName(type.idShort) }} 
           </mat-option>
         </mat-select>
       </mat-form-field>

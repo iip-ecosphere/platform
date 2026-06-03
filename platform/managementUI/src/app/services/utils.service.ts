@@ -103,6 +103,37 @@ export class Utils {
   }
 
   /**
+   * Fix the display name of input by replacing Type or TypeType with Types
+   * 
+   * @param name is the name to fix, e.g. "FloatTypeType"
+   * @returns the fixed name, e.g. "Float Types"
+   */
+  public fixAbstractName(name: String | undefined) {
+    if (!name) return '';
+
+    const fixedName = name
+      .replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+
+    if (fixedName.endsWith('Type Type')) {
+      return fixedName.replace(/Type Type$/, 'Types');
+    }
+
+    if (fixedName.endsWith('Type')) {
+      return fixedName.replace(/Type$/, 'Types');
+    }
+
+    if (fixedName.endsWith('Server')) {
+      return fixedName.replace(/Server$/, 'Servers');
+    }
+
+    if (fixedName.endsWith('Operation')) {
+      return fixedName.replace(/Operation$/, 'Operations');
+    }
+
+    return fixedName;
+  }
+
+  /**
    * Returns the display name of input, if defined the display name else the name.
    * 
    * @param input the input 
