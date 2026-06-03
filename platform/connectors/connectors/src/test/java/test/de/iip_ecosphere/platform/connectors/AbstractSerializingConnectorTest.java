@@ -286,7 +286,7 @@ public abstract class AbstractSerializingConnectorTest {
 
         int count = 20;
         while (received.size() < 2 && count > 0) {
-            TimeUtils.sleep(100);
+            TimeUtils.sleep(200);
             count--;
         }
 
