@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+    <logger name="com.hivemq" level="DEBUG" />
+    <logger name="jetbrains.exodus.env.EnvironmentImpl" level="ERROR"/>
+    <logger name="com.hivemq.extensions.file-rbac" level="DEBUG"/>
+    <logger name="com.hivemq.extensions" level="DEBUG"/>
+    <logger name="com.hivemq.security" level="DEBUG"/>    
+    <logger name="com.hivemq.netty.handler.MQTT" level="OFF"/> <!-- just for debugging -->
+
+</configuration>

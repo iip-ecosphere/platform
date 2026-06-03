@@ -13,8 +13,10 @@
 package de.iip_ecosphere.platform.connectors.mqttv3;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
@@ -182,16 +184,33 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[]
                         + ". Trying with no TLS.");
                 }
             }
-            waitForCompletion(client.connect(connOpts));
-            for (String out : getOutputChannels()) {
-                try {
-                    waitForCompletion(client.subscribe(out, MqttQoS.AT_LEAST_ONCE.value()));
-                    LoggerFactory.getLogger(getClass()).info("Subscribed to: {}", out);
-                } catch (MqttException e) {
-                    throw new IOException(e);
+            AtomicReference<String> connectMsg = new AtomicReference<>(null);
+            waitForCompletion(client.connect(connOpts, null, new IMqttActionListener() {
+
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    LoggerFactory.getLogger(getClass()).info("MQTT: connected");
                 }
+
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    connectMsg.set(exception.getMessage());
+                }
+                
+            }));
+            if (null == connectMsg.get()) {
+                for (String out : getOutputChannels()) {
+                    try {
+                        waitForCompletion(client.subscribe(out, MqttQoS.AT_LEAST_ONCE.value()));
+                        LoggerFactory.getLogger(getClass()).info("MQTT: subscribed to: {}", out);
+                    } catch (MqttException e) {
+                        throw new IOException(e);
+                    }
+                }
+            } else {
+                client = null;
+                throw new IOException("MQTT Connect failed: " + connectMsg.get());
             }
-            LoggerFactory.getLogger(getClass()).info("MQTT: connected");
         } catch (MqttException e) {
             throw new IOException(e);
         }

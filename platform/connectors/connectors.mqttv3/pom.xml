@@ -158,6 +158,16 @@
              </executions>
          </plugin>
 
+         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.6.3</version>
+            <configuration>
+                <mainClass>test.de.iip_ecosphere.platform.connectors.mqttv3.ConnectTest</mainClass>
+                <classpathScope>test</classpathScope>
+            </configuration>            
+         </plugin>
+
     </plugins>
   </build>
   

@@ -1,3 +1,4 @@
+name: C-Pahov3
 identities:
     "mqttAuth":
         type: USERNAME
