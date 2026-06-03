@@ -240,17 +240,19 @@ To ease the application, pre-defined `FileConnector` types are `JsonFileConnecto
 
 ## MQTTv3 connector
 
-The `MQTTv3` connector is a channel connector with no further fields. Channel names correspond to the channel/topic names on the MQTT broker, hierarchical names are separated by "/".
+The `MQTTv3` connector is a channel connector with no further fields. Channel names correspond to the channel/topic names on the MQTT broker, hierarchical names are separated by "/". 
 
-Formatters and parsers can be applied as described for the `FileConnector`. This connector supports `USERNAME` authentication tokens and TLS encryption. 
+Formatters and parsers can be applied as described for the `FileConnector`. 
 
-The `MipMqttV3Connector` is an example of a pre-configured connector with fixed input/output types. The connector is part of oktoflow's default library.
+This connector supports `USERNAME` authentication tokens and TLS encryption. If no authentication token is given, it implicitly applies anonymous authentication. Whether these forms of authentication are supported, in particular anonymous authentication, or wheter the right access control permissions are set so that the connector can access the configured data depends on the setup of the broker that you are addressing.
 
 ## MQTTv5 connector
 
 The `MQTTv5` connector is a channel connector with no further fields. Channel names correspond to the channel/topic names on the MQTT broker, hierarchical names are separated by "/".
 
-Formatters and parsers can be applied as described for the `FileConnector`. This connector supports `USERNAME` authentication tokens and TLS encryption. 
+Formatters and parsers can be applied as described for the `FileConnector`. 
+
+This connector supports `USERNAME` authentication tokens and TLS encryption. If no authentication token is given, it implicitly applies anonymous authentication. Whether these forms of authentication are supported, in particular anonymous authentication, or wheter the right access control permissions are set so that the connector can access the configured data depends on the setup of the broker that you are addressing.
 
 ## MQTT connector
 
