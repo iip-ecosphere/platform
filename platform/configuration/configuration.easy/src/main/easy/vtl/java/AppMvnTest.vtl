@@ -1,4 +1,5 @@
 import Basics;
+import JavaBasics;
 import MavenBasics;
 import JavaMapping;
 import MeshBasics;
@@ -39,11 +40,9 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         projectVersion = "\\${iip.version}";
         
         XmlElement globalDeps = createDependencies(project);
-        XmlElement profiles = new XmlElement(project, "profiles");
-        XmlElement profile = new XmlElement(profiles, "profile");
-        new XmlElement(profile, "id", "App");
-        new XmlElement(new XmlElement(profile, "activation"), "activeByDefault", "true");
-        XmlElement profileProperties = new XmlElement(profile, "properties");
+        XmlElement profiles = appendProfiles(project);
+        XmlElement profile = appendProfile(profiles, "App", activateByDefault=true);
+        XmlElement profileProperties = appendProperties(profile);
         new XmlElement(profileProperties, "maven.javadoc.skip", not(withDocs));
         new XmlElement(profileProperties, "configuration.allServices", allServices);
         new XmlElement(profileProperties, "configuration.allTypes", allTypes);
@@ -152,8 +151,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
     appendMavenIipDependencyPluginUnpackPluginsExecution(execs, globalOktoPlugins, projectVersion, enable=withPlugins(config));
 }*/
 
-        profile = new XmlElement(profiles, "profile");
-        new XmlElement(profile, "id", "Exec");
+        profile = appendProfile(profiles, "Exec");
         build = createMavenBuildElement(profile, "", false);
         plugins = createPlugins(build);
         dependencyPlugin = appendMavenIipDependencyPlugin(plugins, ver=projectVersion);
@@ -171,6 +169,25 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         execArgs = new XmlElement(execCfg, "arguments");
         new XmlElement(execArgs, "argument", "\\${project.build.directory}/apps/${appName}.jar");
         new XmlElement(execCfg, "classpathScope", "test");
+        
+        profile = appendArtifactProfile(profiles);
+        build = createMavenBuildElement(profile, "", false);
+        plugins = createPlugins(build);
+        XmlElement plugin = appendPlugin(plugins, "de.iip-ecosphere.platform", "invoker-plugin", projectVersion, false);
+        execs = new XmlElement(plugin, "executions");
+        exec = new XmlElement(execs, "execution");
+        new XmlElement(exec, "id", "update-app");
+        appendGoal(exec, "install");
+        XmlElement cfg = appendConfiguration(exec);
+        XmlElement cfgInvProf = new XmlElement(cfg, "invokeProfiles");
+        new XmlElement(cfgInvProf, "invokeProfile", "App");
+        new XmlElement(cfgInvProf, "invokeProfile", "Art");
+        XmlElement cfgInvGoal = new XmlElement(cfg, "invokeGoals");
+        new XmlElement(cfgInvGoal, "invokeGoal", "package");
+        new XmlElement(cfg, "pom", "\\${iip.gen}/${asTypeName(appName)}/pom.xml");
+        new XmlElement(cfg, "omitProperties", "true");
+        new XmlComment(cfg, "Disabled by default, enable for all-in-one examples, keep for pure service implementation projects");
+        new XmlElement(cfg, "skip", "true");
     }
 
     // dispatch basis

@@ -37,8 +37,11 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         XmlElement properties = new XmlElement(project, "properties");
         new XmlElement(properties, "maven.jar.forceCreation", "true"); // spring-boot-plugin result grows if not re-built, clean plugin prevents creating the result jar
         addDistributionManagement(project, config);
-        
-        XmlElement dep = new XmlElement(project, "dependencies");
+        XmlElement profiles = appendProfiles(project);
+        XmlElement profile = appendProfile(profiles, "App", activateByDefault=true);
+        appendArtifactProfile(profiles);
+                
+        XmlElement dep = new XmlElement(profile, "dependencies");
         appendDependency(dep, iipGroup, "support", projectVersion);
         appendDependencies(dep, oktoPlugins, artifacts, projectVersion, enable=withoutPlugins(config));
         appendDependency(dep, iipGroup, "support.aas", projectVersion);
@@ -80,7 +83,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             appendDependency(dep, "org.springframework.cloud", "spring-cloud-stream", type="test-jar", scope="test", classifier="test-binder");
         }
         
-        XmlElement plugins = createMavenBuildElement(project, "", true);
+        XmlElement plugins = createMavenBuildElement(profile, "", true);
         XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);
         appendAssemblyDescriptors(assemblyPlugin, assemblies);
         //appendIipPythonPlugin(plugins, projectVersion);
@@ -90,6 +93,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
 
         XmlElement dependencyPlugin = appendMavenIipDependencyPlugin(plugins, ver=config.iipVer); // otherwise project's appVer
         XmlElement execs = new XmlElement(dependencyPlugin, "executions");
+        appendMavenIipDependencyPluginTouchPluginsExecution(execs, "\\${project.build.directory}/deployed", phase="install");
         /*if (isPythonUsed(usedServiceTypes)) {
             appendMavenDependencyPluginExecution(execs, "unpack", "${iipGroup}:services.environment:${projectVersion}", "python", "\\${project.basedir}/src/main/python", "pythonEnv.zip", type="zip");
         }*/

@@ -416,7 +416,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             artifacts.add(server.artifact);
             sequenceOf(String) tmp = server.artifact.split(":");
             String artifact = tmp[0]+":"+tmp[1]+":zip:python:"+tmp[2];
-            vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serverFolderName}.xml", withServices=true, dependency=artifact);
+            vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serverFolderName}.xml", withServices=true, dependency=artifact, id="python_${serverFolderName}");
             addAssemblyInfo(assemblies, "python_${serverFolderName}", "${assemblyRel}/python_${serverFolderName}.xml", "prepare-package", "${mvnProjectBuildDir}/classes", finalName="python_${serverFolderName}");
         }
     }
@@ -2199,7 +2199,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             }
             artifacts.add(artifact);
         }
-        vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serviceFolderName}.xml", withServices=true, dependency=artifact, dependency2=shArtifact);
+        vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serviceFolderName}.xml", withServices=true, dependency=artifact, dependency2=shArtifact, id="python_${serviceFolderName}");
         if (not(noDeps)) {
             addAssemblyInfo(assemblies, "python_${serviceFolderName}", "${assemblyRel}/python_${serviceFolderName}.xml", "prepare-package", "${mvnProjectBuildDir}/classes", finalName="python_${serviceFolderName}");
             addArtifact(service, artifacts, oktoPlugins);

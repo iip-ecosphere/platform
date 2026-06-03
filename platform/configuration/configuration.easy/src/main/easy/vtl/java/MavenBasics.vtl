@@ -155,6 +155,24 @@ template MavenBasics(Configuration config, FileArtifact target) {
         appendExclusion(appendExclusions(dep), groupId, artifactId);
     }
     
+    def appendProfiles(XmlElement parent) {
+        new XmlElement(parent, "profiles");
+    }
+
+    def appendProfile(XmlElement profiles, String id, Boolean activateByDefault=false) {
+        XmlElement profile = new XmlElement(profiles, "profile");
+        new XmlElement(profile, "id", id);
+        if (activateByDefault) {
+            XmlElement act = new XmlElement(profile, "activation");
+            new XmlElement(act, "activeByDefault", "true");
+        }
+        profile;
+    }
+    
+    def appendProperties(XmlElement parent) {
+        new XmlElement(parent, "properties");
+    }
+    
     // ---------------------------------- maven jar plugin ------------------------------------------------------
     
     def XmlElement appendMavenJarPlugin(XmlElement plugins, String ver, Boolean addClassPath, String mainClass="", String goal="") {
@@ -263,6 +281,15 @@ template MavenBasics(Configuration config, FileArtifact target) {
             }
         }
         cfg;
+    }
+    
+    def XmlElement appendMavenIipDependencyPluginTouchPluginsExecution(XmlElement execs, String file, String phase="deploy") {
+        XmlElement exec = new XmlElement(execs, "execution");
+        new XmlElement(exec, "id", "touch-deployed");
+        appendGoal(exec, "touch");
+        new XmlElement(exec, "phase", phase);
+        XmlElement config = appendConfiguration(exec);
+        new XmlElement(config, "file", file);
     }
 
     // with executions in appendMavenIipDependencyPlugin as parent
@@ -746,6 +773,17 @@ template MavenBasics(Configuration config, FileArtifact target) {
     
     def Boolean isGlobalPlugin(String plugin) {
         plugin.find("platform:transport") > 0 or plugin.find("platform:support.aas.basyx:") > 0 or plugin.find("platform:support.aas.basyx2:") > 0;        
+    }
+    
+    def XmlElement appendArtifactProfile(XmlElement parent, String id="Art") {
+        XmlElement profile = appendProfile(parent, id);
+        XmlElement props = appendProperties(profile);
+        new XmlElement(props, "maven.main.skip", "true");
+        new XmlElement(props, "maven.javadoc.skip", "true");
+        new XmlElement(props, "maven.test.skip", "true");
+        new XmlElement(props, "jacoco.skip", "true");
+        new XmlElement(props, "configuration.skip", "true");
+        profile;
     }
 
 }
