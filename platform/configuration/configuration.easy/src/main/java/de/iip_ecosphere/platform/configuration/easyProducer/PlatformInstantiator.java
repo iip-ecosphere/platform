@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.configuration.easyProducer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -309,25 +310,27 @@ public class PlatformInstantiator {
             if (null != metaModelFolder) {
                 easySetup.setIvmlMetaModelFolder(metaModelFolder);
             }
-            long start = System.currentTimeMillis();
             if (cleanOutputFolder()) {
-                LoggerFactory.getLogger(this).info("Deleting {} ...", outputFolder);
-                FileUtils.deleteQuietly(outputFolder);
-                outputFolder.mkdirs();
-            } else {
-                LoggerFactory.getLogger(this).info("Deleting built artifacts in {} ...", outputFolder);
-                try (Stream<Path> paths = Files.walk(outputFolder.toPath())) {
-                    paths.filter(Files::isRegularFile)
-                         .filter(p -> isOutputArtifactFile(p))
-                         .forEach(p -> deleteFile(p));
-                         
-                } catch (IOException e) {
-                    LoggerFactory.getLogger(PlatformInstantiator.class).warn("Failed to delete output artifacts: {}", 
-                        e.getMessage());
+                long start = System.currentTimeMillis();
+                if (ConfigurationLifecycleDescriptor.INCREMENTAL) {
+                    LoggerFactory.getLogger(this).info("Deleting built artifacts in {} ...", outputFolder);
+                    try (Stream<Path> paths = Files.walk(outputFolder.toPath())) {
+                        paths.filter(Files::isRegularFile)
+                             .filter(p -> isOutputArtifactFile(p))
+                             .forEach(p -> deleteFile(p));
+                    } catch (UncheckedIOException e) { // permission? ignore
+                    } catch (IOException e) {
+                        LoggerFactory.getLogger(PlatformInstantiator.class).warn(
+                            "Failed to delete output artifacts: {}", e.getMessage());
+                    }
+                } else {
+                    LoggerFactory.getLogger(this).info("Deleting {} ...", outputFolder);
+                    FileUtils.deleteQuietly(outputFolder);
+                    outputFolder.mkdirs();
                 }
+                LoggerFactory.getLogger(this).info("Cleaned output folder {} in {} ms", outputFolder, 
+                    System.currentTimeMillis() - start);
             }
-            LoggerFactory.getLogger(this).info("Cleaned output folder {} in {} ms", outputFolder, 
-                System.currentTimeMillis() - start);
             easySetup.setGenTarget(outputFolder);    
             if (null != testIvmlMetaModelFolder) {
                 easySetup.setIvmlMetaModelFolder(testIvmlMetaModelFolder);
@@ -423,7 +426,7 @@ public class PlatformInstantiator {
          * @return {@code true} for clean, {@code false} else
          */
         protected boolean cleanOutputFolder() {
-            return !ConfigurationLifecycleDescriptor.INCREMENTAL;
+            return true;
         }
         
         /**
