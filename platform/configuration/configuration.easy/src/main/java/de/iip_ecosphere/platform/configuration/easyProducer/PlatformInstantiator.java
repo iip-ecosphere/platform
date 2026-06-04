@@ -13,11 +13,15 @@
 package de.iip_ecosphere.platform.configuration.easyProducer;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Stream;
 
 import de.iip_ecosphere.platform.configuration.cfg.StatusCache;
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor.ExecutionMode;
@@ -305,14 +309,25 @@ public class PlatformInstantiator {
             if (null != metaModelFolder) {
                 easySetup.setIvmlMetaModelFolder(metaModelFolder);
             }
+            long start = System.currentTimeMillis();
             if (cleanOutputFolder()) {
                 LoggerFactory.getLogger(this).info("Deleting {} ...", outputFolder);
-                long start = System.currentTimeMillis();
                 FileUtils.deleteQuietly(outputFolder);
-                LoggerFactory.getLogger(this).info("Deleted {} in {} ms", outputFolder, 
-                    System.currentTimeMillis() - start);
                 outputFolder.mkdirs();
+            } else {
+                LoggerFactory.getLogger(this).info("Deleting built artifacts in {} ...", outputFolder);
+                try (Stream<Path> paths = Files.walk(outputFolder.toPath())) {
+                    paths.filter(Files::isRegularFile)
+                         .filter(p -> isOutputArtifactFile(p))
+                         .forEach(p -> deleteFile(p));
+                         
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(PlatformInstantiator.class).warn("Failed to delete output artifacts: {}", 
+                        e.getMessage());
+                }
             }
+            LoggerFactory.getLogger(this).info("Cleaned output folder {} in {} ms", outputFolder, 
+                System.currentTimeMillis() - start);
             easySetup.setGenTarget(outputFolder);    
             if (null != testIvmlMetaModelFolder) {
                 easySetup.setIvmlMetaModelFolder(testIvmlMetaModelFolder);
@@ -321,6 +336,41 @@ public class PlatformInstantiator {
                 easySetup.setAdditionalIvmlFolders(additionalIvmlFolders);
             }
         }
+        
+        /**
+         * Deletes the given file/path.
+         *
+         * @param path the path to the file
+         */
+        private static void deleteFile(Path path) {
+            try {
+                Files.delete(path);
+            } catch (IOException e) {
+                LoggerFactory.getLogger(PlatformInstantiator.class).warn("Failed to delete output artifact {}: {}", 
+                    path, e.getMessage());
+            }
+        }        
+        
+        /**
+         * Returns whether {@code path} represents an output artifact to be deleted, usually archives.
+         * 
+         * @param path the path
+         * @return {@code true} for output artifact, {@code false} else
+         */
+        private static boolean isOutputArtifactFile(Path path) {
+            String fileName = path.getFileName().toString().toLowerCase();
+            boolean isFile = fileName.endsWith(".jar") || fileName.endsWith(".zip");
+            if (isFile) {
+                isFile = false;
+                Path parent = path.getParent();
+                if (parent != null) {
+                    if (parent.getFileName() != null && parent.getFileName().toString().equals("target")) {
+                        isFile = true;
+                    }
+                }
+            }
+            return isFile;
+        }        
         
         /**
          * Returns the VIL start rule name. [public for testing]

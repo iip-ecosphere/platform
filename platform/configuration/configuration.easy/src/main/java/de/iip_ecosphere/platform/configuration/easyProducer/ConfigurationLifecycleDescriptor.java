@@ -296,6 +296,9 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
         throws ModelManagementException {
         EasyExecutor.enablePrepareArtifactsDefault(INCREMENTAL);
         EasyExecutor.enableIncrementalInstantiation(INCREMENTAL);
+        if (INCREMENTAL) { // not always
+            getLogger().info("Setting up incremental build mode: {}", INCREMENTAL);
+        }
         getLogger().info("Setting up configuration base: {}", easySetup.getBase());
         getLogger().info("Setting up configuration meta model: {}", easySetup.getIvmlMetaModelFolder());
         getLogger().info("Setting up configuration model name: {}", easySetup.getIvmlModelName());
