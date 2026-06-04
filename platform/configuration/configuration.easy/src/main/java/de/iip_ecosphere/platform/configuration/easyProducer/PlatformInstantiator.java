@@ -313,15 +313,17 @@ public class PlatformInstantiator {
             if (cleanOutputFolder()) {
                 long start = System.currentTimeMillis();
                 if (ConfigurationLifecycleDescriptor.INCREMENTAL) {
-                    LoggerFactory.getLogger(this).info("Deleting built artifacts in {} ...", outputFolder);
-                    try (Stream<Path> paths = Files.walk(outputFolder.toPath())) {
-                        paths.filter(Files::isRegularFile)
-                             .filter(p -> isOutputArtifactFile(p))
-                             .forEach(p -> deleteFile(p));
-                    } catch (UncheckedIOException e) { // permission? ignore
-                    } catch (IOException e) {
-                        LoggerFactory.getLogger(PlatformInstantiator.class).warn(
-                            "Failed to delete output artifacts: {}", e.getMessage());
+                    if (outputFolder.isDirectory()) {
+                        LoggerFactory.getLogger(this).info("Deleting built artifacts in {} ...", outputFolder);
+                        try (Stream<Path> paths = Files.walk(outputFolder.toPath())) {
+                            paths.filter(Files::isRegularFile)
+                                 .filter(p -> isOutputArtifactFile(p))
+                                 .forEach(p -> deleteFile(p));
+                        } catch (UncheckedIOException e) { // permission? ignore
+                        } catch (IOException e) {
+                            LoggerFactory.getLogger(PlatformInstantiator.class).warn(
+                                "Failed to delete output artifacts: {}", e.getMessage());
+                        }
                     }
                 } else {
                     LoggerFactory.getLogger(this).info("Deleting {} ...", outputFolder);

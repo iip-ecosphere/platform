@@ -1047,12 +1047,8 @@ public class IvmlDashboardMapper implements DashboardMapper {
      * Performs the dashboard AAS-JSON instantiation.
      * 
      * @param args command line arguments
-     * 
-     * @throws ExecutionException in case that the VIL instantiation fails, shall not occur here as handled by 
-     * default {@link InstantiationConfigurer}
-     * @throws IOException if files cannot be located/written
      */
-    public static void main(String[] args) throws ExecutionException, IOException {
+    public static void main(String[] args) {
         System.out.println("oktoflow dashboard instantiator");
         if (args.length < 2) {
             System.out.println("Following arguments are required:");
@@ -1060,7 +1056,12 @@ public class IvmlDashboardMapper implements DashboardMapper {
             System.out.println(" - folder the model is located in, src/main/easy is used for the metamodel");
             System.out.println(" - optional IVML meta model folder");
         } else {
-            mainImpl(args);
+            try {
+                mainImpl(args);
+            } catch (ExecutionException | IOException e) {
+                System.err.println("Dashboard mapper failed: " + e.getMessage());
+                System.exit(1);
+            }
         }
     }
 
