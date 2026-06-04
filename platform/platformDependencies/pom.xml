@@ -165,6 +165,7 @@
   
   <properties>
     <surefireArgLine></surefireArgLine>
+    <surefireCiLine></surefireCiLine>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     
     <iip.version>0.8.1-SNAPSHOT</iip.version> <!-- project.version is always narrowest version -> plugins -->
@@ -398,7 +399,7 @@
           </includes>
           <forkedProcessTimeoutInSeconds>${surefireProcessTimeout}</forkedProcessTimeoutInSeconds>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
-           <argLine>@{jacocoArgLine} @{surefireArgLine}</argLine>
+           <argLine>@{jacocoArgLine} @{surefireArgLine} @{surefireCiLine}</argLine>
         </configuration>
         <dependencies>
           <!-- Force using the latest JUnit 47 provider, consider also in lib dependencies; seems also to work with
