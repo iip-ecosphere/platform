@@ -13,6 +13,7 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
     String topPath = "";
     mapOf(Field, Integer) cachingTimes = {};
     Boolean splitTranslatorMethods = true;
+    Boolean shortTransferExpressions = false;
     Boolean dataTransferTo = true; // temporary
     mapOf(RecordType, JavaCodeBlock) typeOut = {};
     RecordType topType;
@@ -459,14 +460,20 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
                if (not(genFrom)) {
                    wrapOptional(field, new JavaCodeMethodCall(path + ".set" + asMethodNameSuffix(field.name)).arg(value), param="access", args="a", optFind="access", optReplace="a"); 
                } else {
-                   if (convName(field.type) <> "") { // is there a conversion?
+                   String cName = convName(field.type);
+                   if (cName <> "") { // is there a conversion?
                        JavaCodeExpression convOp = genConvertOp("outConverter", field.type, "from", value);
                        if (isMultiField(field)) {
                            AasField fld = field;
                            convOp = convOp.replaceMethod("fromList", "fromElementList");
                            wrapOptional(field, new JavaCodeMethodCall("access.setMultiValue").stringArg(field.name).arg(fld.counting).arg(convOp));
                        } else {
-                           wrapOptional(field, new JavaCodeMethodCall("access.set").arg(getFieldPath(field, p)).arg(convOp), param="access", args="a", optFind="access", optReplace="a"); 
+                           //wrapOptional(field, new JavaCodeMethodCall("access.set" + convName(field.type)).arg(getFieldPath(field, p)), param="access", args="a", optFind="access", optReplace="a"); 
+                           if (shortTransferExpressions) {
+                               wrapOptional(field, new JavaCodeMethodCall("access.set" + cName).arg(getFieldPath(field, p)).arg(value), param="access", args="a", optFind="access", optReplace="a"); 
+                           } else {
+                               wrapOptional(field, new JavaCodeMethodCall("access.set").arg(getFieldPath(field, p)).arg(convOp), param="access", args="a", optFind="access", optReplace="a"); 
+                           }
                        }
                    } else {
                        new JavaCodeExpression();
@@ -480,7 +487,18 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
 
     @DispatchBasis    
     def JavaCodeExpression genFieldGetCall(Field field, String p) {
-        genConvertOp("inConverter", field.type, "to", new JavaCodeMethodCall("access.get").arg(getFieldPath(field, p)).arg(cachingTime(field)));
+        String cName;
+        if (shortTransferExpressions) {
+            cName = convName(field.type);
+        } else {
+            cName = "";            
+        }
+        JavaCodeExpression ex = new JavaCodeMethodCall("access.get" + cName).arg(getFieldPath(field, p)).arg(cachingTime(field));
+        if (shortTransferExpressions) {
+            ex;
+        } else {
+            genConvertOp("inConverter", field.type, "to", ex);
+        }     
     }
     
     def JavaCodeExpression genFieldGetCall(AasField field, String p) {

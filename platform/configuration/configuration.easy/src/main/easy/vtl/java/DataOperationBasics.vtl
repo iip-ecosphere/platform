@@ -546,8 +546,9 @@ template DataOperationBasics(Configuration config, FileArtifact target) {
     // - prefix to be used before #convName, "from" or "to"
     // - data the actual data to be converted, may be a parameter name    
     def JavaCodeExpression genConvertOp(String converter, DataType type, String prefix, JavaCodeExpression data) {
-        String convertOp = prefix + convName(type);
-        JavaCodeMethodCall call = new JavaCodeMethodCall(prefix + convName(type)).qualifiedBy(converter).addArgument(data);
+        String cName = convName(type);
+        String convertOp = prefix + cName;
+        JavaCodeMethodCall call = new JavaCodeMethodCall(prefix + cName).qualifiedBy(converter).addArgument(data);
         convParam(type, prefix=="from", call);
         call;
     }
