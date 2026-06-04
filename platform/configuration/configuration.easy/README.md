@@ -9,6 +9,8 @@ It is important to understand that the configuration model and the related code 
 
 The graphical user interface is in [managementUi](../../managementUi) which is located one layer above this component, i.e., uses the interfaces this component provides as well as the `simpleMesh` testing application defined in this component. The default configuration plugin is [EASy-Producer](../configuration.easy). This plugin relies on its model being located in `src/main/easy` and `src/test/easy`. Alternative implementations may demand similar folders, for which, however, the assembly packaging must be adjusted.
 
+>Hint: Eclipse m2e tends to remove ´src/test/java´ and ´src/test/resources´ from the ´.classpath´ file. For now, these folders are declared as m2e-handsoff (´maven.pomderived´ to ´false´) and we set the auto-activated Maven profile explicitly in the projects m2e configuration.
+
 ## Setup
 
 ```yaml
