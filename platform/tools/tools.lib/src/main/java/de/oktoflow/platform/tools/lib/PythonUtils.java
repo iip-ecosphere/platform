@@ -111,7 +111,7 @@ public class PythonUtils {
             path = pythonBinary;
         }
         if (null == path) {
-            path = "/var/lib/jenkins/python/active/bin/python3"; // JENKINS, still legacy
+            path = "/usr/lib/python3";
         }
         File tmpPath = new File(path);
         if (tmpPath.exists()) {
