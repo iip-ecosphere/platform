@@ -57,6 +57,12 @@ Also input files (see `src/test/resources`) require renaming and adjustments.
 - `mvn -P App exec:java@app` executes the app after it was built from the platforms artifact directory (must be set up correctly).
 - `mvn -P App exec:java@transportLogger` runs the transport logger with default setup in the context of this application.
 ${genTestExecutions(nodes)}
+
+For Python development, updating the app artifacts is faster than running a full build, in particular if the app keeps 
+running and updates services at runtime. This can be achieved using the "updateArtifacts" script or 
+"mvn -P App,Art install". Please note that a full update cycle is only possible if the "Art" profile is taken over into
+your POM and either building the artifacts of the apps is enabled in the POM for all-in-one examples or app updating is 
+trigged via the management UI.
  
 ## VSCode
 

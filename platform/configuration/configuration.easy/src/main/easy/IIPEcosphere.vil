@@ -285,12 +285,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 vilTemplateProcessor("TemplatesEclipsePyDevProject", config, "${appRoot}/.pydevproject", appName=appName);
                 vilTemplateProcessor("TemplatesEclipseGitignore", config, "${appRoot}/.gitignore", appName=appName);
                 vilTemplateProcessor("TemplatesEasyProducer", config, "${appRoot}/.EASyProducer", appName=appName);
-                vilTemplateProcessor("TemplatesMvnBash", config, "${appRoot}/build.sh", forBuild=true, forRun=false);
-                vilTemplateProcessor("TemplatesMvnBash", config, "${appRoot}/updateModel.sh", forBuild=false, forRun=false);
-                vilTemplateProcessor("TemplatesMvnBash", config, "${appRoot}/run.sh", forBuild=false, forRun=true);
-                vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/build.bat", forBuild=true, forRun=false);
-                vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/updateModel.bat", forBuild=false, forRun=false);
-                vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/run.bat", forBuild=false, forRun=true);
+                vilTemplateProcessor("TemplatesMvnBash", config, "${appRoot}/build.sh", forBuild=true);
+                vilTemplateProcessor("TemplatesMvnBash", config, "${appRoot}/updateModel.sh", forBuild=false);
+                vilTemplateProcessor("TemplatesMvnBash", config, "${appRoot}/run.sh", forRun=true);
+                vilTemplateProcessor("TemplatesMvnBash", config, "${appRoot}/updateArtifacts.sh", forUpdate=true);
+                vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/build.bat", forBuild=true);
+                vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/updateModel.bat", forBuild=false);
+                vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/run.bat", forRun=true);
+                vilTemplateProcessor("TemplatesMvnBatch", config, "${appRoot}/updateArtifacts.bat", forUpdate=true);
                 generateBroker(config, target, "${appRoot}/target/gen/broker", false, false);
                 
                 // currently no separate templates

@@ -2,15 +2,17 @@ import Basics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template TemplatesMvnBash(Configuration config, FileArtifact target, Boolean forBuild=true, Boolean forRun=false) {
+template TemplatesMvnBash(Configuration config, FileArtifact target, Boolean forBuild=true, Boolean forRun=false, Boolean forUpdate=false) {
 	
-    def main(Configuration config, FileArtifact target, Boolean forBuild=true, Boolean forRun=false) {
+    def main(Configuration config, FileArtifact target, Boolean forBuild=true, Boolean forRun=false, Boolean forUpdate=false) {
         '#!/bin/bash'
         '# Resolve the directory of the script (handles ./, ../, and absolute paths)
         SCRIPT_DIR="\\$(cd "$(dirname "\\$0")" && pwd)"        
         cd "\\$SCRIPT_DIR" || exit 1'
         if (forRun) {
             'mvn -P Exec dependency:copy@app exec:java@app'
+        } else if (forUpdate) {
+            'mvn install -P App,Art \\$*'
         } else if (forBuild) {
             'mvn install \\$*'
         } else {

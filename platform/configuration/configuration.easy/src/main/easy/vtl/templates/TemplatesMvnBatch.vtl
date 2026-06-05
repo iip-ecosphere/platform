@@ -3,13 +3,15 @@ import JavaOsBasics;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template TemplatesMvnBatch(Configuration config, FileArtifact target, Boolean forBuild=true, Boolean forRun=false) {
+template TemplatesMvnBatch(Configuration config, FileArtifact target, Boolean forBuild=true, Boolean forRun=false, Boolean forUpdate=false) {
 	
-    def main(Configuration config, FileArtifact target, Boolean forBuild=true, Boolean forRun=false) {
+    def main(Configuration config, FileArtifact target, Boolean forBuild=true, Boolean forRun=false, Boolean forUpdate=false) {
         'setlocal
         cd /D "%~dp0"'
         if (forRun) {
             'mvn -P Exec dependency:copy@app exec:java@app'
+        } else if (forUpdate) {
+            'mvn -P App,Art install %*'
         } else if (forBuild) {
             'mvn install %*'
         } else {
