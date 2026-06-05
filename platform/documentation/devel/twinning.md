@@ -2,7 +2,7 @@
 
 If the real device/machine is not accessible as needed or you want to test an oktoflow connector/app prior to testing it on-site, a **virtual/simulated counterpart** could be helpful. While we focus on just providing a counterpart the offers an expected situation, a more precise approach might use a **virtual twin**.
 
-As a initial step, we describe below how to apply virtual testing to a virtual OPC-UA server. Further approaches may follow.
+We describe below how to apply virtual testing to a virtual OPC-UA server and MQTT broker server. Further approaches may follow.
 
 ## Virtual OPC-UA Server
 
@@ -10,7 +10,7 @@ This guide explains how to simulate an OPC-UA endpoint and connect to it locally
 
 If the physical device/machine is unavailable - or you want to validate an oktoflow connector/app before going on-site - a **virtual/simulated counterpart** provides a practical testing environment. Note that this is a lightweight simulation that replicates expected behavior, not a full **digital twin**.
 
-### OPC UA: Create simplified OPC UA simulation using a Docker containers.
+### OPC UA: Create simplified OPC UA simulation using Docker containers.
 
 -	The OPC-UA endpoint and browser are provided by [IOTech Systems](https://iotechsys.com/) as Docker images.
 -	Docker images by IOTech Systems are free for academic purposes (non-commercial use).
@@ -124,3 +124,121 @@ OpcUaV1Connector myOpcUaConn = {
 };
 ```
 
+## Virtual MQTT Server
+
+This guide explains how to simulate an MQTT broker and connect to it locally.
+
+If the physical device/machine is unavailable - or you want to validate an oktoflow connector/app before going on-site - a **virtual/simulated counterpart** provides a practical testing environment. Note that this is a lightweight simulation that replicates expected behavior, not a full **digital twin**.
+
+### MQTT: Create MQTT broker simulation using Docker container managed by Docker Compose.
+
+#### Allow anonymous access without user/password
+-	eclipse-mosquitto:2.1.2-alpine is a free to use Docker image to run a MQTT broker
+-	Docker Compose is required to run the simulation
+-	Create a file named "docker-compose.yml" and save the following Docker compose definition in it
+```
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2.1.2-alpine
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883" # Standard MQTT Port
+      - "9001:9001" # MQTT over WebSockets Port
+    volumes:
+      - ./config:/mosquitto/config
+      - ./data:/mosquitto/data
+      - ./log:/mosquitto/log
+```
+-	In the same directory create an empty folder and name it "mosquitto"
+-	Create a file named "mosquitto.conf" in the mosquitto folder and save the following MQTT configuration in it
+```
+listener 1883
+allow_anonymous true
+
+listener 9001
+protocol websockets
+allow_anonymous true
+
+persistence true
+persistence_location /mosquitto/data/
+log_dest stdout
+```
+-	Run a container from the eclipse-mosquitto:2.1.2-alpine image by Docker compose (In the same directory )
+```
+docker compose up
+```
+-	To register on a topic
+```
+docker exec -it mosquitto mosquitto_sub -h localhost -t topic_name
+```
+-	To send payload to a topic
+```
+docker exec mosquitto mosquitto_pub -h localhost -t **topic_name** -m '{payload}'
+```
+
+#### Allow anonymous access and by user/password
+
+Repeat the steps above, replacing only "docker-compose.yml" and "mosquitto.conf" with the versions provided below.
+-	"docker-compose.yml"
+```
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2.1.2-alpine
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883" # Standard MQTT Port
+      - "9001:9001" # MQTT over WebSockets Port
+    volumes:
+      - ./config:/mosquitto/config
+      - ./data:/mosquitto/data
+      - ./log:/mosquitto/log
+    entrypoint: >
+      sh -c "
+        if [ ! -f /mosquitto/config/passwd ]; then
+          mosquitto_passwd -b -c /mosquitto/config/passwd user user &&
+          chown mosquitto:mosquitto /mosquitto/config/passwd &&
+          chmod 0700 /mosquitto/config/passwd;
+        fi &&
+        exec /docker-entrypoint.sh /usr/sbin/mosquitto -c /mosquitto/config/mosquitto.conf
+      "
+```
+-	"mosquitto.conf"
+```
+listener 1883
+allow_anonymous true
+
+listener 9001
+protocol websockets
+allow_anonymous true
+
+password_file /mosquitto/config/passwd
+
+persistence true
+persistence_location /mosquitto/data/
+log_dest stdout
+```
+
+To add a new user/password to the current MQTT broker
+-	Execute the follwong command to create the user
+```
+docker exec mosquitto mosquitto_passwd -b /mosquitto/config/passwd username password
+```
+-	Restart the container
+```
+docker compose restart mosquitto
+```
+
+To mount a new MQTT broker configuration
+-	Edit the file "/mosquitto/config" OR mount the new configuration in "docker-compose.yml"
+```
+    volumes:
+      - ./config:/mosquitto/config_new
+      - ./data:/mosquitto/data
+      - ./log:/mosquitto/log
+```
+-	Restart the container
+```
+docker compose restart mosquitto
+```
