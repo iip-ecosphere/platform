@@ -180,6 +180,7 @@ public class SpringStartup {
             addAasNotificationMode(args, cmdLine);
             addAppId(args, cmdLine);
             addNoAas(args, cmdLine);
+            addFileTracker(artifact, cmdLine);
             System.out.println("Starting with arguments: " + cmdLine);
             ProcessBuilder builder = new ProcessBuilder(cmdLine);
             if (null != procCfg) {
@@ -210,6 +211,16 @@ public class SpringStartup {
         } catch (ExecutionException | InterruptedException | IOException e) {
             System.err.println("Running the app: " + e.getMessage());
         }
+    }
+
+    /**
+     * Adds file tracking folder {@link Starter#PARAM_IIP_TEST_WATCH} to {@code cmdArgs}.
+     * 
+     * @param artifact the app artifact used for starting
+     * @param cmdArgs the command line arguments to be modified as a side effect
+     */
+    private static void addFileTracker(File artifact, List<String> cmdArgs) {
+        cmdArgs.add(CmdLine.composeArgument(Starter.PARAM_IIP_TEST_WATCH, artifact.getParentFile()));
     }
 
     /**

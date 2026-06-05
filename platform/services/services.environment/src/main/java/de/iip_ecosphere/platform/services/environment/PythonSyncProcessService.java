@@ -76,7 +76,7 @@ public class PythonSyncProcessService extends AbstractPythonProcessService {
 
     @Override
     public void update(URI location) throws ExecutionException {
-        // do within Java
+        update(location, null);
     }
 
     @Override

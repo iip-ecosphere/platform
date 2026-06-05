@@ -12,9 +12,12 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -32,6 +35,8 @@ import de.iip_ecosphere.platform.services.environment.GenericMultiTypeServiceImp
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.StringUtils;
+import de.iip_ecosphere.platform.support.ZipUtils;
+import de.iip_ecosphere.platform.support.function.ExecutionConsumer;
 import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.setup.InstalledDependenciesSetup;
 import de.iip_ecosphere.platform.support.logging.Logger;
@@ -142,7 +147,7 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
      * @return {@code true} if enabled, {@code false} else
      */
     public boolean isFileDeletionEnabled() {
-        return enableFileDeletion;
+        return enableFileDeletion && getState() != ServiceState.UPDATING;
     }
     
     /**
@@ -734,6 +739,53 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
             return Long.parseLong(averageResponseTime);
         } catch (NumberFormatException e) {
             return 0;
+        }
+    }
+
+    /**
+     * Performs an update of the service. Must be stopped.
+     * 
+     * @param location the location to update from
+     * @param preUpdate optional consumer called before update, if not <b>null</b>
+     * @throws ExecutionException if updating fails
+     */
+    public void update(URI location, ExecutionConsumer<URI> preUpdate) throws ExecutionException {
+        ServiceState state = getState();
+        if (ServiceState.enablesUpdate(state)) {
+            if (null != preUpdate) {
+                preUpdate.accept(location);
+            }
+            setState(ServiceState.UPDATING);
+            ExecutionException exc = null;
+            if (!location.getPath().endsWith(".zip")) {
+                try {
+                    String id = getId();
+                    if (id.length() > 0) { // generation convention
+                        id = Character.toLowerCase(id.charAt(0)) + id.substring(1);
+                    }
+                    location = new URI(location.toString() + "/classes/python_" + id + ".zip");
+                } catch (URISyntaxException e) {
+                    // quiet, then it fails later
+                }
+            }
+            InputStream is = null;
+            try {
+                is = location.toURL().openStream();
+                if (null != is) {
+                    is = new BufferedInputStream(is);
+                    ZipUtils.extractZip(is, getHome().toPath());
+                    is.close();
+                }
+            } catch (IOException e) {
+                if (is != null) {
+                    FileUtils.closeQuietly(is);
+                }
+                exc = new ExecutionException(e);
+            }
+            setState(state);
+            if (null != exc) {
+                throw exc;
+            }
         }
     }
  

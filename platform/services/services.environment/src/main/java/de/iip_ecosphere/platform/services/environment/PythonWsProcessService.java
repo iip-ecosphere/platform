@@ -128,7 +128,11 @@ public class PythonWsProcessService extends PythonAsyncProcessService {
             NetworkManagerFactory.getInstance().releasePort(networkPortKey);
             networkPortKey = null;
         }
-        socket.close();
+        try {
+            socket.closeBlocking();
+            socket = null;
+        } catch (IOException e) {
+        }
         return super.stop();
     }
 

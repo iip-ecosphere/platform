@@ -104,6 +104,11 @@ public enum ServiceState {
     RECONFIGURING,
     
     /**
+     * The service is being updated. Must be {@link #CREATED}, {@link #PASSIVATED} or {@link #STOPPED}.
+     */
+    UPDATING,
+    
+    /**
      * After {@link #STOPPED} the service is not going back to {@link #STARTING} rather than being undeployed and
      * disposed.
      */
@@ -122,19 +127,20 @@ public enum ServiceState {
         addValidTransition(AVAILABLE, DEPLOYING, CREATED, STARTING, STOPPING, UNDEPLOYING); // prelim: created, starting
         addValidTransition(STARTING, STOPPING); // test fallback :/
         addValidTransition(DEPLOYING, CREATED, STARTING, STOPPING); // preliminary: starting; including emergency stop
-        addValidTransition(CREATED, STARTING);
+        addValidTransition(CREATED, STARTING, UPDATING);
         addValidTransition(STARTING, RUNNING);
         addValidTransition(RUNNING, STOPPING, RECONFIGURING, PASSIVATING);
         addValidTransition(RECONFIGURING, RUNNING, PASSIVATING);
         addValidTransition(PASSIVATING, PASSIVATED);
-        addValidTransition(PASSIVATED, MIGRATING, ACTIVATING);
+        addValidTransition(PASSIVATED, MIGRATING, UPDATING, ACTIVATING);
         addValidTransition(MIGRATING, ACTIVATING);
         addValidTransition(ACTIVATING, RUNNING);
         addValidTransition(FAILED, RECOVERING, STOPPING, STOPPED);
         addValidTransition(RECOVERING, RECOVERED);
         addValidTransition(RECOVERED, RUNNING);
         addValidTransition(STOPPING, STOPPED, DEPLOYING); // pragmatic if connection is already down
-        addValidTransition(STOPPED, AVAILABLE, DEPLOYING, STARTING, STOPPING); // pragmatic if connection is down
+        addValidTransition(STOPPED, AVAILABLE, DEPLOYING, UPDATING, STARTING, STOPPING); // pragmatic if connection down
+        addValidTransition(UPDATING, CREATED, PASSIVATED, STOPPED);
         addValidTransition(UNDEPLOYING, UNKNOWN);
     }
     
@@ -200,6 +206,16 @@ public enum ServiceState {
      */
     public static String toString(ServiceState state) { // move to service.environment?
         return toString(state, ServiceState.UNKNOWN);
+    }
+
+    /**
+     * Returns whether {@code state} enables {@link #UPDATING}.
+     * 
+     * @param state the state to check
+     * @return {@code true} for enabled, {@code false} else
+     */
+    public static boolean enablesUpdate(ServiceState state) {
+        return state == ServiceState.CREATED || state == ServiceState.PASSIVATED || state == ServiceState.STOPPED;
     }
 
     /**

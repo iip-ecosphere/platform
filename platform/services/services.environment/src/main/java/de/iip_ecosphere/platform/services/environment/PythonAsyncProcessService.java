@@ -148,7 +148,7 @@ public class PythonAsyncProcessService extends AbstractPythonProcessService {
 
     @Override
     public void update(URI location) throws ExecutionException {
-        sendToService("*update", location.toString());
+        update(location, l -> sendToService("*update", l.toString()));
     }
 
     @Override

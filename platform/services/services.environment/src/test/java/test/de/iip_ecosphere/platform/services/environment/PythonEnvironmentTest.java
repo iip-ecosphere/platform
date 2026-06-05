@@ -171,11 +171,7 @@ public class PythonEnvironmentTest extends AbstractEnvironmentTest {
         Process python = createPythonProcess(bindingConsumer, bindingConsumer, args.toArray(tmp));
         // add protocol
 
-        int count = 0;
-        while (!started.get() && count < 20) { // wait max. for 20*200 ms
-            TimeUtils.sleep(200);
-            count++;
-        }
+        TimeUtils.waitFor(() -> !started.get(), 20 * 500, 500);
         Assert.assertTrue("Python server process not started", started.get());
         
         ServerAddress aasServer = new ServerAddress(Schema.HTTP); 

@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.services.environment.testing.TestBroker;
@@ -39,6 +41,10 @@ import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.aas.AasFactory;
 import de.iip_ecosphere.platform.support.aas.BasicSetupSpec;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
+import de.iip_ecosphere.platform.support.commons.Commons;
+import de.iip_ecosphere.platform.support.commons.FileAlterationListener;
+import de.iip_ecosphere.platform.support.commons.FileAlterationMonitor;
+import de.iip_ecosphere.platform.support.commons.FileAlterationObserver;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
@@ -82,6 +88,7 @@ public class Starter {
     public static final String PARAM_IIP_TEST_SMREG_PORT = "iip.test.smRegistry.port";
     public static final String PARAM_IIP_TEST_SERVICE_AUTOSTART = "iip.test.service.autostart";
     public static final String PARAM_IIP_ENFORCE_START_SEQUENCE = "okto.service.enforcestartsequence";
+    public static final String PARAM_IIP_TEST_WATCH = "okto.test.watch";
     public static final String ARG_AAS_NOTIFICATION = "iip.test.aas.notification";
     public static final String PROPERTY_JAVA8 = "iip.test.java8";
     public static final String IIP_TEST = "iip.test";
@@ -497,6 +504,62 @@ public class Starter {
     public static Service getMappedService(String serviceId) {
         return null == serviceId ? null : mappedServices.get(serviceId);
     }
+
+    /**
+     * Turns {@code services} into their ids.
+     * 
+     * @param services the services
+     * @return the service ids
+     */
+    private static List<String> toServiceIds(List<Service> services) {
+        return services.stream().map(s -> s.getId()).collect(Collectors.toList());
+    }
+    
+    /**
+     * Sets up file tracking based on {@link #PARAM_IIP_TEST_WATCH}.
+     */
+    protected static void configureFileTracker(String[] args) {
+        String watch = CmdLine.getArg(args, PARAM_IIP_TEST_WATCH, null);
+        if (null != watch) {
+            File folder = new File(watch);
+            if (folder.isDirectory()) {
+                URI updateLocation = folder.toURI();
+                Commons commons = Commons.getInstance();
+                FileAlterationListener listener = new FileAlterationListener() {
+        
+                    @Override
+                    public void onFileChange(final File file) {
+                        getLogger().info("File change detected on {}", file);
+                        List<Service> services = mappedServices.values()
+                            .stream()
+                            .filter(s -> s.getState() == ServiceState.RUNNING)
+                            .collect(Collectors.toList());
+                        Collections.sort(services, Service.START_COMPARATOR);
+                        List<Service> servicesRev = new ArrayList<>(services);
+                        Collections.reverse(servicesRev);
+                        getLogger().info("Stopping services {}", toServiceIds(servicesRev));
+                        servicesRev.forEach(s -> s.stopData());
+                        servicesRev.forEach(s -> setStateQuietly(s, ServiceState.STOPPING, ServiceState.STOPPED));
+                        getLogger().info("Updating services {}", toServiceIds(services));
+                        services.forEach(s -> updateQuietly(s, updateLocation));
+                        getLogger().info("Re-starting services {}", toServiceIds(services));
+                        services.forEach(s -> setStateQuietly(s, ServiceState.STARTING, ServiceState.RUNNING));
+                        services.forEach(s -> s.startData());
+                    }
+                };
+                FileAlterationObserver obs = commons.createFileAlterationObserver(folder.getAbsolutePath(), 
+                    f -> f.isFile() && f.getName().equals("deployed"));
+                obs.addListener(listener);
+                FileAlterationMonitor fam = commons.createFileAlterationMonitor(300, obs);
+                try {
+                    fam.start();
+                    getLogger().info("Watching file changes on {}", folder);
+                } catch (ExecutionException e) {
+                    getLogger().warn("Cannot watch file changes on {}: {}", folder, e.getMessage());
+                }
+            }
+        }
+    }
     
     /**
      * Calls {@link Service#startData()} if either {@code enable} is <b>null</b> or {@code enable} leads to 
@@ -713,13 +776,56 @@ public class Starter {
                         }
                     }));
                 }
-                if (maxServiceStartWaitingTime > 0) {
-                    TimeUtils.waitFor(() -> service.getState() != ServiceState.RUNNING 
-                        && service.getState() != ServiceState.FAILED, maxServiceStartWaitingTime, 500);
-                }
+                setState(service, null, ServiceState.RUNNING); // wait for running
             } catch (ExecutionException e) {
                 getLogger().error("Service autostart '{}': {}", service.getId(), e.getMessage());
             }
+        }
+    }
+
+    /**
+     * Updates {@code service} using the given {@code location} without throwing exceptions.
+     * 
+     * @param service the service to update
+     * @param location the location potentially containing the service update
+     */
+    private static void updateQuietly(Service service, URI location) {
+        try {
+            service.update(location);
+        } catch (ExecutionException e) {
+            getLogger().error("Updating service '{}': {}", service.getId(), e.getMessage());
+        }
+    }
+
+    /**
+     * Changes the state of {@code service} without throwing exceptions. Waits for completion/failure if specified.
+     * 
+     * @param service the service to change the state for
+     * @param state the new service state, may be <b>null</b> to omit setting the state
+     * @param expected the expected service state to wait for, may be <b>null</b> to omit waiting
+     */
+    private static void setStateQuietly(Service service, ServiceState state, ServiceState expected) {
+        try {
+            setState(service, state, expected);
+        } catch (ExecutionException e) {
+            getLogger().error("Setting state {} on '{}': {}", state, service.getId(), e.getMessage());
+        }
+    }
+
+    /**
+     * Changes the state of {@code service}. Waits for completion/failure if specified.
+     * 
+     * @param service the service to change the state for
+     * @param state the new service state, may be <b>null</b> to omit setting the state
+     * @param expected the expected service state to wait for, may be <b>null</b> to omit waiting
+     */
+    private static void setState(Service service, ServiceState state, ServiceState expected) throws ExecutionException {
+        if (state != null) {
+            service.setState(state);
+        }
+        if (maxServiceStartWaitingTime > 0 && null != expected) {
+            TimeUtils.waitFor(() -> service.getState() != expected  && service.getState() != ServiceState.FAILED, 
+                maxServiceStartWaitingTime, 500);
         }
     }
     
@@ -959,9 +1065,9 @@ public class Starter {
                         plugins = pluginParent;
                     }
                 } 
-                LoggerFactory.getLogger(Starter.class).info("Using {} as oktoflow plugin directory", plugins);
+                getLogger().info("Using {} as oktoflow plugin directory", plugins);
                 if (plugins.isDirectory()) {
-                    LoggerFactory.getLogger(Starter.class).info("Trying to load oktoflow plugins from {}", plugins);
+                    getLogger().info("Trying to load oktoflow plugins from {}", plugins);
                     PluginFilter filter = info -> {
                         String name = info.getName();
                         boolean ok = true;
@@ -994,6 +1100,7 @@ public class Starter {
         registerDefaultPlugins(a -> Starter.start());
         Starter.parse(args);
         loadOktoPlugins();
+        configureFileTracker(args);
         if (!startServer(args)) {
             getSetup(); // ensure instance
             runPlugin(args);
