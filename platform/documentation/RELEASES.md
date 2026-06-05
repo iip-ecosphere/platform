@@ -2,6 +2,7 @@
 
 In progress:
 
+* [#192](https://github.com/iip-ecosphere/platform/issues/192): More flexible connector value handling
 * [#185](https://github.com/iip-ecosphere/platform/issues/185): Performance improvements
 * [#180](https://github.com/iip-ecosphere/platform/issues/180): Add application templates to UI
 * [#189](https://github.com/iip-ecosphere/platform/issues/183): Enable AAS metamodel v3 in mgmt UI
