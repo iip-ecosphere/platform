@@ -100,6 +100,10 @@ public class TestAppMojo extends AbstractLoggingMojo {
     @Parameter(property = "configuration.testApp.appPluginFolder", required = false, defaultValue = "plugins")
     private String appPluginFolder;
 
+    // default false as enable updates make more sense when the app is started explicitly rather than in testing
+    @Parameter(property = "configuration.testApp.appEnableUpdates", required = false, defaultValue = "false")
+    private boolean appEnableUpdates;
+
     @Parameter(property = "configuration.testApp.appArgs", required = false)
     private List<String> appArgs;
 
@@ -496,6 +500,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
             + pluginFolderArg
             + " --iip.app.noAas=true" 
             + " --iip.test.brokerPort=" + brokerPort 
+            + " --okto.test.watch=" + appEnableUpdates
             + tmpAppArgs + "\"");
         
         getLog().info("Trying to execute exec:java@ " + appId + " (must be defined as build step in POM) in profile " 
