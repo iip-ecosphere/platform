@@ -14,6 +14,8 @@ package de.iip_ecosphere.platform.examples;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,6 +33,7 @@ import de.iip_ecosphere.platform.services.spring.SpringCloudServiceSetup;
 import de.iip_ecosphere.platform.services.spring.SpringInstances;
 import de.iip_ecosphere.platform.services.spring.yaml.YamlArtifact;
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.setup.CmdLine;
 import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
@@ -55,6 +58,8 @@ public class SpringStartup {
     public static final String ARG_BROKER_PORT = "iip.test.brokerPort";
     public static final int DFLT_BROKER_PORT = 8883;
     public static final String ARG_STOP = "iip.test.stop";
+    
+    private static boolean enableUpdates = true;
 
     /**
      * Main program to start the application. Takes into account additional args via system
@@ -160,9 +165,14 @@ public class SpringStartup {
         int adminPort = -1; // ephemeral
         String serviceProtocol = "";
 
+        enableUpdates = CmdLine.getBooleanArg(args, Starter.PARAM_IIP_TEST_WATCH, enableUpdates);
+        File origArtifact = artifact;
+        artifact = relocateForUpdates(artifact);
         loadPlugins(artifact, args);
         System.setProperty(NetworkManagerFactory.PROPERTY, PersistentLocalNetworkManagerDescriptor.class.getName());
+        System.out.println("Spring artifact: " + artifact);
         System.out.println("Spring Startup with args: " + Arrays.toString(args));
+        System.out.println("Runtime service updates: " + enableUpdates);
         System.out.println("System environment: " + System.getenv());
         System.out.println("JVM properties: " + System.getProperties());
 
@@ -180,7 +190,7 @@ public class SpringStartup {
             addAasNotificationMode(args, cmdLine);
             addAppId(args, cmdLine);
             addNoAas(args, cmdLine);
-            addFileTracker(artifact, cmdLine);
+            addFileTracker(origArtifact, cmdLine);
             System.out.println("Starting with arguments: " + cmdLine);
             ProcessBuilder builder = new ProcessBuilder(cmdLine);
             if (null != procCfg) {
@@ -212,6 +222,31 @@ public class SpringStartup {
             System.err.println("Running the app: " + e.getMessage());
         }
     }
+    
+    /**
+     * Relocates the artifacts to enable updates, i.e., copies the app artifact so that updates through build processes
+     * are not blocked by the running app. No executed if {@link #enableUpdates} is {@code false}. May disable 
+     * {@link #enableUpdates} if copying the artifact fails.
+     * 
+     * @param artifact the artifact to be relocated
+     * @return {@code artifact} if no relocation is needed or relocation fails, a temporary copy of the artifact else
+     */
+    private static File relocateForUpdates(File artifact) {
+        File result = artifact;
+        if (enableUpdates) {
+            try {
+                File tmpFile = new File(FileUtils.getTempDirectory(), artifact.getName());
+                System.out.println("Relocating app artifact to " + tmpFile);
+                Files.copy(artifact.toPath(), tmpFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                tmpFile.deleteOnExit();
+                result = tmpFile;
+            } catch (IOException e) {
+                System.out.println("Disabling service updates. While relocating the artifact: " + e.getMessage());
+                enableUpdates = false;
+            }
+        }
+        return result;
+    }
 
     /**
      * Adds file tracking folder {@link Starter#PARAM_IIP_TEST_WATCH} to {@code cmdArgs}.
@@ -220,7 +255,9 @@ public class SpringStartup {
      * @param cmdArgs the command line arguments to be modified as a side effect
      */
     private static void addFileTracker(File artifact, List<String> cmdArgs) {
-        cmdArgs.add(CmdLine.composeArgument(Starter.PARAM_IIP_TEST_WATCH, artifact.getParentFile()));
+        if (enableUpdates) {
+            cmdArgs.add(CmdLine.composeArgument(Starter.PARAM_IIP_TEST_WATCH, artifact.getParentFile()));
+        }
     }
 
     /**
