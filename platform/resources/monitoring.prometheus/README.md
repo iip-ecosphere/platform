@@ -1,4 +1,4 @@
-# IIP-Ecosphere platform: central resource monitoring (Prometheus)
+# oktoflow platform: central resource monitoring (Prometheus)
 
 Integration of Prometheus as central resource monitoring component. Receives Meter and status information via Transport  and exports that information to Prometheus. This component ships with Windows/Linux binaries for prometheus that can be started during the platform lifecycle.
 

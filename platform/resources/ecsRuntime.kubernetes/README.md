@@ -1,6 +1,6 @@
-# IIP-Ecosphere platform: ECSruntime extension for plain Docker
+# oktoflow platform: ECSruntime extension for plain Docker
 
-[Kubernetes](https://kubernetes.io/) extension/implementation of the SPI interfaces of the IIP-Ecosphere container management agent (ECSruntime) running on compute resources.
+[Kubernetes](https://kubernetes.io/) extension/implementation of the SPI interfaces of the oktoflow container management agent (ECSruntime) running on compute resources.
 
 ## Descriptor file format
 

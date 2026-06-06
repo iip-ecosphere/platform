@@ -1,6 +1,6 @@
-# IIP-Ecosphere platform: ECSruntime extension for LXC
+# oktoflow platform: ECSruntime extension for LXC
 
-LXC extension/implementation of the SPI interfaces of the IIP-Ecosphere container management agent (ECSruntime) running on compute resources.
+LXC extension/implementation of the SPI interfaces of the oktoflow container management agent (ECSruntime) running on compute resources.
 
 ## Container descriptor
 
@@ -17,7 +17,7 @@ The container descriptor is an additional file for identifying the container. Ty
         protocol: <DEFAULT|TCP|UDP|SCTP>
     networkMode: <host|bridge|none|container:name/id>
 
-The first line indicates the internal descriptor used to represent the date for the manager. `id`is the identifier the container can uniquely addressed via the IIP-Ecosphere interfaces used to start/stop the container. This identifier is determined by the platform and instantiated into that file. Similarly, the `name` is the descriptive name of the container. A container image is added to the container manager via its (download) repository. The repository points to the container descriptor (or the default descriptor name is added if it is just a path, see below). `lxcZip` is the name of the compressed image file in a given location. `lxcImageAlias` is the combination of the name of the base image and the repository used to create the container.
+The first line indicates the internal descriptor used to represent the date for the manager. `id`is the identifier the container can uniquely addressed via the oktoflow interfaces used to start/stop the container. This identifier is determined by the platform and instantiated into that file. Similarly, the `name` is the descriptive name of the container. A container image is added to the container manager via its (download) repository. The repository points to the container descriptor (or the default descriptor name is added if it is just a path, see below). `lxcZip` is the name of the compressed image file in a given location. `lxcImageAlias` is the combination of the name of the base image and the repository used to create the container.
 
 The `env` contains the environment settings to be passed to the container during creation/startup. May be single names to be propagated from the system environment or `<key>=<value>`. `${port}` will be replaced by the dynamic port intended for the AAS implementation server). Exposed ports lists the ports that must be accessible in the container. For service manager containers, `env` typically contains `IIP_PORT=${port}` and the exposed ports `port: ${port} protocol:TCP`.
 
