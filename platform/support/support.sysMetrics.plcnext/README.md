@@ -1,4 +1,4 @@
-# IIP-Ecosphere platform: System metrics implementation for Phoenix Contact / PLCnext
+# oktoflow platform: System metrics implementation for Phoenix Contact / PLCnext
 
 Uses [PLCnext internal gRPC](https://www.plcnext.help/te/Service_Components/gRPC_Introduction.htm) to provide default measures. Seems to require AXC firmware 2022.0 LTS and newer.
 

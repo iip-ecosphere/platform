@@ -1,4 +1,4 @@
-# Transport layer of the IIP-Ecosphere platform: Streaming basics
+# Transport layer of the oktoflow platform: Streaming basics
 
 Basic classes for soft-realtime manner based on [Spring cloud stream](https://spring.io/projects/spring-cloud-stream).
 This component is not part of the basic transport component, as we consider Spring cloud stream as one potential
