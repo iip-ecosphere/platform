@@ -1,4 +1,4 @@
-# Transport Component in the Transport Layer of the IIP-Ecosphere platform
+# Transport Component in the Transport Layer of the oktoflow platform
 
 The Transport Component shall provide a simple frontend for the upstream layers/components to communicate in 
 stream-based soft-realtime manner. At the same time this component shall enable flexibility and simplicity in the 

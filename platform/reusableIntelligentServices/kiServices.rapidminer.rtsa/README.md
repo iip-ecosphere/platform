@@ -1,4 +1,4 @@
-# IIP-Ecosphere platform: RapidMiner RTSA integration
+# oktoflow platform: RapidMiner RTSA integration
 
 Generic integration of the [RapidMiner](https://rapidminer.com) [Real-Time Scoring Agent (RTSA)](https://docs.rapidminer.com/latest/scoring-agent/install/) for AI components and processes.
 

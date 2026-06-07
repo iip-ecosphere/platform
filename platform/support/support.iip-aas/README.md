@@ -1,6 +1,6 @@
-# Plattform functions on top of the AAS Component in the Support Layer of the IIP-Ecosphere platform
+# Plattform functions on top of the AAS Component in the Support Layer of the oktoflow platform
 
-Specific IIP-Ecosphere support function realized on top of the Asset Administration Shell (AAS) abstraction:
+Specific oktoflow support function realized on top of the Asset Administration Shell (AAS) abstraction:
 * Constructing an AAS from different components via JSL
 * Generic AAS client classes for conveniently using AAS from Java
 * Network manager AAS sub-model and client

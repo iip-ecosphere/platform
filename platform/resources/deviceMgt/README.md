@@ -1,4 +1,4 @@
-# IIP-Ecosphere platform: central device management
+# oktoflow platform: central device management
 
 Component to perform/integrate the central AAS-based device management.
 

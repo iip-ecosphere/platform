@@ -1,4 +1,4 @@
-# IIP-Ecosphere platform: Basic support libary
+# oktoflow platform: Basic support libary
 
 Basic support classes for the platform, Maven plugins etc. Must remain on Java 8 as some (external) components enforce Java 8. 
 

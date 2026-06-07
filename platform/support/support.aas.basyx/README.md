@@ -1,4 +1,4 @@
-# AAS Component AAS/BaSxy client extension of the Support Layer of the IIP-Ecosphere platform
+# AAS Component AAS/BaSxy client extension of the Support Layer of the oktoflow platform
 
 Client-side Asset Administration Shell (AAS) abstraction based on [Eclipse BaSyx](https://www.eclipse.org/basyx/).  
 

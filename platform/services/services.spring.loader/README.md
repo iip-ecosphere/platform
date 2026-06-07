@@ -1,4 +1,4 @@
-# IIP-Ecosphere platform: App loader for Spring Cloud Stream and ZIP packaging
+# oktoflow platform: App loader for Spring Cloud Stream and ZIP packaging
 
 Extended implementation of spring app loader for isolated class loading.
 

@@ -1,4 +1,4 @@
-# IIP-Ecosphere platform: Service management for Spring Cloud Stream
+# oktoflow platform: Service management for Spring Cloud Stream
 
 Alternative service management implementation for services running with [Spring Cloud Stream](https://spring.io/projects/spring-cloud-stream). Services are given as JAR file. A JAR file may contain multiple services as well as network-coupled service implementations in other programming languages. The services are defined as usual in Spring Clout Stream as Java Bean methods returning Supplier, Function or Consumer. The linking between the services and their binding properties are defined in an `application.yml`. 
 
@@ -118,7 +118,7 @@ The descriptor structure looks as given below (lists are indicates by a single e
 Also the service manager itself can be configured via the ``iipecosphere.yml``, i.e., with this extension Spring execution concepts are/must be added to the containing component.
 
 In addition to the basic AAS settings, the following properties can be configured:
-* `service-mgr` is the IIP-Ecosphere service manager. Service operations such as starting or stopping may not be executed immediately, e.g., as they have to wait for starting up of services or JVMs. 
+* `service-mgr` is the oktoflow service manager. Service operations such as starting or stopping may not be executed immediately, e.g., as they have to wait for starting up of services or JVMs. 
   * The `waitingTime` limits this time and causes called operations to failed if the given time is exceeded (default `60000` ms).
   * `availabilityRetryDelay` denotes the time to wait between two subsequent service availability request (default `500` ms).
   * `brokerHost` and `brokerPort` define the communication setup for the locally installed messaging service/broker that serves for local service communication, e.g., a MQTT broker. 

@@ -1,4 +1,4 @@
-# IIP-Ecosphere platform: Generic Anonymziation/Pseudonymization Service
+# oktoflow platform: Generic Anonymziation/Pseudonymization Service
 
 This component realizes the integration of [KIPROTECT kodex]() as (deployable) generic anonymization/pseudonymization service. The KODEX community edition is AGPL-3.0; as we use and do not modify the binary, there is no license issue if we use, loosely integrate and distribute the official binary.
 

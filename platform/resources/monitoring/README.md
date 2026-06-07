@@ -1,4 +1,4 @@
-# IIP-Ecosphere platform: central resource monitoring
+# oktoflow platform: central resource monitoring
 
 Component to perform central resource monitoring. This is a generic component, which requires respective extensions, e.g., monitoring.prometheus.
 

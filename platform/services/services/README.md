@@ -1,6 +1,6 @@
-# Generic Service and Management and Control of the IIP-Ecosphere platform
+# Generic Service and Management and Control of the oktoflow platform
 
-The basic service and service management interfaces of the IIP-Ecosphere platform. Also provides the AAS of the 
+The basic service and service management interfaces of the oktoflow platform. Also provides the AAS of the 
 services, including
 
 * Artifacts containing the services.

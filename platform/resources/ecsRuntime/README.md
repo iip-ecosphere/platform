@@ -1,4 +1,4 @@
-# ECS runtime of the IIP-Ecosphere platform
+# ECS runtime of the oktoflow platform
 
 Interfaces (SPI) and basic implementation of container and service management agent running on compute resources.
 
