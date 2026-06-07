@@ -24,7 +24,7 @@ import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 
-import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.OsUtils;
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.TestSuite;
 
@@ -36,13 +36,13 @@ import junit.framework.TestSuite;
 public class TestUtils {
     
     /**
-     * Returns whether this JVM is currently executing on the SSE CI Jenkins.
+     * Returns whether this JVM is currently executing in the CI (@code {-DinCi=true} shall be set).
      * This may be needed to disable some tests.
      * 
      * @return {@code true} if we are running on SSE CI, {@code false}
      */
-    public static boolean isSseCI() {
-        return NetUtils.getOwnHostname().indexOf("jenkins") >= 0;
+    public static boolean isInCI() {
+        return OsUtils.getBooleanProperty("inCi", false);
     }
     
     /**
