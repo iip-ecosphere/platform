@@ -1,4 +1,4 @@
-# IIP-Ecosphere platform: Extended dependency plugin for Maven
+# oktoflow platform: Extended dependency plugin for Maven
 
 We use the `maven-dependency-plugin` for various tasks, e.g., to unpack Python code or the configuration model.  However, we do not limit ourselves to the target directory which may be cleaned up with `mvn clean` and other cleaning procedures do not work. So we decided to add a cleanup specification to `unpack` goal of maven-dependency-plugin provided by this package. Similarly, we need to add further non-classpath files to `build-classpath` when creating classpath files for platform instances. For convenience, we include further goals such as `delete` or `copy` of the original plugin we use them frequently in conjunction with `unpack`. Basic properties of the underlying maven dependendency plugin can be applied although not explicitly discussed here. 
 
@@ -69,6 +69,7 @@ The `build-classpath` goal is an extension of the original plugin and allows for
 - `afters` lines to be appended after the classpath without modification, uses `lineSeparator` between given lines and classpath; e.g., use # to have comments before the classpath, see [the Java command documentation](https://docs.oracle.com/en/java/javase/17/docs/specs/man/java.html#java-command-line-argument-files)
 - `lineSeparator` (default the carriage return, user property `mdep.lineSeparator`) used as separator between `befores`, `afters` and the classpath 
 - `addAppLoader` (default `false`, user property `mdep.addAppLoader`) adds whatever dependencies are needed to start an oktoflow app, e.g., the spring loader via the `org.springframework.boot.version` oktoflow maven property 
+- `outputFiles` (default none, user property `mdep.outputFiles`), list (comma separated) of copies of the classpath files to write
 
 The expressions `${self}` or `${self-test}` can be used in prepends/appends to add the jar/test-jar artifact of the actual project.
 

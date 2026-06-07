@@ -15,6 +15,9 @@ package de.iip_ecosphere.platform.tools.maven.dependencies;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -53,7 +56,10 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
 
     @Parameter( property = "mdep.outputFile" )
     private File outputFile; // -> setter
-    
+
+    @Parameter( property = "mdep.outputFiles", required = false )
+    private String outputFiles;
+
     @Parameter( property = "mdep.pathSeparator", defaultValue = "" )
     private String pathSeparator; // -> setter
     
@@ -361,6 +367,26 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
             } catch (IOException e) {
                 getLog().error("Reading: " + e.getMessage());
             }           
+        }
+        writeCopies();
+    }
+    
+    /**
+     * Writes copies of {@code outputFile}.
+     */
+    private void writeCopies() {
+        if (null != outputFiles && outputFiles.length() > 0 && outputFile != null && outputFile.exists()) {
+            getLog().info("Writing copies of " + outputFile);
+            StringTokenizer oFiles = new StringTokenizer(outputFiles, ",");
+            while (oFiles.hasMoreTokens()) {
+                String o = oFiles.nextToken();
+                try {
+                    getLog().info(" - Copying to " + o);
+                    Files.copy(outputFile.toPath(), Paths.get(o), StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                    getLog().error("   Writing copy " + o + ": " + e.getMessage());
+                }
+            }
         }
     }
 
