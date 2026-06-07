@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.support.plugins;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -123,6 +124,19 @@ public class URLPluginSetupDescriptor implements PluginSetupDescriptor {
             .debug("Creating classpath for {}", Arrays.toString(urls));
         return createClassLoader(urls, parent);
     }
+    
+    /**
+     * Logs a failing index access.
+     * 
+     * @param th the throwable
+     */
+    private void logFailingIndex(Throwable th) {
+        LoggerFactory.getLogger(URLPluginSetupDescriptor.class).warn(
+            "Cannot create {}, falling back to {}. Reason: {}", 
+            IndexClassloader.class.getSimpleName(), 
+            ChildFirstURLClassLoader.class.getSimpleName(), 
+            th.getMessage());
+    }
 
     /**
      * Actually creates the classloader.
@@ -134,11 +148,27 @@ public class URLPluginSetupDescriptor implements PluginSetupDescriptor {
     protected ClassLoader createClassLoader(URL[] urls, ClassLoader parent) {
         ClassLoader result = null;
         if (ChildFirstClassLoader.useChildFirst()) {
-            File idxFile = getIndexFile();
-            if (null != idxFile && idxFile.isFile() && idxFile.length() > 0 
-                && OsUtils.getBooleanEnv("OKTO_USE_PLUGIN_INDEXES", true)) {
+            LoaderIndex index = null;
+            if (OsUtils.getBooleanEnv("OKTO_USE_PLUGIN_INDEXES", true)) {
+                File idxFile = getIndexFile();
+                if (null != idxFile && idxFile.isFile() && idxFile.length() > 0) {
+                    try {
+                        index = LoaderIndex.fromFile(idxFile);
+                    } catch (IOException e) {
+                        logFailingIndex(e);
+                    }
+                }
+                InputStream idxStream = getIndexStream();
+                if (null != idxStream) {
+                    try {
+                        index = LoaderIndex.fromStream(idxStream);
+                    } catch (IOException e) {
+                        logFailingIndex(e);
+                    }
+                }
+            }
+            if (null != index) {
                 try {
-                    LoaderIndex index = LoaderIndex.fromFile(idxFile);
                     Map<String, String> urlMapping = new HashMap<>();
                     for (URL url : urls) {
                         String u = LoaderIndex.normalize(Paths.get(url.toURI()).toString());
@@ -152,12 +182,8 @@ public class URLPluginSetupDescriptor implements PluginSetupDescriptor {
                     }
                     index.substituteLocations(urlMapping);
                     result = new ChildFirstIndexClassLoader(index, parent);
-                } catch (IOException | URISyntaxException e) {
-                    LoggerFactory.getLogger(URLPluginSetupDescriptor.class).warn(
-                        "Cannot create {}, falling back to {}. Reason: {}", 
-                        IndexClassloader.class.getSimpleName(), 
-                        ChildFirstURLClassLoader.class.getSimpleName(), 
-                        e.getMessage());
+                } catch (URISyntaxException e) {
+                    logFailingIndex(e);
                 }
             }
             if (null == result) {
@@ -175,6 +201,15 @@ public class URLPluginSetupDescriptor implements PluginSetupDescriptor {
      * @return the index file
      */
     protected File getIndexFile() {
+        return null;
+    }
+
+    /**
+     * Returns the index file stream for classloading. Fallback for {@link #getIndexFile()}.
+     * 
+     * @return the index file stream
+     */
+    protected InputStream getIndexStream() {
         return null;
     }
 

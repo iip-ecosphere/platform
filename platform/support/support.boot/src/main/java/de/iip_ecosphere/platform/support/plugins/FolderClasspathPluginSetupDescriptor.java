@@ -150,7 +150,7 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
     public static URL[] loadClasspathFileSafe(File cpFile, boolean descriptorOnly) {
         return loadClasspathFileSafe(cpFile, cpFile.getParentFile(), descriptorOnly);
     }
-    
+
     /**
      * Loads a classpath file relative to the actual jars and returns the specified classpath entries as URLs. 
      * Logs errors and  exceptions.
@@ -161,42 +161,59 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
      * @param appends further classpath files that shall be appended, e.g., logging, may be <b>null</b>
      * @return the URLs, may be empty
      */
-    private static URL[] loadClasspathFileSafe(File cpFile, File base, boolean descriptorOnly, File... appends) {
+    static URL[] loadClasspathFileSafe(File cpFile, File base, boolean descriptorOnly, File... appends) {
         URL[] result = null;
         try (InputStream in = new FileInputStream(cpFile)) {
             getLogger().info("Loading classpath from '{}' (descriptorOnly: {})", cpFile, descriptorOnly);
-            ClasspathFile cpf = readClasspathFile(in, base);
-            if (null != appends) {
-                for (File a: appends) {
-                    if (!a.isFile()) {
-                        a = new File(a, "target/jars/classpath");
-                    }
-                    try (InputStream aIn = new FileInputStream(a)) {
-                        getLogger().info("Appending classpath from '{}'", a);
-                        ClasspathFile aCpf = readClasspathFile(aIn, base);
-                        cpf.entries.addAll(aCpf.entries);
-                    } catch (IOException e) {
-                        getLogger().warn("While reading append classpath from '{}': {} Ignoring.", a, e.getMessage());
-                    }
-                }
-            }
-            List<File> entries = new ArrayList<File>(cpf.entries);
-            if (descriptorOnly) {
-                if (entries.size() > 1) {
-                    List<File> tmp = new ArrayList<>();
-                    tmp.add(entries.get(0));
-                    String first = stripExtension(entries.get(0).getName());
-                    String second = stripExtension(entries.get(1).getName());
-                    if (second.startsWith(first)) { // xxx-tests
-                        tmp.add(entries.get(1));
-                    }
-                    entries = tmp;
-                }
-            }
-            result = toURLSafe(entries.toArray(new File[entries.size()]));
+            loadClasspathFileSafe(in, base, descriptorOnly, appends);
         } catch (IOException e) {
             getLogger().error("While reading classpath from '{}': {} Ignoring.", cpFile, e.getMessage());
         }
+        return result;
+    }
+
+    /**
+     * Loads a classpath file relative to the actual jars and returns the specified classpath entries as URLs. 
+     * Logs errors and  exceptions.
+     * 
+     * @param cpFile the classpath file
+     * @param base the base folder use to make relative classpath entries absolute
+     * @param descriptorOnly only the first/two entries, the full thing else
+     * @param appends further classpath files that shall be appended, e.g., logging, may be <b>null</b>
+     * @return the URLs, may be empty
+     */
+    static URL[] loadClasspathFileSafe(InputStream in, File base, boolean descriptorOnly, File[] appends) 
+        throws IOException {
+        URL[] result = null;
+        ClasspathFile cpf = readClasspathFile(in, base);
+        if (null != appends) {
+            for (File a: appends) {
+                if (!a.isFile()) {
+                    a = new File(a, "target/jars/classpath");
+                }
+                try (InputStream aIn = new FileInputStream(a)) {
+                    getLogger().info("Appending classpath from '{}'", a);
+                    ClasspathFile aCpf = readClasspathFile(aIn, base);
+                    cpf.entries.addAll(aCpf.entries);
+                } catch (IOException e) {
+                    getLogger().warn("While reading append classpath from '{}': {} Ignoring.", a, e.getMessage());
+                }
+            }
+        }
+        List<File> entries = new ArrayList<File>(cpf.entries);
+        if (descriptorOnly) {
+            if (entries.size() > 1) {
+                List<File> tmp = new ArrayList<>();
+                tmp.add(entries.get(0));
+                String first = stripExtension(entries.get(0).getName());
+                String second = stripExtension(entries.get(1).getName());
+                if (second.startsWith(first)) { // xxx-tests
+                    tmp.add(entries.get(1));
+                }
+                entries = tmp;
+            }
+        }
+        result = toURLSafe(entries.toArray(new File[entries.size()]));
         if (null == result) {
             result = new URL[0];
         }

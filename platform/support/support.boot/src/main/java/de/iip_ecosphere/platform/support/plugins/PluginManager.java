@@ -211,7 +211,7 @@ public class PluginManager {
     private static void loadPlugins(boolean onlyNew) {
         ServiceLoaderUtils
             .stream(ServiceLoaderUtils.load(PluginSetupDescriptor.class))
-            .forEach(d -> registerPlugin(d, onlyNew));
+            .forEach(d -> registerPlugin(d, onlyNew, false));
 
         String plugins = OsUtils.getPropertyOrEnv(FILE_PLUGINS_PROPERTY, "");
         StringTokenizer tokens = new StringTokenizer(plugins, ":;");
@@ -219,7 +219,7 @@ public class PluginManager {
             String token = tokens.nextToken();
             File file = new File(token);
             if (file.exists() && file.isDirectory()) {
-                registerPlugin(new FolderClasspathPluginSetupDescriptor(file), onlyNew);
+                registerPlugin(new FolderClasspathPluginSetupDescriptor(file), onlyNew, false);
             } else {
                 LoggerFactory.getLogger(PluginManager.class).warn("While reading unpacked plugins from -D{}, "
                     + "{} does not exist/is no directory.", FILE_PLUGINS_PROPERTY, file);
@@ -240,6 +240,19 @@ public class PluginManager {
     }
 
     /**
+     * Explicitly registers the given plugin (setup) descriptor. Obtains the class loader
+     * of the descriptor and loads the known {@link PluginDescriptor plugin descriptors}.
+     * 
+     * @param desc the plugin setup descriptor
+     * @param force forces overriding existing known plugins
+     * @see #registerPlugin(PluginSetupDescriptor, boolean)
+     * @see #registerPlugin(PluginDescriptor, boolean, File)
+     */
+    public static void registerPlugin(PluginSetupDescriptor desc, boolean force) {
+        registerPlugin(desc, false, force);
+    }
+
+    /**
      * Registers the given plugin (setup) descriptor. Obtains the class loader
      * of the descriptor and loads the known {@link PluginDescriptor plugin descriptors}. Mandates that known
      * {@link PluginDescriptor plugin descriptors} are loaded by the class loader(s) of {@code desc}.
@@ -247,10 +260,11 @@ public class PluginManager {
      * @param desc the plugin setup descriptor
      * @param onlyNew if {@code true} considers only unknown/new plugins, if {@code false} consides all plugins and 
      *   issues warnings
+     * @param force forces overriding existing known plugins
      * @see #registerPlugin(PluginDescriptor, boolean, File)
      * @see PluginSetup#getClassLoader()
      */
-    private static void registerPlugin(PluginSetupDescriptor desc, boolean onlyNew) {
+    private static void registerPlugin(PluginSetupDescriptor desc, boolean onlyNew, boolean force) {
         LoggerFactory.getLogger(PluginManager.class).info("Found plugin setup descriptor {}. Registering plugin...", 
             desc.getClass());
         boolean allowAll = !desc.preventDuplicates();
@@ -258,7 +272,7 @@ public class PluginManager {
         ClassLoader descLoader = desc.createClassLoader(loader);
         desc.getPluginDescriptors(descLoader)
             .filter(d -> allowAll || loadedBy(d, descLoader))
-            .forEach(d -> registerPlugin(d, onlyNew, desc.getInstallDir()));
+            .forEach(d -> registerPlugin(d, onlyNew, force, desc.getInstallDir()));
     }
     
     /**
@@ -303,20 +317,36 @@ public class PluginManager {
      * @param installDir the installation directory, may be <b>null</b>
      */
     public static void registerPlugin(PluginDescriptor<?> desc, boolean onlyNew, File installDir) {
+        registerPlugin(desc, onlyNew, false, installDir);
+    }
+
+    /**
+     * Registers the given plugin descriptor. May warn if a {@link PluginDescriptor#getId() plugin id}
+     * is already registered and ignores then {@code desc}.
+     * 
+     * @param desc the descriptor to register
+     * @param onlyNew if {@code true} considers only unknown/new plugins, if {@code false} considers all plugins and 
+     *   issues warnings
+     * @param force forces overriding existing known plugins
+     * @param installDir the installation directory, may be <b>null</b>
+     */
+    public static void registerPlugin(PluginDescriptor<?> desc, boolean onlyNew, boolean force, File installDir) {
         Plugin<?> plugin = desc.createPlugin(installDir);
         Class<?> pluginClass = plugin.getInstanceClass();
         List<String> ids = plugin.getAllIds();
         boolean dflt = ids.stream().anyMatch(i -> i.endsWith(POSTFIX_ID_DEFAULT));
         boolean isKnown = false;
-        for (String id : ids) {
-            Plugin<?> known = plugins.get(id);
-            if (null != known) {
-                if (descriptors.get(id) != desc) {
-                    LoggerFactory.getLogger(PluginManager.class).warn(
-                        "Plugin id '{}' is already registered for {}. Ignoring descriptor {}.", 
-                        id, known.getClass(), desc.getClass());
+        if (!force) {
+            for (String id : ids) {
+                Plugin<?> known = plugins.get(id);
+                if (null != known) {
+                    if (descriptors.get(id) != desc) {
+                        LoggerFactory.getLogger(PluginManager.class).warn(
+                            "Plugin id '{}' is already registered for {}. Ignoring descriptor {}.", 
+                            id, known.getClass(), desc.getClass());
+                    }
+                    isKnown = true;
                 }
-                isKnown = true;
             }
         }
         if ((onlyNew && !isKnown) || !onlyNew) {
