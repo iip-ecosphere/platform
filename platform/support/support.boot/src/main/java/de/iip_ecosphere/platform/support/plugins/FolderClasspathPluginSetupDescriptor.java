@@ -165,7 +165,7 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
         URL[] result = null;
         try (InputStream in = new FileInputStream(cpFile)) {
             getLogger().info("Loading classpath from '{}' (descriptorOnly: {})", cpFile, descriptorOnly);
-            loadClasspathFileSafe(in, base, descriptorOnly, appends);
+            result = loadClasspathFileSafe(in, base, descriptorOnly, appends);
         } catch (IOException e) {
             getLogger().error("While reading classpath from '{}': {} Ignoring.", cpFile, e.getMessage());
         }
