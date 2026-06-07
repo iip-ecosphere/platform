@@ -169,6 +169,9 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
         } catch (IOException e) {
             getLogger().error("While reading classpath from '{}': {} Ignoring.", cpFile, e.getMessage());
         }
+        if (null == result) {
+            result = new URL[0];
+        }
         return result;
     }
 
