@@ -78,6 +78,11 @@ public class SpringAsyncServiceBaseTests {
         }
 
         @Override
+        public String getArtifact() {
+            return null;
+        }
+
+        @Override
         public boolean isDeployable() {
             return false;
         }

@@ -134,7 +134,7 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
                 Collections.sort(services, Service.START_COMPARATOR);
                 ServiceMapper mapper = new ServiceMapper(Starter.getProtocolBuilder());
                 for (Service service : services) {
-                    mapService(mapper, service, true); // used by testing, may require individual information
+                    mapService(mapper, service, true, null); // used by testing, may require individual information
                 }
             }
             Starter.start();
@@ -412,7 +412,21 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
      * @see #determineStartupSequence()
      */
     public static void mapService(Service service) {
-        mapService(service, null);
+        mapService(service, null, null);
+    }
+
+    /**
+     * Maps a service through the default mapper and the default metrics client. [Convenience method for generation]
+     * By default, do autostart.
+     * 
+     * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
+     * @param updateHandler optional handler to be called when a service is being updated, shall return 
+     *     the updated service instance, may be <b>null</b>
+     * 
+     * @see #determineStartupSequence()
+     */
+    public static void mapService(Service service, Supplier<? extends Service> updateHandler) {
+        mapService(service, null, updateHandler);
     }
     
     /**
@@ -421,10 +435,12 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
      * 
      * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
      * @param after code to be executed after mapping, may be <b>null</b>
+     * @param updateHandler optional handler to be called when a service is being updated, shall return 
+     *     the updated service instance, may be <b>null</b>
      * 
      * @see #determineStartupSequence()
      */
-    public static void mapService(Service service, Runnable after) {
+    public static void mapService(Service service, Runnable after, Supplier<? extends Service> updateHandler) {
         if (null != startupSequence) {
             String serviceId = service.getId();
             for (int i = 0; i < startupSequence.size(); i++) {
@@ -432,13 +448,13 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
                 if (s != null && s.mapping.get() == null && s.id.equals(serviceId)) {
                     s.mapping.set(() -> {
                         de.iip_ecosphere.platform.services.environment.Starter.mapService(service, 
-                            service.getKind() != ServiceKind.SOURCE_SERVICE);
+                            service.getKind() != ServiceKind.SOURCE_SERVICE, updateHandler);
                     });
                     s.after.set(after);
                 }
             }
         } else {
-            de.iip_ecosphere.platform.services.environment.Starter.mapService(service);
+            de.iip_ecosphere.platform.services.environment.Starter.mapService(service, updateHandler);
             if (null != after) {
                 after.run();
             }
