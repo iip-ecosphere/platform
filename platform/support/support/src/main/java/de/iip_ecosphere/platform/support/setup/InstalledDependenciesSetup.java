@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import de.iip_ecosphere.platform.support.resources.FolderResourceResolver;
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
@@ -131,10 +132,11 @@ public class InstalledDependenciesSetup extends AbstractSetup {
      * Returns the location for a given program/dependency key.
      * 
      * @param key the key
-     * @return the location, may be <b>null</b> for none
+     * @return the (resolved) location, may be <b>null</b> for none
+     * @see FileUtils#resolve(File)
      */
     public File getLocation(String key) {
-        return null == key ? null : locations.get(key);
+        return null == key ? null : FileUtils.resolve(locations.get(key));
     }
 
     /**
