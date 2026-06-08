@@ -978,6 +978,19 @@ public class Starter {
      * 
      * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
      * @param enableAutostart whether service autostart shall be performed if {@code}, e.g., not for family members
+     * 
+     * @see #getServiceMapper()
+     * @see #mapService(ServiceMapper, Service, boolean, Supplier)
+     */
+    public static void mapService(Service service, boolean enableAutostart) {
+        mapService(getServiceMapper(), service, enableAutostart, null);
+    }
+
+    /**
+     * Maps a service through the default mapper and the default metrics client. [Convenience method for generation]
+     * 
+     * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
+     * @param enableAutostart whether service autostart shall be performed if {@code}, e.g., not for family members
      * @param updateHandler optional handler to be called when a service is being updated, shall return 
      *     the updated service instance, may be <b>null</b>
      * 
