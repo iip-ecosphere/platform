@@ -58,6 +58,7 @@ public abstract class AbstractService implements Service {
     private String name;
     private Version version;
     private String description;
+    private String artifact;
     private boolean isDeployable; 
     private boolean isTopLevel; 
     private ServiceKind kind;
@@ -120,6 +121,7 @@ public abstract class AbstractService implements Service {
     protected AbstractService(YamlService yaml) {
         this(yaml.getId(), yaml.getName(), yaml.getVersion(), yaml.getDescription(), yaml.isDeployable(), 
             yaml.isTopLevel(), yaml.getKind());
+        artifact = yaml.getArtifact();
         if (null != yaml.getNetMgtKey() && yaml.getNetMgtKey().length() > 0) {
             netKeyMgtAddress = NetworkManagerFactory.getInstance().getPort(yaml.getNetMgtKey());
         }
@@ -584,6 +586,11 @@ public abstract class AbstractService implements Service {
     @Override
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public String getArtifact() {
+        return artifact;
     }
 
     @Override

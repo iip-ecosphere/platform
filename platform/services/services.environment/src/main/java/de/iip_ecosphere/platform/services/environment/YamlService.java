@@ -31,7 +31,7 @@ public class YamlService extends AbstractYamlService {
     }
 
     /**
-     * Defines an optional attached process realizing the service. [required by SnakeYaml]
+     * Defines an optional attached process realizing the service. [required by Yaml]
      * 
      * @param process the process information, may be <b>null</b>
      */

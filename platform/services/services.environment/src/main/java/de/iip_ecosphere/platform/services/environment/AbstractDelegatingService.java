@@ -83,6 +83,11 @@ public abstract class AbstractDelegatingService<S extends Service> implements Se
     }
 
     @Override
+    public String getArtifact() {
+        return service.getArtifact();
+    }
+
+    @Override
     public boolean isDeployable() {
         return service.isDeployable();
     }

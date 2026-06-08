@@ -20,12 +20,15 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
@@ -54,6 +57,8 @@ import de.iip_ecosphere.platform.support.net.NetworkManagerFactory;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
 import de.iip_ecosphere.platform.support.plugins.PluginManager.PluginFilter;
 import de.iip_ecosphere.platform.support.plugins.PluginSetup;
+import de.iip_ecosphere.platform.support.plugins.PluginSetupDescriptor;
+import de.iip_ecosphere.platform.support.plugins.StreamClasspathPluginSetupDescriptor;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.support.setup.InstalledDependenciesSetup;
 import de.iip_ecosphere.platform.support.logging.Logger;
@@ -100,6 +105,7 @@ public class Starter {
     private static Server appServer;
     private static Map<String, Integer> servicePorts = new HashMap<>();
     private static Map<String, Service> mappedServices = new HashMap<>();
+    private static Map<String, Supplier<? extends Service>> updateHandlers = new HashMap<>();
     private static boolean serviceAutostart = false; // shall be off, done by platform, only for testing
     private static boolean enforceStartSequence = true; // default since 0.8.1
     private static boolean onServiceAutostartAttachShutdownHook = true;
@@ -496,13 +502,23 @@ public class Starter {
     }
     
     /**
-     * Returns service mapped by this starter. These are typically all services executed within the same JVM.
+     * Returns the service mapped by this starter. These are typically all services executed within the same JVM.
      * 
      * @param serviceId the serviceId, ignored if <b>null</b>
      * @return the service if known, <b>null</b> else
      */
     public static Service getMappedService(String serviceId) {
         return null == serviceId ? null : mappedServices.get(serviceId);
+    }
+    
+    /**
+     * Returns the update handler mapped by this starter. MAy be available for services executed within the same JVM.
+     * 
+     * @param serviceId the serviceId, ignored if <b>null</b>
+     * @return the update handler if known, <b>null</b> else
+     */
+    public static Supplier<? extends Service> getUpdateHandler(String serviceId) {
+        return null == serviceId ? null : updateHandlers.get(serviceId);
     }
 
     /**
@@ -541,7 +557,7 @@ public class Starter {
                         servicesRev.forEach(s -> s.stopData());
                         servicesRev.forEach(s -> setStateQuietly(s, ServiceState.STOPPING, ServiceState.STOPPED));
                         getLogger().info("Updating services {}", toServiceIds(services));
-                        services.forEach(s -> updateQuietly(s, updateLocation));
+                        updateServices(services, updateLocation);
                         getLogger().info("Re-starting services {}", toServiceIds(services));
                         services.forEach(s -> setStateQuietly(s, ServiceState.STARTING, ServiceState.RUNNING));
                         services.forEach(s -> s.startData());
@@ -737,11 +753,17 @@ public class Starter {
      * @param mapper the service mapper instance (may be <b>null</b>, no mapping will happen then)
      * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
      * @param enableAutostart whether service autostart shall be performed 
+     * @param updateHandler optional handler to be called when a service is being updated, shall return 
+     *     the updated service instance, may be <b>null</b>
      * @see #autostartService(Service)
      */
-    public static void mapService(ServiceMapper mapper, Service service, boolean enableAutostart) {
+    public static void mapService(ServiceMapper mapper, Service service, boolean enableAutostart, 
+        Supplier<? extends Service> updateHandler) {
         if (null != service && service.getId() != null) {
             mappedServices.put(service.getId(), service);
+            if (null != updateHandlers) {
+                updateHandlers.put(service.getId(), updateHandler);
+            }
             if (null != mapper && null != Starter.getProtocolBuilder()) {
                 mapper.mapService(service);
             }
@@ -781,6 +803,52 @@ public class Starter {
                 getLogger().error("Service autostart '{}': {}", service.getId(), e.getMessage());
             }
         }
+    }
+    
+    /**
+     * Updates the given {@code services}.
+     * 
+     * @param services the services to update
+     * @param location the location potentially containing the service update
+     */
+    private static void updateServices(List<Service> services, URI location) {
+        Set<String> doneArtifacts = new HashSet<>();
+        File base;
+        try {
+            base = new File(location);
+        } catch (IllegalArgumentException e) {
+            base = new File("");
+        }
+        for (Service s : services) {
+            String artifact = s.getArtifact();
+            if (null != artifact && artifact.length() > 0) {
+                String[] parts = artifact.split(":");
+                if (parts.length > 0) {
+                    artifact = parts[0] + "." + parts[1]; // see generation
+                } else {
+                    artifact = null;
+                }
+            } else {
+                artifact = null;
+            }
+            if (null != artifact && !doneArtifacts.contains(artifact)) {
+                doneArtifacts.add(artifact);
+                ClassLoader sCl = s.getClass().getClassLoader();
+                InputStream cp = ResourceLoader.getResourceAsStream(sCl, artifact);
+                InputStream idx = null;
+                if (null != cp) {
+                    idx = ResourceLoader.getResourceAsStream(sCl, artifact + ".idx");
+                    try {
+                        PluginSetupDescriptor psd = new StreamClasspathPluginSetupDescriptor(cp, idx, base);
+                        PluginManager.registerPlugin(psd, true);
+                    } catch (IOException e) {
+                        getLogger().warn("Cannot create plugin setup descriptor for '{}': {}", 
+                            s.getArtifact(), e.getMessage());
+                    }
+                }
+            }
+        }
+        services.forEach(s -> updateQuietly(s, location));
     }
 
     /**
@@ -910,12 +978,14 @@ public class Starter {
      * 
      * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
      * @param enableAutostart whether service autostart shall be performed if {@code}, e.g., not for family members
+     * @param updateHandler optional handler to be called when a service is being updated, shall return 
+     *     the updated service instance, may be <b>null</b>
      * 
      * @see #getServiceMapper()
-     * @see #mapService(ServiceMapper, Service, boolean)
+     * @see #mapService(ServiceMapper, Service, boolean, Supplier)
      */
-    public static void mapService(Service service, boolean enableAutostart) {
-        mapService(getServiceMapper(), service, enableAutostart);
+    public static void mapService(Service service, boolean enableAutostart, Supplier<? extends Service> updateHandler) {
+        mapService(getServiceMapper(), service, enableAutostart, updateHandler);
     }
 
     /**
@@ -925,12 +995,25 @@ public class Starter {
      * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
      * 
      * @see #getServiceMapper()
-     * @see #mapService(ServiceMapper, Service, boolean)
+     * @see #mapService(Service, boolean, Supplier)
      */
     public static void mapService(Service service) {
-        mapService(service, true);
+        mapService(service, true, null);
     }
-    
+
+    /**
+     * Maps a service through the default mapper and the default metrics client. [Convenience method for generation]
+     * By default, do autostart.
+     * 
+     * @param service the service to be mapped (may be <b>null</b>, no mapping will happen then)
+     * 
+     * @see #getServiceMapper()
+     * @see #mapService(Service, boolean, Supplier)
+     */
+    public static void mapService(Service service, Supplier<? extends Service> updateHandler) {
+        mapService(service, true, updateHandler);
+    }
+
     /**
      * Terminates running server instances.
      */

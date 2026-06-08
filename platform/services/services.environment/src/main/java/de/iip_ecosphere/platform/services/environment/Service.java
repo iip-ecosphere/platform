@@ -22,6 +22,7 @@ import java.util.function.Supplier;
 import de.iip_ecosphere.platform.services.environment.switching.ServiceBase;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.Version;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Defines the (administrative) interface of an IIP-Ecosphere service.
@@ -53,6 +54,13 @@ public interface Service extends ParameterConfigurerProvider, ServiceBase {
      * @return the description, may be empty
      */
     public String getDescription();
+
+    /**
+     * The artifact containing the service.
+     * 
+     * @return the maven artifact coordinate if known, else empty or <b>null</b>
+     */
+    public String getArtifact();
 
     /**
      * Returns whether the service is deployable in distributable manner or fixed in deployment location.
@@ -143,6 +151,25 @@ public interface Service extends ParameterConfigurerProvider, ServiceBase {
     @Override
     public default Set<String> getParameterNames() {
         return null;
+    }
+
+    /**
+     * Transfers all matching state, parameters.
+     * 
+     * @param source the source service to transfer from
+     */
+    public default void transferState(Service source) {
+        for (String n : source.getParameterNames()) {
+            ParameterConfigurer<?> sp = source.getParameterConfigurer(n);
+            ParameterConfigurer<?> tp = getParameterConfigurer(n);
+            if (tp != null && sp != null) {
+                try {
+                    tp.transferValue(sp);
+                } catch (ExecutionException e) {
+                    LoggerFactory.getLogger(getClass()).warn("Cannot transfer value of {}: {}", n, e.getMessage());
+                }
+            }
+        }
     }
     
     /**

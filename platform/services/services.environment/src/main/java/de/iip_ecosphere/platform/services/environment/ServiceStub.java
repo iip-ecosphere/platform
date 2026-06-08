@@ -223,6 +223,11 @@ public class ServiceStub implements Service {
     }
 
     @Override
+    public String getArtifact() {
+        return convertGetterResultToString(NAME_PROP_ARTIFACT);
+    }
+
+    @Override
     public ServiceState getState() {
         try {
             Object[] param = new Object[] {};

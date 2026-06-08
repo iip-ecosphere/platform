@@ -56,7 +56,7 @@ public class YamlProcess implements ProcessSpec {
     }
 
     /**
-     * Changes whether the underlying process is already started when firing up the service. [required by SnakeYaml] 
+     * Changes whether the underlying process is already started when firing up the service. [required by Yaml] 
      * 
      * @param started {@code true} for started (default), {@code false} else
      */
@@ -142,7 +142,7 @@ public class YamlProcess implements ProcessSpec {
     }
 
     /**
-     * Defines the system command or relative path to be executed. [required by SnakeYaml]
+     * Defines the system command or relative path to be executed. [required by Yaml]
      * 
      * @param executable the name/path
      */
@@ -162,7 +162,7 @@ public class YamlProcess implements ProcessSpec {
     /**
      * Changes the optional path to be prefixed before the executable. Relevance depends on the execution environment. 
      * May contain "${tmp}" for the system temporary directory path and "${user}" for the user directory path.
-     * [required by SnakeYaml]
+     * [required by Yaml]
      * 
      * @param executablePath the optional executable path, may be <b>null</b> for none
      */
@@ -173,7 +173,7 @@ public class YamlProcess implements ProcessSpec {
     /**
      * Changes the optional path to be prefixed before the executable. Relevance depends on the execution environment. 
      * May contain "${tmp}" for the system temporary directory path and "${user}" for the user directory path.
-     * [required by SnakeYaml]
+     * [required by Yaml]
      * 
      * @param executablePath the optional executable path, may be <b>null</b> for none
      */
@@ -182,7 +182,7 @@ public class YamlProcess implements ProcessSpec {
     }
     
     /**
-     * Changes the home directory of the process to be executed. [required by SnakeYaml]
+     * Changes the home directory of the process to be executed. [required by Yaml]
      * May contain "${tmp}" for the system temporary directory path and "${user}" for the user directory path.
      * 
      * @param homePath the home directory, may be <b>null</b> to rely on extracted paths, may be given to explicitly 
@@ -193,7 +193,7 @@ public class YamlProcess implements ProcessSpec {
     }
     
     /**
-     * Changes the home directory of the process to be executed. [required by SnakeYaml]
+     * Changes the home directory of the process to be executed. [required by Yaml]
      * May contain "${tmp}" for the system temporary directory path and "${user}" for the user directory path.
      * 
      * @param home the home directory, may be <b>null</b> to rely on extracted paths, may be given to explicitly 
@@ -204,7 +204,7 @@ public class YamlProcess implements ProcessSpec {
     }
     
     /**
-     * Defines the arguments to be passed to the executable itself. [required by SnakeYaml]
+     * Defines the arguments to be passed to the executable itself. [required by Yaml]
      * Executable args and command line args may be the same in many cases, but also may differ for Java (-D arguments)
      * or Python/Conda (conda arguments).
      * 
@@ -215,7 +215,7 @@ public class YamlProcess implements ProcessSpec {
     }
 
     /**
-     * Defines the command line arguments. [required by SnakeYaml]
+     * Defines the command line arguments. [required by Yaml]
      * 
      * @param cmdArg the command line arguments (may be empty for none)
      */

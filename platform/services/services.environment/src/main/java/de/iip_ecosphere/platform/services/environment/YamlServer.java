@@ -105,7 +105,7 @@ public class YamlServer extends YamlProcess {
     }
     
     /**
-     * Returns the id of the server, also to be used as network management key. [required by SnakeYaml]
+     * Returns the id of the server, also to be used as network management key. [required by Yaml]
      * 
      * @param id the id of the server
      */
@@ -114,7 +114,7 @@ public class YamlServer extends YamlProcess {
     }
     
     /**
-     * Defines the version of the service. [required by SnakeYaml]
+     * Defines the version of the service. [required by Yaml]
      * 
      * @param version the version
      */
@@ -123,7 +123,7 @@ public class YamlServer extends YamlProcess {
     }
 
     /**
-     * Defines the description of the service. [required by SnakeYaml]
+     * Defines the description of the service. [required by Yaml]
      * 
      * @param description the description (<b>null</b> is ignored, default is empty)
      */
@@ -134,7 +134,7 @@ public class YamlServer extends YamlProcess {
     }
     
     /**
-     * Defines the network port of this server instance. [required by SnakeYaml]
+     * Defines the network port of this server instance. [required by Yaml]
      * 
      * @param port the network port
      */
@@ -143,7 +143,7 @@ public class YamlServer extends YamlProcess {
     }
 
     /**
-     * Defined the host the server instance (may be superseded through a deployment plan). [required by SnakeYaml]
+     * Defined the host the server instance (may be superseded through a deployment plan). [required by Yaml]
      * 
      * @param host the host name
      */

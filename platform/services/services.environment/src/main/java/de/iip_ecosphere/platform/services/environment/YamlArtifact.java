@@ -41,7 +41,7 @@ public class YamlArtifact extends AbstractYamlArtifact {
     }
 
     /**
-     * Sets the service instances. [required by SnakeYaml]
+     * Sets the service instances. [required by Yaml]
      * 
      * @param services the services
      */
@@ -50,7 +50,7 @@ public class YamlArtifact extends AbstractYamlArtifact {
     }
 
     /**
-     * Returns the server specification instances. [required by SnakeYaml]
+     * Returns the server specification instances. [required by Yaml]
      * 
      * @return the servers
      */
@@ -59,7 +59,7 @@ public class YamlArtifact extends AbstractYamlArtifact {
     }
 
     /**
-     * Sets the server specification instances. [required by SnakeYaml]
+     * Sets the server specification instances. [required by Yaml]
      * 
      * @param servers the servers
      */

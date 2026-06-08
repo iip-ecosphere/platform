@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.services.environment;
 import static de.iip_ecosphere.platform.support.aas.AasUtils.*;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
@@ -39,6 +40,7 @@ public class ServiceMapper {
     public static final String NAME_PROP_KIND = "kind";
     public static final String NAME_PROP_VERSION = "version";
     public static final String NAME_PROP_DESCRIPTION = "description";
+    public static final String NAME_PROP_ARTIFACT = "artifact";
     public static final String NAME_OP_ACTIVATE = "activate";
     public static final String NAME_OP_PASSIVATE = "passivate";
     public static final String NAME_OP_MIGRATE = "migrate";
@@ -49,7 +51,8 @@ public class ServiceMapper {
     public static final String NAME_OP_GET_STATE = "getState";
     
     public static final String[] PROP_READONLY = {NAME_PROP_ID, NAME_PROP_NAME, NAME_PROP_DEPLOYABLE, 
-        NAME_PROP_TOPLEVEL, NAME_PROP_KIND, NAME_PROP_VERSION, NAME_PROP_DESCRIPTION, NAME_PROP_STATE}; 
+        NAME_PROP_TOPLEVEL, NAME_PROP_KIND, NAME_PROP_VERSION, NAME_PROP_DESCRIPTION, NAME_PROP_ARTIFACT, 
+        NAME_PROP_STATE}; 
     public static final String[] PROP_WRITEONLY = {}; 
     public static final String[] PROP_READWRITE = {}; 
     public static final String[] OPERATIONS = {NAME_OP_ACTIVATE, NAME_OP_PASSIVATE, NAME_OP_MIGRATE, 
@@ -77,6 +80,8 @@ public class ServiceMapper {
                 () -> service.getId(), null);
             builder.defineProperty(getQName(service, NAME_PROP_DESCRIPTION), 
                 () -> service.getDescription(), null);
+            builder.defineProperty(getQName(service, NAME_PROP_ARTIFACT), 
+                () -> service.getArtifact(), null);
             builder.defineProperty(getQName(service, NAME_PROP_VERSION), 
                 () -> service.getVersion().toString(), null);
             builder.defineProperty(getQName(service, NAME_PROP_KIND), 
@@ -135,15 +140,33 @@ public class ServiceMapper {
                     return null;
                 }
             ));
-            builder.defineOperation(getQName(service, NAME_OP_UPDATE), 
-                new JsonResultWrapper(p -> {
-                    service.update(readUri(p, 0, EMPTY_URI));
-                    return null;
-                }
-            ));
+            defineUpdateOperation(builder, service);
         } catch (IllegalArgumentException e) {
             LoggerFactory.getLogger(ServiceMapper.class).error("Cannot map/register service: " + e.getMessage());
         }
+    }
+    
+    /**
+     * Defines the update operation taking into account {@link Starter#getUpdateHandler(String)}.
+     * 
+     * @param builder the builder 
+     * @param service the service to map the operation to
+     */
+    private static void defineUpdateOperation(final ProtocolServerBuilder builder, final Service service) {
+        builder.defineOperation(getQName(service, NAME_OP_UPDATE), 
+            new JsonResultWrapper(p -> {
+                service.update(readUri(p, 0, EMPTY_URI));
+                Supplier<? extends Service> updateHandler = Starter.getUpdateHandler(service.getId());
+                if (null != updateHandler) {
+                    Service updatedService = updateHandler.get();
+                    if (null != updatedService) {
+                        updatedService.transferState(service);
+                        Starter.mapService(updatedService, updateHandler); // redefine operations
+                    }
+                }
+                return null;
+            }
+        ));
     }
     
     /**

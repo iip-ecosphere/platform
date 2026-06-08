@@ -166,4 +166,24 @@ public class ParameterConfigurer<T> implements ValueConfigurer<T> {
         return value;
     }
     
+    /**
+     * Transfers the value of {@code source} to this configurer. Works only if the type of source is assignable to 
+     * the type of this configurer.
+     * 
+     * @param <S> the source value type
+     * @param source the source configurer
+     * @return {@code true} if the value was transferred, {@code false} if the types were incompatible
+     * @throws ExecutionException if the value was about to be transferred but failed in {@link #configure(Object)}
+     */
+    @SuppressWarnings("unchecked")
+    public <S> boolean transferValue(ParameterConfigurer<S> source) throws ExecutionException {
+        boolean done = false;
+        if (getType().isAssignableFrom(source.getType())) {
+            S sv = source.getGetter().get();
+            configure((T) sv);
+            done = true;
+        }
+        return done;
+    }
+    
 }

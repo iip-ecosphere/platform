@@ -26,6 +26,7 @@ public abstract class AbstractYamlService {
 
     private String id;
     private String applicationId = "";
+    private String artifact;
     private String name;
     private Version version;
     private String description = "";
@@ -53,6 +54,15 @@ public abstract class AbstractYamlService {
      */
     public String getApplicationId() {
         return applicationId;
+    }
+
+    /**
+     * Returns the artifact the service is located in.
+     * 
+     * @return the artifact, may be <b>null</b> or empty for none/not specified
+     */
+    public String getArtifact() {
+        return artifact;
     }
 
     /**
@@ -149,7 +159,7 @@ public abstract class AbstractYamlService {
     }
 
     /**
-     * Defines the id of the service. [required by SnakeYaml]
+     * Defines the id of the service. [required by Yaml]
      * 
      * @param id the id (may contain the {@link #getApplicationId() application id} if specified)
      */
@@ -158,7 +168,7 @@ public abstract class AbstractYamlService {
     }
 
     /**
-     * Defines the name of the service. [required by SnakeYaml]
+     * Defines the name of the service. [required by Yaml]
      * 
      * @param name the name
      */
@@ -167,12 +177,21 @@ public abstract class AbstractYamlService {
     }
     
     /**
-     * Defines the application id this service is assigned to. [required by SnakeYaml]
+     * Defines the application id this service is assigned to. [required by Yaml]
      * 
      * @param applicationId the application id
      */
     public void setApplicationId(String applicationId) {
         this.applicationId = applicationId;
+    }
+    
+    /**
+     * Defines the artifact the service is located in. [required by Yaml]
+     * 
+     * @param artifact the artifact, may be <b>null</b> or empty for none/not specified
+     */
+    public void setArtifact(String artifact) {
+        this.artifact = artifact;
     }
 
     /**
@@ -195,7 +214,7 @@ public abstract class AbstractYamlService {
     }
     
     /**
-     * Defines the version of the service. [required by SnakeYaml]
+     * Defines the version of the service. [required by Yaml]
      * 
      * @param version the version
      */
@@ -204,7 +223,7 @@ public abstract class AbstractYamlService {
     }
 
     /**
-     * Defines the description of the service. [required by SnakeYaml]
+     * Defines the description of the service. [required by Yaml]
      * 
      * @param description the description (<b>null</b> is ignored, default is empty)
      */
@@ -233,7 +252,7 @@ public abstract class AbstractYamlService {
     }
 
     /**
-     * Sets the service kind. [required by SnakeYaml]
+     * Sets the service kind. [required by Yaml]
      * 
      * @param kind the service kind
      */

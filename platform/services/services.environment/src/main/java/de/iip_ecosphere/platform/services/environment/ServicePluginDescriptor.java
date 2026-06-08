@@ -34,6 +34,7 @@ public interface ServicePluginDescriptor<S extends Service> extends PluginInstan
 
     public static final String PLUGIN_ID_PREFIX = "service-";
     public static final String PLUGIN_TEST_ID_PREFIX = PLUGIN_ID_PREFIX + "test-";
+    public static final String PLUGIN_ID_APP_SERVICE_PREFIX = "app-service-";
     
     /**
      * Returns a plugin filter for platform components that filters out all service plugins 

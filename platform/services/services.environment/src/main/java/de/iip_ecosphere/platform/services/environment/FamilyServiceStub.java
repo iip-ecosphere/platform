@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.services.environment;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 
@@ -66,7 +67,15 @@ public class FamilyServiceStub extends DefaultServiceImpl {
     public ServiceState getState() {
         return super.getState(); // preliminary, influence of active
     }
-    
-    // TODO migrate, update, switch?
+
+    @Override
+    public void update(URI location) throws ExecutionException {
+        ServiceBase active = this.active.get();
+        if (active instanceof Service) {
+            ((Service) active).update(location);
+        }
+    }
+
+    // TODO migrate, switch?
 
 }
