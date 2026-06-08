@@ -7,7 +7,7 @@
 	
     <!-- intentionally no deployment here -->
 	<target name="maven"> 
-	    <replace file="installedDependencies.yml" token="/home/myVenv/bin/python" value="/home/jenkins/venv/pythonCondaVenv/bin/python"/>
+	    <replace file="installedDependencies.yml" token="/home/myVenv/bin/python" value="/home/jenkins/venv/pythonCondaVenv/bin/python\n  CONDA=/home/jenkins/miniconda3/bin/conda"/>
         <maven pomFile="pom.xml" goal="install">
             <arg value="-Dunpack.force=true"/>
             <arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
