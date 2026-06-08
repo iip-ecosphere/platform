@@ -1,4 +1,4 @@
-# Connectors Component in the Transport Layer of the IIP-Ecosphere platform
+# Connectors Component in the Transport Layer of the oktoflow platform
 
 The Connectors Component provides bi-directional access to machines and already installed platforms. Therefore, we 
 define a connector interface that can work with model-based and payload-based protocols, whereby model-based access
