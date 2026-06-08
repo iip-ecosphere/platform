@@ -9,7 +9,7 @@
 	<target name="maven"> 
         <replaceregexp file="installedDependencies.yml"
            match="/home/myVenv/bin/python$"
-           replace="/home/jenkins/venv/pythonCondaVenv/bin/python${line.separator}  CONDA=/home/jenkins/miniconda3/bin/conda"
+           replace="/home/jenkins/venv/pythonCondaVenv/bin/python${line.separator}  CONDA: /home/jenkins/miniconda3/bin/conda"
            byline="false"/>
         <maven pomFile="pom.xml" goal="install">
             <arg value="-Dunpack.force=true"/>
