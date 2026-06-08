@@ -7,11 +7,10 @@
 	
     <!-- intentionally no deployment here -->
 	<target name="maven"> 
-	    <replace file="installedDependencies.yml" token="/home/myVenv/bin/python">
-	    	<replacetoken>/home/jenkins/venv/pythonCondaVenv/bin/python
-  CONDA=/home/jenkins/miniconda3/bin/conda
-	    	</replacetoken>
-	    </replace>
+        <replaceregexp file="installedDependencies.yml"
+           match="/home/myVenv/bin/python$"
+           replace="/home/jenkins/venv/pythonCondaVenv/bin/python${line.separator}  CONDA=/home/jenkins/miniconda3/bin/conda"
+           byline="false"/>
         <maven pomFile="pom.xml" goal="install">
             <arg value="-Dunpack.force=true"/>
             <arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
