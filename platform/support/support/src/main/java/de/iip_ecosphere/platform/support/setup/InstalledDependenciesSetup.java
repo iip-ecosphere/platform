@@ -209,6 +209,9 @@ public class InstalledDependenciesSetup extends AbstractSetup {
                 LoggerFactory.getLogger(InstalledDependenciesSetup.class).warn(
                     "Cannot read '{}': {}. Falling back to default instance", fileName, e.getMessage());
             }
+        } else {
+            LoggerFactory.getLogger(InstalledDependenciesSetup.class).warn(
+                "Installed dependencies file '{}' not found by ResourceLoader. Using default setup.", fileName);
         }
         if (null == result) {
             result = new InstalledDependenciesSetup();
@@ -236,6 +239,16 @@ public class InstalledDependenciesSetup extends AbstractSetup {
             instance = readFromYaml();
         }
         return instance;
+    }
+    
+    /**
+     * Merges the information of {@code setup} into this instance. Overrides existing information.
+     * 
+     * @param setup the setup instance to use
+     */
+    public void merge(InstalledDependenciesSetup setup) {
+        this.locations.putAll(setup.locations);
+        this.envMappings.putAll(setup.envMappings);
     }
     
     /**
