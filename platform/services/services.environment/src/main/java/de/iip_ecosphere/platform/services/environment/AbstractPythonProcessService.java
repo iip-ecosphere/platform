@@ -394,8 +394,8 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
             if ("conda".equals(pyExec.getName())) {
                 File conda = InstalledDependenciesSetup.getInstance().getLocation(
                         InstalledDependenciesSetup.KEY_PREFIX_CONDA);
-                if (null == conda) {
-                    conda = new File("conda");
+                if (conda != null) {
+                    pyExec = conda;
                 }
                 // search for run and -n <name>, the latter the envNameIndex
                 boolean foundRun = false;
