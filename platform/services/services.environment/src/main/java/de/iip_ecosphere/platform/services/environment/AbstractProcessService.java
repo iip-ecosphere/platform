@@ -354,6 +354,8 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunna
         List<String> tmp = new ArrayList<String>();
         if (byName || !exe.exists()) {
             tmp.add(exe.getName());
+            LoggerFactory.getLogger(AbstractProcessService.class).info("Changing executable {} to {}: "
+                + "exists {}, call byName {}", exe, tmp, exe.exists(), byName);
         } else {
             tmp.add(exe.getAbsolutePath());
         }

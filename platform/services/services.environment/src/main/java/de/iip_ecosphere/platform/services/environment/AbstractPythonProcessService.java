@@ -393,9 +393,10 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
             int unbufferPos = 0; // python -u 
             if ("conda".equals(pyExec.getName())) {
                 File conda = InstalledDependenciesSetup.getInstance().getLocation(
-                        InstalledDependenciesSetup.KEY_PREFIX_CONDA);
+                    InstalledDependenciesSetup.KEY_PREFIX_CONDA);
                 if (conda != null) {
                     pyExec = conda;
+                    getLogger().info("Using CONDA path from installed dependencies: {}", conda);
                 }
                 // search for run and -n <name>, the latter the envNameIndex
                 boolean foundRun = false;
@@ -421,7 +422,6 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
             if (unbuffer()) {
                 args.add(unbufferPos, "-u"); // do not buffer I/O, officially supported since Python 2.0
             }
-            
             Process proc = AbstractProcessService.createProcess(pyExec, startExecutableByName(), home, args);
             handleErrorStream(proc.getErrorStream());
             return proc;
