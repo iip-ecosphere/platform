@@ -201,7 +201,7 @@ public class ResourceLoader {
      * @param optional further, optional on-the fly resolvers
      * @return the resource as input stream, may be <b>null</b> if the resource was not found
      */
-    public static InputStream getResourceAsStream1(ClassLoader loader, String name, ResourceResolver... optional) {
+    public static InputStream getResourceAsStream(ClassLoader loader, String name, ResourceResolver... optional) {
         return getResourceAsStream(loader, name, false, optional);
     }
 
