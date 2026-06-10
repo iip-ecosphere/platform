@@ -1,3 +1,4 @@
+mode: TEST
 locations:
   PYTHON2: /var/lib/python2/bin/python
   PYTHON3: /var/lib/python3/bin/python

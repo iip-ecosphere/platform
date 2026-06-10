@@ -1,0 +1,4 @@
+locations:
+  PYTHON2: /usr/bin/python2
+  PYTHON3: /usr/bin/python3
+  JAVA99: c:\programs\Java\Java11\bin\java.exe

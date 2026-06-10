@@ -24,6 +24,7 @@ import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
+import de.iip_ecosphere.platform.support.resources.ResourceResolver;
 
 /**
  * Provides access to installed dependencies on the actual resource, e.g., the location of a specific Java version
@@ -67,8 +68,14 @@ public class InstalledDependenciesSetup extends AbstractSetup {
     
     public static final String KEY_JAVA_8 = KEY_PREFIX_JAVA + 8;
     public static final String KEY_JAVA_11 = KEY_PREFIX_JAVA + 11;
+
+    public enum Mode {
+        PRODUCTION,
+        TEST
+    }
     
     private static InstalledDependenciesSetup instance;
+    private Mode mode = Mode.PRODUCTION;
     private Map<String, File> locations = new HashMap<>();
     private Map<String, String> envMappings = new HashMap<>();
     
@@ -118,6 +125,15 @@ public class InstalledDependenciesSetup extends AbstractSetup {
         }
         return KEY_PREFIX_JAVA + ver;
     }
+
+    /**
+     * Returns the mode.
+     * 
+     * @return the mode
+     */
+    public Mode getMode() {
+        return mode;
+    }
     
     /**
      * Returns the locations.
@@ -161,7 +177,25 @@ public class InstalledDependenciesSetup extends AbstractSetup {
     }
     
     /**
-     * Changes the locations. [required by SnakeYaml]
+     * Returns the number of environment mappings.
+     * 
+     * @return the number of environment mappings
+     */
+    public int getEnvironmentMappingsSize() {
+        return envMappings.size();
+    }
+    
+    /**
+     * Changes the mode. [required by Yaml]
+     * 
+     * @param mode the new mode
+     */
+    public void setMode(Mode mode) {
+        this.mode = mode;
+    }
+    
+    /**
+     * Changes the locations. [required by Yaml]
      * 
      * @param locations the locations
      */
@@ -171,7 +205,7 @@ public class InstalledDependenciesSetup extends AbstractSetup {
     }
 
     /**
-     * Changes the locations. [required by SnakeYaml]
+     * Changes the locations. [required by Yaml]
      * 
      * @param envMappings the mappings
      */
@@ -199,12 +233,20 @@ public class InstalledDependenciesSetup extends AbstractSetup {
      */
     public static InstalledDependenciesSetup readFromYaml(String fileName) {
         InstalledDependenciesSetup result = null;
-        InputStream in = ResourceLoader.getResourceAsStream(fileName, 
+        final ResourceResolver[] resolvers = {
             new FolderResourceResolver(System.getProperty(PROPERTY_PATH, ".")),
-            new FolderResourceResolver()); // also look in system root
+            new FolderResourceResolver() // also look in system root
+        };
+        InputStream in = ResourceLoader.getResourceAsStream(fileName, resolvers); 
         if (null != in) {
             try {
                 result = readFromYaml(InstalledDependenciesSetup.class, in);
+                if (Mode.TEST == result.getMode()) {
+                    in = ResourceLoader.getResourceAsStream(fileName, true, resolvers); 
+                    if (null != in) {
+                        result = readFromYaml(InstalledDependenciesSetup.class, in);
+                    }                    
+                }
             } catch (IOException e) {
                 LoggerFactory.getLogger(InstalledDependenciesSetup.class).warn(
                     "Cannot read '{}': {}. Falling back to default instance", fileName, e.getMessage());

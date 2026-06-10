@@ -13,12 +13,16 @@
 package test.de.iip_ecosphere.platform.support;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.setup.InstalledDependenciesSetup;
+import de.iip_ecosphere.platform.support.setup.InstalledDependenciesSetup.Mode;
 
 /**
  * Tests {@link InstalledDependenciesSetup}.
@@ -31,9 +35,13 @@ public class InstalledDependenciesSetupTest {
      * Tests the dependency setup.
      * 
      * @throws ExecutionException shall not occur
+     * @throws IOException shall not occur
      */
     @Test
-    public void testDependenciesSetup() throws ExecutionException {
+    public void testDependenciesSetup() throws ExecutionException, IOException {
+        File root = new File("installedDependencies.yml");
+        root.delete();
+        
         Assert.assertTrue(InstalledDependenciesSetup.getJavaKey().length() > 0);
         Assert.assertTrue(InstalledDependenciesSetup.getJavaKey().startsWith(
             InstalledDependenciesSetup.KEY_PREFIX_JAVA));
@@ -42,6 +50,7 @@ public class InstalledDependenciesSetupTest {
         Assert.assertNotNull(inst.getLocation(InstalledDependenciesSetup.getJavaKey()));  // actual Java must be in
         
         inst = InstalledDependenciesSetup.readFromYaml(); // read from test/resources via classloader
+        Assert.assertEquals(Mode.TEST, inst.getMode());
         Assert.assertTrue(inst.getLocations().size() > 1); // more than the last one ;)
         Assert.assertNotNull(inst.getLocation(InstalledDependenciesSetup.getJavaKey())); // default Java is still there
         Assert.assertNotNull(inst.getLocation("PYTHON2"));
@@ -57,6 +66,17 @@ public class InstalledDependenciesSetupTest {
         Assert.assertNull(inst.getEnvironmentMapping(null, null));
         Assert.assertEquals("env1", inst.getEnvironmentMapping(null, "env1"));
         Assert.assertEquals("env4", inst.getEnvironmentMapping("svc1", "env1"));
+        
+        System.out.println("Overriding test environment mapping...");
+        Files.copy(new File("src/test/resources/installedDependencies2.yml").toPath(), root.toPath(), 
+            StandardCopyOption.REPLACE_EXISTING);
+        
+        inst = InstalledDependenciesSetup.readFromYaml(); // read from test/resources via classloader
+        Assert.assertEquals(Mode.PRODUCTION, inst.getMode());
+        Assert.assertEquals(new File("/usr/bin/python2"), inst.getLocation("PYTHON2"));
+        Assert.assertEquals(0, inst.getEnvironmentMappingsSize());
+
+        root.delete();
     }
 
 }
