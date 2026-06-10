@@ -15,6 +15,9 @@ package de.iip_ecosphere.platform.services.environment;
 import java.io.InputStream;
 import java.util.List;
 
+import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
+import de.iip_ecosphere.platform.transport.serialization.TypeTranslator;
+
 /**
  * A basic implementation of the {@link ServicePluginDescriptor} delegating to the {@link ServiceDescriptor} for 
  * SISO generic services (legacy).
@@ -74,5 +77,11 @@ public abstract class AbstractGenericServicePluginDescriptor<S extends Service>
     public S createService(YamlService yaml, Object... args) {
         return null;
     }
+    
+    @Override
+    public <I, O> S createService(TypeTranslator<I, String> inTrans, TypeTranslator<String, O> outTrans, 
+        ReceptionCallback<O> callback, YamlService yaml, Object... args) {
+        return null;
+    }    
     
 }
