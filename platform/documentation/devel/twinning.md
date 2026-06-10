@@ -135,6 +135,7 @@ If the physical device/machine is unavailable - or you want to validate an oktof
 #### Allow anonymous access without user/password
 -	eclipse-mosquitto:2.1.2-alpine is a free to use Docker image to run a MQTT broker
 -	Docker Compose is required to run the simulation
+-	[Simple Example](https://raw.githubusercontent.com/iip-ecosphere/platform/main/platform/documentation/devel/MQTT.zip)
 -	Create a file named "docker-compose.yml" and save the following Docker compose definition in it
 ```
 services:
@@ -180,6 +181,7 @@ docker exec mosquitto mosquitto_pub -h localhost -t **topic_name** -m '{payload}
 #### Allow anonymous access and by user/password
 
 Repeat the steps above, replacing only "docker-compose.yml" and "mosquitto.conf" with the versions provided below.
+-	[Simple Example with user/password](https://raw.githubusercontent.com/iip-ecosphere/platform/main/platform/documentation/devel/MQTT_With_User.zip)
 -	"docker-compose.yml"
 ```
 services:
