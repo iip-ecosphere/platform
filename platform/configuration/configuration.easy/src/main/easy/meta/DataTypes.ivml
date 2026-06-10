@@ -21,6 +21,7 @@ project DataTypes {
     
     const String Eclass_Unit_MByte = "0173-1#05-AAA042#005";
     const String Eclass_Unit_ms = "0173-1#05-AAA114#003";
+    const String Eclass_Unit_percent = "0173-1#05-AAA129#006";
     const String Eclass_Property_swVersion = "0173-1#02-AAM737#002";
     const String Eclass_Property_swName = "0173-1#02-AAO247#002";
     
@@ -62,6 +63,24 @@ project DataTypes {
             String semanticId = represents.semanticId;
         }
     }
+    
+    AliasType PercentDoubleType = {
+        name = "Percent Double",
+        represents = refBy(DoubleType),
+        semanticId = Eclass_Unit_percent
+    };
+
+    AliasType PercentFloatType = {
+        name = "Percent Float",
+        represents = refBy(FloatType),
+        semanticId = Eclass_Unit_percent
+    };
+    
+    AliasType PercentIntegerType = {
+        name = "Percent Integer",
+        represents = refBy(IntegerType),
+        semanticId = Eclass_Unit_percent
+    };
     
     // allow for unique selection on UI, not necessarily needed for code generation
     Constraint dataTypeNamesUnique = allInstances(DataType)->isUnique(t|t.name); 

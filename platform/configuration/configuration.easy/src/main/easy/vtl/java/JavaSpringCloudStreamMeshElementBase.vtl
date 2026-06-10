@@ -14,6 +14,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, JavaCodeArti
     Boolean isConnector = false;
     setOf(String) serviceVars = {};
     JavaCodeClass mainCls;
+    String updateHandler = "creator";
 
     // do not create annotations if we have a family interface, then the node delegates here
     def JavaCodeMethod nodeAnnotation(JavaCodeMethod m, String annotation) {
@@ -176,7 +177,7 @@ block;
     }
 
     def genMapService(String serviceVarName, JavaCodeBlockInterface block) {
-        block.callQualified("de.iip_ecosphere.platform.services.environment.spring.Starter.mapService").arg(serviceVarName).(c|{
+        block.callQualified("de.iip_ecosphere.platform.services.environment.spring.Starter.mapService").arg(serviceVarName).arg(updateHandler).(c|{
             if (familyInterface <> "") {
                 c.arg(isDefaultService(elt.impl, familyMember));
             }
@@ -465,8 +466,21 @@ block;
     
     def generateAbstractServiceCreateInstance(MeshElement elt, ServiceBase service, String attrName, String className, JavaCodeMethod m) {
         String serviceType = getServiceType(elt, service);
-        m.assign(attrName).callQualified("de.iip_ecosphere.platform.services.environment.AbstractService.createInstance").stringArg(className)
+        Boolean updateHandlerPresent = mainCls.containsAttribute(updateHandler);
+        JavaCodeBlock updateHandlerBlock;
+        JavaCodeBlock block = m;
+        if (updateHandlerPresent) {
+            JavaCodeLambdaExpression init = new JavaCodeLambdaExpression();
+            updateHandlerBlock = init.addBlock();
+            mainCls.getAttribute(updateHandler).initializer(init);
+            block = updateHandlerBlock;
+        }
+        block.assign(attrName).callQualified("de.iip_ecosphere.platform.services.environment.AbstractService.createInstance").stringArg(className)
             .classArg(serviceType).stringArg(service.id).stringArg(getDeploymentDescriptorPath());
+        if (updateHandlerPresent) {
+            updateHandlerBlock.return(attrName);
+            m.addCall("get").qualifiedBy(updateHandler);
+        }
     }
     
     def attachMetricsProvider(String serviceVarName, JavaCodeBlockInterface block) {
@@ -703,7 +717,13 @@ block;
     }
         
     def generateServiceAttribute(MeshElement elt, ServiceBase base, JavaCodeClass c) {
-        c.attribute(getServiceType(elt, base), "service");
+        String serviceType = getServiceType(elt, base);
+        c.attribute(serviceType, "service");
+        generateUpdateHandler(serviceType, c);
+    }
+    
+    def generateUpdateHandler(String serviceType, JavaCodeClass c) {
+        c.attribute("java.util.function.Supplier<${serviceType}>", updateHandler);
     }
     
     // --------------------------- ServiceFamily ----------------------------------
@@ -984,6 +1004,7 @@ block;
 
     def initialService(MeshElement elt, PythonService service, setOf(String) serviceVars, JavaCodeMethod m) {
         generateAbstractServiceCreateInstance(elt, service, "service", getServiceType(elt, service), m);
+        updateHandler = ""; // disable updates, handled within python service
         // no mapServices here as Python may take long and block the constructor -> initIngestors
         serviceVars.add("service");
         for (IOType in: service.input) {

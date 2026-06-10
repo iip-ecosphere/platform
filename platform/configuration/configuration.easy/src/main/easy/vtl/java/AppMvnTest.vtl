@@ -75,6 +75,9 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
             skipIfNotFound=true, skipIfNotFoundComment="Tolerant resolution for initial build; skipIfNotFound can be removed/set to false when app interfaces are deployed.");
         appendMavenDependencyPluginArtifactItem(unpackItems, config.sharedArtifact, "python", 
             "\\${project.build.directory}/pySrc", "pyIf.zip", type="zip");
+        if (config.withPlugins) {
+            appendMavenIipDependencyPluginBuildClasspathPluginExecution(execs, furtherFiles="\\${project.build.directory}/classes/\\${project.groupId}.\\${project.artifactId}");
+        }
 //appendMavenIipDependencyPluginUnpackPluginsExecution(execs, oktoPlugins, projectVersion, enable=withPlugins(config));
         //appendIipPythonPlugin(plugins, projectVersion);
         //XmlElement pluginMgt = createPlugins(createPluginManagement(build));
@@ -93,7 +96,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
             new XmlElement(exec, "id", "${clsName}Test");
             XmlElement execCfg = new XmlElement(exec, "configuration");
             new XmlElement(execCfg, "mainClass", "iip.nodes.${clsName}Test");
-            new XmlElement(execCfg, "dependencyaclasspathFilenameExclusions", testClasspathFnExclusions);
+            new XmlElement(execCfg, "classpathFilenameExclusions", testClasspathFnExclusions);
             new XmlElement(execCfg, "classpathScope", "test");
             if (elt.impl.isKindOf(Connector)) {
                 XmlElement exec = new XmlElement(execPluginExecs, "execution");

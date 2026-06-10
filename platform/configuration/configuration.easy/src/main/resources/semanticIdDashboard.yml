@@ -11,6 +11,7 @@ grafana:
     0173-1#05-AAA753#005: watth
     0173-1#05-AAA555#005: kwatth
     0173-1#05-AAA124#005: mwatth
+    0173-1#05-AAA129#006: percent
     0173-1#05-AAA124#005: none
     0173-1#05-AAA098#005: none
     Boolean: bool

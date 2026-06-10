@@ -335,6 +335,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
 
                 if (javaTests.size() > 0) {
                     vilTemplateProcessor("JavaAllTestsTemplate", config, "${appRoot}/src/test/java/AllTests.java", javaTests=javaTests, pkg="");
+                    sequenceOf(String) descs = javaTests.toSequence()->collect(t|t.substring(0, t.size() - 4) + "$" + "Descriptor")->sortedBy(d|d); // remove Test, sort
+                    vilTemplateProcessor("JavaServices", cfg, "${appRoot}/src/main/resources/META-INF/services/de.iip_ecosphere.platform.support.plugins.PluginDescriptor", descriptors=descs);
                 }
                 
                 vilTemplateProcessor("TemplatesEclipseReadme", config, "${appRoot}/README.md", appName="impl." + appName, nodes=elements);

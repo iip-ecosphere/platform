@@ -148,6 +148,7 @@ template JavaSpringCloudStreamYaml(IIPEcosphere config, YamlFileArtifact target,
         namedList("sources", sources, springCloud);
         YamlNode springCloudStream = springCloud.addObject("stream");
         poller(nodes, springCloudStream);
+        springCloudStream.addObject("function").addValue("autodetect", "false"); // disable Spring warnings
         springCloudStream.addObject("default").addValue("contentType", "application/iip");
         springCloudStream.addValue("defaultBinder", "internal");
         generateDestinations(destinations, springCloudStream);

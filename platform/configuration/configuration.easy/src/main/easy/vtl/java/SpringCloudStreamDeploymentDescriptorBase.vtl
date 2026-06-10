@@ -76,6 +76,7 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
         n.addValue("version", service.ver);
         n.addValueNotEmpty("description", service.description); // default is ""
         n.addValue("deployable", service.deployable);
+        generateArtifact(service, n);
         generateService(service, n);
         n.addValue("kind", service.kind);
         n.addValue("topLevel", topLevel);
@@ -91,6 +92,15 @@ template SpringCloudStreamDeploymentDescriptorBase(Configuration config, FileArt
         }
         generateProcess(elt, service, n);
         generateEnsemble(elt, service, familyId, n);
+    }
+
+    @DispatchBasis    
+    def generateArtifact(ServiceBase service, YamlNode node) {
+    }
+
+    @DispatchCase    
+    def generateArtifact(JavaService service, YamlNode node) {
+        node.addValue("artifact", service.artifact);
     }
     
     @DispatchBasis

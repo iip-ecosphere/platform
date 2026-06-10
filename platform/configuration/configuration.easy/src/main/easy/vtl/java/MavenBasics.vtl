@@ -282,6 +282,18 @@ template MavenBasics(Configuration config, FileArtifact target) {
         }
         cfg;
     }
+
+    def XmlElement appendMavenIipDependencyPluginBuildClasspathPluginExecution(XmlElement execs, String furtherFiles="", String phase="prepare-package") {
+        XmlElement exec = new XmlElement(execs, "execution");
+        new XmlElement(exec, "id", "build-classpath-plugin");
+        new XmlElement(exec, "phase", phase);
+        appendGoal(exec, "build-plugin-classpath");
+        if (furtherFiles <> "") {
+            XmlElement config = appendConfiguration(exec);
+            new XmlElement(config, "outputFiles", furtherFiles);
+        }    
+        exec;
+    }
     
     def XmlElement appendMavenIipDependencyPluginTouchPluginsExecution(XmlElement execs, String file, String phase="deploy") {
         XmlElement exec = new XmlElement(execs, "execution");
@@ -290,6 +302,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(exec, "phase", phase);
         XmlElement config = appendConfiguration(exec);
         new XmlElement(config, "file", file);
+        exec;
     }
 
     // with executions in appendMavenIipDependencyPlugin as parent
