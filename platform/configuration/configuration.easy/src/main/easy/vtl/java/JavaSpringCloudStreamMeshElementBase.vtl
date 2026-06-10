@@ -14,7 +14,8 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, JavaCodeArti
     Boolean isConnector = false;
     setOf(String) serviceVars = {};
     JavaCodeClass mainCls;
-    String updateHandler = "creator";
+    String updateHandlerName = "creator";
+    String updateHandler = "";
 
     // do not create annotations if we have a family interface, then the node delegates here
     def JavaCodeMethod nodeAnnotation(JavaCodeMethod m, String annotation) {
@@ -177,6 +178,7 @@ block;
     }
 
     def genMapService(String serviceVarName, JavaCodeBlockInterface block) {
+        // ignore arg updateHandler if empty
         block.callQualified("de.iip_ecosphere.platform.services.environment.spring.Starter.mapService").arg(serviceVarName).arg(updateHandler).(c|{
             if (familyInterface <> "") {
                 c.arg(isDefaultService(elt.impl, familyMember));
@@ -466,20 +468,20 @@ block;
     
     def generateAbstractServiceCreateInstance(MeshElement elt, ServiceBase service, String attrName, String className, JavaCodeMethod m) {
         String serviceType = getServiceType(elt, service);
-        Boolean updateHandlerPresent = mainCls.containsAttribute(updateHandler);
+        Boolean updateHandlerPresent = mainCls.containsAttribute(updateHandlerName);
         JavaCodeBlock updateHandlerBlock;
         JavaCodeBlock block = m;
         if (updateHandlerPresent) {
             JavaCodeLambdaExpression init = new JavaCodeLambdaExpression();
             updateHandlerBlock = init.addBlock();
-            mainCls.getAttribute(updateHandler).initializer(init);
+            mainCls.getAttribute(updateHandlerName).initializer(init);
             block = updateHandlerBlock;
         }
         block.assign(attrName).callQualified("de.iip_ecosphere.platform.services.environment.AbstractService.createInstance").stringArg(className)
             .classArg(serviceType).stringArg(service.id).stringArg(getDeploymentDescriptorPath());
         if (updateHandlerPresent) {
             updateHandlerBlock.return(attrName);
-            m.addCall("get").qualifiedBy(updateHandler);
+            m.addCall("get").qualifiedBy(updateHandlerName);
         }
     }
     
@@ -723,6 +725,7 @@ block;
     }
     
     def generateUpdateHandler(String serviceType, JavaCodeClass c) {
+        updateHandler = updateHandlerName;
         c.attribute("java.util.function.Supplier<${serviceType}>", updateHandler);
     }
     
