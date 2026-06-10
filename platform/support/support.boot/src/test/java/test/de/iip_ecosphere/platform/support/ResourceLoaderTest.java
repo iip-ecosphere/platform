@@ -159,7 +159,9 @@ public class ResourceLoaderTest {
         
         // okto1 contains both folders, but only a file in resources
         OktoflowResourceResolver res = new OktoflowResourceResolver(new File("src/test/resources/okto1"));
-        InputStream in = ResourceLoader.getResourceAsStream("nameplate.txt", res);
+        InputStream in = ResourceLoader.getResourceAsStream("nameplate.txt", true, res); // ignore registered
+        Assert.assertNotNull(in);
+        in = ResourceLoader.getResourceAsStream("nameplate.txt", res);
         Assert.assertNotNull(in);
         String txt = Commons.getInstance().toString(in, Charset.defaultCharset()); // implemented
         Assert.assertEquals("resources", txt);

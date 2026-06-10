@@ -179,7 +179,7 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
      * Loads a classpath file relative to the actual jars and returns the specified classpath entries as URLs. 
      * Logs errors and  exceptions.
      * 
-     * @param cpFile the classpath file
+     * @param in the classpath stream
      * @param base the base folder use to make relative classpath entries absolute
      * @param descriptorOnly only the first/two entries, the full thing else
      * @param appends further classpath files that shall be appended, e.g., logging, may be <b>null</b>

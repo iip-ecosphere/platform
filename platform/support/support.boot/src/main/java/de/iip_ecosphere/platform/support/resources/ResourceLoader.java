@@ -144,9 +144,23 @@ public class ResourceLoader {
      * @return the resource as input stream, may be <b>null</b> if the resource was not found
      */
     public static InputStream getResourceAsStream(String name, ResourceResolver... optional) {
-        return getResourceAsStream(PluginSetup.getClassLoader(), name, optional);
+        return getResourceAsStream(PluginSetup.getClassLoader(), name, false, optional);
     }
-    
+
+    /**
+     * Returns a resource as string taking the class loader of this class.
+     * 
+     * @param name the name of the resource to load
+     * @param excludeRegistered whether, if {@code optional} resolvers are given, the registered shall be excluded or 
+     *     included/also considered
+     * @param optional further, optional on-the fly resolvers
+     * @return the resource as input stream, may be <b>null</b> if the resource was not found
+     */
+    public static InputStream getResourceAsStream(String name, boolean excludeRegistered, 
+        ResourceResolver... optional) {
+        return getResourceAsStream(PluginSetup.getClassLoader(), name, excludeRegistered, optional);
+    }
+
     /**
      * Returns a resolver for all registered resolvers.
      * 
@@ -176,7 +190,7 @@ public class ResourceLoader {
      * @return the resource as input stream, may be <b>null</b> if the resource was not found
      */
     public static InputStream getResourceAsStream(Class<?> cls, String name, ResourceResolver... optional) {
-        return getResourceAsStream(cls.getClassLoader(), name, optional);
+        return getResourceAsStream(cls.getClassLoader(), name, false, optional);
     }
 
     /**
@@ -187,7 +201,22 @@ public class ResourceLoader {
      * @param optional further, optional on-the fly resolvers
      * @return the resource as input stream, may be <b>null</b> if the resource was not found
      */
-    public static InputStream getResourceAsStream(ClassLoader loader, String name, ResourceResolver... optional) {
+    public static InputStream getResourceAsStream1(ClassLoader loader, String name, ResourceResolver... optional) {
+        return getResourceAsStream(loader, name, false, optional);
+    }
+
+    /**
+     * Returns a resource as string.
+     * 
+     * @param loader the class loader to use
+     * @param name the name of the resource to load (shall not start with "/", used as fallback alternative)
+     * @param excludeRegistered whether, if {@code optional} resolvers are given, the registered shall be excluded or 
+     *     included/also considered
+     * @param optional further, optional on-the fly resolvers
+     * @return the resource as input stream, may be <b>null</b> if the resource was not found
+     */
+    public static InputStream getResourceAsStream(ClassLoader loader, String name, boolean excludeRegistered, 
+        ResourceResolver... optional) {
         InputStream result = null;
         while (name.startsWith("/")) {
             name = name.substring(1);
@@ -195,7 +224,9 @@ public class ResourceLoader {
         List<ResourceResolver> res = resolvers;
         if (null != optional && optional.length > 0) {
             res = new ArrayList<>();
-            res.addAll(resolvers);
+            if (!excludeRegistered) {
+                res.addAll(resolvers);
+            }
             Collections.addAll(res, optional);
         }
         for (ResourceResolver r: res) {
