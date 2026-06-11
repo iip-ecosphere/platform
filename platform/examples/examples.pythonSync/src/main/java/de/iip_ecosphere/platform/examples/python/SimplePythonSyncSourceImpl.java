@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.examples.python;
 import java.io.InputStream;
 import java.util.Random;
 
+import de.iip_ecosphere.platform.services.environment.AbstractGenericServicePluginDescriptor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.PythonSyncTestInput;
 import iip.datatypes.PythonSyncTestInputImpl;
@@ -30,6 +31,30 @@ public class SimplePythonSyncSourceImpl extends SimplePythonSyncDataSourceImpl {
 
     private Random random = new Random();
     private int counter = 0;
+    
+    /**
+     * JSL descriptor for dynamic loading.
+     */
+    public static class Descriptor extends AbstractGenericServicePluginDescriptor<SimplePythonSyncSourceImpl> {
+
+        /**
+         * Creates the instance for JSL.
+         */
+        public Descriptor() {
+            super(PLUGIN_ID_APP_SERVICE_PREFIX + "SimplePythonSyncDataSource", SimplePythonSyncSourceImpl.class);
+        }
+
+        @Override
+        public SimplePythonSyncSourceImpl createService(String serviceId, InputStream ymlFile) {
+            return new SimplePythonSyncSourceImpl(serviceId, ymlFile);
+        }
+
+        @Override
+        public SimplePythonSyncSourceImpl createService() {
+            return new SimplePythonSyncSourceImpl();
+        }
+
+    }    
     
     /**
      * Fallback constructor.

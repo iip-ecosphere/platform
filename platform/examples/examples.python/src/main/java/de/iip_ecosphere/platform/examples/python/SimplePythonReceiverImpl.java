@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.examples.python;
 
 import java.io.InputStream;
 
+import de.iip_ecosphere.platform.services.environment.AbstractGenericServicePluginDescriptor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.PythonTestOutput;
 import iip.impl.SimplePythonDataReceiverImpl;
@@ -25,6 +26,30 @@ import iip.impl.SimplePythonDataReceiverImpl;
  */
 public class SimplePythonReceiverImpl extends SimplePythonDataReceiverImpl {
 
+    /**
+     * JSL descriptor for dynamic loading.
+     */
+    public static class Descriptor extends AbstractGenericServicePluginDescriptor<SimplePythonReceiverImpl> {
+
+        /**
+         * Creates the instance for JSL.
+         */
+        public Descriptor() {
+            super(PLUGIN_ID_APP_SERVICE_PREFIX + "SimplePythonDataReceiver", SimplePythonReceiverImpl.class);
+        }
+
+        @Override
+        public SimplePythonReceiverImpl createService(String serviceId, InputStream ymlFile) {
+            return new SimplePythonReceiverImpl(serviceId, ymlFile);
+        }
+
+        @Override
+        public SimplePythonReceiverImpl createService() {
+            return new SimplePythonReceiverImpl();
+        }
+
+    }    
+    
     /**
      * Fallback constructor.
      */

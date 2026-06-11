@@ -17,6 +17,7 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import de.iip_ecosphere.platform.services.environment.AbstractGenericServicePluginDescriptor;
 import de.iip_ecosphere.platform.services.environment.DataIngestor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
 import iip.datatypes.PythonTestInput;
@@ -34,6 +35,30 @@ public class SimplePythonSourceImpl extends SimplePythonDataSourceImpl {
     private Timer timer = new Timer();
     private Random random = new Random();
     private int counter = 0;
+    
+    /**
+     * JSL descriptor for dynamic loading.
+     */
+    public static class Descriptor extends AbstractGenericServicePluginDescriptor<SimplePythonSourceImpl> {
+
+        /**
+         * Creates the instance for JSL.
+         */
+        public Descriptor() {
+            super(PLUGIN_ID_APP_SERVICE_PREFIX + "SimplePythonDataSource", SimplePythonSourceImpl.class);
+        }
+
+        @Override
+        public SimplePythonSourceImpl createService(String serviceId, InputStream ymlFile) {
+            return new SimplePythonSourceImpl(serviceId, ymlFile);
+        }
+
+        @Override
+        public SimplePythonSourceImpl createService() {
+            return new SimplePythonSourceImpl();
+        }
+
+    }    
     
     /**
      * Fallback constructor.
