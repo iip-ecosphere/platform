@@ -61,7 +61,7 @@ template JavaMeshElementTemplate(Configuration config, JavaCodeArtifact target, 
 
         mainCls.addClass("Descriptor", "JSL descriptor for dynamic loading.").setPublic().setStatic().(c|{
             c.extends("de.iip_ecosphere.platform.services.environment.AbstractGenericServicePluginDescriptor<${name}>");
-            c.addConstructor("Creates the instance for JSL").(m|{
+            c.addConstructor("Creates the instance for JSL.").(m|{
                 String id = asIdentifier(elt.name);
                 m.addSuperCall().addArgument("PLUGIN_ID_APP_SERVICE_PREFIX + " + '"${id}"').addClassArgument(name);
             });
