@@ -282,6 +282,15 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
         EasySetup easySetup = setup.getEasyProducer();
         return createExecutor(easySetup, executionMode);
     }
+
+    /**
+     * Cleans the output folder.
+     */
+    public static void cleanOutputFolder() {
+        ConfigurationSetup setup = ConfigurationSetup.getSetup(false);
+        // equip EASyExecutor with access to output folder?
+        PlatformInstantiator.cleanOutputFolder(setup.getEasyProducer().getGenTarget());
+    }
     
     /**
      * Creates an EASy-Producer executor with the given execution mode taking the setup information 

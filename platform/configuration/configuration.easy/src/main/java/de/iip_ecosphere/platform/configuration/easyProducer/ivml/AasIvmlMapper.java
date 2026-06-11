@@ -590,6 +590,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         Object result = null;
         try {
             EasyExecutor executor = ConfigurationLifecycleDescriptor.createExecutor(ExecutionMode.FULL); // with VIL/VTL
+            ConfigurationLifecycleDescriptor.cleanOutputFolder();
             ConfigurationManager.loadIvmlModel(executor);
             ReasoningResult rRes = ConfigurationManager.validateAndPropagate(executor, NO_TEMPLATE_FILTER);
             if (null == rRes) {

@@ -311,27 +311,7 @@ public class PlatformInstantiator {
                 easySetup.setIvmlMetaModelFolder(metaModelFolder);
             }
             if (cleanOutputFolder()) {
-                long start = System.currentTimeMillis();
-                if (ConfigurationLifecycleDescriptor.INCREMENTAL) {
-                    if (outputFolder.isDirectory()) {
-                        LoggerFactory.getLogger(this).info("Deleting built artifacts in {} ...", outputFolder);
-                        try (Stream<Path> paths = Files.walk(outputFolder.toPath())) {
-                            paths.filter(Files::isRegularFile)
-                                 .filter(p -> isOutputArtifactFile(p))
-                                 .forEach(p -> deleteFile(p));
-                        } catch (UncheckedIOException e) { // permission? ignore
-                        } catch (IOException e) {
-                            LoggerFactory.getLogger(PlatformInstantiator.class).warn(
-                                "Failed to delete output artifacts: {}", e.getMessage());
-                        }
-                    }
-                } else {
-                    LoggerFactory.getLogger(this).info("Deleting {} ...", outputFolder);
-                    FileUtils.deleteQuietly(outputFolder);
-                    outputFolder.mkdirs();
-                }
-                LoggerFactory.getLogger(this).info("Cleaned output folder {} in {} ms", outputFolder, 
-                    System.currentTimeMillis() - start);
+                PlatformInstantiator.cleanOutputFolder(outputFolder);
             }
             easySetup.setGenTarget(outputFolder);    
             if (null != testIvmlMetaModelFolder) {
@@ -341,41 +321,6 @@ public class PlatformInstantiator {
                 easySetup.setAdditionalIvmlFolders(additionalIvmlFolders);
             }
         }
-        
-        /**
-         * Deletes the given file/path.
-         *
-         * @param path the path to the file
-         */
-        private static void deleteFile(Path path) {
-            try {
-                Files.delete(path);
-            } catch (IOException e) {
-                LoggerFactory.getLogger(PlatformInstantiator.class).warn("Failed to delete output artifact {}: {}", 
-                    path, e.getMessage());
-            }
-        }        
-        
-        /**
-         * Returns whether {@code path} represents an output artifact to be deleted, usually archives.
-         * 
-         * @param path the path
-         * @return {@code true} for output artifact, {@code false} else
-         */
-        private static boolean isOutputArtifactFile(Path path) {
-            String fileName = path.getFileName().toString().toLowerCase();
-            boolean isFile = fileName.endsWith(".jar") || fileName.endsWith(".zip");
-            if (isFile) {
-                isFile = false;
-                Path parent = path.getParent();
-                if (parent != null) {
-                    if (parent.getFileName() != null && parent.getFileName().toString().equals("target")) {
-                        isFile = true;
-                    }
-                }
-            }
-            return isFile;
-        }        
         
         /**
          * Returns the VIL start rule name. [public for testing]
@@ -612,6 +557,71 @@ public class PlatformInstantiator {
             return false;
         }
 
+    }
+    
+    /**
+     * Cleans the given output folder.
+     * 
+     * @param outputFolder the output folder to clean
+     */
+    static void cleanOutputFolder(File outputFolder) {
+        long start = System.currentTimeMillis();
+        if (ConfigurationLifecycleDescriptor.INCREMENTAL) {
+            if (outputFolder.isDirectory()) {
+                LoggerFactory.getLogger(PlatformInstantiator.class).info("Deleting built artifacts in {} ...", 
+                    outputFolder);
+                try (Stream<Path> paths = Files.walk(outputFolder.toPath())) {
+                    paths.filter(Files::isRegularFile)
+                         .filter(p -> isOutputArtifactFile(p))
+                         .forEach(p -> deleteFile(p));
+                } catch (UncheckedIOException e) { // permission? ignore
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(PlatformInstantiator.class).warn(
+                        "Failed to delete output artifacts: {}", e.getMessage());
+                }
+            }
+        } else {
+            LoggerFactory.getLogger(PlatformInstantiator.class).info("Deleting {} ...", outputFolder);
+            FileUtils.deleteQuietly(outputFolder);
+            outputFolder.mkdirs();
+        }
+        LoggerFactory.getLogger(PlatformInstantiator.class).info("Cleaned output folder {} in {} ms", outputFolder, 
+            System.currentTimeMillis() - start);
+    }
+
+    /**
+     * Deletes the given file/path.
+     *
+     * @param path the path to the file
+     */
+    private static void deleteFile(Path path) {
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            LoggerFactory.getLogger(PlatformInstantiator.class).warn("Failed to delete output artifact {}: {}", 
+                path, e.getMessage());
+        }
+    }        
+    
+    /**
+     * Returns whether {@code path} represents an output artifact to be deleted, usually archives.
+     * 
+     * @param path the path
+     * @return {@code true} for output artifact, {@code false} else
+     */
+    private static boolean isOutputArtifactFile(Path path) {
+        String fileName = path.getFileName().toString().toLowerCase();
+        boolean isFile = fileName.endsWith(".jar") || fileName.endsWith(".zip");
+        if (isFile) {
+            isFile = false;
+            Path parent = path.getParent();
+            if (parent != null) {
+                if (parent.getFileName() != null && parent.getFileName().toString().equals("target")) {
+                    isFile = true;
+                }
+            }
+        }
+        return isFile;
     }
     
     /**
