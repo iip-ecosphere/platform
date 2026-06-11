@@ -121,6 +121,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
     @Parameter(property = "skipTests", required = false, defaultValue = "false") 
     private String skipTests;
 
+    @Parameter(property = "jacoco.skip", required = false, defaultValue = "false") 
+    private String skipJacoco;    
+    
     @Parameter(property = "maven.test.skip", required = false, defaultValue = "false") 
     private boolean mavenTestSkip;
 
@@ -304,6 +307,7 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
             value = value || disableJava || disableBuild || disableJavaTests;
             sysProperties.put("maven.test.skip", String.valueOf(value));
             sysProperties.put("skipTests", String.valueOf(value)); // maven.test.skip might be sufficient
+            sysProperties.put("jacoco.skip", String.valueOf(skipJacoco));
             setAsProperty(sysProperties, "maven.build.cache.enabled", mavenBuildCacheEnabled);
             setAsProperty(sysProperties, "easy.docker.failOnError", easyDockerFailOnError);
             setAsProperty(sysProperties, "easy.docker.skip", easyDockerSkip);
