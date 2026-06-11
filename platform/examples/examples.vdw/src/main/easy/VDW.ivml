@@ -3,6 +3,7 @@ project VDW {
     import IIPEcosphere;
     import OpcUaDataTypes;
     import OpcWoodworking;
+    import AllConstants;
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
@@ -58,22 +59,22 @@ project VDW {
           name = "Events",
           type = refBy(opcWwMachineTypeEvents),
         //cachingTime = CACHE_NONE
-          cachingTime = CACHE_ALWAYS
+        //cachingTime = CACHE_ALWAYS
           }, Field {
                 name = "Identification",
                 type = refBy(opcWwMachineTypeIdentification),
 //              //cachingTime = CACHE_NONE
-              cachingTime = CACHE_ALWAYS
+//              cachingTime = CACHE_ALWAYS
             }, Field {
         name = "ManufacturerSpecific",
         type = refBy(opcWwMachineTypeManufacturerSpecific),
 //          //cachingTime = CACHE_NONE
-        cachingTime = CACHE_ALWAYS
+//        cachingTime = CACHE_ALWAYS
             }, Field {
                   name = "State",           
                   type = refBy(opcWwMachineTypeState),
 //                //cachingTime = CACHE_NONE
-                  cachingTime = CACHE_ALWAYS  
+//                  cachingTime = CACHE_ALWAYS  
             }
         }
     };    
@@ -86,17 +87,17 @@ project VDW {
           name = "Events",
           type = refBy(opcWwMachineTypeEvents),
         //cachingTime = CACHE_NONE
-          cachingTime = CACHE_ALWAYS
+//          cachingTime = CACHE_ALWAYS
           }, Field {
                 name = "Identification",
                 type = refBy(opcWwMachineTypeIdentification),
 //              //cachingTime = CACHE_NONE
-              cachingTime = CACHE_ALWAYS
+//              cachingTime = CACHE_ALWAYS
               }, Field {
         name = "ManufacturerSpecific",
         type = refBy(opcWwMachineTypeManufacturerSpecific),
 //          //cachingTime = CACHE_NONE
-        cachingTime = CACHE_ALWAYS
+//        cachingTime = CACHE_ALWAYS
               }, Field {
                   name = "State",           
                   type = refBy(opcWwMachineTypeState),

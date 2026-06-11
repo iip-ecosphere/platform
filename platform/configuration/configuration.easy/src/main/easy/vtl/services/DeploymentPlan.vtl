@@ -4,7 +4,7 @@
 template DeploymentPlan(IIPEcosphere config, YamlFileArtifact target, DeploymentPlan plan, Application app, String artifact) {
 
     def main(IIPEcosphere config, YamlFileArtifact target, DeploymentPlan plan, Application app, String artifact) {
-        YamlNode n = target.addDocument(true);
+        YamlNode n = target.addDocument(true, true);
         n.addValue("application", plan.name);
         n.addValue("id", plan.id);
         n.addValue("appId", app.id);

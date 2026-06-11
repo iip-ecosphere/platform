@@ -161,7 +161,7 @@ template EcsRuntimeDockerContainerManagerYaml(IIPEcosphere config, YamlFileArtif
     }    
     
     def produceEcsRuntimeCfg(IIPEcosphere config, YamlFileArtifact target, EcsDevice deviceType) {
-        YamlNode n = target.addDocument(true);
+        YamlNode n = target.addDocument(true, true);
         produceTransport(config, n);
         produceAas(config, n, implLocalEphemerial=config.aasImplServer.devicesAsEphemeral);
         produceNetMgr(config, n);
