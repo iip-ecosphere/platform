@@ -1,6 +1,6 @@
 # oktoflow platform: Python plugins for Maven
 
-Maven is the build system for the oktoflow platform, in particular also for generated code, applications and generated application templates. However, so far we did not find suitable Maven plugins for Python code. This component provides two plugins, one for Python "compilation" (compile time syntax checking with pyflakes) and for executing Python unit test suites.
+Maven is the build system for the IIP-Ecosphere platform, in particular also for generated code, applications and generated application templates. However, so far we did not find suitable Maven plugins for Python code. This component provides two plugins, one for Python "compilation" (compile time syntax checking with pyflakes) and for executing Python unit test suites.
 
 ## Prerequisites
 

@@ -118,7 +118,7 @@ template JavaSpringCloudStreamYaml(IIPEcosphere config, YamlFileArtifact target,
         setOf(String) functions = {};
         setOf(String) sources = {};
         calcBindings(mappedMesh, nodes, destinations, functions, sources, "", app);
-        YamlNode n = target.addDocument(true, true);
+        YamlNode n = target.addDocument(true);
 
         protocolConfig(config.transportProtocol, false, n);
         produceTransport(config, n);

@@ -89,7 +89,7 @@ template PlatformYaml(IIPEcosphere config, YamlFileArtifact target, String model
 
     def main(IIPEcosphere config, YamlFileArtifact target, String modelName) {
         String pers = "${config.aasPersistency}";
-        YamlNode n = target.addDocument(true, true);
+        YamlNode n = target.addDocument(true);
         produceTransport(config, n);
         produceAas(config, n, pers, false);
         produceNetMgr(config, n);

@@ -233,7 +233,6 @@
     <maven.build.cache.enabled>false</maven.build.cache.enabled> <!--  fails on windows -->
     <surefireProcessTimeout>3600</surefireProcessTimeout>
     <protobuf.skip>true</protobuf.skip>
-    <jacoco.skip>true</jacoco.skip>
   </properties>
 
   <repositories>       

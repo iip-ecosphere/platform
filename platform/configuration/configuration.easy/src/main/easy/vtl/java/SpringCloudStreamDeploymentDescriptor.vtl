@@ -12,7 +12,7 @@ insert SpringCloudStreamDeploymentDescriptorPart*;
 template SpringCloudStreamDeploymentDescriptor(Configuration config, YamlFileArtifact target, Application app, sequenceOf(MeshElement) elements) extends SpringCloudStreamDeploymentDescriptorBase {
 
     def main(Configuration config, YamlFileArtifact target, Application app, sequenceOf(MeshElement) elements) {
-        YamlNode n = target.addDocument(true, true);
+        YamlNode n = target.addDocument(true);
         n.addValue("id", app.id);
         n.addValue("name", app.name);
         n.addValue("version", app.ver);

@@ -33,7 +33,6 @@ import java.util.zip.ZipEntry;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Profile;
 import org.apache.maven.plugin.AbstractMojo;
@@ -55,8 +54,6 @@ import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 @Mojo( name = "split-classpath", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true )
 public class SplitClasspathMojo extends AbstractMojo {
 
-    private static final String APP_SUFFIX = "-app";
-
     @Parameter(defaultValue = "${project}", readonly = true)
     private MavenProject project;
     
@@ -68,9 +65,6 @@ public class SplitClasspathMojo extends AbstractMojo {
 
     @Parameter( property = "mdep.createIndex", defaultValue = "true")
     private boolean createIndex;
-    
-    @Parameter( property = "mdep.outputFiles", required = false )
-    private String outputFiles;
 
     @Parameter( required = false )
     private List<String> mainPatterns;
@@ -236,8 +230,7 @@ public class SplitClasspathMojo extends AbstractMojo {
         private void setSpringIndexPaths() {
             if (createIndex) {
                 appIndex = new LoaderIndex();
-                appIndexPath = mainPath.getFileSystem().getPath("/BOOT-INF/classpath-app-okto" 
-                    + LoaderIndex.INDEX_SUFFIX);
+                appIndexPath = mainPath.getFileSystem().getPath("/BOOT-INF/classpath-app-okto.idx");
             }
         }
         
@@ -300,10 +293,10 @@ public class SplitClasspathMojo extends AbstractMojo {
                     }
                 }
             } else {
-                cp.mainPath = fs.getPath("/BOOT-INF/classpath" + LoaderIndex.INDEX_SUFFIX);
+                cp.mainPath = fs.getPath("/BOOT-INF/classpath.idx");
                 if (Files.exists(cp.mainPath)) {
                     getLog().info("Processing " + file + " as spring app JAR archive");
-                    cp.appPath = fs.getPath("/BOOT-INF/classpath-app" + LoaderIndex.INDEX_SUFFIX);
+                    cp.appPath = fs.getPath("/BOOT-INF/classpath-app.idx");
                     Path libAppPath = fs.getPath("/BOOT-INF/lib-app");
                     if (!Files.isDirectory(libAppPath)) {
                         Files.createDirectory(libAppPath);
@@ -340,34 +333,6 @@ public class SplitClasspathMojo extends AbstractMojo {
     private void toStream(LoaderIndex index, Path path) throws IOException {
         if (null != index && createIndex) {
             LoaderIndex.toStream(index, Files.newOutputStream(path));
-            
-            if (null != outputFiles && outputFiles.length() > 0) {
-                getLog().info("Writing copies of " + path);
-                StringTokenizer oFiles = new StringTokenizer(outputFiles, ",");
-                
-                File srcFile = path.toFile();
-                String srcName = srcFile.getName();
-                srcName = StringUtils.removeEnd(srcName, LoaderIndex.INDEX_SUFFIX);                
-                boolean srcAppPart = srcName.endsWith(APP_SUFFIX);
-                
-                while (oFiles.hasMoreTokens()) {
-                    String o = oFiles.nextToken();
-                    if (o.endsWith(LoaderIndex.INDEX_SUFFIX) && path.endsWith(LoaderIndex.INDEX_SUFFIX)) {
-                        File outFile = new File(o);
-                        String outName = outFile.getName();
-                        outName = StringUtils.removeEnd(outName, LoaderIndex.INDEX_SUFFIX);
-                        outName = StringUtils.removeEnd(outName, APP_SUFFIX);
-                        outFile = new File(outFile.getParentFile(), outName + (srcAppPart ? APP_SUFFIX : "") 
-                            + LoaderIndex.INDEX_SUFFIX);
-                        try {
-                            getLog().info("Copying to " + outFile);
-                            Files.copy(path, outFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        } catch (IOException e) {
-                            getLog().error("Writing copy " + outFile + ": " + e.getMessage());
-                        }
-                    }
-                }
-            }
         }
     }
     

@@ -380,7 +380,6 @@ The example applies the split-classpath plugin in the package phase of that POM 
 - `skip` (default `false`, user property `mdep.skip`, inherited from original maven plugin) skips the execution of this plugin.
 - `keepClasses` (default empty) defining file (sub-)paths for classes that shall reside in the main class loader rather than being moved into isolated classloading; introduced only for very specific testing situations
 - `createIndex` (default `true`, user property `mdep.createIndex`) whether a classpath index file shall be created for the plugin
-- `outputFiles` (default none, user property `mdep.outputFiles`), list (comma separated) of copies of the classpath files to write; target names receive the "-app" name suffix if the source index to copy from is an "-app" index
 
 # Missing
 
