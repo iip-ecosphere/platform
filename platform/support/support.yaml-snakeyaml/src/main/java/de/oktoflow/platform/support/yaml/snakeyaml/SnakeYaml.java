@@ -123,10 +123,11 @@ public class SnakeYaml extends de.iip_ecosphere.platform.support.yaml.Yaml {
         Yaml result;
         Representer representer = new Representer(new DumperOptions());
         representer.getPropertyUtils().setSkipMissingProperties(true);
+        DumperOptions dumperOptions = initDumperOptions(representer);
         if (null == cls) {
-            result = new Yaml(representer);
+            result = new Yaml(representer, dumperOptions);
         } else {
-            result = new Yaml(new FocusedConstructor(cls), representer);
+            result = new Yaml(new FocusedConstructor(cls), representer, dumperOptions);
         }
         return result;
     }
@@ -147,7 +148,7 @@ public class SnakeYaml extends de.iip_ecosphere.platform.support.yaml.Yaml {
          * @param cls the class to construct for, primarily querying the class loader of {@code cls}
          */
         public FocusedConstructor(Class<? extends Object> cls) {
-            super(cls);
+            super(cls, new LoaderOptions());
             loader = cls.getClassLoader();
         }
         
@@ -173,9 +174,24 @@ public class SnakeYaml extends de.iip_ecosphere.platform.support.yaml.Yaml {
     public <T> T loadTolerantAs(InputStream in, Class<T> cls) {
         Representer representer = new Representer(new DumperOptions());
         representer.getPropertyUtils().setSkipMissingProperties(true);
-        Yaml yaml = new Yaml(new Constructor(cls, new LoaderOptions()), representer);
+        Yaml yaml = new Yaml(new Constructor(cls, new LoaderOptions()), representer, initDumperOptions(representer));
         return yaml.load(in);        
     }
+    
+    /**
+     * Initialize dumper from {@code representer}, takeover in migration from 1.27 to 2.3.
+     * 
+     * @param representer the representer to initialize from
+     * @return the initialized dumper
+     */
+    private static DumperOptions initDumperOptions(Representer representer) {
+        DumperOptions dumperOptions = new DumperOptions();
+        dumperOptions.setDefaultFlowStyle(representer.getDefaultFlowStyle());
+        dumperOptions.setDefaultScalarStyle(representer.getDefaultScalarStyle());
+        dumperOptions.setAllowReadOnlyProperties(representer.getPropertyUtils().isAllowReadOnlyProperties());
+        dumperOptions.setTimeZone(representer.getTimeZone());
+        return dumperOptions;
+    }    
     
     @Override
     public String dump(Object object) throws IOException {
@@ -184,7 +200,7 @@ public class SnakeYaml extends de.iip_ecosphere.platform.support.yaml.Yaml {
 
     @Override
     public void dump(Object object, Class<?> cls, Writer out) throws IOException {
-        Constructor constructor = new Constructor(cls);
+        Constructor constructor = new Constructor(cls, new LoaderOptions());
         TypeDescription configDescription = new TypeDescription(cls);
         constructor.addTypeDescription(configDescription);
         Yaml yaml = new Yaml(constructor);
