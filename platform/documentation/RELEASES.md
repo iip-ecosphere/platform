@@ -26,6 +26,7 @@ Improvements:
 
 Changes:
 * In particular if the start sequence state above is activated, source services shall not ingest data before/outside the `RUNNING` state 
+* If oktoflow plugins are enabled, take over the service descriptors/JSL service descriptor file generated for Java services in app implementation templates. This is also a prerequisite for online updates of Java services.
 
 ### Version 0.8.0 (2026/04/26):
 

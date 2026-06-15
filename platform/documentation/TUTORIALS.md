@@ -7,65 +7,76 @@ We prepared several videos on the oktoflow platform, in particular how to design
 * there is no mentioning of "oktoflow" as the name was invented later
 * there are more examples in the platform than mentioned in the videos
 
-## Introduction: Why another platform, reasons for oktoflow/IIP-Ecosphere.
+## ReGap Community Assets
+
+* "Was ist oktoflow? Eine Einführung" (in German) [Video on Youtube](https://www.youtube.com/watch?v=Yrbq7w0h4S0).
+* Oktoflow platform documentation (in German) [Document on ReGaP homepage](https://regap.de/community-assets/oktoflow-dokumentationsfuehrer/)
+* Structured oktoflow installation guide [Decision tree on ReGaP homepage](https://regap.de/community-assets/oktoflow-Installations-Flowchart/)
+* How to create oktoflow apps using the management UI [Video on Youtube](https://regap.de/community-assets/oktoflow-Installations-Flowchart/)
+* Step-by-step guideline for an anomaly detection app with oktoflow [Document on ReGaP homepage](https://git.l3s.uni-hannover.de/regap_assets/anomaly_detection)
+* How to integrate an AI service into an oktoflow app - the technical side [Video on Youtube](https://youtu.be/Ed8Wj0LEPsI?si=I9Dhp5UhIdHA5irc)
+
+## IIP-Ecosphere videos
+
+### Introduction: Why another platform, reasons for oktoflow/IIP-Ecosphere.
 
 [![Yet another platform](https://img.youtube.com/vi/4P64iwDqqdE/0.jpg)](https://www.youtube.com/watch?v=4P64iwDqqdE)
 
-## Basics: Platform overview, design, architecture, services.
+### Basics: Platform overview, design, architecture, services.
 
 [![Platform overview, design, architecture, services](https://img.youtube.com/vi/kbwT7u6z-Po/0.jpg)](https://www.youtube.com/watch?v=kbwT7u6z-Po)
 
-## Preparation: How to install the platform/development container on Linux
+### Preparation: How to install the platform/development container on Linux
 
 [![Installation for Linux](https://img.youtube.com/vi/0Glp9JVxO5I/0.jpg)](https://www.youtube.com/watch?v=0Glp9JVxO5I)
 
 See also the [Linux Installation Guide](Platform_Installation_Guide_for_Linux.pdf). 
 
-## Preparation: How to install the platform/development container on Windows
+### Preparation: How to install the platform/development container on Windows
 
 [![Installation for Windows](https://img.youtube.com/vi/9jnYziLD4TI/0.jpg)](https://www.youtube.com/watch?v=9jnYziLD4TI)
 
 See also the [Windows Installation Guide](Platform_Installation_Guide_for_Windows.pdf). 
 
-## Preparation: Using of the development container
+### Preparation: Using of the development container
 
 [![Use of development container](https://img.youtube.com/vi/CuyC9hvjL3M/0.jpg)](https://www.youtube.com/watch?v=CuyC9hvjL3M)
 
-## Background: Additional technical knowledge about configuration and code generation in the platform
+### Background: Additional technical knowledge about configuration and code generation in the platform
 
 [![Configuration and code generation background](https://img.youtube.com/vi/OVM11_kyqCg/0.jpg)](https://www.youtube.com/watch?v=OVM11_kyqCg)
 
-## Step 1: Specifying data types
+### Step 1: Specifying data types
 
 [![Step 1: Data types](https://img.youtube.com/vi/zeOFrOvZ9I4/0.jpg)](https://www.youtube.com/watch?v=zeOFrOvZ9I4)
 
-## Step 2: Service configuration
+### Step 2: Service configuration
 
 [![Step 2: Service configuration](https://img.youtube.com/vi/Nmw92SIhycU/0.jpg)](https://www.youtube.com/watch?v=Nmw92SIhycU)
 
-## Step 3: Service mesh configuration
+### Step 3: Service mesh configuration
 
 [![Step 3: Service mesh configuration](https://img.youtube.com/vi/BL6hZQ-5B8Y/0.jpg)](https://www.youtube.com/watch?v=BL6hZQ-5B8Y)
 
-## Step 4: Configuring an application and implementing services
+### Step 4: Configuring an application and implementing services
 
 [![Step 4: Application and service implementation](https://img.youtube.com/vi/WgGhWM-Q6D8/0.jpg)](https://www.youtube.com/watch?v=WgGhWM-Q6D8)
 
 [![Step 4: Service implementation for Python](https://img.youtube.com/vi/leNiYPccdUw/0.jpg)](https://www.youtube.com/watch?v=leNiYPccdUw)
 
-## Step 5: Testing
+### Step 5: Testing
 
 [![Step 5: Testing](https://img.youtube.com/vi/RlNmRTLM3Fs/0.jpg)](https://www.youtube.com/watch?v=RlNmRTLM3Fs)
 
-## Step 6: (Local) Depoying
+### Step 6: (Local) Depoying
 
 [![Step 6: Deploying](https://img.youtube.com/vi/WnFxBU0-Uuk/0.jpg)](https://www.youtube.com/watch?v=WnFxBU0-Uuk)
 
-## Existing examples in the platform
+### Existing examples in the platform
 
 [![Existing examples](https://img.youtube.com/vi/ObTbW869WcE/0.jpg)](https://www.youtube.com/watch?v=ObTbW869WcE)
 
-## Open and advanced topics
+### Open and advanced topics
 
 [![Open and advanced topics](https://img.youtube.com/vi/SaijxVtCcTg/0.jpg)](https://www.youtube.com/watch?v=SaijxVtCcTg)
 
