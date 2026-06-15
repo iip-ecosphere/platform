@@ -10,9 +10,10 @@ We prepared several videos on the oktoflow platform, in particular how to design
 ## ReGap Community Assets
 
 * "Was ist oktoflow? Eine Einführung" (in German) [Video on Youtube](https://www.youtube.com/watch?v=Yrbq7w0h4S0).
+* Release 0.8.0 summary (in German) [Document on ReGaP homepage](https://regap.de/community-assets/oktoflow-release-0-8-0/).
 * Oktoflow platform documentation (in German) [Document on ReGaP homepage](https://regap.de/community-assets/oktoflow-dokumentationsfuehrer/)
 * Structured oktoflow installation guide [Decision tree on ReGaP homepage](https://regap.de/community-assets/oktoflow-Installations-Flowchart/)
-* How to create oktoflow apps using the management UI [Video on Youtube](https://www.youtube.com/watch?v=Yrbq7w0h4S0)
+* How to create oktoflow apps using the management UI [Video on Youtube](https://youtu.be/Cg2zQsa0fy4?si=B_iv6LWc7szhN2wZ)
 * Step-by-step guideline for an anomaly detection app with oktoflow [Document/Notebooks on ReGaP homepage](https://git.l3s.uni-hannover.de/regap_assets/anomaly_detection)
 * How to integrate an AI service into an oktoflow app - the technical side [Video on Youtube](https://youtu.be/Ed8Wj0LEPsI?si=I9Dhp5UhIdHA5irc)
 
