@@ -48,6 +48,22 @@ public abstract class ProcessInfoFactory {
             instance = rest;
         }
     }
+    
+    /**
+     * Represents the system and its accessible information.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public interface SystemInfo {
+        
+        /**
+         * Returns the CPU temperature.
+         * 
+         * @return the CPU temperature, negative if not available
+         */
+        public float getCpuTemperature();
+
+    }
 
     /**
      * Represents a process and its accessible information.
@@ -99,5 +115,12 @@ public abstract class ProcessInfoFactory {
      * @return the process id
      */
     public abstract long getProcessId();
+    
+    /**
+     * Returns the {@link SystemInfo} object.
+     * 
+     * @return the system info object
+     */
+    public abstract SystemInfo getSystemInfo();
 
 }

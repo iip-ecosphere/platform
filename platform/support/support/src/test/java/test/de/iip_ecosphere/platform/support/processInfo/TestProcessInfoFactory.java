@@ -22,6 +22,20 @@ import de.iip_ecosphere.platform.support.processInfo.ProcessInfoFactory;
 public class TestProcessInfoFactory extends ProcessInfoFactory {
 
     /**
+     * Test implementation of {@link SystemInfo}.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class TestSystemInfo implements SystemInfo {
+
+        @Override
+        public float getCpuTemperature() {
+            return 20;
+        }
+        
+    }
+
+    /**
      * Test implementation of {@link ProcessInfo}.
      * 
      * @author Holger Eichelberger, SSE
@@ -48,6 +62,11 @@ public class TestProcessInfoFactory extends ProcessInfoFactory {
     @Override
     public long getProcessId() {
         return -1;
+    }
+
+    @Override
+    public SystemInfo getSystemInfo() {
+        return new TestSystemInfo();
     }
 
 }

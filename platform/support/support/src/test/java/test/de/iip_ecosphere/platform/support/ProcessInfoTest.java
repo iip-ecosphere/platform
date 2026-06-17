@@ -19,6 +19,7 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.processInfo.ProcessInfoFactory;
 import de.iip_ecosphere.platform.support.processInfo.ProcessInfoFactory.ProcessInfo;
+import de.iip_ecosphere.platform.support.processInfo.ProcessInfoFactory.SystemInfo;
 import test.de.iip_ecosphere.platform.support.processInfo.TestProcessInfoFactory;
 
 /**
@@ -49,6 +50,10 @@ public class ProcessInfoTest {
 
         pi = pif.create(0);
         Assert.assertTrue(pi.getVirtualSize() > 0);
+        
+        SystemInfo sys = pif.getSystemInfo();
+        Assert.assertNotNull(sys);
+        Assert.assertTrue(sys.getCpuTemperature() > 0);
     }
 
 }
