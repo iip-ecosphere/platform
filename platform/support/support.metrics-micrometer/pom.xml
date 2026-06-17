@@ -7,8 +7,8 @@
   <description>metrics plugin through micrometer.</description>
 
   <properties>
-    <maven.compiler.target>8</maven.compiler.target>
-    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.source>17</maven.compiler.source>
   </properties>
 
   <parent>
@@ -55,9 +55,8 @@
          <artifactId>maven-compiler-plugin</artifactId>
          <version>${org.apache.maven.compiler.version}</version>
            <configuration>
-             <!-- Must remain on Java 8 level, support level, rapidminer -->
-             <source>8</source>
-             <target>8</target>
+             <source>17</source>
+             <target>17</target>
              <encoding>${java.encoding}</encoding>
            </configuration>
        </plugin>
@@ -92,5 +91,24 @@
          </plugin>
       </plugins>
   </build>
+  
+  <profiles>
+    <profile>
+        <id>Migration</id>
+        <activation>
+          <property>
+            <name>oktoflow_lib_migration</name>
+            <value>true</value>
+          </property>
+        </activation>
+        <dependencies>
+            <dependency>
+              <groupId>io.micrometer</groupId>
+              <artifactId>micrometer-core</artifactId>
+              <version>1.14.4</version>
+            </dependency>
+        </dependencies>
+    </profile>
+  </profiles>
 
 </project>
