@@ -14,11 +14,11 @@ package de.oktoflow.platform.support.rest.spark;
 
 import java.io.IOException;
 
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.MediaType;
 
 import de.iip_ecosphere.platform.support.rest.RestTarget;
 
@@ -89,7 +89,7 @@ public class JerseyWebTarget implements RestTarget {
      */
     private class JerseyInvocationBuilder implements Invocation {
         
-        private javax.ws.rs.client.Invocation.Builder invocationBuilder;
+        private jakarta.ws.rs.client.Invocation.Builder invocationBuilder;
         private String mediaType;
         
         /**
