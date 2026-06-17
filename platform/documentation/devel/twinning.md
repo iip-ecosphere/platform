@@ -232,6 +232,15 @@ docker exec mosquitto mosquitto_passwd -b /mosquitto/config/passwd username pass
 docker compose restart mosquitto
 ```
 
+-	To register on a topic with user/password
+```
+docker exec -it mosquitto mosquitto_sub -h localhost -t topic_name -u user -P user
+```
+-	To send payload to a topic with user/password
+```
+docker exec mosquitto mosquitto_pub -h localhost -t **topic_name** -m '{payload}' -u user -P user
+```
+
 To mount a new MQTT broker configuration
 -	Edit the file "/mosquitto/config" OR mount the new configuration in "docker-compose.yml"
 ```
