@@ -15,12 +15,12 @@ package de.iip_ecosphere.platform.support.dfltSysMetrics;
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
+import de.iip_ecosphere.platform.support.processInfo.ProcessInfoFactory;
+import de.iip_ecosphere.platform.support.processInfo.ProcessInfoFactory.SystemInfo;
 import jcuda.CudaException;
 import jcuda.driver.CUdevice;
 import jcuda.driver.CUdevice_attribute;
 import jcuda.driver.JCudaDriver;
-import oshi.hardware.HardwareAbstractionLayer;
-import oshi.hardware.Sensors;
 
 /**
  * Default system metrics with a basic non-JDK provided metrics implementation.
@@ -31,7 +31,7 @@ public class DefaultSystemMetrics implements SystemMetrics {
 
     public static final SystemMetrics INSTANCE = new DefaultSystemMetrics();
     
-    private static oshi.SystemInfo sysInfo;
+    private static SystemInfo sysInfo;
     private static boolean cudaWarn = false;
 
     /**
@@ -48,11 +48,9 @@ public class DefaultSystemMetrics implements SystemMetrics {
     @Override
     public float getCpuTemperature() {
         if (null == sysInfo) {
-            sysInfo = new oshi.SystemInfo();
+            sysInfo = ProcessInfoFactory.getInstance().getSystemInfo();
         }
-        HardwareAbstractionLayer hal = sysInfo.getHardware();
-        Sensors sensors = hal.getSensors();
-        return (float) sensors.getCpuTemperature();
+        return sysInfo.getCpuTemperature();
     }
     
     @Override

@@ -20,6 +20,8 @@ import java.lang.reflect.Method;
 
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.processInfo.ProcessInfoFactory;
+import oshi.hardware.HardwareAbstractionLayer;
+import oshi.hardware.Sensors;
 import oshi.software.os.OSProcess;
 import oshi.software.os.OperatingSystem;
 
@@ -32,6 +34,37 @@ public class OshiProcessInfoFactory extends ProcessInfoFactory {
 
     private static oshi.SystemInfo sysInfo;
     
+    /**
+     * Implements the {@link SystemInfo} interface.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class OshiSystemInfo implements SystemInfo {
+        
+        private HardwareAbstractionLayer hal;
+        
+        /**
+         * Creates an attached process information object.
+         * 
+         * @param hal the hardware abstraction layer
+         */
+        private OshiSystemInfo(HardwareAbstractionLayer hal) {
+            this.hal = hal;
+        }        
+        
+        @Override
+        public float getCpuTemperature() {
+            Sensors sensors = hal.getSensors();
+            return (float) sensors.getCpuTemperature();
+        }
+        
+    }
+    
+    /**
+     * Implements the {@link ProcessInfo} interface.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
     private static class OshiProcessInfo implements ProcessInfo {
 
         private OSProcess proc;
@@ -108,6 +141,14 @@ public class OshiProcessInfoFactory extends ProcessInfoFactory {
             LoggerFactory.getLogger(getClass()).error("Could not extract PID from JVM name: " + jvmName);
         }
         return result;
+    }
+    
+    @Override
+    public SystemInfo getSystemInfo() {
+        if (null == sysInfo) {
+            sysInfo = new oshi.SystemInfo();
+        }
+        return new OshiSystemInfo(sysInfo.getHardware());
     }
 
 }

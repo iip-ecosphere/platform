@@ -20,11 +20,6 @@
       <version>${project.version}</version>
     </dependency>   
     <dependency>
-        <groupId>com.github.oshi</groupId>
-        <artifactId>oshi-core</artifactId>
-        <version>6.1.6</version>
-    </dependency>
-    <dependency>
         <groupId>org.jcuda</groupId>
         <artifactId>jcuda</artifactId>
         <version>12.6.0</version>
@@ -36,6 +31,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <artifactId>support.processInfo-oshi</artifactId>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <scope>test</scope>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <artifactId>support.commons-apache</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <scope>test</scope>
@@ -44,6 +45,13 @@
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>support.aas</artifactId>
+      <version>${project.version}</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>     
+    <dependency>
+      <groupId>de.iip-ecosphere.platform</groupId>
+      <artifactId>support.log-slf4j-simple</artifactId>
       <version>${project.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>

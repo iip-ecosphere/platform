@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import de.iip_ecosphere.platform.support.processInfo.ProcessInfoFactory;
 import de.iip_ecosphere.platform.support.processInfo.ProcessInfoFactory.ProcessInfo;
+import de.iip_ecosphere.platform.support.processInfo.ProcessInfoFactory.SystemInfo;
 import de.iip_ecosphere.platform.support.rest.Rest;
 import de.oktoflow.platform.support.processInfo.oshi.OshiProcessInfoFactory;
 
@@ -35,6 +36,10 @@ public class OshiProcessFactoryTest {
         ProcessInfo pi = pif.create(pif.getProcessId());
         Assert.assertNotNull(pi);
         Assert.assertTrue(pi.getVirtualSize() > 0);
+        
+        SystemInfo sys = pif.getSystemInfo();
+        Assert.assertNotNull(sys);
+        sys.getCpuTemperature(); // value unclear
     }
 
 }

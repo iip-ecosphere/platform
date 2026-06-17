@@ -27,12 +27,19 @@
     <dependency>
         <groupId>com.github.oshi</groupId>
         <artifactId>oshi-core</artifactId>
-        <version>6.1.6</version>
+        <version>7.3.1</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>support.log-slf4j-simple</artifactId>
+     <version>${project.version}</version>
+     <type>test-jar</type>
+     <scope>test</scope>
     </dependency>
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
