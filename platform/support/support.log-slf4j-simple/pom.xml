@@ -86,5 +86,30 @@
          </plugin>
       </plugins>
   </build>
+  
+  <profiles>
+    <profile>
+        <id>Migration</id>
+        <activation>
+          <property>
+            <name>oktoflow_lib_migration</name>
+            <value>true</value>
+          </property>
+        </activation>
+        <dependencies>
+            <dependency>
+              <groupId>org.slf4j</groupId>
+              <artifactId>slf4j-api</artifactId>
+              <version>2.0.18</version>
+            </dependency>
+            <dependency>
+              <groupId>org.slf4j</groupId>
+              <artifactId>slf4j-simple</artifactId>
+              <version>2.0.18</version>
+              <!--<scope>compile</scope> TODO override from parent -->
+            </dependency>
+        </dependencies>
+    </profile>
+  </profiles>
 
 </project>
