@@ -39,7 +39,7 @@
       <artifactId>javax.json</artifactId>
       <version>1.1.4</version>
     </dependency>    
-    <dependency> <!-- preliminary, move to plugin -->
+    <dependency>
      <groupId>com.jsoniter</groupId>
      <artifactId>jsoniter</artifactId>
      <version>0.9.23</version>
@@ -94,5 +94,39 @@
          </plugin>
       </plugins>
   </build>
+
+  <profiles>
+    <profile>
+        <id>Migration</id>
+        <activation>
+          <property>
+            <name>oktoflow_lib_migration</name>
+            <value>true</value>
+          </property>
+        </activation>
+        <dependencies>
+            <dependency>
+              <groupId>com.fasterxml.jackson.core</groupId>
+              <artifactId>jackson-core</artifactId>
+              <version>2.18.2</version>
+            </dependency>
+            <dependency>
+              <groupId>com.fasterxml.jackson.core</groupId>
+              <artifactId>jackson-databind</artifactId>
+              <version>2.18.2</version>
+            </dependency>
+             <dependency>
+              <groupId>org.glassfish</groupId>
+              <artifactId>jakarta.json</artifactId>
+              <version>2.0.1</version>
+            </dependency>    
+            <dependency>
+             <groupId>com.jsoniter</groupId>
+             <artifactId>jsoniter</artifactId>
+             <version>0.9.23</version>
+            </dependency>
+        </dependencies>
+    </profile>
+  </profiles>
 
 </project>
