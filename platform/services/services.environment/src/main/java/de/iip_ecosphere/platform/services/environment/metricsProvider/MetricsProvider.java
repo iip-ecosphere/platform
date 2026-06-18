@@ -517,6 +517,23 @@ public class MetricsProvider {
         }
         increaseCounterBy(counters.get(counterId), value);
     }
+
+    /**
+     * Helper method to increase/increment the given {@code counter} by the specified {@code value} if {@code data}
+     * is not <b>null</b>. Does nothing if {@code counter} is <b>null</b>.
+     * 
+     * @param counter the counter
+     * @param value the value
+     * @param data the data to consider
+     * @return {@code data}
+     */
+    public static <T> T increaseCounterBy(Counter counter, double value, T data) {
+        if (null != data) {
+            increaseCounterBy(counter, value);
+        }
+        return data;
+    }
+
     
     /**
      * Helper method to increase/increment the given {@code counter} by the specified {@code value}.
