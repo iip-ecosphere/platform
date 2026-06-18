@@ -12,6 +12,7 @@
 
 package de.oktoflow.platform.connectors.file;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -203,7 +204,7 @@ public class FileConnector<CO, CI> extends AbstractChannelConnector<byte[], byte
         if (null != writeFiles) {
             this.writeFiles = new File(writeFiles); // file or directory
         } // warn?
-        LOGGER.info("File connected with InputFile(s) " + readFiles + " OutputFile" + writeFiles);
+        LOGGER.info("File connected with InputFile(s) " + readFiles + " OutputFile " + writeFiles);
         fixedDataInterval = params.getSpecificIntSetting(SETTING_DATA_TIMEDIFF);
         skipFirstLine = Boolean.valueOf(params.getSpecificStringSetting(SETTING_SKIP_FIRST_LINE));
         pollingFrequency = params.getNotificationInterval();
@@ -328,16 +329,17 @@ public class FileConnector<CO, CI> extends AbstractChannelConnector<byte[], byte
                     + Thread.currentThread().getId() + OUT_NAME_SUFFIX);
             }
             try {
-                out = new PrintStream(new FileOutputStream(f));
+                out = new PrintStream(new BufferedOutputStream(new FileOutputStream(f)));
                 this.out.put(channel, out);
             } catch (IOException e) {
                 outFailed = true;
-                LOGGER.error("While reading file {}: {}", f, e.getMessage(), e);
+                LOGGER.error("While writing file {}: {}", f, e.getMessage(), e);
             }
         }
         if (null != out) {
             out.write(data);
             out.println();
+            out.flush(); // else it closes/flushes when the services shuts down, so may not write small chunks
         }
     }
 

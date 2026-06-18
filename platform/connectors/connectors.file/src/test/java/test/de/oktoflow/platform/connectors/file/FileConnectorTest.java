@@ -33,6 +33,8 @@ import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeAdapter;
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.TimeUtils;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.Serializer;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
@@ -207,6 +209,7 @@ public class FileConnectorTest {
      */
     private void testConnector(String readFiles, String writeFiles, int expectedReceived, boolean determineTimeDiff) 
         throws IOException {
+        NotificationMode mode = ActiveAasBase.setNotificationMode(NotificationMode.NONE);
         System.out.println("Testing with read (" + readFiles + ") write (" + writeFiles + ")");
         File[] tmpFiles = deleteTmpConnectorFiles(writeFiles);
         ConnectorTest.assertDescriptorRegistration(FileConnector.Descriptor.class);
@@ -267,6 +270,7 @@ public class FileConnectorTest {
             Assert.assertEquals(expectedContents, writtenContents);
             FileUtils.deleteQuietly(written);
         }
+        ActiveAasBase.setNotificationMode(mode);
     }
 
 }
