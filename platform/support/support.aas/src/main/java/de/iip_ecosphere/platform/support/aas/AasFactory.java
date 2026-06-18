@@ -730,7 +730,7 @@ public abstract class AasFactory {
                 } // further cleanup?
             }
             result += "_" + tmp;*/
-            if (s.length() > 0) {
+            if (null != s && s.length() > 0) {
                 if (result.length() > 0) {
                     result += "_";
                 }
