@@ -829,6 +829,7 @@ public class SpringCloudServiceManager
                         DeploymentState state = status.getState();
                         if (state != null) { // if it was in a failure, also try to get rid of it, #50
                             setState(service, ServiceState.STOPPING);
+                            service.detachStub();
                             LOGGER.info("Stopping " + id + "... ");
                             deployer.undeploy(id);
                             state = waitFor(id, state, s -> DeploymentState.deployed == s);
@@ -840,12 +841,13 @@ public class SpringCloudServiceManager
                             }
                         } else {
                             setState(service, ServiceState.STOPPING);
+                            service.detachStub();
                         }
                     }
                 } else {
                     setState(service, ServiceState.STOPPING);
+                    service.detachStub();
                 }
-                service.detachStub();
                 Transport.sendProcessStatus(PROGRESS_COMPONENT_ID, step++, serviceIds.length + 1, 
                     "Stopped service " + ids);
                 netClient = markServerUse(true, service, false, netClient);
