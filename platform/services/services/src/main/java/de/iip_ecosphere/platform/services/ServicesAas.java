@@ -886,7 +886,9 @@ public class ServicesAas implements AasContributor {
                         op.invoke(actName);
                     } catch (ExecutionException e) {
                         if (logError) {
-                            getLogger().error("Cannot set state for service `{}`: {}", desc.getId(), e.getMessage());
+                            getLogger().error("Cannot set state {} for service `{}`: {}", actName, desc.getId(), 
+                                e.getMessage());
+                            e.printStackTrace(); // preliminary
                         }
                     }
                 } else if (logError) {
@@ -900,7 +902,8 @@ public class ServicesAas implements AasContributor {
                         prop.setValue(actName);
                     } catch (ExecutionException e) {
                         if (logError) {
-                            getLogger().warn("Cannot write state for service `{}`: {}", desc.getId(), e.getMessage());
+                            getLogger().warn("Cannot write state {} for service `{}`: {}", actName, desc.getId(), 
+                                e.getMessage());
                         }
                     }
                 } else if (logError) {
