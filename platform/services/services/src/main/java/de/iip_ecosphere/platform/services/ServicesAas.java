@@ -870,72 +870,75 @@ public class ServicesAas implements AasContributor {
      */
     public static void notifyServiceStateChanged(ServiceState old, ServiceState act, ServiceDescriptor desc, 
         NotificationMode mode) {
-        ActiveAasBase.processNotification(NAME_SUBMODEL, mode, (sub, aas) -> {
-            // other approach... link property against service descriptor while creation and reflect state
-            // let's try this one for now
-            SubmodelElementCollection services = sub.getSubmodelElementCollection(NAME_COLL_SERVICES);
-            String serviceId = fixId(desc.getId());
-            SubmodelElementCollection elt = services.getSubmodelElementCollection(serviceId);
-            String actName = ServiceState.toString(act);
-            if (null != elt) {
-                boolean logError = logExecutionErrors && act != null && ERROR_IF_NOT_FOUND.contains(act) 
-                    && desc.getKind() != ServiceKind.SERVER;
-                Operation op = elt.getOperation(NAME_OP_SVC_SET_STATE);
-                if (null != op) {
-                    try {
-                        op.invoke(actName);
-                    } catch (ExecutionException e) {
-                        if (logError) {
-                            getLogger().error("Cannot set state {} for service `{}`: {}", actName, desc.getId(), 
-                                e.getMessage());
-                            e.printStackTrace(); // preliminary
+        if (old != act) {
+            ActiveAasBase.processNotification(NAME_SUBMODEL, mode, (sub, aas) -> {
+                // other approach... link property against service descriptor while creation and reflect state
+                // let's try this one for now
+                SubmodelElementCollection services = sub.getSubmodelElementCollection(NAME_COLL_SERVICES);
+                String serviceId = fixId(desc.getId());
+                SubmodelElementCollection elt = services.getSubmodelElementCollection(serviceId);
+                String actName = ServiceState.toString(act);
+                if (null != elt) {
+                    boolean logError = logExecutionErrors && act != null && ERROR_IF_NOT_FOUND.contains(act) 
+                        && desc.getKind() != ServiceKind.SERVER;
+                    Operation op = elt.getOperation(NAME_OP_SVC_SET_STATE);
+                    if (null != op) {
+                        try {
+                            op.invoke(actName);
+                            getLogger().info("State of service `{}` set to {}", desc.getId(), actName);
+                        } catch (ExecutionException e) {
+                            if (logError) {
+                                getLogger().error("Cannot set state {} for service `{}`: {}", actName, desc.getId(), 
+                                    e.getMessage());
+                                e.printStackTrace(); // preliminary
+                            }
                         }
+                    } else if (logError) {
+                        getLogger().error("Service state change - cannot find operation {} for service `{}`. "
+                            + "Deployment descriptor ok? Network port reserved?", NAME_OP_SVC_SET_STATE, desc.getId());
                     }
-                } else if (logError) {
-                    getLogger().error("Service state change - cannot find operation {} for service `{}`. "
-                        + "Deployment descriptor ok? Network port reserved?", NAME_OP_SVC_SET_STATE, desc.getId());
-                }
-                // old style, kept for UI, overwrite property value
-                Property prop = elt.getProperty(NAME_PROP_STATE);
-                if (null != prop) {
-                    try {
-                        prop.setValue(actName);
-                    } catch (ExecutionException e) {
-                        if (logError) {
-                            getLogger().warn("Cannot write state {} for service `{}`: {}", actName, desc.getId(), 
-                                e.getMessage());
+                    // old style, kept for UI, overwrite property value
+                    Property prop = elt.getProperty(NAME_PROP_STATE);
+                    if (null != prop) {
+                        try {
+                            prop.setValue(actName);
+                        } catch (ExecutionException e) {
+                            if (logError) {
+                                getLogger().warn("Cannot write state {} for service `{}`: {}", actName, desc.getId(), 
+                                    e.getMessage());
+                            }
                         }
+                    } else if (logError) {
+                        getLogger().warn("Service state change - cannot find property {} for service `{}`", 
+                            NAME_PROP_STATE, desc.getId());
                     }
-                } else if (logError) {
-                    getLogger().warn("Service state change - cannot find property {} for service `{}`", 
-                        NAME_PROP_STATE, desc.getId());
+                } else {
+                    getLogger().error("Service state change - cannot find service `{}` (idShort: {})", 
+                        desc.getId(), serviceId);
                 }
-            } else {
-                getLogger().error("Service state change - cannot find service `{}` (idShort: {})", 
-                    desc.getId(), serviceId);
-            }
-            // synchronous execution needed??
-            getLogger().info("Handling service state change `{}`: {} -> {}", desc.getId(), old, act);
-            if (ServiceState.AVAILABLE == old && ServiceState.STARTING == act) {
-                ifEarlyAas(null, () -> registerMetrics(desc, sub, elt));
-                Transport.sendServiceStatusWithDescription(ActionTypes.CHANGED, desc.getId(), actName);
-            } else if (ServiceState.STARTING == old && ServiceState.RUNNING == act) {
-                setupRelations(desc, sub, elt);
-                Transport.sendServiceStatusWithDescription(ActionTypes.CHANGED, desc.getId(), actName);
-            } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
-                && ServiceState.STOPPED == act) {
-                removeRelations(desc, sub, null);
-                removeService(desc, sub);
-                Transport.sendServiceStatusWithDescription(ActionTypes.REMOVED, desc.getId(), actName);
-            } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
-                && ServiceState.STOPPING == act) {
-                ifEarlyAas(() -> MetricsAasConstructor.clearProviderMetricsInAasSubmodel(elt), 
-                    () -> MetricsAasConstructor.removeProviderMetricsFromAasSubmodel(elt));
-                Transport.sendServiceStatusWithDescription(ActionTypes.CHANGED, desc.getId(), actName);
-            } else if (old != act) {
-                Transport.sendServiceStatusWithDescription(ActionTypes.CHANGED, desc.getId(), actName);
-            }
-        });
+                // synchronous execution needed??
+                getLogger().info("Handling service state change `{}`: {} -> {}", desc.getId(), old, act);
+                if (ServiceState.AVAILABLE == old && ServiceState.STARTING == act) {
+                    ifEarlyAas(null, () -> registerMetrics(desc, sub, elt));
+                    Transport.sendServiceStatusWithDescription(ActionTypes.CHANGED, desc.getId(), actName);
+                } else if (ServiceState.STARTING == old && ServiceState.RUNNING == act) {
+                    setupRelations(desc, sub, elt);
+                    Transport.sendServiceStatusWithDescription(ActionTypes.CHANGED, desc.getId(), actName);
+                } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
+                    && ServiceState.STOPPED == act) {
+                    removeRelations(desc, sub, null);
+                    removeService(desc, sub);
+                    Transport.sendServiceStatusWithDescription(ActionTypes.REMOVED, desc.getId(), actName);
+                } else if ((ServiceState.RUNNING == old  || ServiceState.FAILED == old) 
+                    && ServiceState.STOPPING == act) {
+                    ifEarlyAas(() -> MetricsAasConstructor.clearProviderMetricsInAasSubmodel(elt), 
+                        () -> MetricsAasConstructor.removeProviderMetricsFromAasSubmodel(elt));
+                    Transport.sendServiceStatusWithDescription(ActionTypes.CHANGED, desc.getId(), actName);
+                } else if (old != act) {
+                    Transport.sendServiceStatusWithDescription(ActionTypes.CHANGED, desc.getId(), actName);
+                }
+            });
+        }
     }
     
     /**
