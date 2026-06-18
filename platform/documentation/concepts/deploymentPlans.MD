@@ -4,7 +4,7 @@ Applications running on the oktoflow typically run distributed and, thus, need a
 
 ## Deployment Plan
 
-Fields of the 'DeploymentPlan' type:
+Fields of the `DeploymentPlan` type:
 
 | Field |  Description | Default |
 | ---   |  --- | --- |
@@ -22,6 +22,7 @@ Fields of the 'DeploymentPlan' type:
 | cmdArg | Comma-separated application arguments as String |  | 
 | server | Sequence of server assignments, see `ServerAssignment` below |  | 
 | parameter | Sequence of service assignment parameters, see `ParameterServiceAssignment` below |  | 
+| ensembleStrategy | Strategy for automatically determining ensembles | `MANUAL`, `ALL_ON_FIRST` | |
 
 The constraints of the deployment plan validate whether only services of the referenced application are stated and the service mesh is fully covered, that ensemble services do not form loops, whether parameter services and parameter service names are unique and whether plan ids are unique.
 
@@ -51,6 +52,8 @@ Fields of the 'EnsembleSpec' type:
 | ---   |  --- | --- |
 | leader | Reference to the `MeshElement` that shall be the ensemble leader, the service that is primarily started in the process. | |
 | member | Reference to the `MeshElement` that shall be started in the same process as the ensemble leader. ||
+
+Specifying ensembles can be tedious and in most cases it is fully sufficient if the first specified service in `services` becomes the respective ensemble leader. This can be enabled by the `ensembleStrategy` `ALL_ON_FIRST`. By default, the `ensembleStrategy` is `MANUAL` and if no `ensembles` are given, services are started in individual processes. Please note, in particular with `ALL_ON_FIRST` that depending on your application and input data, it might be required to start sinks, transformers and sources in sequence, i.e., put the sources last in your service lists. 
 
 ## Server Assignments
 
