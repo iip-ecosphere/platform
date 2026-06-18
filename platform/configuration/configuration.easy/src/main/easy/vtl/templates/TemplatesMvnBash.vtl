@@ -12,7 +12,7 @@ template TemplatesMvnBash(Configuration config, FileArtifact target, Boolean for
         if (forRun) {
             'mvn -P Exec dependency:copy@app exec:java@app'
         } else if (forUpdate) {
-            'mvn install -P App,Art \\$*'
+            'mvn -o install -P App,Art \\$*'
         } else if (forBuild) {
             'mvn install \\$*'
         } else {

@@ -11,7 +11,7 @@ template TemplatesMvnBatch(Configuration config, FileArtifact target, Boolean fo
         if (forRun) {
             'mvn -P Exec dependency:copy@app exec:java@app'
         } else if (forUpdate) {
-            'mvn -P App,Art install %*'
+            'mvn -o -P App,Art install %*'
         } else if (forBuild) {
             'mvn install %*'
         } else {
