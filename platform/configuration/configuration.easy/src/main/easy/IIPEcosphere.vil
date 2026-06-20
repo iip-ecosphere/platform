@@ -243,8 +243,16 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 setOf(DisplayPanel) displayPanels = DisplayPanel.allInstances();
                 Boolean mapToDisplay = displayPanels.size() > 0; // initial, we may look deeper, also for the specific application
                 
+                String pluginOutputFolder = "target/jars";
                 vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, oktoPlugins=oktoPlugins, bins=bins, assemblies=assemblies, resources=resources, 
-                    starterCls=appStarterCls, appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests, copyRuntimeDependencies=copyDependencies, mapDisplay=mapToDisplay);
+                    starterCls=appStarterCls, appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests, copyRuntimeDependencies=copyDependencies, mapDisplay=mapToDisplay, pluginOutputFolder=pluginOutputFolder);
+                PropertiesFileArtifact pluginCfg = "${appRoot}/pluginCfg.properties";
+                if (cfg.withPlugins) {
+                    pluginCfg.setValue("pluginFolder", "target/plugins");
+                    pluginCfg.save();
+                } else {
+                    pluginCfg.delete();
+                }
                 vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
                 generatePlugins(cfg, appRoot);
                 mvn(appRoot);
