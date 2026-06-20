@@ -238,7 +238,7 @@ docker exec -it mosquitto mosquitto_sub -h localhost -t topic_name -u user -P us
 ```
 -	To send payload to a topic with user/password
 ```
-docker exec mosquitto mosquitto_pub -h localhost -t **topic_name** -m '{payload}' -u user -P user
+docker exec mosquitto mosquitto_pub -h localhost -t topic_name -m '{payload}' -u user -P user
 ```
 
 To mount a new MQTT broker configuration
@@ -252,4 +252,9 @@ To mount a new MQTT broker configuration
 -	Restart the container
 ```
 docker compose restart mosquitto
+```
+
+-	In case of sending Json payload you should use Json format for the payload '{"payload": 11}'
+```
+docker exec mosquitto mosquitto_pub -h localhost -t topic_name -m '{"payload": 11}' -u user -P user
 ```
