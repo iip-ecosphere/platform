@@ -1,6 +1,10 @@
 # oktoflow platform: App debugging
 
-This document aims at collecting potential issues and resolutions when developing oktoflow apps. Although the first impression might be that the platform is not doing it's job, in particular also the service code parts contributed by you might be the culprit.
+This document aims at collecting topics and techniques on developing oktoflow apps. 
+
+## Typical Issues and Resolutions
+
+Although a first impression might be that oktoflow is not doing it's job, in particular also the service code parts contributed by you might be the culprit. Below, we list questions, properties and topics that shall help thinking out-of-the-box when app execution issues occur.
 
 * Is your code correct?
   * Syntax checking and (for Java compiability) are covered by the build process.
@@ -23,3 +27,14 @@ This document aims at collecting potential issues and resolutions when developin
   * Tracing also works in distributed manner, i.e., via a central collector.
   
 Apps can be tested in automated/distributed fashion using the [Platform Evaluation and Testing Environment (PETE)](../../tests/test.environment).
+
+## Online Update of Services
+
+When a service issue shall be identified, e.g., by adding debug outputs, or a resolution is found, the traditional approach is to stop the communication broker, to re-build the application, to re-start the broker and to run the application again. As this involves a complete re-generation, re-compilation and re-packaging of the application, it might be rather tedious. Since version 0.8.1 of oktoflow we aim at speeding up this cycle by more lightweight build and runtime service update processes.7
+
+* **Stopping and re-startnig the communication broker is not alyways needed:** An app build process only re-builds the broker if the meta-model has been changed (and then a running-broker may prevent overriding it's packaged binaries). Thus, am application re-build, you can keep the broker running. Moreover, if the broker protocol/setup is the same, you may also run the broker of another app or install a global broker (e.g., mosquitto for MQTT) and use that insinde to avoid keeping track of a broker.
+* Use **artifact-update shortcut build processes** (additional profile `-P Art`, see generated scripts `updateArtifacts.sh` and `updateArtifacts.bat`). These build process variants bypass interface/app code generation and just focus on updating the Java/Python/resource artifacts for app services. If enabled in the POM of the service implementation project/all-in-one-example, the app is packaged afterwards, a prerequisite that the changed artifacts become available. Basically, this variant still requires re-starting the application. 
+* In testing/evaulation: Rely on **runtime service updates** (in combination with artifact-update shortcut build processes), i.e., keep broker and app running, just run the artifact-update shortcut build process and let the app update its services. Thereby, mocked connectors are re-set so that mocked data ingestion starts from the beginning of the respective data files.
+  * Requires that all involved (data ingesting) services correctly take the service state into account, i.e., do not ingest data when they are stopped. Not considering service states may confuse the service execution, which may believe that ingested and transported data is not processed further so that individual data paths may be disabled.
+  * Python: Synchronous and asynchronous Python services with websocket integration seem to "survive" a service update. Python services are independend of oktoflow platform plugins.
+  * Java: Runtime update for Java services is only supported when oktoflow platform plugins are enabled.  
