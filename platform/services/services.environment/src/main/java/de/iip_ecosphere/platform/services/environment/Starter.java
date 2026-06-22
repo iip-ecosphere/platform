@@ -561,6 +561,7 @@ public class Starter {
                         getLogger().info("Re-starting services {}", toServiceIds(services));
                         services.forEach(s -> setStateQuietly(s, ServiceState.STARTING, ServiceState.RUNNING));
                         services.forEach(s -> s.startData());
+                        getLogger().info("Update completed");
                     }
                 };
                 FileAlterationObserver obs = commons.createFileAlterationObserver(folder.getAbsolutePath(), 
