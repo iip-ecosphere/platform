@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.examples;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
@@ -168,7 +170,7 @@ public class SpringStartup {
         enableUpdates = CmdLine.getBooleanArg(args, Starter.PARAM_IIP_TEST_WATCH, enableUpdates);
         File origArtifact = artifact;
         artifact = relocateForUpdates(artifact);
-        loadPlugins(artifact, args);
+        loadPlugins(origArtifact, args);
         System.setProperty(NetworkManagerFactory.PROPERTY, PersistentLocalNetworkManagerDescriptor.class.getName());
         System.out.println("Spring artifact: " + artifact);
         System.out.println("Spring Startup with args: " + Arrays.toString(args));
@@ -268,23 +270,55 @@ public class SpringStartup {
      */
     private static void loadPlugins(File artifact, String[] args) {
         Starter.transferArgsToEnvironment(args);
-        final String pluginsDirDflt = "target";
-        // similar to Starter.loadOktoPlugins() but disable plugin loading if there are none in default dirs -> legacy
-        String pluginsDir = System.getProperty(Starter.PARAM_IIP_APP_PLUGINS, pluginsDirDflt);
-        if (pluginsDir.equals(pluginsDirDflt)) { // if set differently, we assume that this is intentional and "ok"
-            File pluginParent = new File(pluginsDir);
-            File plugins = new File(pluginParent, "plugins");
-            if (!plugins.isDirectory()) { // testing fallback
-                plugins = new File(pluginParent, "oktoPlugins");
-                if (!plugins.isDirectory()) {
-                    System.setProperty(Starter.PARAM_IIP_APP_PLUGINS, Starter.PARAM_IIP_APP_PLUGINS_NO_PLUGINS);
+        String pluginsDirDflt = "target";
+        boolean pluginsDirDone = false;
+
+        File cfgRoot = artifact.getParentFile();
+        if (null != cfgRoot && cfgRoot.getName().equals("target")) {
+            cfgRoot = cfgRoot.getParentFile();
+        }
+        if (null != cfgRoot) {
+            // all-in-one examples, switch transparently to plugin without java:exec param
+            File pluginCfg = new File(cfgRoot, "pluginCfg.properties");
+            if (pluginCfg.exists()) {
+                Properties prop = new Properties();
+                try (FileInputStream fis = new FileInputStream(pluginCfg)) {
+                    prop.load(fis);
+                    String pluginsDir = prop.getProperty("pluginFolder");
+                    if (null != pluginsDir) {
+                        File plugins = new File(cfgRoot, pluginsDir);
+                        if (plugins.exists()) {
+                            System.setProperty(Starter.PARAM_IIP_APP_PLUGINS, plugins.getAbsolutePath());
+                            pluginsDirDone = true;
+                            System.out.println("Taking over default plugin location from pluginCfg.properties: " 
+                                + plugins);
+                        }
+                    }
+                } catch (IOException e) {
+                    System.out.println("Cannot read pluginCfg.properties: " + e.getMessage() + " Ignorning.");
                 }
-            } 
-        } else { // try it from the artifact
-            File base = artifact.getParentFile();
-            File plugins = new File(base, "plugins");
-            if (plugins.exists()) {
-                System.setProperty(Starter.PARAM_IIP_APP_PLUGINS, plugins.getAbsolutePath());
+            }
+        }
+        
+        if (!pluginsDirDone) {
+            // similar to Starter.loadOktoPlugins() but disable plugin loading if there are none in default 
+            // dirs -> legacy
+            String pluginsDir = System.getProperty(Starter.PARAM_IIP_APP_PLUGINS, pluginsDirDflt);
+            if (pluginsDir.equals(pluginsDirDflt)) { // if set differently, we assume that this is intentional and "ok"
+                File pluginParent = new File(pluginsDir);
+                File plugins = new File(pluginParent, "plugins");
+                if (!plugins.isDirectory()) { // testing fallback
+                    plugins = new File(pluginParent, "oktoPlugins");
+                    if (!plugins.isDirectory()) {
+                        System.setProperty(Starter.PARAM_IIP_APP_PLUGINS, Starter.PARAM_IIP_APP_PLUGINS_NO_PLUGINS);
+                    }
+                } 
+            } else { // try it from the artifact
+                File base = artifact.getParentFile();
+                File plugins = new File(base, "plugins");
+                if (plugins.exists()) {
+                    System.setProperty(Starter.PARAM_IIP_APP_PLUGINS, plugins.getAbsolutePath());
+                }
             }
         }
         Starter.loadOktoPlugins();
