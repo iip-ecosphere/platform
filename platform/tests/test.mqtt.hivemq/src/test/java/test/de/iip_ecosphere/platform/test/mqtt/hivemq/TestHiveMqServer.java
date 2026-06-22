@@ -73,11 +73,15 @@ public class TestHiveMqServer extends AbstractTestServer {
     @Override
     public void stop(boolean dispose) {
         if (null != hiveMQ) {
-            hiveMQ.stop().join();
-            hiveMQ = null;
-            if (dispose && hiveTmp != null) {
-                FileUtils.deleteQuietly(hiveTmp);
+            try {
+                hiveMQ.stop().join();
+                if (dispose && hiveTmp != null) {
+                    FileUtils.deleteQuietly(hiveTmp);
+                }
+            } catch (IllegalStateException e) {
+                // double shutdown, ignore
             }
+            hiveMQ = null;
         }
     }
     
