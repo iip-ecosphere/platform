@@ -70,6 +70,8 @@ public class TestHiveMqServer extends AbstractTestServer {
         return this;
     }
     
+    // checkstyle: stop exception type check
+    
     @Override
     public void stop(boolean dispose) {
         if (null != hiveMQ) {
@@ -78,13 +80,15 @@ public class TestHiveMqServer extends AbstractTestServer {
                 if (dispose && hiveTmp != null) {
                     FileUtils.deleteQuietly(hiveTmp);
                 }
-            } catch (IllegalStateException e) {
+            } catch (Throwable e) {
                 // double shutdown, ignore
             }
             hiveMQ = null;
         }
     }
-    
+
+    // checkstyle: resume exception type check
+
     /**
      * Determins the server address from the command line.
      * 
