@@ -182,7 +182,7 @@ public class ServerConfig implements WebMvcConfigurer {
     
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        if (authDesc != null) {
+        if (authDesc != null && authDesc.getServerUsers() != null) {
             // Apply this interceptor to all paths, or specific ones like "/api/**"
             registry.addInterceptor(authInterceptor)
                 .addPathPatterns("/**")
