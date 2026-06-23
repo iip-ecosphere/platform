@@ -14,7 +14,9 @@ package de.iip_ecosphere.platform.services.environment;
 
 import static de.iip_ecosphere.platform.support.aas.AasUtils.*;
 
+import java.net.URI;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
@@ -155,18 +157,28 @@ public class ServiceMapper {
     private static void defineUpdateOperation(final ProtocolServerBuilder builder, final Service service) {
         builder.defineOperation(getQName(service, NAME_OP_UPDATE), 
             new JsonResultWrapper(p -> {
-                service.update(readUri(p, 0, EMPTY_URI));
-                Supplier<? extends Service> updateHandler = Starter.getUpdateHandler(service.getId());
-                if (null != updateHandler) {
-                    Service updatedService = updateHandler.get();
-                    if (null != updatedService) {
-                        updatedService.transferState(service);
-                        Starter.mapService(updatedService, updateHandler); // redefine operations
-                    }
-                }
+                updateService(service, readUri(p, 0, EMPTY_URI));
                 return null;
             }
         ));
+    }
+    
+    /**
+     * Updates a service including calling its update handler if known.
+     * 
+     * @param service the service to update
+     * @see Starter#getUpdateHandler(String)
+     */
+    static void updateService(Service service, URI location) throws ExecutionException {
+        service.update(location);
+        Supplier<? extends Service> updateHandler = Starter.getUpdateHandler(service.getId());
+        if (null != updateHandler) {
+            Service updatedService = updateHandler.get();
+            if (null != updatedService) {
+                updatedService.transferState(service);
+                Starter.mapService(updatedService, updateHandler); // redefine operations
+            }
+        }
     }
     
     /**

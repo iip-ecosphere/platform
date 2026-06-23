@@ -860,7 +860,7 @@ public class Starter {
      */
     private static void updateQuietly(Service service, URI location) {
         try {
-            service.update(location);
+            ServiceMapper.updateService(service, location);
         } catch (ExecutionException e) {
             getLogger().error("Updating service '{}': {}", service.getId(), e.getMessage());
         }

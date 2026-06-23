@@ -879,6 +879,12 @@ public abstract class AbstractService implements Service {
             e -> e.getValue().getType()
         ));
     }
+
+    @Override
+    public void transferState(Service source) {
+        state = source.getState(); // don't run the full setState mechanism, just transfer the state
+        Service.transferParameters(source, this);
+    }
     
     /**
      * Represents a type creator with actual type being created.

@@ -157,16 +157,28 @@ public interface Service extends ParameterConfigurerProvider, ServiceBase {
      * Transfers all matching state, parameters.
      * 
      * @param source the source service to transfer from
+     * 
+     * @see #transferState(Service)
      */
     public default void transferState(Service source) {
+        transferParameters(source, this);
+    }
+
+    /**
+     * Transfers parameters from {@code source} to {@code target}.
+     * 
+     * @param source the source service
+     * @param target the target service
+     */
+    public static void transferParameters(Service source, Service target) {
         for (String n : source.getParameterNames()) {
             ParameterConfigurer<?> sp = source.getParameterConfigurer(n);
-            ParameterConfigurer<?> tp = getParameterConfigurer(n);
+            ParameterConfigurer<?> tp = target.getParameterConfigurer(n);
             if (tp != null && sp != null) {
                 try {
                     tp.transferValue(sp);
                 } catch (ExecutionException e) {
-                    LoggerFactory.getLogger(getClass()).warn("Cannot transfer value of {}: {}", n, e.getMessage());
+                    LoggerFactory.getLogger(Service.class).warn("Cannot transfer value of {}: {}", n, e.getMessage());
                 }
             }
         }
