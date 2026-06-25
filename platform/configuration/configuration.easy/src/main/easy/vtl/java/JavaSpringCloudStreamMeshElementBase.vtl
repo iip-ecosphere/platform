@@ -15,6 +15,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, JavaCodeArti
     setOf(String) serviceVars = {};
     JavaCodeClass mainCls;
     String updateHandlerName = "creator";
+    mapOf(String) props = {};
 
     // do not create annotations if we have a family interface, then the node delegates here
     def JavaCodeMethod nodeAnnotation(JavaCodeMethod m, String annotation) {
@@ -190,12 +191,13 @@ block;
     }
 
     def genMapService(String serviceVarName, JavaCodeBlockInterface block) {
-        String updateHandler = getUpdateHandlerName(elt.impl);
+        String updateHandler = props.get("UPD", "");
         // ignore arg updateHandler if empty
-        block.callQualified("de.iip_ecosphere.platform.services.environment.spring.Starter.mapService").arg(serviceVarName).arg(updateHandler).(c|{
+        block.callQualified("de.iip_ecosphere.platform.services.environment.spring.Starter.mapService").arg(serviceVarName).(c|{
             if (familyInterface <> "") {
                 c.arg(isDefaultService(elt.impl, familyMember));
             }
+            c.arg(updateHandler);
         });
     }
     
@@ -738,12 +740,8 @@ block;
     }
     
     def generateUpdateHandler(String serviceType, JavaCodeClass c) {
+        props.put("UPD", updateHandlerName);
         c.attribute("java.util.function.Supplier<${serviceType}>", updateHandlerName);
-    }
-
-    @DispatchBasis
-    def String getUpdateHandlerName(ServiceBase service) {
-        updateHandlerName;
     }
     
     // --------------------------- ServiceFamily ----------------------------------
@@ -779,6 +777,7 @@ block;
     }
     
     def generateServiceAttribute(MeshElement elt, ServiceFamily family, JavaCodeClass c) {
+        props.remove("UPD"); // disable updates, handled within family
         Service init = defaultService(family);
         if (familyInterface.length() == 0 and isDefined(family.selector) and family.selector <> null) {
             generateSelectorServiceAttribute(family, family.selector, c);
@@ -1022,13 +1021,9 @@ block;
         
     // -------------------- Python --------------------------
 
-    @DispatchBasis
-    def String getUpdateHandlerName(PythonService service) {
-        ""; // disable updates, handled within python service
-    }
-
     def initialService(MeshElement elt, PythonService service, setOf(String) serviceVars, JavaCodeMethod m) {
         generateAbstractServiceCreateInstance(elt, service, "service", getServiceType(elt, service), m);
+        props.remove("UPD"); // disable updates, handled within python service
         // no mapServices here as Python may take long and block the constructor -> initIngestors
         serviceVars.add("service");
         for (IOType in: service.input) {
