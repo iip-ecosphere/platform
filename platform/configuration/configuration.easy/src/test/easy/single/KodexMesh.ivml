@@ -231,7 +231,17 @@ project KodexMesh {
         name = "Simple Kodex Testing App",
         ver = "0.1.0",
         description = "",
-        services = {refBy(myMesh)}        
+        services = {refBy(myMesh)},
+        identityStore = AppIdentityStore {
+            includeInApplication=true,
+            identities = {
+                UserPwAppIdentityStoreEntry {
+                    userName = "user", 
+                    password = "pwd", 
+                    name = "amqp1"
+                }
+            }
+        }
     };
     
     ServiceMesh myMesh = {
