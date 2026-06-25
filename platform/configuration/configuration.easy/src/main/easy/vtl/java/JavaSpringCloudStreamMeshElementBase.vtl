@@ -15,7 +15,6 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, JavaCodeArti
     setOf(String) serviceVars = {};
     JavaCodeClass mainCls;
     String updateHandlerName = "creator";
-    String updateHandler = "";
 
     // do not create annotations if we have a family interface, then the node delegates here
     def JavaCodeMethod nodeAnnotation(JavaCodeMethod m, String annotation) {
@@ -85,7 +84,17 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, JavaCodeArti
             JavaCodeBlock block = new JavaCodeBlock();
             String trace = "";
             if (base.monitorSentCount) {
-                block.call("MetricsProvider.increaseCounterBy").arg("serviceSent").arg("1.0");
+                JavaCodeMethodCall call = new JavaCodeMethodCall("MetricsProvider.increaseCounterBy").arg("serviceSent").arg("1.0").arg(expr); 
+                if (needsReturn) {
+                    if (base.traceSent <> TraceKind::NONE) {
+                        block.var(exprType, "result", call);
+                        expr = new JavaCodeVariableExpression("result");
+                    } else {
+                        expr = call;
+                    }
+                } else {
+                    block.add(call);
+                }
             }
             if (base.traceSent <> TraceKind::NONE) {
                 String d;                
@@ -109,11 +118,14 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, JavaCodeArti
                 }
             } 
             
-            String ret;
             if (needsReturn) {
-               block.return(expr);
+                block.return(expr);
             } else {
-               block.add(expr);
+                if (not(base.monitorSentCount)) {
+                    block.add(expr);
+               } else {
+                   expr;
+               }
             }
         } else {
             new JavaCodeStringExpression(expr);
@@ -178,6 +190,7 @@ block;
     }
 
     def genMapService(String serviceVarName, JavaCodeBlockInterface block) {
+        String updateHandler = getUpdateHandlerName(elt.impl);
         // ignore arg updateHandler if empty
         block.callQualified("de.iip_ecosphere.platform.services.environment.spring.Starter.mapService").arg(serviceVarName).arg(updateHandler).(c|{
             if (familyInterface <> "") {
@@ -725,8 +738,12 @@ block;
     }
     
     def generateUpdateHandler(String serviceType, JavaCodeClass c) {
-        updateHandler = updateHandlerName;
-        c.attribute("java.util.function.Supplier<${serviceType}>", updateHandler);
+        c.attribute("java.util.function.Supplier<${serviceType}>", updateHandlerName);
+    }
+
+    @DispatchBasis
+    def String getUpdateHandlerName(ServiceBase service) {
+        updateHandlerName;
     }
     
     // --------------------------- ServiceFamily ----------------------------------
@@ -1005,9 +1022,13 @@ block;
         
     // -------------------- Python --------------------------
 
+    @DispatchBasis
+    def String getUpdateHandlerName(PythonService service) {
+        ""; // disable updates, handled within python service
+    }
+
     def initialService(MeshElement elt, PythonService service, setOf(String) serviceVars, JavaCodeMethod m) {
         generateAbstractServiceCreateInstance(elt, service, "service", getServiceType(elt, service), m);
-        updateHandler = ""; // disable updates, handled within python service
         // no mapServices here as Python may take long and block the constructor -> initIngestors
         serviceVars.add("service");
         for (IOType in: service.input) {

@@ -75,9 +75,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
             skipIfNotFound=true, skipIfNotFoundComment="Tolerant resolution for initial build; skipIfNotFound can be removed/set to false when app interfaces are deployed.");
         appendMavenDependencyPluginArtifactItem(unpackItems, config.sharedArtifact, "python", 
             "\\${project.build.directory}/pySrc", "pyIf.zip", type="zip");
-        if (config.withPlugins) {
-            appendMavenIipDependencyPluginBuildClasspathPluginExecution(execs, furtherFiles="\\${project.build.directory}/classes/\\${project.groupId}.\\${project.artifactId}");
-        }
+        appendMavenIipDependencyPluginBuildClasspathPluginExecution(execs, furtherFiles="\\${project.build.directory}/classes/\\${project.groupId}.\\${project.artifactId}");
 //appendMavenIipDependencyPluginUnpackPluginsExecution(execs, oktoPlugins, projectVersion, enable=withPlugins(config));
         //appendIipPythonPlugin(plugins, projectVersion);
         //XmlElement pluginMgt = createPlugins(createPluginManagement(build));
