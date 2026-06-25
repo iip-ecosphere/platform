@@ -24,7 +24,7 @@ Type substitutions allows customizing an application derived from a template. Wh
 
 ### App identity stores
 
-Moreover, app templates may already prescribe identity, authentication and security information, preferrably as gaps, so that the concrete information, e.g., identity tokens must be entered by the user upon app template instantiation. Although by the introduction of identity stores we aim at avoiding plain passwords and identity tokens in configuration models, we tolerate them in this case. If specified, the application instantiation will create an identity store from the following configuration structure of type `AppIdentityStore`:
+Moreover, app templates may prescribe identity, authentication and security information, preferrably as gaps, so that the concrete information, e.g., identity tokens must be entered by the user upon app template instantiation. Although by the introduction of identity stores we aim at avoiding plain passwords and identity tokens in configuration models, we tolerate them in this case. If specified, the application instantiation will create an identity store from the following configuration structure of type `AppIdentityStore`:
 
 | Field |  Description | Default |
 | --- |  --- | --- |
@@ -43,3 +43,7 @@ A `UserPwAppIdentityStoreEntry` is a refined `AppIdentityStoreEntry` with the fo
 | --- |  --- | --- |
 |userName| Required non-empty name of the user account  | |
 |password| Required non-empty password or identity token | |
+
+Entries in `identities` take precedence over default platform values, e.g. the default setup for inter-service AMQP communication intended for testing.
+
+By default, the configuration of the app identity store leads to the population of `src/main/resources/identityStore.yml` in the respective app implementation template. "Usual" apps shall take this file over and customize/extend it as needed, i.e., typically the app itself is not equipped with an app identity store. This happens if an app is instantiated from an IVML app template, or in special cases where otherwise no identity store is available. Currently, the two cases that we are aware of are 1) apps without service implementation asset (apps only consisting of connectors, apps instantiated from IVML app templates) or if oktoflow plugins are enabled for a platform instance. all-in-one apps take over their identityStore from the `resources`/`resources.ipr` folder.

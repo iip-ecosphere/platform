@@ -37,8 +37,6 @@ Fields of the 'Application' type.
 | identityStore | Optional application identity store, see [app templates](appTemplates.MD) for details. | `null` |
 | derivedFrom | Name of the app template this application is derived from, just as information | `null` |
 
-Type substitutions
-
 ## ServiceMesh
 
 Fields of the 'ServiceMesh' type.
