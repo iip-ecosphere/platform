@@ -643,4 +643,18 @@ template MeshBasics(Configuration config, FileArtifact target) {
         "iip.datatypes." + toTypeName(type) + typeAdd;
     }
     
+    def mapsToDashboard(ServiceBasis service) {
+        supportsDashboardMapping(service);
+    }
+    
+    @DispatchBasis
+    def supportsDashboardMapping(ServiceBasis service) {
+        false;        
+    }
+        
+    @DispatchCase
+    def supportsDashboardMapping(Connector connector) {
+        connector.mapsToDashboard;        
+    }
+    
 }

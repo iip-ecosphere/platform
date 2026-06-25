@@ -11,6 +11,7 @@ project TechnicalSetup {
     containerGeneration = false;
     sharedInterfaces = true;
     sharedArtifact = "de.iip-ecosphere.platform:apps.AppInterfacesSimpleMesh:" + iipVer; // for testing all-in-one
+    alwaysMapDashboard = true;
 
     // ------------ freezing ------------------
     
@@ -18,6 +19,7 @@ project TechnicalSetup {
         sharedInterfaces;
         sharedArtifact;
         containerGeneration;
+        alwaysMapDashboard;
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 

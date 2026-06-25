@@ -168,6 +168,7 @@ project Connectors {
        }
        assign (uiGroup = UiInvisibleGroup) to {
            setOf(MappingEntry) mapping = {};
+           Boolean mapsToDashboard = false;
        }
        Constraint connectorKind = kind <> ServiceKind.PROBE_SERVICE;
        Constraint connectorDeployability = deployable == true;
@@ -583,6 +584,7 @@ project Connectors {
                manufacturerProductDesignation = "Generic INFLUX DB connector@en",
                manufacturer = refBy(manufacturer_sse)
            };
+           Boolean mapsToDashboard = true;
        }
        assign (uiGroup = UiOptionalGroup2) to {
            String deviceServiceKey = "INFLUX";
@@ -604,6 +606,7 @@ project Connectors {
                manufacturerProductDesignation = "Generic INFLUX DB v3 connector@en",
                manufacturer = refBy(manufacturer_sse)
            };
+           Boolean mapsToDashboard = true;
        }
        assign (uiGroup = UiOptionalGroup2) to {
            String deviceServiceKey = "INFLUX";

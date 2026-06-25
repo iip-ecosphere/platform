@@ -26,6 +26,7 @@ project IIPEcosphere {
     String genTarget = "gen";
     String modelName = "PlatformConfiguration";
     String dashboardPushURI = null;
+    Boolean alwaysMapDashboard = false;
     
     const String pluginsFolderDflt = "plugins";
     String pluginsFolder = pluginsFolderDflt;
