@@ -463,15 +463,9 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
         if (isModelDirectoryValid()) {
             if (enableRun(metaModelDir, modelDir, outputDir)) {
                 PlatformInstantiation executor = createExecutor();
-                if (allTypes) {
-                    executor.setProperty("okto.easy.allTypes", "true");
-                }
-                if (allServices) {
-                    executor.setProperty("okto.easy.allServices", "true");
-                }
-                if (incremental) {
-                    executor.setProperty("easy.vil.incremental", "true");
-                }
+                executor.setAllTypes(allTypes)
+                    .setAllServices(allServices)
+                    .setIncremental(incremental);
                 try {
                     if (asProcess) {
                         executor.executeAsProcess(getClass().getClassLoader(), resourcesDir, getTracingLevel(), 

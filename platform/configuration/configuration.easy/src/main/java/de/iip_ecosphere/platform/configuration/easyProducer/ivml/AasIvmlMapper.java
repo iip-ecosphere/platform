@@ -32,6 +32,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.configuration.cfg.ConfigurationChangeType;
+import de.iip_ecosphere.platform.configuration.cfg.ConfigurationFactory;
+import de.iip_ecosphere.platform.configuration.cfg.PlatformInstantiation;
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor.ExecutionMode;
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor;
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationManager;
@@ -126,6 +128,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     public static final String OP_ADD_IMPORTS = "addImports";
     public static final String OP_REMOVE_IMPORTS = "removeImports";
     
+    public static final boolean INSTANTIATE_AS_PROCESS = false; // preliminary
     public static final Predicate<AbstractVariable> FILTER_NO_CONSTRAINT_VARIABLES = 
         v -> !TypeQueries.isConstraint(v.getType());
     // exclude unrefined fields from MetaConcepts, do we need that for refTo(Any)
@@ -557,6 +560,16 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     }
     
     /**
+     * Turns a file to a string.
+     * 
+     * @param file the file to be processed
+     * @return the file as string
+     */
+    private static String toString(File file) {
+        return file.toString(); // make absolute??
+    }
+    
+    /**
      * Instantiates according to the given {@code configurer}.
      * 
      * @param mode the instantiation mode
@@ -589,18 +602,27 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         }
         Object result = null;
         try {
-            EasyExecutor executor = ConfigurationLifecycleDescriptor.createExecutor(ExecutionMode.FULL); // with VIL/VTL
             ConfigurationLifecycleDescriptor.cleanOutputFolder();
-            ConfigurationManager.loadIvmlModel(executor);
-            ReasoningResult rRes = ConfigurationManager.validateAndPropagate(executor, NO_TEMPLATE_FILTER);
-            if (null == rRes) {
-                throw new ExecutionException("No valid IVML model loaded/found.", null);
+            if (INSTANTIATE_AS_PROCESS) {
+                EasySetup easy = ConfigurationSetup.getSetup().getEasyProducer();                
+                String[] args = {easy.getIvmlModelName(), toString(easy.getBase()), toString(easy.getGenTarget()), 
+                    mode.getStartRuleName(), toString(easy.getIvmlMetaModelFolder())};            
+                PlatformInstantiation inst = ConfigurationFactory.createInstantiator(null, null);
+                inst.takeOverProperties();
+                inst.executeAsProcess(getClass().getClassLoader(), null, "TOP", null, args);
+            } else {
+                EasyExecutor executor = ConfigurationLifecycleDescriptor.createExecutor(ExecutionMode.FULL);
+                ConfigurationManager.loadIvmlModel(executor);
+                ReasoningResult rRes = ConfigurationManager.validateAndPropagate(executor, NO_TEMPLATE_FILTER);
+                if (null == rRes) {
+                    throw new ExecutionException("No valid IVML model loaded/found.", null);
+                }
+                IvmlUtils.analyzeReasoningResult(rRes, false, true);            
+                ConfigurationManager.setupContainerProperties(executor);
+                ConfigurationManager.instantiate(executor, mode.getStartRuleName()); // throws exception if it fails
+                executor.discardVILLocations();
+                executor.clearVILModels();
             }
-            IvmlUtils.analyzeReasoningResult(rRes, false, true);            
-            ConfigurationManager.setupContainerProperties(executor);
-            ConfigurationManager.instantiate(executor, mode.getStartRuleName()); // throws exception if it fails
-            executor.discardVILLocations();
-            executor.clearVILModels();
             if (null != appId) {
                 System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, "");
             }

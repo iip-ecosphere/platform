@@ -32,6 +32,7 @@ import java.util.function.Consumer;
 import de.iip_ecosphere.platform.support.IOUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.JavaUtils;
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.plugins.StreamGobbler;
@@ -47,6 +48,10 @@ import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator
  */
 public class PlatformInstantiatorExecutor implements PlatformInstantiation {
     
+    public static final String PROP_ALL_TYPES = "okto.easy.allTypes";
+    public static final String PROP_ALL_SERVICES = "okto.easy.allServices";
+    public static final String PROP_INCREMENTAL = "easy.vil.incremental";
+
     private File localRepo;
     private Consumer<Long> executionTimeConsumer;
     private String mainCls = PlatformInstantiator.class.getName();
@@ -97,8 +102,34 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
     }
     
     @Override
-    public void setProperty(String key, String value) {
+    public PlatformInstantiation setProperty(String key, String value) {
         properties.put(key, value);
+        return this;
+    }
+    
+    @Override
+    public PlatformInstantiation setAllTypes(boolean allTypes) {
+        setProperty(PROP_ALL_TYPES, String.valueOf(allTypes));
+        return this;
+    }
+
+    @Override
+    public PlatformInstantiation setAllServices(boolean allServices) {
+        setProperty(PROP_ALL_SERVICES, String.valueOf(allServices));
+        return this;
+    }
+
+    @Override
+    public PlatformInstantiation setIncremental(boolean incremental) {
+        setProperty(PROP_INCREMENTAL, String.valueOf(incremental));
+        return this;
+    }
+
+    @Override
+    public void takeOverProperties() {
+        setAllTypes(OsUtils.getBooleanProperty(PROP_ALL_TYPES, false));
+        setAllServices(OsUtils.getBooleanProperty(PROP_ALL_SERVICES, false));
+        setIncremental(OsUtils.getBooleanProperty(PROP_INCREMENTAL, false));
     }
         
     @Override
