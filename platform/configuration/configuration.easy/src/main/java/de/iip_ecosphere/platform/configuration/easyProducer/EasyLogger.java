@@ -4,6 +4,7 @@ import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.uni_hildesheim.sse.easy.loader.framework.Log.LoaderLogger;
 import net.ssehub.easy.basics.logger.ILogger;
+import net.ssehub.easy.varModel.confModel.AssignmentResolver;
 
 /**
  * EASy-to-oktoflow logging adapter.
@@ -114,7 +115,14 @@ public class EasyLogger implements ILogger, LoaderLogger {
      * @return {@code true} for log the message, {@code false} for consume and be quiet
      */
     protected boolean allowLogging(String msg, Class<?> clazz, String bundleName, LogLevel level) {
-        return true;
+        boolean emit = true;
+        if (emit && level.ordinal() < LogLevel.WARN.ordinal()) { // emit warn/error anyway
+            emit = !ConfigurationLifecycleDescriptor.isEasyLoggingDisabled(clazz.getName());
+        }
+        if (emit && clazz == AssignmentResolver.class) {
+            emit = false;
+        }
+        return emit;
     }
     
 }

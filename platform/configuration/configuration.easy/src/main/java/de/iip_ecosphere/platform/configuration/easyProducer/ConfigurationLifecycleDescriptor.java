@@ -71,6 +71,16 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
     }
     
     /**
+     * Returns whether EASy-Logging is disabled on the given class name.
+     * 
+     * @param cls the class name
+     * @return {@code true} for disabled, {@code false} else
+     */
+    public static boolean isEasyLoggingDisabled(String cls) {
+        return null != cls && noEasyLogging.contains(cls);
+    }
+    
+    /**
      * Defines execution modes implying logging, model loading setup etc.
      * 
      * @author Holger Eichelberger, SSE
@@ -139,8 +149,8 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             if (doFilterLogs && (LogLevel.ERROR != level && LogLevel.WARN != level)) { // limit main decision override 
                 emit = clazz == EasyExecutor.class;
             }
-            if (emit && level.ordinal() < LogLevel.WARN.ordinal()) { // emit warn/error anyway
-                emit = !noEasyLogging.contains(clazz.getName());
+            if (emit) { // emit warn/error anyway
+                emit = super.allowLogging(msg, clazz, bundleName, level);
             }
             if (emit && clazz.getSimpleName().equals("YamlFileArtifact") && msg.contains("While reading") 
                 && msg.contains(File.separator + "resources")) {

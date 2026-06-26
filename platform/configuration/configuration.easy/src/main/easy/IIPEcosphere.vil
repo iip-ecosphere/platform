@@ -241,8 +241,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 // partition according to container strategy
                 String appVersion = getAppMvnVersion(a);
                 setOf(DisplayPanel) displayPanels = DisplayPanel.allInstances();
-                Boolean mapToDisplay = cfg.alwaysMapDashboard or (displayPanels.size() > 0 and getServiceTypes()->collect(s|mapsToDashboard(s)).size() > 0); // initial, we may look deeper, also for the specific application
-                
+                Boolean mapToDisplay = cfg.alwaysMapDashboard or (displayPanels.size() > 0 and getServiceTypes()->select(s|mapsToDashboard(s)).size() > 0); // initial, we may look deeper, also for the specific application
                 String pluginOutputFolder = "target/jars";
                 vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, oktoPlugins=oktoPlugins, bins=bins, assemblies=assemblies, resources=resources, 
                     starterCls=appStarterCls, appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests, copyRuntimeDependencies=copyDependencies, mapDisplay=mapToDisplay, pluginOutputFolder=pluginOutputFolder);
