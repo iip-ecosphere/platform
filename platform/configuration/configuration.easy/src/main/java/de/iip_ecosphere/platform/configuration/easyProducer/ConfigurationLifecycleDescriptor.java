@@ -58,6 +58,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
         addNoEasyLogging(net.ssehub.easy.instantiation.core.model.templateModel.Template.class);
         addNoEasyLogging(net.ssehub.easy.instantiation.core.model.buildlangModel.Script.class);
         addNoEasyLogging(net.ssehub.easy.instantiation.core.model.expressions.ExpressionParserRegistry.class);
+        addNoEasyLogging(net.ssehub.easy.varModel.confModel.AssignmentResolver.class);
     }
     
     /**
