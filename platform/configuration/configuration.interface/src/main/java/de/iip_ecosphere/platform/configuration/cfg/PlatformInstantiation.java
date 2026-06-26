@@ -26,7 +26,7 @@ public interface PlatformInstantiation {
      * significant library overlaps that can also not resolved by creating a dedicated classloader.
      * 
      * @param loader the class loader to load the classpath resource file
-     * @param resourcesDir the optional resources directory for the instantiation
+     * @param resourcesDir the optional resources directory for the instantiation (may be <b>null</b> for none)
      * @param tracingLevel the tracing level for the instantiation
      * @param mvnArgs optional maven arguments for the instantiation (may be <b>null</b> for none)
      * @param args the instantiation arguments
@@ -39,7 +39,7 @@ public interface PlatformInstantiation {
      * library overlaps that can also not resolved by creating a dedicated classloader.
      * 
      * @param loader the class loader to load the classpath resource file
-     * @param resourcesDir the optional resources directory for the instantiation
+     * @param resourcesDir the optional resources directory for the instantiation (may be <b>null</b> for none)
      * @param tracingLevel the tracing level for the instantiation
      * @param mvnArgs optional maven arguments for the instantiation (may be <b>null</b> for none)
      * @param args the instantiation arguments
@@ -52,7 +52,37 @@ public interface PlatformInstantiation {
      * 
      * @param key the key
      * @param value the value
+     * @return <b>this</b> for chaining
      */
-    public void setProperty(String key, String value);
+    public PlatformInstantiation setProperty(String key, String value);
+
+    /**
+     * Configures whether all types or just referenced types by apps shall be instantiated. 
+     * 
+     * @param allTypes all types (@code{true}) or just referenced types (@code{false}, the default)
+     * @return <b>this</b> for chaining
+     */
+    public PlatformInstantiation setAllTypes(boolean allTypes);
+
+    /**
+     * Configures whether all services or just referenced services by apps shall be instantiated. 
+     * 
+     * @param allTypes all services (@code{true}) or just referenced services (@code{false}, the default)
+     * @return <b>this</b> for chaining
+     */
+    public PlatformInstantiation setAllServices(boolean allServices);
+
+    /**
+     * Configures whether the instantiation shall run in incremental mode.
+     * 
+     * @param incremental incremental mode or wipe out target folder/generate anew
+     * @return <b>this</b> for chaining
+     */
+    public PlatformInstantiation setIncremental(boolean incremental);
+    
+    /**
+     * Takes over properties from this process.
+     */
+    public void takeOverProperties();
     
 }
