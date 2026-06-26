@@ -25,7 +25,10 @@ Although a first impression might be that oktoflow is not doing it's job, in par
 * If the applications seems "to loose data", enable tracing on selected/all connectors/services, e.g., in IVML `traceSent=TraceKind::SYSOUT` (see [service configuration concepts](concepts/services.MD)). 
   * Is the communication broker running?
   * Does the transport connector have a connection (see application log)?
-  * Is there a transport authentication issue? Did the app load its identity store (see application log) and if yes, is it the intended one (validate the name of the identity store given in the log)? Are the entries in the application store correct? Did you accidentally override default values? If no identity store is loaded, are you running an app without service implementation, e.g., instantiated from a template or consisting only of connectors (then you may wish to specify an [identity store in IVML](../concepts/app.MD))).
+  * Is there a transport authentication issue? 
+    * Did the app load its identity store (see application log) and if yes, is it the intended one (validate the name of the identity store given in the log)? 
+    * Are the entries in the application store correct? Did you accidentally override default entries that now prevent transport connections? 
+    * If no identity store is loaded, are you running an app without service implementation, e.g., instantiated from a template or consisting only of connectors (then you may wish to specify an [identity store in IVML](../concepts/app.MD)).
   * For performance reason, tracing is disabled by default and shall be disabled after debugging is done.
   * Tracing also works in distributed manner, i.e., via a central collector.
   
