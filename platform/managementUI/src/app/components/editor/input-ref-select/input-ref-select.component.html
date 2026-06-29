@@ -16,22 +16,22 @@
 
 <div style="padding: 0;">
   <span id="inputName" class="inputLabel" *ngIf="!selector">
-    {{ getDisplayName(input) }} 
-    <span *ngIf="fieldsMeta && fieldsMeta.value">
-      <mat-form-field appearance="outline">
-        <mat-select [matTooltip]="input.description[0].text" id="typeSelect" [(value)]="selectedType">
-          <mat-option *ngFor="let type of fieldsMeta?.value" [value]="type">
-            {{ fixAbstractName(type.idShort) }} 
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </span>
-    &nbsp;
-    <span #subEditor *ngIf="(input.metaTypeKind == 10 || this.input.metaTypeKind == 2 ) && input.multipleInputs else other" 
+    <span #subEditor *ngIf="(input.metaTypeKind == 10 || input.metaTypeKind == 2 ) && input.multipleInputs else other" 
       id="ref-select.inputName.subEd"> 
       <app-subeditor-button [meta]="meta" [input]="input" [selectedType]="selectedType" matIcon="add" (saveEvent)="onChildSaveEvent($event)"></app-subeditor-button>
     </span>
     <ng-template #other>
+      {{ getDisplayName(input) }}
+      <span *ngIf="fieldsMeta && fieldsMeta.value">
+        <mat-form-field appearance="outline">
+          <mat-select [matTooltip]="input.description[0].text" id="typeSelect" [(value)]="selectedType">
+            <mat-option *ngFor="let type of fieldsMeta?.value" [value]="type">
+              {{ fixAbstractName(type.idShort) }} 
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </span>
+      &nbsp;
       <button [matTooltip]="input.description[0].text" mat-icon-button class="itemButton" (click)="selectElement()" id="ref-select.inputName.btn-add">
         <mat-icon>add</mat-icon>
       </button>
@@ -80,7 +80,7 @@
               </td>
               <td style="width:8em;">{{getElementDisplayName(value, true)}}</td>
               <td>
-                <button mat-icon-button class="itemButton" (click)="editInputValue(i)" matTooltip="Edit value" 
+                <button *ngIf="!input.refTo" mat-icon-button class="itemButton" (click)="editInputValue(i)" matTooltip="Edit value" 
                   id="ref-select.container.bnt-edit">
                   <mat-icon>menu_open</mat-icon>
                 </button>

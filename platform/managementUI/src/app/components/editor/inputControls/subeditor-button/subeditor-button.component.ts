@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { IvmlRecordValue, MT_metaAbstract, MT_metaRefines, Resource, ResourceAttribute, editorInput, metaTypes } from 'src/interfaces';
+import { IvmlRecordValue, IvmlValue, MT_metaAbstract, MT_metaRefines, Resource, ResourceAttribute, editorInput, metaTypes } from 'src/interfaces';
 import { EditorComponent } from '../../editor.component';
 import { DataUtils, Utils } from 'src/app/services/utils.service';
 import { IvmlFormatterService } from 'src/app/components/services/ivml/ivml-formatter.service';
@@ -23,6 +23,7 @@ export class SubeditorButtonComponent extends Utils implements OnInit {
 
   errorMsg: string = 'loading...';
   disabled = false;
+  fieldsMeta: Resource | undefined;
 
   refinedTypes: ResourceAttribute[] = [];
   selectedRefinedType: ResourceAttribute | null = null;
@@ -32,28 +33,48 @@ export class SubeditorButtonComponent extends Utils implements OnInit {
   }
 
   ngOnInit(): void {
-    this.disabled = this.validateEditorInputType(this.input)
+    this.disabled = this.validateEditorInputType(this.input);
+    if (this.meta) {
+      const typeMeta = DataUtils.getProperty(this.meta.value!, DataUtils.stripGenericType(this.input.type));
+      if (typeMeta && this.ivmlFormatter.isAbstract(typeMeta) /*&& !this.ivmlFormatter.isMetaRef(typeMeta)*/) {
+          const refinedTypes = DataUtils.getRefinedTypes(typeMeta.idShort, this.meta);
+          this.fieldsMeta = this.ivmlFormatter.filterMeta(this.meta, '');
+          refinedTypes?.forEach(type => {
+            this.fieldsMeta?.value?.push(type);
+          });
+      } else if (this.input.name === "fields") {
+        this.fieldsMeta = this.ivmlFormatter.filterMeta(this.meta, 'Fields');
+      }
+    }
+
+    if (this.fieldsMeta && this.fieldsMeta.value && this.fieldsMeta.value?.length > 0) {
+      this.fieldsMeta.value = this.fieldsMeta?.value?.sort((a, b) => (a.idShort ?? '').localeCompare(b.idShort ?? ''));
+      this.selectedType = this.fieldsMeta.value[0]
+    }
+
   }
 
   public openSubeditor(type: editorInput, selectedType: Resource | undefined) {
     if (this.meta) {
-      type.type = getFieldType(type.type, selectedType);
-      const typeMeta = DataUtils.getProperty(this.meta.value!, DataUtils.stripGenericType(type.type));
-      if (this.ivmlFormatter.isAbstract(typeMeta) /*&& !this.ivmlFormatter.isMetaRef(typeMeta)*/) {
-          const refinedTypes = DataUtils.getRefinedTypes(typeMeta.idShort, this.meta);
-          if (refinedTypes.length > 0) {
-            type.type = refinedTypes[0].idShort ?? type.type;
-          }
+      // Clear previous selected value for refined abstract types e.g. change machine formatter for Json File connector from "TextLineFormatter" to "JavaMachineFormatter"
+      if (selectedType && selectedType.idShort !== DataUtils.stripGenericType(type.type)) {
+        type.value = '';
       }
+      type.type = getFieldType(type.type, selectedType);
       let uiGroups = this.ivmlFormatter.calculateUiGroupsInf(type, this.meta);
-      let parts = this.ivmlFormatter.partitionUiGroups(uiGroups);
-      let dialogRef = this.subDialog.open(EditorComponent, this.configureDialog('80%', '80%', parts));
-      let component = dialogRef.componentInstance;
-      component.type = type;
-      component.metaBackup = this.meta;
-      component.dialog = dialogRef;
-      component.topLevel = false;
-      component.saveEvent = this.saveEvent;
+      if (uiGroups.length == 0) {
+        let emptyType: IvmlRecordValue = createEmptyType(type.type);
+        this.saveEvent.emit({ idShort: type.name, value: emptyType, multipleInputs: type.multipleInputs });
+      } else {
+        let parts = this.ivmlFormatter.partitionUiGroups(uiGroups);
+        let dialogRef = this.subDialog.open(EditorComponent, this.configureDialog('80%', '80%', parts));
+        let component = dialogRef.componentInstance;
+        component.type = type;
+        component.metaBackup = this.meta;
+        component.dialog = dialogRef;
+        component.topLevel = false;
+        component.saveEvent = this.saveEvent;
+      }
     }
   }
 
@@ -121,3 +142,18 @@ function getFieldType(type: string, selectedType: Resource | undefined): string 
   }
   return type;
 }
+
+/**
+ * Create an empty value for a specific type e.g. 'JsonFormatter{}'
+ * 
+ * @param type the empty type
+ * @param value the input to search
+ * @returns type as Resource
+ */
+function createEmptyType(type: string): IvmlRecordValue {
+  let emptyType: IvmlRecordValue = {};
+  let val: IvmlValue = { value: type + '{}', _type: type };
+  emptyType[type] = val;
+  return emptyType;
+}
+

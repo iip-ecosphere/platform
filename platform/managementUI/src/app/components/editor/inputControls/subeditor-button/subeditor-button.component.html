@@ -1,4 +1,29 @@
 <span [matTooltip]="errorMsg" [matTooltipDisabled]="!disabled">
+  <span *ngIf="fieldsMeta && fieldsMeta.value">
+    <div style="padding: 0;">
+      <span *ngIf="matIcon != 'menu_open'">
+        {{ getDisplayName(input) }}
+      </span>
+      <mat-form-field appearance="outline">
+        <mat-select [matTooltip]="input.description[0].text" id="typeSelect" [(value)]="selectedType">
+          <mat-option *ngFor="let type of fieldsMeta?.value" [value]="type">
+            {{ fixAbstractName(type.idShort) }} 
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <span *ngIf="matIcon && matIcon.length > 0 else noIcon">
+        <button [matTooltip]="input.description[0].text" #button mat-icon-button class="itemButton" [disabled]="disabled" (click)="openSubeditor(input, selectedType)">
+          <mat-icon>{{matIcon}}</mat-icon>
+        </button>
+      </span>
+      <ng-template #noIcon>
+        <button [matTooltip]="input.description[0].text" #button mat-raised-button class="okto-button" [disabled]="disabled" (click)="openSubeditor(input, selectedType)">
+          {{buttonText}}
+        </button>
+      </ng-template>
+    </div>
+  </span>
+
   <span id="editorButton.value" *ngIf="showValue == 'true'">
     <span *ngIf="getDisplayValue() else noInput">
       {{getDisplayValue()}} 
@@ -7,15 +32,20 @@
       <i>no value</i>
     </ng-template>
   </span>
-  <span *ngIf="matIcon && matIcon.length > 0 else noIcon">
-    <button [matTooltip]="input.description[0].text" #button mat-icon-button class="itemButton" [disabled]="disabled" (click)="openSubeditor(input, selectedType)">
-      <mat-icon>{{matIcon}}</mat-icon>
-    </button>
+  <span *ngIf="!(fieldsMeta && fieldsMeta.value)">
+    <span *ngIf="matIcon && matIcon.length > 0 else noIcon">
+      <span *ngIf="matIcon != 'menu_open'">
+        {{ getDisplayName(input) }}
+      </span>
+      <button [matTooltip]="input.description[0].text" #button mat-icon-button class="itemButton" [disabled]="disabled" (click)="openSubeditor(input, selectedType)">
+        <mat-icon>{{matIcon}}</mat-icon>
+      </button>
+    </span>
+    <ng-template #noIcon>
+      <button [matTooltip]="input.description[0].text" #button mat-raised-button class="okto-button" [disabled]="disabled" (click)="openSubeditor(input, selectedType)">
+        {{buttonText}}
+      </button>
+    </ng-template>
   </span>
-  <ng-template #noIcon>
-    <button [matTooltip]="input.description[0].text" #button mat-raised-button class="okto-button" [disabled]="disabled" (click)="openSubeditor(input, selectedType)">
-      {{buttonText}}
-    </button>
-  </ng-template>
 </span>
 

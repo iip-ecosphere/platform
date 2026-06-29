@@ -1,5 +1,5 @@
 //import { type } from 'os';
-import { InputVariable, primitiveDataTypes, IVML_TYPE_PREFIX_enumeration, JsonPlatformOperationResult, IvmlRecordValue, IVML_TYPE_String, IVML_TYPE_Boolean, IvmlValue, UserFeedback, uiGroup, configMetaContainer, MT_metaTypeKind, MTK_enum, configMetaEntry, editorInput, Resource, metaTypes, DR_displayName, MTK_derived, MT_metaRefines, MT_metaDefault, MTK_compound, MT_metaAbstract, MTK_primitive, MTK_langString, IVML_TYPE_NonEmptyString, MT_metaRequired, CacheEntry } from 'src/interfaces';
+import { InputVariable, primitiveDataTypes, IVML_TYPE_PREFIX_enumeration, JsonPlatformOperationResult, IvmlRecordValue, IVML_TYPE_String, IVML_TYPE_Boolean, IvmlValue, UserFeedback, uiGroup, configMetaContainer, MT_metaTypeKind, MTK_enum, configMetaEntry, editorInput, Resource, metaTypes, DR_displayName, MTK_derived, MT_metaRefines, MT_metaDefault, MTK_compound, MT_metaAbstract, MTK_primitive, MTK_langString, IVML_TYPE_NonEmptyString, MT_metaRequired, CacheEntry, ResourceAttribute } from 'src/interfaces';
 import { Injectable } from '@angular/core';
 import { AAS_OP_PREFIX_SME, AAS_TYPE_STRING, ApiService, GRAPHFORMAT_DRAWFLOW, IDSHORT_SUBMODEL_CONFIGURATION } from '../../../services/api.service';
 import { DataUtils, EditorPartition, UtilsService } from '../../../services/utils.service';
@@ -146,6 +146,7 @@ export class IvmlFormatterService extends UtilsService {
       result = value._type + "{";
       let first = true;
       for (let elemt in value.value) {
+        if (elemt === value._type) break;
         let elemtIvml = this.toIvml(value.value[elemt]);
         if (elemtIvml) {
           if (!first) {
@@ -706,7 +707,9 @@ export class IvmlFormatterService extends UtilsService {
               let initial;
               if (!this.isArray(ivmlValue) && this.isObject(ivmlValue) && ivmlValue) {
                 // compound instances may be passed in as object with properties, those being undefined are defaults
-                ivmlValue = ivmlValue[input.idShort];
+                if (ivmlValue[input.idShort]) {
+                  ivmlValue = ivmlValue[input.idShort];
+                }
                 if (this.isString(ivmlValue)) {
                   let tempValue: string = ivmlValue;
                   let valueName = meta?.value?.find(type => type.idShort === tempValue);
@@ -715,9 +718,10 @@ export class IvmlFormatterService extends UtilsService {
                   }
                 }
                 
-              
                 if (!this.isArray(ivmlValue) && ivmlValue && this.isObject(ivmlValue)) {
-                  ivmlValue = ivmlValue["value"]
+                  if ("value" in ivmlValue) {
+                    ivmlValue = ivmlValue["value"]
+                  }
                 }
                 if (!ivmlValue) {
                   ivmlValue = editorInput.defaultValue;
@@ -837,6 +841,9 @@ export class IvmlFormatterService extends UtilsService {
     let actual: EditorPartition | null = null;
     let group = 1;
     let cols = 1;
+
+    if (uiGroups.length == 0) return [{count: 1, columns: 1}]
+
     for (let u of uiGroups) {
       // well, it was defined that way :/
       for (let ei of u.inputs.concat(u.optionalInputs, u.fullLineInputs, u.fullLineOptionalInputs)) {

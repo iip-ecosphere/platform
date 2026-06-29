@@ -229,12 +229,13 @@ export class EditorComponent extends Utils implements OnInit {
     let resultProp: any = {};
     for (let entry in event.value) {
       let src = event.value[entry];
+      if ((entry !== 'semanticId') && (src.value === undefined || src.value === '')) continue; // If "semanticId" is not added, then the data does not exist
       if (src.value.hasOwnProperty("varValue") && src.value.varValue == "varValue") {
         name = src.value.name;
         src.value = src.value.idShort;
       } 
       if (host.value.hasOwnProperty(entry)) {
-        host.value[entry] = src.value;
+        host.value[entry] = src;
       } else {
         if (this.isArray(host.value)) {
           resultProp[entry] = src;
@@ -244,7 +245,7 @@ export class EditorComponent extends Utils implements OnInit {
       }
     }
 
-    if (prop.value === null) {
+    if (event.multipleInputs && (prop.value === null || prop.value === '')) {
       prop.value = [];
     }
     if (event.multipleInputs && prop.metaTypeKind == MTK_enum) {

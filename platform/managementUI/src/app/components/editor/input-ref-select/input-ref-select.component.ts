@@ -48,18 +48,12 @@ export class InputRefSelectComponent extends Utils implements OnInit {
         refinedTypes?.forEach(type => {
           this.fieldsMeta?.value?.push(type);
         });
-      } else if (this.input.name === "fields") {
-        this.fieldsMeta = this.ivmlFormatter.filterMeta(this.meta, 'Fields');
-      }
+      } 
     }
 
     if (this.fieldsMeta && this.fieldsMeta.value && this.fieldsMeta.value?.length > 0) {
       this.fieldsMeta.value = this.fieldsMeta?.value?.sort((a, b) => (a.idShort ?? '').localeCompare(b.idShort ?? ''));
-      if (this.isArray(this.input.value)) {
-        this.selectedType = findFieldType(this.input.value[0]._type, this.fieldsMeta.value)
-      } else {
-        this.selectedType = this.fieldsMeta.value[0]
-      }
+      this.selectedType = this.fieldsMeta.value[0]
     }
     if (!this.selector) {
       let type = this.input.type;
@@ -309,8 +303,4 @@ export interface SaveEvent {
   idShort: string;
   value: IvmlRecordValue; 
   multipleInputs?: boolean;
-}
-
-function findFieldType(_type: any, value: ResourceAttribute[]): Resource | undefined {
-  return value.find(fieldType => fieldType.idShort === _type);
 }

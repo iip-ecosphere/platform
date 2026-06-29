@@ -222,6 +222,13 @@ export class Utils {
           }
           idShort += this.getElementDisplayName(e, true);
         }
+      } else if (this.isObject(element)) {
+        const firstKey = Object.keys(element)[0];
+        if (Object.keys(element).length === 1) {
+          idShort = `{${firstKey}: '${element[firstKey].value}'}`
+        } else if (Object.keys(element).length > 1) {
+          idShort = `{${firstKey}: '${element[firstKey].value}', ... }`
+        }
       } else {
         if (element && !DataUtils.isEmpty(element)) {
           console.log("Unconsidered alternative in getElementDisplayName " + JSON.stringify(element));
@@ -440,6 +447,17 @@ export class DataUtils {
       return false;
     }
   }
+
+  // /**
+  //  * Returns the field by type.
+  //  * 
+  //  * @param _type the type looking for 
+  //  * @param value the input to search
+  //  * @returns type as Resource
+  //  */
+  // public static findFieldType(_type: any, value: ResourceAttribute[]): Resource | undefined {
+  //   return value.find(fieldType => fieldType.idShort === _type);
+  // }
 
   /**
    * Strips the generic type name, returning the generics.
