@@ -624,7 +624,7 @@ if [ $yn == "y" ] || [ $yn == "Y" ]; then
     $IIP_PYTHON -m pip install -r requirements.txt
     cd ..
             
-    sed -i 's/147.172.178.145/'$localIP'/g' src/main/easy/TechnicalSetup.ivml
+    sed -i 's/127.0.0.1/'$localIP'/g' src/main/easy/TechnicalSetup.ivml
     
     # Run Docker Private Registry
     
@@ -808,7 +808,7 @@ elif [ $yn == "n" ] || [ $yn == "N" ]; then
     $IIP_PYTHON -m pip install -r requirements.txt
     cd ..
 
-    sed -i 's/147.172.178.145/'$localIP'/g' src/main/easy/TechnicalSetup.ivml
+    sed -i 's/127.0.0.1/'$localIP'/g' src/main/easy/TechnicalSetup.ivml
 
     # Run Docker Private Registry
     
