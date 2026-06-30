@@ -382,7 +382,7 @@ cd platformDependencies/
 cd ..
     
 @echo off
-set "replace=147.172.178.145"
+set "replace=127.0.0.1"
 set "replaced=%ip%"
 
 set "source=src\main\easy\TechnicalSetup.ivml"
