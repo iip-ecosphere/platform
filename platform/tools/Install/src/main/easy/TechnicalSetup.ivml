@@ -6,7 +6,7 @@ project TechnicalSetup {
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
-    String platformServer = "147.172.178.145";
+    String platformServer = "127.0.0.1";
     Integer mgtUiPort = 4200;
 
     // ------------ component setup ------------------
