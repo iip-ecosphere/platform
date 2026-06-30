@@ -69,18 +69,18 @@ For distributing containers created by the platform, we need a local Docker regi
 
 In general, we recommend using a distinct server for this and to adjust the settings in the platform configuration.
 
-You may check the registry using ("147.172.178.145" should be changed to the IP address of your machine)
+You may check the registry using ("127.0.0.1" should be changed to the IP address of your machine)
     
-    curl -sS http://147.172.178.145:5001/v2/_catalog
+    curl -sS http://127.0.0.1:5001/v2/_catalog
     
 ### Prepare the devices
 
 On devices, the installation may differ depending on the desired degree of containerization. If you want to run the fundamental platform components on bare metal, please install also JDK, Maven, Python, Python packages and Docker on the devices. If you plan to run only containers on the devices, docker is sufficient.
 
-Create or edit the ``daemon.json`` file (usually in ``C:\ProgramData\Docker\config\daemon.json``) in order to access the local Docker registry installed above, here without TLS certificate ("147.172.178.145" should be changed to the IP address of your machine that running the Docker registry). For an empty file, this looks like:
+Create or edit the ``daemon.json`` file (usually in ``C:\ProgramData\Docker\config\daemon.json``) in order to access the local Docker registry installed above, here without TLS certificate ("127.0.0.1" should be changed to the IP address of your machine that running the Docker registry). For an empty file, this looks like:
 
     {
-      "insecure-registries" : ["147.172.178.145:5001"]
+      "insecure-registries" : ["127.0.0.1:5001"]
     }
     
 Then a restart of docker may be required.
