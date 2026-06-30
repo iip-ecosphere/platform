@@ -9,7 +9,7 @@ Pull the latest image from DockerHub:
 
     docker pull iipecosphere/dev-container:latest
 
-> The image is quite large — approximately 2 GB.
+> The image is quite large — approximately 8 GB.
 
 Start the container with: 
 
