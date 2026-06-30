@@ -97,7 +97,7 @@ install_python_binary_version() {
     sudo apt update -y
     sudo apt install python3.9 -y
     sudo apt install python3.9-distutils -y
-    $SUDO wget https://bootstrap.pypa.io/get-pip.py
+    $SUDO wget https://bootstrap.pypa.io/pip/3.9/get-pip.py
     export IIP_PYTHON=$(which python3.9)
     $SUDO $IIP_PYTHON get-pip.py
     echo "Python 3.9 installation completed."
