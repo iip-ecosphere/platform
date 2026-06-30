@@ -12,7 +12,7 @@ if [ $7 == "True" ]; then
     wget https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/job/IIP_Install/lastSuccessfulBuild/artifact/platform/tools/Install/install.tar.gz
     tar xzpvf install.tar.gz
         
-    sed -i 's/147.172.178.145/'$localIP'/g' src/main/easy/TechnicalSetup.ivml
+    sed -i 's/127.0.0.1/'$localIP'/g' src/main/easy/TechnicalSetup.ivml
     
     artifactsLineNumber=$(cat src/main/easy/TechnicalSetup.ivml | grep -n "String platformServer" | cut -d ' ' -f1 | sed 's/:/ /g')
     ((artifactsLineNumber=artifactsLineNumber+1))
