@@ -49,6 +49,8 @@ public class TaskRegistry {
      */
     public static class TaskData {
         
+        public static final String PATH_SEPARATOR = ",";
+        
         private String id;
         private long threadId;
         private long timestamp;
@@ -57,6 +59,7 @@ public class TaskRegistry {
         private int stopCallCount = 0;
         private int maxEventCount = 0;
         private int eventCount = 0;
+        private String path = "";
         
         /**
          * Creates an instance, sets the id and turns the status to {@link TaskStatus#RUNNING}.
@@ -175,6 +178,44 @@ public class TaskRegistry {
             return id.equals(taskId);
         }
         
+        /**
+         * Returns the task/log reporting path.
+         * 
+         * @param path the path(s), if multiple separated by {@link #PATH_SEPARATOR}, may be empty for none
+         */
+        public String getPath() {
+            return path;
+        }
+
+        /**
+         * Changes the task/log reporting path.
+         * 
+         * @param path the path
+         */
+        public void setPath(String path) {
+            if (path == null || NO_TASK == this) {
+                path = "";
+            }
+            this.path = path;
+        }
+        
+        /**
+         * Appends a path to the task/log reporting path, separated by {@link #PATH_SEPARATOR}. If no path is set,
+         * the new path of this object will be {@code path}.
+         * 
+         * @param path the path to be added
+         */
+        public void appendPath(String path) {
+            if (path == null || NO_TASK == this) {
+                path = "";
+            }
+            if (this.path.length() > 0) {
+                this.path += PATH_SEPARATOR + path;
+            } else {
+                this.path = path;
+            }
+        }
+
     }
 
     /**

@@ -83,6 +83,12 @@ public class TaskRegistryTests {
         
         Assert.assertEquals(1000, TaskRegistry.setTimeout(old));
         Assert.assertEquals(old, TaskRegistry.getTimeout());
+        
+        task2.appendPath("path1");
+        task2.appendPath("path2");
+        Assert.assertEquals("path1" + TaskData.PATH_SEPARATOR + "path2", task2.getPath());
+        task2.setPath("path1");
+        Assert.assertEquals("path1", task2.getPath());
     }
 
 }
