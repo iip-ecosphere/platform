@@ -77,6 +77,7 @@ public class PlatformAas implements AasContributor {
     public static final String NAME_OPERATION_UNDEPLOY_ASYNC = "undeployPlanAsync";
     public static final String NAME_OPERATION_UNDEPLOY_WITHID_ASYNC = "undeployPlanWithIdAsync";
     public static final String NAME_OPERATION_GET_TASK_STATUS = "getTaskStatus";
+    public static final String NAME_OPERATION_GET_TASK_PATH = "getTaskPath";
     public static final String NAME_OPERATION_UPLOAD = "upload";
     
     private static final String PROGRESS_COMPONENT_ID = "IIP-Ecosphere Platform";
@@ -127,6 +128,10 @@ public class PlatformAas implements AasContributor {
             .addInputVariable("taskId", Type.STRING)
             .setInvocable(iCreator.createInvocable(NAME_OPERATION_GET_TASK_STATUS))
             .build(Type.STRING, aDesc);
+        smB.createOperationBuilder(NAME_OPERATION_GET_TASK_PATH)
+            .addInputVariable("taskId", Type.STRING)
+            .setInvocable(iCreator.createInvocable(NAME_OPERATION_GET_TASK_PATH))
+            .build(Type.STRING, aDesc);
         smB.createOperationBuilder(NAME_OPERATION_UPLOAD)
             .addInputVariable("kind", Type.STRING)
             .addInputVariable("sequenceNr", Type.INTEGER)
@@ -174,6 +179,10 @@ public class PlatformAas implements AasContributor {
         sBuilder.defineOperation(NAME_OPERATION_GET_TASK_STATUS, new JsonResultWrapper(p -> {
             TaskData data = TaskRegistry.getTaskData(AasUtils.readString(p));
             return data != null && data != TaskRegistry.NO_TASK ? data.getStatus().toString() : null;
+        }));
+        sBuilder.defineOperation(NAME_OPERATION_GET_TASK_PATH, new JsonResultWrapper(p -> {
+            TaskData data = TaskRegistry.getTaskData(AasUtils.readString(p));
+            return data != null && data != TaskRegistry.NO_TASK ? data.getPath() : "";
         }));
         sBuilder.defineOperation(NAME_OPERATION_UPLOAD, new JsonResultWrapper(p -> {
             try {
