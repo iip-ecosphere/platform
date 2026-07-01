@@ -11,9 +11,10 @@
  ********************************************************************************/
 
 package de.iip_ecosphere.platform.services.environment.services;
-
 import java.io.IOException;
 import java.net.URI;
+
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
  * Represents a sender instance for converted transport data.
@@ -75,5 +76,25 @@ public interface Sender<T> {
      * @return the URI connected to
      */
     public URI getURI();
+    
+    /**
+     * Tolerantly closes {@code sender}.
+     * 
+     * @param sender the sender to close, may be <b>null</b>
+     * @param blocking close by blocking or asynchronously
+     */
+    public static void close(Sender<String> sender, boolean blocking) {
+        if (null != sender) {
+            if (blocking) {
+                try {
+                    sender.closeBlocking();
+                } catch (IOException e) {
+                    LoggerFactory.getLogger(Sender.class).warn("While closing: {}", e.getMessage());
+                }
+            } else {
+                sender.close();
+            }
+        }
+    }
 
 }
