@@ -3,7 +3,6 @@
 In progress:
 
 * [#192](https://github.com/iip-ecosphere/platform/issues/192): More flexible connector value handling
-* [#185](https://github.com/iip-ecosphere/platform/issues/185): Performance improvements
 * [#180](https://github.com/iip-ecosphere/platform/issues/180): Add application templates to UI
 * [#189](https://github.com/iip-ecosphere/platform/issues/183): Enable AAS metamodel v3 in mgmt UI
 * [#189](https://github.com/iip-ecosphere/platform/issues/188): On-demand IVML imports
@@ -11,7 +10,6 @@ In progress:
 * [#189](https://github.com/iip-ecosphere/platform/issues/182): Try optimizing container sizes
 * [#189](https://github.com/iip-ecosphere/platform/issues/187): Integrate expression editor
 * [#122](https://github.com/iip-ecosphere/platform/issues/122): Transparent encryption, RBAC on AAS (incl. UI authentication)
-* [#189](https://github.com/iip-ecosphere/platform/issues/184): Support venv on mvn Python tooling
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 
 ### Version 0.8.1 (Fall '26)
@@ -23,6 +21,9 @@ Improvements:
 * [#190](https://github.com/iip-ecosphere/platform/issues/190): Integration of oktoflo2grafana
 * [#193](https://github.com/iip-ecosphere/platform/issues/193): Improve OPC integration
 * [#195](https://github.com/iip-ecosphere/platform/issues/195): Templates contain wrong file names for connectors, issue persists for versions 0.7.1-SNAPSHOT, 0.8.0
+* [#185](https://github.com/iip-ecosphere/platform/issues/185): Performance improvements
+* [#189](https://github.com/iip-ecosphere/platform/issues/184): Support venv on mvn Python tooling
+* [#189](https://github.com/iip-ecosphere/platform/issues/198): Create identity stores via IVML
 
 Changes:
 * In particular if the start sequence state above is activated, source services shall not ingest data before/outside the `RUNNING` state 
