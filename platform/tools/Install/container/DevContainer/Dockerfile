@@ -42,7 +42,7 @@ RUN mkdir -p /root/platform/Install \
     https://projects.sse.uni-hildesheim.de/oktoflow/install.tar.gz \
  && tar -xzf /root/platform/install.tar.gz -C /root/platform/Install
 
-RUN chmod 777 *   
+RUN chmod 777 *.sh   
 
 # ------ Eclipse ----------------------------------------------------------------------
 COPY eclipse/ /opt/eclipse
