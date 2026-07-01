@@ -55,6 +55,7 @@ import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.LifecycleHandler;
 import de.iip_ecosphere.platform.support.NetUtils;
+import de.iip_ecosphere.platform.support.TaskRegistry;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.Updater;
 import de.iip_ecosphere.platform.support.commons.Commons;
@@ -1014,8 +1015,9 @@ public class SpringCloudServiceManager
             if (tmp instanceof File) {
                 File file = (File) f.get(inst);
                 SpringCloudServiceSetup setup = SpringInstances.getConfig();
-                LogTailerListener listener = new LogTailerListener(setup.getAas(), setup.getTransport(), 
-                    desc.getId().replace(ServiceBase.APPLICATION_SEPARATOR, "/") + "/" + field);
+                String path = desc.getId().replace(ServiceBase.APPLICATION_SEPARATOR, "/") + "/" + field;
+                LogTailerListener listener = new LogTailerListener(setup.getAas(), setup.getTransport(), path);
+                TaskRegistry.getTaskData().appendPath(path);
                 Tailer tailer = Commons.getInstance().createTailer(file, listener, Duration.ofMillis(300), 
                     mode == StreamLogMode.TAIL);
                 listener.attachTailer(tailer);
