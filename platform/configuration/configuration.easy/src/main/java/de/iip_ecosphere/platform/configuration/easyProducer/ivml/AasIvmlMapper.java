@@ -618,7 +618,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             } else {
                 final ExecutionMode execMode = ExecutionMode.FULL;
                 SenderCloseable sender = ConfigurationLifecycleDescriptor.setTransportLogConsumer(logPath, execMode);
-                EasyExecutor executor = ConfigurationLifecycleDescriptor.createExecutor(execMode);
+                EasyExecutor executor = ConfigurationLifecycleDescriptor.createExecutor(execMode, sender);
                 ConfigurationManager.loadIvmlModel(executor);
                 ReasoningResult rRes = ConfigurationManager.validateAndPropagate(executor, NO_TEMPLATE_FILTER);
                 if (null == rRes) {

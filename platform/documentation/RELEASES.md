@@ -11,6 +11,7 @@ In progress:
 * [#189](https://github.com/iip-ecosphere/platform/issues/187): Integrate expression editor
 * [#122](https://github.com/iip-ecosphere/platform/issues/122): Transparent encryption, RBAC on AAS (incl. UI authentication)
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
+* [#199](https://github.com/iip-ecosphere/platform/issues/199): Log instantiation trace on management UI
 
 ### Version 0.8.1 (Fall '26)
 

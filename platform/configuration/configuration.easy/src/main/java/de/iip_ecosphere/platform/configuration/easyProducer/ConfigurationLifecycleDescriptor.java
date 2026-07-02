@@ -37,6 +37,7 @@ import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.instantiation.core.model.execution.IInstantiatorTracer;
 import net.ssehub.easy.instantiation.core.model.execution.TracerFactory;
 import net.ssehub.easy.instantiation.core.model.templateModel.ITracer;
+import net.ssehub.easy.instantiation.core.model.tracing.ConsoleTracerFactory;
 import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 
 /**
@@ -256,7 +257,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
      * @return the current EASy tracer factory
      */
     public static TracerFactory setLogConsumer(LogConsumer consumer) {
-        TracerFactory orig = TracerFactory.getInstance();
+        TracerFactory orig = TracerFactory.getInstance(); // may be quiet
         ILogger logger = EASyLoggerFactory.INSTANCE.getLogger();
         if (logger instanceof EasyLogger) {
             ((EasyLogger) logger).setLogConsumer(consumer);
@@ -267,7 +268,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
 
                 @Override
                 public ITracer createTemplateLanguageTracerImpl() {
-                    ITracer result = orig.createTemplateLanguageTracerImpl();
+                    ITracer result = ConsoleTracerFactory.INSTANCE.createTemplateLanguageTracerImpl();
                     result.setLogConsumer(logConsumer);
                     return result;
                 }
@@ -275,20 +276,20 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
                 @Override
                 public net.ssehub.easy.instantiation.core.model.buildlangModel.ITracer createBuildLanguageTracerImpl() {
                     net.ssehub.easy.instantiation.core.model.buildlangModel.ITracer result 
-                        = orig.createBuildLanguageTracerImpl();
+                        = ConsoleTracerFactory.INSTANCE.createBuildLanguageTracerImpl();
                     result.setLogConsumer(logConsumer);
                     return result;
                 }
 
                 @Override
                 public IInstantiatorTracer createInstantiatorTracerImpl() {
-                    IInstantiatorTracer result = orig.createInstantiatorTracerImpl();
+                    IInstantiatorTracer result = ConsoleTracerFactory.INSTANCE.createInstantiatorTracerImpl();
                     result.setLogConsumer(logConsumer);
                     return result;
                 }
                 
             };
-            TracerFactory.setInstance(f);
+            TracerFactory.setDefaultInstance(f);
         }
         return orig;
     }
@@ -302,14 +303,15 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
         
         private Sender<String> sender;
         private TracerFactory factory;
+        private TracerFactory origFactory;
 
         /**
          * Closes the sender, resets the factory.
          */
         public void close() {
             Sender.close(sender, false);
-            if (null != factory) {
-                TracerFactory.setInstance(factory);
+            if (null != origFactory) {
+                TracerFactory.setDefaultInstance(origFactory);
             }
         }
         
@@ -334,23 +336,21 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
      * @see Sender#close(Sender, boolean)
      */
     public static SenderCloseable setTransportLogConsumer(String logPath, ExecutionMode executionMode) {
-        System.out.println("LOG-CONS setup?"); // preliminary
         SenderCloseable result = new SenderCloseable();
         if (logPath != null && logPath.length() > 0 && executionMode != ExecutionMode.TOOLING) {
             ConfigurationSetup setup = ConfigurationSetup.getSetup();
-            System.out.println("LOG-CONS setup " + setup.getTransport()); // preliminary
             Sender<String> sender = TransportConverterFactory.getInstance().createSender(setup.getAas(), 
                 setup.getTransport(), logPath, TypeTranslators.STRING, String.class);
             TracerFactory factory = null;
             try {
                 sender.connectBlocking();
+                getLogger().info("Setting up log consumer, connected");
                 factory = setLogConsumer((l, m) -> {
                     try {
                         String prefix = "";
                         if (LogLevel.TEXT != l) {
                             prefix = l.name() + " ";
                         }
-                        System.out.println("LOG-CONS-SEND " + prefix + m); // preliminary
                         sender.send(prefix + m);
                     } catch (IOException e) {
                         getLogger().warn("Logging to transport: {}", e.getMessage());
@@ -361,7 +361,8 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             }
             result = new SenderCloseable();
             result.sender = sender;
-            result.factory = factory;
+            result.factory = TracerFactory.getDefaultInstance();
+            result.origFactory = factory;
         }
         return result;
     }
@@ -376,9 +377,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             // pass through everything and let platform logger decide
             EASyLoggerFactory.INSTANCE.setLoggingLevel(LoggingLevel.INFO);
             String logPath = System.getProperty(PlatformInstantiatorExecutor.PROP_LOG_PATH, "");
-            if (logPath.length() > 0) {
-                logSender = setTransportLogConsumer(logPath, executionMode);
-            }
+            logSender = setTransportLogConsumer(logPath, executionMode);
             ConfigurationSetup setup = ConfigurationSetup.getSetup(executionMode.extendedLogging());
             loader = new ManifestLoader(false, classLoader); // to debug, replace first parameter by true, mvn install
             EasySetup easySetup = setup.getEasyProducer();
@@ -392,7 +391,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             t1 = t2;
             doLogging = true;
             try {
-                EasyExecutor exec = createExecutor(easySetup, executionMode);
+                EasyExecutor exec = createExecutor(easySetup, executionMode, logSender);
                 ConfigurationManager.setExecutor(exec);
                 t2 = System.currentTimeMillis();
                 getLogger().info("EASy-Producer models loaded in {} ms", t2 - t1);
@@ -417,13 +416,15 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
      * called before.
      * 
      * @param executionMode the execution mode
+     * @param sender optional log sender, may be <b>null</b>
      * @return the EASy executor
      * @throws ModelManagementException when the executor cannot be created/models cannot be loaded
      */
-    public static EasyExecutor createExecutor(ExecutionMode executionMode) throws ModelManagementException {
+    public static EasyExecutor createExecutor(ExecutionMode executionMode, SenderCloseable sender) 
+        throws ModelManagementException {
         ConfigurationSetup setup = ConfigurationSetup.getSetup(false);
         EasySetup easySetup = setup.getEasyProducer();
-        return createExecutor(easySetup, executionMode);
+        return createExecutor(easySetup, executionMode, sender);
     }
 
     /**
@@ -440,11 +441,13 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
      * from {@link ConfigurationSetup}. EASy-Producer must be loaded before, i.e., {@link #startup(String[])} must be
      * called before or this call may be issued within {@link #startup(String[])}.
      * 
+     * @param easySetup easy producer setup
      * @param executionMode the execution mode
+     * @param sender optional log sender, may be <b>null</b>
      * @return the EASy executor
      * @throws ModelManagementException when the executor cannot be created/models cannot be loaded
      */
-    public static EasyExecutor createExecutor(EasySetup easySetup, ExecutionMode executionMode) 
+    public static EasyExecutor createExecutor(EasySetup easySetup, ExecutionMode executionMode, SenderCloseable sender) 
         throws ModelManagementException {
         EasyExecutor.enablePrepareArtifactsDefault(INCREMENTAL);
         EasyExecutor.enableIncrementalInstantiation(INCREMENTAL);
@@ -458,6 +461,11 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             easySetup.getBase(), 
             easySetup.getIvmlMetaModelFolder(), 
             easySetup.getIvmlModelName());
+        if (null != sender) {
+            if (null != sender.factory) {
+                exec.setTracerFactory(sender.factory);
+            }
+        }        
         exec.setLogger(new ExecLogger());
         // VIL model name is fix, IVML/Configuration name may change
         exec.setVilModelName(EasySetup.PLATFORM_META_MODEL_NAME);
