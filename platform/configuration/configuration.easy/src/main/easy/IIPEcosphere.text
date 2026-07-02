@@ -22,6 +22,8 @@ IIPEcosphere::genTarget = Folder where generated code shall be stored.
 IIPEcosphere::modelName = Name of the top-level IVML project representing the actual platform configuration (default IIPEcosphere)
 IIPEcosphere::dashboardPushURI = Optional REST API URL for pushing an oktoflow2grafana mapping JSON if generated (default undefined)
 IIPEcosphere::alwaysMapDashboard = Force dashboard mapping independent of actual model (i.e., do not consider DisplayPanels and InfluxConnectors, default false).
+IIPEcosphere::resourcesDirDflt = Default value of the platform-wide resources directory.
+IIPEcosphere::resourcesDir = Configured value of the platform-wide resources directory (default null, takes resourcesDirDflt).
 IIPEcosphere::pidDir = Installation directory where to place PID files, i.e., files containing the process identifier of core platform processes.
 IIPEcosphere::sharedArtifact = Maven coordinate of the generated artifact containing the platform service interfaces (if sharedInterfaces=false).
 IIPEcosphere::sharedInterfaces = Generate application interfaces into application code (default false, i.e., use separate folders)

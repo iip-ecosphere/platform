@@ -27,6 +27,8 @@ project IIPEcosphere {
     String modelName = "PlatformConfiguration";
     String dashboardPushURI = null;
     Boolean alwaysMapDashboard = false;
+    const String resourcesDirDflt = "./resources";
+    String resourcesDir = null;
     
     const String pluginsFolderDflt = "plugins";
     String pluginsFolder = pluginsFolderDflt;

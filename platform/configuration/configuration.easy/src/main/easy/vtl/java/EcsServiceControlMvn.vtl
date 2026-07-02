@@ -46,8 +46,8 @@ template EcsServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, Strin
         appendMavenIipDependencyPluginUnpackPluginsExecution(ex2, oktoPlugins, projectVersion, enable=withPlugins(config), outputDir="../${dir}/jars");
 
         sequenceOf(String) files = defltOktoResourceFiles();
-        ex2 = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder()+"/devices", files, id="dev-res");
-        appendMavenResourcesCopyResourcesExecution(ex2, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder()+"/platform", files, id="platf-res");
+        ex2 = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder(config)+"/devices", files, id="dev-res");
+        appendMavenResourcesCopyResourcesExecution(ex2, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder(config)+"/platform", files, id="platf-res");
     }
 
 }

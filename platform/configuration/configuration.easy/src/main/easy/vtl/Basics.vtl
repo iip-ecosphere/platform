@@ -61,6 +61,14 @@ template Basics(Configuration config, FileArtifact target) {
         rInfo.file = file;
         infos.add(rInfo);
     }
+    
+    def setOf(ResourceInfo) postProcessResources(setOf(ResourceInfo) resources, String txt, String newText) {
+        setOf(ResourceInfo) result = {};
+        for (ResourceInfo rInfo : resources) {
+            addResourceInfo(result, rInfo.srcDir.replace(txt, newText), rInfo.file);
+        }
+        result;
+    }
 	
     def Boolean isUsedType(setOf(String) usedServiceTypes, Type type) {
         String name = type;
@@ -131,10 +139,11 @@ template Basics(Configuration config, FileArtifact target) {
         s.firstToLowerCase().toIdentifier();
     }
     
-    def String getResourcesFolder() {
-        getProperty("iip.resources", "./resources");
+    def String getResourcesFolder(IIPEcosphere config) {
+        String dflt = getStringValueSafe(config.resourcesDir, config.resourcesDirDflt);
+        getProperty("iip.resources", dflt);
     }
-    
+        
     def Boolean isInTest() {
         getProperty("iip.skipConfigPlugin", "false") == "true";
     }

@@ -44,6 +44,7 @@ import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlGraphMapper.IvmlGraphEdge;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlGraphMapper.IvmlGraphNode;
+import de.iip_ecosphere.platform.services.environment.services.Sender;
 import de.iip_ecosphere.platform.support.aas.IdentifierType;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.LangString;
@@ -128,7 +129,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     public static final String OP_ADD_IMPORTS = "addImports";
     public static final String OP_REMOVE_IMPORTS = "removeImports";
     
-    public static final boolean INSTANTIATE_AS_PROCESS = false; // preliminary
     public static final Predicate<AbstractVariable> FILTER_NO_CONSTRAINT_VARIABLES = 
         v -> !TypeQueries.isConstraint(v.getType());
     // exclude unrefined fields from MetaConcepts, do we need that for refTo(Any)
@@ -580,6 +580,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @throws ExecutionException when the instantiation fails
      */
     public Object instantiate(InstantiationMode mode, String appId, String codeFile) throws ExecutionException {
+        LoggerFactory.getLogger(getClass()).info("Instantiating app id '{}' mode {} codeFile '{}' asProcess {}", 
+            appId, mode, codeFile, ConfigurationSetup.getSetup().getInstantiateAsProcess());
         TaskData lastTaskData = TaskUtils.getLastTaskData(); // may be wrong thread
         if (null == lastTaskData) { // fallback
             lastTaskData = TaskRegistry.getTaskData();
@@ -602,16 +604,21 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         }
         Object result = null;
         try {
+            String logPath = "instantiation/" + appId;
+            TaskRegistry.getTaskData().setPath(logPath);
             ConfigurationLifecycleDescriptor.cleanOutputFolder();
-            if (INSTANTIATE_AS_PROCESS) {
+            if (ConfigurationSetup.getSetup().getInstantiateAsProcess()) {
                 EasySetup easy = ConfigurationSetup.getSetup().getEasyProducer();                
                 String[] args = {easy.getIvmlModelName(), toString(easy.getBase()), toString(easy.getGenTarget()), 
                     mode.getStartRuleName(), toString(easy.getIvmlMetaModelFolder())};            
                 PlatformInstantiation inst = ConfigurationFactory.createInstantiator(null, null);
+                inst.setLogPath(logPath);                
                 inst.takeOverProperties();
                 inst.executeAsProcess(getClass().getClassLoader(), null, "TOP", null, args);
             } else {
-                EasyExecutor executor = ConfigurationLifecycleDescriptor.createExecutor(ExecutionMode.FULL);
+                final ExecutionMode execMode = ExecutionMode.FULL;
+                Sender<String> sender = ConfigurationLifecycleDescriptor.setTransportLogConsumer(logPath, execMode);
+                EasyExecutor executor = ConfigurationLifecycleDescriptor.createExecutor(execMode);
                 ConfigurationManager.loadIvmlModel(executor);
                 ReasoningResult rRes = ConfigurationManager.validateAndPropagate(executor, NO_TEMPLATE_FILTER);
                 if (null == rRes) {
@@ -622,6 +629,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 ConfigurationManager.instantiate(executor, mode.getStartRuleName()); // throws exception if it fails
                 executor.discardVILLocations();
                 executor.clearVILModels();
+                ConfigurationLifecycleDescriptor.setLogConsumer(null);
+                Sender.close(sender, false);
             }
             if (null != appId) {
                 System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, "");

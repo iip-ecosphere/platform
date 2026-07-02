@@ -133,8 +133,8 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         }
 
         sequenceOf(String) files = defltOktoResourceFiles();
-        appendMavenResourcesCopyResourcesExecution(rExecs, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder()+"/platform", files, id="platf-res");
-        appendMavenResourcesCopyResourcesExecution(rExecs, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder()+"/software", files, id="sw-res");
+        appendMavenResourcesCopyResourcesExecution(rExecs, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder(config)+"/platform", files, id="platf-res");
+        appendMavenResourcesCopyResourcesExecution(rExecs, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder(config)+"/software", files, id="sw-res");
         
         if (copyRuntimeDependencies) {
             // prependGroupId as in Spring, fails otherwise with jakarta.el, zip excludes required for now
@@ -154,7 +154,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             new XmlElement(configPluginExec, "id", "mapDashboard");
             appendGoal(configPluginExec, "mapDashboard");
             XmlElement configPluginCfg = appendConfiguration(configPluginExec);
-            new XmlElement(configPluginCfg, "projectDirectory", getResourcesFolder()+"/..");
+            new XmlElement(configPluginCfg, "projectDirectory", getResourcesFolder(config)+"/..");
             new XmlElement(configPluginCfg, "outputFile", "\\${project.build.directory}/dashboard-" + toFolderName(appName) + ".json");
             if (isDefined(config.dashboardPushURI) and config.dashboardPushURI <> "") {
                 new XmlElement(configPluginCfg, "postUrl", config.dashboardPushURI);

@@ -5,7 +5,7 @@ import Basics;
 template Rtsa(Configuration config, FileArtifact target) {
 
     def String rtsaResources() {
-        getResourcesFolder() + "/rtsa";
+        "-/rtsa"; // -/ will be replaced by configured resource folder, no access here
     }
 
     def String rtsaBin(RtsaService service) {

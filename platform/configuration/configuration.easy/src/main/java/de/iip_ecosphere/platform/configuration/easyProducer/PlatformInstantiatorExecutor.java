@@ -50,6 +50,7 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
     
     public static final String PROP_ALL_TYPES = "okto.easy.allTypes";
     public static final String PROP_ALL_SERVICES = "okto.easy.allServices";
+    public static final String PROP_LOG_PATH = "okto.easy.logPath";
     public static final String PROP_INCREMENTAL = "easy.vil.incremental";
 
     private File localRepo;
@@ -126,10 +127,19 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
     }
 
     @Override
+    public PlatformInstantiation setLogPath(String path) {
+        if (null != path) {
+            setProperty(PROP_LOG_PATH, path);
+        }
+        return this;
+    }
+
+    @Override
     public void takeOverProperties() {
         setAllTypes(OsUtils.getBooleanProperty(PROP_ALL_TYPES, false));
         setAllServices(OsUtils.getBooleanProperty(PROP_ALL_SERVICES, false));
         setIncremental(OsUtils.getBooleanProperty(PROP_INCREMENTAL, false));
+        setLogPath(System.getProperty(PROP_LOG_PATH, ""));
     }
         
     @Override

@@ -236,7 +236,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     vilTemplateProcessor("TemplatesIdentityStoreYaml", config, "${resourcesSrc}/identityStore.yml", app=a);
                 }
                 
-                
+                resources = postProcessResources(resources, "-/", getResourcesFolder(config) + "/");
                 Boolean copyDependencies = enablesPackaging(a, AppPackagingSchema::ZipWithClasspath); // may be more...
                 // partition according to container strategy
                 String appVersion = getAppMvnVersion(a);
@@ -362,7 +362,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             generateAllAppsContainers(config, target, allAppsContainersElements);
         }
     }
-
+    
     // currently only one, no naming of apps    
     buildServices(Application app, Project target) = {
         String impl = getProperty("iip.easy.impl", "");
@@ -821,7 +821,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     newChangeOnContainerFiles = true;
                 }
             
-                Path devicesPath = getResourcesFolder() + "/devices";
+                Path devicesPath = getResourcesFolder(config) + "/devices";
                 Path devicesGenPath = "${appRoot}/../resources/devices";
                 copy(devicesPath, devicesGenPath);
                 Path lastDevicesPath = "${deviceBaseDf}/resources/devices";
@@ -829,9 +829,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     newChangeOnContainerFiles = true;
                 }
                 
-                Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
+                Path identityStorePath = getResourcesFolder(config) + "/platform/identityStore.yml";
                 if (not(identityStorePath.exists())) {
-                    identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
+                    identityStorePath = getResourcesFolder(config) + "/software/identityStore.yml";
                 }
                 Path identityStoreGenPath = "${appRoot}/../resources";
                 Path lastIdentityStoreFilePath = "${deviceBaseDf}/resources/identityStore.yml";
@@ -1120,7 +1120,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             newChangeOnContainerFiles = true;
                         }
                 
-                        Path devicesPath = getResourcesFolder() + "/devices";
+                        Path devicesPath = getResourcesFolder(config) + "/devices";
                         Path devicesGenPath = "${appRoot}/../resources/devices";
                         copy(devicesPath, devicesGenPath);
                         Path lastDevicesPath = "${deviceDf}/resources/devices";
@@ -1128,9 +1128,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             newChangeOnContainerFiles = true;
                         }
 
-                        Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
+                        Path identityStorePath = getResourcesFolder(config) + "/platform/identityStore.yml";
                         if (not(identityStorePath.exists())) {
-                            identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
+                            identityStorePath = getResourcesFolder(config) + "/software/identityStore.yml";
                         }
                         Path identityStoreGenPath = "${appRoot}/../resources";
                         Path lastIdentityStoreFilePath = "${deviceDf}/resources/identityStore.yml";
@@ -1330,7 +1330,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     newChangeOnContainerFiles = true;
                 }
             
-                Path devicesPath = getResourcesFolder() + "/devices";
+                Path devicesPath = getResourcesFolder(config) + "/devices";
                 Path devicesGenPath = "${target}/resources/devices";
                 copy(devicesPath, devicesGenPath);
                 Path lastDevicesPath = "${deviceBaseDf}/resources/devices";
@@ -1338,9 +1338,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     newChangeOnContainerFiles = true;
                 }
 
-                Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
+                Path identityStorePath = getResourcesFolder(config) + "/platform/identityStore.yml";
                 if (not(identityStorePath.exists())) {
-                    identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
+                    identityStorePath = getResourcesFolder(config) + "/software/identityStore.yml";
                 }
                 Path identityStoreGenPath = "${target}/resources";
                 copy(identityStorePath, identityStoreGenPath);
@@ -1637,7 +1637,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                 newChangeOnContainerFiles = true;
                             }
 
-                            Path devicesPath = getResourcesFolder() + "/devices";
+                            Path devicesPath = getResourcesFolder(config) + "/devices";
                             Path devicesGenPath = "${target}/resources/devices";
                             copy(devicesPath, devicesGenPath);
                             Path lastDevicesPath = "${deviceDf}/resources/devices";
@@ -1645,9 +1645,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                                 newChangeOnContainerFiles = true;
                             }                            
 	                    
-                            Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
+                            Path identityStorePath = getResourcesFolder(config) + "/platform/identityStore.yml";
                             if (not(identityStorePath.exists())) {
-                                identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
+                                identityStorePath = getResourcesFolder(config) + "/software/identityStore.yml";
                             }
                             Path identityStoreGenPath = "${target}/resources";
                             copy(identityStorePath, identityStoreGenPath);
@@ -1985,7 +1985,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             newChangeOnContainerFiles = true;
         }
 
-        Path devicesPath = getResourcesFolder() + "/devices";
+        Path devicesPath = getResourcesFolder(config) + "/devices";
         Path devicesGenPath = "${target}/resources/devices";
         copy(devicesPath, devicesGenPath);
         Path lastDevicesPath = "${deviceDf}/resources/devices";
@@ -1993,9 +1993,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             newChangeOnContainerFiles = true;
         }                            
 	    
-        Path identityStorePath = getResourcesFolder() + "/platform/identityStore.yml";
+        Path identityStorePath = getResourcesFolder(config) + "/platform/identityStore.yml";
         if (not(identityStorePath.exists())) {
-            identityStorePath = getResourcesFolder() + "/software/identityStore.yml";
+            identityStorePath = getResourcesFolder(config) + "/software/identityStore.yml";
         }
         Path identityStoreGenPath = "${target}/resources";
         copy(identityStorePath, identityStoreGenPath);

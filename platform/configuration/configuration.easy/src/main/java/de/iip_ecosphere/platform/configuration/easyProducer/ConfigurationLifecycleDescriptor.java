@@ -18,13 +18,19 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.iip_ecosphere.platform.configuration.cfg.StatusCache;
+import de.iip_ecosphere.platform.configuration.easyProducer.EasyLogger.LogConsumer;
+import de.iip_ecosphere.platform.services.environment.services.Sender;
+import de.iip_ecosphere.platform.services.environment.services.TransportConverterFactory;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
 import de.uni_hildesheim.sse.easy.loader.ManifestLoader;
 import de.uni_hildesheim.sse.easy.loader.framework.Log;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
+import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
+import net.ssehub.easy.basics.logger.ILogger;
 import net.ssehub.easy.basics.logger.LoggingLevel;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
@@ -49,6 +55,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
     private boolean doFilterLogs = false;
     private ClassLoader classLoader = ConfigurationLifecycleDescriptor.class.getClassLoader();
     private ExecutionMode executionMode = ExecutionMode.IVML;
+    private Sender<String> logSender = null;
     
     static {
         addNoEasyLogging(net.ssehub.easy.instantiation.core.model.vilTypes.TypeRegistry.class);
@@ -238,6 +245,52 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
         startup(args);
     }
     
+    /**
+     * Sets the piggyback EASy log consumer.
+     * 
+     * @param consumer the consumer, may be <b>null</b> for none
+     */
+    public static void setLogConsumer(LogConsumer consumer) {
+        ILogger logger = EASyLoggerFactory.INSTANCE.getLogger();
+        if (logger instanceof EASyLogger) {
+            ((EasyLogger) logger).setLogConsumer(consumer);
+        }
+    }
+
+    /**
+     * Sets the log consumer for transport logging.
+     * 
+     * @param logPath the log path
+     * @return the sender instance, may be <b>null</b> e.g. in {@link ExecutionMode#TOOLING} or if no {@code logPath} 
+     * is given
+     * @see Sender#close(Sender, boolean)
+     */
+    public static Sender<String> setTransportLogConsumer(String logPath, ExecutionMode executionMode) {
+        System.out.println("LOG-CONS setup?"); // preliminary
+        Sender<String> sender = null;
+        if (logPath != null && logPath.length() > 0 && executionMode != ExecutionMode.TOOLING) {
+            ConfigurationSetup setup = ConfigurationSetup.getSetup();
+            System.out.println("LOG-CONS setup " + setup.getTransport()); // preliminary
+            sender = TransportConverterFactory.getInstance().createSender(setup.getAas(), 
+                setup.getTransport(), logPath, TypeTranslators.STRING, String.class);
+            Sender<String> s = sender; 
+            try {
+                s.connectBlocking();
+                setLogConsumer((l, m) -> {
+                    try {
+                        System.out.println("LOG-CONS-SEND " + l.name() + " " + m); // preliminary
+                        s.send(l.name() + " " + m);
+                    } catch (IOException e) {
+                        getLogger().warn("Logging to transport: {}", e.getMessage());
+                    }
+                });
+            } catch (IOException e) {
+                getLogger().warn("Setting up transport logging: {}", e.getMessage());
+            }
+        }
+        return sender;
+    }
+
     @Override
     public void startup(String[] args) {
         try {
@@ -247,6 +300,10 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             EASyLoggerFactory.INSTANCE.setLogger(logger);
             // pass through everything and let platform logger decide
             EASyLoggerFactory.INSTANCE.setLoggingLevel(LoggingLevel.INFO);
+            String logPath = System.getProperty(PlatformInstantiatorExecutor.PROP_LOG_PATH, "");
+            if (logPath.length() > 0) {
+                logSender = setTransportLogConsumer(logPath, executionMode);
+            }
             ConfigurationSetup setup = ConfigurationSetup.getSetup(executionMode.extendedLogging());
             loader = new ManifestLoader(false, classLoader); // to debug, replace first parameter by true, mvn install
             EasySetup easySetup = setup.getEasyProducer();
@@ -356,6 +413,8 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
 
     @Override
     public void shutdown() {
+        Sender.close(logSender, false);        
+        logSender = null;
         StatusCache.stop();
         EasyExecutor exec = ConfigurationManager.getExecutor();
         if (null != exec) {

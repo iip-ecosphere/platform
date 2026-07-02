@@ -40,8 +40,8 @@ template EcsRuntimeMvn(IIPEcosphere config, XmlFileArtifact target, String dir, 
         appendCompilerPlugin(plugins);
         appendSurefirePlugin(plugins, tests=tests);
         sequenceOf(String) files = defltOktoResourceFiles();
-        ex = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder()+"/devices", files, id="dev-res");
-        appendMavenResourcesCopyResourcesExecution(ex, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder()+"/platform", files, id="platf-res");
+        ex = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder(config)+"/devices", files, id="dev-res");
+        appendMavenResourcesCopyResourcesExecution(ex, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder(config)+"/platform", files, id="platf-res");
     }
 
 }

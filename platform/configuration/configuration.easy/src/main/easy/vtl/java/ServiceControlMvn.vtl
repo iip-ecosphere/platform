@@ -41,8 +41,8 @@ template ServiceControlMvn(IIPEcosphere config, XmlFileArtifact target, String d
         appendMavenIipDependencyPluginUnpackPluginsExecution(ex, oktoPlugins, projectVersion, enable=withPlugins(config), outputDir="../${dir}/jars");
 
         sequenceOf(String) files = defltOktoResourceFiles();
-        ex = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder()+"/devices", files, id="dev-res");
-        appendMavenResourcesCopyResourcesExecution(ex, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder()+"/platform", files, id="platf-res");
+        ex = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder(config)+"/devices", files, id="dev-res");
+        appendMavenResourcesCopyResourcesExecution(ex, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder(config)+"/platform", files, id="platf-res");
     }
 
 }
