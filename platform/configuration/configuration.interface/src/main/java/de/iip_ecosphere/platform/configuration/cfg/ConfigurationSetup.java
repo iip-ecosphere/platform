@@ -15,8 +15,10 @@ package de.iip_ecosphere.platform.configuration.cfg;
 import java.io.File;
 
 import de.iip_ecosphere.platform.deviceMgt.storage.PackageStorageSetup;
+import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.setup.AbstractSetup;
 import de.iip_ecosphere.platform.support.setup.EnableSetupMerge;
+import de.iip_ecosphere.platform.transport.connectors.TransportSetup;
 
 /**
  * The setup for the configuration component. As there are also EASy-Producer configuration classes with different 
@@ -32,6 +34,9 @@ public class ConfigurationSetup extends AbstractSetup {
     private File artifactsFolder = new File("artifacts");
     private String artifactsUriPrefix = "";
     private File uploadFolder; // default on getter
+    private boolean instantiateAsProcess = false;
+    private AasSetup aas = new AasSetup();
+    private TransportSetup transport = new TransportSetup();
 
     /**
      * Returns the EASy-Producer setup.
@@ -122,5 +127,61 @@ public class ConfigurationSetup extends AbstractSetup {
     public void setUploadFolder(File uploadFolder) {
         this.uploadFolder = uploadFolder;
     }
+
+
+    /**
+     * Returns whether instantiation shall run in an own process.
+     * 
+     * @return whether instantiation shall run in an own process (default is {@code false})
+     */
+    public boolean getInstantiateAsProcess() {
+        return instantiateAsProcess;
+    }
+
+    /**
+     * Changes whether instantiation shall run in an own process. The implementation may ignore this setting. [yaml]
+     * 
+     * @param instantiateAsProcess whether instantiation shall run in an own process
+     */
+    public void setInstantiateAsProcess(boolean instantiateAsProcess) {
+        this.instantiateAsProcess = instantiateAsProcess;
+    }
+    
+    /**
+     * Returns the transport setup.
+     * 
+     * @return the transport setup
+     */
+    public TransportSetup getTransport() {
+        return transport;
+    }
+
+    /**
+     * Defines the transport setup. [yaml]
+     * 
+     * @param transport the transport setup
+     */
+    public void setTransport(TransportSetup transport) {
+        this.transport = transport;
+    }
+
+    /**
+     * Returns the AAS setup.
+     * 
+     * @return the AAs setup
+     */
+    public AasSetup getAas() {
+        return aas;
+    }
+    
+    /**
+     * Defines the AAS setup. [required by yaml]
+     * 
+     * @param aas the AAS setup
+     */
+    public void setAas(AasSetup aas) {
+        this.aas = aas;
+    }
+
 
 }

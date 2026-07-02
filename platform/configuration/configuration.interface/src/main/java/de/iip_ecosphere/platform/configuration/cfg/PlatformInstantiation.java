@@ -81,6 +81,14 @@ public interface PlatformInstantiation {
     public PlatformInstantiation setIncremental(boolean incremental);
     
     /**
+     * Sets the log path for transport-based distributed logging.
+     * 
+     * @param path the path, may be <b>null</b> for none
+     * @return <b>this</b> for chaining
+     */
+    public PlatformInstantiation setLogPath(String path);
+    
+    /**
      * Takes over properties from this process.
      */
     public void takeOverProperties();
