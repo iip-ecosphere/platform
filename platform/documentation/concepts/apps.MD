@@ -187,4 +187,18 @@ myPythonSource ==>> myPythonConnMySourceMyTransformer ==>> myPythonTransformer =
 
 ```
 
+## App and platform resources
 
+Resources are additional files that are loaded during runtime, e.g., images, serialized AAS, binaries. For various reasons, there is more than one folder, some folders requiring a certain sub-structure.
+
+* In service implementation projects / app code templates
+  * `src/main/resources` files that shall be available during productive execution, packaged with the service implementation binaries; typically loaded by name through the Java classloader, depending on the respective resources only one (the "first" found) or all are considered.
+  * `src/test/resources` files that shall be available during testing
+* In all-in-one examples, there is also the `resources` folder on project level
+  * `resources` contains resources that shall be directly packaged into the application, not into a service implementation artifact. May contain platform-wide resources, but also service binaries. As a kind of template, this folder may be committed to a code repository. The typical structure is
+    - `devices`: resources for devices such as nameplate information to be packaged with the ECS runtime
+    - `platform`: resources for all platform components such as central services, monitoring, ECS runtime, service manager
+    - `software`: resources for software services to be packaged into the service artifacts
+    - further service-specific folders, e.g., `rtsa` for RapidMiner RTSA containing the RTSA binary or actual RTSA deployments
+  * `resources.ipr` replaces `resources`, but in contrast may contain IPR-protected resources and shall not be commited to a code repository. On linux, `resources.ipr` may contain symlinks to `resources`. For example, this folder would contain in the same substructure the licensed RTSA binary replacing our oktoflows fake RTSA version.
+* A platform global `resources` folder, following the structure of the all-in-one resources folder, manually created during installation. Needs to be specified in the `TechnicalSettings`, then supersedes local `resources` folders for all apps build with that platform. One application case is a global identity store, so that an app can be built/executed without specifying an identity store in the configuration model.

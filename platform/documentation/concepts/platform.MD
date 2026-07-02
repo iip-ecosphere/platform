@@ -385,6 +385,7 @@ In addition to the setup topics discussed above, oktoflow has a set of further g
 | modelName | `String` | Name of the top-level IVML project containing the platform configuration | `PlatformConfiguration` | 
 | pluginsFolder | `String` | Name of the folder containing oktoflow plugins; if not absolute, interpreted relative to `instDir` | `plugins` |  
 | zipBinaries | `Boolean` | Enable creation of ZIPped device platform binaries | `false` |
+| resourcesDir | `String` | Folder/directory where platform-wide resource files can be found, taken into account during app generation | `./resources` |
 
 ### Device settings
 
@@ -414,3 +415,11 @@ In addition to the setup topics discussed above, oktoflow has a set of further g
 | containerBaseImageMethod | `Boolean` | Use container base image method during the container creation | `false` | 
 | containerTestingMode | `Boolean` | Add more testing/debugging software into the containers | `false` | 
 | forceContainersCreation | `Boolean` | Enforce containers creation regardless of the container's fingerprint | `false` | 
+
+### Dashboard settings (oktoflow2grafana)
+
+| Variable | Type | Description | Default |
+| --- |  --- | --- | --- |
+| dashboardPushURI | `String` | URI used during build processes where to push the dashboard settings to. If not set, just the dashboard file is generated if there is at least an influx connector and a display panel configured. | `null` |
+| alwaysMapDashboard | `boolean` | Generate the dashboard settings even if there is no influx connector and no display panel configured. | `false` |
+
