@@ -35,6 +35,7 @@ import de.iip_ecosphere.platform.configuration.cfg.ConfigurationChangeType;
 import de.iip_ecosphere.platform.configuration.cfg.ConfigurationFactory;
 import de.iip_ecosphere.platform.configuration.cfg.PlatformInstantiation;
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor.ExecutionMode;
+import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor.SenderCloseable;
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecycleDescriptor;
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationManager;
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationSetup;
@@ -44,7 +45,6 @@ import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlGraphMapper.IvmlGraphEdge;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlGraphMapper.IvmlGraphNode;
-import de.iip_ecosphere.platform.services.environment.services.Sender;
 import de.iip_ecosphere.platform.support.aas.IdentifierType;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.LangString;
@@ -617,7 +617,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 inst.executeAsProcess(getClass().getClassLoader(), null, "TOP", null, args);
             } else {
                 final ExecutionMode execMode = ExecutionMode.FULL;
-                Sender<String> sender = ConfigurationLifecycleDescriptor.setTransportLogConsumer(logPath, execMode);
+                SenderCloseable sender = ConfigurationLifecycleDescriptor.setTransportLogConsumer(logPath, execMode);
                 EasyExecutor executor = ConfigurationLifecycleDescriptor.createExecutor(execMode);
                 ConfigurationManager.loadIvmlModel(executor);
                 ReasoningResult rRes = ConfigurationManager.validateAndPropagate(executor, NO_TEMPLATE_FILTER);
@@ -630,7 +630,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 executor.discardVILLocations();
                 executor.clearVILModels();
                 ConfigurationLifecycleDescriptor.setLogConsumer(null);
-                Sender.close(sender, false);
+                ConfigurationLifecycleDescriptor.close(sender);
             }
             if (null != appId) {
                 System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, "");

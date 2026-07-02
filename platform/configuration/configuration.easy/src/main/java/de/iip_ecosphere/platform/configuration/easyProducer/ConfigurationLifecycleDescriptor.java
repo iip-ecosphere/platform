@@ -16,9 +16,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import de.iip_ecosphere.platform.configuration.cfg.StatusCache;
 import de.iip_ecosphere.platform.configuration.easyProducer.EasyLogger.LogConsumer;
+import de.iip_ecosphere.platform.configuration.easyProducer.EasyLogger.LogLevel;
 import de.iip_ecosphere.platform.services.environment.services.Sender;
 import de.iip_ecosphere.platform.services.environment.services.TransportConverterFactory;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
@@ -29,10 +31,12 @@ import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
 import de.uni_hildesheim.sse.easy.loader.ManifestLoader;
 import de.uni_hildesheim.sse.easy.loader.framework.Log;
 import net.ssehub.easy.basics.logger.EASyLoggerFactory;
-import net.ssehub.easy.basics.logger.EASyLoggerFactory.EASyLogger;
 import net.ssehub.easy.basics.logger.ILogger;
 import net.ssehub.easy.basics.logger.LoggingLevel;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
+import net.ssehub.easy.instantiation.core.model.execution.IInstantiatorTracer;
+import net.ssehub.easy.instantiation.core.model.execution.TracerFactory;
+import net.ssehub.easy.instantiation.core.model.templateModel.ITracer;
 import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 
 /**
@@ -55,7 +59,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
     private boolean doFilterLogs = false;
     private ClassLoader classLoader = ConfigurationLifecycleDescriptor.class.getClassLoader();
     private ExecutionMode executionMode = ExecutionMode.IVML;
-    private Sender<String> logSender = null;
+    private SenderCloseable logSender = null;
     
     static {
         addNoEasyLogging(net.ssehub.easy.instantiation.core.model.vilTypes.TypeRegistry.class);
@@ -249,11 +253,76 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
      * Sets the piggyback EASy log consumer.
      * 
      * @param consumer the consumer, may be <b>null</b> for none
+     * @return the current EASy tracer factory
      */
-    public static void setLogConsumer(LogConsumer consumer) {
+    public static TracerFactory setLogConsumer(LogConsumer consumer) {
+        TracerFactory orig = TracerFactory.getInstance();
         ILogger logger = EASyLoggerFactory.INSTANCE.getLogger();
-        if (logger instanceof EASyLogger) {
+        if (logger instanceof EasyLogger) {
             ((EasyLogger) logger).setLogConsumer(consumer);
+        }
+        if (null != consumer) {
+            Consumer<String> logConsumer = s -> consumer.log(LogLevel.TEXT, s);
+            TracerFactory f = new TracerFactory() {
+
+                @Override
+                public ITracer createTemplateLanguageTracerImpl() {
+                    ITracer result = orig.createTemplateLanguageTracerImpl();
+                    result.setLogConsumer(logConsumer);
+                    return result;
+                }
+
+                @Override
+                public net.ssehub.easy.instantiation.core.model.buildlangModel.ITracer createBuildLanguageTracerImpl() {
+                    net.ssehub.easy.instantiation.core.model.buildlangModel.ITracer result 
+                        = orig.createBuildLanguageTracerImpl();
+                    result.setLogConsumer(logConsumer);
+                    return result;
+                }
+
+                @Override
+                public IInstantiatorTracer createInstantiatorTracerImpl() {
+                    IInstantiatorTracer result = orig.createInstantiatorTracerImpl();
+                    result.setLogConsumer(logConsumer);
+                    return result;
+                }
+                
+            };
+            TracerFactory.setInstance(f);
+        }
+        return orig;
+    }
+    
+    /**
+     * A closeable for the transport logger sender that also re-sets the EASY tracer factory.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class SenderCloseable {
+        
+        private Sender<String> sender;
+        private TracerFactory factory;
+
+        /**
+         * Closes the sender, resets the factory.
+         */
+        public void close() {
+            Sender.close(sender, false);
+            if (null != factory) {
+                TracerFactory.setInstance(factory);
+            }
+        }
+        
+    }
+    
+    /**
+     * Tolerantly closes the given closeable.
+     * 
+     * @param closeable the closeable to close, may be <b>null</b>
+     */
+    public static void close(SenderCloseable closeable) {
+        if (null != closeable) {
+            closeable.close();
         }
     }
 
@@ -261,25 +330,28 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
      * Sets the log consumer for transport logging.
      * 
      * @param logPath the log path
-     * @return the sender instance, may be <b>null</b> e.g. in {@link ExecutionMode#TOOLING} or if no {@code logPath} 
-     * is given
+     * @return something that closes the sender/resets the state
      * @see Sender#close(Sender, boolean)
      */
-    public static Sender<String> setTransportLogConsumer(String logPath, ExecutionMode executionMode) {
+    public static SenderCloseable setTransportLogConsumer(String logPath, ExecutionMode executionMode) {
         System.out.println("LOG-CONS setup?"); // preliminary
-        Sender<String> sender = null;
+        SenderCloseable result = new SenderCloseable();
         if (logPath != null && logPath.length() > 0 && executionMode != ExecutionMode.TOOLING) {
             ConfigurationSetup setup = ConfigurationSetup.getSetup();
             System.out.println("LOG-CONS setup " + setup.getTransport()); // preliminary
-            sender = TransportConverterFactory.getInstance().createSender(setup.getAas(), 
+            Sender<String> sender = TransportConverterFactory.getInstance().createSender(setup.getAas(), 
                 setup.getTransport(), logPath, TypeTranslators.STRING, String.class);
-            Sender<String> s = sender; 
+            TracerFactory factory = null;
             try {
-                s.connectBlocking();
-                setLogConsumer((l, m) -> {
+                sender.connectBlocking();
+                factory = setLogConsumer((l, m) -> {
                     try {
-                        System.out.println("LOG-CONS-SEND " + l.name() + " " + m); // preliminary
-                        s.send(l.name() + " " + m);
+                        String prefix = "";
+                        if (LogLevel.TEXT != l) {
+                            prefix = l.name() + " ";
+                        }
+                        System.out.println("LOG-CONS-SEND " + prefix + m); // preliminary
+                        sender.send(prefix + m);
                     } catch (IOException e) {
                         getLogger().warn("Logging to transport: {}", e.getMessage());
                     }
@@ -287,8 +359,11 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             } catch (IOException e) {
                 getLogger().warn("Setting up transport logging: {}", e.getMessage());
             }
+            result = new SenderCloseable();
+            result.sender = sender;
+            result.factory = factory;
         }
-        return sender;
+        return result;
     }
 
     @Override
@@ -413,7 +488,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
 
     @Override
     public void shutdown() {
-        Sender.close(logSender, false);        
+        close(logSender);
         logSender = null;
         StatusCache.stop();
         EasyExecutor exec = ConfigurationManager.getExecutor();

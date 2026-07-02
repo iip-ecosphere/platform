@@ -1219,8 +1219,8 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                 } else {
                     removeConstraintsForVariable(target, varDecl);
                     createAssignment(varDecl, ent.getValue(), target); 
-                    projects.add(target);
                 }
+                projects.add(target);
                 notifyChange(var, ConfigurationChangeType.MODIFIED);
             } catch (ExecutionException e) {
                 history.rollback();

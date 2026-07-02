@@ -47,7 +47,8 @@ public class EasyLogger implements ILogger, LoaderLogger {
         INFO, 
         WARN, 
         ERROR,
-        OFF
+        OFF,
+        TEXT
     }
     
     /**
