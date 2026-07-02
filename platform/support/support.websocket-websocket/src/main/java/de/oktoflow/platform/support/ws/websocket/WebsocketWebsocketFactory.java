@@ -240,7 +240,10 @@ public class WebsocketWebsocketFactory extends WebsocketFactory {
             List<org.java_websocket.WebSocket> cList = connections.get(conn.getResourceDescriptor());
             if (null != cList) {
                 for (int c = 0; c < cList.size(); c++) {
-                    cList.get(c).send(message);
+                    org.java_websocket.WebSocket socket = cList.get(c);
+                    if (socket.isOpen() && !socket.isClosing()) {
+                        socket.send(message);
+                    }
                 }
             }            
             //"topic" specific broadcast(message);
