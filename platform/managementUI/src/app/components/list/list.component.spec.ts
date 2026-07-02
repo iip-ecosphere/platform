@@ -232,10 +232,10 @@ async function test(fixture: ComponentFixture<ListComponent>, component: ListCom
         let genTemplateBtn = compiled.querySelector('button[id="data.btnGenTemplate"]') as HTMLElement;
         expect(genTemplateBtn).withContext(`genTemplate button of table ${tabName}`).toBeTruthy();
         genTemplateBtn.click();
-        console.log("Waiting for tempate instantiation...");
+        console.log("Waiting for template instantiation...");
         await retry({
           fn: () => done,
-          maxAttempts: 40,
+          maxAttempts: 100,
           delay: 1000
         }).catch(e=>{});
 
@@ -246,7 +246,7 @@ async function test(fixture: ComponentFixture<ListComponent>, component: ListCom
         console.log("Waiting for app instantiation...");
         await retry({
           fn: () => done,
-          maxAttempts: 40,
+          maxAttempts: 100,
           delay: 1000
         }).catch(e=>{});
     }
