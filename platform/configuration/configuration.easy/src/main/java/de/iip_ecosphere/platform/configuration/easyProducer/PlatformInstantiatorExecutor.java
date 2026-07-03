@@ -38,6 +38,7 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.plugins.StreamGobbler;
 import de.iip_ecosphere.platform.configuration.cfg.PlatformInstantiation;
 import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator.InstantiationConfigurer;
+import de.iip_ecosphere.platform.services.environment.Starter;
 
 /**
  * Helper methods to execute the platform instantiator as an own process. This class must not have
@@ -127,6 +128,12 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
     }
 
     @Override
+    public PlatformInstantiation setInTest(boolean test) {
+        setProperty(Starter.IIP_TEST, String.valueOf(test));
+        return this;
+    }
+
+    @Override
     public PlatformInstantiation setLogPath(String path) {
         if (null != path) {
             setProperty(PROP_LOG_PATH, path);
@@ -139,6 +146,7 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
         setAllTypes(OsUtils.getBooleanProperty(PROP_ALL_TYPES, false));
         setAllServices(OsUtils.getBooleanProperty(PROP_ALL_SERVICES, false));
         setIncremental(OsUtils.getBooleanProperty(PROP_INCREMENTAL, false));
+        setIncremental(OsUtils.getBooleanProperty(Starter.IIP_TEST, false));
         setLogPath(System.getProperty(PROP_LOG_PATH, ""));
     }
         

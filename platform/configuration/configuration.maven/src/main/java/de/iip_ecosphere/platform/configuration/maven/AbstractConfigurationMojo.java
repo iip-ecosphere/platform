@@ -115,6 +115,9 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
 
     @Parameter(property = "configuration.incremental", required = false, defaultValue = "false")
     private boolean incremental;
+    
+    @Parameter(property = "configuration.inTest", required = false, defaultValue = "false")
+    private boolean inTest;
 
     @Parameter(property = "configuration.changeCheckArtifacts", required = false, defaultValue = "")
     private String changeCheckArtifacts;
@@ -465,7 +468,8 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
                 PlatformInstantiation executor = createExecutor();
                 executor.setAllTypes(allTypes)
                     .setAllServices(allServices)
-                    .setIncremental(incremental);
+                    .setIncremental(incremental)
+                    .setInTest(inTest);
                 try {
                     if (asProcess) {
                         executor.executeAsProcess(getClass().getClassLoader(), resourcesDir, getTracingLevel(), 
