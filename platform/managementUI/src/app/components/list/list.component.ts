@@ -1,11 +1,11 @@
-import { AAS_OP_PREFIX_SME, AAS_TYPE_STRING, ApiService, ArtifactKind, IDSHORT_SUBMODEL_CONFIGURATION } from 'src/app/services/api.service';
+import { AAS_OP_PREFIX_SME, AAS_TYPE_STRING, ApiService, ArtifactKind, IDSHORT_OPERATION_GET_TASK_PATH, IDSHORT_SUBMODEL_ARTIFACTS, IDSHORT_SUBMODEL_CONFIGURATION, IDSHORT_SUBMODEL_PLATFORM } from 'src/app/services/api.service';
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { EditorComponent } from '../editor/editor.component';
-import { DEFAULT_UPLOAD_CHUNK, IVML_TYPE_Boolean, InputVariable, MT_metaType, MT_metaVariable, MT_varValue, Resource, configMetaEntry, editorInput, primitiveDataTypes } from 'src/interfaces';
+import { DEFAULT_UPLOAD_CHUNK, IVML_TYPE_Boolean, InputVariable, MT_metaType, MT_metaVariable, MT_varValue, Resource, ST_PROCESS, ST_RECEIVED, configMetaEntry, editorInput, primitiveDataTypes } from 'src/interfaces';
 import { Utils, DataUtils } from 'src/app/services/utils.service';
 import { WebsocketService } from 'src/app/websocket.service';
 import { StatusCollectionService } from 'src/app/services/status-collection.service';
@@ -13,6 +13,7 @@ import { chunkInput } from '../file-upload/file-upload.component';
 import { IvmlFormatterService } from 'src/app/components/services/ivml/ivml-formatter.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfigExpertModeService } from '../../services/config-expert-mode.service';
+import { OnlyIdPipe } from 'src/app/pipes/only-id.pipe';
 
 /**
  * Information on a file being uploaded.
@@ -67,6 +68,7 @@ export class ListComponent extends Utils implements OnInit {
   private appFiles = new Map<string, FileUploadInfo>();
   meta: Resource | undefined;
   metaBackup: Resource | undefined;
+  taskId: string = "";
   constructor(private router: Router,
     public http: HttpClient,
     public api: ApiService,
@@ -74,6 +76,7 @@ export class ListComponent extends Utils implements OnInit {
     public websocketService: WebsocketService,
     public collector: StatusCollectionService,
     private snackBar: MatSnackBar,
+    private onlyId: OnlyIdPipe,
     private ivmlFormatter: IvmlFormatterService, 
     public configExpertMode: ConfigExpertModeService) {
     super();
@@ -520,7 +523,23 @@ export class ListComponent extends Utils implements OnInit {
       console.log("IMPLEMENT DELETE " + JSON.stringify(item));
       //TODO this.ivmlFormatter.deleteMesh(); // needs appName
     } else {
+      // Toast: upload finished
+      this.snackBar.open(
+        `Deleting: ${item.idShort}`,
+        'Close',
+        { 
+          duration: 7000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top' 
+        }
+      );
       await this.ivmlFormatter.deleteVariable(item.varName);
+
+      const tabName = this.currentTab === '' ? 'Setup' : this.currentTab;
+      const selectedTab = this.visibleTabs.find(tab => tab.tabName === tabName);
+      if (selectedTab) {
+        this.getDisplayData(selectedTab?.tabName, selectedTab?.metaProject, selectedTab?.submodelElement)
+      }
     }
     // TODO feedback
   }
@@ -585,21 +604,21 @@ export class ListComponent extends Utils implements OnInit {
   public genTemplate(appId: string) {
     let inputVariables: InputVariable[] = [];
     inputVariables.push(ApiService.createAasOperationParameter("appId", AAS_TYPE_STRING, appId));
-    const snackRef = this.snackBar.open(
-      `Generate application template for ${appId}, please wait...`,
-      undefined,
-      {
-        horizontalPosition: 'center',
-        verticalPosition: 'top'
-      }
-    );
-    const tempSub = this.websocketService.getMsgSubject().subscribe((value: string) => {
-      if (value.includes('"id":"Configuration"')) {
-        snackRef.dismiss();
-        tempSub.unsubscribe();
-      }
-    })
-    this.execFunctionInConfig("genAppsNoDepsAsync", inputVariables)
+    // const snackRef = this.snackBar.open(
+    //   `Generate application template for ${appId}, please wait...`,
+    //   undefined,
+    //   {
+    //     horizontalPosition: 'center',
+    //     verticalPosition: 'top'
+    //   }
+    // );
+    // const tempSub = this.websocketService.getMsgSubject().subscribe((value: string) => {
+    //   if (value.includes('"id":"Configuration"')) {
+    //     snackRef.dismiss();
+    //     tempSub.unsubscribe();
+    //   }
+    // })
+    this.execFunctionInConfig("genAppsNoDepsAsync", inputVariables);
   }
 
   public isUploading(appId: string) {
@@ -639,25 +658,72 @@ export class ListComponent extends Utils implements OnInit {
     let fileName = fileInfo?.file.name || '';
     this.appFiles.delete(appId);
     inputVariables.push(ApiService.createAasOperationParameter("codeFile", AAS_TYPE_STRING, fileName));
-    const snackRef = this.snackBar.open(
-      `Integrate the application with the uploaded template, please wait...`,
-      undefined,
-      {
-        horizontalPosition: 'center',
-        verticalPosition: 'top'
-      }
-    );
-    const tempSub = this.websocketService.getMsgSubject().subscribe((value: string) => {
-      if (value.includes('"id":"Configuration"')) {
-        snackRef.dismiss();
-        tempSub.unsubscribe();
-      }
-    })
+    // const snackRef = this.snackBar.open(
+    //   `Integrate the application with the uploaded template, please wait...`,
+    //   undefined,
+    //   {
+    //     horizontalPosition: 'center',
+    //     verticalPosition: 'top'
+    //   }
+    // );
+    // const tempSub = this.websocketService.getMsgSubject().subscribe((value: string) => {
+    //   if (value.includes('"id":"Configuration"')) {
+    //     snackRef.dismiss();
+    //     tempSub.unsubscribe();
+    //   }
+    // })
     this.execFunctionInConfig("genAppsAsync", inputVariables)
   }
 
+  public async requestReceivedMessage(message: string, taskId: string, action: string) {
+    this.collector.receiveStatus({
+      description: message, 
+      taskId: taskId,
+      action: action,
+      componentType: '',
+      subDescription: '',
+      deviceId: '',
+      id: '',
+      aliasIds: [],
+      progress: 0
+    });
+  }
+
   public async execFunctionInConfig(basyxFun: string, inputVariables: InputVariable[]) {
-    await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_CONFIGURATION, AAS_OP_PREFIX_SME + basyxFun, inputVariables);
+    const response = await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_CONFIGURATION, AAS_OP_PREFIX_SME + basyxFun, inputVariables);
+    let Type: string = '';
+    if(response && response.outputArguments[0] && response.outputArguments[0].value) {
+      this.taskId = this.onlyId.transform(response.outputArguments[0].value.value);
+      let message: string = '';
+      if (basyxFun == "genAppsAsync") {
+        message = "Integrate the application recieved";
+        Type = "Integrate application";
+      } else if (basyxFun == "genAppsNoDepsAsync"){
+        message = "Generate application template recieved";
+        Type = "Generate template";
+      }
+      
+      this.requestReceivedMessage(message, this.taskId, ST_RECEIVED);
+    }
+    let inputVariablesTask: InputVariable[] = [];
+    inputVariablesTask.push(ApiService.createAasOperationParameter("taskId", AAS_TYPE_STRING, this.taskId));
+    const responseTask = await this.api.executeAasJsonOperation(IDSHORT_SUBMODEL_ARTIFACTS, IDSHORT_OPERATION_GET_TASK_PATH, inputVariablesTask);
+    if(responseTask && responseTask.outputArguments[0] && responseTask.outputArguments[0].value) {
+      const taskPath = this.onlyId.transform(responseTask.outputArguments[0].value.value);
+      if (taskPath && taskPath !== '') {
+        const taskUrl = await this.api.getTaskPathUri(taskPath);
+        const ws: WebsocketService = new WebsocketService();
+        ws.connect(taskUrl);
+        const tempSub = ws.getMsgSubject().subscribe((value: any) => {
+          this.requestReceivedMessage(`${value}`, this.taskId, ST_PROCESS);
+          if (value.includes('"id":"Configuration"')) {
+            ws.close();
+            tempSub.unsubscribe();
+          }
+        });
+      }
+    }
+    return response;
   }
 
   /**

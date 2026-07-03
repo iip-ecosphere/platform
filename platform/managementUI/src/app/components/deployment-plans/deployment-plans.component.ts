@@ -8,6 +8,7 @@ import { Resource, PlatformArtifacts, DEFAULT_UPLOAD_CHUNK } from 'src/interface
 import { Utils } from 'src/app/services/utils.service';
 import { StatusCollectionNotifier } from 'src/app/services/status-collection.service';
 import { chunkInput } from '../file-upload/file-upload.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
     selector: 'app-deployment-plans',
@@ -35,6 +36,7 @@ export class DeploymentPlansComponent extends Utils implements OnInit {
   constructor(public api: ApiService,
     private deployer: PlanDeployerService,
     private onlyId: OnlyIdPipe,
+    private snackBar: MatSnackBar,
     public websocket: WebsocketService) {
       super();
   }
@@ -60,6 +62,21 @@ export class DeploymentPlansComponent extends Utils implements OnInit {
 
       this.instanceId.fill("", 0, this.deploymentPlans?.value?.length);
     }
+  }
+
+  public async hasNewPlanAppeared(): Promise<boolean> {
+    const response = await this.api.getArtifacts();
+
+    if (!response.submodelElements) {
+      return false;
+    }
+
+    const newPlans = response.submodelElements.find(
+      item => item.idShort === "DeploymentPlans"
+    );
+
+    return (newPlans?.value?.length ?? 0) >
+          (this.deploymentPlans?.value?.length ?? 0);
   }
 
   public async deploy(plan?: Resource) {
@@ -110,9 +127,29 @@ export class DeploymentPlansComponent extends Utils implements OnInit {
     this.uploadEnabled = false;
     chunkInput(file, DEFAULT_UPLOAD_CHUNK, (chunk, seqNr) => {
       this.api.uploadFileAsArrayBuffer(ArtifactKind.DEPLOYMENT_PLAN, seqNr, file.name, chunk);
-    }, () => {
+    }, async () => {
+      const timeout = Date.now() + 20000; // 10 seconds
+
+      while (!(await this.hasNewPlanAppeared()) && Date.now() < timeout) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      let responseMessage = Date.now() < timeout ?
+                            `Upload complete: ${file.name}` :
+                            `Upload failed: ${file.name}`;
+      // Toast: upload finished
+      this.snackBar.open(
+        responseMessage,
+        'Close',
+        { 
+          duration: 10000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top' 
+        }
+      );
+      await this.getArtifacts();
       this.uploadEnabled = true;
     });
+
   }
 
 }

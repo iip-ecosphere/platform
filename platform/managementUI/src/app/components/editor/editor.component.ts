@@ -196,10 +196,10 @@ export class EditorComponent extends Utils implements OnInit {
           this.handleFeedback(this.requestFeedback);
         } else if (this.saveEvent) {
           this.saveEvent.emit({ idShort: this.type.name, value: complexType, multipleInputs: this.type.multipleInputs });
+          this.dialog.close();
         }
       }
     }
-    this.dialog.close();
   }
 
   /**

@@ -320,6 +320,16 @@ export class ApiService extends UtilsService {
     return statusUri;
   }
 
+    /**
+   * Returns the platform WS with taskPath URI instead of status.
+   * 
+   * @returns the platform WS with taskPath URI instead of status
+   */
+  public async getTaskPathUri(taskPath: string) {
+    const url: string = await this.getStatusUri() + "";
+    return url.replace('status', taskPath);
+  }
+
   /**
    * Recursive function to turn a single AAS JSON data row into an internal data structure. Considers (recursive) IVML collection sub-structures. 
    * Takes metaType, metaSize and varValue from the platform generated AAS entries into account.
@@ -406,6 +416,8 @@ export const IDSHORT_OPERATION_ARTIFACTS_UNDEPLOYPLANASYNC = "undeployPlanAsync"
 export const IDSHORT_OPERATION_ARTIFACTS_DEPLOYPLANASYNC = "deployPlanAsync";
 export const IDSHORT_OPERATION_ARTIFACTS_DEPLOYPLANWITHIDASYNC = "undeployPlanWithIdAsync";
 export const IDSHORT_OPERATION_ARTIFACTS_UPLOAD = "upload";
+export const IDSHORT_OPERATION_GET_TASK_STATUS = "getTaskStatus";
+export const IDSHORT_OPERATION_GET_TASK_PATH = "getTaskPath";
 
 export const IDSHORT_SUBMODEL_PLATFORM = "platform";
 export const IDSHORT_OPERATION_PLATFORM_RESOLVESEMANTICID = "resolveSemanticId";
