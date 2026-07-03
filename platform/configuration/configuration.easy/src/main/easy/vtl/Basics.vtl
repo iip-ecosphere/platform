@@ -144,8 +144,12 @@ template Basics(Configuration config, FileArtifact target) {
         getProperty("iip.resources", dflt);
     }
         
-    def Boolean isInTest() {
+    def Boolean isInTestAndSkipConfigPlugin() {
         getProperty("iip.skipConfigPlugin", "false") == "true";
+    }
+
+    def Boolean isInTest() {
+        getProperty("iip.test", "false") == "true";
     }
 	
 	def setOf(MeshElement) nextMeshNodes(MeshElement elt, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
