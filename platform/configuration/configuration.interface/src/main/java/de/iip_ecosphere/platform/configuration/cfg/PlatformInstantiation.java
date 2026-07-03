@@ -79,7 +79,15 @@ public interface PlatformInstantiation {
      * @return <b>this</b> for chaining
      */
     public PlatformInstantiation setIncremental(boolean incremental);
-    
+
+    /**
+     * Configures whether the instantiation shall run in test mode.
+     * 
+     * @param test test mode or production mode
+     * @return <b>this</b> for chaining
+     */
+    public PlatformInstantiation setInTest(boolean test);
+
     /**
      * Sets the log path for transport-based distributed logging.
      * 
