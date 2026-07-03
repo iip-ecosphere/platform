@@ -17,8 +17,8 @@ import java.util.Random;
 
 import de.iip_ecosphere.platform.services.environment.AbstractGenericServicePluginDescriptor;
 import de.iip_ecosphere.platform.services.environment.ServiceKind;
+import de.iip_ecosphere.platform.services.environment.ServiceState;
 import iip.datatypes.PythonSyncTestInput;
-import iip.datatypes.PythonSyncTestInputImpl;
 import iip.impl.SimplePythonSyncDataSourceImpl;
 
 /**
@@ -75,10 +75,13 @@ public class SimplePythonSyncSourceImpl extends SimplePythonSyncDataSourceImpl {
 
     @Override
     public PythonSyncTestInput producePythonSyncTestInput() {
-        PythonSyncTestInput rec = new PythonSyncTestInputImpl();
-        rec.setId(counter++);
-        rec.setValue1(random.nextDouble());
-        rec.setValue2(random.nextDouble());
+        PythonSyncTestInput rec = null;
+        if (getState() == ServiceState.RUNNING) {
+            rec = createPythonSyncTestInput();
+            rec.setId(counter++);
+            rec.setValue1(random.nextDouble());
+            rec.setValue2(random.nextDouble());
+        }
         return rec;
     }
 
