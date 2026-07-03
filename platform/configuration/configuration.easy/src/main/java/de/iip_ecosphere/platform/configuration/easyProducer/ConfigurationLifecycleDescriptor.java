@@ -344,7 +344,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             TracerFactory factory = null;
             try {
                 sender.connectBlocking();
-                getLogger().info("Setting up log consumer, connected");
+                getLogger().info("Setting up log consumer, connected to path {}", logPath);
                 factory = setLogConsumer((l, m) -> {
                     try {
                         String prefix = "";
