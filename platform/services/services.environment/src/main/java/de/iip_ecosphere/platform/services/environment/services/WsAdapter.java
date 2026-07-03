@@ -45,6 +45,7 @@ public abstract class WsAdapter {
 
                 @Override
                 public void onConnect() {
+                    logger.info("Websocket client connected on : {}", serverUri);
                 }
 
                 @Override
