@@ -46,10 +46,10 @@ export class IvmlFormatterService extends UtilsService {
    */
   public async setVariable(variableName: string, data: IvmlRecordValue, type: string) {
     let ivmlFormat = this.getIvml(variableName, data, type);
-    let valueExprs = new Map();
-    valueExprs.set(variableName, ivmlFormat);
+    let valueExprs = new Map<string, string>();
+    valueExprs.set(variableName, JSON.stringify(ivmlFormat));
     let params: InputVariable[] = [];
-    params.push(ApiService.createAasOperationParameter("valueExprs", AAS_TYPE_STRING, JSON.stringify(valueExprs)));
+    params.push(ApiService.createAasOperationParameter("valueExprs", AAS_TYPE_STRING, valueExprs));
     return await this.callConfigOperation("changeValues", params, "Values have been stored!");
   }
 
@@ -142,17 +142,26 @@ export class IvmlFormatterService extends UtilsService {
       result = value.value ? `refBy(${value.value})` : "";
     } else if (this.isString(value.value) && value.value.startsWith(IVML_TYPE_PREFIX_enumeration)) { // ivml enums in internal notation
       result = value.value.replace(IVML_TYPE_PREFIX_enumeration, "");
+    } else if (this.isString(value)) {
+      result = `"${value}"`;
     } else { // compound
-      result = value._type + "{";
+      result = value._type === undefined ? "{" : value._type + "{";
       let first = true;
-      for (let elemt in value.value) {
+      let elements = value.value ?? value;
+      for (let elemt in elements) {
         if (elemt === value._type) break;
-        let elemtIvml = this.toIvml(value.value[elemt]);
+        if (elements[elemt] === undefined || elements[elemt] === null) continue; // Skip undefined and null value, update exist values
+        if (elemt === "_type") continue; // Skip _type value, update exist values
+        let elemtIvml = this.toIvml(elements[elemt]);
         if (elemtIvml) {
           if (!first) {
             result += ",";
           }
-          result += elemt + "=" + elemtIvml;
+          if (this.isArray(elements)) {
+            result += elemtIvml;
+          } else {
+            result += elemt + "=" + elemtIvml;
+          }
         }
         first = false;
       }
