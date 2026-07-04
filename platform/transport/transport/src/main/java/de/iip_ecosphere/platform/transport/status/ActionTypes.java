@@ -47,6 +47,11 @@ public enum ActionTypes implements ActionType {
     /**
      * Failure of an asynchronous operation. Taskid shall be set.
      */
-    ERROR
+    ERROR,
+
+    /**
+     * Data collected from an execution log. Taskid shall be set.
+     */
+    LOG
 
 }

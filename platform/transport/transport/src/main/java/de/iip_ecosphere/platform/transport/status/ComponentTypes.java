@@ -37,6 +37,11 @@ public enum ComponentTypes implements ComponentType {
     /**
      * Denotes an artifact containing one or multiple services.
      */
-    SERVICE_ARTIFACT;
+    SERVICE_ARTIFACT,
+    
+    /**
+     * Denotes the platform instantiation.
+     */
+    INSTANTIATION;
     
 }
