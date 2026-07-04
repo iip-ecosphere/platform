@@ -39,6 +39,7 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 public abstract class VabInvocablesCreator implements InvocablesCreator, Serializable {
 
     private static final long serialVersionUID = -4388430468665656598L;
+    private static final boolean STORE_FAILED = false;
     
     /**
      * Creates the element proxy.
@@ -82,10 +83,12 @@ public abstract class VabInvocablesCreator implements InvocablesCreator, Seriali
          * Marks the underlying connection as failed for {@link #TIMEOUT}.
          */
         protected void markAsFailed() {
-            if (null == failed) { // lazy due to serialization
-                failed = new HashMap<String, Long>();
+            if (STORE_FAILED) {
+                if (null == failed) { // lazy due to serialization
+                    failed = new HashMap<String, Long>();
+                }
+                failed.put(creator.getId(), System.currentTimeMillis());
             }
-            failed.put(creator.getId(), System.currentTimeMillis());
         }
 
         /**
