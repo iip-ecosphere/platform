@@ -492,7 +492,15 @@ public class ConfigurationManager {
     public static OperationCompletedListener getAasOperationCompletedListener() {
         return aasOpListener;
     };
-
+    
+    /**
+     * Returns the reporting progress observer instance.
+     * 
+     * @return the observer
+     */
+    public static BasicProgressObserver getProgressObserver() {
+        return observer;
+    }
 
     /**
      * Returns the logger for this class.

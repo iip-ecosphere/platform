@@ -25,6 +25,7 @@ import de.iip_ecosphere.platform.services.environment.services.Sender;
 import de.iip_ecosphere.platform.services.environment.services.TransportConverterFactory;
 import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.OsUtils;
+import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.transport.serialization.TypeTranslators;
@@ -332,13 +333,17 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
      * Sets the log consumer for transport logging.
      * 
      * @param logPath the log path
+     * @param executionMode the actual execution mode
+     * @param taskData the task data object to use, if <b>null</b> take the task associated to the current thread
      * @return something that closes the sender/resets the state
      * @see Sender#close(Sender, boolean)
      */
-    public static SenderCloseable setTransportLogConsumer(String logPath, ExecutionMode executionMode) {
+    public static SenderCloseable setTransportLogConsumer(String logPath, ExecutionMode executionMode, 
+        TaskData taskData) {
         SenderCloseable result = new SenderCloseable();
         if (logPath != null && logPath.length() > 0 && executionMode != ExecutionMode.TOOLING) {
             ConfigurationSetup setup = ConfigurationSetup.getSetup();
+            // instead of TypeTranslators.STRING: new StatusMessageSerializer();
             Sender<String> sender = TransportConverterFactory.getInstance().createSender(setup.getAas(), 
                 setup.getTransport(), logPath, TypeTranslators.STRING, String.class);
             TracerFactory factory = null;
@@ -352,6 +357,11 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
                             prefix = l.name() + " ";
                         }
                         sender.send(prefix + m);
+                        /*TaskData td = null == taskData ? TaskRegistry.getTaskData() : taskData;
+                        StatusMessage sm = new StatusMessage(ComponentTypes.INSTANTIATION, ActionTypes.LOG, "", "")
+                            .withDescription(prefix + m)
+                            .withTask(taskData);
+                        sender.send(sm);*/
                     } catch (IOException e) {
                         getLogger().warn("Logging to transport: {}", e.getMessage());
                     }
@@ -377,7 +387,7 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
             // pass through everything and let platform logger decide
             EASyLoggerFactory.INSTANCE.setLoggingLevel(LoggingLevel.INFO);
             String logPath = System.getProperty(PlatformInstantiatorExecutor.PROP_LOG_PATH, "");
-            logSender = setTransportLogConsumer(logPath, executionMode);
+            logSender = setTransportLogConsumer(logPath, executionMode, null);
             ConfigurationSetup setup = ConfigurationSetup.getSetup(executionMode.extendedLogging());
             loader = new ManifestLoader(false, classLoader); // to debug, replace first parameter by true, mvn install
             EasySetup easySetup = setup.getEasyProducer();

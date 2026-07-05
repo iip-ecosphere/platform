@@ -589,7 +589,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         String logPath = "instantiation/" + appId;
         lastTaskData.setPath(logPath);
         TaskData beforeTaskData = ConfigurationManager.setTaskData(lastTaskData);
-        System.out.println("TASKID " + lastTaskData.getId());
         if (InstantiationMode.APPS == mode && codeFile != null && codeFile.endsWith(".zip")) {
             File f = new File(ConfigurationSetup.getSetup().getUploadFolder(), codeFile);
             if (f.exists()) {
@@ -618,8 +617,10 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 inst.executeAsProcess(getClass().getClassLoader(), null, "TOP", null, args);
             } else {
                 final ExecutionMode execMode = ExecutionMode.FULL;
-                SenderCloseable sender = ConfigurationLifecycleDescriptor.setTransportLogConsumer(logPath, execMode);
+                SenderCloseable sender = ConfigurationLifecycleDescriptor.setTransportLogConsumer(
+                    logPath, execMode, lastTaskData);
                 EasyExecutor executor = ConfigurationLifecycleDescriptor.createExecutor(execMode, sender);
+                executor.setProgressObserver(ConfigurationManager.getProgressObserver());
                 ConfigurationManager.loadIvmlModel(executor);
                 ReasoningResult rRes = ConfigurationManager.validateAndPropagate(executor, NO_TEMPLATE_FILTER);
                 if (null == rRes) {
