@@ -207,6 +207,7 @@
                <outputDirectory>${platformDir}</outputDirectory>
                <metaModelDirectory>${project.build.directory}/easy</metaModelDirectory>
                <modelDirectory>${project.build.directory}/easy-test</modelDirectory>
+               <inTest>true</inTest>
            </configuration>
        </plugin>
        
