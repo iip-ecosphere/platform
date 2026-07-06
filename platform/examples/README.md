@@ -17,3 +17,5 @@ To demonstrate and validate the oktoflow platform, we collect in this folder a s
 * [Python venv example](examples.pythonCondaVenv/README.md): Demonstrating the use of Conda/venv for Python services.
 
 For a more detailed summary, see [../documentation/examples/examples.md].
+
+Examples tested/adjusted for online service update: `examples.python` and `examples.pythonSync`.
