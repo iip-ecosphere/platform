@@ -13,7 +13,7 @@ oktoflow provides management services to run (distributed) user-defined applicat
 * oktoflow's code generation creates a specific environment for an application, in particular an application/service implementation template. Such a template consists of skeletons for the specified Java/Python services that are then filled by the user. For testing services individually and before integration, oktoflow also generates test skeletons as well as the required (heterogeneous) build process.
 * As soon as application-/user-specific services are ready for integration, their implementation is handed over to oktoflow for final, automated integration of the services to the app along the specified data flows. Application execution may happen local (steered by the platform or even outside the platform as a "normal" application), but also, based on a deployment plan, in a distributed fashion.
 
-For installation and first steps, see [install guide](platform/documentation/INSTALL.md).
+For installation and first steps, see [install guide](platform/documentation/INSTALL.md). For more detailed information, see the [ReGaP community assets on oktoflow](https://regap.de/community-assets/#oktoflow), the [configuration concepts](platform/documentation/concepts/apps.MD) or the [development documentation](platform/documentation/devel/apps.md) 
 
 ## News
 
@@ -50,10 +50,12 @@ For more details on how to develop application-specific services for the IIP-Eco
 
 Platform installation, use and concepts are documented in several documents:
   * The platform [installation guide](platform/documentation/INSTALL.md).
+  * The platform [configuration concepts](platform/documentation/concepts/apps.MD) 
+  * The platform [development documentation](platform/documentation/devel/apps.md)
   * The platform [FAQ](platform/documentation/FAQ.md). 
   * The platform [handbook](platform/documentation/PlatformHandbook.pdf) and on [Zenodo](https://doi.org/10.5281/zenodo.19704503)
   * The platform [releases overview](platform/documentation/RELEASES.md)
-  * Service development tutorial [YouTube](https://www.youtube.com/playlist?list=PL5VSYtiD_PfdxUDXGlX53UsHdQlXcHYK7) and [IIP-Ecosphere](https://www.iip-ecosphere.de/angebote/plattform/).
+  * The [ReGaP community assets on oktoflow](https://regap.de/community-assets/#oktoflow) including structured installation guideline, examples and recent development videos.
   * The IIP-Ecosphere [platform requirements (functional and quality view)](https://doi.org/10.5281/zenodo.4485774)
   * The IIP-Ecosphere [platform usage view](https://doi.org/10.5281/zenodo.4485801)
   * The IIP-Ecosphere [Industry 4.0 platform overview](https://doi.org/10.5281/zenodo.4485756)
