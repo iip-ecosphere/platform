@@ -8,6 +8,11 @@
 
 The oktoflow Industry 4.0/IIoT platform aims at demonstrating new approaches to vendor-independent, interoperable and open platform concepts for easy-to-use AI. In particular, it aims at uniform, distributed deployment of services to heterogeneous (edge) devices, an AI toolkit for the industrial production, consistent configuration support ranging from network to applications as well as the use and application of established and upcoming IIoT standards, e.g., asset administration shells (to be used for all platform interfaces).
 
+oktoflow provides management services to run (distributed) user-defined applications. To develop such applications, oktoflow follows a model-driven approach, i.e., 
+* an application is modeled in terms of (data processing) services, external data connectors and typed data streams. Besides platform-supplied services, an application typically consists of application- and user-specific services that are finally integrated and executed by oktoflow. Such a model can be created through oktoflow's web-based management UI or directly by modifying the textual configuration model.
+* oktoflow's code generation creates a specific environment for an application, in particular an application/service implementation template. Such a template consists of skeletons for the specified Java/Python services that are then filled by the user. For testing services individually and before integration, oktoflow also generates test skeletons as well as the required (heterogeneous) build process.
+* As soon as application-/user-specific services are ready for integration, their implementation is handed over to oktoflow for final, automated integration of the services to the app along the specified data flows. Application execution may happen local (steered by the platform or even outside the platform as a "normal" application), but also, based on a deployment plan, in a distributed fashion.
+
 For installation and first steps, see [install guide](platform/documentation/INSTALL.md).
 
 ## News
