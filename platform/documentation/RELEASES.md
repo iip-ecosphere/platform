@@ -1,17 +1,18 @@
 # oktoflow platform: Releases
 
+### Version 0.8.2 (Spring '27)
+
 In progress:
 
 * [#192](https://github.com/iip-ecosphere/platform/issues/192): More flexible connector value handling
 * [#180](https://github.com/iip-ecosphere/platform/issues/180): Add application templates to UI
-* [#189](https://github.com/iip-ecosphere/platform/issues/183): Enable AAS metamodel v3 in mgmt UI
-* [#189](https://github.com/iip-ecosphere/platform/issues/188): On-demand IVML imports
-* [#189](https://github.com/iip-ecosphere/platform/issues/179): Clean up container VTL scripts
-* [#189](https://github.com/iip-ecosphere/platform/issues/182): Try optimizing container sizes
-* [#189](https://github.com/iip-ecosphere/platform/issues/187): Integrate expression editor
+* [#183](https://github.com/iip-ecosphere/platform/issues/183): Enable AAS metamodel v3 in mgmt UI
+* [#188](https://github.com/iip-ecosphere/platform/issues/188): On-demand IVML imports
+* [#179](https://github.com/iip-ecosphere/platform/issues/179): Clean up container VTL scripts
+* [#182](https://github.com/iip-ecosphere/platform/issues/182): Try optimizing container sizes
+* [#187](https://github.com/iip-ecosphere/platform/issues/187): Integrate expression editor
 * [#122](https://github.com/iip-ecosphere/platform/issues/122): Transparent encryption, RBAC on AAS (incl. UI authentication)
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
-* [#199](https://github.com/iip-ecosphere/platform/issues/199): Log instantiation trace on management UI
 
 ### Version 0.8.1 (Fall '26)
 
@@ -24,7 +25,9 @@ Improvements:
 * [#195](https://github.com/iip-ecosphere/platform/issues/195): Templates contain wrong file names for connectors, issue persists for versions 0.7.1-SNAPSHOT, 0.8.0
 * [#185](https://github.com/iip-ecosphere/platform/issues/185): Performance improvements
 * [#189](https://github.com/iip-ecosphere/platform/issues/184): Support venv on mvn Python tooling
-* [#189](https://github.com/iip-ecosphere/platform/issues/198): Create identity stores via IVML
+* [#197](https://github.com/iip-ecosphere/platform/issues/197): Resources folder for apps built by management UI
+* [#198](https://github.com/iip-ecosphere/platform/issues/198): Create identity stores via IVML
+* [#199](https://github.com/iip-ecosphere/platform/issues/199): Log instantiation trace on management UI
 
 Changes:
 * In particular if the start sequence state above is activated, source services shall not ingest data before/outside the `RUNNING` state 
