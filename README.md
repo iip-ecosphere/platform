@@ -28,16 +28,6 @@ For installation and first steps, see [install guide](platform/documentation/INS
 * Upcoming support for Asset Administration Shells metamodel v3 through BaSyx2
 * Support for Python 3.13 and virtual environments
 
-## Public demonstrations
-
-* Public demonstration on [EMO 2023](https://emo-hannover.de/) with magnetic identification by [MIP technology](https://mip-technology.de/de/), drive condition monitoring by [Lenze](https://lenze.de/) and AI-based visual quality inspection. 
-* Public demonstrations on 2023/06/29 in [Hildesheim at the "day of computer science"](https://www.uni-hildesheim.de/fb4/veranstaltungen/tag-der-informatik/) as well as at [Nuernberg Digital "The future of intelligent Manufacturing"](https://nuernberg.digital/programm/details/die-zukunft-der-intelligenten-fertigung.html) on 2023/07/07. 
-* Presentation of a federated learning case with two cobots on [HM'23](https://www.iip-ecosphere.de/iip-ecosphere-auf-der-hannover-messe-2023/) in collaboration with Phoenix Contact, Bitmotec/OnLogic, UR including platform-integrated federated learning based on [Flower](https://flower.dev/).
-* Presentation of improved robot-based platform demonstrator at [TddT'22, Berlin](https://www.digitale-technologien.de/DT/Redaktion/DE/Veranstaltungen/2022/DT/220829_Tage_der_digitalen_Technologien.html) 
-* Presentation of robot-based visual quality inspection app on [HM'22](https://www.hannovermesse.de/de/) (with 3 sources, Python-based AI, AAS-based Angular application).
-
-The demonstrations and further experiments confirmed compatibility with Phoenix Contact PLCnext (OPC UA, EEM integration), Beckhoff IPC (OPC UA), VDW UMATI (OPC UA), Bitmotec (MQTT), Lenze (MQTT), MIP (MQTT), Beckhoff ADS (Windows), Phoenix Contact EEM-MA 370 (Modbus/TCP), Siemens SENTRON PAC 3200 (Modbus/TCP) ...
-
 ## Overview
 
 ![Architecture Overview](platform/ArchitectureOverview.png)
@@ -60,6 +50,20 @@ Platform installation, use and concepts are documented in several documents:
   * The IIP-Ecosphere [platform usage view](https://doi.org/10.5281/zenodo.4485801)
   * The IIP-Ecosphere [Industry 4.0 platform overview](https://doi.org/10.5281/zenodo.4485756)
   * For more information, see the [documentation overview](platform/documentation/README.md)
+
+## Public demonstrations
+
+* Public demonstration on [EMO 2023](https://emo-hannover.de/) with magnetic identification by [MIP technology](https://mip-technology.de/de/), drive condition monitoring by [Lenze](https://lenze.de/) and AI-based visual quality inspection. 
+* Public demonstrations on 2023/06/29 in [Hildesheim at the "day of computer science"](https://www.uni-hildesheim.de/fb4/veranstaltungen/tag-der-informatik/) as well as at [Nuernberg Digital "The future of intelligent Manufacturing"](https://nuernberg.digital/programm/details/die-zukunft-der-intelligenten-fertigung.html) on 2023/07/07. 
+* Presentation of a federated learning case with two cobots on [HM'23](https://www.iip-ecosphere.de/iip-ecosphere-auf-der-hannover-messe-2023/) in collaboration with Phoenix Contact, Bitmotec/OnLogic, UR including platform-integrated federated learning based on [Flower](https://flower.dev/).
+* Presentation of improved robot-based platform demonstrator at [TddT'22, Berlin](https://www.digitale-technologien.de/DT/Redaktion/DE/Veranstaltungen/2022/DT/220829_Tage_der_digitalen_Technologien.html) 
+* Presentation of robot-based visual quality inspection app on [HM'22](https://www.hannovermesse.de/de/) (with 3 sources, Python-based AI, AAS-based Angular application).
+
+The demonstrations and further experiments confirmed compatibility in particular with 
+* OPC UA (Phoenix Contact PLCnext, Beckhoff IPC, VDW UMATI, Siematic)
+* MQTT (Bitmotec, Lenze, MIP, mosquitto, hivemq)
+* Modbus/TCP (Phoenix Contact EEM, Siemens SENTRON)
+* Beckhoff ADS
 
 ## Publications
 * Holger Eichelberger, Christian Sauer, Amir Shayan Ahmadian, Christian Kröher, Industry 4.0/IIoT Platforms for manufacturing systems - A systematic review contrasting the scientific and the industrial side, Journal of Information and Software Technology, 107650, 2024, [DOI](https://doi.org/10.1016/j.infsof.2024.107650)
