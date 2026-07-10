@@ -36,7 +36,7 @@ public class BasicContainerDescriptorTest extends TestWithQpid {
         BasicContainerDescriptor desc = BasicContainerDescriptor.readFromYamlFile(
             new File("src/test/resources/image-info.yml"));
         Assert.assertNotNull(desc);
-        Assert.assertEquals("01", desc.getId());
+        Assert.assertEquals("a1", desc.getId());
         Assert.assertEquals("test-container", desc.getName());
         Assert.assertEquals("1.0", desc.getVersion().toString());
         Assert.assertEquals("alpine-ssh-image.tar.gz", desc.getImageFile());
