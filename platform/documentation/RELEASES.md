@@ -32,7 +32,7 @@ Improvements:
 Changes:
 * In particular if the start sequence state above is activated, source services shall not ingest data before/outside the `RUNNING` state 
 * If oktoflow plugins are enabled, take over the service descriptors/JSL service descriptor file generated for Java services in app implementation templates. This is also a prerequisite for online updates of Java services.
-* Due to a change in YAML processing, on Linux trailing 0 in strings (ids) may be ignored/missing, e.g., in descriptor files.
+* Due to a change in YAML processing, on Linux trailing 0 in strings (ids) may be ignored/missing, e.g., in descriptor files. In these cases, quote the string, e.g. `id: "01"`.
 
 ### Version 0.8.0 (2026/04/26):
 
