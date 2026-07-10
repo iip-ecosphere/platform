@@ -18,6 +18,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.iip_ecosphere.platform.support.commons.Commons;
@@ -216,5 +217,33 @@ public class CollectionUtils {
     public static void reverse(final Object[] array) {
         Commons.getInstance().reverse(array);
     }
+    
+    /**
+     * Merges source into target recursively.
+     *
+     * If a key exists in both maps:
+     * a) If both values are Map<String, Object>, they are merged recursively.
+     * b) Otherwise, the value from source replaces the one in target.
+     *
+     * @param <K> the key type (assumed to be homogeneous even in sub maps)
+     * @param <V> the value type (assumed to be homogeneous even in sub maps)
+     * @param target the map to merge into (modified in place)
+     * @param source the map to merge from
+     * @return the target map
+     */
+    @SuppressWarnings("unchecked")
+    public static <K, V> Map<K, V> merge(Map<K, V> target, Map<K, V> source) {
+        for (Map.Entry<K, V> entry : source.entrySet()) {
+            K key = entry.getKey();
+            V sourceValue = entry.getValue();
+            V targetValue = target.get(key);
+            if (targetValue instanceof Map<?, ?> && sourceValue instanceof Map<?, ?>) {
+                merge((Map<K, V>) targetValue, (Map<K, V>) sourceValue);
+            } else {
+                target.put(key, sourceValue);
+            }
+        }
+        return target;
+    }    
     
 }

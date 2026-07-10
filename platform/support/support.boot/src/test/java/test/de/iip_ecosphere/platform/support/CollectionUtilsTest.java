@@ -13,8 +13,10 @@
 package test.de.iip_ecosphere.platform.support;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -198,6 +200,41 @@ public class CollectionUtilsTest {
         data = new String[] {"a", "b"};
         CollectionUtils.reverse(data);
         Assert.assertArrayEquals(new String[] {"b", "a"}, data);
+    }
+    
+    /**
+     * Tests {@link CollectionUtils#merge(java.util.Map, java.util.Map)}.
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testMerge() {
+        Map<String, Object> map1 = new HashMap<>();
+        Map<String, Object> db1 = new HashMap<>();
+        db1.put("host", "localhost");
+        db1.put("port", 5432);
+        map1.put("database", db1);
+        map1.put("timeout", 30);
+
+        Map<String, Object> map2 = new HashMap<>();
+        Map<String, Object> db2 = new HashMap<>();
+        db2.put("port", 5433);
+        db2.put("user", "admin");
+        map2.put("database", db2);
+        map2.put("debug", true);
+
+        Map<String, Object> merged = CollectionUtils.merge(map1, map2);
+        Assert.assertTrue(merged.containsKey("database"));
+        Object o = merged.get("database");
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof Map<?, ?>);
+        Map<String, Object> om = (Map<String, Object>) o;
+        Assert.assertEquals("localhost", om.get("host"));
+        Assert.assertEquals(5433, om.get("port"));
+        Assert.assertEquals("admin", om.get("user"));
+        Assert.assertTrue(merged.containsKey("timeout"));
+        Assert.assertEquals(30, merged.get("timeout"));
+        Assert.assertTrue(merged.containsKey("debug"));
+        Assert.assertEquals(true, merged.get("debug"));
     }
 
 }

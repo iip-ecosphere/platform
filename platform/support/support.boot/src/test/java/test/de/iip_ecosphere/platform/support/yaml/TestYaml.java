@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.function.Predicate;
 
 /**
  * Implements the YAML interface by SnakeYaml.
@@ -46,11 +47,6 @@ public class TestYaml extends de.iip_ecosphere.platform.support.yaml.Yaml {
     }
 
     @Override
-    public Iterator<Object> loadAll(InputStream in, String path, Class<?> cls) throws IOException {
-        return null;
-    }
-
-    @Override
     public Iterator<Object> loadAll(InputStream in) throws IOException {
         return null;
     }
@@ -67,6 +63,17 @@ public class TestYaml extends de.iip_ecosphere.platform.support.yaml.Yaml {
     
     @Override
     public void dump(Object object, Class<?> cls, Writer out) throws IOException {
+    }
+
+    @Override
+    public Map<String, Object> loadMapping(InputStream in, Map<String, Predicate<Object>> conds) throws IOException {
+        return null;
+    }
+
+    @Override
+    public Iterator<Object> loadAll(InputStream in, String path, Class<?> cls, Map<String, Predicate<Object>> conds)
+        throws IOException {
+        return null;
     }
 
 }

@@ -17,6 +17,8 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
@@ -91,7 +93,106 @@ public abstract class Yaml {
      * @throws IOException if accessing the input stream fails, if reading the structure fails
      */
     public abstract Map<String, Object> loadMapping(InputStream in) throws IOException;
+
+    /**
+     * Loads a plain name-object mapping from an input stream.
+     * 
+     * @param in the input stream to load from
+     * @param conds the conditions with key = "."-separated key in {@code data} and value = the predicate checking the 
+     *     value for the associated key, {@code conds} may be <b>null</b>
+     * @return the mapping
+     * @throws IOException if accessing the input stream fails, if reading the structure fails
+     */
+    public abstract Map<String, Object> loadMapping(InputStream in, Map<String, Predicate<Object>> conds) 
+        throws IOException;
     
+    /**
+     * From a mapping and a "."-separated key, return the value if known.
+     * 
+     * @param <T> the value type
+     * @param mapping the mapping
+     * @param key the "."-separated key
+     * @param dflt the default value if no value was found
+     * @param converter the value converted
+     * @return the value or {@code dflt}
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T getValue(Map<String, Object> mapping, String key, T dflt, Function<Object, T> converter) {
+        String[] parts = key.split("\\.");
+        Object tmpValue = null;
+        Map<String, Object> act = mapping;
+        for (int i = 0; i < parts.length; i++) {
+            tmpValue = act.get(parts[i]);
+            if (tmpValue instanceof Map) {
+                act = (Map<String, Object>) tmpValue;
+            }
+            if (null == tmpValue) {
+                break;
+            }
+        }
+        return null == tmpValue ? dflt : converter.apply(tmpValue);
+    }
+    
+    /**
+     * From a mapping and a "."-separated key, return a String value if known/convertible.
+     * 
+     * @param mapping the mapping
+     * @param key the "."-separated key
+     * @param dflt the default value if no value was found
+     * @return the value or {@code dflt}
+     */
+    public static String getStringValue(Map<String, Object> mapping, String key, String dflt) {
+        return getValue(mapping, key, dflt, o -> o.toString());
+    }
+
+    /**
+     * From a mapping and a "."-separated key, return a long value if known/convertible.
+     * 
+     * @param mapping the mapping
+     * @param key the "."-separated key
+     * @param dflt the default value if no value was found
+     * @return the value or {@code dflt}
+     */
+    public static long getLongValue(Map<String, Object> mapping, String key, long dflt) {
+        return getValue(mapping, key, dflt, o -> {
+            try {
+                return Long.parseLong(o.toString());
+            } catch (NumberFormatException e) {
+                return dflt;
+            }
+        });
+    }    
+
+    /**
+     * From a mapping and a "."-separated key, return an int value if known/convertible.
+     * 
+     * @param mapping the mapping
+     * @param key the "."-separated key
+     * @param dflt the default value if no value was found
+     * @return the value or {@code dflt}
+     */
+    public static int getIntValue(Map<String, Object> mapping, String key, int dflt) {
+        return getValue(mapping, key, dflt, o -> {
+            try {
+                return Integer.parseInt(o.toString());
+            } catch (NumberFormatException e) {
+                return dflt;
+            }
+        });
+    }    
+
+    /**
+     * From a mapping and a "."-separated key, return an Boolean value if known/convertible.
+     * 
+     * @param mapping the mapping
+     * @param key the "."-separated key
+     * @param dflt the default value if no value was found
+     * @return the value or {@code dflt}
+     */
+    public static boolean getBooleanValue(Map<String, Object> mapping, String key, boolean dflt) {
+        return getValue(mapping, key, dflt, o -> Boolean.parseBoolean(o.toString()));
+    }    
+
     /**
      * Loads an object from YAML given as string expecting all properties.
      * 
@@ -146,8 +247,25 @@ public abstract class Yaml {
      * @return an iterator over all documents
      * @throws IOException if accessing the input stream fails, if reading the structure fails
      */
-    public abstract Iterator<Object> loadAll(InputStream in, String path, Class<?> cls) throws IOException;
+    public Iterator<Object> loadAll(InputStream in, String path, Class<?> cls) throws IOException {
+        return loadAll(in, path, cls, null);
+    }
 
+    /**
+     * Loads all condition-matching documents from a YAML file, trying to apply {@code cls} as type.
+     * 
+     * @param in the input stream to load from
+     * @param path the path within YAML to load from, may be <b>null</b> or empty for none
+     * @param cls the class/type of the object to read; if given, only objects of that type will be returned
+     * @param conds the conditions with key = "."-separated key in {@code data} and value = the predicate checking the 
+     *     value for the associated key, {@code conds} may be <b>null</b>
+     * @return an iterator over all documents
+     * @throws IOException if accessing the input stream fails, if reading the structure fails
+     */
+    public abstract Iterator<Object> loadAll(InputStream in, String path, Class<?> cls, 
+        Map<String, Predicate<Object>> conds) 
+        throws IOException;
+    
     /**
      * Loads all documents from a YAML file.
      * 
