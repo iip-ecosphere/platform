@@ -3,7 +3,10 @@ package test.de.oktoflow.platform.support.yaml.snakeyaml;
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.function.Predicate;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -75,4 +78,24 @@ public class YamlTest {
         yaml.dump(new Object(), Object.class, new CharArrayWriter());
     }
 
+    /**
+     * Tests YAML mapping functions.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testYamlMappings() throws IOException {
+        Yaml yaml = Yaml.getInstance();
+        Map<String, Predicate<Object>> conds = new HashMap<>();
+        conds.put("spring.config.activate.on-profile", v -> v == null || v.equals("baselineSender"));
+
+        Map<String, Object> data = fromResource("application.yml", in -> yaml.loadMapping(in, conds));
+        Assert.assertNotNull(data);
+        Assert.assertEquals(".", Yaml.getStringValue(data, "experiment.logFolder", ""));
+        Assert.assertEquals(60000, Yaml.getIntValue(data, "experiment.experimentDuration", 0));
+        Assert.assertEquals(8, Yaml.getIntValue(data, "spring.cloud.stream.poller.fixedDelay", 0));
+        Assert.assertEquals(1, Yaml.getIntValue(data, "spring.cloud.stream.poller.maxMessagesPerPoll", 0));
+        Assert.assertEquals(2, Yaml.getIntValue(data, "spring.cloud.stream.poller.whatever", 0));
+    }
+    
 }

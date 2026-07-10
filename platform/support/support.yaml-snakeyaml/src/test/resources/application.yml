@@ -1,0 +1,21 @@
+experiment:
+    logFolder: .
+    experimentDuration: 60000
+spring:
+    cloud:
+        stream:
+            poller:
+                whatever: 1
+
+---
+
+spring:
+    config:
+        activate:
+            on-profile: baselineSender
+    cloud:
+        stream:
+            poller:
+                fixedDelay: 8
+                maxMessagesPerPoll: 1
+                whatever: 2

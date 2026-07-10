@@ -16,9 +16,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
@@ -28,6 +30,8 @@ import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.representer.Representer;
 
+import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.IOUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
@@ -48,6 +52,21 @@ public class SnakeYaml extends de.iip_ecosphere.platform.support.yaml.Yaml {
     public Map<String, Object> loadMapping(InputStream in) throws IOException {
         return (Map<String, Object>) load(in);
     }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public Map<String, Object> loadMapping(InputStream in, Map<String, Predicate<Object>> conds) throws IOException {
+        Map<String, Object> result = new HashMap<>();
+        Iterator<Object> docs = loadAll(in, null, null, conds);
+        while (docs.hasNext()) {
+            Object o = docs.next();
+            if (o instanceof Map) {
+                Map<String, Object> map = (Map<String, Object>) o;
+                CollectionUtils.merge(result, map);
+            }
+        }
+        return result;
+    }
 
     @Override
     public <T> T loadAs(String in, Class<T> cls) throws IOException {
@@ -59,35 +78,45 @@ public class SnakeYaml extends de.iip_ecosphere.platform.support.yaml.Yaml {
         return createYaml(cls).loadAs(in, cls);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Iterator<Object> loadAll(InputStream in, String path, Class<?> cls) throws IOException {
+        return loadAll(in, path, cls, null);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Iterator<Object> loadAll(InputStream in, String path, Class<?> cls, Map<String, Predicate<Object>> conds) 
+        throws IOException {
         Iterator<Object> it = null;
         try {
-            if (path != null && path.length() > 0) {
-                Yaml yaml = createYaml(Map.class);
-                List<Object> documents = new ArrayList<>();
-                try {
-                    for (Object o : yaml.loadAll(in)) {
-                        if (o instanceof Map) {
-                            Map<String, Object> map = (Map<String, Object>) o;
-                            Map<String, Object> data = (Map<String, Object>) map.get(path);
-                            if (data != null) {
-                                documents.add(yaml.loadAs(yaml.dump(data), cls));
-                            } else {
-                                LoggerFactory.getLogger(this).warn("Cannot find YAML path {}, falling back to "
-                                    + "full document", path);
-                            }
-                        } else {
-                            LoggerFactory.getLogger(this).warn("Cannot read data, instance is of type {}", 
-                                o == null ? null : o.getClass().getName());
-                        }
+            Yaml yaml = createYaml(Map.class);
+            List<Object> documents = new ArrayList<>();
+            String content = IOUtils.toString(in);
+            String[] rawDocuments = content.split("(?m)^---$");
+            for (String docText : rawDocuments) {
+                if (docText.trim().isEmpty()) {
+                    continue;
+                }
+                Map<String, Object> map = yaml.load(docText);
+                Map<String, Object> data = map;
+                if (path != null && path.length() > 0) {
+                    data = (Map<String, Object>) map.get(path);
+                }
+                if (matchesConditions(data, conds)) {
+                    if (null == cls) {
+                        documents.add(yaml.load(yaml.dump(data)));
+                    } else {
+                        documents.add(yaml.loadAs(yaml.dump(data), cls));
                     }
-                } catch (NullPointerException e) { // if end-of-string, NPE by snakeyaml
+                } else {
+                    if (conds == null) {
+                        LoggerFactory.getLogger(this).warn("Cannot find YAML path {}, falling back to "
+                            + "full document", path);
+                    }
                 }
-                if (documents.size() > 0) {
-                    it = documents.iterator();
-                }
+            }
+            if (documents.size() > 0) {
+                it = documents.iterator();
             }
             if (it == null) { // fallback if property not found
                 it = createYaml(cls).loadAll(in).iterator();
@@ -107,7 +136,31 @@ public class SnakeYaml extends de.iip_ecosphere.platform.support.yaml.Yaml {
         }
         return it;
     }
-
+    
+    /**
+     * Returns whether at least one condition in {@code conds} holds for the specified mapping.
+     * 
+     * @param data the data containing the mapping
+     * @param conds the conditions with key = "."-separated key in {@code data} and value = the predicate checking the 
+     *     value for the associated key, {@code conds} may be <b>null</b>
+     * @return {@code true} if there are no conditions and {@code data} is not <b>null</b> or if at least one condition 
+     *     meets, {@code false} else
+     */
+    private boolean matchesConditions(Map<String, Object> data, Map<String, Predicate<Object>> conds) {
+        boolean matches = data != null;
+        if (matches && conds != null) {
+            matches = false;
+            for (Map.Entry<String, Predicate<Object>> cond: conds.entrySet()) {
+                Object value = getValue(data, cond.getKey(), null, v -> v);
+                matches = cond.getValue().test(value);
+                if (matches) {
+                    break;
+                }
+            }
+        }
+        return matches;
+    }
+    
     @Override
     public Iterator<Object> loadAll(InputStream in) throws IOException {
         return loadAll(in, null);
