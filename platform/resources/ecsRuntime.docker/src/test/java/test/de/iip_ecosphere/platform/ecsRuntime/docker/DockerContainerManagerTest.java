@@ -59,7 +59,7 @@ public class DockerContainerManagerTest {
             return;
         }
         
-        String testId = "01";
+        String testId = "c1";
         String testName = "test-container";
         
         //---- Adding container -----------------
