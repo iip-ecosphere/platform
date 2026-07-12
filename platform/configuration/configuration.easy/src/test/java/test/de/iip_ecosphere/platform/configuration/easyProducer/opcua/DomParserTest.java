@@ -78,6 +78,30 @@ public class DomParserTest {
         String outContents = normalize(FileUtils.readFileToString(out, charset));
         Assert.assertEquals(exContents, outContents);
     }
+    
+    /**
+     * Tests {@link DomParser} on the energy companion spec XML.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testDomParserEnergy() throws IOException {
+        File in = new File("src/test/resources/NodeSets/Opc.Ua.Machinery.Energy.NodeSet2.xml");
+        Assert.assertTrue(in.exists());
+        File tmp = new File("target/tmp");
+        tmp.mkdirs();
+        File out = new File(tmp, "OpcEnergy.ivml");
+        DomParser.setDefaultVerbose(false);
+        DomParser.setUsingIvmlFolder("target/tmp");
+        DomParser.process(in, "Energy", out, false);
+
+        Charset charset = Charset.forName("UTF-8");
+        File expected = new File("src/test/resources/OpcEnergy.ivml");
+        String exContents = normalize(FileUtils.readFileToString(expected, charset));
+        String outContents = normalize(FileUtils.readFileToString(out, charset));
+        Assert.assertEquals(exContents, outContents);
+    }
+
 
     /**
      * Helper function to indicate char differences to apply when string comparison fails.

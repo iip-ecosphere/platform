@@ -5992,6 +5992,2331 @@ Southern latitudes have a negative value, western longitudes as well. For exampl
 		}
 	};
 
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteErrorTimeDefinition = {
+		name = "opcIWwUnitValuesTypeAbsoluteErrorTimeDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6540},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteErrorTime)
+	};
+
+	UADataType opcEUInformationType = {
+		name = "opcEUInformationType",
+		nodeId = {nameSpaceIndex = 0, identifier = 887},
+		nodeClass = NodeClass::UADataType,
+		browseName = "EUInformation",
+		displayName = "EUInformation",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part8/5.6.3/#5.6.3.2",
+		literals = {
+			DataLiteral {
+				name = "_NamespaceUri",
+				type = refBy(StringType),
+				description = ""
+			}, DataLiteral {
+				name = "_UnitId",
+				type = refBy(Integer32Type),
+				description = ""
+			}, DataLiteral {
+				name = "_DisplayName",
+				type = refBy(opcLocalizedTextType),
+				description = ""
+			}, DataLiteral {
+				name = "_Description",
+				type = refBy(opcLocalizedTextType),
+				description = ""
+			}
+		}
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteErrorTimeEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeAbsoluteErrorTimeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6542},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteErrorTime)
+	};
+
+	UADataType opcRangeType = {
+		name = "opcRangeType",
+		nodeId = {nameSpaceIndex = 0, identifier = 884},
+		nodeClass = NodeClass::UADataType,
+		browseName = "Range",
+		displayName = "Range",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part8/5.6.2",
+		literals = {
+			DataLiteral {
+				name = "_Low",
+				type = refBy(DoubleType),
+				description = ""
+			}, DataLiteral {
+				name = "_High",
+				type = refBy(DoubleType),
+				description = ""
+			}
+		}
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteErrorTimeEURange = {
+		name = "opcIWwUnitValuesTypeAbsoluteErrorTimeEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6541},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteErrorTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteErrorTimeInstrumentRange = {
+		name = "opcIWwUnitValuesTypeAbsoluteErrorTimeInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6543},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteErrorTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteErrorTimeValuePrecision = {
+		name = "opcIWwUnitValuesTypeAbsoluteErrorTimeValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6544},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteErrorTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteLengthDefinition = {
+		name = "opcIWwUnitValuesTypeAbsoluteLengthDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6545},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteLength)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteLengthEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeAbsoluteLengthEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6547},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteLength)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteLengthEURange = {
+		name = "opcIWwUnitValuesTypeAbsoluteLengthEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6546},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteLength)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteLengthInstrumentRange = {
+		name = "opcIWwUnitValuesTypeAbsoluteLengthInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6548},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteLength)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteLengthValuePrecision = {
+		name = "opcIWwUnitValuesTypeAbsoluteLengthValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6549},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteLength)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteMachineOffTimeDefinition = {
+		name = "opcIWwUnitValuesTypeAbsoluteMachineOffTimeDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6555},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteMachineOffTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteMachineOffTimeEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeAbsoluteMachineOffTimeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6557},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteMachineOffTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteMachineOffTimeEURange = {
+		name = "opcIWwUnitValuesTypeAbsoluteMachineOffTimeEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6556},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteMachineOffTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteMachineOffTimeInstrumentRange = {
+		name = "opcIWwUnitValuesTypeAbsoluteMachineOffTimeInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6558},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteMachineOffTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteMachineOffTimeValuePrecision = {
+		name = "opcIWwUnitValuesTypeAbsoluteMachineOffTimeValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6559},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteMachineOffTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteMachineOnTimeDefinition = {
+		name = "opcIWwUnitValuesTypeAbsoluteMachineOnTimeDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6550},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteMachineOnTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteMachineOnTimeEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeAbsoluteMachineOnTimeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6552},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteMachineOnTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteMachineOnTimeEURange = {
+		name = "opcIWwUnitValuesTypeAbsoluteMachineOnTimeEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6551},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteMachineOnTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteMachineOnTimeInstrumentRange = {
+		name = "opcIWwUnitValuesTypeAbsoluteMachineOnTimeInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6553},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteMachineOnTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteMachineOnTimeValuePrecision = {
+		name = "opcIWwUnitValuesTypeAbsoluteMachineOnTimeValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6554},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteMachineOnTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsolutePiecesInDefinition = {
+		name = "opcIWwUnitValuesTypeAbsolutePiecesInDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6560},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsolutePiecesIn)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsolutePiecesInEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeAbsolutePiecesInEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6562},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsolutePiecesIn)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsolutePiecesInEURange = {
+		name = "opcIWwUnitValuesTypeAbsolutePiecesInEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6561},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsolutePiecesIn)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsolutePiecesInInstrumentRange = {
+		name = "opcIWwUnitValuesTypeAbsolutePiecesInInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6563},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsolutePiecesIn)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsolutePiecesInValuePrecision = {
+		name = "opcIWwUnitValuesTypeAbsolutePiecesInValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6564},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsolutePiecesIn)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsolutePiecesOutDefinition = {
+		name = "opcIWwUnitValuesTypeAbsolutePiecesOutDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6565},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsolutePiecesOut)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsolutePiecesOutEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeAbsolutePiecesOutEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6567},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsolutePiecesOut)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsolutePiecesOutEURange = {
+		name = "opcIWwUnitValuesTypeAbsolutePiecesOutEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6566},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsolutePiecesOut)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsolutePiecesOutInstrumentRange = {
+		name = "opcIWwUnitValuesTypeAbsolutePiecesOutInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6568},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsolutePiecesOut)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsolutePiecesOutValuePrecision = {
+		name = "opcIWwUnitValuesTypeAbsolutePiecesOutValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6569},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsolutePiecesOut)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsolutePowerPresentTimeDefinition = {
+		name = "opcIWwUnitValuesTypeAbsolutePowerPresentTimeDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6570},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsolutePowerPresentTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsolutePowerPresentTimeEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeAbsolutePowerPresentTimeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6572},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsolutePowerPresentTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsolutePowerPresentTimeEURange = {
+		name = "opcIWwUnitValuesTypeAbsolutePowerPresentTimeEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6571},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsolutePowerPresentTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsolutePowerPresentTimeInstrumentRange = {
+		name = "opcIWwUnitValuesTypeAbsolutePowerPresentTimeInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6573},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsolutePowerPresentTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsolutePowerPresentTimeValuePrecision = {
+		name = "opcIWwUnitValuesTypeAbsolutePowerPresentTimeValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6574},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsolutePowerPresentTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteProductionTimeDefinition = {
+		name = "opcIWwUnitValuesTypeAbsoluteProductionTimeDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6575},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteProductionTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteProductionTimeEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeAbsoluteProductionTimeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6577},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteProductionTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteProductionTimeEURange = {
+		name = "opcIWwUnitValuesTypeAbsoluteProductionTimeEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6576},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteProductionTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteProductionTimeInstrumentRange = {
+		name = "opcIWwUnitValuesTypeAbsoluteProductionTimeInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6578},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteProductionTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteProductionTimeValuePrecision = {
+		name = "opcIWwUnitValuesTypeAbsoluteProductionTimeValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6579},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteProductionTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteProductionWaitWorkpieceTimeDefinition = {
+		name = "opcIWwUnitValuesTypeAbsoluteProductionWaitWorkpieceTimeDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6580},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteProductionWaitWorkpieceTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteProductionWaitWorkpieceTimeEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeAbsoluteProductionWaitWorkpieceTimeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6582},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteProductionWaitWorkpieceTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteProductionWaitWorkpieceTimeEURange = {
+		name = "opcIWwUnitValuesTypeAbsoluteProductionWaitWorkpieceTimeEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6581},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteProductionWaitWorkpieceTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteProductionWaitWorkpieceTimeInstrumentRange = {
+		name = "opcIWwUnitValuesTypeAbsoluteProductionWaitWorkpieceTimeInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6583},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteProductionWaitWorkpieceTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteProductionWaitWorkpieceTimeValuePrecision = {
+		name = "opcIWwUnitValuesTypeAbsoluteProductionWaitWorkpieceTimeValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6584},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteProductionWaitWorkpieceTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteProductionWithoutWorkpieceTimeDefinition = {
+		name = "opcIWwUnitValuesTypeAbsoluteProductionWithoutWorkpieceTimeDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6585},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteProductionWithoutWorkpieceTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteProductionWithoutWorkpieceTimeEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeAbsoluteProductionWithoutWorkpieceTimeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6587},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteProductionWithoutWorkpieceTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteProductionWithoutWorkpieceTimeEURange = {
+		name = "opcIWwUnitValuesTypeAbsoluteProductionWithoutWorkpieceTimeEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6586},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteProductionWithoutWorkpieceTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteProductionWithoutWorkpieceTimeInstrumentRange = {
+		name = "opcIWwUnitValuesTypeAbsoluteProductionWithoutWorkpieceTimeInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6588},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteProductionWithoutWorkpieceTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteProductionWithoutWorkpieceTimeValuePrecision = {
+		name = "opcIWwUnitValuesTypeAbsoluteProductionWithoutWorkpieceTimeValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6589},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteProductionWithoutWorkpieceTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteReadyTimeDefinition = {
+		name = "opcIWwUnitValuesTypeAbsoluteReadyTimeDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6590},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteReadyTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteReadyTimeEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeAbsoluteReadyTimeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6592},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteReadyTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteReadyTimeEURange = {
+		name = "opcIWwUnitValuesTypeAbsoluteReadyTimeEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6591},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteReadyTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteReadyTimeInstrumentRange = {
+		name = "opcIWwUnitValuesTypeAbsoluteReadyTimeInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6593},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteReadyTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteReadyTimeValuePrecision = {
+		name = "opcIWwUnitValuesTypeAbsoluteReadyTimeValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6594},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteReadyTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteRunsAbortedDefinition = {
+		name = "opcIWwUnitValuesTypeAbsoluteRunsAbortedDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6595},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteRunsAborted)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteRunsAbortedEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeAbsoluteRunsAbortedEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6597},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteRunsAborted)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteRunsAbortedEURange = {
+		name = "opcIWwUnitValuesTypeAbsoluteRunsAbortedEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6596},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteRunsAborted)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteRunsAbortedInstrumentRange = {
+		name = "opcIWwUnitValuesTypeAbsoluteRunsAbortedInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6598},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteRunsAborted)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteRunsAbortedValuePrecision = {
+		name = "opcIWwUnitValuesTypeAbsoluteRunsAbortedValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6599},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteRunsAborted)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteRunsGoodDefinition = {
+		name = "opcIWwUnitValuesTypeAbsoluteRunsGoodDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6600},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteRunsGood)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteRunsGoodEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeAbsoluteRunsGoodEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6602},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteRunsGood)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteRunsGoodEURange = {
+		name = "opcIWwUnitValuesTypeAbsoluteRunsGoodEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6601},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteRunsGood)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteRunsGoodInstrumentRange = {
+		name = "opcIWwUnitValuesTypeAbsoluteRunsGoodInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6603},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteRunsGood)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteRunsGoodValuePrecision = {
+		name = "opcIWwUnitValuesTypeAbsoluteRunsGoodValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6604},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteRunsGood)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteRunsTotalDefinition = {
+		name = "opcIWwUnitValuesTypeAbsoluteRunsTotalDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6605},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteRunsTotal)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteRunsTotalEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeAbsoluteRunsTotalEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6607},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteRunsTotal)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteRunsTotalEURange = {
+		name = "opcIWwUnitValuesTypeAbsoluteRunsTotalEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6606},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteRunsTotal)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteRunsTotalInstrumentRange = {
+		name = "opcIWwUnitValuesTypeAbsoluteRunsTotalInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6608},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteRunsTotal)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteRunsTotalValuePrecision = {
+		name = "opcIWwUnitValuesTypeAbsoluteRunsTotalValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6609},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteRunsTotal)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteStandbyTimeDefinition = {
+		name = "opcIWwUnitValuesTypeAbsoluteStandbyTimeDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6610},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteStandbyTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteStandbyTimeEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeAbsoluteStandbyTimeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6612},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteStandbyTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteStandbyTimeEURange = {
+		name = "opcIWwUnitValuesTypeAbsoluteStandbyTimeEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6611},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteStandbyTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteStandbyTimeInstrumentRange = {
+		name = "opcIWwUnitValuesTypeAbsoluteStandbyTimeInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6613},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteStandbyTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteStandbyTimeValuePrecision = {
+		name = "opcIWwUnitValuesTypeAbsoluteStandbyTimeValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6614},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteStandbyTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteWorkingTimeDefinition = {
+		name = "opcIWwUnitValuesTypeAbsoluteWorkingTimeDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6615},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteWorkingTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteWorkingTimeEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeAbsoluteWorkingTimeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6617},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteWorkingTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteWorkingTimeEURange = {
+		name = "opcIWwUnitValuesTypeAbsoluteWorkingTimeEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6616},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteWorkingTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteWorkingTimeInstrumentRange = {
+		name = "opcIWwUnitValuesTypeAbsoluteWorkingTimeInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6618},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteWorkingTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAbsoluteWorkingTimeValuePrecision = {
+		name = "opcIWwUnitValuesTypeAbsoluteWorkingTimeValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6619},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAbsoluteWorkingTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeActualCycleDefinition = {
+		name = "opcIWwUnitValuesTypeActualCycleDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6620},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeActualCycle)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeActualCycleEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeActualCycleEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6622},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeActualCycle)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeActualCycleEURange = {
+		name = "opcIWwUnitValuesTypeActualCycleEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6621},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeActualCycle)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeActualCycleInstrumentRange = {
+		name = "opcIWwUnitValuesTypeActualCycleInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6623},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeActualCycle)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeActualCycleValuePrecision = {
+		name = "opcIWwUnitValuesTypeActualCycleValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6624},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeActualCycle)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAxisOverrideDefinition = {
+		name = "opcIWwUnitValuesTypeAxisOverrideDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6625},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAxisOverride)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAxisOverrideEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeAxisOverrideEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6627},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAxisOverride)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAxisOverrideEURange = {
+		name = "opcIWwUnitValuesTypeAxisOverrideEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6626},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAxisOverride)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAxisOverrideInstrumentRange = {
+		name = "opcIWwUnitValuesTypeAxisOverrideInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6628},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAxisOverride)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeAxisOverrideValuePrecision = {
+		name = "opcIWwUnitValuesTypeAxisOverrideValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6629},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeAxisOverride)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeFeedSpeedDefinition = {
+		name = "opcIWwUnitValuesTypeFeedSpeedDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6630},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeFeedSpeed)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeFeedSpeedEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeFeedSpeedEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6632},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeFeedSpeed)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeFeedSpeedEURange = {
+		name = "opcIWwUnitValuesTypeFeedSpeedEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6631},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeFeedSpeed)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeFeedSpeedInstrumentRange = {
+		name = "opcIWwUnitValuesTypeFeedSpeedInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6633},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeFeedSpeed)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeFeedSpeedValuePrecision = {
+		name = "opcIWwUnitValuesTypeFeedSpeedValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6634},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeFeedSpeed)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeErrorTimeDefinition = {
+		name = "opcIWwUnitValuesTypeRelativeErrorTimeDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6635},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeErrorTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeErrorTimeEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeRelativeErrorTimeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6637},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeErrorTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeErrorTimeEURange = {
+		name = "opcIWwUnitValuesTypeRelativeErrorTimeEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6636},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeErrorTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeErrorTimeInstrumentRange = {
+		name = "opcIWwUnitValuesTypeRelativeErrorTimeInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6638},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeErrorTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeErrorTimeValuePrecision = {
+		name = "opcIWwUnitValuesTypeRelativeErrorTimeValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6639},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeErrorTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeLengthDefinition = {
+		name = "opcIWwUnitValuesTypeRelativeLengthDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6640},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeLength)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeLengthEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeRelativeLengthEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6642},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeLength)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeLengthEURange = {
+		name = "opcIWwUnitValuesTypeRelativeLengthEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6641},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeLength)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeLengthInstrumentRange = {
+		name = "opcIWwUnitValuesTypeRelativeLengthInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6643},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeLength)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeLengthValuePrecision = {
+		name = "opcIWwUnitValuesTypeRelativeLengthValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6644},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeLength)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeMachineOnTimeDefinition = {
+		name = "opcIWwUnitValuesTypeRelativeMachineOnTimeDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6645},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeMachineOnTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeMachineOnTimeEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeRelativeMachineOnTimeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6647},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeMachineOnTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeMachineOnTimeEURange = {
+		name = "opcIWwUnitValuesTypeRelativeMachineOnTimeEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6646},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeMachineOnTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeMachineOnTimeInstrumentRange = {
+		name = "opcIWwUnitValuesTypeRelativeMachineOnTimeInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6648},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeMachineOnTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeMachineOnTimeValuePrecision = {
+		name = "opcIWwUnitValuesTypeRelativeMachineOnTimeValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6649},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeMachineOnTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativePiecesInDefinition = {
+		name = "opcIWwUnitValuesTypeRelativePiecesInDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6655},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativePiecesIn)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativePiecesInEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeRelativePiecesInEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6657},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativePiecesIn)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativePiecesInEURange = {
+		name = "opcIWwUnitValuesTypeRelativePiecesInEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6656},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativePiecesIn)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativePiecesInInstrumentRange = {
+		name = "opcIWwUnitValuesTypeRelativePiecesInInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6658},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativePiecesIn)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativePiecesInValuePrecision = {
+		name = "opcIWwUnitValuesTypeRelativePiecesInValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6659},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativePiecesIn)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativePiecesOutDefinition = {
+		name = "opcIWwUnitValuesTypeRelativePiecesOutDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6660},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativePiecesOut)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativePiecesOutEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeRelativePiecesOutEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6662},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativePiecesOut)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativePiecesOutEURange = {
+		name = "opcIWwUnitValuesTypeRelativePiecesOutEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6661},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativePiecesOut)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativePiecesOutInstrumentRange = {
+		name = "opcIWwUnitValuesTypeRelativePiecesOutInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6663},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativePiecesOut)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativePiecesOutValuePrecision = {
+		name = "opcIWwUnitValuesTypeRelativePiecesOutValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6664},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativePiecesOut)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativePowerPresentTimeDefinition = {
+		name = "opcIWwUnitValuesTypeRelativePowerPresentTimeDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6665},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativePowerPresentTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativePowerPresentTimeEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeRelativePowerPresentTimeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6667},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativePowerPresentTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativePowerPresentTimeEURange = {
+		name = "opcIWwUnitValuesTypeRelativePowerPresentTimeEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6666},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativePowerPresentTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativePowerPresentTimeInstrumentRange = {
+		name = "opcIWwUnitValuesTypeRelativePowerPresentTimeInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6668},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativePowerPresentTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativePowerPresentTimeValuePrecision = {
+		name = "opcIWwUnitValuesTypeRelativePowerPresentTimeValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6669},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativePowerPresentTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeProductionTimeDefinition = {
+		name = "opcIWwUnitValuesTypeRelativeProductionTimeDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6670},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeProductionTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeProductionTimeEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeRelativeProductionTimeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6672},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeProductionTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeProductionTimeEURange = {
+		name = "opcIWwUnitValuesTypeRelativeProductionTimeEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6671},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeProductionTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeProductionTimeInstrumentRange = {
+		name = "opcIWwUnitValuesTypeRelativeProductionTimeInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6673},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeProductionTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeProductionTimeValuePrecision = {
+		name = "opcIWwUnitValuesTypeRelativeProductionTimeValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6674},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeProductionTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeProductionWaitWorkpieceTimeDefinition = {
+		name = "opcIWwUnitValuesTypeRelativeProductionWaitWorkpieceTimeDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6675},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeProductionWaitWorkpieceTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeProductionWaitWorkpieceTimeEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeRelativeProductionWaitWorkpieceTimeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6677},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeProductionWaitWorkpieceTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeProductionWaitWorkpieceTimeEURange = {
+		name = "opcIWwUnitValuesTypeRelativeProductionWaitWorkpieceTimeEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6676},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeProductionWaitWorkpieceTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeProductionWaitWorkpieceTimeInstrumentRange = {
+		name = "opcIWwUnitValuesTypeRelativeProductionWaitWorkpieceTimeInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6678},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeProductionWaitWorkpieceTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeProductionWaitWorkpieceTimeValuePrecision = {
+		name = "opcIWwUnitValuesTypeRelativeProductionWaitWorkpieceTimeValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6679},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeProductionWaitWorkpieceTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeProductionWithoutWorkpieceTimeDefinition = {
+		name = "opcIWwUnitValuesTypeRelativeProductionWithoutWorkpieceTimeDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6680},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeProductionWithoutWorkpieceTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeProductionWithoutWorkpieceTimeEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeRelativeProductionWithoutWorkpieceTimeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6682},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeProductionWithoutWorkpieceTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeProductionWithoutWorkpieceTimeEURange = {
+		name = "opcIWwUnitValuesTypeRelativeProductionWithoutWorkpieceTimeEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6681},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeProductionWithoutWorkpieceTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeProductionWithoutWorkpieceTimeInstrumentRange = {
+		name = "opcIWwUnitValuesTypeRelativeProductionWithoutWorkpieceTimeInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6683},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeProductionWithoutWorkpieceTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeProductionWithoutWorkpieceTimeValuePrecision = {
+		name = "opcIWwUnitValuesTypeRelativeProductionWithoutWorkpieceTimeValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6684},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeProductionWithoutWorkpieceTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeReadyTimeDefinition = {
+		name = "opcIWwUnitValuesTypeRelativeReadyTimeDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6685},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeReadyTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeReadyTimeEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeRelativeReadyTimeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6687},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeReadyTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeReadyTimeEURange = {
+		name = "opcIWwUnitValuesTypeRelativeReadyTimeEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6686},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeReadyTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeReadyTimeInstrumentRange = {
+		name = "opcIWwUnitValuesTypeRelativeReadyTimeInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6688},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeReadyTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeReadyTimeValuePrecision = {
+		name = "opcIWwUnitValuesTypeRelativeReadyTimeValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6689},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeReadyTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeRunsAbortedDefinition = {
+		name = "opcIWwUnitValuesTypeRelativeRunsAbortedDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6690},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeRunsAborted)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeRunsAbortedEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeRelativeRunsAbortedEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6692},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeRunsAborted)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeRunsAbortedEURange = {
+		name = "opcIWwUnitValuesTypeRelativeRunsAbortedEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6691},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeRunsAborted)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeRunsAbortedInstrumentRange = {
+		name = "opcIWwUnitValuesTypeRelativeRunsAbortedInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6693},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeRunsAborted)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeRunsAbortedValuePrecision = {
+		name = "opcIWwUnitValuesTypeRelativeRunsAbortedValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6694},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeRunsAborted)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeRunsGoodDefinition = {
+		name = "opcIWwUnitValuesTypeRelativeRunsGoodDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6695},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeRunsGood)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeRunsGoodEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeRelativeRunsGoodEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6697},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeRunsGood)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeRunsGoodEURange = {
+		name = "opcIWwUnitValuesTypeRelativeRunsGoodEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6696},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeRunsGood)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeRunsGoodInstrumentRange = {
+		name = "opcIWwUnitValuesTypeRelativeRunsGoodInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6698},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeRunsGood)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeRunsGoodValuePrecision = {
+		name = "opcIWwUnitValuesTypeRelativeRunsGoodValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6699},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeRunsGood)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeRunsTotalDefinition = {
+		name = "opcIWwUnitValuesTypeRelativeRunsTotalDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6700},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeRunsTotal)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeRunsTotalEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeRelativeRunsTotalEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6702},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeRunsTotal)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeRunsTotalEURange = {
+		name = "opcIWwUnitValuesTypeRelativeRunsTotalEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6701},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeRunsTotal)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeRunsTotalInstrumentRange = {
+		name = "opcIWwUnitValuesTypeRelativeRunsTotalInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6703},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeRunsTotal)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeRunsTotalValuePrecision = {
+		name = "opcIWwUnitValuesTypeRelativeRunsTotalValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6704},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeRunsTotal)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeStandbyTimeDefinition = {
+		name = "opcIWwUnitValuesTypeRelativeStandbyTimeDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6705},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeStandbyTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeStandbyTimeEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeRelativeStandbyTimeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6707},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeStandbyTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeStandbyTimeEURange = {
+		name = "opcIWwUnitValuesTypeRelativeStandbyTimeEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6706},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeStandbyTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeStandbyTimeInstrumentRange = {
+		name = "opcIWwUnitValuesTypeRelativeStandbyTimeInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6708},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeStandbyTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeStandbyTimeValuePrecision = {
+		name = "opcIWwUnitValuesTypeRelativeStandbyTimeValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6709},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeStandbyTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeWorkingTimeDefinition = {
+		name = "opcIWwUnitValuesTypeRelativeWorkingTimeDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6710},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeWorkingTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeWorkingTimeEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeRelativeWorkingTimeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6712},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeWorkingTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeWorkingTimeEURange = {
+		name = "opcIWwUnitValuesTypeRelativeWorkingTimeEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6711},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeWorkingTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeWorkingTimeInstrumentRange = {
+		name = "opcIWwUnitValuesTypeRelativeWorkingTimeInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6713},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeWorkingTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeRelativeWorkingTimeValuePrecision = {
+		name = "opcIWwUnitValuesTypeRelativeWorkingTimeValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6714},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeRelativeWorkingTime)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeSpindleOverrideDefinition = {
+		name = "opcIWwUnitValuesTypeSpindleOverrideDefinition",
+		nodeId = {nameSpaceIndex = 1, identifier = 6715},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Definition",
+		displayName = "Definition",
+		description = "",
+		optional = true,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeSpindleOverride)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeSpindleOverrideEngineeringUnits = {
+		name = "opcIWwUnitValuesTypeSpindleOverrideEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6717},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeSpindleOverride)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeSpindleOverrideEURange = {
+		name = "opcIWwUnitValuesTypeSpindleOverrideEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6716},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeSpindleOverride)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeSpindleOverrideInstrumentRange = {
+		name = "opcIWwUnitValuesTypeSpindleOverrideInstrumentRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6718},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "InstrumentRange",
+		displayName = "InstrumentRange",
+		description = "",
+		optional = true,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeSpindleOverride)
+	};
+
+	UARootVariableType opcIWwUnitValuesTypeSpindleOverrideValuePrecision = {
+		name = "opcIWwUnitValuesTypeSpindleOverrideValuePrecision",
+		nodeId = {nameSpaceIndex = 1, identifier = 6719},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValuePrecision",
+		displayName = "ValuePrecision",
+		description = "",
+		optional = true,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIWwUnitValuesTypeSpindleOverride)
+	};
+
 	freeze {
 		.; // every variable declared in this project
 	} but (f|f.bindingTime >= BindingTime.compile);

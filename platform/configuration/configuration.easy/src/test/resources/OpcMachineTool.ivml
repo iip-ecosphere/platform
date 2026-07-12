@@ -1916,7 +1916,7 @@ project OpcMachineTool {
 				displayName = "Aborted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionStateMachineTypeAbortedToInitializingAborted)
+				type = refBy(opcProductionStateMachineTypeAborted)
 			}, UAFieldObjectType {
 				name = "Initializing",
 				nodeId = {nameSpaceIndex = 1, identifier = 135},
@@ -1940,30 +1940,6 @@ project OpcMachineTool {
 		}
 	};
 
-	UAObjectType opcProductionStateMachineTypeAbortedToInitializingAborted = {
-		name = "opcProductionStateMachineTypeAbortedToInitializingAborted",
-		nodeId = {nameSpaceIndex = 1, identifier = 141},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Aborted",
-		displayName = "Aborted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcAbortedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 350},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
 	UAObjectTypeType opcInitialStateType = {
 		name = "opcInitialStateType",
 		nodeId = {nameSpaceIndex = 0, identifier = 2309},
@@ -1972,30 +1948,6 @@ project OpcMachineTool {
 		displayName = "InitialStateType",
 		description = "",
 		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part16/4.4.9"
-	};
-
-	UAObjectType opcProductionStateMachineTypeAbortedToInitializingInitializing = {
-		name = "opcProductionStateMachineTypeAbortedToInitializingInitializing",
-		nodeId = {nameSpaceIndex = 1, identifier = 135},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Initializing",
-		displayName = "Initializing",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcInitialStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInitializingStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 345},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
 	};
 
 	UARootObjectType opcProductionStateMachineTypeEnded = {
@@ -2042,7 +1994,7 @@ project OpcMachineTool {
 				displayName = "Ended",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionStateMachineTypeEndedToInitializingEnded)
+				type = refBy(opcProductionStateMachineTypeEnded)
 			}, UAFieldObjectType {
 				name = "Initializing",
 				nodeId = {nameSpaceIndex = 1, identifier = 135},
@@ -2051,7 +2003,7 @@ project OpcMachineTool {
 				displayName = "Initializing",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionStateMachineTypeEndedToInitializingInitializing)
+				type = refBy(opcProductionStateMachineTypeAbortedToInitializingInitializing)
 			}, UAFieldVariableType {
 				name = "opcEndedToInitializingTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 299},
@@ -2066,56 +2018,8 @@ project OpcMachineTool {
 		}
 	};
 
-	UAObjectType opcProductionStateMachineTypeEndedToInitializingEnded = {
-		name = "opcProductionStateMachineTypeEndedToInitializingEnded",
-		nodeId = {nameSpaceIndex = 1, identifier = 140},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Ended",
-		displayName = "Ended",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcEndedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 349},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionStateMachineTypeEndedToInitializingInitializing = {
-		name = "opcProductionStateMachineTypeEndedToInitializingInitializing",
-		nodeId = {nameSpaceIndex = 1, identifier = 135},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Initializing",
-		displayName = "Initializing",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcInitialStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInitializingStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 345},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UARootObjectType opcProductionStateMachineTypeInitializing = {
-		name = "opcProductionStateMachineTypeInitializing",
+	UARootObjectType opcProductionStateMachineTypeAbortedToInitializingInitializing = {
+		name = "opcProductionStateMachineTypeAbortedToInitializingInitializing",
 		nodeId = {nameSpaceIndex = 1, identifier = 135},
 		nodeClass = NodeClass::UAObject,
 		browseName = "1:Initializing",
@@ -2158,7 +2062,7 @@ project OpcMachineTool {
 				displayName = "Aborted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionStateMachineTypeInitializingToAbortedAborted)
+				type = refBy(opcProductionStateMachineTypeAborted)
 			}, UAFieldObjectType {
 				name = "Initializing",
 				nodeId = {nameSpaceIndex = 1, identifier = 135},
@@ -2167,61 +2071,13 @@ project OpcMachineTool {
 				displayName = "Initializing",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionStateMachineTypeInitializingToAbortedInitializing)
+				type = refBy(opcProductionStateMachineTypeAbortedToInitializingInitializing)
 			}, UAFieldVariableType {
 				name = "opcInitializingToAbortedTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 373},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionStateMachineTypeInitializingToAbortedAborted = {
-		name = "opcProductionStateMachineTypeInitializingToAbortedAborted",
-		nodeId = {nameSpaceIndex = 1, identifier = 141},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Aborted",
-		displayName = "Aborted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcAbortedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 350},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionStateMachineTypeInitializingToAbortedInitializing = {
-		name = "opcProductionStateMachineTypeInitializingToAbortedInitializing",
-		nodeId = {nameSpaceIndex = 1, identifier = 135},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Initializing",
-		displayName = "Initializing",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcInitialStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInitializingStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 345},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -2249,7 +2105,7 @@ project OpcMachineTool {
 				displayName = "Initializing",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionStateMachineTypeInitializingToRunningInitializing)
+				type = refBy(opcProductionStateMachineTypeAbortedToInitializingInitializing)
 			}, UAFieldObjectType {
 				name = "Running",
 				nodeId = {nameSpaceIndex = 1, identifier = 138},
@@ -2265,54 +2121,6 @@ project OpcMachineTool {
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionStateMachineTypeInitializingToRunningInitializing = {
-		name = "opcProductionStateMachineTypeInitializingToRunningInitializing",
-		nodeId = {nameSpaceIndex = 1, identifier = 135},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Initializing",
-		displayName = "Initializing",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcInitialStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInitializingStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 345},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionStateMachineTypeInitializingToRunningRunning = {
-		name = "opcProductionStateMachineTypeInitializingToRunningRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -2365,7 +2173,7 @@ project OpcMachineTool {
 				displayName = "Aborted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionStateMachineTypeInterruptedToAbortedAborted)
+				type = refBy(opcProductionStateMachineTypeAborted)
 			}, UAFieldObjectType {
 				name = "Interrupted",
 				nodeId = {nameSpaceIndex = 1, identifier = 139},
@@ -2374,61 +2182,13 @@ project OpcMachineTool {
 				displayName = "Interrupted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionStateMachineTypeInterruptedToAbortedInterrupted)
+				type = refBy(opcProductionStateMachineTypeInterrupted)
 			}, UAFieldVariableType {
 				name = "opcInterruptedToAbortedTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 298},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionStateMachineTypeInterruptedToAbortedAborted = {
-		name = "opcProductionStateMachineTypeInterruptedToAbortedAborted",
-		nodeId = {nameSpaceIndex = 1, identifier = 141},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Aborted",
-		displayName = "Aborted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcAbortedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 350},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionStateMachineTypeInterruptedToAbortedInterrupted = {
-		name = "opcProductionStateMachineTypeInterruptedToAbortedInterrupted",
-		nodeId = {nameSpaceIndex = 1, identifier = 139},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Interrupted",
-		displayName = "Interrupted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInterruptedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 347},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -2456,7 +2216,7 @@ project OpcMachineTool {
 				displayName = "Interrupted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionStateMachineTypeInterruptedToRunningInterrupted)
+				type = refBy(opcProductionStateMachineTypeInterrupted)
 			}, UAFieldObjectType {
 				name = "Running",
 				nodeId = {nameSpaceIndex = 1, identifier = 138},
@@ -2465,7 +2225,7 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionStateMachineTypeInterruptedToRunningRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcInterruptedToRunningTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 294},
@@ -2480,56 +2240,8 @@ project OpcMachineTool {
 		}
 	};
 
-	UAObjectType opcProductionStateMachineTypeInterruptedToRunningInterrupted = {
-		name = "opcProductionStateMachineTypeInterruptedToRunningInterrupted",
-		nodeId = {nameSpaceIndex = 1, identifier = 139},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Interrupted",
-		displayName = "Interrupted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInterruptedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 347},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionStateMachineTypeInterruptedToRunningRunning = {
-		name = "opcProductionStateMachineTypeInterruptedToRunningRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UARootObjectType opcProductionStateMachineTypeRunning = {
-		name = "opcProductionStateMachineTypeRunning",
+	UARootObjectType opcProductionStateMachineTypeInitializingToRunningRunning = {
+		name = "opcProductionStateMachineTypeInitializingToRunningRunning",
 		nodeId = {nameSpaceIndex = 1, identifier = 138},
 		nodeClass = NodeClass::UAObject,
 		browseName = "1:Running",
@@ -2572,7 +2284,7 @@ project OpcMachineTool {
 				displayName = "Aborted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionStateMachineTypeRunningToAbortedAborted)
+				type = refBy(opcProductionStateMachineTypeAborted)
 			}, UAFieldObjectType {
 				name = "Running",
 				nodeId = {nameSpaceIndex = 1, identifier = 138},
@@ -2581,61 +2293,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionStateMachineTypeRunningToAbortedRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcRunningToAbortedTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 378},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionStateMachineTypeRunningToAbortedAborted = {
-		name = "opcProductionStateMachineTypeRunningToAbortedAborted",
-		nodeId = {nameSpaceIndex = 1, identifier = 141},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Aborted",
-		displayName = "Aborted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcAbortedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 350},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionStateMachineTypeRunningToAbortedRunning = {
-		name = "opcProductionStateMachineTypeRunningToAbortedRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -2663,7 +2327,7 @@ project OpcMachineTool {
 				displayName = "Ended",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionStateMachineTypeRunningToEndedEnded)
+				type = refBy(opcProductionStateMachineTypeEnded)
 			}, UAFieldObjectType {
 				name = "Running",
 				nodeId = {nameSpaceIndex = 1, identifier = 138},
@@ -2672,61 +2336,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionStateMachineTypeRunningToEndedRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcRunningToEndedTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 381},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionStateMachineTypeRunningToEndedEnded = {
-		name = "opcProductionStateMachineTypeRunningToEndedEnded",
-		nodeId = {nameSpaceIndex = 1, identifier = 140},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Ended",
-		displayName = "Ended",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcEndedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 349},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionStateMachineTypeRunningToEndedRunning = {
-		name = "opcProductionStateMachineTypeRunningToEndedRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -2754,7 +2370,7 @@ project OpcMachineTool {
 				displayName = "Interrupted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionStateMachineTypeRunningToInterruptedInterrupted)
+				type = refBy(opcProductionStateMachineTypeInterrupted)
 			}, UAFieldObjectType {
 				name = "Running",
 				nodeId = {nameSpaceIndex = 1, identifier = 138},
@@ -2763,61 +2379,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionStateMachineTypeRunningToInterruptedRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcRunningToInterruptedTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 386},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionStateMachineTypeRunningToInterruptedInterrupted = {
-		name = "opcProductionStateMachineTypeRunningToInterruptedInterrupted",
-		nodeId = {nameSpaceIndex = 1, identifier = 139},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Interrupted",
-		displayName = "Interrupted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInterruptedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 347},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionStateMachineTypeRunningToInterruptedRunning = {
-		name = "opcProductionStateMachineTypeRunningToInterruptedRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -2845,37 +2413,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionStateMachineTypeRunningToRunningRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcRunningToRunningTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 358},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionStateMachineTypeRunningToRunningRunning = {
-		name = "opcProductionStateMachineTypeRunningToRunningRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -2903,7 +2447,7 @@ project OpcMachineTool {
 				displayName = "Aborted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionJobStateMachineTypeAbortedToInitializingAborted)
+				type = refBy(opcProductionStateMachineTypeAborted)
 			}, UAFieldObjectType {
 				name = "Initializing",
 				nodeId = {nameSpaceIndex = 1, identifier = 135},
@@ -2912,61 +2456,13 @@ project OpcMachineTool {
 				displayName = "Initializing",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionJobStateMachineTypeAbortedToInitializingInitializing)
+				type = refBy(opcProductionStateMachineTypeAbortedToInitializingInitializing)
 			}, UAFieldVariableType {
 				name = "opcAbortedToInitializingTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 376},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionJobStateMachineTypeAbortedToInitializingAborted = {
-		name = "opcProductionJobStateMachineTypeAbortedToInitializingAborted",
-		nodeId = {nameSpaceIndex = 1, identifier = 141},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Aborted",
-		displayName = "Aborted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcAbortedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 350},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionJobStateMachineTypeAbortedToInitializingInitializing = {
-		name = "opcProductionJobStateMachineTypeAbortedToInitializingInitializing",
-		nodeId = {nameSpaceIndex = 1, identifier = 135},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Initializing",
-		displayName = "Initializing",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcInitialStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInitializingStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 345},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -2994,7 +2490,7 @@ project OpcMachineTool {
 				displayName = "Ended",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionJobStateMachineTypeEndedToInitializingEnded)
+				type = refBy(opcProductionStateMachineTypeEnded)
 			}, UAFieldObjectType {
 				name = "Initializing",
 				nodeId = {nameSpaceIndex = 1, identifier = 135},
@@ -3003,61 +2499,13 @@ project OpcMachineTool {
 				displayName = "Initializing",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionJobStateMachineTypeEndedToInitializingInitializing)
+				type = refBy(opcProductionStateMachineTypeAbortedToInitializingInitializing)
 			}, UAFieldVariableType {
 				name = "opcEndedToInitializingTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 360},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionJobStateMachineTypeEndedToInitializingEnded = {
-		name = "opcProductionJobStateMachineTypeEndedToInitializingEnded",
-		nodeId = {nameSpaceIndex = 1, identifier = 140},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Ended",
-		displayName = "Ended",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcEndedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 349},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionJobStateMachineTypeEndedToInitializingInitializing = {
-		name = "opcProductionJobStateMachineTypeEndedToInitializingInitializing",
-		nodeId = {nameSpaceIndex = 1, identifier = 135},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Initializing",
-		displayName = "Initializing",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcInitialStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInitializingStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 345},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -3085,7 +2533,7 @@ project OpcMachineTool {
 				displayName = "Aborted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionJobStateMachineTypeInitializingToAbortedAborted)
+				type = refBy(opcProductionStateMachineTypeAborted)
 			}, UAFieldObjectType {
 				name = "Initializing",
 				nodeId = {nameSpaceIndex = 1, identifier = 135},
@@ -3094,61 +2542,13 @@ project OpcMachineTool {
 				displayName = "Initializing",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionJobStateMachineTypeInitializingToAbortedInitializing)
+				type = refBy(opcProductionStateMachineTypeAbortedToInitializingInitializing)
 			}, UAFieldVariableType {
 				name = "opcInitializingToAbortedTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 385},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionJobStateMachineTypeInitializingToAbortedAborted = {
-		name = "opcProductionJobStateMachineTypeInitializingToAbortedAborted",
-		nodeId = {nameSpaceIndex = 1, identifier = 141},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Aborted",
-		displayName = "Aborted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcAbortedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 350},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionJobStateMachineTypeInitializingToAbortedInitializing = {
-		name = "opcProductionJobStateMachineTypeInitializingToAbortedInitializing",
-		nodeId = {nameSpaceIndex = 1, identifier = 135},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Initializing",
-		displayName = "Initializing",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcInitialStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInitializingStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 345},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -3176,7 +2576,7 @@ project OpcMachineTool {
 				displayName = "Initializing",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionJobStateMachineTypeInitializingToRunningInitializing)
+				type = refBy(opcProductionStateMachineTypeAbortedToInitializingInitializing)
 			}, UAFieldObjectType {
 				name = "Running",
 				nodeId = {nameSpaceIndex = 1, identifier = 138},
@@ -3185,61 +2585,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionJobStateMachineTypeInitializingToRunningRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcInitializingToRunningTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 352},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionJobStateMachineTypeInitializingToRunningInitializing = {
-		name = "opcProductionJobStateMachineTypeInitializingToRunningInitializing",
-		nodeId = {nameSpaceIndex = 1, identifier = 135},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Initializing",
-		displayName = "Initializing",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcInitialStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInitializingStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 345},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionJobStateMachineTypeInitializingToRunningRunning = {
-		name = "opcProductionJobStateMachineTypeInitializingToRunningRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -3267,7 +2619,7 @@ project OpcMachineTool {
 				displayName = "Aborted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionJobStateMachineTypeInterruptedToAbortedAborted)
+				type = refBy(opcProductionStateMachineTypeAborted)
 			}, UAFieldObjectType {
 				name = "Interrupted",
 				nodeId = {nameSpaceIndex = 1, identifier = 139},
@@ -3276,61 +2628,13 @@ project OpcMachineTool {
 				displayName = "Interrupted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionJobStateMachineTypeInterruptedToAbortedInterrupted)
+				type = refBy(opcProductionStateMachineTypeInterrupted)
 			}, UAFieldVariableType {
 				name = "opcInterruptedToAbortedTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 357},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionJobStateMachineTypeInterruptedToAbortedAborted = {
-		name = "opcProductionJobStateMachineTypeInterruptedToAbortedAborted",
-		nodeId = {nameSpaceIndex = 1, identifier = 141},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Aborted",
-		displayName = "Aborted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcAbortedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 350},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionJobStateMachineTypeInterruptedToAbortedInterrupted = {
-		name = "opcProductionJobStateMachineTypeInterruptedToAbortedInterrupted",
-		nodeId = {nameSpaceIndex = 1, identifier = 139},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Interrupted",
-		displayName = "Interrupted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInterruptedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 347},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -3358,7 +2662,7 @@ project OpcMachineTool {
 				displayName = "Interrupted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionJobStateMachineTypeInterruptedToRunningInterrupted)
+				type = refBy(opcProductionStateMachineTypeInterrupted)
 			}, UAFieldObjectType {
 				name = "Running",
 				nodeId = {nameSpaceIndex = 1, identifier = 138},
@@ -3367,61 +2671,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionJobStateMachineTypeInterruptedToRunningRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcInterruptedToRunningTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 356},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionJobStateMachineTypeInterruptedToRunningInterrupted = {
-		name = "opcProductionJobStateMachineTypeInterruptedToRunningInterrupted",
-		nodeId = {nameSpaceIndex = 1, identifier = 139},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Interrupted",
-		displayName = "Interrupted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInterruptedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 347},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionJobStateMachineTypeInterruptedToRunningRunning = {
-		name = "opcProductionJobStateMachineTypeInterruptedToRunningRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -3449,7 +2705,7 @@ project OpcMachineTool {
 				displayName = "Aborted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionJobStateMachineTypeRunningToAbortedAborted)
+				type = refBy(opcProductionStateMachineTypeAborted)
 			}, UAFieldObjectType {
 				name = "Running",
 				nodeId = {nameSpaceIndex = 1, identifier = 138},
@@ -3458,61 +2714,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionJobStateMachineTypeRunningToAbortedRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcRunningToAbortedTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 354},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionJobStateMachineTypeRunningToAbortedAborted = {
-		name = "opcProductionJobStateMachineTypeRunningToAbortedAborted",
-		nodeId = {nameSpaceIndex = 1, identifier = 141},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Aborted",
-		displayName = "Aborted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcAbortedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 350},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionJobStateMachineTypeRunningToAbortedRunning = {
-		name = "opcProductionJobStateMachineTypeRunningToAbortedRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -3540,7 +2748,7 @@ project OpcMachineTool {
 				displayName = "Ended",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionJobStateMachineTypeRunningToEndedEnded)
+				type = refBy(opcProductionStateMachineTypeEnded)
 			}, UAFieldObjectType {
 				name = "Running",
 				nodeId = {nameSpaceIndex = 1, identifier = 138},
@@ -3549,61 +2757,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionJobStateMachineTypeRunningToEndedRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcRunningToEndedTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 353},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionJobStateMachineTypeRunningToEndedEnded = {
-		name = "opcProductionJobStateMachineTypeRunningToEndedEnded",
-		nodeId = {nameSpaceIndex = 1, identifier = 140},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Ended",
-		displayName = "Ended",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcEndedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 349},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionJobStateMachineTypeRunningToEndedRunning = {
-		name = "opcProductionJobStateMachineTypeRunningToEndedRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -3631,7 +2791,7 @@ project OpcMachineTool {
 				displayName = "Interrupted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionJobStateMachineTypeRunningToInterruptedInterrupted)
+				type = refBy(opcProductionStateMachineTypeInterrupted)
 			}, UAFieldObjectType {
 				name = "Running",
 				nodeId = {nameSpaceIndex = 1, identifier = 138},
@@ -3640,61 +2800,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionJobStateMachineTypeRunningToInterruptedRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcRunningToInterruptedTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 355},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionJobStateMachineTypeRunningToInterruptedInterrupted = {
-		name = "opcProductionJobStateMachineTypeRunningToInterruptedInterrupted",
-		nodeId = {nameSpaceIndex = 1, identifier = 139},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Interrupted",
-		displayName = "Interrupted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInterruptedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 347},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionJobStateMachineTypeRunningToInterruptedRunning = {
-		name = "opcProductionJobStateMachineTypeRunningToInterruptedRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -3722,37 +2834,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionJobStateMachineTypeRunningToRunningRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcRunningToRunningTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 372},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionJobStateMachineTypeRunningToRunningRunning = {
-		name = "opcProductionJobStateMachineTypeRunningToRunningRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -3780,7 +2868,7 @@ project OpcMachineTool {
 				displayName = "Aborted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionPartStateMachineTypeAbortedToInitializingAborted)
+				type = refBy(opcProductionStateMachineTypeAborted)
 			}, UAFieldObjectType {
 				name = "Initializing",
 				nodeId = {nameSpaceIndex = 1, identifier = 135},
@@ -3789,61 +2877,13 @@ project OpcMachineTool {
 				displayName = "Initializing",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionPartStateMachineTypeAbortedToInitializingInitializing)
+				type = refBy(opcProductionStateMachineTypeAbortedToInitializingInitializing)
 			}, UAFieldVariableType {
 				name = "opcAbortedToInitializingTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 329},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionPartStateMachineTypeAbortedToInitializingAborted = {
-		name = "opcProductionPartStateMachineTypeAbortedToInitializingAborted",
-		nodeId = {nameSpaceIndex = 1, identifier = 141},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Aborted",
-		displayName = "Aborted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcAbortedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 350},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionPartStateMachineTypeAbortedToInitializingInitializing = {
-		name = "opcProductionPartStateMachineTypeAbortedToInitializingInitializing",
-		nodeId = {nameSpaceIndex = 1, identifier = 135},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Initializing",
-		displayName = "Initializing",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcInitialStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInitializingStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 345},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -3871,7 +2911,7 @@ project OpcMachineTool {
 				displayName = "Ended",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionPartStateMachineTypeEndedToInitializingEnded)
+				type = refBy(opcProductionStateMachineTypeEnded)
 			}, UAFieldObjectType {
 				name = "Initializing",
 				nodeId = {nameSpaceIndex = 1, identifier = 135},
@@ -3880,61 +2920,13 @@ project OpcMachineTool {
 				displayName = "Initializing",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionPartStateMachineTypeEndedToInitializingInitializing)
+				type = refBy(opcProductionStateMachineTypeAbortedToInitializingInitializing)
 			}, UAFieldVariableType {
 				name = "opcEndedToInitializingTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 330},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionPartStateMachineTypeEndedToInitializingEnded = {
-		name = "opcProductionPartStateMachineTypeEndedToInitializingEnded",
-		nodeId = {nameSpaceIndex = 1, identifier = 140},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Ended",
-		displayName = "Ended",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcEndedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 349},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionPartStateMachineTypeEndedToInitializingInitializing = {
-		name = "opcProductionPartStateMachineTypeEndedToInitializingInitializing",
-		nodeId = {nameSpaceIndex = 1, identifier = 135},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Initializing",
-		displayName = "Initializing",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcInitialStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInitializingStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 345},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -3962,7 +2954,7 @@ project OpcMachineTool {
 				displayName = "Aborted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionPartStateMachineTypeInitializingToAbortedAborted)
+				type = refBy(opcProductionStateMachineTypeAborted)
 			}, UAFieldObjectType {
 				name = "Initializing",
 				nodeId = {nameSpaceIndex = 1, identifier = 135},
@@ -3971,61 +2963,13 @@ project OpcMachineTool {
 				displayName = "Initializing",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionPartStateMachineTypeInitializingToAbortedInitializing)
+				type = refBy(opcProductionStateMachineTypeAbortedToInitializingInitializing)
 			}, UAFieldVariableType {
 				name = "opcInitializingToAbortedTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 379},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionPartStateMachineTypeInitializingToAbortedAborted = {
-		name = "opcProductionPartStateMachineTypeInitializingToAbortedAborted",
-		nodeId = {nameSpaceIndex = 1, identifier = 141},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Aborted",
-		displayName = "Aborted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcAbortedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 350},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionPartStateMachineTypeInitializingToAbortedInitializing = {
-		name = "opcProductionPartStateMachineTypeInitializingToAbortedInitializing",
-		nodeId = {nameSpaceIndex = 1, identifier = 135},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Initializing",
-		displayName = "Initializing",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcInitialStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInitializingStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 345},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -4053,7 +2997,7 @@ project OpcMachineTool {
 				displayName = "Initializing",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionPartStateMachineTypeInitializingToRunningInitializing)
+				type = refBy(opcProductionStateMachineTypeAbortedToInitializingInitializing)
 			}, UAFieldObjectType {
 				name = "Running",
 				nodeId = {nameSpaceIndex = 1, identifier = 138},
@@ -4062,61 +3006,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionPartStateMachineTypeInitializingToRunningRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcInitializingToRunningTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 377},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionPartStateMachineTypeInitializingToRunningInitializing = {
-		name = "opcProductionPartStateMachineTypeInitializingToRunningInitializing",
-		nodeId = {nameSpaceIndex = 1, identifier = 135},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Initializing",
-		displayName = "Initializing",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcInitialStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInitializingStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 345},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionPartStateMachineTypeInitializingToRunningRunning = {
-		name = "opcProductionPartStateMachineTypeInitializingToRunningRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -4144,7 +3040,7 @@ project OpcMachineTool {
 				displayName = "Aborted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionPartStateMachineTypeInterruptedToAbortedAborted)
+				type = refBy(opcProductionStateMachineTypeAborted)
 			}, UAFieldObjectType {
 				name = "Interrupted",
 				nodeId = {nameSpaceIndex = 1, identifier = 139},
@@ -4153,61 +3049,13 @@ project OpcMachineTool {
 				displayName = "Interrupted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionPartStateMachineTypeInterruptedToAbortedInterrupted)
+				type = refBy(opcProductionStateMachineTypeInterrupted)
 			}, UAFieldVariableType {
 				name = "opcInterruptedToAbortedTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 331},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionPartStateMachineTypeInterruptedToAbortedAborted = {
-		name = "opcProductionPartStateMachineTypeInterruptedToAbortedAborted",
-		nodeId = {nameSpaceIndex = 1, identifier = 141},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Aborted",
-		displayName = "Aborted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcAbortedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 350},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionPartStateMachineTypeInterruptedToAbortedInterrupted = {
-		name = "opcProductionPartStateMachineTypeInterruptedToAbortedInterrupted",
-		nodeId = {nameSpaceIndex = 1, identifier = 139},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Interrupted",
-		displayName = "Interrupted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInterruptedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 347},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -4235,7 +3083,7 @@ project OpcMachineTool {
 				displayName = "Interrupted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionPartStateMachineTypeInterruptedToRunningInterrupted)
+				type = refBy(opcProductionStateMachineTypeInterrupted)
 			}, UAFieldObjectType {
 				name = "Running",
 				nodeId = {nameSpaceIndex = 1, identifier = 138},
@@ -4244,61 +3092,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionPartStateMachineTypeInterruptedToRunningRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcInterruptedToRunningTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 333},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionPartStateMachineTypeInterruptedToRunningInterrupted = {
-		name = "opcProductionPartStateMachineTypeInterruptedToRunningInterrupted",
-		nodeId = {nameSpaceIndex = 1, identifier = 139},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Interrupted",
-		displayName = "Interrupted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInterruptedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 347},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionPartStateMachineTypeInterruptedToRunningRunning = {
-		name = "opcProductionPartStateMachineTypeInterruptedToRunningRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -4326,7 +3126,7 @@ project OpcMachineTool {
 				displayName = "Aborted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionPartStateMachineTypeRunningToAbortedAborted)
+				type = refBy(opcProductionStateMachineTypeAborted)
 			}, UAFieldObjectType {
 				name = "Running",
 				nodeId = {nameSpaceIndex = 1, identifier = 138},
@@ -4335,61 +3135,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionPartStateMachineTypeRunningToAbortedRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcRunningToAbortedTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 380},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionPartStateMachineTypeRunningToAbortedAborted = {
-		name = "opcProductionPartStateMachineTypeRunningToAbortedAborted",
-		nodeId = {nameSpaceIndex = 1, identifier = 141},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Aborted",
-		displayName = "Aborted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcAbortedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 350},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionPartStateMachineTypeRunningToAbortedRunning = {
-		name = "opcProductionPartStateMachineTypeRunningToAbortedRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -4417,7 +3169,7 @@ project OpcMachineTool {
 				displayName = "Ended",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionPartStateMachineTypeRunningToEndedEnded)
+				type = refBy(opcProductionStateMachineTypeEnded)
 			}, UAFieldObjectType {
 				name = "Running",
 				nodeId = {nameSpaceIndex = 1, identifier = 138},
@@ -4426,61 +3178,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionPartStateMachineTypeRunningToEndedRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcRunningToEndedTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 374},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionPartStateMachineTypeRunningToEndedEnded = {
-		name = "opcProductionPartStateMachineTypeRunningToEndedEnded",
-		nodeId = {nameSpaceIndex = 1, identifier = 140},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Ended",
-		displayName = "Ended",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcEndedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 349},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionPartStateMachineTypeRunningToEndedRunning = {
-		name = "opcProductionPartStateMachineTypeRunningToEndedRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -4508,7 +3212,7 @@ project OpcMachineTool {
 				displayName = "Interrupted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionPartStateMachineTypeRunningToInterruptedInterrupted)
+				type = refBy(opcProductionStateMachineTypeInterrupted)
 			}, UAFieldObjectType {
 				name = "Running",
 				nodeId = {nameSpaceIndex = 1, identifier = 138},
@@ -4517,61 +3221,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionPartStateMachineTypeRunningToInterruptedRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcRunningToInterruptedTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 337},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionPartStateMachineTypeRunningToInterruptedInterrupted = {
-		name = "opcProductionPartStateMachineTypeRunningToInterruptedInterrupted",
-		nodeId = {nameSpaceIndex = 1, identifier = 139},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Interrupted",
-		displayName = "Interrupted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInterruptedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 347},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionPartStateMachineTypeRunningToInterruptedRunning = {
-		name = "opcProductionPartStateMachineTypeRunningToInterruptedRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -4599,37 +3255,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionPartStateMachineTypeRunningToRunningRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcRunningToRunningTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 410},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionPartStateMachineTypeRunningToRunningRunning = {
-		name = "opcProductionPartStateMachineTypeRunningToRunningRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -4657,7 +3289,7 @@ project OpcMachineTool {
 				displayName = "Aborted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionProgramStateMachineTypeAbortedToInitializingAborted)
+				type = refBy(opcProductionStateMachineTypeAborted)
 			}, UAFieldObjectType {
 				name = "Initializing",
 				nodeId = {nameSpaceIndex = 1, identifier = 135},
@@ -4666,61 +3298,13 @@ project OpcMachineTool {
 				displayName = "Initializing",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionProgramStateMachineTypeAbortedToInitializingInitializing)
+				type = refBy(opcProductionStateMachineTypeAbortedToInitializingInitializing)
 			}, UAFieldVariableType {
 				name = "opcAbortedToInitializingTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 311},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionProgramStateMachineTypeAbortedToInitializingAborted = {
-		name = "opcProductionProgramStateMachineTypeAbortedToInitializingAborted",
-		nodeId = {nameSpaceIndex = 1, identifier = 141},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Aborted",
-		displayName = "Aborted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcAbortedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 350},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionProgramStateMachineTypeAbortedToInitializingInitializing = {
-		name = "opcProductionProgramStateMachineTypeAbortedToInitializingInitializing",
-		nodeId = {nameSpaceIndex = 1, identifier = 135},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Initializing",
-		displayName = "Initializing",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcInitialStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInitializingStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 345},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -4748,7 +3332,7 @@ project OpcMachineTool {
 				displayName = "Ended",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionProgramStateMachineTypeEndedToInitializingEnded)
+				type = refBy(opcProductionStateMachineTypeEnded)
 			}, UAFieldObjectType {
 				name = "Initializing",
 				nodeId = {nameSpaceIndex = 1, identifier = 135},
@@ -4757,61 +3341,13 @@ project OpcMachineTool {
 				displayName = "Initializing",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionProgramStateMachineTypeEndedToInitializingInitializing)
+				type = refBy(opcProductionStateMachineTypeAbortedToInitializingInitializing)
 			}, UAFieldVariableType {
 				name = "opcEndedToInitializingTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 315},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionProgramStateMachineTypeEndedToInitializingEnded = {
-		name = "opcProductionProgramStateMachineTypeEndedToInitializingEnded",
-		nodeId = {nameSpaceIndex = 1, identifier = 140},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Ended",
-		displayName = "Ended",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcEndedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 349},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionProgramStateMachineTypeEndedToInitializingInitializing = {
-		name = "opcProductionProgramStateMachineTypeEndedToInitializingInitializing",
-		nodeId = {nameSpaceIndex = 1, identifier = 135},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Initializing",
-		displayName = "Initializing",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcInitialStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInitializingStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 345},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -4839,7 +3375,7 @@ project OpcMachineTool {
 				displayName = "Aborted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionProgramStateMachineTypeInitializingToAbortedAborted)
+				type = refBy(opcProductionStateMachineTypeAborted)
 			}, UAFieldObjectType {
 				name = "Initializing",
 				nodeId = {nameSpaceIndex = 1, identifier = 135},
@@ -4848,61 +3384,13 @@ project OpcMachineTool {
 				displayName = "Initializing",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionProgramStateMachineTypeInitializingToAbortedInitializing)
+				type = refBy(opcProductionStateMachineTypeAbortedToInitializingInitializing)
 			}, UAFieldVariableType {
 				name = "opcInitializingToAbortedTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 313},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionProgramStateMachineTypeInitializingToAbortedAborted = {
-		name = "opcProductionProgramStateMachineTypeInitializingToAbortedAborted",
-		nodeId = {nameSpaceIndex = 1, identifier = 141},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Aborted",
-		displayName = "Aborted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcAbortedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 350},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionProgramStateMachineTypeInitializingToAbortedInitializing = {
-		name = "opcProductionProgramStateMachineTypeInitializingToAbortedInitializing",
-		nodeId = {nameSpaceIndex = 1, identifier = 135},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Initializing",
-		displayName = "Initializing",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcInitialStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInitializingStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 345},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -4930,7 +3418,7 @@ project OpcMachineTool {
 				displayName = "Initializing",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionProgramStateMachineTypeInitializingToRunningInitializing)
+				type = refBy(opcProductionStateMachineTypeAbortedToInitializingInitializing)
 			}, UAFieldObjectType {
 				name = "Running",
 				nodeId = {nameSpaceIndex = 1, identifier = 138},
@@ -4939,61 +3427,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionProgramStateMachineTypeInitializingToRunningRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcInitializingToRunningTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 291},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionProgramStateMachineTypeInitializingToRunningInitializing = {
-		name = "opcProductionProgramStateMachineTypeInitializingToRunningInitializing",
-		nodeId = {nameSpaceIndex = 1, identifier = 135},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Initializing",
-		displayName = "Initializing",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcInitialStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInitializingStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 345},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionProgramStateMachineTypeInitializingToRunningRunning = {
-		name = "opcProductionProgramStateMachineTypeInitializingToRunningRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -5021,7 +3461,7 @@ project OpcMachineTool {
 				displayName = "Aborted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionProgramStateMachineTypeInterruptedToAbortedAborted)
+				type = refBy(opcProductionStateMachineTypeAborted)
 			}, UAFieldObjectType {
 				name = "Interrupted",
 				nodeId = {nameSpaceIndex = 1, identifier = 139},
@@ -5030,61 +3470,13 @@ project OpcMachineTool {
 				displayName = "Interrupted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionProgramStateMachineTypeInterruptedToAbortedInterrupted)
+				type = refBy(opcProductionStateMachineTypeInterrupted)
 			}, UAFieldVariableType {
 				name = "opcInterruptedToAbortedTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 314},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionProgramStateMachineTypeInterruptedToAbortedAborted = {
-		name = "opcProductionProgramStateMachineTypeInterruptedToAbortedAborted",
-		nodeId = {nameSpaceIndex = 1, identifier = 141},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Aborted",
-		displayName = "Aborted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcAbortedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 350},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionProgramStateMachineTypeInterruptedToAbortedInterrupted = {
-		name = "opcProductionProgramStateMachineTypeInterruptedToAbortedInterrupted",
-		nodeId = {nameSpaceIndex = 1, identifier = 139},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Interrupted",
-		displayName = "Interrupted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInterruptedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 347},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -5112,7 +3504,7 @@ project OpcMachineTool {
 				displayName = "Interrupted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionProgramStateMachineTypeInterruptedToRunningInterrupted)
+				type = refBy(opcProductionStateMachineTypeInterrupted)
 			}, UAFieldObjectType {
 				name = "Running",
 				nodeId = {nameSpaceIndex = 1, identifier = 138},
@@ -5121,61 +3513,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionProgramStateMachineTypeInterruptedToRunningRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcInterruptedToRunningTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 327},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionProgramStateMachineTypeInterruptedToRunningInterrupted = {
-		name = "opcProductionProgramStateMachineTypeInterruptedToRunningInterrupted",
-		nodeId = {nameSpaceIndex = 1, identifier = 139},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Interrupted",
-		displayName = "Interrupted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInterruptedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 347},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionProgramStateMachineTypeInterruptedToRunningRunning = {
-		name = "opcProductionProgramStateMachineTypeInterruptedToRunningRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -5203,7 +3547,7 @@ project OpcMachineTool {
 				displayName = "Aborted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionProgramStateMachineTypeRunningToAbortedAborted)
+				type = refBy(opcProductionStateMachineTypeAborted)
 			}, UAFieldObjectType {
 				name = "Running",
 				nodeId = {nameSpaceIndex = 1, identifier = 138},
@@ -5212,61 +3556,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionProgramStateMachineTypeRunningToAbortedRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcRunningToAbortedTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 328},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionProgramStateMachineTypeRunningToAbortedAborted = {
-		name = "opcProductionProgramStateMachineTypeRunningToAbortedAborted",
-		nodeId = {nameSpaceIndex = 1, identifier = 141},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Aborted",
-		displayName = "Aborted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcAbortedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 350},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionProgramStateMachineTypeRunningToAbortedRunning = {
-		name = "opcProductionProgramStateMachineTypeRunningToAbortedRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -5294,7 +3590,7 @@ project OpcMachineTool {
 				displayName = "Ended",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionProgramStateMachineTypeRunningToEndedEnded)
+				type = refBy(opcProductionStateMachineTypeEnded)
 			}, UAFieldObjectType {
 				name = "Running",
 				nodeId = {nameSpaceIndex = 1, identifier = 138},
@@ -5303,61 +3599,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionProgramStateMachineTypeRunningToEndedRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcRunningToEndedTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 292},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionProgramStateMachineTypeRunningToEndedEnded = {
-		name = "opcProductionProgramStateMachineTypeRunningToEndedEnded",
-		nodeId = {nameSpaceIndex = 1, identifier = 140},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Ended",
-		displayName = "Ended",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcEndedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 349},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionProgramStateMachineTypeRunningToEndedRunning = {
-		name = "opcProductionProgramStateMachineTypeRunningToEndedRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -5385,7 +3633,7 @@ project OpcMachineTool {
 				displayName = "Interrupted",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionProgramStateMachineTypeRunningToInterruptedInterrupted)
+				type = refBy(opcProductionStateMachineTypeInterrupted)
 			}, UAFieldObjectType {
 				name = "Running",
 				nodeId = {nameSpaceIndex = 1, identifier = 138},
@@ -5394,61 +3642,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionProgramStateMachineTypeRunningToInterruptedRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcRunningToInterruptedTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 339},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionProgramStateMachineTypeRunningToInterruptedInterrupted = {
-		name = "opcProductionProgramStateMachineTypeRunningToInterruptedInterrupted",
-		nodeId = {nameSpaceIndex = 1, identifier = 139},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Interrupted",
-		displayName = "Interrupted",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcInterruptedStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 347},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionProgramStateMachineTypeRunningToInterruptedRunning = {
-		name = "opcProductionProgramStateMachineTypeRunningToInterruptedRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -5476,37 +3676,13 @@ project OpcMachineTool {
 				displayName = "Running",
 				description = "",
 				optional = false,
-				type = refBy(opcProductionProgramStateMachineTypeRunningToRunningRunning)
+				type = refBy(opcProductionStateMachineTypeInitializingToRunningRunning)
 			}, UAFieldVariableType {
 				name = "opcRunningToRunningTransitionNumber",
 				nodeId = {nameSpaceIndex = 1, identifier = 359},
 				nodeClass = NodeClass::UAVariable,
 				browseName = "TransitionNumber",
 				displayName = "TransitionNumber",
-				description = "",
-				type = refBy(UnsignedInteger32Type),
-				typeDefinition = refBy(opcPropertyTypeType),
-				optional = false
-			}
-		}
-	};
-
-	UAObjectType opcProductionProgramStateMachineTypeRunningToRunningRunning = {
-		name = "opcProductionProgramStateMachineTypeRunningToRunningRunning",
-		nodeId = {nameSpaceIndex = 1, identifier = 138},
-		nodeClass = NodeClass::UAObject,
-		browseName = "1:Running",
-		displayName = "Running",
-		description = "",
-		optional = false,
-		typeDefinition = refBy(opcStateType),
-		fields = {
-			UAFieldVariableType {
-				name = "opcRunningStateNumber",
-				nodeId = {nameSpaceIndex = 1, identifier = 346},
-				nodeClass = NodeClass::UAVariable,
-				browseName = "StateNumber",
-				displayName = "StateNumber",
 				description = "",
 				type = refBy(UnsignedInteger32Type),
 				typeDefinition = refBy(opcPropertyTypeType),
@@ -7796,6 +5972,263 @@ device.@en"
 				description = "The tool is addressed by a different, custom defined system.@en"
 			}
 		}
+	};
+
+	UARootVariableType opcProductionJobTransitionEventTypeRunsPlannedIsValid = {
+		name = "opcProductionJobTransitionEventTypeRunsPlannedIsValid",
+		nodeId = {nameSpaceIndex = 1, identifier = 392},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:IsValid",
+		displayName = "IsValid",
+		description = "",
+		optional = false,
+		type = refBy(BooleanType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcProductionJobTransitionEventTypeRunsPlanned)
+	};
+
+	UARootVariableType opcToolTypeLockedReasonForLocking = {
+		name = "opcToolTypeLockedReasonForLocking",
+		nodeId = {nameSpaceIndex = 1, identifier = 269},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:ReasonForLocking",
+		displayName = "ReasonForLocking",
+		description = "",
+		optional = false,
+		type = refBy(opcToolLockedType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcToolTypeLocked)
+	};
+
+	UADataType opcInt32Type = {
+		name = "opcInt32Type",
+		nodeId = {nameSpaceIndex = 0, identifier = 6},
+		nodeClass = NodeClass::UADataType,
+		browseName = "Int32",
+		displayName = "Int32",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/12.2.9/#12.2.9.7",
+		literals = {
+		}
+	};
+
+	UADataType opcEUInformationType = {
+		name = "opcEUInformationType",
+		nodeId = {nameSpaceIndex = 0, identifier = 887},
+		nodeClass = NodeClass::UADataType,
+		browseName = "EUInformation",
+		displayName = "EUInformation",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part8/5.6.3/#5.6.3.2",
+		literals = {
+			DataLiteral {
+				name = "_NamespaceUri",
+				type = refBy(StringType),
+				description = ""
+			}, DataLiteral {
+				name = "_UnitId",
+				type = refBy(opcInt32Type),
+				description = ""
+			}, DataLiteral {
+				name = "_DisplayName",
+				type = refBy(opcLocalizedTextType),
+				description = ""
+			}, DataLiteral {
+				name = "_Description",
+				type = refBy(opcLocalizedTextType),
+				description = ""
+			}
+		}
+	};
+
+	UARootVariableType opcChannelMonitoringTypeFeedOverrideEngineeringUnits = {
+		name = "opcChannelMonitoringTypeFeedOverrideEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 335},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = false,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcChannelMonitoringTypeFeedOverride)
+	};
+
+	UADataType opcRangeType = {
+		name = "opcRangeType",
+		nodeId = {nameSpaceIndex = 0, identifier = 884},
+		nodeClass = NodeClass::UADataType,
+		browseName = "Range",
+		displayName = "Range",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part8/5.6.2",
+		literals = {
+			DataLiteral {
+				name = "_Low",
+				type = refBy(DoubleType),
+				description = ""
+			}, DataLiteral {
+				name = "_High",
+				type = refBy(DoubleType),
+				description = ""
+			}
+		}
+	};
+
+	UARootVariableType opcChannelMonitoringTypeFeedOverrideEURange = {
+		name = "opcChannelMonitoringTypeFeedOverrideEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 336},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = false,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcChannelMonitoringTypeFeedOverride)
+	};
+
+	UARootVariableType opcChannelMonitoringTypeRapidOverrideEngineeringUnits = {
+		name = "opcChannelMonitoringTypeRapidOverrideEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 342},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = false,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcChannelMonitoringTypeRapidOverride)
+	};
+
+	UARootVariableType opcChannelMonitoringTypeRapidOverrideEURange = {
+		name = "opcChannelMonitoringTypeRapidOverrideEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 343},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = false,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcChannelMonitoringTypeRapidOverride)
+	};
+
+	UARootVariableType opcSpindleMonitoringTypeOverrideEngineeringUnits = {
+		name = "opcSpindleMonitoringTypeOverrideEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 246},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = false,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcSpindleMonitoringTypeOverride)
+	};
+
+	UARootVariableType opcSpindleMonitoringTypeOverrideEURange = {
+		name = "opcSpindleMonitoringTypeOverrideEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 275},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = false,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcSpindleMonitoringTypeOverride)
+	};
+
+	UARootVariableType opcMachineOperationMonitoringTypeFeedOverrideEngineeringUnits = {
+		name = "opcMachineOperationMonitoringTypeFeedOverrideEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 237},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = false,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcMachineOperationMonitoringTypeFeedOverride)
+	};
+
+	UARootVariableType opcMachineOperationMonitoringTypeFeedOverrideEURange = {
+		name = "opcMachineOperationMonitoringTypeFeedOverrideEURange",
+		nodeId = {nameSpaceIndex = 1, identifier = 252},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EURange",
+		displayName = "EURange",
+		description = "",
+		optional = false,
+		type = refBy(opcRangeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcMachineOperationMonitoringTypeFeedOverride)
+	};
+
+	UARootVariableType opcProductionJobTypeRunsPlannedIsValid = {
+		name = "opcProductionJobTypeRunsPlannedIsValid",
+		nodeId = {nameSpaceIndex = 1, identifier = 188},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:IsValid",
+		displayName = "IsValid",
+		description = "",
+		optional = false,
+		type = refBy(BooleanType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcProductionJobTypeRunsPlanned)
+	};
+
+	UARootVariableType opcProductionStateMachineTypeCurrentStateId = {
+		name = "opcProductionStateMachineTypeCurrentStateId",
+		nodeId = {nameSpaceIndex = 1, identifier = 271},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Id",
+		displayName = "Id",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcProductionStateMachineTypeCurrentState)
+	};
+
+	UARootVariableType opcProductionStateMachineTypeCurrentStateNumber = {
+		name = "opcProductionStateMachineTypeCurrentStateNumber",
+		nodeId = {nameSpaceIndex = 1, identifier = 274},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Number",
+		displayName = "Number",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcProductionStateMachineTypeCurrentState)
+	};
+
+	UARootVariableType opcProductionStateMachineTypeLastTransitionId = {
+		name = "opcProductionStateMachineTypeLastTransitionId",
+		nodeId = {nameSpaceIndex = 1, identifier = 273},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Id",
+		displayName = "Id",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcProductionStateMachineTypeLastTransition)
+	};
+
+	UARootVariableType opcProductionStateMachineTypeLastTransitionNumber = {
+		name = "opcProductionStateMachineTypeLastTransitionNumber",
+		nodeId = {nameSpaceIndex = 1, identifier = 278},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "Number",
+		displayName = "Number",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcProductionStateMachineTypeLastTransition)
 	};
 
 	freeze {
