@@ -5643,31 +5643,31 @@ project OpcMachineTool {
 			EnumLiteral {
 				name = "_Automatic",
 				ordinal = 0,
-				description = "NC channel mode Automatic – execute CNC part programs.@en"
+				description = "NC channel mode Automatic â€“ execute CNC part programs.@en"
 			}, EnumLiteral {
 				name = "_MdaMdi",
 				ordinal = 1,
-				description = "NC channel mode Mda/Mdi – manual data input and execution.@en"
+				description = "NC channel mode Mda/Mdi â€“ manual data input and execution.@en"
 			}, EnumLiteral {
 				name = "_JogManual",
 				ordinal = 2,
-				description = "NC channel mode Jog Manual – axis movement triggered by user.@en"
+				description = "NC channel mode Jog Manual â€“ axis movement triggered by user.@en"
 			}, EnumLiteral {
 				name = "_JogIncrement",
 				ordinal = 3,
-				description = "NC channel mode Jog Increment – incremental axis movement triggered by user.@en"
+				description = "NC channel mode Jog Increment â€“ incremental axis movement triggered by user.@en"
 			}, EnumLiteral {
 				name = "_TeachingHandle",
 				ordinal = 4,
-				description = "NC channel mode Teaching Handle – teaching a machine tool by moving axes of the machine tool by hand.@en"
+				description = "NC channel mode Teaching Handle â€“ teaching a machine tool by moving axes of the machine tool by hand.@en"
 			}, EnumLiteral {
 				name = "_Remote",
 				ordinal = 5,
-				description = "NC channel mode Remote – the machine tool can receive CNC files via a remote access mechanism.@en"
+				description = "NC channel mode Remote â€“ the machine tool can receive CNC files via a remote access mechanism.@en"
 			}, EnumLiteral {
 				name = "_Reference",
 				ordinal = 6,
-				description = "NC channel mode Reference – The machine tool returns to its reference point/ zero position.@en"
+				description = "NC channel mode Reference â€“ The machine tool returns to its reference point/ zero position.@en"
 			}, EnumLiteral {
 				name = "_Other",
 				ordinal = 7,
@@ -5721,7 +5721,7 @@ project OpcMachineTool {
 			}, EnumLiteral {
 				name = "_Active_Low_Voltage",
 				ordinal = 2,
-				description = "Generator is switched on and is supplying pulses respecting the low voltage (? 25 V AC or ? 60 V DC) requirements of safety standard (ISO 28881).@en"
+				description = "Generator is switched on and is supplying pulses respecting the low voltage (â‰¤ 25 V AC or â‰¤ 60 V DC) requirements of safety standard (ISO 28881).@en"
 			}, EnumLiteral {
 				name = "_Active_High_Voltage",
 				ordinal = 3,
@@ -5784,7 +5784,7 @@ device.@en"
 			}, EnumLiteral {
 				name = "_Automatic",
 				ordinal = 1,
-				description = "Operating mode for the automatic, programmed and continuous operation of the machine. Manual loading and unloading workpieces are possible when the automatic program is stopped. Axis movement speeds are fully available to the machine tool’s ability.@en"
+				description = "Operating mode for the automatic, programmed and continuous operation of the machine. Manual loading and unloading workpieces are possible when the automatic program is stopped. Axis movement speeds are fully available to the machine toolâ€™s ability.@en"
 			}, EnumLiteral {
 				name = "_Setup",
 				ordinal = 2,
@@ -5883,11 +5883,11 @@ device.@en"
 			}, EnumLiteral {
 				name = "_NumberOfParts",
 				ordinal = 1,
-				description = "The tool life indicates the total number of parts that have been produced or can still be produced using the tool. The unit shall be „one.@en"
+				description = "The tool life indicates the total number of parts that have been produced or can still be produced using the tool. The unit shall be â€žone.@en"
 			}, EnumLiteral {
 				name = "_NumberOfUsages",
 				ordinal = 2,
-				description = "The tool life indicates counting the process steps this tool has been used or can still be used (for example usages of a punching tool). The unit shall be „one.@en"
+				description = "The tool life indicates counting the process steps this tool has been used or can still be used (for example usages of a punching tool). The unit shall be â€žone.@en"
 			}, EnumLiteral {
 				name = "_Feed_Distance",
 				ordinal = 3,

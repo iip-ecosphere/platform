@@ -14,7 +14,9 @@ package de.iip_ecosphere.platform.configuration.easyProducer.opcua.parser;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -45,7 +47,8 @@ public class Generator {
                 + "\t} but (f|f.bindingTime >= BindingTime.compile);\n\n" + "}";
 
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(ivmlFile));
+            BufferedWriter writer = new BufferedWriter(
+                    new OutputStreamWriter(new FileOutputStream(ivmlFile), StandardCharsets.UTF_8));
             writer.write(ivmlHeader);
             for (BaseType b : hierarchy) {
                 writer.write(b.toString());
@@ -143,7 +146,8 @@ public class Generator {
 
         String connectorFields = "";
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(vdwConfig));
+            BufferedWriter writer = new BufferedWriter(
+                    new OutputStreamWriter(new FileOutputStream(vdwConfig), StandardCharsets.UTF_8));
             StringBuilder builder = new StringBuilder();
             writer.write(configHeader);
             System.out.println("ConnectorFields:");
@@ -162,7 +166,8 @@ public class Generator {
             writer.write(connectorFields);
             writer.write(configEnding);
             writer.close();
-            writer = new BufferedWriter(new FileWriter(vdwSpecificConfig));
+            writer = new BufferedWriter(
+                    new OutputStreamWriter(new FileOutputStream(vdwSpecificConfig), StandardCharsets.UTF_8));
             writer.write(configHeader);
             writer.write(connectorFields);
             writer.write(configEnding);
