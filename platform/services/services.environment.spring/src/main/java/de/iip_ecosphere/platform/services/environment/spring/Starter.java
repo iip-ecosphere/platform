@@ -274,6 +274,15 @@ public abstract class Starter extends de.iip_ecosphere.platform.services.environ
     protected Environment getEnvironment() {
         return environment;
     }
+
+    /**
+     * Returns the active profiles.
+     * 
+     * @return the active profiles, may be <b>null</b>
+     */
+    public static String[] getActiveProfiles() {
+        return environment.getActiveProfiles();
+    }
     
     /**
      * Parses the external binder connections and turns them into external routing keys. [public for testing]
