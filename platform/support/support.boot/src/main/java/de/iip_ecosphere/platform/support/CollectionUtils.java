@@ -246,4 +246,33 @@ public class CollectionUtils {
         return target;
     }    
     
+    /**
+     * Returns whether two objects are equal even if they are <b>null</b>.
+     * 
+     * @param o1 the first object
+     * @param o2 the second object
+     * @return {@code true} for equal or both are <b>null</b>, {@code false} for different
+     */
+    public static boolean equals(Object o1, Object o2) {
+        return o1 == null ? o1 == o2 : o1.equals(o2);
+    }
+
+    /**
+     * Returns whether {@code element} is in {@code array}, compared by equality.
+     * 
+     * @param <T> the element type
+     * @param array the array, may be <b>null</b>
+     * @param element the element, may be <b>null</b> 
+     * @return {@code true} for containment, {@code false} else
+     */
+    public static <T> boolean contains(T[] array, T element) {
+        boolean found = false;
+        if (null != array) {
+            for (int i = 0; !found && i < array.length; i++) {
+                found |=  equals(array[i], element);
+            }
+        }
+        return found;
+    }
+    
 }

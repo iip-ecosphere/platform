@@ -236,5 +236,28 @@ public class CollectionUtilsTest {
         Assert.assertTrue(merged.containsKey("debug"));
         Assert.assertEquals(true, merged.get("debug"));
     }
+    
+    /**
+     * Tests {@link CollectionUtils#equals(Object, Object)}.
+     */
+    @Test
+    public void testEquals() {
+        Assert.assertTrue(CollectionUtils.equals(null, null));
+        Assert.assertFalse(CollectionUtils.equals(null, 1));
+        Assert.assertFalse(CollectionUtils.equals(1, null));
+        Assert.assertTrue(CollectionUtils.equals(1, 1));
+        Assert.assertTrue(CollectionUtils.equals("me", "me"));
+        Assert.assertFalse(CollectionUtils.equals("me", "here"));
+    }
+    
+    /**
+     * Tests {@link CollectionUtils#contains(Object[], Object)}.
+     */
+    public void testArrayContains() {
+        Assert.assertFalse(CollectionUtils.contains(null, null));
+        Assert.assertFalse(CollectionUtils.contains(null, 1));
+        Assert.assertFalse(CollectionUtils.contains(new Integer[] {}, 1));
+        Assert.assertTrue(CollectionUtils.contains(new Integer[] {2, 1}, 1));
+    }
 
 }
