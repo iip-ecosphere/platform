@@ -22,7 +22,7 @@ import de.iip_ecosphere.platform.support.aas.basyx2.server.apps.common.BaSyxName
 @SpringBootApplication
 @Configuration
 @ComponentScan(
-    basePackages = { BaSyxNames.PACKAGE_BASYX }, 
+    basePackages = { BaSyxNames.PACKAGE_BASYX, BaSyxNames.PACKAGE_PLUGIN_BASYX_SERVER_COMMON }, 
     excludeFilters = @ComponentScan.Filter(type = FilterType.CUSTOM, classes = AutodiscoveryTypeFilter.class))
 @Component
 @Import({

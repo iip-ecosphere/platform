@@ -39,14 +39,10 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.client.reactive.JdkClientHttpConnector;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.lang.Nullable;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.servlet.HandlerExceptionResolver;
@@ -72,7 +68,8 @@ import de.iip_ecosphere.platform.support.net.KeyStoreDescriptor;
 @SpringBootApplication
 @Configuration
 @ComponentScan(
-    basePackages = { BaSyxNames.PACKAGE_BASYX, BaSyxNames.PACKAGE_PLUGIN_BASYX_SERVER_SECURITY }, 
+    basePackages = { BaSyxNames.PACKAGE_BASYX, BaSyxNames.PACKAGE_PLUGIN_BASYX_SERVER_COMMON, 
+        BaSyxNames.PACKAGE_PLUGIN_BASYX_SERVER_SECURITY }, 
     excludeFilters = @ComponentScan.Filter(type = FilterType.CUSTOM, classes = SubmodelRepositoryTypeFilter.class))
 public class SubmodelRepositorySpringApp implements WebMvcConfigurer {
 
@@ -192,25 +189,6 @@ public class SubmodelRepositorySpringApp implements WebMvcConfigurer {
     public SubmodelServiceFactory getSubmodelServiceFactory() {
         return new CrudSubmodelServiceFactory(new InMemorySubmodelBackend(), new InMemoryFileRepository());
     }
-
-    // checkstyle: stop exception type check
-    
-    /**
-     * Defines the security filter chain.
-     * @param http the security instance
-     * @return the filterchain
-     * @throws Exception if something fails
-     */
-    @Profile("test")
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception { // preliminary
-        //https://www.baeldung.com/spring-security-deactivate
-        http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-            .csrf(AbstractHttpConfigurer::disable);
-        return http.build();
-    }    
-
-    // checkstyle: resume exception type check
 
     @Override
     public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {

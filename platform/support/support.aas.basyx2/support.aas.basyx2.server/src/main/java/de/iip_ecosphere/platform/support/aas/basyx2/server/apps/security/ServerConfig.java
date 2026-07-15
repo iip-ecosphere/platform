@@ -26,13 +26,16 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
@@ -54,6 +57,8 @@ public class ServerConfig implements WebMvcConfigurer {
     private static ThreadLocal<Object> principal = new ThreadLocal<>();
     @Autowired(required = false)
     private AuthenticationDescriptor authDesc;
+    //@Autowired
+    //private Environment environment;
 
     /**
      * Implements the authentication interceptor.
@@ -177,6 +182,37 @@ public class ServerConfig implements WebMvcConfigurer {
             return httpSecurity.build();
         }
     }*/
+    
+    /**
+     * Defines the security filter chain, mainly disabling spring security as without that we always end up in a 
+     * login page.
+     * 
+     * @param httpSecurity the security object
+     * @return the modified/defined filter chain
+     * @throws Exception if defining fails
+     */
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+/*        if (CollectionUtils.contains(environment.getActiveProfiles(), "test")) {
+            //https://www.baeldung.com/spring-security-deactivate
+            httpSecurity.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .csrf(AbstractHttpConfigurer::disable);
+        } else {*/
+        httpSecurity
+        .csrf(csrf -> csrf.disable())
+        //.cors(cors -> cors.disable())
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/error").permitAll()
+            .anyRequest().permitAll()
+        ).formLogin(form -> form.disable());
+//        }
+        return httpSecurity.build();        
+    }
+    
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/error").setViewName("forward:/index.html");
+    }    
 
     // checkstyle: stop exception type check
     

@@ -37,6 +37,7 @@ public abstract class InclusionBasedTypeFilter implements TypeFilter {
      * Initializes the default filters.
      */
     protected InclusionBasedTypeFilter() {
+        addInclusion(BaSyxNames.PACKAGE_PLUGIN_BASYX_SERVER_COMMON);
         addInclusion(BaSyxNames.PACKAGE_PLUGIN_BASYX_SERVER_SECURITY);
     }
 

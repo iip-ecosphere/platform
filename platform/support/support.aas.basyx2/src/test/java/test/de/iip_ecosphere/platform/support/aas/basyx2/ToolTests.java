@@ -236,5 +236,15 @@ public class ToolTests {
         Assert.assertTrue(tmp instanceof Calendar);
         Assert.assertEquals(now.getTime(), ((Calendar) tmp).getTimeInMillis());
     }
+    
+    /**
+     * Tests {@link Tools#translateValueToBaSyx(DataTypeDefXsd, Object)}.
+     */
+    @Test
+    public void testConversion() {
+        String tmp = Tools.translateValueToBaSyx(DataTypeDefXsd.INT, "1784116241319");
+        Assert.assertNotNull(tmp);
+        Assert.assertTrue(tmp.contains("1784116241319"));
+    }
 
 }

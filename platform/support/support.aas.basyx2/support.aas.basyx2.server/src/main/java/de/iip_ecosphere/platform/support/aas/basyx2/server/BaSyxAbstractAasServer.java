@@ -51,7 +51,7 @@ abstract class BaSyxAbstractAasServer implements AasServer {
         COMBINED
     }
     
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private SetupSpec spec;
     private ServerType type;
     private ConfigurableApplicationContext aasRepoCtx;
@@ -218,6 +218,7 @@ abstract class BaSyxAbstractAasServer implements AasServer {
         private List<String> args = new ArrayList<>();
         private List<String> profiles = new ArrayList<>();
         private List<ApplicationContextInitializer<ConfigurableApplicationContext>> initializers = new ArrayList<>();
+        private boolean enableBaSyxAuthentication = false;
         
         /**
          * Adds a context initializer.
@@ -364,7 +365,7 @@ abstract class BaSyxAbstractAasServer implements AasServer {
          */
         public AppConfigurer setBasyxAuthorization(boolean enable) {
             args.add("--registry.authorization=" + (enable ? "Enabled" : "Disabled"));
-            args.add("--basyx.feature.authorization.enabled=" + enable);
+            enableBaSyxAuthentication = enable;
             return this;
         }
 
@@ -460,6 +461,11 @@ abstract class BaSyxAbstractAasServer implements AasServer {
          * @return the arguments
          */
         private String[] getArgs() {
+            final String authKey = "--basyx.feature.authorization.enabled=";
+            boolean authKeyConfigured = args.stream().anyMatch(a -> a.startsWith(authKey));
+            if (!authKeyConfigured) {
+                args.add(authKey + enableBaSyxAuthentication);
+            }
             return args.toArray(new String[args.size()]);
         }
 
@@ -575,7 +581,6 @@ abstract class BaSyxAbstractAasServer implements AasServer {
             // HTTP_COMPONENTS, JETTY, REACTOR, JDK, SIMPLE; JETTY conflicts with some tests, reactor is taken here
             // by default
             configurer.addArg("spring.http.client.factory", "reactor");
-
             result = app.run(null == configurer ? new String[0] : configurer.getArgs());
             if (null != stateConsumer) {
                 stateConsumer.accept(State.RUNNING);

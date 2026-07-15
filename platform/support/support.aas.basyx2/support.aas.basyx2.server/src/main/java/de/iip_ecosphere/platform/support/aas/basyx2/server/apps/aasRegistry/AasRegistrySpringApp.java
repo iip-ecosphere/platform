@@ -18,10 +18,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.Profile;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.stereotype.Component;
 
 import de.iip_ecosphere.platform.support.aas.basyx2.server.apps.common.BaSyxNames;
@@ -40,7 +36,8 @@ import org.eclipse.digitaltwin.basyx.aasregistry.service.storage.memory.InMemory
 @SpringBootApplication
 @Configuration
 @ComponentScan(
-    basePackages = { BaSyxNames.PACKAGE_BASYX, BaSyxNames.PACKAGE_PLUGIN_BASYX_SERVER_SECURITY }, 
+    basePackages = { BaSyxNames.PACKAGE_BASYX, BaSyxNames.PACKAGE_PLUGIN_BASYX_SERVER_COMMON, 
+        BaSyxNames.PACKAGE_PLUGIN_BASYX_SERVER_SECURITY }, 
     excludeFilters = @ComponentScan.Filter(type = FilterType.CUSTOM, classes = AasRegistryTypeFilter.class))
 @Component
 public class AasRegistrySpringApp {
@@ -82,15 +79,15 @@ public class AasRegistrySpringApp {
      * @return the filterchain
      * @throws Exception if something fails
      */
-    @Profile("test")
+    /*@Profile("test")
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception { // preliminary
         //https://www.baeldung.com/spring-security-deactivate
         http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
             .csrf(AbstractHttpConfigurer::disable);
         return http.build();
-    }    
+    } */   
 
     // checkstyle: resume exception type check
-
+    
 }

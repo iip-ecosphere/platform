@@ -23,7 +23,7 @@ import de.iip_ecosphere.platform.support.aas.basyx2.server.apps.common.BaSyxName
 @SpringBootApplication
 @Configuration
 @ComponentScan(
-    basePackages = { BaSyxNames.PACKAGE_BASYX_CONCEPTREPO }, 
+    basePackages = { BaSyxNames.PACKAGE_BASYX_CONCEPTREPO, BaSyxNames.PACKAGE_PLUGIN_BASYX_SERVER_COMMON }, 
     excludeFilters = @ComponentScan.Filter(type = FilterType.CUSTOM, classes = ConceptRepositoryTypeFilter.class))
 @Component
 public class ConceptRepositorySpringApp {

@@ -69,7 +69,7 @@ public class Tools extends de.iip_ecosphere.platform.support.aas.basyx2.common.T
     
     private static final Function<Object, String> DFLT_OBJECT2BASXY = o -> null != o ? o.toString() : null;
     private static final Function<String, Object> DFLT_BASYX2OBJECT = o -> o;
-    private static final Function<Object, String> DFLT_INT2BASXY = o -> DatatypeConverter.printInt((Integer) o);
+    private static final Function<Object, String> DFLT_INT2BASXY = o -> printIntOrLong(o);
     private static final Function<Object, String> DFLT_LONG2BASXY = o -> DatatypeConverter.printLong((Long) o);
     private static final Function<String, Object> DFLT_BASYX2INT = s -> DatatypeConverter.parseInt(s);
     private static final Function<String, Object> DFLT_BASYX2LONG = s -> DatatypeConverter.parseLong(s);
@@ -161,6 +161,23 @@ public class Tools extends de.iip_ecosphere.platform.support.aas.basyx2.common.T
         mapKeyType(org.eclipse.digitaltwin.aas4j.v3.model.SubmodelElementList.class, KeyTypes.SUBMODEL_ELEMENT_LIST);
     }
 
+    /**
+     * Tries to turn {@code o} into a string representation of an int or, as fallback, into a long.
+     * 
+     * @param obj the object
+     * @return the result
+     */
+    private static String printIntOrLong(Object obj) {
+        String result = "";
+        if (obj instanceof Integer) {
+            result = DatatypeConverter.printInt((Integer) obj);
+        } else if (obj instanceof Long) {
+            result = DatatypeConverter.printLong((Long) obj);
+        } else {
+            result = null == obj ? "" : obj.toString();
+        }
+        return result;
+    }
 
     /**
      * Converts an object to a calendar.
