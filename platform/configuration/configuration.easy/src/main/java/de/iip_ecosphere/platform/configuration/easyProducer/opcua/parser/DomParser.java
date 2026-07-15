@@ -886,11 +886,11 @@ public class DomParser {
                                 fieldName = "placeholder_"
                                         + childNode.getAttribute("Name").replaceAll("[/,\u201C\u201D\"\\\\]", "_");
                             } else {
-                                fieldName = fieldName.replace("�", "mu");
+                                fieldName = fieldName.replace("\u00B5", "mu");
                                 fieldName = fieldName.replace("/", "_per_");
-                                fieldName = fieldName.replace("�", "_toPowerOf2");
-                                fieldName = fieldName.replace("�", "_toPowerOf3");
-                                fieldName = fieldName.replace("�", "degree_");
+                                fieldName = fieldName.replace("\u00B2", "_toPowerOf2");
+                                fieldName = fieldName.replace("\u00B3", "_toPowerOf3");
+                                fieldName = fieldName.replace("\u00B0", "degree_");
                             }
                             String fieldDescription = getFieldDescription(fieldNode);
                             String fieldValue = fieldNode.getAttribute("Value");
