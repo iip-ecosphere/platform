@@ -13,6 +13,7 @@ In progress:
 * [#187](https://github.com/iip-ecosphere/platform/issues/187): Integrate expression editor
 * [#122](https://github.com/iip-ecosphere/platform/issues/122): Transparent encryption, RBAC on AAS (incl. UI authentication)
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
+* [#202](https://github.com/iip-ecosphere/platform/issues/202): Update dependencies/libraries (woth plugins)
 
 ### Version 0.8.1 (Fall '26)
 
@@ -21,6 +22,7 @@ Improvements:
 * Improved type display consistency in managementUI
 * Support for Linux symlinks in file paths, in particular for the configuration models
 * [#190](https://github.com/iip-ecosphere/platform/issues/190): Integration of oktoflo2grafana
+* [#191](https://github.com/iip-ecosphere/platform/issues/191): Update dependencies/libraries
 * [#193](https://github.com/iip-ecosphere/platform/issues/193): Improve OPC integration
 * [#195](https://github.com/iip-ecosphere/platform/issues/195): Templates contain wrong file names for connectors, issue persists for versions 0.7.1-SNAPSHOT, 0.8.0
 * [#185](https://github.com/iip-ecosphere/platform/issues/185): Performance improvements
