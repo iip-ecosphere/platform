@@ -93,17 +93,17 @@ public class OpcUaModelTest {
     }
     
     /**
-     * Tests the VDW platform/connector configuration.
+     * Tests the energy platform/connector configuration.
      * Naming not changed to avoid breaking propagated changes in other projects.
      * 
      * @throws ExecutionException shall not occur
      * @throws IOException shall not occur
      */
     @Test
-    public void testVdw() throws ExecutionException, IOException {
-        File gen = new File("gen/vdw");
+    public void testEnergy() throws ExecutionException, IOException {
+        File gen = new File("gen/energy");
         PlatformInstantiator.instantiate(
-            AbstractIvmlTests.genApps(new TestConfigurer("VDW", new File("src/test/easy"), gen)));
+            AbstractIvmlTests.genApps(new TestConfigurer("Energy", new File("src/test/easy"), gen)));
     }
     
     /**
