@@ -1,8 +1,8 @@
-project VDW {
+project Energy {
 
     import IIPEcosphere;
     import OpcUaDataTypes;
-    import OpcWoodworking;
+    import OpcEnergy;
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
 
@@ -54,54 +54,44 @@ project VDW {
     RecordType opcIn = {
         name = "OpcIn",
         fields = {
-          Field {
-          name = "Events",
-          type = refBy(opcWwMachineTypeEvents),
-        //cachingTime = CACHE_NONE
-          cachingTime = CACHE_ALWAYS
-          }, Field {
-                name = "Identification",
-                type = refBy(opcWwMachineTypeIdentification),
-//              //cachingTime = CACHE_NONE
-              cachingTime = CACHE_ALWAYS
+            Field {
+                name = "NonElectricalEnergy",
+                type = refBy(opcINonElectricalEnergyType),
+                cachingTime = CACHE_ALWAYS
             }, Field {
-        name = "ManufacturerSpecific",
-        type = refBy(opcWwMachineTypeManufacturerSpecific),
-//          //cachingTime = CACHE_NONE
-        cachingTime = CACHE_ALWAYS
+                name = "BaseFlow",
+                type = refBy(opcIBaseFlowType),
+                cachingTime = CACHE_ALWAYS
             }, Field {
-                  name = "State",           
-                  type = refBy(opcWwMachineTypeState),
-//                //cachingTime = CACHE_NONE
-                  cachingTime = CACHE_ALWAYS  
+                name = "VolumeFlow",
+                type = refBy(opcIVolumeFlowType),
+                cachingTime = CACHE_ALWAYS
+            }, Field {
+                name = "MassFlow",
+                type = refBy(opcIMassFlowType),
+                cachingTime = CACHE_ALWAYS
             }
         }
     };    
     RecordType opcOut = {
-        //path = "Objects/Machines/FullWoodworking/",
         name = "OpcOut",
-
         fields = {
             Field {
-          name = "Events",
-          type = refBy(opcWwMachineTypeEvents),
-        //cachingTime = CACHE_NONE
-          cachingTime = CACHE_ALWAYS
-          }, Field {
-                name = "Identification",
-                type = refBy(opcWwMachineTypeIdentification),
-//              //cachingTime = CACHE_NONE
-              cachingTime = CACHE_ALWAYS
-              }, Field {
-        name = "ManufacturerSpecific",
-        type = refBy(opcWwMachineTypeManufacturerSpecific),
-//          //cachingTime = CACHE_NONE
-        cachingTime = CACHE_ALWAYS
-              }, Field {
-                  name = "State",           
-                  type = refBy(opcWwMachineTypeState),
-//                //cachingTime = CACHE_NONE
-                  cachingTime = CACHE_ALWAYS  
+                name = "NonElectricalEnergy",
+                type = refBy(opcINonElectricalEnergyType),
+                cachingTime = CACHE_ALWAYS
+            }, Field {
+                name = "BaseFlow",
+                type = refBy(opcIBaseFlowType),
+                cachingTime = CACHE_ALWAYS
+            }, Field {
+                name = "VolumeFlow",
+                type = refBy(opcIVolumeFlowType),
+                cachingTime = CACHE_ALWAYS
+            }, Field {
+                name = "MassFlow",
+                type = refBy(opcIMassFlowType),
+                cachingTime = CACHE_ALWAYS
             }
         }
     };
@@ -119,8 +109,8 @@ project VDW {
         
         input = {{type=refBy(opcIn)}},
         output = {{type=refBy(opcOut)}},
-        inInterface = {{type=refBy(opcIn), path="Objects/Machines/FullWoodworking/"}}, 
-        outInterface = {{type=refBy(opcOut), path="Objects/Machines/FullWoodworking/"}}
+        inInterface = {{type=refBy(opcIn), path="Objects/Machines/"}}, 
+        outInterface = {{type=refBy(opcOut), path="Objects/Machines/"}}
         /*operations = {
           FieldAssignmentOperation{field=myConnPltfIn.fields[1], 
             operation=AddDataTranslationOperation{
@@ -156,15 +146,15 @@ project VDW {
     // ------------ application and service nets ------------------
 
     Application myApp = {
-        id = "VdwOpcApp",
-        name = "Simple VDW OPC Demo App",
+        id = "EnergyOpcApp",
+        name = "Simple Energy OPC Demo App",
         ver = "0.1.0",
         description = "",
         services = {refBy(myMesh)}        
     };
 
     ServiceMesh myMesh = {
-        description = "VDW Service Net",
+        description = "Energy Service Net",
         sources = {refBy(mqttOpcSource)}
     };
 
@@ -187,7 +177,7 @@ project VDW {
     // ---------- generation setup ------------
 
     sharedInterfaces = true;
-    sharedArtifact = "de.iip-ecosphere.platform:apps.VdwOpcAppInterfaces:" + iipVer;
+    sharedArtifact = "de.iip-ecosphere.platform:apps.EnergyOpcAppInterfaces:" + iipVer;
 
     // ------------ freezing ------------------
 
@@ -215,7 +205,7 @@ project VDW {
         managementUi;
         artifactsFolder;
         artifactsUriPrefix;
-        OpcWoodworking; // now freeze also cachingTime
+        OpcEnergy; // now freeze also cachingTime
         .; // every variable declared in this project
     } but (f|f.bindingTime >= BindingTime.runtimeMon);
 

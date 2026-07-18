@@ -1,0 +1,1285 @@
+project OpcEnergy {
+
+	import IIPEcosphere;
+	import DataTypes;
+	import OpcUaDataTypes;
+
+	annotate BindingTime bindingTime = BindingTime::compile to .;
+
+	UAVariableTypeType opcEnergyMeasurementValueTypeType = {
+		name = "opcEnergyMeasurementValueTypeType",
+		nodeId = {nameSpaceIndex = 2, identifier = 2002},
+		nodeClass = NodeClass::UAVariableType,
+		browseName = "1:EnergyMeasurementValueType",
+		displayName = "EnergyMeasurementValueType",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/8.1",
+		type = refBy(opcUnknownDataType)
+	};
+
+	UARootVariableType opcIBaseFlowTypePressure = {
+		name = "opcIBaseFlowTypePressure",
+		nodeId = {nameSpaceIndex = 1, identifier = 6021},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:Pressure",
+		displayName = "Pressure",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIBaseFlowType),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIBaseFlowTypeTemperature = {
+		name = "opcIBaseFlowTypeTemperature",
+		nodeId = {nameSpaceIndex = 1, identifier = 6029},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:Temperature",
+		displayName = "Temperature",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIBaseFlowType),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIMassFlowTypeMass = {
+		name = "opcIMassFlowTypeMass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6069},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:Mass",
+		displayName = "Mass",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIMassFlowType),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIMassFlowTypeMassFlowRate = {
+		name = "opcIMassFlowTypeMassFlowRate",
+		nodeId = {nameSpaceIndex = 1, identifier = 6061},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:MassFlowRate",
+		displayName = "MassFlowRate",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIMassFlowType),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIVolumeFlowTypeVolume = {
+		name = "opcIVolumeFlowTypeVolume",
+		nodeId = {nameSpaceIndex = 1, identifier = 6041},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:Volume",
+		displayName = "Volume",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIVolumeFlowType),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIVolumeFlowTypeVolumeFlowRate = {
+		name = "opcIVolumeFlowTypeVolumeFlowRate",
+		nodeId = {nameSpaceIndex = 1, identifier = 6049},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:VolumeFlowRate",
+		displayName = "VolumeFlowRate",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIVolumeFlowType),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcINonElectricalEnergyTypeNeEnergyExportHp = {
+		name = "opcINonElectricalEnergyTypeNeEnergyExportHp",
+		nodeId = {nameSpaceIndex = 1, identifier = 6009},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:NeEnergyExportHp",
+		displayName = "NeEnergyExportHp",
+		description = "",
+		optional = false,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcINonElectricalEnergyType),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcINonElectricalEnergyTypeNeEnergyImportHp = {
+		name = "opcINonElectricalEnergyTypeNeEnergyImportHp",
+		nodeId = {nameSpaceIndex = 1, identifier = 6001},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:NeEnergyImportHp",
+		displayName = "NeEnergyImportHp",
+		description = "",
+		optional = false,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcINonElectricalEnergyType),
+		accessLevel = 3
+	};
+
+	UAObjectTypeType opcIBaseFlowType = {
+		name = "opcIBaseFlowType",
+		nodeId = {nameSpaceIndex = 1, identifier = 1006},
+		nodeClass = NodeClass::UAObjectType,
+		browseName = "1:IBaseFlowType",
+		displayName = "IBaseFlowType",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/Machinery/Energy/v100/docs/7.2"
+	};
+
+	UAObjectTypeType opcIMassFlowType = {
+		name = "opcIMassFlowType",
+		nodeId = {nameSpaceIndex = 1, identifier = 1008},
+		nodeClass = NodeClass::UAObjectType,
+		browseName = "1:IMassFlowType",
+		displayName = "IMassFlowType",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/Machinery/Energy/v100/docs/7.4"
+	};
+
+	UAObjectTypeType opcIVolumeFlowType = {
+		name = "opcIVolumeFlowType",
+		nodeId = {nameSpaceIndex = 1, identifier = 1004},
+		nodeClass = NodeClass::UAObjectType,
+		browseName = "1:IVolumeFlowType",
+		displayName = "IVolumeFlowType",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/Machinery/Energy/v100/docs/7.3"
+	};
+
+	UAObjectTypeType opcINonElectricalEnergyType = {
+		name = "opcINonElectricalEnergyType",
+		nodeId = {nameSpaceIndex = 1, identifier = 1003},
+		nodeClass = NodeClass::UAObjectType,
+		browseName = "1:INonElectricalEnergyType",
+		displayName = "INonElectricalEnergyType",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/Machinery/Energy/v100/docs/7.1"
+	};
+
+	UADataType opcNumberType = {
+		name = "opcNumberType",
+		nodeId = {nameSpaceIndex = 0, identifier = 26},
+		nodeClass = NodeClass::UADataType,
+		browseName = "Number",
+		displayName = "Number",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/12.2.9",
+		literals = {
+		}
+	};
+
+	UAVariableTypeType opcMultiStateValueDiscreteTypeType = {
+		name = "opcMultiStateValueDiscreteTypeType",
+		nodeId = {nameSpaceIndex = 0, identifier = 11238},
+		nodeClass = NodeClass::UAVariableType,
+		browseName = "MultiStateValueDiscreteType",
+		displayName = "MultiStateValueDiscreteType",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part8/5.3.3/#5.3.3.4",
+		type = refBy(opcNumberType)
+	};
+
+	UARootVariableType opcIBaseFlowTypePressureAccuracyClass = {
+		name = "opcIBaseFlowTypePressureAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6022},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIBaseFlowTypePressure)
+	};
+
+	UAVariableTypeType opcPropertyTypeType = {
+		name = "opcPropertyTypeType",
+		nodeId = {nameSpaceIndex = 0, identifier = 68},
+		nodeClass = NodeClass::UAVariableType,
+		browseName = "PropertyType",
+		displayName = "PropertyType",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/7.3",
+		type = refBy(opcUnknownDataType)
+	};
+
+	UADataType opcInt64Type = {
+		name = "opcInt64Type",
+		nodeId = {nameSpaceIndex = 0, identifier = 8},
+		nodeClass = NodeClass::UADataType,
+		browseName = "Int64",
+		displayName = "Int64",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/12.2.9/#12.2.9.8",
+		literals = {
+		}
+	};
+
+	UADataType opcLocalizedTextType = {
+		name = "opcLocalizedTextType",
+		nodeId = {nameSpaceIndex = 0, identifier = 21},
+		nodeClass = NodeClass::UADataType,
+		browseName = "LocalizedText",
+		displayName = "LocalizedText",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/12.2.7",
+		literals = {
+		}
+	};
+
+	UADataType opcEnumValueTypeType = {
+		name = "opcEnumValueTypeType",
+		nodeId = {nameSpaceIndex = 0, identifier = 7594},
+		nodeClass = NodeClass::UADataType,
+		browseName = "EnumValueType",
+		displayName = "EnumValueType",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/12.2.12/#12.2.12.6",
+		literals = {
+			DataLiteral {
+				name = "_Value",
+				type = refBy(opcInt64Type),
+				description = ""
+			}, DataLiteral {
+				name = "_DisplayName",
+				type = refBy(opcLocalizedTextType),
+				description = ""
+			}, DataLiteral {
+				name = "_Description",
+				type = refBy(opcLocalizedTextType),
+				description = ""
+			}
+		}
+	};
+
+	UARootVariableType opcIBaseFlowTypePressureAccuracyClassEnumValues = {
+		name = "opcIBaseFlowTypePressureAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6023},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIBaseFlowTypePressureAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIBaseFlowTypePressureAccuracyClassValueAsText = {
+		name = "opcIBaseFlowTypePressureAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6024},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIBaseFlowTypePressureAccuracyClass)
+	};
+
+	UADataType opcNodeIdType = {
+		name = "opcNodeIdType",
+		nodeId = {nameSpaceIndex = 0, identifier = 17},
+		nodeClass = NodeClass::UADataType,
+		browseName = "NodeId",
+		displayName = "NodeId",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/12.2.8",
+		literals = {
+		}
+	};
+
+	UARootVariableType opcIBaseFlowTypePressureAccuracyDomain = {
+		name = "opcIBaseFlowTypePressureAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6025},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIBaseFlowTypePressure)
+	};
+
+	UADataType opcInt32Type = {
+		name = "opcInt32Type",
+		nodeId = {nameSpaceIndex = 0, identifier = 6},
+		nodeClass = NodeClass::UADataType,
+		browseName = "Int32",
+		displayName = "Int32",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/12.2.9/#12.2.9.7",
+		literals = {
+		}
+	};
+
+	UADataType opcEUInformationType = {
+		name = "opcEUInformationType",
+		nodeId = {nameSpaceIndex = 0, identifier = 887},
+		nodeClass = NodeClass::UADataType,
+		browseName = "EUInformation",
+		displayName = "EUInformation",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part8/5.6.3/#5.6.3.2",
+		literals = {
+			DataLiteral {
+				name = "_NamespaceUri",
+				type = refBy(StringType),
+				description = ""
+			}, DataLiteral {
+				name = "_UnitId",
+				type = refBy(opcInt32Type),
+				description = ""
+			}, DataLiteral {
+				name = "_DisplayName",
+				type = refBy(opcLocalizedTextType),
+				description = ""
+			}, DataLiteral {
+				name = "_Description",
+				type = refBy(opcLocalizedTextType),
+				description = ""
+			}
+		}
+	};
+
+	UARootVariableType opcIBaseFlowTypePressureEngineeringUnits = {
+		name = "opcIBaseFlowTypePressureEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6037},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIBaseFlowTypePressure)
+	};
+
+	UARootVariableType opcIBaseFlowTypePressureMeasurementID = {
+		name = "opcIBaseFlowTypePressureMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6038},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIBaseFlowTypePressure)
+	};
+
+	UARootVariableType opcIBaseFlowTypePressureResource = {
+		name = "opcIBaseFlowTypePressureResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6026},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIBaseFlowTypePressure),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIBaseFlowTypePressureResourceEnumValues = {
+		name = "opcIBaseFlowTypePressureResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6027},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIBaseFlowTypePressureResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIBaseFlowTypePressureResourceValueAsText = {
+		name = "opcIBaseFlowTypePressureResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6028},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIBaseFlowTypePressureResource)
+	};
+
+	UARootVariableType opcIBaseFlowTypeTemperatureAccuracyClass = {
+		name = "opcIBaseFlowTypeTemperatureAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6030},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIBaseFlowTypeTemperature)
+	};
+
+	UARootVariableType opcIBaseFlowTypeTemperatureAccuracyClassEnumValues = {
+		name = "opcIBaseFlowTypeTemperatureAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6031},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIBaseFlowTypeTemperatureAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIBaseFlowTypeTemperatureAccuracyClassValueAsText = {
+		name = "opcIBaseFlowTypeTemperatureAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6032},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIBaseFlowTypeTemperatureAccuracyClass)
+	};
+
+	UARootVariableType opcIBaseFlowTypeTemperatureAccuracyDomain = {
+		name = "opcIBaseFlowTypeTemperatureAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6033},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIBaseFlowTypeTemperature)
+	};
+
+	UARootVariableType opcIBaseFlowTypeTemperatureEngineeringUnits = {
+		name = "opcIBaseFlowTypeTemperatureEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6040},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIBaseFlowTypeTemperature)
+	};
+
+	UARootVariableType opcIBaseFlowTypeTemperatureMeasurementID = {
+		name = "opcIBaseFlowTypeTemperatureMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6039},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIBaseFlowTypeTemperature)
+	};
+
+	UARootVariableType opcIBaseFlowTypeTemperatureResource = {
+		name = "opcIBaseFlowTypeTemperatureResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6034},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIBaseFlowTypeTemperature),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIBaseFlowTypeTemperatureResourceEnumValues = {
+		name = "opcIBaseFlowTypeTemperatureResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6035},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIBaseFlowTypeTemperatureResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIBaseFlowTypeTemperatureResourceValueAsText = {
+		name = "opcIBaseFlowTypeTemperatureResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6036},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIBaseFlowTypeTemperatureResource)
+	};
+
+	UARootVariableType opcIMassFlowTypeMassAccuracyClass = {
+		name = "opcIMassFlowTypeMassAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6070},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIMassFlowTypeMass)
+	};
+
+	UARootVariableType opcIMassFlowTypeMassAccuracyClassEnumValues = {
+		name = "opcIMassFlowTypeMassAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6071},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIMassFlowTypeMassAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIMassFlowTypeMassAccuracyClassValueAsText = {
+		name = "opcIMassFlowTypeMassAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6072},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIMassFlowTypeMassAccuracyClass)
+	};
+
+	UARootVariableType opcIMassFlowTypeMassAccuracyDomain = {
+		name = "opcIMassFlowTypeMassAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6073},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIMassFlowTypeMass)
+	};
+
+	UARootVariableType opcIMassFlowTypeMassEngineeringUnits = {
+		name = "opcIMassFlowTypeMassEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6077},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIMassFlowTypeMass)
+	};
+
+	UARootVariableType opcIMassFlowTypeMassMeasurementID = {
+		name = "opcIMassFlowTypeMassMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6078},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIMassFlowTypeMass)
+	};
+
+	UARootVariableType opcIMassFlowTypeMassResource = {
+		name = "opcIMassFlowTypeMassResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6074},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIMassFlowTypeMass),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIMassFlowTypeMassResourceEnumValues = {
+		name = "opcIMassFlowTypeMassResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6075},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIMassFlowTypeMassResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIMassFlowTypeMassResourceValueAsText = {
+		name = "opcIMassFlowTypeMassResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6076},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIMassFlowTypeMassResource)
+	};
+
+	UARootVariableType opcIMassFlowTypeMassFlowRateAccuracyClass = {
+		name = "opcIMassFlowTypeMassFlowRateAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6062},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIMassFlowTypeMassFlowRate)
+	};
+
+	UARootVariableType opcIMassFlowTypeMassFlowRateAccuracyClassEnumValues = {
+		name = "opcIMassFlowTypeMassFlowRateAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6063},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIMassFlowTypeMassFlowRateAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIMassFlowTypeMassFlowRateAccuracyClassValueAsText = {
+		name = "opcIMassFlowTypeMassFlowRateAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6064},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIMassFlowTypeMassFlowRateAccuracyClass)
+	};
+
+	UARootVariableType opcIMassFlowTypeMassFlowRateAccuracyDomain = {
+		name = "opcIMassFlowTypeMassFlowRateAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6065},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIMassFlowTypeMassFlowRate)
+	};
+
+	UARootVariableType opcIMassFlowTypeMassFlowRateEngineeringUnits = {
+		name = "opcIMassFlowTypeMassFlowRateEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6079},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIMassFlowTypeMassFlowRate)
+	};
+
+	UARootVariableType opcIMassFlowTypeMassFlowRateMeasurementID = {
+		name = "opcIMassFlowTypeMassFlowRateMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6080},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIMassFlowTypeMassFlowRate)
+	};
+
+	UARootVariableType opcIMassFlowTypeMassFlowRateResource = {
+		name = "opcIMassFlowTypeMassFlowRateResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6066},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIMassFlowTypeMassFlowRate),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIMassFlowTypeMassFlowRateResourceEnumValues = {
+		name = "opcIMassFlowTypeMassFlowRateResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6067},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIMassFlowTypeMassFlowRateResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIMassFlowTypeMassFlowRateResourceValueAsText = {
+		name = "opcIMassFlowTypeMassFlowRateResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6068},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIMassFlowTypeMassFlowRateResource)
+	};
+
+	UARootVariableType opcIVolumeFlowTypeVolumeAccuracyClass = {
+		name = "opcIVolumeFlowTypeVolumeAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6042},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIVolumeFlowTypeVolume)
+	};
+
+	UARootVariableType opcIVolumeFlowTypeVolumeAccuracyClassEnumValues = {
+		name = "opcIVolumeFlowTypeVolumeAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6043},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIVolumeFlowTypeVolumeAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIVolumeFlowTypeVolumeAccuracyClassValueAsText = {
+		name = "opcIVolumeFlowTypeVolumeAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6044},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIVolumeFlowTypeVolumeAccuracyClass)
+	};
+
+	UARootVariableType opcIVolumeFlowTypeVolumeAccuracyDomain = {
+		name = "opcIVolumeFlowTypeVolumeAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6045},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIVolumeFlowTypeVolume)
+	};
+
+	UARootVariableType opcIVolumeFlowTypeVolumeEngineeringUnits = {
+		name = "opcIVolumeFlowTypeVolumeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6057},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIVolumeFlowTypeVolume)
+	};
+
+	UARootVariableType opcIVolumeFlowTypeVolumeMeasurementID = {
+		name = "opcIVolumeFlowTypeVolumeMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6058},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIVolumeFlowTypeVolume)
+	};
+
+	UARootVariableType opcIVolumeFlowTypeVolumeResource = {
+		name = "opcIVolumeFlowTypeVolumeResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6046},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIVolumeFlowTypeVolume),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIVolumeFlowTypeVolumeResourceEnumValues = {
+		name = "opcIVolumeFlowTypeVolumeResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6047},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIVolumeFlowTypeVolumeResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIVolumeFlowTypeVolumeResourceValueAsText = {
+		name = "opcIVolumeFlowTypeVolumeResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6048},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIVolumeFlowTypeVolumeResource)
+	};
+
+	UARootVariableType opcIVolumeFlowTypeVolumeFlowRateAccuracyClass = {
+		name = "opcIVolumeFlowTypeVolumeFlowRateAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6050},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIVolumeFlowTypeVolumeFlowRate)
+	};
+
+	UARootVariableType opcIVolumeFlowTypeVolumeFlowRateAccuracyClassEnumValues = {
+		name = "opcIVolumeFlowTypeVolumeFlowRateAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6051},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIVolumeFlowTypeVolumeFlowRateAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIVolumeFlowTypeVolumeFlowRateAccuracyClassValueAsText = {
+		name = "opcIVolumeFlowTypeVolumeFlowRateAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6052},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIVolumeFlowTypeVolumeFlowRateAccuracyClass)
+	};
+
+	UARootVariableType opcIVolumeFlowTypeVolumeFlowRateAccuracyDomain = {
+		name = "opcIVolumeFlowTypeVolumeFlowRateAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6053},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIVolumeFlowTypeVolumeFlowRate)
+	};
+
+	UARootVariableType opcIVolumeFlowTypeVolumeFlowRateEngineeringUnits = {
+		name = "opcIVolumeFlowTypeVolumeFlowRateEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6059},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIVolumeFlowTypeVolumeFlowRate)
+	};
+
+	UARootVariableType opcIVolumeFlowTypeVolumeFlowRateMeasurementID = {
+		name = "opcIVolumeFlowTypeVolumeFlowRateMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6060},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIVolumeFlowTypeVolumeFlowRate)
+	};
+
+	UARootVariableType opcIVolumeFlowTypeVolumeFlowRateResource = {
+		name = "opcIVolumeFlowTypeVolumeFlowRateResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6054},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIVolumeFlowTypeVolumeFlowRate),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIVolumeFlowTypeVolumeFlowRateResourceEnumValues = {
+		name = "opcIVolumeFlowTypeVolumeFlowRateResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6055},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIVolumeFlowTypeVolumeFlowRateResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIVolumeFlowTypeVolumeFlowRateResourceValueAsText = {
+		name = "opcIVolumeFlowTypeVolumeFlowRateResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6056},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIVolumeFlowTypeVolumeFlowRateResource)
+	};
+
+	UARootVariableType opcINonElectricalEnergyTypeNeEnergyExportHpAccuracyClass = {
+		name = "opcINonElectricalEnergyTypeNeEnergyExportHpAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6010},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcINonElectricalEnergyTypeNeEnergyExportHp)
+	};
+
+	UARootVariableType opcINonElectricalEnergyTypeNeEnergyExportHpAccuracyClassEnumValues = {
+		name = "opcINonElectricalEnergyTypeNeEnergyExportHpAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6011},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcINonElectricalEnergyTypeNeEnergyExportHpAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcINonElectricalEnergyTypeNeEnergyExportHpAccuracyClassValueAsText = {
+		name = "opcINonElectricalEnergyTypeNeEnergyExportHpAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6012},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcINonElectricalEnergyTypeNeEnergyExportHpAccuracyClass)
+	};
+
+	UARootVariableType opcINonElectricalEnergyTypeNeEnergyExportHpAccuracyDomain = {
+		name = "opcINonElectricalEnergyTypeNeEnergyExportHpAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6013},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcINonElectricalEnergyTypeNeEnergyExportHp)
+	};
+
+	UARootVariableType opcINonElectricalEnergyTypeNeEnergyExportHpEngineeringUnits = {
+		name = "opcINonElectricalEnergyTypeNeEnergyExportHpEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6017},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcINonElectricalEnergyTypeNeEnergyExportHp)
+	};
+
+	UARootVariableType opcINonElectricalEnergyTypeNeEnergyExportHpMeasurementID = {
+		name = "opcINonElectricalEnergyTypeNeEnergyExportHpMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6018},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcINonElectricalEnergyTypeNeEnergyExportHp)
+	};
+
+	UARootVariableType opcINonElectricalEnergyTypeNeEnergyExportHpResource = {
+		name = "opcINonElectricalEnergyTypeNeEnergyExportHpResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6014},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcINonElectricalEnergyTypeNeEnergyExportHp),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcINonElectricalEnergyTypeNeEnergyExportHpResourceEnumValues = {
+		name = "opcINonElectricalEnergyTypeNeEnergyExportHpResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6015},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcINonElectricalEnergyTypeNeEnergyExportHpResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcINonElectricalEnergyTypeNeEnergyExportHpResourceValueAsText = {
+		name = "opcINonElectricalEnergyTypeNeEnergyExportHpResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6016},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcINonElectricalEnergyTypeNeEnergyExportHpResource)
+	};
+
+	UARootVariableType opcINonElectricalEnergyTypeNeEnergyImportHpAccuracyClass = {
+		name = "opcINonElectricalEnergyTypeNeEnergyImportHpAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6002},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcINonElectricalEnergyTypeNeEnergyImportHp)
+	};
+
+	UARootVariableType opcINonElectricalEnergyTypeNeEnergyImportHpAccuracyClassEnumValues = {
+		name = "opcINonElectricalEnergyTypeNeEnergyImportHpAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6003},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcINonElectricalEnergyTypeNeEnergyImportHpAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcINonElectricalEnergyTypeNeEnergyImportHpAccuracyClassValueAsText = {
+		name = "opcINonElectricalEnergyTypeNeEnergyImportHpAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6004},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcINonElectricalEnergyTypeNeEnergyImportHpAccuracyClass)
+	};
+
+	UARootVariableType opcINonElectricalEnergyTypeNeEnergyImportHpAccuracyDomain = {
+		name = "opcINonElectricalEnergyTypeNeEnergyImportHpAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6005},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcINonElectricalEnergyTypeNeEnergyImportHp)
+	};
+
+	UARootVariableType opcINonElectricalEnergyTypeNeEnergyImportHpEngineeringUnits = {
+		name = "opcINonElectricalEnergyTypeNeEnergyImportHpEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6019},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcINonElectricalEnergyTypeNeEnergyImportHp)
+	};
+
+	UARootVariableType opcINonElectricalEnergyTypeNeEnergyImportHpMeasurementID = {
+		name = "opcINonElectricalEnergyTypeNeEnergyImportHpMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6020},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcINonElectricalEnergyTypeNeEnergyImportHp)
+	};
+
+	UARootVariableType opcINonElectricalEnergyTypeNeEnergyImportHpResource = {
+		name = "opcINonElectricalEnergyTypeNeEnergyImportHpResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6006},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcINonElectricalEnergyTypeNeEnergyImportHp),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcINonElectricalEnergyTypeNeEnergyImportHpResourceEnumValues = {
+		name = "opcINonElectricalEnergyTypeNeEnergyImportHpResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6007},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcINonElectricalEnergyTypeNeEnergyImportHpResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcINonElectricalEnergyTypeNeEnergyImportHpResourceValueAsText = {
+		name = "opcINonElectricalEnergyTypeNeEnergyImportHpResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6008},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcINonElectricalEnergyTypeNeEnergyImportHpResource)
+	};
+
+	freeze {
+		.; // every variable declared in this project
+	} but (f|f.bindingTime >= BindingTime.compile);
+
+}
