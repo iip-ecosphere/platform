@@ -39,7 +39,6 @@ import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyName;
@@ -48,14 +47,10 @@ import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.cfg.MapperConfig;
-import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
-import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
 import com.fasterxml.jackson.databind.introspect.AnnotatedParameter;
-import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.databind.module.SimpleAbstractTypeResolver;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -64,8 +59,6 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.ConfiguredName;
-import de.iip_ecosphere.platform.support.Filter;
-import de.iip_ecosphere.platform.support.Ignore;
 import de.iip_ecosphere.platform.support.IgnoreProperties;
 import de.iip_ecosphere.platform.support.Include;
 import de.iip_ecosphere.platform.support.json.IOIterator;
@@ -108,132 +101,6 @@ public class JsonUtils {
         }
             
     };
-
-    
-    /**
-     * A handler for optional fields.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    public static class OptionalFieldsDeserializationProblemHandler extends DeserializationProblemHandler {
-
-        private Class<?> cls;
-        private Set<String> optionalFields = new HashSet<String>();
-        
-        /**
-         * Creates an optional fields deserialization problem handler to declare certain fields as optional.
-         * 
-         * @param cls the class the fields are defined on
-         * @param fieldNames the field names
-         */
-        public OptionalFieldsDeserializationProblemHandler(Class<?> cls, String... fieldNames) {
-            this.cls = cls;
-            for (String f : fieldNames) {
-                optionalFields.add(f);
-            }
-        }
-
-        @Override
-        public boolean handleUnknownProperty(DeserializationContext ctxt, JsonParser parser,
-            JsonDeserializer<?> deserializer, Object beanOrClass, String propertyName)
-            throws IOException {
-            boolean result;
-            if (optionalFields.contains(propertyName) && beanOrClass.getClass().equals(cls)) {
-                result = true;
-            } else {
-                result = false;
-            }
-            return result;
-        }
-        
-    }
-
-    /**
-     * A property naming strategy exactly using the given names as JSON and Java field/getter/setter names.
-     * Applies a fallback strategy if there is no mapping.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    public static class MappingPropertyNamingStrategy extends PropertyNamingStrategy {
-        
-        private static final long serialVersionUID = -3963175454099182994L;
-        private PropertyNamingStrategy fallback;
-        private Map<String, String> mapping;
-
-        /**
-         * Creates a mapping property naming strategy. Fallback strategy is {@code PropertyNamingStrategy} using
-         * the default names without strategy.
-         * 
-         * @param mapping the mapping of field names to json fields
-         */
-        public MappingPropertyNamingStrategy(Map<String, String> mapping) {
-            this(mapping, new PropertyNamingStrategy());
-        }
-
-        /**
-         * Creates a mapping property naming strategy with explicit fallback strategy.
-         * 
-         * @param mapping the mapping of field names to json fields
-         * @param fallback the fallback strategy
-         */
-        public MappingPropertyNamingStrategy(Map<String, String> mapping, PropertyNamingStrategy fallback) {
-            this.fallback = fallback;
-            this.mapping = mapping;
-        }
-
-        @Override
-        public String nameForConstructorParameter(MapperConfig<?> config, AnnotatedParameter ctorParam,
-            String defaultName) {
-            return fallback.nameForConstructorParameter(config, ctorParam, defaultName);
-        }
-        
-        @Override
-        public String nameForField(MapperConfig<?> config, AnnotatedField field, String defaultName) {
-            String result = field.getName();
-            //String result = mapping.get(field.getName());
-            if (result == null) {
-                result = fallback.nameForField(config, field, defaultName);
-            }
-            return result;
-        }
-
-        @Override
-        public String nameForGetterMethod(MapperConfig<?> config, AnnotatedMethod method, String defaultName) {
-            String fieldName = method.getName();
-            if (fieldName.startsWith("get")) {
-                fieldName = fieldName.substring(3);
-            }
-            String result = mapping.get(fieldName);
-            if (result == null) {
-                /*if (fieldName.length() > 2 && Character.isLowerCase(fieldName.charAt(1))) {
-                    result = fallback.nameForSetterMethod(config, method, defaultName);
-                } else {
-                    result = fieldName;
-                }*/
-                result = fallback.nameForSetterMethod(config, method, defaultName);
-            }
-            return result;
-        }
-        
-        @Override
-        public String nameForSetterMethod(MapperConfig<?> config, AnnotatedMethod method, String defaultName) {
-            String fieldName = method.getName();
-            if (fieldName.startsWith("set")) {
-                fieldName = fieldName.substring(3);
-            }
-            String result = mapping.get(fieldName);
-            if (result == null) {
-                /*if (fieldName.length() > 2 && Character.isLowerCase(fieldName.charAt(1))) {
-                    result = fallback.nameForSetterMethod(config, method, defaultName);
-                } else {
-                    result = fieldName;
-                }*/
-                result = fallback.nameForSetterMethod(config, method, defaultName);
-            }
-            return result;
-        }
-        
-    }
     
     /**
      * Configures the given class for through the abstracted annotations.
@@ -283,85 +150,7 @@ public class JsonUtils {
             }
             cpns.addMapping(cls, renames);
         }
-        return setAnnotationIntrospector(mapper, introspector, null);
-    }
-    
-    /**
-     * Basic annotation introspector for abstracting oktoflow data annotations, in particular {@link ConfiguredName} 
-     * and {@link Ignore}.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    public static class OktoAnnotationIntrospector extends JacksonAnnotationIntrospector {
-
-        private static final long serialVersionUID = -1021095562978855964L;
-        private Set<String> exclusions;
-        private Set<Object> ignore;
-
-        @Override
-        public boolean hasIgnoreMarker(AnnotatedMember member) {
-            Ignore ignoreAnn = member.getAnnotation(Ignore.class);
-            if (null != ignoreAnn) {
-                return ignoreAnn.value();
-            }
-            if (exclusions != null) {
-                boolean exclude = exclusions.contains(member.getName());
-                if (!exclude) {
-                    ConfiguredName cfgName = member.getAnnotation(ConfiguredName.class);
-                    if (null != cfgName && cfgName.value() != null) {
-                        exclude = exclusions.contains(cfgName.value());
-                    }
-                }
-                return exclude;
-            }
-            if (null != ignore) {
-                return ignore.contains(member.getType().getRawClass()) || ignore.contains(member.getMember());
-            }
-            return super.hasIgnoreMarker(member);
-        }
-        
-        @Override
-        public PropertyName findNameForDeserialization(Annotated member) {
-            ConfiguredName cfgName = member.getAnnotation(ConfiguredName.class);
-            if (cfgName != null) {
-                return PropertyName.construct(cfgName.value());
-            } else {                
-                return super.findNameForDeserialization(member);
-            }
-        }
-    
-        @Override
-        public PropertyName findNameForSerialization(Annotated member) {
-            ConfiguredName cfgName = member.getAnnotation(ConfiguredName.class);
-            if (cfgName != null) {
-                return PropertyName.construct(cfgName.value());
-            } else {                
-                return super.findNameForSerialization(member);
-            }
-        }
-        
-        @Override
-        public JsonIgnoreProperties.Value findPropertyIgnorals(Annotated member) {
-            IgnoreProperties ignoreProp = member.getAnnotation(IgnoreProperties.class);
-            if (ignoreProp == null) {
-                return JsonIgnoreProperties.Value.empty();
-            }
-            return super.findPropertyIgnorals(member);
-        }
-        
-        @Override
-        public Object findFilterId(Annotated member) {
-            Filter filter = member.getAnnotation(Filter.class);
-            if (filter != null) {
-                String id = filter.value();
-                // Empty String is same as not having annotation, to allow overrides
-                if (id.length() > 0) {
-                    return id;
-                }
-            }
-            return super.findFilterId(member);
-        }
-        
+        return OktoAnnotationIntrospector.set(introspector, i-> mapper.setAnnotationIntrospector(i), null);
     }
     
     /**
@@ -396,46 +185,24 @@ public class JsonUtils {
     }
     
     /**
+     * Creates a module for handling IIP data/implementation classes according to IIP conventions.
+     * 
+     * @return the module
+     */
+    public static SimpleModule createIipDataClassesModule() {
+        SimpleModule iipModule = new SimpleModule();
+        iipModule.setAbstractTypes(IIP_TYPE_RESOLVER);
+        return iipModule;
+    }
+    
+    /**
      * Configures a Jackson object mapper for IIP conventions.
      * 
      * @param mapper the mapper to be configured
      * @return {@code mapper}
      */
     public static ObjectMapper handleIipDataClasses(ObjectMapper mapper) {
-        SimpleModule iipModule = new SimpleModule();
-        iipModule.setAbstractTypes(IIP_TYPE_RESOLVER);
-        return mapper.registerModule(iipModule);
-    }
-    
-    /**
-     * Defines the given {@code fieldNames} as optional during deserialization.
-     * 
-     * @param mapper the mapper to define the optionals on
-     * @param cls the cls the class {@code fieldNames} are member of
-     * @param fieldNames the field names (names of Java fields)
-     * @return {@code mapper}
-     */
-    public static ObjectMapper defineOptionals(ObjectMapper mapper, Class<?> cls, String... fieldNames) {
-        return mapper.addHandler(new OptionalFieldsDeserializationProblemHandler(cls, fieldNames));
-    }
-
-    /**
-     * Defines a mapping of JSON names to Java field names using exactly the given names.
-     * 
-     * @param mapper the mapper to define the optionals on
-     * @param fieldNames the field names (names of JSON/Java fields)
-     * @return {@code mapper}
-     */
-    public static ObjectMapper defineFields(ObjectMapper mapper, String... fieldNames) {
-        Map<String, String> mapping = new HashMap<>();
-        for (String fn : fieldNames) {
-            String javaField = fn;
-            if (javaField.length() > 0) {
-                javaField = Character.toUpperCase(javaField.charAt(0)) + javaField.substring(1);
-            }
-            mapping.put(javaField, fn);
-        }
-        return mapper.setPropertyNamingStrategy(new MappingPropertyNamingStrategy(mapping));
+        return mapper.registerModule(createIipDataClassesModule());
     }
     
     /**
@@ -470,7 +237,8 @@ public class JsonUtils {
     public static OktoAnnotationIntrospector exceptFields(ObjectMapper mapper, OktoAnnotationIntrospector introspector,
         String... fieldNames) {
         final Set<String> exclusions = CollectionUtils.addAll(new HashSet<String>(), fieldNames);
-        return setAnnotationIntrospector(mapper, introspector, i -> i.exclusions = exclusions);
+        return OktoAnnotationIntrospector.set(introspector, i-> mapper.setAnnotationIntrospector(i), 
+            i -> i.setExclusions(exclusions));
     }
     
     /**
@@ -617,7 +385,8 @@ public class JsonUtils {
             ObjectMapper.DefaultTyping.NON_FINAL, 
             JsonTypeInfo.As.WRAPPER_ARRAY);
         if (!ignore.isEmpty()) {
-            result = setAnnotationIntrospector(mapper, result, i -> i.ignore = ignore);
+            result = OktoAnnotationIntrospector.set(result, i-> mapper.setAnnotationIntrospector(i), 
+                i -> i.setIgnore(ignore));
         }
         return result;
     }

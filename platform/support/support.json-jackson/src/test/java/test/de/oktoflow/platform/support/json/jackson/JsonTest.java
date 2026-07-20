@@ -122,7 +122,7 @@ public class JsonTest {
     public void testJson() throws IOException {
         Json json = Json.createInstance();
         Assert.assertTrue(json instanceof JacksonJson);
-
+        
         Data data = new Data();
         data.setiValue(10);
         data.setsValue("abba");
@@ -133,8 +133,12 @@ public class JsonTest {
         s = json.toJson(data);
         data1 = json.fromJson(s, Data.class);
         assertData(data1, data);
-        
-        byte[] b = json.writeValueAsBytes(data);
+
+        byte[] b = json.writeValueAsBytes(new Object());
+        Object o = json.readValue(new String(b), Object.class);
+        Assert.assertNotNull(o);
+
+        b = json.writeValueAsBytes(data);
         data1 = json.readValue(b, Data.class);
         assertData(data1, data);
     }

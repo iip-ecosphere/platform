@@ -1,1 +1,2 @@
 de.oktoflow.platform.support.json.jackson.JacksonJsonPluginDescriptor
+de.oktoflow.platform.support.json.jackson.JacksonXmlPluginDescriptor

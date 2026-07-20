@@ -31,6 +31,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
@@ -43,11 +44,10 @@ import de.iip_ecosphere.platform.support.json.JsonGenerator;
 import de.iip_ecosphere.platform.support.json.JsonIterator;
 import de.iip_ecosphere.platform.support.json.JsonObject;
 import de.iip_ecosphere.platform.support.json.JsonObjectBuilder;
-import de.oktoflow.platform.support.json.jackson.JsonUtils.OktoAnnotationIntrospector;
 import de.oktoflow.platform.support.json.jackson.JsonUtils.JacksonEnumMapping;
 
 /**
- * Implements the JSON interface by Jackson.
+ * Implements the JSON interface using Jackson.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -56,6 +56,10 @@ public class JacksonJson extends de.iip_ecosphere.platform.support.json.Json {
     private ObjectMapper mapper = new ObjectMapper();
     private ObjectWriter writer; 
     private OktoAnnotationIntrospector introspector;
+    
+    { // basic configuraiton for all mappers, independend whether specific classes shall be considered
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+    }
 
     /**
      * Self-configuring Json implementation based on provided types.
@@ -230,7 +234,7 @@ public class JacksonJson extends de.iip_ecosphere.platform.support.json.Json {
     public <T> T readValue(String src, Class<T> cls) throws IOException {
         try {
             return mapper.readValue(src, cls);
-        } catch (JsonProcessingException e) {
+        } catch (JsonProcessingException e) { // frontend exception although e is IOException
             throw new IOException(e);
         }
     }
@@ -239,7 +243,7 @@ public class JacksonJson extends de.iip_ecosphere.platform.support.json.Json {
     public <T> T readValue(byte[] src, Class<T> valueType) throws IOException {
         try {
             return mapper.readValue(src, valueType);
-        } catch (JsonProcessingException e) {
+        } catch (JsonProcessingException e) { // frontend exception although e is IOException
             throw new IOException(e);
         }
     }
@@ -252,7 +256,7 @@ public class JacksonJson extends de.iip_ecosphere.platform.support.json.Json {
             } else {
                 return mapper.writeValueAsBytes(value);
             }
-        } catch (JsonProcessingException e) {
+        } catch (JsonProcessingException e) { // frontend exception although e is IOException
             throw new IOException(e);
         }
     }    
@@ -265,7 +269,7 @@ public class JacksonJson extends de.iip_ecosphere.platform.support.json.Json {
             } else {
                 return mapper.writeValueAsString(value);
             }
-        } catch (JsonProcessingException e) {
+        } catch (JsonProcessingException e) { // frontend exception although e is IOException
             throw new IOException(e);
         }
     }
@@ -294,13 +298,13 @@ public class JacksonJson extends de.iip_ecosphere.platform.support.json.Json {
     
     @Override
     public Json defineOptionals(Class<?> cls, String... fieldNames) {
-        mapper = JsonUtils.defineOptionals(mapper, cls, fieldNames);
+        mapper.addHandler(new OptionalFieldsDeserializationProblemHandler(cls, fieldNames));
         return this;
     }
 
     @Override
     public Json defineFields(String... fieldNames) {
-        mapper = JsonUtils.defineFields(mapper, fieldNames);
+        mapper.setPropertyNamingStrategy(MappingPropertyNamingStrategy.createFor(fieldNames));
         return this;
     }
     
