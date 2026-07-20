@@ -21,6 +21,7 @@ Improvements:
 * Determined start sequence for standalone apps/tests: sinks, transformers/probes, sources
 * Improved type display consistency in managementUI
 * Support for Linux symlinks in file paths, in particular for the configuration models
+* Support for XML data format, akin to Json but simplified
 * [#190](https://github.com/iip-ecosphere/platform/issues/190): Integration of oktoflo2grafana
 * [#191](https://github.com/iip-ecosphere/platform/issues/191): Update dependencies/libraries
 * [#193](https://github.com/iip-ecosphere/platform/issues/193): Improve OPC integration

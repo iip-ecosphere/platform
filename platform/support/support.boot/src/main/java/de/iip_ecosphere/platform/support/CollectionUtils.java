@@ -222,7 +222,7 @@ public class CollectionUtils {
      * Merges source into target recursively.
      *
      * If a key exists in both maps:
-     * a) If both values are Map<String, Object>, they are merged recursively.
+     * a) If both values are Map&lt;String, Object&gt;, they are merged recursively.
      * b) Otherwise, the value from source replaces the one in target.
      *
      * @param <K> the key type (assumed to be homogeneous even in sub maps)

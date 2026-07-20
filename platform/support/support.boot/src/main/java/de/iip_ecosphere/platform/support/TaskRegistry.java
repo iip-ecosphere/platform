@@ -181,7 +181,7 @@ public class TaskRegistry {
         /**
          * Returns the task/log reporting path.
          * 
-         * @param path the path(s), if multiple separated by {@link #PATH_SEPARATOR}, may be empty for none
+         * @return the path(s), if multiple separated by {@link #PATH_SEPARATOR}, may be empty for none
          */
         public String getPath() {
             return path;

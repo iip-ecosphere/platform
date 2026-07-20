@@ -81,7 +81,7 @@ public class JsonTest {
     }
 
     /**
-     * Tests basic YAML functions.
+     * Tests basic Json functions.
      * 
      * @throws IOException shall not occur
      */

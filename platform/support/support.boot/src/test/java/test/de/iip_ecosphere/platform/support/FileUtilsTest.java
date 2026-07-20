@@ -21,7 +21,7 @@ import de.iip_ecosphere.platform.support.resources.ResourceLoader;
  */
 public class FileUtilsTest {
     
-    private static int numberTestFiles = 26;
+    private static int numberTestFiles = 27;
     private static int numberTestNotServiceFiles = 19;
 
     /**
