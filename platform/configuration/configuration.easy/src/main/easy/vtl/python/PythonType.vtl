@@ -123,6 +123,11 @@ template PythonType(Configuration config, PythonCodeArtifact target, RecordType 
         addDatatypeImport(asTypeName(type.name), false, art);
     }
 
+    @DispatchBasis    
+    def genImport(EnumType type, PythonCodeArtifact art) {
+        addDatatypeImport(asTypeName(type.name), false, art);
+    }
+
     // added v2->v3
     def getBase(RecordType type, String add, PythonCodeArtifact target) {
         String result = "";
@@ -156,6 +161,7 @@ template PythonType(Configuration config, PythonCodeArtifact target, RecordType 
         genTypeImports(type, target);
     	target.addImport("datetime", "datetime");
     	target.addImport("decimal", "Decimal");
+    	target.addImport("typing", "Any");
         String base = getBase(type, add, target);
     	PythonCodeClass c = addPythonClass(target, "${clsName}${add}", '${comment} of the application data type ${clsName}.');
     	c.addBase(ext);
