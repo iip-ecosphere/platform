@@ -36,12 +36,77 @@ public class CollectionUtils {
      * @param <T> the element type
      * @param elements the elements
      * @return the list containing all {@code elements}
+     * @see #toListWithNull(Object[])
      */
     @SafeVarargs
     public static <T> List<T> toList(T... elements) {
         List<T> result = new ArrayList<T>();
         for (T e : elements) {
             result.add(e);
+        }
+        return result;
+    }
+
+    /**
+     * Turns an array into a list.
+     * 
+     * @param <T> the element type
+     * @param elements the array to convert, may be <b>null</b>
+     * @return the converted list, may be <b>null</b> if {@code elements} was <b>null</b>
+     * @see #toList(Object...)
+     */
+    public static <T> List<T> toListWithNull(T[] elements) {
+        return null == elements ? null : toList(elements);
+    }
+    
+    /**
+     * Converts a number list to a byte array.
+     * 
+     * @param list the list to be converted, may be <b>null</b>
+     * @return the converted array, may be <b>null</b> if {@code list} was <b>null</b>
+     */
+    public static byte[] toByteArray(List<? extends Number> list) {
+        byte[] result = null;
+        if (null != list) {
+            result = new byte[list.size()];
+            for (int i = 0; i < list.size(); i++) {
+                result[i] = list.get(i).byteValue();
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Adds all values from {@code data} to {@code list}.
+     * 
+     * @param list the list to modify, may be <b>null</b> for no action
+     * @param data the array to copy from, may be <b>null</b> for no action
+     * @return {@code list}
+     */
+    public static List<Integer> addAllBytes(List<Integer> list, byte[] data) {
+        if (null != list && null != data) {
+            for (int i = 0; i < data.length; i++) {
+                list.add(Integer.valueOf(data[i]));
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Turns a list into an array.
+     * 
+     * @param <T> the element type
+     * @param list the list to convert, may be <b>null</b>
+     * @return the converted array, may be <b>null</b> if {@code list} was null
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T[] toArray(List<T> list, Class<T> cls) {
+        T[] result;
+        if (list != null) {
+            result = (T[]) java.lang.reflect.Array.newInstance(cls, list.size());
+            list.toArray(result);
+        } else {
+            result = null;
         }
         return result;
     }

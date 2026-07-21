@@ -94,5 +94,31 @@ public class TimeUtilsTest {
         
         Assert.assertNull(TimeUtils.toDate(null));
     }
+    
+    /**
+     * Tests {@link TimeUtils#toTimestamp(LocalDateTime)} and {@link TimeUtils#toLocalDateTime(long)}.
+     */
+    @Test
+    public void testLocalTimeStamp() {
+        long timestamp = System.currentTimeMillis();
+        LocalDateTime ldt = TimeUtils.toLocalDateTime(timestamp);
+        Assert.assertNotNull(ldt);
+        long timestamp2 = TimeUtils.toTimestamp(ldt);
+        Assert.assertEquals(timestamp, timestamp2);
+        Assert.assertEquals(0, TimeUtils.toTimestamp((LocalDateTime) null));
+    }
+
+    /**
+     * Tests {@link TimeUtils#toDate(long)} and {@link TimeUtils#toTimestamp(Date)}.
+     */
+    @Test
+    public void testDateTimestamp() {
+        long timestamp = System.currentTimeMillis();
+        Date d = TimeUtils.toDate(timestamp);
+        Assert.assertNotNull(d);
+        long timestamp2 = TimeUtils.toTimestamp(d);
+        Assert.assertEquals(timestamp, timestamp2);
+        Assert.assertEquals(0, TimeUtils.toTimestamp((Date) null));
+    }
 
 }

@@ -259,5 +259,52 @@ public class CollectionUtilsTest {
         Assert.assertFalse(CollectionUtils.contains(new Integer[] {}, 1));
         Assert.assertTrue(CollectionUtils.contains(new Integer[] {2, 1}, 1));
     }
+    
+    /**
+     * Tests {@link CollectionUtils#toArray(List)} and {@link CollectionUtils#toListWithNull(Object[])}.
+     */
+    @Test
+    public void testArrayConversions() {
+        Assert.assertNull(CollectionUtils.toListWithNull(null));
+        Assert.assertNull(CollectionUtils.toArray(null, Object.class));
+        
+        String[] arr = {"aa", "bb"};
+        List<String> lst = CollectionUtils.toListWithNull(arr);
+        Assert.assertNotNull(lst);
+        Assert.assertEquals(lst.size(), arr.length);
+        for (int i = 0; i < arr.length; i++) {
+            Assert.assertEquals(arr[i], lst.get(i));    
+        }
+        String[] arr2 = CollectionUtils.toArray(lst, String.class);
+        Assert.assertArrayEquals(arr, arr2);
+    }
+   
+    /**
+     * Tests {@link CollectionUtils#toByteArray(List) and {@link CollectionUtils#addAllBytes(List, byte[])}.
+     */
+    @Test
+    public void testByteArrayConversion() {
+        List<Integer> intList = new ArrayList<>();
+        intList.add(1);
+        intList.add(10);
+        byte[] arr = CollectionUtils.toByteArray(intList);
+        Assert.assertNotNull(arr);
+        Assert.assertEquals(intList.size(), arr.length);
+        Assert.assertEquals(intList.get(0).byteValue(), arr[0]);
+        Assert.assertEquals(intList.get(1).byteValue(), arr[1]);
+        
+        Assert.assertNull(CollectionUtils.toByteArray(null));
+        
+        intList.clear();
+        CollectionUtils.addAllBytes(intList, arr);
+        Assert.assertEquals(intList.size(), arr.length);
+        Assert.assertEquals(intList.get(0).byteValue(), arr[0]);
+        Assert.assertEquals(intList.get(1).byteValue(), arr[1]);
+        
+        CollectionUtils.addAllBytes(null, null);
+        CollectionUtils.addAllBytes(intList, null);
+        Assert.assertEquals(intList.size(), arr.length);
+        CollectionUtils.addAllBytes(null, arr);
+    }
 
 }

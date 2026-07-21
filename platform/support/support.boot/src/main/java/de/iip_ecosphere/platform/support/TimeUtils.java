@@ -15,6 +15,7 @@ package de.iip_ecosphere.platform.support;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -237,6 +238,55 @@ public class TimeUtils {
         return result;
     }
     
+    /**
+     * Returns the default time zone id.
+     * 
+     * @return the time zone id
+     */
+    public static ZoneId getDefaultZoneId() {
+        return ZoneId.systemDefault(); // for now
+    }
+
+    /**
+     * Converts a long timestamp to a {@link LocalDateTime} using {@link #getDefaultZoneId()}.
+     * 
+     * @param timestamp the timestamp
+     * @return the local date time object
+     */
+    public static LocalDateTime toLocalDateTime(long timestamp) {
+        return Instant.ofEpochMilli(timestamp).atZone(getDefaultZoneId()).toLocalDateTime();
+    }
+
+    /**
+     * Converts a timestamp to a date.
+     * 
+     * @param timestamp the timestamp
+     * @return the date object
+     */
+    public static Date toDate(long timestamp) {
+        return new Date(timestamp);
+    }
+
+    /**
+     * Converts a local date time to a timestamp using {@link #getDefaultZoneId()}.
+     * 
+     * @param time the local date time object, may be <b>null</b>
+     * @return the timestamp, {@code 0} if {@code time} is <b>null</b>
+     */
+    public static long toTimestamp(LocalDateTime time) {
+        return null == time ? 0 : time.atZone(getDefaultZoneId()).toInstant().toEpochMilli();
+    }
+
+    /**
+     * Converts a date to a timestamp.
+     * 
+     * @param time the date object, may be <b>null</b>
+     * @return the timestamp, {@code 0} if {@code time} is <b>null</b>
+     */
+    public static long toTimestamp(Date time) {
+        return null == time ? 0 : time.getTime();
+    }
+
     /**
      * Converts a {@link LocalDateTime} value to {@link Date} using instant and the 
      * system default time zone.
