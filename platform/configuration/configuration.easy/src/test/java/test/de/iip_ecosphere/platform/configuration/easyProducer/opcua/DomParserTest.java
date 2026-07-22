@@ -13,11 +13,13 @@
 package test.de.iip_ecosphere.platform.configuration.easyProducer.opcua;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.xml.sax.SAXException;
 
 import de.iip_ecosphere.platform.configuration.easyProducer.opcua.parser.DomParser;
 import de.iip_ecosphere.platform.support.FileUtils;
@@ -47,6 +49,30 @@ public class DomParserTest {
         DomParser.main(new String[] {in.toString()});
 
         Assert.assertTrue(out.isFile());
+    }
+
+    /**
+     * Tests propagation of XML parser failures.
+     *
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testParserErrorPropagation() throws IOException {
+        File tmp = new File("target/tmp");
+        tmp.mkdirs();
+        File invalid = File.createTempFile("invalid-opcua-input-", ".xml", tmp);
+        try (FileWriter writer = new FileWriter(invalid)) {
+            writer.write("<invalid>");
+        }
+        try {
+            DomParser.process(invalid, "Invalid", new File(tmp, "OpcInvalid.ivml"), false);
+            Assert.fail("Expected malformed XML input to be rejected");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(e.getMessage().contains(invalid.toString()));
+            Assert.assertTrue(e.getCause() instanceof SAXException);
+        } finally {
+            Assert.assertTrue(invalid.delete());
+        }
     }
     
     /**

@@ -1394,7 +1394,7 @@ public class DomParser {
             Collector.collectInformation(compSpec.getName(), objectTypeList, objectList, variableList, methodList,
                     dataTypeList, variableTypeList, hierarchy, reqModels.length);
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            System.out.println(e.getMessage());
+            throw new IllegalArgumentException("Cannot parse OPC UA NodeSet '" + compSpec + "': " + e.getMessage(), e);
         }
         return parser;
     }
