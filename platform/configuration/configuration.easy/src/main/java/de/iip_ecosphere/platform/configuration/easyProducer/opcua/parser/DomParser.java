@@ -1458,6 +1458,7 @@ public class DomParser {
         ArrayList<File> files = new ArrayList<File>();
         if (args.length == 1) {
             file = new File(args[0]);
+            files.add(file);
         } else {
             File baseDir = new File("src/main/resources/NodeSets/");
             files.add(new File(baseDir, "Opc.Ua.Woodworking.NodeSet2.xml"));

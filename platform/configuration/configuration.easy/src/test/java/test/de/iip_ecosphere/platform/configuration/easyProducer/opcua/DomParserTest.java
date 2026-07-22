@@ -28,6 +28,26 @@ import de.iip_ecosphere.platform.support.FileUtils;
  * @author Holger Eichelberger, SSE
  */
 public class DomParserTest {
+
+    /**
+     * Tests processing one explicitly supplied companion specification.
+     */
+    @Test
+    public void testDomParserSingleInput() {
+        File in = new File("src/test/resources/NodeSets/Opc.Ua.MachineTool.NodeSet2.xml");
+        Assert.assertTrue(in.isFile());
+        File out = new File("target/gen/OpcMachineTool.ivml");
+        out.getParentFile().mkdirs();
+        if (out.exists()) {
+            Assert.assertTrue(out.delete());
+        }
+        DomParser.setDefaultVerbose(false);
+        DomParser.setUsingIvmlFolder("target/tmp");
+
+        DomParser.main(new String[] {in.toString()});
+
+        Assert.assertTrue(out.isFile());
+    }
     
     /**
      * Tests {@link DomParser} on the machine tool companion spec XML.
