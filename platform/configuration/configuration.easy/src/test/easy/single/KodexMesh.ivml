@@ -3,6 +3,8 @@ project KodexMesh {
     import CommonSetupNoMonUi;
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    serializer = Serializer::ProtoBuf;
    
     // ------------ data types ------------------
     
@@ -19,6 +21,24 @@ project KodexMesh {
         }
     };
     
+    GenericDateTimeTypeType myTime = {
+        name="myTime",
+        format="yyyy-mm-dd hh:mm:ss"        
+    };
+    
+    EnumType myTestEnum = EnumType {
+        name = "myTestEnum",
+        literals = {
+            EnumLiteral {
+                name = "Lit1",
+                ordinal = 25
+            }, EnumLiteral {
+                name = "Lit2",
+                ordinal = 100
+            }
+        }
+    };
+    
     RecordType rec2 = {
         name = "KRec13Anon",
         fields = {
@@ -31,6 +51,27 @@ project KodexMesh {
             }, Field {
                 name = "stringField",
                 type = refBy(StringType)
+            }, Field { // for protobuf testing
+                name = "dateTimeField",
+                type = refBy(DateTimeType)
+            }, Field { // for protobuf testing
+                name = "genericDateTimeField",
+                type = refBy(myTime)
+            }, Field { // for protobuf testing
+                name = "manyStringsField",
+                type = refBy(StringArrayType)
+            }, Field { // for protobuf testing
+                name = "byteField",
+                type = refBy(ByteType)
+            }, Field { // for protobuf testing
+                name = "byteStringField",
+                type = refBy(ByteStringType)
+            }, Field { // for protobuf testing
+                name = "objectField",
+                type = refBy(ObjectType)
+            }, Field { // for protobuf testing
+                name = "enumField",
+                type = refBy(myTestEnum)
             }
         }
     };
@@ -294,6 +335,7 @@ project KodexMesh {
     // ------------ freezing ------------------
     
     freeze {
+        serializer;
         sharedInterfaces;
         sharedArtifact;
         containerGeneration;

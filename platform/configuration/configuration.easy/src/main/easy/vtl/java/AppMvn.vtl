@@ -67,6 +67,10 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             ex = new XmlElement(exs, "exclusion");
             new XmlElement(ex, "groupId", "org.apache.tomcat");
             new XmlElement(ex, "artifactId", "tomcat-catalina");*/
+        } else {
+            if (config.serializer==Serializer::ProtoBuf) {
+                appendDependency(dep, "com.google.protobuf", "protobuf-java", "\\${protobuf.version}");    
+            }
         }
         for (String art : artifacts.asSequence()->sortedBy(a|a)) { // sortedBy for testing
             appendArtifact(dep, art, projectVersion);
@@ -158,6 +162,12 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             new XmlElement(configPluginCfg, "outputFile", "\\${project.build.directory}/dashboard-" + toFolderName(appName) + ".json");
             if (isDefined(config.dashboardPushURI) and config.dashboardPushURI <> "") {
                 new XmlElement(configPluginCfg, "postUrl", config.dashboardPushURI);
+            }
+        }
+        
+        if (ifArtifact) {
+            if (config.serializer==Serializer::ProtoBuf) {
+                appendProtobufPlugins(plugins);
             }
         }
     }

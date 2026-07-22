@@ -4,6 +4,8 @@ project SerializerConfig1Old {
     import DataTypes;
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    serializer = Serializer::Xml;
     
     // ------------ data types ------------------
     
@@ -364,6 +366,7 @@ project SerializerConfig1Old {
     // ------------ freezing ------------------
     
     freeze {
+        serializer;
         sharedInterfaces;
         sharedArtifact;
         containerGeneration;

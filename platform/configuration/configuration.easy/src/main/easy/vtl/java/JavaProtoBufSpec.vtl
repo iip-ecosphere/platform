@@ -1,0 +1,184 @@
+import JavaBasics;
+import JavaSerializerBase;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+template JavaProtoBufSpec(IIPEcosphere config, JavaCodeArtifact target, RecordType type, String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl) {
+
+    def main(IIPEcosphere config, JavaCodeArtifact target, RecordType type, String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl) {
+'syntax = "proto3";
+option java_package = "iip.serializers";
+
+message ${getTypeName(type)}Proto {
+    ${genFields(type)}
+}
+        
+'
+    }
+    
+    def String getTypeName(RecordType type) {
+        String clsName = asTypeName(type.name);
+        if (impl) {
+            clsName = clsName + "Impl";
+        }
+        clsName;
+    }
+    
+    def genImports(RecordType r) {
+        for (Field f : r.fields) {
+            '${genImport(f.type)}'
+        }
+    }
+    
+    @DispatchBasis
+    def genImport(DataType t) {
+    }
+
+    @DispatchBasis
+    def genImport(RecordType t) {
+        'import "src/main/proto/${getTypeName(t)}";'
+    }
+    
+    def genFields(RecordType r) {
+        Integer fCount = 0;
+        for (Field f : r.fields) {
+            fCount = fCount + 1;
+            '${genField(f, fCount)}'
+        }
+    }
+    
+    def genField(Field f, Integer id) {
+        '${genType(f.type)} ${asMethodFieldIdentifier(f.name)} = ${id};'
+    }
+    
+    @DispatchBasis
+    def genType(DataType t) {
+        "${asTypeName(t.name)}Proto";
+    }
+
+    @DispatchCase
+    def genType(AliasType t) {
+        genType(t.represents);
+    }
+
+    @DispatchCase
+    def genType(ArrayType t) {
+        "repeated " + genType(t.type);
+    }
+    
+    @DispatchCase
+    def genType(EnumType t) {
+        "string";
+    }
+    
+    @DispatchCase
+    def genType(ListType t) {
+        "repeated " + genType(t.type);
+    }
+
+    @DispatchCase
+    def genType(IntegerTypeType t) {
+        "sint32";
+    }
+
+    @DispatchCase
+    def genType(ShortTypeType t) {
+        "sint32";
+    }
+    
+    @DispatchCase
+    def genType(LongTypeType t) {
+        "sint64";
+    }
+
+    @DispatchCase
+    def genType(StringTypeType t) {
+        "string";
+    }
+
+    @DispatchCase
+    def genType(StringBase64TypeType t) {
+        "string";
+    }
+
+    @DispatchCase
+    def genType(BooleanTypeType t) {
+        "bool";
+    }
+    
+    @DispatchCase
+    def genType(FloatTypeType t) {
+        "float";
+    }
+    
+    @DispatchCase
+    def genType(DoubleTypeType t) {
+        "double";
+    }
+
+    @DispatchCase
+    def genType(ByteTypeType t) {
+        "sint32";
+    }
+
+    @DispatchCase
+    def genType(ObjectTypeType t) {
+        "string"; // for now
+    }
+
+    @DispatchCase
+    def genType(Integer16TypeType t) {
+        "sint32";
+    }
+
+    @DispatchCase
+    def genType(Integer32TypeType t) {
+        "sint32";
+    }
+
+    @DispatchCase
+    def genType(Integer64TypeType t) {
+        "sint64";
+    }
+
+    @DispatchCase
+    def genType(SByteTypeType t) {
+        "sint32";
+    }
+
+    @DispatchCase
+    def genType(UnsignedInteger16TypeType t) {
+        "uint32";
+    }
+
+    @DispatchCase
+    def genType(UnsignedInteger32TypeType t) {
+        "uint32";
+    }
+
+    @DispatchCase
+    def genType(UnsignedInteger64TypeType t) {
+        "uint64";
+    }
+
+    @DispatchCase
+    def genType(ByteStringTypeType t) {
+        "repeated sint32";
+    }
+
+    @DispatchCase
+    def genType(DateTimeTypeType t) {
+        "sint64"; // timestamp
+    }
+
+    @DispatchCase
+    def genType(GenericDateTimeTypeType t) {
+        "sint64"; // timestamp
+    }
+
+    @DispatchCase
+    def genType(IEC61131_3DateTimeTypeType t) {
+        "sint64"; // timestamp
+    }
+    
+}

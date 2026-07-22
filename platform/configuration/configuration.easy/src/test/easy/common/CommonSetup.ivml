@@ -6,7 +6,7 @@ project CommonSetup {
 
     // ------------ component setup ------------------
 
-    serializer = Serializer::Json;
+    // serializer is now individual per model
 
     // containerManager is already defined    
     serviceManager = SpringCloudStream {
@@ -107,7 +107,6 @@ project CommonSetup {
         aasPersistency;
         aasProtocol;
         aasAccessControlAllowOrigin;
-        serializer;
         transportProtocol;
         serviceManager;
         serviceProtocol;

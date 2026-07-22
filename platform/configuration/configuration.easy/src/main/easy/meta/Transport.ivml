@@ -6,7 +6,7 @@ project Transport {
     annotate String semanticId = "" to .;
     
     // enum for now
-    enum Serializer { Json, ProtoBuf };
+    enum Serializer { Json, ProtoBuf, Xml };
     Serializer serializer = Serializer::Json;
     Constraint serializerDefined = isDefined(serializer);
 

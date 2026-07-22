@@ -4,22 +4,22 @@ import JavaSerializerBase;
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
 @format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120, profileArg_eltSorting="CONS")
-template JavaJsonSerializer(IIPEcosphere config, JavaCodeArtifact target, RecordType type, String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl) extends JavaSerializerBase {
+template JavaXmlSerializer(IIPEcosphere config, JavaCodeArtifact target, RecordType type, String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl) extends JavaSerializerBase {
 
     @Override
     def String getProtocolName() {
-        "JSON";
+        "XML";
     }
 
     @Override
     def genClsInit(IIPEcosphere config, JavaCodeClass mainCls, String origTypeName, String typeName) {
-        JavaCodeMethodCall initEx = new JavaCodeMethodCall("Json.createInstance")
+        JavaCodeMethodCall initEx = new JavaCodeMethodCall("Xml.createInstance")
             .classArg(origTypeName);
         if (origTypeName <> typeName) {
             initEx.classArg(typeName);
         }
             
-        mainCls.addAttribute("de.iip_ecosphere.platform.support.json.Json", "MAPPER")
+        mainCls.addAttribute("de.iip_ecosphere.platform.support.xml.Xml", "MAPPER")
             .addInitializer(initEx)
             .setStatic()
             .setFinal();

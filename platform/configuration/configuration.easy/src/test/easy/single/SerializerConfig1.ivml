@@ -3,6 +3,8 @@ project SerializerConfig1 {
     import CommonSetup;
 
     annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    serializer = Serializer::Json;
     
     // ------------ data types ------------------
     
@@ -449,6 +451,7 @@ project SerializerConfig1 {
     // ------------ freezing ------------------
     
     freeze {
+        serializer;
         sharedInterfaces;
         sharedArtifact;
         platformMonitoring;

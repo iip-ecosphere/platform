@@ -136,8 +136,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     String clsName = asTypeName(r.name);
                     vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, 
                         pkg=javaDatatypesPackage, interface=false, sharedInterfaces=false, impl=true);
-                    vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", 
-                        type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage, sharedInterfaces=false);
+                    generateSerializer(cfg, "${javaSerializersSrc}/${clsName}Serializer.java", r, appRoot, false, impl=false);
                     javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
                     if (isPythonUsed(usedServiceTypes)) {
                         vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r, interface=false, 
@@ -2226,6 +2225,23 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     
     // ------------------------------------------- generating shared interfaces/classes ------------------------------------------------------------
     
+    generateSerializer(IIPEcosphere cfg, String tgt, RecordType r, Path appRoot, Boolean sharedInterfaces, Boolean impl=false) = {
+        if (cfg.serializer==Serializer::Xml) {
+            vilTemplateProcessor("JavaXmlSerializer", cfg, tgt, type=r, pkg=javaSerializersPackage, 
+                typePkg=javaDatatypesPackage, sharedInterfaces=sharedInterfaces, impl=impl);
+        } else if (cfg.serializer==Serializer::ProtoBuf) {
+            Path spec = tgt;
+            String specTgt = "${appRoot}/src/main/proto/" + spec.getName().substitute("Serializer.java$", "Proto.proto");
+            vilTemplateProcessor("JavaProtoBufSpec", cfg, specTgt, type=r, pkg=javaSerializersPackage, 
+                typePkg=javaDatatypesPackage, sharedInterfaces=sharedInterfaces, impl=impl);
+            vilTemplateProcessor("JavaProtoBufSerializer", cfg, tgt, type=r, pkg=javaSerializersPackage, 
+                typePkg=javaDatatypesPackage, sharedInterfaces=sharedInterfaces, impl=impl);
+        } else {
+            vilTemplateProcessor("JavaJsonSerializer", cfg, tgt, type=r, pkg=javaSerializersPackage, 
+                typePkg=javaDatatypesPackage, sharedInterfaces=sharedInterfaces, impl=impl);
+        }
+    }
+    
     generateSharedInterfaces(Configuration config, Project target, setOf(String) javaSerializers, setOf(String) artifacts) = {
         IIPEcosphere cfg = config;
         setOf(Application) applications = Application.allInstances(); // do not prune here, keep interfaces stable
@@ -2261,11 +2277,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 pkg=javaDatatypesPackage, interface=true, sharedInterfaces=true, impl=true);
             vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}Impl.java", type=r, 
                 pkg=javaDatatypesPackage, interface=false, sharedInterfaces=true, impl=true);
-            vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}Serializer.java", type=r, 
-                pkg=javaSerializersPackage, typePkg=javaDatatypesPackage, sharedInterfaces=true, impl=false);
+            generateSerializer(cfg, "${javaSerializersSrc}/${clsName}Serializer.java", r, appRoot, true, impl=false);
             javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
-            vilTemplateProcessor("JavaJsonSerializer", config, "${javaSerializersSrc}/${clsName}ImplSerializer.java", 
-                type=r, pkg=javaSerializersPackage, typePkg=javaDatatypesPackage, sharedInterfaces=true, impl=true);
+            generateSerializer(cfg, "${javaSerializersSrc}/${clsName}ImplSerializer.java", r, appRoot, true, impl=true);
             javaSerializers.add("${javaSerializersPackage}.${clsName}ImplSerializer");
             if (isPythonUsed(usedServiceTypes)) {
                 vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r, interface=true, 

@@ -6,6 +6,8 @@ project TechnicalSetup {
     
     // unusual for managed model structure, but reuse common setup here
 
+    serializer = Serializer::Json;
+
     // ---------- generation setup ------------
     
     containerGeneration = false;
@@ -15,6 +17,7 @@ project TechnicalSetup {
     // ------------ freezing ------------------
     
     freeze {
+        serializer;
         sharedInterfaces;
         sharedArtifact;
         containerGeneration;

@@ -135,9 +135,20 @@ template MavenBasics(Configuration config, FileArtifact target) {
     def appendExecutions(XmlElement parent) {
         new XmlElement(new XmlElement(parent, "executions"), "execution");
     }
+    
+    def XmlElement appendGoals(XmlElement execution) {
+        new XmlElement(execution, "goals");
+    }
 
-    def appendGoal(XmlElement execution, String goal) {
-        new XmlElement(new XmlElement(execution, "goals"), "goal", goal);
+    def appendGoal(XmlElement parent, String goal) {
+        if (parent.getName() <> "goals") {
+            parent = appendGoals(parent);
+        }
+        new XmlElement(parent, "goal", goal);
+    }
+    
+    def appendPhase(XmlElement execution, String phase) {
+        new XmlElement(execution, "phase", phase);
     }
     
     def appendExclusions(XmlElement dep) {
@@ -797,6 +808,23 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(props, "jacoco.skip", "true");
         new XmlElement(props, "configuration.skip", "true");
         profile;
+    }
+    
+    def XmlElement appendProtobufPlugins(XmlElement parent, String protoPluginVer="\\${org.xolstice.maven.protobuf.version}", String osPluginVer="\\${kr.motd.maven.os.version}") {
+        if (osPluginVer <> "") {
+            XmlElement osPlugin = appendPlugin(parent, "kr.motd.maven", "os-maven-plugin", osPluginVer, false);
+            XmlElement osExec = appendExecutions(osPlugin);
+            appendPhase(osExec, "initialize");
+            appendGoal(osExec, "detect");
+        }
+        XmlElement protoPlugin = appendPlugin(parent, "org.xolstice.maven.plugins", "protobuf-maven-plugin", protoPluginVer, false);
+        XmlElement protoCfg = appendConfiguration(protoPlugin);
+        new XmlElement(protoCfg, "protocArtifact", "com.google.protobuf:protoc:\\${protobuf.version}:exe:\\${os.detected.classifier}");
+        XmlElement protoExec = appendExecutions(protoPlugin);
+        XmlElement protoGoals = appendGoals(protoExec);
+        appendGoal(protoGoals, "compile");
+        appendGoal(protoGoals, "test-compile");
+        protoPlugin;
     }
 
 }

@@ -70,4 +70,21 @@ template JavaSerializerBase(IIPEcosphere config, JavaCodeArtifact target, Record
         });
     }
     
+    def configureOptionals(RecordType type, String objectMapperVar, String typeName, JavaCodeBlock block) {
+        sequenceOf(Field) fields = collectFields(type);
+        sequenceOf(String) fieldNames = fields->select(f|f.optional)->collect(f|f.name);
+        if (fieldNames.size() > 0) {
+            JavaCodeMethodCall call = block.addCall("${objectMapperVar}.defineOptionals")
+                .addClassArgument(typeName);
+            fieldNames->forEach(n|call.addStringArgument(n));
+        }
+    }
+
+    def configureIipMapping(IIPEcosphere config, String varName, JavaCodeBlock block) {
+        if (config.sharedInterfaces) {
+             block.addCall("${varName}.handleIipDataClasses");
+        }
+    }
+    
+    
 }

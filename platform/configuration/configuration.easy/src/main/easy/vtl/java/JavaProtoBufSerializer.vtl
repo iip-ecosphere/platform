@@ -1,0 +1,199 @@
+import JavaBasics;
+import JavaSerializerBase;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120, profileArg_eltSorting="CONS")
+template JavaProtoBufSerializer(IIPEcosphere config, JavaCodeArtifact target, RecordType type, String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl) extends JavaSerializerBase {
+
+    @Override
+    def String getProtocolName() {
+        "ProtoBuf";
+    }
+
+    @Override
+    def genClsInit(IIPEcosphere config, JavaCodeClass mainCls, String origTypeName, String typeName) {
+    }
+
+    @Override
+    def genFrom(IIPEcosphere config, RecordType type, JavaCodeMethod from, String paramName, String dataType) {
+        String clsName = asTypeName(type.name);
+        String add = "";
+        if (sharedInterfaces) {
+            clsName = clsName + "Impl";
+        }
+        String protoClsName = clsName + "Proto";
+        protoClsName = "${protoClsName}OuterClass.${protoClsName}";
+     
+        from.var("iip.serializers.${protoClsName}", "proto", "${protoClsName}.parseFrom(data)");
+        from.var("iip.datatypes.${clsName}", "result").addNew("${clsName}");
+        for (Field f : type.fields) {
+            String fSuffix = asMethodNameSuffix(f.name);
+            JavaCodeExpression get = convFrom(f.type, new JavaCodeMethodCall(getProtoMethodName(f.type, fSuffix)));
+            from.call("result.set${fSuffix}").arg(get);
+        }
+        from.addReturn("result");
+    }
+
+    @Override
+    def genTo(IIPEcosphere config, RecordType type, JavaCodeMethod to, String paramName, String dataType) {
+        String clsName = asTypeName(type.name);
+        if (sharedInterfaces) {
+            clsName = clsName + "Impl";
+        }
+        clsName = clsName + "Proto";
+
+        to.var("iip.serializers.${clsName}OuterClass.${clsName}.Builder", "builder", "${clsName}OuterClass.${clsName}.newBuilder()");
+        for (Field f : type.fields) {
+            String fSuffix = asMethodNameSuffix(f.name);
+            JavaCodeExpression get = convTo(f.type, new JavaCodeMethodCall("source.get${fSuffix}"));
+            createSetCall(f.type, to, fSuffix, get);
+        }
+        to.addReturn("builder.build().toByteArray()");
+    }
+    
+    // write into result, get from proto
+
+    @DispatchBasis
+    def getProtoMethodName(DataType t, String fSuffix) {
+        "proto.get${fSuffix}";
+    }
+
+    @DispatchCase
+    def getProtoMethodName(ArrayType t, String fSuffix) {
+        "proto.get${fSuffix}List";
+    }
+
+    @DispatchCase
+    def getProtoMethodName(ByteStringTypeType t, String fSuffix) {
+        "proto.get${fSuffix}List";
+    }
+
+    // write into proto, get from source
+        
+    @DispatchBasis
+    def createSetCall(DataType t, JavaCodeMethod to, String fSuffix, JavaCodeExpression get) {
+        to.call("builder.set${fSuffix}").arg(get);
+    }
+
+    @DispatchCase
+    def createSetCall(ArrayType t, JavaCodeMethod to, String fSuffix, JavaCodeExpression get) {
+        to.call("builder.get${fSuffix}List").addCall("addAll").arg(get);
+    }
+
+    @DispatchCase
+    def createSetCall(ByteStringTypeType t, JavaCodeMethod to, String fSuffix, JavaCodeExpression get) {
+        //addAll(List<Integer> list, byte[] data) 
+        to.call("de.iip_ecosphere.platform.support.CollectionUtils.addAllBytes", JavaCodeImportScope.METHOD_CLASS_IMPORT).(c|{
+            c.addCallArgument("builder.get${fSuffix}List");
+            c.arg(get);
+        });
+    }
+
+    // java -> protobuf
+
+    @DispatchBasis 
+    def JavaCodeExpression convTo(DataType t, JavaCodeMethodCall c) {
+        c;
+    }
+
+    @DispatchCase
+    def JavaCodeExpression convTo(AliasType t, JavaCodeMethodCall c) {
+        convTo(t.represents, c);
+    }
+
+    @DispatchCase
+    def JavaCodeExpression convTo(EnumType t, JavaCodeMethodCall c) {
+        c.addCall("name");
+        c;
+    }
+
+    @DispatchCase
+    def JavaCodeExpression convTo(DateTimeTypeType t, JavaCodeMethodCall c) {
+        new JavaCodeMethodCall("de.iip_ecosphere.platform.support.TimeUtils.toTimestamp", JavaCodeImportScope.METHOD_CLASS_IMPORT).arg(c);
+    }
+
+    @DispatchCase
+    def JavaCodeExpression convTo(GenericDateTimeTypeType t, JavaCodeMethodCall c) {
+        new JavaCodeMethodCall("de.iip_ecosphere.platform.support.TimeUtils.toTimestamp", JavaCodeImportScope.METHOD_CLASS_IMPORT).arg(c);
+    }
+
+    @DispatchCase
+    def JavaCodeExpression convTo(IEC61131_3DateTimeTypeType t, JavaCodeMethodCall c) {
+        new JavaCodeMethodCall("de.iip_ecosphere.platform.support.TimeUtils.toTimestamp", JavaCodeImportScope.METHOD_CLASS_IMPORT).arg(c);
+    }
+
+    @DispatchCase
+    def JavaCodeExpression convTo(ArrayType t, JavaCodeMethodCall c) {
+        new JavaCodeMethodCall("de.iip_ecosphere.platform.support.CollectionUtils.toListWithNull", JavaCodeImportScope.METHOD_CLASS_IMPORT).arg(c);
+    }
+
+/*    @DispatchCase
+    def JavaCodeExpression convTo(ByteStringTypeType t, JavaCodeMethodCall c) {
+        new JavaCodeMethodCall("de.iip_ecosphere.platform.support.CollectionUtils.toListWithNull", JavaCodeImportScope.METHOD_CLASS_IMPORT).arg(c);
+    }*/
+
+    @DispatchCase
+    def JavaCodeExpression convTo(ObjectTypeType t, JavaCodeMethodCall c) {
+        new JavaCodeMethodCall("de.iip_ecosphere.platform.support.StringUtils.toString", JavaCodeImportScope.METHOD_CLASS_IMPORT).arg(c);
+    }
+
+    // protobuf -> java
+
+    @DispatchBasis 
+    def JavaCodeExpression convFrom(DataType t, JavaCodeMethodCall c) {
+        c;
+    }
+
+    @DispatchCase
+    def JavaCodeExpression convFrom(AliasType t, JavaCodeMethodCall c) {
+        convFrom(t.represents, c);
+    }
+    
+    @DispatchCase
+    def JavaCodeExpression convFrom(EnumType t, JavaCodeMethodCall c) {
+        new JavaCodeMethodCall("Enum.valueOf").classArg("iip.datatypes."+asTypeName(t.name)).arg(c);
+    }
+
+    @DispatchCase
+    def JavaCodeExpression convFrom(DateTimeTypeType t, JavaCodeMethodCall c) {
+        new JavaCodeMethodCall("de.iip_ecosphere.platform.support.TimeUtils.toLocalDateTime", JavaCodeImportScope.METHOD_CLASS_IMPORT).arg(c);
+    }
+
+    @DispatchCase
+    def JavaCodeExpression convFrom(GenericDateTimeTypeType t, JavaCodeMethodCall c) {
+        new JavaCodeMethodCall("de.iip_ecosphere.platform.support.TimeUtils.toDate", JavaCodeImportScope.METHOD_CLASS_IMPORT).arg(c);
+    }
+
+    @DispatchCase
+    def JavaCodeExpression convFrom(IEC61131_3DateTimeTypeType t, JavaCodeMethodCall c) {
+        new JavaCodeMethodCall("de.iip_ecosphere.platform.support.TimeUtils.toDate", JavaCodeImportScope.METHOD_CLASS_IMPORT).arg(c);
+    }
+
+    @DispatchCase
+    def JavaCodeExpression convFrom(ArrayType t, JavaCodeMethodCall c) {
+        new JavaCodeMethodCall("de.iip_ecosphere.platform.support.CollectionUtils.toArray", JavaCodeImportScope.METHOD_CLASS_IMPORT).arg(c).classArg(toTypeName(t.type));
+    }
+
+    @DispatchCase
+    def JavaCodeExpression convFrom(SByteTypeType t, JavaCodeMethodCall c) {
+        new JavaCodeCastExpression("byte", c);
+    }
+
+    @DispatchCase
+    def JavaCodeExpression convFrom(ByteTypeType t, JavaCodeMethodCall c) {
+        new JavaCodeCastExpression("byte", c);
+    }
+
+    @DispatchCase
+    def JavaCodeExpression convFrom(ByteStringTypeType t, JavaCodeMethodCall c) {
+        new JavaCodeMethodCall("de.iip_ecosphere.platform.support.CollectionUtils.toByteArray", JavaCodeImportScope.METHOD_CLASS_IMPORT).arg(c);
+    }
+    
+    // object is "encoded" to string, just keep it
+
+    def main(IIPEcosphere config, JavaCodeArtifact target, RecordType type, String pkg, String typePkg, Boolean sharedInterfaces, Boolean impl) {
+        genCls(config, target, type, pkg, typePkg, sharedInterfaces, impl);
+    }
+    
+}
