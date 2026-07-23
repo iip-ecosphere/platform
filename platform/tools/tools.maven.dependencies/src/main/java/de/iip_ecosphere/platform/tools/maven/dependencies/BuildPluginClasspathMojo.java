@@ -98,34 +98,16 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
      */
     private String getRelTargetDirectory() {
         String result = targetDirectory.getName(); // often but not always
-        // we need this although ChatGPT does not believe it
-        result = toRelDirectory(result, new File(System.getProperty("user.dir")));
-        // ChatGPT believes we need this, let's see
-        result = toRelDirectory(result, getProject().getBasedir());
-        return result;
-    }
-    
-    /**
-     * Turns {@code dir} into a relative directory of {@code base}.
-     * 
-     * @param dir the (absolute) directory to be turned into a relative one
-     * @param base the base directory that is potentially removed as prefix
-     * @return {@code dir} if no change is needed, {@code dir} without {@code base} if {@code base} is the prefix
-     */
-    private String toRelDirectory(String dir, File base) {
-        String result = dir; 
-        String basePath = base.getAbsolutePath();
+        File home = new File(System.getProperty("user.dir"));
+        String homePath = home.getAbsolutePath();
         String targetPath = targetDirectory.getAbsolutePath();
         try {
-            basePath = base.getCanonicalPath();
+            homePath = home.getCanonicalPath();
             targetPath = targetDirectory.getCanonicalPath();
         } catch (IOException e) {
         }
-        if (!basePath.endsWith(File.separator)) {
-            basePath = basePath + File.separator;
-        }
-        if (targetPath.startsWith(basePath)) {
-            result = targetPath.substring(basePath.length() + 1);
+        if (targetPath.startsWith(homePath)) {
+            result = targetPath.substring(homePath.length() + 1);
         }
         return result;
     }
