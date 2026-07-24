@@ -75,6 +75,39 @@ public class DomParserTest {
     }
 
     /**
+     * Tests resolving an external type definition for root variables.
+     *
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testExternalRootVariableTypeDefinition() throws IOException {
+        File in = new File("src/test/resources/NodeSets/Opc.Ua.ExternalRootVariable.NodeSet2.xml");
+        Assert.assertTrue(in.isFile());
+        File tmp = new File("target/tmp");
+        tmp.mkdirs();
+        File out = new File(tmp, "OpcExternalRootVariable.ivml");
+        if (out.exists()) {
+            Assert.assertTrue(out.delete());
+        }
+
+        DomParser.setUsingIvmlFolder("target/tmp");
+        DomParser.process(in, "ExternalRootVariable", out, false);
+
+        Assert.assertTrue(out.isFile());
+        String contents = FileUtils.readFileToString(out, Charset.forName("UTF-8"));
+        Assert.assertTrue(contents.contains("UAVariableTypeType opcExternalMeasurementValueTypeType"));
+        Assert.assertTrue(contents.contains("nodeId = {nameSpaceIndex = 2, identifier = 2001}"));
+        Assert.assertTrue(contents.contains("UARootVariableType opcSyntheticRootTypePressure"));
+        Assert.assertTrue(contents.contains("nodeId = {nameSpaceIndex = 1, identifier = 6001}"));
+        Assert.assertTrue(contents.contains("typeDefinition = refBy(opcExternalMeasurementValueTypeType)"));
+        Assert.assertTrue(contents.contains("rootParent = refBy(opcSyntheticRootType)"));
+        Assert.assertTrue(contents.contains("optional = false,\n\t\ttype = refBy(FloatType)"));
+        Assert.assertTrue(contents.contains("UARootVariableType opcSyntheticRootTypeTemperature"));
+        Assert.assertTrue(contents.contains("nodeId = {nameSpaceIndex = 1, identifier = 6002}"));
+        Assert.assertTrue(contents.contains("optional = true,\n\t\ttype = refBy(DoubleType)"));
+    }
+
+    /**
      * Tests {@link DomParser} on the woodworking companion spec XML.
      * 
      * @throws IOException shall not occur
