@@ -92,14 +92,9 @@ Container `myContainer` has the Service Manager installed and will execute subse
       list
       start myContainer
       ..
-    services a005056C00008
-      add http://localhost/simpleMesh.jar
-      listArtifacts
-      startAll simpleMesh
-      listServices
-      stopAll simpleMesh
-      listServices
-      remove simpleMesh
+    deploy artifacts/deployment.yaml
+      ..
+    undeploy artifacts/deployment.yaml
       ..
     containers a005056C00008
       stop myContainer
@@ -107,6 +102,8 @@ Container `myContainer` has the Service Manager installed and will execute subse
       list
       ..
     exit
+    
+The CLI is primarily intended for automation purposes and testing. While there are commands to start individual services or an entire application, all prerequisites for these commands must be met so that they can execute successfully. These prerequisites are taken into account by the `deploy`/`undeploy` commands that execute entire deployment plans as shown above. Both, the application artifact must be available in the central artifacts directory, the deployment plan may be referenced by URL or as local file name. We intend to hide the individual service start commands through an expert or testing mode in future versions.    
       
 ### Communication with Containers
 Please note that accessing, starting, and stopping containers or services requires specifying the corresponding resource identifier. When exiting the CLI, the CLI container will end. The platform container will continue operating until you stop it explicitly, e.g., using `docker ps` to obtain the container identifier of the running container and `docker stop <id>` to ultimately stop the container.
