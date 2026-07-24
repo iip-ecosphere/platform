@@ -1446,6 +1446,28 @@ public class DomParser {
         parser.createIvmlModel(outName, ivmlOut);
     }
 
+    /**
+     * Derives the technical IVML model name from {@code sourceFileName}.
+     *
+     * @param sourceFileName the source file name
+     * @return the technical IVML model name
+     */
+    private static String getModelName(String sourceFileName) {
+        String modelName = StringUtils.removeStart(sourceFileName, "Opc.Ua");
+        modelName = StringUtils.removeEnd(modelName, ".xml");
+        modelName = StringUtils.removeEnd(modelName, ".NodeSet2");
+        modelName = modelName.replace(".", "");
+        modelName = modelName.replace("-", "_");
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < modelName.length(); i++) {
+            char c = modelName.charAt(i);
+            if (!Character.isWhitespace(c)) {
+                result.append(c);
+            }
+        }
+        return result.toString();
+    }
+
     // checkstyle: stop method length check
 
     /**
@@ -1454,11 +1476,10 @@ public class DomParser {
      * @param args command line arguments (ignored)
      */
     public static void main(String[] args) {
-        File file;
         ArrayList<File> files = new ArrayList<File>();
         if (args.length == 1) {
-            file = new File(args[0]);
-            files.add(file);
+            File sourceFile = new File(args[0]);
+            files.add(sourceFile);
         } else {
             File baseDir = new File("src/main/resources/NodeSets/");
             files.add(new File(baseDir, "Opc.Ua.Woodworking.NodeSet2.xml"));
@@ -1548,16 +1569,11 @@ public class DomParser {
             //files.add(new File(baseDir, "Opc.Ua.Gds.NodeSet2.xml"));
             files.add(new File(baseDir, "Opc.Ua.Machinery.NodeSet2.xml"));
         }
-        for (File f : files) {
-            file = f;
-            String fileName = file.getName();
-            fileName = StringUtils.removeStart(fileName, "Opc.Ua");
-            fileName = StringUtils.removeEnd(fileName, ".xml");
-            fileName = StringUtils.removeEnd(fileName, ".NodeSet2");
-            fileName = fileName.replace(".", "");
-            fileName = fileName.replace("-", "_");
-            File ivmlFile = new File("target/gen/Opc" + fileName + ".ivml");
-            process(file, fileName, ivmlFile, verboseDefault);
+        for (File sourceFile : files) {
+            String sourceFileName = sourceFile.getName();
+            String modelName = getModelName(sourceFileName);
+            File ivmlFile = new File("target/gen/Opc" + modelName + ".ivml");
+            process(sourceFile, modelName, ivmlFile, verboseDefault);
         }
         Collector.informationToExcel();
     }

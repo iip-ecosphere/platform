@@ -14,13 +14,18 @@ package test.de.iip_ecosphere.platform.configuration.easyProducer.opcua;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.uni_hildesheim.sse.easy.loader.ManifestLoader;
 import de.iip_ecosphere.platform.configuration.easyProducer.opcua.parser.DomParser;
 import de.iip_ecosphere.platform.support.FileUtils;
+import net.ssehub.easy.basics.modelManagement.ModelManagementException;
+import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
+import net.ssehub.easy.varModel.confModel.Configuration;
 
 /**
  * Tests {@link DomParser}.
@@ -47,6 +52,95 @@ public class DomParserTest {
         DomParser.main(new String[] {in.toString()});
 
         Assert.assertTrue(out.isFile());
+    }
+
+    /**
+     * Tests deriving technical IVML model names.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     */
+    @Test
+    public void testDomParserModelNameDerivation() throws ReflectiveOperationException {
+        Method method = DomParser.class.getDeclaredMethod("getModelName", String.class);
+        method.setAccessible(true);
+        String[][] names = {
+            {"Opc.Ua.MachineTool.NodeSet2.xml", "MachineTool"},
+            {"Machine-Tool.xml", "Machine_Tool"},
+            {"Machine_Tool.xml", "Machine_Tool"},
+            {"Machine.Tool.v1.xml", "MachineToolv1"},
+            {"Machine  \t Tool.xml", "MachineTool"}
+        };
+        for (String[] name : names) {
+            Assert.assertEquals(name[1], method.invoke(null, name[0]));
+        }
+    }
+
+    /**
+     * Tests processing and loading a NodeSet with whitespace in its file name.
+     *
+     * @throws IOException shall not occur
+     * @throws ModelManagementException shall not occur
+     */
+    @Test
+    public void testDomParserWhitespaceModelName() throws IOException, ModelManagementException {
+        File nodeSets = new File("src/test/resources/NodeSets");
+        File testFolder = new File("target/tmp/domParserWhitespaceModelName");
+        File output = new File("target/gen/OpcMachineTool.ivml");
+        File invalidOutput = new File("target/gen/OpcMachine Tool.ivml");
+        if (testFolder.exists()) {
+            FileUtils.deleteDirectory(testFolder);
+        }
+        Assert.assertTrue(testFolder.mkdirs());
+        FileUtils.copyDirectory(new File(nodeSets, "RequiredModels"), new File(testFolder, "RequiredModels"));
+        File sourceFile = new File(testFolder, "Machine Tool.xml");
+        FileUtils.copyFile(new File(nodeSets, "Opc.Ua.MachineTool.NodeSet2.xml"), sourceFile);
+        output.delete();
+        invalidOutput.delete();
+        DomParser.setDefaultVerbose(false);
+        DomParser.setUsingIvmlFolder(new File(testFolder, "connector").getPath());
+
+        try {
+            DomParser.main(new String[] {sourceFile.getPath()});
+
+            Assert.assertTrue(output.isFile());
+            String contents = FileUtils.readFileToString(output, Charset.forName("UTF-8"));
+            Assert.assertTrue(contents.startsWith("project OpcMachineTool {"));
+            Assert.assertFalse(invalidOutput.exists());
+            assertModelLoads(output.getParentFile(), "OpcMachineTool");
+        } finally {
+            output.delete();
+            invalidOutput.delete();
+            FileUtils.deleteDirectory(testFolder);
+            DomParser.setUsingIvmlFolder("target/tmp");
+        }
+    }
+
+    /**
+     * Asserts that {@code modelName} can be loaded from {@code modelFolder}.
+     *
+     * @param modelFolder the model folder
+     * @param modelName the model name
+     * @throws IOException shall not occur
+     * @throws ModelManagementException shall not occur
+     */
+    private static void assertModelLoads(File modelFolder, String modelName)
+        throws IOException, ModelManagementException {
+        File metaModelFolder = new File("src/main/easy");
+        ManifestLoader loader = new ManifestLoader(false, DomParserTest.class.getClassLoader());
+        loader.startup();
+        EasyExecutor executor = new EasyExecutor(new File("."), metaModelFolder, modelName);
+        executor.prependIvmlFolder(modelFolder);
+        try {
+            executor.setupLocations();
+            executor.loadIvmlModel();
+            Configuration configuration = executor.getConfiguration();
+            Assert.assertNotNull(configuration);
+            Assert.assertEquals(modelName, configuration.getProject().getName());
+        } finally {
+            executor.discardLocations();
+            executor.clearModels();
+            loader.shutdown();
+        }
     }
     
     /**
