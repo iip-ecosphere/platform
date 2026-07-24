@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<UANodeSet xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd">
+  <NamespaceUris>
+    <Uri>http://opcfoundation.org/UA/ExternalReferenceWrong/</Uri>
+  </NamespaceUris>
+  <Models>
+    <Model ModelUri="http://opcfoundation.org/UA/ExternalReferenceWrong/"
+        Version="1.00" PublicationDate="2026-07-24T00:00:00Z">
+      <RequiredModel ModelUri="http://opcfoundation.org/UA/"
+          Version="1.05.02" PublicationDate="2022-11-01T00:00:00Z" />
+    </Model>
+  </Models>
+  <UAObjectType NodeId="ns=1;i=1002" BrowseName="1:WrongTargetType">
+    <DisplayName>WrongTargetType</DisplayName>
+    <References>
+      <Reference ReferenceType="HasSubtype" IsForward="false">i=58</Reference>
+    </References>
+  </UAObjectType>
+</UANodeSet>

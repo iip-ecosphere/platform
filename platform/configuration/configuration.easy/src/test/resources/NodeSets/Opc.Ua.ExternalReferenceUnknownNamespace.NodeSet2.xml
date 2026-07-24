@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<UANodeSet xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd">
+  <NamespaceUris>
+    <Uri>http://opcfoundation.org/UA/ExternalReferenceResolution/</Uri>
+    <Uri>http://opcfoundation.org/UA/ExternalReferenceCorrect/</Uri>
+    <Uri>http://opcfoundation.org/UA/ExternalReferenceWrong/</Uri>
+  </NamespaceUris>
+  <Models>
+    <Model ModelUri="http://opcfoundation.org/UA/ExternalReferenceResolution/"
+        Version="1.00" PublicationDate="2026-07-24T00:00:00Z">
+      <RequiredModel ModelUri="http://opcfoundation.org/UA/"
+          Version="1.05.02" PublicationDate="2022-11-01T00:00:00Z" />
+      <RequiredModel ModelUri="http://opcfoundation.org/UA/ExternalReferenceCorrect/"
+          Version="1.00" PublicationDate="2026-07-24T00:00:00Z" />
+      <RequiredModel ModelUri="http://opcfoundation.org/UA/ExternalReferenceWrong/"
+          Version="1.00" PublicationDate="2026-07-24T00:00:00Z" />
+    </Model>
+  </Models>
+  <UAObjectType NodeId="ns=1;i=1001" BrowseName="1:ExternalReferenceRootType">
+    <DisplayName>ExternalReferenceRootType</DisplayName>
+    <References>
+      <Reference ReferenceType="HasSubtype" IsForward="false">i=58</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=5001</Reference>
+    </References>
+  </UAObjectType>
+  <UAObject NodeId="ns=1;i=5001" BrowseName="1:Thing" ParentNodeId="ns=1;i=1001">
+    <DisplayName>Thing</DisplayName>
+    <References>
+      <Reference ReferenceType="HasModellingRule">i=80</Reference>
+      <Reference ReferenceType="HasTypeDefinition">ns=4;i=1002</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+    </References>
+  </UAObject>
+</UANodeSet>

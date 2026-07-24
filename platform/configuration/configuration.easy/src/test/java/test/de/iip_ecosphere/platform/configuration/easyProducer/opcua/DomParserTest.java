@@ -191,6 +191,7 @@ public class DomParserTest {
 
     /**
      * Tests propagation of XML parser failures.
+     * Tests namespace-aware resolution if a colliding required model is loaded first.
      *
      * @throws IOException shall not occur
      */
@@ -212,6 +213,37 @@ public class DomParserTest {
             Assert.assertTrue(invalid.delete());
         }
     }    
+    public void testExternalReferenceResolutionWrongFirst() throws IOException {
+        assertExternalReferenceResolution("WrongFirst");
+    }
+
+    /**
+     * Tests namespace-aware resolution if the referenced required model is loaded first.
+     *
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testExternalReferenceResolutionCorrectFirst() throws IOException {
+        assertExternalReferenceResolution("CorrectFirst");
+    }
+
+    /**
+     * Tests rejecting an external reference with an unknown source namespace index.
+     */
+    @Test
+    public void testUnknownExternalNamespaceIndex() {
+        File in = new File("src/test/resources/NodeSets/Opc.Ua.ExternalReferenceUnknownNamespace.NodeSet2.xml");
+        Assert.assertTrue(in.isFile());
+        File out = new File("target/tmp/ExternalReferenceUnknownNamespace.ivml");
+
+        try {
+            DomParser.process(in, "ExternalReferenceUnknownNamespace", out, false);
+            Assert.fail("Expected an invalid namespace index to be rejected");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(e.getMessage().contains("No namespace URI"));
+            Assert.assertTrue(e.getMessage().contains("ns=4;i=1002"));
+        }
+    }
     
     /**
      * Tests {@link DomParser} on the machine tool companion spec XML.
@@ -236,6 +268,36 @@ public class DomParserTest {
         String exContents = normalize(FileUtils.readFileToString(expected, charset));
         String outContents = normalize(FileUtils.readFileToString(out, charset));
         Assert.assertEquals(exContents, outContents);
+        Assert.assertTrue(outContents.contains("UADataType opcNumberType = {"));
+        Assert.assertTrue(outContents.contains("UADataType opcLocalizedTextType = {"));
+        Assert.assertTrue(outContents.contains("UADataType opcUtcTimeType = {"));
+        Assert.assertTrue(outContents.contains("UADataType opcNodeIdType = {"));
+    }
+
+    /**
+     * Parses and checks a synthetic external-reference case.
+     *
+     * @param order the required-model order suffix
+     * @throws IOException shall not occur
+     */
+    private void assertExternalReferenceResolution(String order) throws IOException {
+        String name = "ExternalReferenceResolution" + order;
+        File in = new File("src/test/resources/NodeSets/Opc.Ua." + name + ".NodeSet2.xml");
+        Assert.assertTrue(in.isFile());
+        File out = new File("target/tmp", name + ".ivml");
+        out.getParentFile().mkdirs();
+        if (out.exists()) {
+            Assert.assertTrue(out.delete());
+        }
+
+        DomParser.setDefaultVerbose(false);
+        DomParser.setUsingIvmlFolder("target/tmp");
+        DomParser.process(in, name, out, false);
+
+        String contents = normalize(FileUtils.readFileToString(out, Charset.forName("UTF-8")));
+        Assert.assertTrue(contents.contains("typeDefinition = refBy(opcCorrectTargetType)"));
+        Assert.assertTrue(contents.contains("UAObjectTypeType opcCorrectTargetType = {"));
+        Assert.assertFalse(contents.contains("opcWrongTargetType"));
     }
 
     /**
@@ -294,6 +356,7 @@ public class DomParserTest {
         String exContents = normalize(FileUtils.readFileToString(expected, charset));
         String outContents = normalize(FileUtils.readFileToString(out, charset));
         Assert.assertEquals(exContents, outContents);
+        Assert.assertTrue(outContents.contains("UADataType opcGuidType = {"));
     }
 
     /**

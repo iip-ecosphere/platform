@@ -708,14 +708,14 @@ project OpcMachineTool {
 		}
 	};
 
-	UAObjectTypeType opcMachineryItemStateStateMachineType = {
-		name = "opcMachineryItemStateStateMachineType",
+	UAObjectTypeType opcBasicStacklightType = {
+		name = "opcBasicStacklightType",
 		nodeId = {nameSpaceIndex = 4, identifier = 1002},
 		nodeClass = NodeClass::UAObjectType,
-		browseName = "1:MachineryItemState_StateMachineType",
-		displayName = "MachineryItemState_StateMachineType",
-		description = "State machine representing the state of a machinery item",
-		documentation = "https://reference.opcfoundation.org/v104/Machinery/v101/docs/12.2"
+		browseName = "1:BasicStacklightType",
+		displayName = "BasicStacklightType",
+		description = "Entry point to a stacklight containing elements of the stacklight as well as additional information valid for the whole unit.",
+		documentation = "https://reference.opcfoundation.org/v105/IA/v102/docs/5.2.1"
 	};
 
 	UARootObjectType opcMonitoringTypeStacklight = {
@@ -726,7 +726,7 @@ project OpcMachineTool {
 		displayName = "Stacklight",
 		description = "",
 		optional = true,
-		typeDefinition = refBy(opcMachineryItemStateStateMachineType),
+		typeDefinition = refBy(opcBasicStacklightType),
 		rootParent = refBy(opcMonitoringType),
 		fields = {
 			UAFieldObjectType {
@@ -827,14 +827,14 @@ project OpcMachineTool {
 		}
 	};
 
-	UAObjectTypeType opcMachineComponentsType = {
-		name = "opcMachineComponentsType",
+	UAObjectTypeType opcStackElementLightType = {
+		name = "opcStackElementLightType",
 		nodeId = {nameSpaceIndex = 4, identifier = 1006},
 		nodeClass = NodeClass::UAObjectType,
-		browseName = "1:MachineComponentsType",
-		displayName = "MachineComponentsType",
-		description = "Contains all identifiable components of a machine",
-		documentation = "https://reference.opcfoundation.org/v104/Machinery/v101/docs/11.2"
+		browseName = "1:StackElementLightType",
+		displayName = "StackElementLightType",
+		description = "Represents a lamp element in a stacklight.",
+		documentation = "https://reference.opcfoundation.org/v105/IA/v102/docs/5.2.6"
 	};
 
 	UAObjectType opcMonitoringTypeStacklightOrderedObject = {
@@ -845,7 +845,7 @@ project OpcMachineTool {
 		displayName = "<OrderedObject>",
 		description = "",
 		optional = false,
-		typeDefinition = refBy(opcMachineComponentsType),
+		typeDefinition = refBy(opcStackElementLightType),
 		fields = {
 			UAFieldVariableType {
 				name = "opcOrderedObjectNumberInList",
