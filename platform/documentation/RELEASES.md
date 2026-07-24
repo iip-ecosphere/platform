@@ -4,6 +4,7 @@
 
 In progress:
 
+* [#205](https://github.com/iip-ecosphere/platform/issues/205): Hide service start/stop commands in CLI
 * [#192](https://github.com/iip-ecosphere/platform/issues/192): More flexible connector value handling
 * [#180](https://github.com/iip-ecosphere/platform/issues/180): Add application templates to UI
 * [#183](https://github.com/iip-ecosphere/platform/issues/183): Enable AAS metamodel v3 in mgmt UI
