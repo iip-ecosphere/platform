@@ -90,7 +90,7 @@ public class Generator {
                 + "    deviceMgtStorageServer = S3MockDeviceMgtStorageServer{};\n\n"
                 + "    // ------------ data types ------------------\n\n" + "    RecordType opcIn = {\n"
                 + "        name = \"OpcIn\",\n" + "        fields = {\n" + "        }\n" + "    };    \n"
-                + "    RecordType opcOut = {\n" + "        path = \"PLACEHOLDER\",\n" + "        name = \"OpcOut\",\n\n"
+                + "    RecordType opcOut = {\n" + "        name = \"OpcOut\",\n\n"
                 + "        fields = {\n";
 
         String configEnding = "        \n}\n" + "    };\n\n"
@@ -100,7 +100,8 @@ public class Generator {
                 + "        ver = \"0.1.0\",\n" + "        host = \"opcua.umati.app\",\n"
                 + "        port = 4840, // default localhost\n" + "        \n"
                 + "        input = {{type=refBy(opcIn)}},\n" + "        output = {{type=refBy(opcOut)}},\n"
-                + "        inInterface = refBy(opcIn), \n" + "        outInterface = refBy(opcOut)\n"
+                + "        inInterface = {{type=refBy(opcIn)}}, \n"
+                + "        outInterface = {{type=refBy(opcOut), path=\"PLACEHOLDER\"}}\n"
                 + "        /*operations = {\n" + "          FieldAssignmentOperation{field=myConnPltfIn.fields[1], \n"
                 + "            operation=AddDataTranslationOperation{\n" + "                arguments={\n"
                 + "                    DataFieldAccess{field=myConnMachineOut.fields[0]},\n"

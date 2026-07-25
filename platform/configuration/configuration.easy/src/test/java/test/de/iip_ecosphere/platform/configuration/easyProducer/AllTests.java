@@ -15,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import test.de.iip_ecosphere.platform.configuration.easyProducer.opcua.DomParserTest;
+import test.de.iip_ecosphere.platform.configuration.easyProducer.opcua.GeneratorTest;
 
 /**
  * Defines the tests to be executed.
@@ -39,7 +40,8 @@ import test.de.iip_ecosphere.platform.configuration.easyProducer.opcua.DomParser
     AasIvmlMapperTest.class,
     CommentTests.class,
 
-    DomParserTest.class
+    DomParserTest.class,
+    GeneratorTest.class
 })
 public class AllTests {
 }
