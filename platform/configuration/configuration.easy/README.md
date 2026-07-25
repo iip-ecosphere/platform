@@ -152,6 +152,20 @@ In addition, the meta-model contains two specialized type models for OPC UA (com
 
 The IDTA tools are meant to be proof-of-context implementations as the specifications/formats allow for many variations. The IDTA tools also contain a program to structurally compare models as well as a program to load AASX files via multiple versions of BaSyx.
 
+### OPC UA NodeSet parser
+
+The `OpcUaParser` profile provides the runtime provider needed to execute the OPC UA NodeSet-to-IVML parser as a development tool. The generated IVML is used by subsequent configuration and generation steps; the profile and parser provider are not required by the platform runtime.
+
+From this module, run:
+
+```
+mvn -PCfg,OpcUaParser compile exec:java \
+    -Dopcua.ivml.output=target/opcua-parser \
+    -Dexec.args=src/test/resources/NodeSets/Opc.Ua.Woodworking.NodeSet2.xml
+```
+
+The output folder is created automatically. It contains the generated `OpcWoodworking.ivml`, `VDW.ivml` and `VDW_Woodworking.ivml` files.
+
 ## The resources folder
 
 The resources directory contains files that shall be packaged into platform jars or into an application artifact during platform/application instantiation. It is split into
