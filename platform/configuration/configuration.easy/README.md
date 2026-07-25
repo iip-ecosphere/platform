@@ -154,17 +154,22 @@ The IDTA tools are meant to be proof-of-context implementations as the specifica
 
 ### OPC UA NodeSet parser
 
-The `OpcUaParser` profile provides the runtime provider needed to execute the OPC UA NodeSet-to-IVML parser as a development tool. The generated IVML is used by subsequent configuration and generation steps; the profile and parser provider are not required by the platform runtime.
+The `OpcUaParser` profile provides the runtime provider needed to execute the OPC UA NodeSet-to-IVML parser as a development tool. The input NodeSet must be specified. The generated IVML is used by subsequent configuration and generation steps; the profile and parser provider are not required by the platform runtime.
 
 From this module, run:
 
 ```
 mvn -PCfg,OpcUaParser compile exec:java \
-    -Dopcua.ivml.output=target/opcua-parser \
     -Dexec.args=src/test/resources/NodeSets/Opc.Ua.Woodworking.NodeSet2.xml
 ```
 
-The output folder is created automatically. It contains the generated `OpcWoodworking.ivml`, `VDW.ivml` and `VDW_Woodworking.ivml` files.
+The optional output property defaults to `target/opcua-parser`. The folder is created automatically and contains the generated `OpcWoodworking.ivml`, `VDW.ivml` and `VDW_Woodworking.ivml` files. To use a different output folder, run:
+
+```
+mvn -PCfg,OpcUaParser compile exec:java \
+    -Dopcua.ivml.output=/path/to/output \
+    -Dexec.args=/path/to/NodeSet.xml
+```
 
 ## The resources folder
 

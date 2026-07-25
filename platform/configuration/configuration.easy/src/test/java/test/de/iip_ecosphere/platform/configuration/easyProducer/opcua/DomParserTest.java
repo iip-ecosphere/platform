@@ -138,8 +138,8 @@ public class DomParserTest {
     public void testDomParserWhitespaceModelName() throws IOException, ModelManagementException {
         File nodeSets = new File("src/test/resources/NodeSets");
         File testFolder = new File("target/tmp/domParserWhitespaceModelName");
-        File output = new File("target/gen/OpcMachineTool.ivml");
-        File invalidOutput = new File("target/gen/OpcMachine Tool.ivml");
+        File output = new File(testFolder, "connector/OpcMachineTool.ivml");
+        File invalidOutput = new File(testFolder, "connector/OpcMachine Tool.ivml");
         if (testFolder.exists()) {
             FileUtils.deleteDirectory(testFolder);
         }
@@ -203,8 +203,8 @@ public class DomParserTest {
     public void testDomParserMultipleInputs() {
         File first = new File("src/test/resources/NodeSets/Opc.Ua.Woodworking.NodeSet2.xml");
         File second = new File("src/test/resources/NodeSets/Opc.Ua.MachineTool.NodeSet2.xml");
-        File firstOut = new File("target/gen/OpcWoodworking.ivml");
-        File secondOut = new File("target/gen/OpcMachineTool.ivml");
+        File firstOut = new File("target/tmp/OpcWoodworking.ivml");
+        File secondOut = new File("target/tmp/OpcMachineTool.ivml");
         Assert.assertTrue(first.isFile());
         Assert.assertTrue(second.isFile());
         firstOut.getParentFile().mkdirs();
