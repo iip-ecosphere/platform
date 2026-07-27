@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<UANodeSet xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd">
+  <NamespaceUris>
+    <Uri>http://opcfoundation.org/UA/ExternalRootVariable/</Uri>
+    <Uri>http://opcfoundation.org/UA/ExternalVariableType/</Uri>
+  </NamespaceUris>
+  <Models>
+    <Model ModelUri="http://opcfoundation.org/UA/ExternalRootVariable/"
+        Version="1.00" PublicationDate="2026-07-24T00:00:00Z">
+      <RequiredModel ModelUri="http://opcfoundation.org/UA/"
+          Version="1.05.02" PublicationDate="2022-11-01T00:00:00Z" />
+      <RequiredModel ModelUri="http://opcfoundation.org/UA/ExternalVariableType/"
+          Version="1.00" PublicationDate="2026-07-24T00:00:00Z" />
+    </Model>
+  </Models>
+  <UAObjectType NodeId="ns=1;i=1001" BrowseName="1:SyntheticRootType">
+    <DisplayName>SyntheticRootType</DisplayName>
+    <References>
+      <Reference ReferenceType="HasSubtype" IsForward="false">i=58</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=6001</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=6002</Reference>
+    </References>
+  </UAObjectType>
+  <UAVariable NodeId="ns=1;i=6001" BrowseName="1:Pressure"
+      ParentNodeId="ns=1;i=1001" DataType="Float" AccessLevel="3">
+    <DisplayName>Pressure</DisplayName>
+    <References>
+      <Reference ReferenceType="HasModellingRule">i=78</Reference>
+      <Reference ReferenceType="HasTypeDefinition">ns=2;i=2001</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=6002" BrowseName="1:Temperature"
+      ParentNodeId="ns=1;i=1001" DataType="Double" AccessLevel="3">
+    <DisplayName>Temperature</DisplayName>
+    <References>
+      <Reference ReferenceType="HasModellingRule">i=80</Reference>
+      <Reference ReferenceType="HasTypeDefinition">ns=2;i=2001</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+    </References>
+  </UAVariable>
+</UANodeSet>

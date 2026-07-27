@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<UANodeSet xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd">
+  <NamespaceUris>
+    <Uri>http://opcfoundation.org/UA/ExternalVariableType/</Uri>
+  </NamespaceUris>
+  <Models>
+    <Model ModelUri="http://opcfoundation.org/UA/ExternalVariableType/"
+        Version="1.00" PublicationDate="2026-07-24T00:00:00Z">
+      <RequiredModel ModelUri="http://opcfoundation.org/UA/"
+          Version="1.05.02" PublicationDate="2022-11-01T00:00:00Z" />
+    </Model>
+  </Models>
+  <UAVariableType NodeId="ns=1;i=2001" BrowseName="1:ExternalMeasurementValueType"
+      DataType="Float" ValueRank="-2">
+    <DisplayName>ExternalMeasurementValueType</DisplayName>
+    <References>
+      <Reference ReferenceType="HasSubtype" IsForward="false">i=63</Reference>
+    </References>
+  </UAVariableType>
+</UANodeSet>
