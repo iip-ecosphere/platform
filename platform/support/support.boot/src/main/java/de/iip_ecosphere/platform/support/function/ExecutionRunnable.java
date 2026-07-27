@@ -1,6 +1,6 @@
 /**
  * ******************************************************************************
- * Copyright (c) {2020} The original author or authors
+ * Copyright (c) {2025} The original author or authors
  *
  * All rights reserved. This program and the accompanying materials are made 
  * available under the terms of the Eclipse Public License 2.0 which is available 
@@ -10,16 +10,21 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package test.de.iip_ecosphere.platform.transport;
+package de.iip_ecosphere.platform.support.function;
 
-import de.iip_ecosphere.platform.transport.AbstractServer;
+import java.util.concurrent.ExecutionException;
 
 /**
- * A basic abstract server for testing/experiments (legacy type, moved to AbstractServer as Eclipse did not play with 
- * using test dependencies in compile scope).
+ * A runnable that may throw an execution exception.
  * 
  * @author Holger Eichelberger, SSE
  */
-public abstract class AbstractTestServer extends AbstractServer {
+@FunctionalInterface
+public interface ExecutionRunnable {
+
+    /**
+     * Runs this operation.
+     */
+    void run() throws ExecutionException;
 
 }

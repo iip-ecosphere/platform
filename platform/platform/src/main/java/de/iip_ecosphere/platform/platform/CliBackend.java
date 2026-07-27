@@ -67,6 +67,7 @@ import de.iip_ecosphere.platform.support.net.UriResolver;
  */
 class CliBackend {
 
+    public static final boolean ENABLE_EXPERT_MODE = false; // -> version 0.8.2
     public static final Consumer<String> DEFAULT_ERROR_CONSUMER = s -> { };
     private static ServicesClientFactory servicesFactory = ServicesClientFactory.DEFAULT;
     private static EcsClientFactory ecsFactory = EcsClientFactory.DEFAULT;
@@ -129,6 +130,7 @@ class CliBackend {
     protected abstract static class AbstractCommandInterpreter {
 
         private boolean hadException = false;
+        private boolean expertMode = false;
         
         /**
          * Prints the help.
@@ -177,6 +179,9 @@ class CliBackend {
                                 cmd = null;
                             }
                             break;
+                        case "--expert":
+                            expertMode = true;
+                            break;
                         default:
                             try {
                                 exit = interpretFurther(provider, level, cmd);
@@ -194,6 +199,77 @@ class CliBackend {
                 hadException = true;
             }
             return exit;
+        }
+        
+        /**
+         * Returns whether this interpreter runs in expert mode.
+         * 
+         * @return {@code true} for expert mode, {@code false} else
+         */
+        protected boolean expertMode() {
+            return expertMode;
+        }
+        
+        /**
+         * A runnable that may throw an execution exception.
+         * 
+         * @author Holger Eichelberger, SSE
+         */
+        @FunctionalInterface
+        protected interface ExecutionRunnable {
+
+            /**
+             * Runs this operation.
+             * 
+             * @throws ExecutionException if the execution fails
+             * @throws URISyntaxException if the execution fails due to an URI syntax
+             */
+            void run() throws ExecutionException, URISyntaxException;
+
+        }
+        
+        /**
+         * Run the given runnable only in expert mode.
+         * 
+         * @param run the runnable
+         * @throws ExecutionException if the runnable fails
+         * @throws URISyntaxException if the execution fails due to an URI syntax
+         */
+        protected void inExpertMode(ExecutionRunnable run) throws ExecutionException, URISyntaxException {
+            if (!ENABLE_EXPERT_MODE) {
+                run.run();
+            } else {
+                if (expertMode()) {
+                    run.run();
+                } else {
+                    error("This command requires --expert. Consider all prerequisites, handle with care.");
+                }
+            }
+        }
+        
+        /**
+         * If not in {@link #expertMode()}, prints {@code string} suffixed by "*" as a marker for (soon) required 
+         * expert mode, else prints {@code string}.
+         * 
+         * @param string the string to be printed/suffixed
+         */
+        protected void printlnSuffixedInExpertMode(String string) {
+            if (!expertMode()) {
+                println(string + " *");
+            } else {
+                println(string);
+            }
+        }
+        
+        /**
+         * Prints the given string only in {@link #expertMode()}.
+         * 
+         * @param string the string to b eprinted
+         */
+        protected void printlnInExpertMode(String string) {
+            if (!expertMode()) {
+                println(string);
+            }            
         }
         
         /**

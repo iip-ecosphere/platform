@@ -12,13 +12,17 @@
 
 package test.de.iip_ecosphere.platform.configuration.easyProducer.opcua;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.io.PrintStream;
 import java.nio.charset.Charset;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.xml.sax.SAXException;
 
 import de.uni_hildesheim.sse.easy.loader.ManifestLoader;
 import de.iip_ecosphere.platform.configuration.easyProducer.opcua.parser.DomParser;
@@ -142,6 +146,70 @@ public class DomParserTest {
             loader.shutdown();
         }
     }
+     * Tests processing explicit inputs exactly once in caller order.
+     */
+    @Test
+    public void testDomParserMultipleInputs() {
+        File first = new File("src/test/resources/NodeSets/Opc.Ua.Woodworking.NodeSet2.xml");
+        File second = new File("src/test/resources/NodeSets/Opc.Ua.MachineTool.NodeSet2.xml");
+        File firstOut = new File("target/gen/OpcWoodworking.ivml");
+        File secondOut = new File("target/gen/OpcMachineTool.ivml");
+        Assert.assertTrue(first.isFile());
+        Assert.assertTrue(second.isFile());
+        firstOut.getParentFile().mkdirs();
+        if (firstOut.exists()) {
+            Assert.assertTrue(firstOut.delete());
+        }
+        if (secondOut.exists()) {
+            Assert.assertTrue(secondOut.delete());
+        }
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        PrintStream previousOut = System.out;
+        try {
+            System.setOut(new PrintStream(buffer));
+            DomParser.setDefaultVerbose(false);
+            DomParser.setUsingIvmlFolder("target/tmp");
+            DomParser.main(new String[] {first.toString(), second.toString()});
+        } finally {
+            System.setOut(previousOut);
+        }
+
+        Assert.assertTrue(firstOut.isFile());
+        Assert.assertTrue(secondOut.isFile());
+        String output = new String(buffer.toByteArray(), Charset.defaultCharset());
+        String firstMessage = "Processing " + first;
+        String secondMessage = "Processing " + second;
+        Assert.assertTrue(output.indexOf(firstMessage) >= 0);
+        Assert.assertTrue(output.indexOf(secondMessage) >= 0);
+        Assert.assertTrue(output.indexOf(firstMessage) < output.indexOf(secondMessage));
+        Assert.assertEquals(output.indexOf(firstMessage), output.lastIndexOf(firstMessage));
+        Assert.assertEquals(output.indexOf(secondMessage), output.lastIndexOf(secondMessage));
+    }
+    
+
+    /**
+     * Tests propagation of XML parser failures.
+     *
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testParserErrorPropagation() throws IOException {
+        File tmp = new File("target/tmp");
+        tmp.mkdirs();
+        File invalid = File.createTempFile("invalid-opcua-input-", ".xml", tmp);
+        try (FileWriter writer = new FileWriter(invalid)) {
+            writer.write("<invalid>");
+        }
+        try {
+            DomParser.process(invalid, "Invalid", new File(tmp, "OpcInvalid.ivml"), false);
+            Assert.fail("Expected malformed XML input to be rejected");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(e.getMessage().contains(invalid.toString()));
+            Assert.assertTrue(e.getCause() instanceof SAXException);
+        } finally {
+            Assert.assertTrue(invalid.delete());
+        }
+    }    
     
     /**
      * Tests {@link DomParser} on the machine tool companion spec XML.

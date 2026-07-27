@@ -414,7 +414,7 @@ public class DomParser {
                         Element childNode = getNextNodeElement(childNodeList, j);
                         if (childNode != null && !childNode.getTagName().equals("References")) {
                             if (childNode.getTagName().equals("DisplayName")) {
-                                identifiedDataType = childNode.getTextContent().replaceAll("[灯\"_\\\\]", "");
+                                identifiedDataType = childNode.getTextContent().replaceAll("[ﾂ督能"_\\\\]", "");
                                 break;
                             }
                         }
@@ -504,7 +504,7 @@ public class DomParser {
                     Element childNode = getNextNodeElement(childNodeList, j);
                     if (childNode != null && !childNode.getTagName().equals("References")) {
                         if (childNode.getTagName().equals("DisplayName")) {
-                            dataType = childNode.getTextContent().replaceAll("[灯\"_\\\\]", "");
+                            dataType = childNode.getTextContent().replaceAll("[ﾂ督能"_\\\\]", "");
                             break;
                         }
                     }
@@ -660,10 +660,10 @@ public class DomParser {
             Element childNode = getNextNodeElement(childNodeList, j);
             if (childNode != null && !childNode.getTagName().equals("References")) {
                 if (childNode.getTagName().equals("DisplayName")) {
-                    result.reference = childNode.getTextContent().replaceAll("[灯\"\\\\]", "");
+                    result.reference = childNode.getTextContent().replaceAll("[ﾂ督能"\\\\]", "");
                     result.displayName = result.reference;
                 } else if (childNode.getTagName().equals("Description")) {
-                    result.description = childNode.getTextContent().replaceAll("[灯\"\\\\]", "");
+                    result.description = childNode.getTextContent().replaceAll("[ﾂ督能"\\\\]", "");
                 } else if (childNode.getTagName().equals("Documentation")) {
                     result.documentation = childNode.getTextContent();
                 }
@@ -799,27 +799,27 @@ public class DomParser {
             if (childNode != null && !childNode.getTagName().equals("References")) {
                 if (childNode.getTagName().equals("Description")) {
                     description = (childNode.getTextContent() + "@" + childNode.getAttribute("Locale"))
-                            .replaceAll("[灯\"\\\\]", "");
+                            .replaceAll("[ﾂ督能"\\\\]", "");
                 } else if (childNode.getTagName().equals("DisplayName")) {
-                    displayName = childNode.getTextContent().replaceAll("[灯\"_\\\\]", "");
+                    displayName = childNode.getTextContent().replaceAll("[ﾂ督能"_\\\\]", "");
                 } else if (childNode.getTagName().equals("Documentation")) {
-                    documentation = childNode.getTextContent().replaceAll("[灯\"\\\\]", "");
+                    documentation = childNode.getTextContent().replaceAll("[ﾂ督能"\\\\]", "");
                 } else if (childNode.getTagName().equals("Definition")) {
                     NodeList fields = childNode.getChildNodes();
 
                     for (int k = 0; k < fields.getLength(); k++) {
                         Element fieldNode = getNextNodeElement(fields, k);
                         if (fieldNode != null) {
-                            String fieldName = "_" + fieldNode.getAttribute("Name").replaceAll("[,灯\"\\\\]", "_");
+                            String fieldName = "_" + fieldNode.getAttribute("Name").replaceAll("[,ﾂ督能"\\\\]", "_");
                             if (fieldName.equals("") || fieldName.equals("_")) {
                                 fieldName = "placeholder_"
-                                        + childNode.getAttribute("Name").replaceAll("[/,灯\"\\\\]", "_");
+                                        + childNode.getAttribute("Name").replaceAll("[/,ﾂ督能"\\\\]", "_");
                             } else {
-                                fieldName = fieldName.replace("ｵ", "mu");
+                                fieldName = fieldName.replace("ﾂｵ", "mu");
                                 fieldName = fieldName.replace("/", "_per_");
-                                fieldName = fieldName.replace("ｲ", "_toPowerOf2");
-                                fieldName = fieldName.replace("ｳ", "_toPowerOf3");
-                                fieldName = fieldName.replace("ｰ", "degree_");
+                                fieldName = fieldName.replace("ﾂｲ", "_toPowerOf2");
+                                fieldName = fieldName.replace("ﾂｳ", "_toPowerOf3");
+                                fieldName = fieldName.replace("ﾂｰ", "degree_");
                             }
                             String fieldDescription = getFieldDescription(fieldNode);
                             String fieldValue = fieldNode.getAttribute("Value");
@@ -879,10 +879,10 @@ public class DomParser {
             if (fieldChildNode != null) {
                 if (fieldChildNode.getTagName().equals("Description")) {
                     if (fieldChildNode.getAttribute("Locale").equals("")) {
-                        fieldDescription = fieldChildNode.getTextContent().replaceAll("[灯\"\\\\]", "");
+                        fieldDescription = fieldChildNode.getTextContent().replaceAll("[ﾂ督能"\\\\]", "");
                     } else {
                         fieldDescription = (fieldChildNode.getTextContent() + "@"
-                                + fieldChildNode.getAttribute("Locale")).replaceAll("[灯\"\\\\]", "");
+                                + fieldChildNode.getAttribute("Locale")).replaceAll("[ﾂ督能"\\\\]", "");
                     }
                 }
             }
@@ -915,7 +915,7 @@ public class DomParser {
         switch (type) {
         case ROOTOBJECT:
             ObjectType uaRootObject = new RootObjectType(id,
-                    element.getAttribute("BrowseName").replaceAll("[灯\"\\\\]", ""), displayName, description, optional,
+                    element.getAttribute("BrowseName").replaceAll("[ﾂ督能"\\\\]", ""), displayName, description, optional,
                     BaseType.validateVarName("opc" + typeDef),
                     retrieveParent(element.getAttribute("ParentNodeId"), objectTypeList), objectFields);
             uaRootObject.setVarName(retrieveParent(element.getAttribute("ParentNodeId"), objectTypeList) + displayName);
@@ -948,7 +948,7 @@ public class DomParser {
                 dimension = dimension.substring(0, dimension.indexOf(","));
             }
             RootVariableType uaRootVariable = new RootVariableType(id,
-                    element.getAttribute("BrowseName").replaceAll("[灯\"\\\\]", ""), displayName, description, dataType,
+                    element.getAttribute("BrowseName").replaceAll("[ﾂ督能"\\\\]", ""), displayName, description, dataType,
                     BaseType.validateVarName("opc" + typeDef + "Type"), optional, element.getAttribute("AccessLevel"),
                     element.getAttribute("ValueRank"), dimension,
                     retrieveParent(element.getAttribute("ParentNodeId"), objectTypeList));
@@ -958,7 +958,7 @@ public class DomParser {
             break;
         case ROOTMETHOD:
             RootMethodType uaRootMethod = new RootMethodType(id,
-                    element.getAttribute("BrowseName").replaceAll("[灯\"\\\\]", ""), displayName, description, optional,
+                    element.getAttribute("BrowseName").replaceAll("[ﾂ督能"\\\\]", ""), displayName, description, optional,
                     null, retrieveParent(element.getAttribute("ParentNodeId"), objectTypeList), objectFields);
             uaRootMethod.setVarName(retrieveParent(element.getAttribute("ParentNodeId"), objectTypeList) + displayName);
             if (!objectFields.isEmpty()) {
@@ -970,7 +970,7 @@ public class DomParser {
             }
             break;
         case SUBOBJECT:
-            ObjectType uaSubObject = new ObjectType(id, element.getAttribute("BrowseName").replaceAll("[灯\"\\\\]", ""),
+            ObjectType uaSubObject = new ObjectType(id, element.getAttribute("BrowseName").replaceAll("[ﾂ督能"\\\\]", ""),
                     displayName, description, optional, BaseType.validateVarName(typeDef), objectFields);
             uaSubObject.setVarName(searchVarName(uaSubObject, hierarchy));
             if (!objectFields.isEmpty()) {
@@ -983,7 +983,7 @@ public class DomParser {
             }
             break;
         case SUBMETHOD:
-            MethodType uaMethod = new MethodType(id, element.getAttribute("BrowseName").replaceAll("[灯\"\\\\]", ""),
+            MethodType uaMethod = new MethodType(id, element.getAttribute("BrowseName").replaceAll("[ﾂ督能"\\\\]", ""),
                     displayName, description, optional, objectFields);
             uaMethod.setVarName(searchVarName(uaMethod, hierarchy));
             if (!objectFields.isEmpty()) {
@@ -997,7 +997,7 @@ public class DomParser {
             break;
         case FIELDOBJECT:
             FieldObjectType uaFieldObject = new FieldObjectType(id,
-                    element.getAttribute("BrowseName").replaceAll("[灯\"\\\\]", ""), displayName, description, "",
+                    element.getAttribute("BrowseName").replaceAll("[ﾂ督能"\\\\]", ""), displayName, description, "",
                     optional);
             uaFieldObject.setVarName("opc" + displayName);
             if (!checkRedundancy(uaFieldObject.getVarName(), subFields)) {
@@ -1025,7 +1025,7 @@ public class DomParser {
                 fieldDimension = fieldDimension.substring(0, fieldDimension.indexOf(","));
             }
             FieldVariableType uaFieldVariable = new FieldVariableType(id,
-                    element.getAttribute("BrowseName").replaceAll("[灯\"\\\\]", ""), displayName, description, dataType,
+                    element.getAttribute("BrowseName").replaceAll("[ﾂ督能"\\\\]", ""), displayName, description, dataType,
                     BaseType.validateVarName("opc" + typeDef + "Type"), optional, element.getAttribute("AccessLevel"),
                     element.getAttribute("ValueRank"), fieldDimension);
             uaFieldVariable.setVarName(retrieveParent(element.getAttribute("ParentNodeId"), objectList) + displayName);
@@ -1035,7 +1035,7 @@ public class DomParser {
             break;
         case FIELDMETHOD:
             FieldMethodType uaFieldMethod = new FieldMethodType(id,
-                    element.getAttribute("BrowseName").replaceAll("[灯\"\\\\]", ""), displayName, description, "",
+                    element.getAttribute("BrowseName").replaceAll("[ﾂ督能"\\\\]", ""), displayName, description, "",
                     optional);
             uaFieldMethod.setVarName("opc" + displayName);
             if (!checkRedundancy(uaFieldMethod.getVarName(), subFields)) {
@@ -1043,27 +1043,27 @@ public class DomParser {
             }
             break;
         case ENUM:
-            EnumType enumeration = new EnumType(id, element.getAttribute("BrowseName").replaceAll("[灯\"\\\\]", ""),
+            EnumType enumeration = new EnumType(id, element.getAttribute("BrowseName").replaceAll("[ﾂ督能"\\\\]", ""),
                     displayName, description, documentation, literals);
             enumeration.setVarName("opc" + displayName + "Type");
             addElement(enumeration, type);
             break;
         case DATATYPE:
-            DataType uaDataType = new DataType(id, element.getAttribute("BrowseName").replaceAll("[灯\"\\\\]", ""),
+            DataType uaDataType = new DataType(id, element.getAttribute("BrowseName").replaceAll("[ﾂ督能"\\\\]", ""),
                     displayName, description, documentation, dataLiterals);
             uaDataType.setVarName("opc" + displayName + "Type");
             addElement(uaDataType, type);
             break;
         case OBJECTTYPE:
             ObjectTypeType uaObjectType = new ObjectTypeType(id,
-                    element.getAttribute("BrowseName").replaceAll("[灯\"\\\\]", ""), displayName, description,
+                    element.getAttribute("BrowseName").replaceAll("[ﾂ督能"\\\\]", ""), displayName, description,
                     documentation);
             uaObjectType.setVarName("opc" + displayName);
             addElement(uaObjectType, type);
             break;
         case VARIABLETYPE:
             VariableTypeType uaVariableType = new VariableTypeType(id,
-                    element.getAttribute("BrowseName").replaceAll("[灯\"\\\\]", ""), displayName, description,
+                    element.getAttribute("BrowseName").replaceAll("[ﾂ督能"\\\\]", ""), displayName, description,
                     documentation, changeVariableDataTypes(element.getAttribute("DataType")));
             uaVariableType.setVarName("opc" + displayName + "Type");
             addElement(uaVariableType, type);
@@ -1270,7 +1270,7 @@ public class DomParser {
                         System.out.println("The following models are still missing:\n" + missingModels);
                     }
                 }
-                // ﾜberpr�fung, ob files fehlen und wenn, ja welche
+                // ﾃ彙erprﾃｼfung, ob files fehlen und wenn, ja welche
             }
             if (!correct) {
                 boolean confirmed = false;
@@ -1394,7 +1394,7 @@ public class DomParser {
             Collector.collectInformation(compSpec.getName(), objectTypeList, objectList, variableList, methodList,
                     dataTypeList, variableTypeList, hierarchy, reqModels.length);
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            System.out.println(e.getMessage());
+            throw new IllegalArgumentException("Cannot parse OPC UA NodeSet '" + compSpec + "': " + e.getMessage(), e);
         }
         return parser;
     }
@@ -1477,9 +1477,10 @@ public class DomParser {
      */
     public static void main(String[] args) {
         ArrayList<File> files = new ArrayList<File>();
-        if (args.length == 1) {
-            File sourceFile = new File(args[0]);
-            files.add(sourceFile);
+        if (args.length > 0) {
+            for (String argument : args) {
+                files.add(new File(argument));
+            }
         } else {
             File baseDir = new File("src/main/resources/NodeSets/");
             files.add(new File(baseDir, "Opc.Ua.Woodworking.NodeSet2.xml"));

@@ -108,15 +108,21 @@ public class Cli extends CliBackend {
                 println("  listArtifacts - lists known artifacts");
                 println("  listServices - lists known services");
                 println("  add <path/URI> - adds an artifact");
-                println("  startAll <artifactId> - starts all services in <artifactId>");
-                println("  start <serviceId>+ . - starts the given services, note the \".\" at the end");
+                printlnSuffixedInExpertMode(
+                        "  startAll <artifactId> - starts all services in <artifactId>");
+                printlnSuffixedInExpertMode(
+                        "  start <serviceId>+ . - starts the given services, note the \".\" at the end");
                 println("  log <serviceId> - emits the logs of the given service");
-                println("  stopAll <artifactId> - stops all services in <artifactId>");
-                println("  remove <artifactId> - removes <artifactId>");
+                printlnSuffixedInExpertMode(
+                        "  stopAll <artifactId> - stops all services in <artifactId>");
+                printlnSuffixedInExpertMode(
+                        "  remove <artifactId> - removes <artifactId>");
                 println("  help - prints help for this level");
                 println("  back - to previous level", provider);
                 println("  ..  - to previous level", provider);
                 println("  exit - exits the program", provider);
+                printlnInExpertMode(
+                        "* will be migrated to --expert mode");
             }
             if (level.isTopLevel()) {
                 println(" container <resourceId> - enters the container command level for <resourceId>");
@@ -330,40 +336,52 @@ public class Cli extends CliBackend {
                 print(client.getArtifacts(), "- Artifact ", null, PrintType.NO, PrintType.PREFIX);
                 break;
             case "add":
-                changedArtifacts = callWithUri(provider, uri -> client.addArtifact(uri));
+                inExpertMode(() -> {
+                    changedArtifacts = callWithUri(provider, uri -> client.addArtifact(uri));
+                });
                 break;
             case "startall":
-                changedServices = callWithArtifactId(provider, id -> client.startService(client.getServices(id, true)));
+                inExpertMode(() -> {
+                    changedServices = callWithArtifactId(provider, 
+                        id -> client.startService(client.getServices(id, true)));
+                });
                 break;
             case "start":
-                List<String> sIds = new ArrayList<String>();
-                String tmp; 
-                while (true) {
-                    tmp = provider.nextCommand();
-                    if (null == tmp) {
-                        sIds = null;
-                        error("No serviceId given.");
-                        break;
-                    } else if (!".".equals(tmp)) {
-                        sIds.add(tmp);
-                    } else {
-                        break;
+                inExpertMode(() -> {
+                    List<String> sIds = new ArrayList<String>();
+                    String tmp; 
+                    while (true) {
+                        tmp = provider.nextCommand();
+                        if (null == tmp) {
+                            sIds = null;
+                            error("No serviceId given.");
+                            break;
+                        } else if (!".".equals(tmp)) {
+                            sIds.add(tmp);
+                        } else {
+                            break;
+                        }
+                        if (null != sIds) {
+                            String[] sTmp = new String[sIds.size()];
+                            client.startService(sIds.toArray(sTmp));
+                            changedServices = true;
+                        }
                     }
-                    if (null != sIds) {
-                        String[] sTmp = new String[sIds.size()];
-                        client.startService(sIds.toArray(sTmp));
-                        changedServices = true;
-                    }
-                }
+                });
                 break;
             case "log":
                 logService(provider);
                 break;
             case "stopall":
-                changedServices = callWithArtifactId(provider, id -> client.stopService(client.getServices(id, true)));
+                inExpertMode(() -> {
+                    changedServices = callWithArtifactId(provider, 
+                        id -> client.stopService(client.getServices(id, true)));
+                });
                 break;
             case "remove":
-                changedArtifacts = callWithArtifactId(provider, id -> client.removeArtifact(id));
+                inExpertMode(() -> {               
+                    changedArtifacts = callWithArtifactId(provider, id -> client.removeArtifact(id));
+                });
                 break;
             default:
                 exit = super.interpretFurther(provider, level, cmd);
