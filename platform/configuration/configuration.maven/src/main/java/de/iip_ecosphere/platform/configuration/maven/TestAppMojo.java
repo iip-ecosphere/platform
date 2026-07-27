@@ -338,6 +338,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
             ProcessUnitBuilder pub = new ProcessUnitBuilder(name, this)
                 .setHome(platformDir)
                 .addShellScriptCommand("cli")
+                .addArgument("--expert")
                 .addArgument(deploy ? "deploy" : "undeploy")
                 .addArgument(deploymentPlan.getAbsolutePath());
             if (!deploy) {
