@@ -31,6 +31,7 @@ import org.junit.runners.Suite;
     TransportSetupTest.class,
     IipEnumTest.class,
     AlertTest.class,
+    GenericXmlSerializerTest.class, 
     GenericJsonSerializerTest.class, 
     BasicSerializerProviderTest.class,
     PrintTransportConnectorTest.class,
