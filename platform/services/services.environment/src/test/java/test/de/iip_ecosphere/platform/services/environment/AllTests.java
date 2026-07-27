@@ -48,6 +48,8 @@ import test.de.iip_ecosphere.platform.services.environment.metricsProvider.Metri
     DataIngestorsTest.class,
     ServicePluginDescriptorTest.class,
     
+    BrokerTest.class,
+    
     TransportLoggerTests.class,
     MetricsProviderTests.class,
     test.de.iip_ecosphere.platform.services.environment.services.AllTests.class
