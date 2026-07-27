@@ -146,6 +146,8 @@ public class DomParserTest {
             loader.shutdown();
         }
     }
+
+    /**
      * Tests processing explicit inputs exactly once in caller order.
      */
     @Test
