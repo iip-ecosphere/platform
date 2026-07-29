@@ -39,13 +39,62 @@ import net.ssehub.easy.varModel.confModel.Configuration;
 public class DomParserTest {
 
     /**
+     * Tests creating and using a dedicated parser output folder.
+     *
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testDomParserOutputFolder() throws IOException {
+        File in = new File("src/test/resources/NodeSets/Opc.Ua.Woodworking.NodeSet2.xml");
+        File output = new File("target/opcua-parser-test");
+        File legacyOutput = new File("src/test/easy/VDW_ToolOutput.ivml");
+        FileUtils.deleteDirectory(output);
+        Assert.assertFalse(output.exists());
+        Assert.assertFalse(legacyOutput.exists());
+        DomParser.setUsingIvmlFolder(output.getPath());
+        try {
+            DomParser.process(in, "ToolOutput", new File(output, "OpcToolOutput.ivml"), false);
+            Assert.assertTrue(new File(output, "OpcToolOutput.ivml").isFile());
+            Assert.assertTrue(new File(output, "VDW.ivml").isFile());
+            Assert.assertTrue(new File(output, "VDW_ToolOutput.ivml").isFile());
+            Assert.assertFalse(legacyOutput.exists());
+        } finally {
+            DomParser.setUsingIvmlFolder("target/tmp");
+            FileUtils.deleteDirectory(output);
+        }
+    }
+
+    /**
+     * Tests reporting an invalid parser output folder.
+     *
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testDomParserInvalidOutputFolder() throws IOException {
+        File output = new File("target/opcua-parser-output-file");
+        FileUtils.deleteQuietly(output);
+        Assert.assertTrue(output.createNewFile());
+        DomParser.setUsingIvmlFolder(output.getPath());
+        try {
+            DomParser.process(new File("src/test/resources/NodeSets/Opc.Ua.Woodworking.NodeSet2.xml"),
+                "ToolOutput", new File(output, "OpcToolOutput.ivml"), false);
+            Assert.fail("Expected an invalid output folder to be rejected");
+        } catch (IllegalStateException e) {
+            Assert.assertTrue(e.getMessage().contains(output.getPath()));
+        } finally {
+            DomParser.setUsingIvmlFolder("target/tmp");
+            FileUtils.deleteQuietly(output);
+        }
+    }
+
+    /**
      * Tests processing one explicitly supplied companion specification.
      */
     @Test
     public void testDomParserSingleInput() {
         File in = new File("src/test/resources/NodeSets/Opc.Ua.MachineTool.NodeSet2.xml");
         Assert.assertTrue(in.isFile());
-        File out = new File("target/gen/OpcMachineTool.ivml");
+        File out = new File("target/tmp/OpcMachineTool.ivml");
         out.getParentFile().mkdirs();
         if (out.exists()) {
             Assert.assertTrue(out.delete());
@@ -89,8 +138,8 @@ public class DomParserTest {
     public void testDomParserWhitespaceModelName() throws IOException, ModelManagementException {
         File nodeSets = new File("src/test/resources/NodeSets");
         File testFolder = new File("target/tmp/domParserWhitespaceModelName");
-        File output = new File("target/gen/OpcMachineTool.ivml");
-        File invalidOutput = new File("target/gen/OpcMachine Tool.ivml");
+        File output = new File(testFolder, "connector/OpcMachineTool.ivml");
+        File invalidOutput = new File(testFolder, "connector/OpcMachine Tool.ivml");
         if (testFolder.exists()) {
             FileUtils.deleteDirectory(testFolder);
         }
@@ -154,8 +203,8 @@ public class DomParserTest {
     public void testDomParserMultipleInputs() {
         File first = new File("src/test/resources/NodeSets/Opc.Ua.Woodworking.NodeSet2.xml");
         File second = new File("src/test/resources/NodeSets/Opc.Ua.MachineTool.NodeSet2.xml");
-        File firstOut = new File("target/gen/OpcWoodworking.ivml");
-        File secondOut = new File("target/gen/OpcMachineTool.ivml");
+        File firstOut = new File("target/tmp/OpcWoodworking.ivml");
+        File secondOut = new File("target/tmp/OpcMachineTool.ivml");
         Assert.assertTrue(first.isFile());
         Assert.assertTrue(second.isFile());
         firstOut.getParentFile().mkdirs();

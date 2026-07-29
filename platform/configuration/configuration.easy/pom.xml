@@ -360,6 +360,31 @@
      </profile>
 
      <profile>
+        <id>OpcUaParser</id>
+        <dependencies>
+          <dependency>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>support.commons-apache</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+          </dependency>
+        </dependencies>
+        <build>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>exec-maven-plugin</artifactId>
+              <version>3.0.0</version>
+              <configuration>
+                <mainClass>de.iip_ecosphere.platform.configuration.easyProducer.opcua.parser.DomParser</mainClass>
+                <classpathScope>runtime</classpathScope>
+              </configuration>
+            </plugin>
+          </plugins>
+        </build>
+     </profile>
+
+     <profile>
         <id>Main</id>
         <activation>
            <activeByDefault>true</activeByDefault>

@@ -61,8 +61,9 @@ enum ElementType {
  */
 public class DomParser {
 
+    private static final String IVML_OUTPUT_PROPERTY = "opcua.ivml.output";
     private static boolean verboseDefault = false;
-    private static String usingIvmlFolder = "src/test/easy";
+    private static String usingIvmlFolder = System.getProperty(IVML_OUTPUT_PROPERTY, "target/opcua-parser");
     private static final Set<String> IDENTIFY_FIELDS_PERMITTED_REFERENCE_TYPE;
 
     static {
@@ -1465,10 +1466,24 @@ public class DomParser {
     /**
      * Sets the folder where to generate example using IVML models.
      * 
-     * @param folder the folder name (by default "src/test/easy")
+     * @param folder the folder name (by default "target/opcua-parser")
      */
     public static void setUsingIvmlFolder(String folder) {
         usingIvmlFolder = folder;
+    }
+
+    /**
+     * Returns the IVML output folder, creating it if needed.
+     *
+     * @return the IVML output folder
+     * @throws IllegalStateException if the folder cannot be created
+     */
+    private static File getUsingIvmlFolder() {
+        File result = new File(usingIvmlFolder);
+        if ((!result.isDirectory() && !result.mkdirs()) || !result.canWrite()) {
+            throw new IllegalStateException("Cannot create or write OPC UA parser output folder '" + result + "'");
+        }
+        return result;
     }
 
     /**
@@ -1478,8 +1493,9 @@ public class DomParser {
      * @param ivmlFile the output file
      */
     private void createIvmlModel(String fileName, File ivmlFile) {
+        File ivmlFolder = getUsingIvmlFolder();
         Generator.generateIVMLModel(fileName, ivmlFile, hierarchy);
-        Generator.generateVDWConnectorSettings(fileName, hierarchy, usingIvmlFolder);
+        Generator.generateVDWConnectorSettings(fileName, hierarchy, ivmlFolder.getPath());
         println("FINISHED");
     }
 
@@ -1633,10 +1649,15 @@ public class DomParser {
             //files.add(new File(baseDir, "Opc.Ua.Gds.NodeSet2.xml"));
             files.add(new File(baseDir, "Opc.Ua.Machinery.NodeSet2.xml"));
         }
+        File ivmlFolder = getUsingIvmlFolder();
+        File collectorFolder = new File("target/tmp");
+        if (!collectorFolder.isDirectory() && !collectorFolder.mkdirs()) {
+            throw new IllegalStateException("Cannot create OPC UA parser collector folder '" + collectorFolder + "'");
+        }
         for (File sourceFile : files) {
             String sourceFileName = sourceFile.getName();
             String modelName = getModelName(sourceFileName);
-            File ivmlFile = new File("target/gen/Opc" + modelName + ".ivml");
+            File ivmlFile = new File(ivmlFolder, "Opc" + modelName + ".ivml");
             process(sourceFile, modelName, ivmlFile, verboseDefault);
         }
         Collector.informationToExcel();
