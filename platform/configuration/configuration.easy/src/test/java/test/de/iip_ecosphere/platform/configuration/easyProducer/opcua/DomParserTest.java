@@ -318,6 +318,7 @@ public class DomParserTest {
      * @return the normalized text
      */
     private static String normalize(String text) {
+        text = text.replace("\r\n", "\n");
         StringBuilder tmp = new StringBuilder(text);
         for (int i = 0; i < tmp.length(); i++) {
             int c = (int) tmp.charAt(i);
