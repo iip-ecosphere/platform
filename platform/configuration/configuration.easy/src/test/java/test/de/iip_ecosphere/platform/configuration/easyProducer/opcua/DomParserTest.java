@@ -213,6 +213,13 @@ public class DomParserTest {
             Assert.assertTrue(invalid.delete());
         }
     }    
+
+    /**
+     * Tests external reference resolution, shall fail first.
+     *
+     * @throws IOException shall not occur
+     */
+    @Test
     public void testExternalReferenceResolutionWrongFirst() throws IOException {
         assertExternalReferenceResolution("WrongFirst");
     }
