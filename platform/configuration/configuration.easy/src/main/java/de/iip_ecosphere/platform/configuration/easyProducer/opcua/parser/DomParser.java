@@ -86,6 +86,7 @@ public class DomParser {
     private ArrayList<BaseType> hierarchy;
     private boolean verbose = verboseDefault;
     private String baseNameSpace;
+    private NodeList namespaceUris;
     private ArrayList<NodeList> externAliasLists;
 
     // checkstyle: stop parameter number check
@@ -356,6 +357,75 @@ public class DomParser {
     }
 
     /**
+     * Returns the namespace URI denoted by the namespace index in {@code nodeId}.
+     *
+     * @param nodeId the node id in the source document
+     * @return the namespace URI
+     */
+    private String getNamespaceUri(String nodeId) {
+        int start = nodeId.indexOf("ns=") + 3;
+        int end = nodeId.indexOf(";", start);
+        int namespaceIndex = Integer.parseInt(nodeId.substring(start, end));
+        NodeList uris = ((Element) namespaceUris.item(0)).getElementsByTagName("Uri");
+        if (namespaceIndex <= 0 || namespaceIndex > uris.getLength()) {
+            throw new IllegalArgumentException("No namespace URI for " + nodeId);
+        }
+        return uris.item(namespaceIndex - 1).getTextContent();
+    }
+
+    /**
+     * Returns the loaded document declaring {@code namespaceUri} as its model URI.
+     *
+     * @param namespaceUri the namespace URI
+     * @return the matching document
+     */
+    private Document getRequiredModel(String namespaceUri) {
+        Document result = null;
+        for (Document document : documents) {
+            Node model = document.getElementsByTagName("Model").item(0);
+            if (model instanceof Element && namespaceUri.equals(((Element) model).getAttribute("ModelUri"))) {
+                result = document;
+                break;
+            }
+        }
+        if (result == null) {
+            throw new IllegalArgumentException("No required model loaded for namespace URI " + namespaceUri);
+        }
+        return result;
+    }
+
+    /**
+     * Returns the namespace index of {@code namespaceUri} in {@code document}.
+     *
+     * @param document the target document
+     * @param namespaceUri the namespace URI
+     * @return the namespace index
+     */
+    private static int getNamespaceIndex(Document document, String namespaceUri) {
+        NodeList namespaceUriElements = document.getElementsByTagName("NamespaceUris");
+        NodeList uris = ((Element) namespaceUriElements.item(0)).getElementsByTagName("Uri");
+        for (int i = 0; i < uris.getLength(); i++) {
+            if (namespaceUri.equals(uris.item(i).getTextContent())) {
+                return i + 1;
+            }
+        }
+        throw new IllegalArgumentException("No namespace index for " + namespaceUri + " in required model");
+    }
+
+    /**
+     * Replaces the namespace index in {@code nodeId}.
+     *
+     * @param nodeId the node id
+     * @param namespaceIndex the new namespace index
+     * @return the adjusted node id
+     */
+    private static String replaceNamespaceIndex(String nodeId, int namespaceIndex) {
+        int start = nodeId.indexOf("ns=") + 3;
+        int end = nodeId.indexOf(";", start);
+        return nodeId.substring(0, start) + namespaceIndex + nodeId.substring(end);
+    }
+
+    /**
      * Returns the next node element.
      * 
      * @param nodes    the nodes to search for
@@ -544,32 +614,24 @@ public class DomParser {
                     }
                 } else {
                     // other models
-                    String newRefId = refId.substring(0, refId.indexOf("=") + 1) + 1
-                            + refId.substring(refId.indexOf(";"), refId.length());
-                    for (int i = 1; i < documents.length; i++) {
-                        NodeList typeList = null;
-                        if (type == ElementType.ROOTOBJECT || type == ElementType.SUBOBJECT) {
-                            typeList = documents[i].getElementsByTagName("UAObjectType");
-                            type = ElementType.OBJECTTYPE;
-                        } else if (type == ElementType.FIELDVARIABLE || type == ElementType.ROOTVARIABLE) {
-                            typeList = documents[i].getElementsByTagName("UAVariableType");
-                            type = ElementType.VARIABLETYPE;
-                        }
-                        Element refElement = checkRelation(newRefId, typeList);
-                        if (refElement != null) {
-                            DescriptionOrDocumentation d = getDescriptionOrDocumentation(reference, refElement);
-                            // create Attribute
-                            reference = d.reference;
-                            createElement(type, refElement, refId, d.displayName, d.description, d.documentation, null,
-                                    null, null, null, null, false);
-                            break;
-                        } else if (type == ElementType.OBJECTTYPE) {
-                            type = ElementType.ROOTOBJECT;
-                        } else if (type == ElementType.VARIABLETYPE) {
-                            type = ElementType.FIELDVARIABLE;
-                        }
+                    String namespaceUri = getNamespaceUri(refId);
+                    Document document = getRequiredModel(namespaceUri);
+                    String newRefId = replaceNamespaceIndex(refId, getNamespaceIndex(document, namespaceUri));
+                    NodeList typeList = null;
+                    if (type == ElementType.ROOTOBJECT || type == ElementType.SUBOBJECT) {
+                        typeList = document.getElementsByTagName("UAObjectType");
+                        type = ElementType.OBJECTTYPE;
+                    } else if (type == ElementType.FIELDVARIABLE || type == ElementType.ROOTVARIABLE) {
+                        typeList = document.getElementsByTagName("UAVariableType");
+                        type = ElementType.VARIABLETYPE;
                     }
-
+                    Element refElement = checkRelation(newRefId, typeList);
+                    if (refElement != null) {
+                        DescriptionOrDocumentation d = getDescriptionOrDocumentation(reference, refElement);
+                        reference = d.reference;
+                        createElement(type, refElement, refId, d.displayName, d.description, d.documentation, null,
+                                null, null, null, null, false);
+                    }
                 }
                 break;
             }
@@ -1376,6 +1438,7 @@ public class DomParser {
 
             parser = new DomParser(objectTypeList, objectList, variableList, methodList, dataTypeList, variableTypeList,
                     aliasList, hierarchy);
+            parser.namespaceUris = nameSpaceUris;
             File[] reqModels = checkRequiredModels(parser, modelName, path,
                     toOsPath(compSpec).replace(toOsPath(path + "/Opc.Ua."), "").replace(".NodeSet.xml", ""),
                     nameSpaceUris);
