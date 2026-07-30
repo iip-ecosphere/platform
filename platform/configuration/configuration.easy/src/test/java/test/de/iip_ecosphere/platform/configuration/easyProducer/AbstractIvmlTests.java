@@ -188,7 +188,7 @@ public abstract class AbstractIvmlTests extends TestWithPlugin {
          * @param ivmlModelName the name of the IVML model representing the topmost platform configuration
          * @param modelFolder the folder where the model is located (ignored if <b>null</b>)
          * @param outputFolder the output folder for code generation, will be cleaned 
-         *     depending on {@link #cleanOutputFolder(})
+         *     depending on {@link #cleanOutputFolder()}
          */
         public TestConfigurer(String ivmlModelName, File modelFolder, File outputFolder) {
             super(ivmlModelName, relocateTestModel(modelFolder), outputFolder);
