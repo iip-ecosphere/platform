@@ -78,6 +78,16 @@ public abstract class AbstractIvmlTests extends TestWithPlugin {
     }
     
     /**
+     * Creates a sibling test folder relative to {@link #TEST_BASE_FOLDER}.
+     * 
+     * @param name the name of the test folder, shall differ from {@link #TEST_BASE_FOLDER}
+     * @return the sibling folder
+     */
+    public static File siblingTestFolder(String name) {
+        return new File(TEST_BASE_FOLDER.getParentFile(), name);
+    }
+    
+    /**
      * Returns {@code file} relocated into {@link #testModelBase} if not <b>null</b>.
      * 
      * @param file the file to relocate
@@ -177,7 +187,8 @@ public abstract class AbstractIvmlTests extends TestWithPlugin {
          * 
          * @param ivmlModelName the name of the IVML model representing the topmost platform configuration
          * @param modelFolder the folder where the model is located (ignored if <b>null</b>)
-         * @param outputFolder the output folder for code generation
+         * @param outputFolder the output folder for code generation, will be cleaned 
+         *     depending on {@link #cleanOutputFolder(})
          */
         public TestConfigurer(String ivmlModelName, File modelFolder, File outputFolder) {
             super(ivmlModelName, relocateTestModel(modelFolder), outputFolder);

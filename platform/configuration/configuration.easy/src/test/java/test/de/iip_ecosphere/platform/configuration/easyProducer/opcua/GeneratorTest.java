@@ -52,7 +52,7 @@ public class GeneratorTest extends AbstractIvmlTests {
             File input = new File("src/test/resources/NodeSets/Opc.Ua.Woodworking.NodeSet2.xml");
             DomParser.process(input, "Woodworking", new File(output, "OpcWoodworking.ivml"), false);
 
-            TestConfigurer configurer = new TestConfigurer("VDW", output, TEST_BASE_FOLDER);
+            TestConfigurer configurer = new TestConfigurer("VDW", output, siblingTestFolder("opc-tests"));
             ConfigurationSetup setup = ConfigurationSetup.getSetup(false);
             configurer.configure(setup);
             lifecycle = configurer.obtainLifecycleDescriptor();
