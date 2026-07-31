@@ -75,6 +75,26 @@
       </properties>
       <!-- just force platform dependencies -->
       <dependencies>
+        <dependency> <!-- for configuration.maven -->
+            <artifactId>support.log-slf4j-simple</artifactId>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>support.json-jackson</artifactId>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>support.commons-apache</artifactId>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>support.yaml-snakeyaml</artifactId>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency> <!-- executed as process, EASy-dependencies may be mitigated by maven and missing -->
             <artifactId>configuration.easy</artifactId>
             <groupId>de.iip-ecosphere.platform</groupId>
