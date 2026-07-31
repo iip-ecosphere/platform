@@ -99,4 +99,4 @@ The plugin supports the following configuration settings:
   - `configSkipMapDashboard` (default unset, user-property `configuration.skipMapDashboard`) passes on whether the dashboard mapper shall be skipped
   - `omitProperties` (default `false`, user property `omitProperties`) omit most of the maven system settings, let the invoked POM decide
   
-The plugin takes over the system properties of the original request, in particular `-Dunpack.force` and passes them to the invoked maven processes.
+The plugin takes over the system properties of the original request, in particular `-Dunpack.force` and passes them to the invoked maven processes. The invoker plugin also considers `-Dprofile` as requested by the `maven-profile`, which nicely traces invoker calls, and, to prevent overwriting the last inner invocation by the POM this plugin is specified in, delays the end of this invoker plugin (logged on the command line).

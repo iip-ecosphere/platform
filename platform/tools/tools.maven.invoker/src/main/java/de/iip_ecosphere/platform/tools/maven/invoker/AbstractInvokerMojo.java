@@ -205,6 +205,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
     @Parameter(property = "configuration.skipMapDashboard")
     private String configSkipMapDashboard;
 
+    @Parameter(property = "profile")
+    private boolean profile; // is maven-profiler active?
+
     /**
      * A specific <code>fileSet</code> rule to select files and directories.
      */
@@ -509,6 +512,14 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
                 }
             } else {
                 getLog().info("Maven invoker disabled, not executing.");
+            }
+        }
+        if (profile) { // quick solution so that last inner report is not overridden by outer report
+            try {
+                final long wait = 1100;
+                getLog().info("For maven-profiler: Delaying execution by " + wait + "ms");
+                Thread.sleep(wait);
+            } catch (InterruptedException e) {
             }
         }
     }
