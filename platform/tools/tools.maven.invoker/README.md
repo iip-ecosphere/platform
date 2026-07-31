@@ -79,6 +79,8 @@ The plugin supports the following configuration settings:
   - `enableJavadoc` (default `false`, user property `enableJava`) enables JavaDoc generation
   - `disablePython` (default `false`, user property `disablePython`) sets system properties to disable platform Python "compilation" and testing.
   - `disablePythonTests` (default `false`, user property `disablePythonTests`) sets system properties to disable platform Python testing.
+  - `disableAppTests` (default `false`, user property `disableAppTests`) sets system properties to disable oktoflow app testing.
+  - `disableTests` (default `false`, user property `disableTests`) is a shortcut for `disableJavaTests` and `disablePythonTests` and `disableAppTests`.
   - `disableBuild` (default `false`, user property `disableBuild`) is a shortcut for `disableJava` and `disablePython`.
   - `python-compile.hashDir` (default `""`, user property `python-compile.hashDir`) defines the hash directory for python compile tests, if empty use the Maven build directory of this execution.
   - `systemProperties` properties to be set for the Maven POM to be called, given in terms of `key` and `value` entries (default: not given)

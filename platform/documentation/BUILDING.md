@@ -92,6 +92,8 @@ Please note that complex build processes, e.g., for examples or platform compone
 |           | install, package          | `-DdisablePythonTests=<bool>`        | enables/disables Python "compilation", i.e., syntax check                                                                     | [invoker build plugin](../tools/tools.maven.invoker)               |
 |           | install, package          | `-DdisablePython=<bool>`             | enables/disables Python building, i.e., "compilation" and tests                                                               | [invoker build plugin](../tools/tools.maven.invoker)               |
 |           | install, package          | `-DenableJavadoc=<bool>`             | enables/disables Java documentation building                                                                                  | [invoker build plugin](../tools/tools.maven.invoker)               |
+|           | install, package          | `-DdisableAppTests=<bool>`           | enables/disables oktoflow application testing                                                                                 | [invoker build plugin](../tools/tools.maven.invoker)               |
+|           | install, package          | `-DdisableTests=<bool>`              | enables/disables Java, Python and oktoflow application testing                                                                | [invoker build plugin](../tools/tools.maven.invoker)               |
 
 ## Partial builds
 
