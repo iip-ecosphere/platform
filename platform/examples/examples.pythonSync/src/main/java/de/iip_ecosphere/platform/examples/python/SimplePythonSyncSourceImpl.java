@@ -41,7 +41,7 @@ public class SimplePythonSyncSourceImpl extends SimplePythonSyncDataSourceImpl {
          * Creates the instance for JSL.
          */
         public Descriptor() {
-            super(PLUGIN_ID_APP_SERVICE_PREFIX + "SimplePythonSyncDataSource", SimplePythonSyncSourceImpl.class);
+            super(PLUGIN_ID_APP_SERVICE_PREFIX + SERVICE_ID, SimplePythonSyncSourceImpl.class);
         }
 
         @Override

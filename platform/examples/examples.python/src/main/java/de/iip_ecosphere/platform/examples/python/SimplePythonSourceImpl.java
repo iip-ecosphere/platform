@@ -45,7 +45,7 @@ public class SimplePythonSourceImpl extends SimplePythonDataSourceImpl {
          * Creates the instance for JSL.
          */
         public Descriptor() {
-            super(PLUGIN_ID_APP_SERVICE_PREFIX + "SimplePythonDataSource", SimplePythonSourceImpl.class);
+            super(PLUGIN_ID_APP_SERVICE_PREFIX + SERVICE_ID, SimplePythonSourceImpl.class);
         }
 
         @Override

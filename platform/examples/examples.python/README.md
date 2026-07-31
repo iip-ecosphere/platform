@@ -44,6 +44,10 @@ Service implementations must follow some rules to be taken up by the service env
 
 See [Platform configuration](../../configuration/configuration) for details on the state of the generation and the required version of EASy-Producer (at least from the day of the last commit of this example). If the configuration meta model shall be updated, add `-Dunpack.force=true`.
 
+## Build process profiling
+
+This example contains `maven-profiler` as build process extension. By default it is switched off in `.mvn/maven.config`. If it disturbs building for some reason, you may locally remove the profiler from `.mvn/extensions.xml`.
+
 ## Legacy build approach
 
 The following build steps are still there and replaced by the single build step `mvn install`. These lecacy build steps may be removed in future revisions.

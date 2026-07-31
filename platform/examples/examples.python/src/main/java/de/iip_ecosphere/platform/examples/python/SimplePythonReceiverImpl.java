@@ -35,7 +35,7 @@ public class SimplePythonReceiverImpl extends SimplePythonDataReceiverImpl {
          * Creates the instance for JSL.
          */
         public Descriptor() {
-            super(PLUGIN_ID_APP_SERVICE_PREFIX + "SimplePythonDataReceiver", SimplePythonReceiverImpl.class);
+            super(PLUGIN_ID_APP_SERVICE_PREFIX + SERVICE_ID, SimplePythonReceiverImpl.class);
         }
 
         @Override
