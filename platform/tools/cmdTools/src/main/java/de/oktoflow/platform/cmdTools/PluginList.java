@@ -52,7 +52,7 @@ public class PluginList {
      * Lists all plugins in {@code file}.
      * 
      * @param file the file/folder to start listing
-     * @param map file name - length mapping, modified as result
+     * @param plugins file name - length mapping, modified as result
      */
     private static void listPlugins(File file, Map<String, Long> plugins) {
         if (file.isDirectory()) {
