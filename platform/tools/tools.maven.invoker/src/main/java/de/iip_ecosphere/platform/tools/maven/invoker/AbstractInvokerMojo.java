@@ -323,8 +323,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
             setAsProperty(sysProperties, "easy.docker.skip", easyDockerSkip);
             setAsProperty(sysProperties, "configuration.tracingLevel", configTracingLevel);
             setAsProperty(sysProperties, "configuration.skipMapDashboard", configSkipMapDashboard);
-            value = disablePython || disableBuild || disableTests;
+            value = disablePython || disableBuild;
             sysProperties.put("python-compile.skip", String.valueOf(value));
+            value = disablePython || disableBuild || disableTests;
             sysProperties.put("python-test.skip", String.valueOf(value));
             value = disablePythonTests;
             sysProperties.put("python-test.skip", String.valueOf(value));
