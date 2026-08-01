@@ -20,7 +20,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    PomReaderTest.class
+    PomReaderTest.class,
+    MavenProfilerToCsvTest.class
 })
 public class AllTests {
 }

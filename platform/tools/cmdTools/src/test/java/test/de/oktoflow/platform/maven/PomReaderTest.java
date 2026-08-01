@@ -55,9 +55,9 @@ public class PomReaderTest {
         Assert.assertTrue(info.getGroupId().length() > 0);
         Assert.assertTrue(info.getVersion().length() > 0);
         Assert.assertTrue(info.getGroupPath().length() > 0);
-        Assert.assertNull(info.getParentArtifactId());
-        Assert.assertNull(info.getParentGroupId());
-        Assert.assertNull(info.getParentVersion());
+        Assert.assertEquals("platformDependencies", info.getParentArtifactId());
+        Assert.assertTrue(info.getParentGroupId().length() > 0);
+        Assert.assertTrue(info.getParentVersion().length() > 0);
     }
 
     /**

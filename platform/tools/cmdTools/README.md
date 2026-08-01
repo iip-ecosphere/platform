@@ -7,6 +7,7 @@ This project contains generic, global command line tools:
     * `CleanMvnSnapshots` removes outdated snapshot versions leaving the latest 3 snapshots.
     * `CleanMvnArtifacts` removes artifacts according to version/snapshot specification from a workspace or a maven repository.
     * `DetermineRemoteRepositories` determines remote repositories used by maven.
+    * `MavenProfilerToCsvTest` merges and converts `maven-profile` output files to CSV
 * File system tools
     * `CleanDumps` cleans surefire dump files in the workspace.
     * `CleanTemp` cleans your temporary folder from typical leftovers of used libraries.
