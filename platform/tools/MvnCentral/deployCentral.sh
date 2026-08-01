@@ -162,6 +162,7 @@ DeployArtifact "${PREFIX}" "platformDependencies" "$OKTO_VERSION" "pomOnly"
 DeployArtifact "${PREFIX}" "platformDependenciesBOM" "$OKTO_VERSION" "pomOnly"
 DeployArtifact "${PREFIX}" "platformDependenciesSpring" "$OKTO_VERSION" "pomOnly"
 
+DeployArtifact "${PREFIX}" "cmdTools" "$OKTO_VERSION" "java"
 DeployArtifact "${PREFIX}" "libs.ads" "$OKTO_VERSION" "java"
 
 DeployArtifact "${PREFIX}" "support.boot" "$OKTO_VERSION" "java"

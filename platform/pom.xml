@@ -18,6 +18,8 @@
      <module>tools/tools.maven.dependencies</module>
      <!-- platform dependencies first -->
      <module>platformDependencies</module>
+
+     <module>tools/cmdTools</module>
      <module>support/support.boot</module>
      <module>support/support</module>
      <module>support/libs.ads</module>
@@ -118,6 +120,7 @@
      <module>examples/examples.KODEX</module>
 	 <module>examples/examples.python</module>
      <module>examples/examples.pythonSync</module>
+     <module>examples/examples.pythonCondaVenv</module>
      <module>examples/examples.rtsa</module>
      <module>examples/examples.templates</module>
      <module>examples/examples.MIP</module>
