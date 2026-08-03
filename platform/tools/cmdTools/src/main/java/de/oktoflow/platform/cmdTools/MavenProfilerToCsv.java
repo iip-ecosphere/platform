@@ -21,6 +21,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -231,7 +233,12 @@ public final class MavenProfilerToCsv {
                 continue;
             }
 
-            for (JsonNode mojo : mojos) {
+            List<JsonNode> sortedMojos = new ArrayList<>();
+            mojos.forEach(m -> sortedMojos.add(m));
+            Collections.sort(sortedMojos, (m1, m2) 
+                -> firstText(m1, "mojo", "entry").compareTo(firstText(m2, "mojo", "entry")));
+            
+            for (JsonNode mojo : sortedMojos) {
                 String mojoName = firstText(mojo, "mojo", "entry");
                 String mojoTime = milliseconds(mojo.path("time"));
 

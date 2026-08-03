@@ -43,14 +43,18 @@ public class MavenProfilerToCsvTest {
         List<String> lines = Files.readAllLines(resultFile.toPath());
         int found = 0;        
         for (String l : lines) {
+            System.out.println(l);
             if (l.contains("org.jacoco:jacoco-maven-plugin:0.8.12:prepare-agent") && l.endsWith(";101")) {
+                found++;
+            }
+            if (l.contains("org.apache.maven.plugins:maven-compiler-plugin:3.7.0:compile") && l.endsWith(";102")) {
                 found++;
             }
             if (l.contains("org.apache.maven.plugins:maven-resources-plugin:3.3.1:testResources") && l.endsWith(";7")) {
                 found++;
             }
         }
-        Assert.assertEquals(2, found);
+        Assert.assertEquals(3, found);
         resultFile.delete();
     }
 

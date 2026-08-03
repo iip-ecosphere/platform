@@ -13,7 +13,11 @@
 				{
 					"mojo": "org.jacoco:jacoco-maven-plugin:0.8.12:prepare-agent {execution: default}",
 					"time": "101 ms"
-				}
+				},
+                {
+                    "mojo": "org.apache.maven.plugins:maven-compiler-plugin:3.7.0:compile {execution: default-compile}",
+                    "time": "102 ms"
+                }
 			]
 		}
 	]
