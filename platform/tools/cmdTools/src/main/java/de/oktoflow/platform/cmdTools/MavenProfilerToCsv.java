@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -170,6 +171,24 @@ public final class MavenProfilerToCsv {
                 .collect(Collectors.toList());
         }
     }
+    
+    /**
+     * Relativizes the given {@code path} with respect to {@code user.dir}.
+     * 
+     * @param path the path
+     * @return {@code path} or the sub-path of {@code path} in {@code user.dir}
+     */
+    private static String realizive(Path path) {
+        String sourceFile = path.toString();
+        String programBaseDir = System.getProperty("user.dir");
+        if (sourceFile.startsWith(programBaseDir)) {
+            sourceFile = sourceFile.substring(programBaseDir.length());
+            while (sourceFile.startsWith(File.separator)) {
+                sourceFile = sourceFile.substring(1);
+            }
+        }
+        return sourceFile;
+    }
 
     /**
      * Converts a single Maven Profiler JSON report into CSV rows.
@@ -184,7 +203,7 @@ public final class MavenProfilerToCsv {
     private static void convertReport(Path report, BufferedWriter writer) throws IOException {
         JsonNode root = JSON.readTree(report.toFile());
 
-        String sourceFile = report.toAbsolutePath().normalize().toString();
+        String sourceFile = realizive(report.toAbsolutePath().normalize());
         String buildName = text(root, "name");
         String profileName = text(root, "profile_name");
         String buildTime = milliseconds(root.path("time"));
@@ -235,8 +254,10 @@ public final class MavenProfilerToCsv {
 
             List<JsonNode> sortedMojos = new ArrayList<>();
             mojos.forEach(m -> sortedMojos.add(m));
-            Collections.sort(sortedMojos, (m1, m2) 
-                -> firstText(m1, "mojo", "entry").compareTo(firstText(m2, "mojo", "entry")));
+            if (Boolean.valueOf(System.getProperty("okto.sortMojo", "true"))) {
+                Collections.sort(sortedMojos, (m1, m2) 
+                    -> firstText(m1, "mojo", "entry").compareTo(firstText(m2, "mojo", "entry")));
+            }
             
             for (JsonNode mojo : sortedMojos) {
                 String mojoName = firstText(mojo, "mojo", "entry");
