@@ -50,7 +50,8 @@ import de.iip_ecosphere.platform.transport.connectors.impl.AbstractTransportConn
  * @author Holger Eichelberger, SSE
  */
 @MachineConnector(hasModel = false, supportsEvents = true, supportsHierarchicalQNames = false, 
-    supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false, specificSettings = {})
+    supportsModelCalls = false, supportsModelProperties = false, supportsModelStructs = false, specificSettings = {}, 
+    supportsSomeData = true)
 public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[], byte[], CO, CI> {
 
     public static final String NAME = "MQTT v3";
@@ -284,6 +285,40 @@ public class PahoMqttv3Connector<CO, CI> extends AbstractChannelConnector<byte[]
     @Override
     public String enabledEncryption() {
         return tlsEnabled ? SslUtils.CONTEXT_ALG_TLS : null;
+    }
+
+    @Override
+    public boolean emitSomeData() throws IOException {
+        if (null == client) {
+            throw new IOException("Not connected");
+        }
+        client.setCallback(new MqttCallback() {
+
+            @Override
+            public void connectionLost(Throwable cause) {
+                System.err.printf("[MQTT] Connection lost: %s%n", cause.getMessage());
+            }
+            
+            @Override
+            public void messageArrived(String topic, MqttMessage message) throws Exception {
+                System.out.printf("%n");
+                System.out.printf("[MQTT] Topic: %s | Payload: %s%n", topic, new String(message.getPayload()));
+                System.out.printf("%n");
+            }
+            
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken token) {
+            }
+            
+        });
+        final String topic = "#";
+        try {
+            client.subscribe(topic, 1).waitForCompletion(); // all topics
+        } catch (MqttException e) {
+            throw new IOException(e);
+        }
+        System.out.printf("[MQTT] Listening on %s\n", topic);
+        return true;
     }
 
 }
