@@ -581,7 +581,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(cfg, "outputDirectory", outputDir);
         new XmlElement(cfg, "attach", "${attach}");
         if (finalName.length() > 0) {
-            new XmlElement(cfg, "finalName", finalName);
+            //new XmlElement(cfg, "finalName", finalName); // handled via assemblyId
             new XmlElement(cfg, "appendAssemblyId", "false");
         }
         cfg;
