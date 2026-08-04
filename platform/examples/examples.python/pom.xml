@@ -110,6 +110,16 @@
                          <force>true</force>
                      </configuration>
                  </execution>
+                <execution>
+                    <id>build-classpath-plugin</id>
+                    <phase>prepare-package</phase>
+                    <goals>
+                        <goal>build-plugin-classpath</goal>
+                    </goals>
+                    <configuration>
+                        <outputFiles>${project.build.directory}/classes/${project.groupId}.${project.artifactId}</outputFiles>
+                    </configuration>
+                </execution>
                </executions>
              </plugin>
              <plugin>
@@ -254,6 +264,10 @@
             <maven.test.skip>true</maven.test.skip>
             <python-compile.skip>true</python-compile.skip>
             <maven.javadoc.skip>true</maven.javadoc.skip>
+<jacoco.skip>true</jacoco.skip>
+<maven.resources.skip>true</maven.resources.skip>
+<maven.source.skip>true</maven.source.skip>
+<maven.install.skip>true</maven.install.skip>
         </properties>       
 
           <build>
