@@ -249,5 +249,17 @@ public interface Connector <O, I, CO, CI> extends EventHandlingConnector {
     public default List<ConnectorField> enumerateFields(String path) {
         return new ArrayList<>();
     }
+    
+    /**
+     * Emits arbitrary data accessible to the connector to the console. May not be implemented by the connector.
+     * For now, may render regular reception unusable, i.e., if not needed anymore, may require re-connect.
+     * 
+     * @return {@code true} if this call affected regular connectivity, {@code false} else
+     * @throws IOException if not connected
+     */
+    public default boolean emitSomeData() throws IOException {
+        System.out.println("Not implemented.");
+        return false;
+    }
 
 }
