@@ -117,7 +117,14 @@ public @interface MachineConnector {
      * @return {@code true} for implemented, {@code false} else
      */
     public boolean supportsFieldEnumeration() default false;
-    
+
+    /**
+     * Returns whether this connector implements {@link Connector#emitSomeData()}.
+     * 
+     * @return {@code true} for implemented, {@code false} else
+     */
+    public boolean supportsSomeData() default false;
+
     // on further properties, adjust ConnectorsAas/ConnectorsAasTest!
     
 }
