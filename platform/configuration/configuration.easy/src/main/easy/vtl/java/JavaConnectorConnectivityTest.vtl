@@ -92,6 +92,7 @@ template JavaConnectorConnectivityTest(IIPEcosphere config, JavaCodeArtifact tar
                 c.addCallArgument("conn.enumerateFields").addStringArgument("");
                 c.addArgument("System.out");
             });
+            mainClsMain.addSLComment("conn.emitSomeData(); // might be useful for debugging");
     
             codeAddShutdownHook(mainClsMain, "conn.disconnectSafe()");
             mainClsMain.addCall("conn.connect").addArgument("params");
