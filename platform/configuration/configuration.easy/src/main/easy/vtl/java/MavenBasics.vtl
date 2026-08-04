@@ -559,7 +559,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
     // ------------------------------------------- maven assembly plugin --------------------------------------------------
 
     // use appendAssemblyDescriptor on result    
-    def XmlElement appendAssemblyPlugin(XmlElement plugins, String ver="3.1.1") {
+    def XmlElement appendAssemblyPlugin(XmlElement plugins, String ver="3.6.0") {
         XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-assembly-plugin", ver, false);
         new XmlElement(plugin, "executions");
     }
@@ -581,7 +581,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(cfg, "outputDirectory", outputDir);
         new XmlElement(cfg, "attach", "${attach}");
         if (finalName.length() > 0) {
-            //new XmlElement(cfg, "finalName", finalName); // handled via assemblyId
+            new XmlElement(cfg, "finalName", finalName); 
             new XmlElement(cfg, "appendAssemblyId", "false");
         }
         cfg;
