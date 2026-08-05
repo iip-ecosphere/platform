@@ -71,14 +71,70 @@
     </dependency>     
   </dependencies>
   
-<profiles>
-  <profile>    
-     <id>Main</id>
-     <activation>
-        <activeByDefault>true</activeByDefault>
-     </activation>
+  <build>
+    <plugins>
+    
+      <plugin>
+        <groupId>org.xolstice.maven.plugins</groupId>
+        <artifactId>protobuf-maven-plugin</artifactId>
+        <version>${org.xolstice.maven.protobuf.version}</version>
+        <configuration>
+          <protocArtifact>com.google.protobuf:protoc:${protoc.version}:exe:${os.detected.classifier}</protocArtifact>
+          <pluginId>grpc-java</pluginId>
+          <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
+          <useArgumentFile>true</useArgumentFile>
+        </configuration>    
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+              <goal>compile-custom</goal>
+              <goal>test-compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+            <mainClass>test.de.iip_ecosphere.platform.support.metrics.plcnext.Main</mainClass>
+            <cleanupDaemonThreads>false</cleanupDaemonThreads>
+            <classpathScope>test</classpathScope>
+        </configuration>
+      </plugin>
 
-      <build>
+         <plugin>
+             <groupId>de.iip-ecosphere.platform</groupId>
+             <artifactId>dependency-plugin</artifactId>
+             <version>${project.version}</version>
+             <executions>
+                 <execution>
+                     <id>build-classpath-plugin</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>build-plugin-classpath</goal>
+                     </goals>
+                 </execution>
+                 <execution>
+                     <id>copy-dependencies</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>copy-plugin-dependencies</goal>
+                     </goals>
+                 </execution>
+                 <execution>
+                     <id>assemble</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>assemble-plugin</goal>
+                     </goals>
+                 </execution>
+             </executions>
+         </plugin>
+    </plugins>
       <extensions>
           <extension>
             <groupId>kr.motd.maven</groupId>
@@ -86,76 +142,14 @@
             <version>${kr.motd.maven.os.version}</version>
           </extension>
         </extensions>
-        <plugins>
-        
-          <plugin>
-            <groupId>org.xolstice.maven.plugins</groupId>
-            <artifactId>protobuf-maven-plugin</artifactId>
-            <version>${org.xolstice.maven.protobuf.version}</version>
-            <configuration>
-              <protocArtifact>com.google.protobuf:protoc:${protoc.version}:exe:${os.detected.classifier}</protocArtifact>
-              <pluginId>grpc-java</pluginId>
-              <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
-              <useArgumentFile>true</useArgumentFile>
-            </configuration>    
-            <executions>
-              <execution>
-                <goals>
-                  <goal>compile</goal>
-                  <goal>compile-custom</goal>
-                  <goal>test-compile</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>3.0.0</version>
-            <configuration>
-                <mainClass>test.de.iip_ecosphere.platform.support.metrics.plcnext.Main</mainClass>
-                <cleanupDaemonThreads>false</cleanupDaemonThreads>
-                <classpathScope>test</classpathScope>
-            </configuration>
-          </plugin>
-    
-             <plugin>
-                 <groupId>de.iip-ecosphere.platform</groupId>
-                 <artifactId>dependency-plugin</artifactId>
-                 <version>${project.version}</version>
-                 <executions>
-                     <execution>
-                         <id>build-classpath-plugin</id>
-                         <phase>package</phase>
-                         <goals>
-                             <goal>build-plugin-classpath</goal>
-                         </goals>
-                     </execution>
-                     <execution>
-                         <id>copy-dependencies</id>
-                         <phase>package</phase>
-                         <goals>
-                             <goal>copy-plugin-dependencies</goal>
-                         </goals>
-                     </execution>
-                     <execution>
-                         <id>assemble</id>
-                         <phase>package</phase>
-                         <goals>
-                             <goal>assemble-plugin</goal>
-                         </goals>
-                     </execution>
-                 </executions>
-             </plugin>
-        </plugins>
-      </build>
-    </profile>
+  </build>
+
+  <profiles>
     <profile>
       <id>CI</id>
       <activation>
         <property>
-          <name>surefireCiLine</name>
+          <name>inCI</name>
         </property>
       </activation>
       <build>

@@ -261,7 +261,7 @@ public class CollectionUtilsTest {
     }
     
     /**
-     * Tests {@link CollectionUtils#toArray(List)} and {@link CollectionUtils#toListWithNull(Object[])}.
+     * Tests {@link CollectionUtils#toArray(List, Class)} and {@link CollectionUtils#toListWithNull(Object[])}.
      */
     @Test
     public void testArrayConversions() {
@@ -280,7 +280,7 @@ public class CollectionUtilsTest {
     }
    
     /**
-     * Tests {@link CollectionUtils#toByteArray(List) and {@link CollectionUtils#addAllBytes(List, byte[])}.
+     * Tests {@link CollectionUtils#toByteArray(List)} and {@link CollectionUtils#addAllBytes(List, byte[])}.
      */
     @Test
     public void testByteArrayConversion() {
