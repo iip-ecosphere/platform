@@ -74,7 +74,6 @@ public abstract class FakeElement implements Element {
      * Sets the description in terms of language strings.
      * 
      * @param description the description
-     * @return <b>this</b>
      */
     public void setDescription(LangString... description) {
         if (description.length > 0) {
