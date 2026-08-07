@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import de.iip_ecosphere.platform.configuration.cfg.ConfigurationFactory;
 import de.iip_ecosphere.platform.configuration.cfg.StatusCache;
 import de.iip_ecosphere.platform.configuration.easyProducer.EasyLogger.LogConsumer;
 import de.iip_ecosphere.platform.configuration.easyProducer.EasyLogger.LogLevel;
@@ -47,6 +48,9 @@ import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
  * through the UI, only needs IVML rather than VIL/VTL. If the caller needs more configuration abilities, please use
  * {@link ExecutionMode#TOOLING} or {@link ExecutionMode#FULL} with {@link #setExecutionMode(ExecutionMode)} before
  * calling {@link #startup(String[])}.
+ * 
+ * This lifecycle descriptor is not loaded as usual via JSL rather than indirectly via {@link ConfigurationFactory} 
+ * and taken up then by a generic, delegating lifecycle descriptor.
  * 
  * @author Holger Eichelberger, SSE
  */
@@ -461,6 +465,8 @@ public class ConfigurationLifecycleDescriptor implements LifecycleDescriptor {
         throws ModelManagementException {
         EasyExecutor.enablePrepareArtifactsDefault(INCREMENTAL);
         EasyExecutor.enableIncrementalInstantiation(INCREMENTAL);
+        //EasyExecutor.setModelReload(ExecutionMode.TOOLING == executionMode);
+        //EasyExecutor.setResourceSetReuse(ExecutionMode.TOOLING == executionMode);
         if (INCREMENTAL) { // not always
             getLogger().info("Setting up incremental build mode: {}", INCREMENTAL);
         }

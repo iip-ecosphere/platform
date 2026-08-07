@@ -21,6 +21,7 @@ import de.iip_ecosphere.platform.configuration.cfg.ConfigurationFactoryDescripto
 import de.iip_ecosphere.platform.configuration.cfg.ConfigurationSetup;
 import de.iip_ecosphere.platform.configuration.cfg.DashboardMapper;
 import de.iip_ecosphere.platform.configuration.cfg.PlatformInstantiation;
+import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.plugins.SingletonPluginDescriptor;
 
 /**
@@ -67,6 +68,11 @@ public class EasyConfigurationFactoryDescriptor extends SingletonPluginDescripto
     @Override
     public void hintAppsToInstantiate(String apps) {
         System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, apps);
+    }
+
+    @Override
+    public LifecycleDescriptor createLifecycleDescriptor() {
+        return new ConfigurationLifecycleDescriptor();
     }
     
 }

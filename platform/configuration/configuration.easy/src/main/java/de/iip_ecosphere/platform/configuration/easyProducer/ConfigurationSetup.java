@@ -72,7 +72,12 @@ public class ConfigurationSetup extends de.iip_ecosphere.platform.configuration.
     public static ConfigurationSetup getSetup(boolean log) {
         if (null == instance) {
             try {
+                // this may be loaded as a plugin, yaml is loaded as a plugin, snakeyaml turns the given class 
+                // into a class name and then tries to load it back from the context class loader :/
+                ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+                Thread.currentThread().setContextClassLoader(ConfigurationSetup.class.getClassLoader());
                 instance = readFromYaml(ConfigurationSetup.class);
+                Thread.currentThread().setContextClassLoader(ccl);
             } catch (IOException e) {
                 if (log) {
                     LoggerFactory.getLogger(ConfigurationSetup.class).warn(
