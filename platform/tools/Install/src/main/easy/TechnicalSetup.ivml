@@ -14,8 +14,9 @@ project TechnicalSetup {
     serializer = Serializer::Json;
     // serviceManager, containerManager are already defined    
     
-    aas = AasImpl::BaSyx2;
-	aasProtocol = AasProtocolRest{};
+    // B2: setup for BaSyx2; when switching, uncomment lines ending with //B1
+    //B2: aas = AasImpl::BaSyx2;
+	//B2: aasProtocol = AasProtocolRest{};
 		
     aasServer = {
         schema = AasSchema::HTTP,
@@ -30,27 +31,27 @@ project TechnicalSetup {
         path = "registry"
     };
     
-    smServer = {
-		schema = AasSchema::HTTP,
-		port = 9004,
-		host = "127.0.0.1"
-	};
+    //B2: smServer = {
+	//B2: 	schema = AasSchema::HTTP,
+	//B2: 	port = 9004,
+	//B2: 	host = "127.0.0.1"
+	//B2: };
 	
-	smRegistryServer = {
-		schema = AasSchema::HTTP,
-		port = 9005,
-		host = "127.0.0.1"
-	};
-	withPlugins = true; 
+	//B2: smRegistryServer = {
+	//B2: 	schema = AasSchema::HTTP,
+	//B2: 	port = 9005,
+	//B2: 	host = "127.0.0.1"
+	//B2: };
+	//B2: withPlugins = true; 
 	
     aasImplServer = {
         port = 9003, // of central server, ephemeral on devices
-        protocol = aasProtocol,
-        schema = AasSchema::HTTP 
+    //B2:     protocol = aasProtocol,
+    //B2:     schema = AasSchema::HTTP 
         // default host is 127.0.0.1 to be replaced by host IP if available
         // default netmask is empty, not selecting any network in case of multiple IP addresses
     };
-    //aasProtocol = AasProtocolVabTcp{};
+    aasProtocol = AasProtocolVabTcp{}; //B1
     aasAccessControlAllowOrigin = "*";
     
     // ------------------ transport --------------------------
