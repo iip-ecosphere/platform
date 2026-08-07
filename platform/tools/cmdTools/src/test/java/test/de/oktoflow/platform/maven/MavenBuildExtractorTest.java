@@ -28,6 +28,28 @@ import org.junit.Test;
  * @author Holger Eichelberger, SSE
  */
 public class MavenBuildExtractorTest {
+
+    /**
+     * Tests {@link MavenBuildExtractor#appendSuffix(File, String)}.
+     */
+    @Test
+    public void testSuffix() {
+        File f = new File("folder/mvn.csv");
+        File o = MavenBuildExtractor.appendSuffix(f, "-01");
+        Assert.assertEquals(new File("folder/mvn-01.csv").getPath(), o.getPath());
+
+        f = new File("folder/mvn");
+        o = MavenBuildExtractor.appendSuffix(f, "-01");
+        Assert.assertEquals(new File("folder/mvn-01").getPath(), o.getPath());
+
+        f = new File("folder/mvn");
+        o = MavenBuildExtractor.appendSuffix(f, "");
+        Assert.assertEquals(f.getPath(), o.getPath());
+
+        f = new File("folder/mvn");
+        o = MavenBuildExtractor.appendSuffix(f, null);
+        Assert.assertEquals(f.getPath(), o.getPath());
+    }
     
     /**
      * Tests {@link MavenBuildExtractor}.

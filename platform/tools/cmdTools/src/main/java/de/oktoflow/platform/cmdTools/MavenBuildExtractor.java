@@ -23,6 +23,7 @@ public class MavenBuildExtractor {
     
     private static final String LOG_FILE_NAME = System.getProperty("okto.maven.logFile", "mvn.log");
     private static final String LOG_OUT_FILE_NAME = System.getProperty("okto.maven.logCsvFile", "mvn.csv");
+    private static final String OUT_FILE_SUFFIX = System.getProperty("okto.maven.outFileSuffix", "");
     private static final String PLUGIN_FILE_NAME = System.getProperty("okto.maven.pluginsFile", "null-output.txt");
     private static final String PLUGIN_OUT_FILE_NAME = System.getProperty("okto.maven.pluginsCsvFile", "plugins.csv");
     
@@ -50,9 +51,11 @@ public class MavenBuildExtractor {
 
             File logFile = new File(inputFolder, LOG_FILE_NAME);
             File logOutFile = new File(outputFolder, LOG_OUT_FILE_NAME);
+            logOutFile = appendSuffix(logOutFile, OUT_FILE_SUFFIX);
             MavenTestTimeExtractor.main(new String[] {logFile.getPath(), logOutFile.getPath()});
             
             File pluginFile = new File(inputFolder, "target/surefire-reports/" + PLUGIN_FILE_NAME);
+            pluginFile = appendSuffix(pluginFile, OUT_FILE_SUFFIX);
             if (pluginFile.exists()) { // non-plugin execution
                 File pluginOutFile = new File(outputFolder, PLUGIN_OUT_FILE_NAME);
                 PluginLoadingTimeExtractor.main(new String[] {pluginFile.getPath(), pluginOutFile.getPath()});
@@ -61,6 +64,34 @@ public class MavenBuildExtractor {
             System.err.println("Input folder " + args[0] + " does not exist.");
             System.exit(1);
         }
+    }
+
+    /**
+     * Appends {@code suffix} to the file name but before a possible extension (after last dot).
+     * 
+     * @param file the file
+     * @param suffix the suffix, may be <b>null</b> or empty
+     * @return the modified file object
+     */
+    public static File appendSuffix(File file, String suffix) {
+        File result = file;
+        if (suffix != null && suffix.length() > 0) {
+            String name = file.getName();
+    
+            int dot = name.lastIndexOf('.');
+    
+            String newName;
+            if (dot > 0) {
+                String baseName = name.substring(0, dot);
+                String extension = name.substring(dot);
+                newName = baseName + suffix + extension;
+            } else {
+                newName = name + suffix;
+            }
+
+            result = new File(file.getParentFile(), newName);
+        }
+        return result;
     }
 
 }
