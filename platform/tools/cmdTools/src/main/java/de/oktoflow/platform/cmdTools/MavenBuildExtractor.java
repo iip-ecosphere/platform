@@ -53,8 +53,10 @@ public class MavenBuildExtractor {
             MavenTestTimeExtractor.main(new String[] {logFile.getPath(), logOutFile.getPath()});
             
             File pluginFile = new File(inputFolder, "target/surefire-reports/" + PLUGIN_FILE_NAME);
-            File pluginOutFile = new File(outputFolder, PLUGIN_OUT_FILE_NAME);
-            PluginLoadingTimeExtractor.main(new String[] {pluginFile.getPath(), pluginOutFile.getPath()});
+            if (pluginFile.exists()) { // non-plugin execution
+                File pluginOutFile = new File(outputFolder, PLUGIN_OUT_FILE_NAME);
+                PluginLoadingTimeExtractor.main(new String[] {pluginFile.getPath(), pluginOutFile.getPath()});
+            }
         } else {
             System.err.println("Input folder " + args[0] + " does not exist.");
             System.exit(1);
