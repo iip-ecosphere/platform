@@ -15,6 +15,8 @@ package de.iip_ecosphere.platform.configuration.cfg;
 import java.io.File;
 import java.util.function.Consumer;
 
+import de.iip_ecosphere.platform.support.LifecycleDescriptor;
+
 /**
  * Provides access to configuration resources and functions.
  * 
@@ -44,8 +46,16 @@ public interface ConfigurationFactoryDescriptor {
      * @param localRepo the local Maven repository, may be <b>null</b>
      * @param executionTimeConsumer optional consumer for the (successful) process execution time, may be <b>null</b> 
      *     for none
+     * @return the instantiator
      */
     public PlatformInstantiation createInstantiator(File localRepo, Consumer<Long> executionTimeConsumer);
+    
+    /**
+     * Creates the lifecycle descriptor.
+     * 
+     * @return the lifecycle descriptor to start, may be <b>null</b> for none
+     */
+    public LifecycleDescriptor createLifecycleDescriptor();
     
     /**
      * Creates a configuration to dashboard mapper instance.

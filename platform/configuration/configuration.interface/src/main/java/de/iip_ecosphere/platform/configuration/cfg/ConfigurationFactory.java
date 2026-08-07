@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.function.Consumer;
 
+import de.iip_ecosphere.platform.support.LifecycleDescriptor;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
@@ -36,6 +37,7 @@ public class ConfigurationFactory {
     private static ConfigurationFactoryDescriptor desc;
     private static ConfigurationSetup setup;
     private static AasChanges aasChanges;
+    private static LifecycleDescriptor lifecycleDescriptor;
     
     /**
      * Initializes this factory.
@@ -93,6 +95,22 @@ public class ConfigurationFactory {
         if (null == result) {
             if (null != desc) {
                 result = desc.createAasChanges();
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Returns the configuration lifecycle descriptor.
+     * 
+     * @return the lifecycle descriptor, may be <b>null</b> if no configuration plugin is available
+     */
+    public static LifecycleDescriptor getLifecycleDescriptor() {
+        init();
+        LifecycleDescriptor result = lifecycleDescriptor;
+        if (null == result) {
+            if (null != desc) {
+                result = desc.createLifecycleDescriptor();
             }
         }
         return result;

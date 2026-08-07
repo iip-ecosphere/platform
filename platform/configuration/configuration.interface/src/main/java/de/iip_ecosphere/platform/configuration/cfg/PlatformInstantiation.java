@@ -67,7 +67,7 @@ public interface PlatformInstantiation {
     /**
      * Configures whether all services or just referenced services by apps shall be instantiated. 
      * 
-     * @param allTypes all services (@code{true}) or just referenced services (@code{false}, the default)
+     * @param allServices all services (@code{true}) or just referenced services (@code{false}, the default)
      * @return <b>this</b> for chaining
      */
     public PlatformInstantiation setAllServices(boolean allServices);
