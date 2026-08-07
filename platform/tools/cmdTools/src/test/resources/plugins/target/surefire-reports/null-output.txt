@@ -1,0 +1,67 @@
+12:54:13 [main] INFO t.d.i.p.s.TestWithPlugin - Added plugin location for support.aas.basyx (descriptor only: false)
+12:54:13 [main] INFO t.d.i.p.s.TestWithPlugin - Added plugin location for support.yaml-snakeyaml (descriptor only: false)
+12:54:13 [main] INFO t.d.i.p.s.TestWithPlugin - Added plugin location for support.json-jackson (descriptor only: false)
+12:54:13 [main] INFO t.d.i.p.s.TestWithPlugin - Added plugin location for support.commons-apache (descriptor only: false)
+12:54:13 [main] INFO t.d.i.p.s.TestWithPlugin - Added plugin location for support.rest-spark (descriptor only: false)
+12:54:13 [main] INFO t.d.i.p.s.TestWithPlugin - Added plugin location for support.metrics-micrometer (descriptor only: false)
+12:54:13 [main] INFO t.d.i.p.s.TestWithPlugin - Added plugin location for support.log-slf4j-simple (descriptor only: false)
+12:54:13 [main] INFO t.d.i.p.s.TestWithPlugin - Added plugin location for support.processInfo-oshi (descriptor only: false)
+12:54:13 [main] INFO t.d.i.p.s.TestWithPlugin - Added plugin location for support.websocket-websocket (descriptor only: false)
+12:54:13 [main] INFO t.d.i.p.s.TestWithPlugin - Added plugin location for support.bytecode-bytebuddy (descriptor only: false)
+12:54:13 [main] INFO d.i.p.s.p.PluginManager - Found plugin setup descriptor class de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor. Registering plugin...
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading plugin from target/plugins (test deployment)
+12:54:14 [main] INFO d.i.p.s.p.FolderClasspathPluginSetupDescriptor - Loading classpath from 'target\plugins\support.aas.basyx' (descriptorOnly: false)
+12:54:14 [main] INFO d.i.p.s.p.FolderClasspathPluginSetupDescriptor - Appending classpath from 'target\plugins\support.log-slf4j-simple'
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Found plugin setup descriptor class de.iip_ecosphere.platform.support.plugins.FolderClasspathPluginSetupDescriptor. Registering plugin...
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Plugin aas-default registered
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Plugin aas.basyx-1.3 registered
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading took 351 ms
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading plugin from target/plugins (test deployment)
+12:54:14 [main] INFO d.i.p.s.p.FolderClasspathPluginSetupDescriptor - Loading classpath from 'target\plugins\support.yaml-snakeyaml' (descriptorOnly: false)
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Found plugin setup descriptor class de.iip_ecosphere.platform.support.plugins.FolderClasspathPluginSetupDescriptor. Registering plugin...
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Plugin yaml-snakeyaml registered
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading took 33 ms
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading plugin from target/plugins (test deployment)
+12:54:14 [main] INFO d.i.p.s.p.FolderClasspathPluginSetupDescriptor - Loading classpath from 'target\plugins\support.json-jackson' (descriptorOnly: false)
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Found plugin setup descriptor class de.iip_ecosphere.platform.support.plugins.FolderClasspathPluginSetupDescriptor. Registering plugin...
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Plugin json-jackson registered
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading took 25 ms
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading plugin from target/plugins (test deployment)
+12:54:14 [main] INFO d.i.p.s.p.FolderClasspathPluginSetupDescriptor - Loading classpath from 'target\plugins\support.commons-apache' (descriptorOnly: false)
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Found plugin setup descriptor class de.iip_ecosphere.platform.support.plugins.FolderClasspathPluginSetupDescriptor. Registering plugin...
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Plugin commons-apache registered
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading took 27 ms
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading plugin from target/plugins (test deployment)
+12:54:14 [main] INFO d.i.p.s.p.FolderClasspathPluginSetupDescriptor - Loading classpath from 'target\plugins\support.rest-spark' (descriptorOnly: false)
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Found plugin setup descriptor class de.iip_ecosphere.platform.support.plugins.FolderClasspathPluginSetupDescriptor. Registering plugin...
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Plugin rest-spark registered
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading took 27 ms
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading plugin from target/plugins (test deployment)
+12:54:14 [main] INFO d.i.p.s.p.FolderClasspathPluginSetupDescriptor - Loading classpath from 'target\plugins\support.metrics-micrometer' (descriptorOnly: false)
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Found plugin setup descriptor class de.iip_ecosphere.platform.support.plugins.FolderClasspathPluginSetupDescriptor. Registering plugin...
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Plugin metrics-micrometer registered
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading took 22 ms
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading plugin from target/plugins (test deployment)
+12:54:14 [main] INFO d.i.p.s.p.FolderClasspathPluginSetupDescriptor - Loading classpath from 'target\plugins\support.log-slf4j-simple' (descriptorOnly: false)
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Found plugin setup descriptor class de.iip_ecosphere.platform.support.plugins.FolderClasspathPluginSetupDescriptor. Registering plugin...
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Plugin log-slf4j-simple registered
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading took 4 ms
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading plugin from target/plugins (test deployment)
+12:54:14 [main] INFO d.i.p.s.p.FolderClasspathPluginSetupDescriptor - Loading classpath from 'target\plugins\support.processInfo-oshi' (descriptorOnly: false)
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Found plugin setup descriptor class de.iip_ecosphere.platform.support.plugins.FolderClasspathPluginSetupDescriptor. Registering plugin...
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Plugin processInfo-oshi registered
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading took 27 ms
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading plugin from target/plugins (test deployment)
+12:54:14 [main] INFO d.i.p.s.p.FolderClasspathPluginSetupDescriptor - Loading classpath from 'target\plugins\support.websocket-websocket' (descriptorOnly: false)
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Found plugin setup descriptor class de.iip_ecosphere.platform.support.plugins.FolderClasspathPluginSetupDescriptor. Registering plugin...
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Plugin ws-websocket registered
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading took 24 ms
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading plugin from target/plugins (test deployment)
+12:54:14 [main] INFO d.i.p.s.p.FolderClasspathPluginSetupDescriptor - Loading classpath from 'target\plugins\support.bytecode-bytebuddy' (descriptorOnly: false)
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Found plugin setup descriptor class de.iip_ecosphere.platform.support.plugins.FolderClasspathPluginSetupDescriptor. Registering plugin...
+12:54:14 [main] INFO d.i.p.s.p.PluginManager - Plugin bytecode-bytebuddy registered
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading took 31 ms
+12:54:14 [main] INFO t.d.i.p.s.a.TestWithPlugin - Using AAS plugin aas.basyx-1.3
+12:54:14 [main] INFO t.d.i.p.s.a.TestWithPlugin - Using AAS plugin aas.basyx-1.3
+12:54:14 [main] INFO t.d.i.p.s.TestWithPlugin - Loading all plugins in 583 ms
+12:54:14 [main] INFO d.i.p.s.a.AasFactory - Using AAS factory implementation: de.iip_ecosphere.platform.support.aas.basyx.BaSyxAasFactory

@@ -1,0 +1,12 @@
+testClass,elapsedTime
+test.de.iip_ecosphere.platform.support.aas.basyx.ToolTests,0.176
+test.de.iip_ecosphere.platform.support.aas.basyx.BaSyxTest,23.973
+test.de.iip_ecosphere.platform.support.aas.basyx.BaSyxPersistenceTest,0.537
+test.de.iip_ecosphere.platform.support.aas.basyx.BaSyxDeploymentTest,2.908
+test.de.iip_ecosphere.platform.support.aas.basyx.BaSyxCodecTest,0.071
+test.de.iip_ecosphere.platform.support.aas.TechnicalDataSubmodelTest,0.231
+test.de.iip_ecosphere.platform.support.aas.basyx.BaSyxXmasAas,1.563
+test.de.iip_ecosphere.platform.support.aas.basyx.BaSyxTimeSeriesDataTest,0.019
+test.de.iip_ecosphere.platform.support.aas.basyx.BaSyxPCF,0.039
+test.de.iip_ecosphere.platform.support.aas.basyx.BaSyxContactInformationsTest,0.024
+test.de.iip_ecosphere.platform.support.aas.basyx.BaSyxSoftwareNameplateTest,0.093

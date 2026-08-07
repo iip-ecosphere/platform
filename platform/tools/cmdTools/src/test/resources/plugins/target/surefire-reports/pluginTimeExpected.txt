@@ -1,0 +1,12 @@
+plugin,time
+aas-default,351
+aas.basyx-1.3,351
+yaml-snakeyaml,33
+json-jackson,25
+commons-apache,27
+rest-spark,27
+metrics-micrometer,22
+log-slf4j-simple,4
+processInfo-oshi,27
+ws-websocket,24
+bytecode-bytebuddy,31
