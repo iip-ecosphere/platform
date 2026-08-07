@@ -89,7 +89,7 @@ public class MavenBuildExtractor {
             } else {
                 basyxFile = new File(inputFolder, surefireReportsPath + basyxFileName);
             }
-            if (basyxFile.exists()) { // applied wherever
+            if (basyxFile != null && basyxFile.exists()) { // applied wherever
                 File basyxOutFile = new File(outputFolder, BASYX_OUT_FILE_NAME);
                 basyxOutFile = appendSuffix(basyxOutFile, OUT_FILE_SUFFIX);
                 BaSyxTestCaseTimeExtractor.main(new String[] {basyxFile.getPath(), basyxOutFile.getPath()});
