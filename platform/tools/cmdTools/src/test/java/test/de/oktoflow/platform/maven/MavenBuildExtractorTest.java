@@ -62,6 +62,7 @@ public class MavenBuildExtractorTest {
         File outFolder = FileUtils.getTempDirectory();
         File expectedLogCsv = new File(outFolder, "mvn.csv");
         File expectedPluginCsv = new File(outFolder, "plugins.csv");
+        File expectedBasyxCsv = new File(outFolder, "basyx.csv");
         
         expectedLogCsv.delete();
         expectedPluginCsv.delete();
@@ -79,6 +80,12 @@ public class MavenBuildExtractorTest {
             expectedPluginCsv.isFile() && expectedPluginCsv.length() > 0);
         extracted = Files.readAllLines(expectedPluginCsv.toPath());
         Assert.assertTrue("Plugin CSV does not contain header: ", extracted.contains("plugin,time"));
+
+        Assert.assertTrue("Basyx CSV does not exist: " + expectedBasyxCsv.getPath(), expectedBasyxCsv.exists());
+        Assert.assertTrue("Basyx CSV appears to be empty: " + expectedBasyxCsv.getPath(), 
+            expectedBasyxCsv.isFile() && expectedBasyxCsv.length() > 0);
+        extracted = Files.readAllLines(expectedBasyxCsv.toPath());
+        Assert.assertTrue("Basyx CSV does not contain header: ", extracted.contains("case,protocols,hasAuth,ssl,time"));
 
         expectedLogCsv.delete();
         expectedPluginCsv.delete();

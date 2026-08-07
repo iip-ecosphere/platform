@@ -1,0 +1,9 @@
+case,protocols,hasAuth,ssl,time
+testVabQuery,/,false,false,5520
+testVabQuery,VAB-TCP/,false,false,1324
+testVabQuery,/VAB-HTTPS,false,true,3555
+testVabQuery,VAB-TCP/VAB-HTTPS,false,true,1432
+testVabQuery,/,true,false,3012
+testVabQuery,VAB-TCP/,true,false,2069
+testVabQuery,/VAB-HTTPS,true,true,2687
+testVabQuery,VAB-TCP/VAB-HTTPS,true,true,2459

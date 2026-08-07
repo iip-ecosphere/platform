@@ -13,6 +13,8 @@
 package de.oktoflow.platform.cmdTools;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Combines {@link MavenTestTimeExtractor} and {@link PluginLoadingTimeExtractor}.
@@ -21,17 +23,24 @@ import java.io.File;
  */
 public class MavenBuildExtractor {
     
+    private static final String PREFIX_INDICATOR = ".*";
     private static final String LOG_FILE_NAME = System.getProperty("okto.maven.logFile", "mvn.log");
     private static final String LOG_OUT_FILE_NAME = System.getProperty("okto.maven.logCsvFile", "mvn.csv");
     private static final String OUT_FILE_SUFFIX = System.getProperty("okto.maven.outFileSuffix", "");
     private static final String PLUGIN_FILE_NAME = System.getProperty("okto.maven.pluginsFile", "null-output.txt");
     private static final String PLUGIN_OUT_FILE_NAME = System.getProperty("okto.maven.pluginsCsvFile", "plugins.csv");
+    private static final String BASYY_FILE_NAME = System.getProperty("okto.maven.basyxFile", PREFIX_INDICATOR 
+        + "BaSyxTest-output.txt");
+    private static final String BASYX_OUT_FILE_NAME = System.getProperty("okto.maven.basyxCsvFile", "basyx.csv");
     
     /**
      * Runs the extractors. Maven log shall be directly in the specified maven folder (default file name "mvn.log"); 
      * extracted CSV will be written to the specified output folder (default file name "mvn.csv"). Plugin load timing 
      * file shall be in "target/surefire-reports" in the specified maven folder (default file name "null-output.log"); 
-     * extracted CSV will be written to the specified output folder (default file name "plugins.csv").
+     * extracted CSV will be written to the specified output folder (default file name "plugins.csv"). Basyx test log 
+     * output file shall be in "target/surefire-reports" in the specified maven folder (default file name ending with 
+     * "BaSyxTest-output.txt"); extracted CSV will be written to the specified output folder (default 
+     * file name "basyx.csv").
      * 
      * @param args
      */
@@ -53,12 +62,37 @@ public class MavenBuildExtractor {
             File logOutFile = new File(outputFolder, LOG_OUT_FILE_NAME);
             logOutFile = appendSuffix(logOutFile, OUT_FILE_SUFFIX);
             MavenTestTimeExtractor.main(new String[] {logFile.getPath(), logOutFile.getPath()});
+
+            final String surefireReportsPath = "target/surefire-reports/";
             
-            File pluginFile = new File(inputFolder, "target/surefire-reports/" + PLUGIN_FILE_NAME);
-            pluginFile = appendSuffix(pluginFile, OUT_FILE_SUFFIX);
+            File pluginFile = new File(inputFolder, surefireReportsPath + PLUGIN_FILE_NAME);
             if (pluginFile.exists()) { // non-plugin execution
                 File pluginOutFile = new File(outputFolder, PLUGIN_OUT_FILE_NAME);
+                pluginOutFile = appendSuffix(pluginOutFile, OUT_FILE_SUFFIX);
                 PluginLoadingTimeExtractor.main(new String[] {pluginFile.getPath(), pluginOutFile.getPath()});
+            }
+
+            File basyxFile = null;
+            String basyxFileName = BASYY_FILE_NAME;
+            if (basyxFileName.startsWith(PREFIX_INDICATOR)) {
+                File surefireFolder = new File(inputFolder, surefireReportsPath);
+                File[] surefireFiles = surefireFolder.listFiles();
+                String name = basyxFileName.substring(PREFIX_INDICATOR.length());
+                if (surefireFiles != null) {
+                    Optional<File> found = Arrays.stream(surefireFiles)
+                        .filter(f -> f.getName().endsWith(name))
+                        .findFirst();
+                    if (found.isPresent()) {
+                        basyxFile = found.get();
+                    }
+                }
+            } else {
+                basyxFile = new File(inputFolder, surefireReportsPath + basyxFileName);
+            }
+            if (basyxFile.exists()) { // applied wherever
+                File basyxOutFile = new File(outputFolder, BASYX_OUT_FILE_NAME);
+                basyxOutFile = appendSuffix(basyxOutFile, OUT_FILE_SUFFIX);
+                BaSyxTestCaseTimeExtractor.main(new String[] {basyxFile.getPath(), basyxOutFile.getPath()});
             }
         } else {
             System.err.println("Input folder " + args[0] + " does not exist.");
