@@ -130,16 +130,6 @@
                      </configuration>
                  </execution>
                  <execution>
-                     <id>build-classpath-plugin-test</id>
-                     <phase>package</phase>
-                     <goals>
-                         <goal>build-plugin-classpath</goal>
-                     </goals>
-                     <configuration>
-                       <asTest>true</asTest>
-                     </configuration>
-                 </execution>
-                 <execution>
                      <id>assemble-test</id>
                      <phase>package</phase>
                      <goals>
