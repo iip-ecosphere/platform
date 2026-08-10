@@ -143,12 +143,11 @@
       <groupId>de.iip-ecosphere.platform</groupId>
       <version>${project.version}</version>
     </dependency> 
-    <!-- for conflicts with EASy instantiation dependencies -->
-    <!--<dependency> 
+    <dependency> 
       <artifactId>support.json-jackson</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
       <version>${project.version}</version>
-    </dependency> -->
+    </dependency>
     <dependency>
       <artifactId>support.yaml-snakeyaml</artifactId>
       <groupId>de.iip-ecosphere.platform</groupId>
