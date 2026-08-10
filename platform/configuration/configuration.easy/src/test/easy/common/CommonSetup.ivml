@@ -10,7 +10,7 @@ project CommonSetup {
 
     // containerManager is already defined    
     serviceManager = SpringCloudStream {
-        memLimit = 512
+        memLimit = 768
     };
     
     //aas = AasImpl::BaSyx2; // > for BaSyx2/plugins
