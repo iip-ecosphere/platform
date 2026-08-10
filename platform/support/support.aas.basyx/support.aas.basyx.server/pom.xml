@@ -110,6 +110,16 @@
                  </execution>
                  
                  <execution>
+                     <id>build-classpath-plugin-test</id>
+                     <phase>package</phase>
+                     <goals>
+                         <goal>build-plugin-classpath</goal>
+                     </goals>
+                     <configuration>
+                       <asTest>true</asTest>
+                     </configuration>
+                 </execution>
+                 <execution>
                      <id>copy-dependencies-test</id>
                      <goals>
                          <goal>copy-plugin-dependencies</goal>
