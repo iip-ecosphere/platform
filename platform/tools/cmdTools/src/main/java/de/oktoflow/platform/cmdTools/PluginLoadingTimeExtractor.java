@@ -43,6 +43,7 @@ public class PluginLoadingTimeExtractor {
             System.exit(1);
         }
 
+        System.out.println("Plugin Loading Time Extractor: " + args[0] + " " + args[1]);
         Path inputFile = Paths.get(args[0]);
         Path outputFile = Paths.get(args[1]);
 

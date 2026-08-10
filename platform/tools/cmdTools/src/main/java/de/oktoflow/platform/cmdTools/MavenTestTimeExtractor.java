@@ -43,7 +43,8 @@ public class MavenTestTimeExtractor {
                     "Usage: java MavenTestTimeExtractor <maven-log> <output.csv>");
             System.exit(1);
         }
-
+        
+        System.out.println("Maven Test Time Extractor: " + args[0] + " " + args[1]);
         Path inputFile = Paths.get(args[0]);
         Path outputFile = Paths.get(args[1]);
 

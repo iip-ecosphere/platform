@@ -40,6 +40,7 @@ public class BaSyxTestCaseTimeExtractor {
             System.exit(1);
         }
 
+        System.out.println("BaSyx Test Case Time Extractor: " + args[0] + " " + args[1]);
         Path inputFile = Paths.get(args[0]);
         Path outputFile = Paths.get(args[1]);
 
