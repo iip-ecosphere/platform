@@ -51,7 +51,7 @@ abstract class BaSyxAbstractAasServer implements AasServer {
         COMBINED
     }
     
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private SetupSpec spec;
     private ServerType type;
     private ConfigurableApplicationContext aasRepoCtx;
