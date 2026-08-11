@@ -83,7 +83,7 @@ public interface Sender<T> {
      * @param sender the sender to close, may be <b>null</b>
      * @param blocking close by blocking or asynchronously
      */
-    public static void close(Sender<String> sender, boolean blocking) {
+    public static void close(Sender<?> sender, boolean blocking) {
         if (null != sender) {
             if (blocking) {
                 try {
