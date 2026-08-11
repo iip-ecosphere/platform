@@ -24,6 +24,7 @@ import java.util.Optional;
 public class MavenBuildExtractor {
     
     private static final String PREFIX_INDICATOR = ".*";
+    private static final String ENV_LOG_FILE_NAME = System.getProperty("okto.maven.envLogFile", "env.log");
     private static final String LOG_FILE_NAME = System.getProperty("okto.maven.logFile", "mvn.log");
     private static final String LOG_OUT_FILE_NAME = System.getProperty("okto.maven.logCsvFile", "mvn.csv");
     private static final String OUT_FILE_SUFFIX = System.getProperty("okto.maven.outFileSuffix", "");
@@ -57,38 +58,32 @@ public class MavenBuildExtractor {
             if (outputFolder.isDirectory()) {
                 outputFolder.mkdirs();
             }
-
-            File logFile = new File(inputFolder, LOG_FILE_NAME);
-            File logOutFile = new File(outputFolder, LOG_OUT_FILE_NAME);
-            logOutFile = appendSuffix(logOutFile, OUT_FILE_SUFFIX);
-            MavenTestTimeExtractor.main(new String[] {logFile.getPath(), logOutFile.getPath()});
-
-            final String surefireReportsPath = "target/surefire-reports/";
             
-            File pluginFile = new File(inputFolder, surefireReportsPath + PLUGIN_FILE_NAME);
-            if (pluginFile.exists()) { // non-plugin execution
-                File pluginOutFile = new File(outputFolder, PLUGIN_OUT_FILE_NAME);
-                pluginOutFile = appendSuffix(pluginOutFile, OUT_FILE_SUFFIX);
-                PluginLoadingTimeExtractor.main(new String[] {pluginFile.getPath(), pluginOutFile.getPath()});
+            File basyxFile = null;
+            File logFile = new File(inputFolder, ENV_LOG_FILE_NAME);
+            if (logFile.exists()) {
+                File logOutFile = new File(outputFolder, LOG_OUT_FILE_NAME);
+                logOutFile = appendSuffix(logOutFile, OUT_FILE_SUFFIX);
+                MavenTestTimeExtractor.readTail(logFile, logOutFile);
+                basyxFile = logFile;
+            } else {
+                logFile = new File(inputFolder, LOG_FILE_NAME);
+                File logOutFile = new File(outputFolder, LOG_OUT_FILE_NAME);
+                logOutFile = appendSuffix(logOutFile, OUT_FILE_SUFFIX);
+                MavenTestTimeExtractor.main(new String[] {logFile.getPath(), logOutFile.getPath()});
+
+                final String surefireReportsPath = "target/surefire-reports/";
+
+                File pluginFile = new File(inputFolder, surefireReportsPath + PLUGIN_FILE_NAME);
+                if (pluginFile.exists()) { // non-plugin execution
+                    File pluginOutFile = new File(outputFolder, PLUGIN_OUT_FILE_NAME);
+                    pluginOutFile = appendSuffix(pluginOutFile, OUT_FILE_SUFFIX);
+                    PluginLoadingTimeExtractor.main(new String[] {pluginFile.getPath(), pluginOutFile.getPath()});
+                }
+
+                basyxFile = findBasyxFile(inputFolder, surefireReportsPath);
             }
 
-            File basyxFile = null;
-            String basyxFileName = BASYY_FILE_NAME;
-            if (basyxFileName.startsWith(PREFIX_INDICATOR)) {
-                File surefireFolder = new File(inputFolder, surefireReportsPath);
-                File[] surefireFiles = surefireFolder.listFiles();
-                String name = basyxFileName.substring(PREFIX_INDICATOR.length());
-                if (surefireFiles != null) {
-                    Optional<File> found = Arrays.stream(surefireFiles)
-                        .filter(f -> f.getName().endsWith(name))
-                        .findFirst();
-                    if (found.isPresent()) {
-                        basyxFile = found.get();
-                    }
-                }
-            } else {
-                basyxFile = new File(inputFolder, surefireReportsPath + basyxFileName);
-            }
             if (basyxFile != null && basyxFile.exists()) { // applied wherever
                 File basyxOutFile = new File(outputFolder, BASYX_OUT_FILE_NAME);
                 basyxOutFile = appendSuffix(basyxOutFile, OUT_FILE_SUFFIX);
@@ -98,6 +93,34 @@ public class MavenBuildExtractor {
             System.err.println("Input folder " + args[0] + " does not exist.");
             System.exit(1);
         }
+    }
+
+    /**
+     * Finds the BaSyx log file.
+     * 
+     * @param inputFolder the input folder
+     * @param surefireReportsPath the surefire reports path
+     * @return the basyx file, may be <b>null</b>
+     */
+    private static File findBasyxFile(File inputFolder, String surefireReportsPath) {
+        File basyxFile = null;
+        String basyxFileName = BASYY_FILE_NAME;
+        if (basyxFileName.startsWith(PREFIX_INDICATOR)) {
+            File surefireFolder = new File(inputFolder, surefireReportsPath);
+            File[] surefireFiles = surefireFolder.listFiles();
+            String name = basyxFileName.substring(PREFIX_INDICATOR.length());
+            if (surefireFiles != null) {
+                Optional<File> found = Arrays.stream(surefireFiles)
+                    .filter(f -> f.getName().endsWith(name))
+                    .findFirst();
+                if (found.isPresent()) {
+                    basyxFile = found.get();
+                }
+            }
+        } else {
+            basyxFile = new File(inputFolder, surefireReportsPath + basyxFileName);
+        }
+        return basyxFile;
     }
 
     /**

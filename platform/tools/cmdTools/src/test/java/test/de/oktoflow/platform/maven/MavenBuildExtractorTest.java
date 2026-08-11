@@ -66,6 +66,7 @@ public class MavenBuildExtractorTest {
         
         expectedLogCsv.delete();
         expectedPluginCsv.delete();
+        expectedBasyxCsv.delete();
         
         MavenBuildExtractor.main(new String[] {mvnFolder.getPath(), outFolder.getPath()});
         
@@ -89,6 +90,41 @@ public class MavenBuildExtractorTest {
 
         expectedLogCsv.delete();
         expectedPluginCsv.delete();
+        expectedBasyxCsv.delete();
+    }
+
+    /**
+     * Tests {@link MavenBuildExtractor}.
+     * 
+     * @throws IOException in case of I/O issues
+     */
+    @Test
+    public void testEnvExtractor() throws IOException {
+        File mvnFolder = new File("src/test/resources/pluginEnv");
+        File outFolder = FileUtils.getTempDirectory();
+        File expectedLogCsv = new File(outFolder, "mvn.csv");
+        File expectedPluginCsv = new File(outFolder, "plugins.csv");
+        File expectedBasyxCsv = new File(outFolder, "basyx.csv");
+
+        MavenBuildExtractor.main(new String[] {mvnFolder.getPath(), outFolder.getPath()});
+
+        Assert.assertTrue("Log CSV does not exist: " + expectedLogCsv.getPath(), expectedLogCsv.exists());
+        Assert.assertTrue("Log CSV appears to be empty: " + expectedLogCsv.getPath(), 
+            expectedLogCsv.isFile() && expectedLogCsv.length() > 0);
+        List<String> extracted = Files.readAllLines(expectedLogCsv.toPath());
+        Assert.assertTrue("Log CSV does not contain header: ", extracted.contains("testClass,elapsedTime"));
+
+        Assert.assertFalse("Plugin CSV shall not exist: " + expectedPluginCsv.getPath(), expectedPluginCsv.exists());
+
+        Assert.assertTrue("Basyx CSV does not exist: " + expectedBasyxCsv.getPath(), expectedBasyxCsv.exists());
+        Assert.assertTrue("Basyx CSV appears to be empty: " + expectedBasyxCsv.getPath(), 
+            expectedBasyxCsv.isFile() && expectedBasyxCsv.length() > 0);
+        extracted = Files.readAllLines(expectedBasyxCsv.toPath());
+        Assert.assertTrue("Basyx CSV does not contain header: ", extracted.contains("case,protocols,hasAuth,ssl,time"));
+        
+        expectedLogCsv.delete();
+        expectedPluginCsv.delete();
+        expectedBasyxCsv.delete();
     }
 
 }

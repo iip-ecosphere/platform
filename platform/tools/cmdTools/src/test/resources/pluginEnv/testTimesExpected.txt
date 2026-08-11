@@ -1,0 +1,3 @@
+testClass,elapsedTime
+test.de.iip_ecosphere.platform.support.aas.basyx2.BaSyxDeploymentTest,5522
+test.de.iip_ecosphere.platform.support.aas.basyx2.BaSyxTest,19909

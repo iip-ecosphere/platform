@@ -52,4 +52,26 @@ public class MavenTestTimeExtractorTest {
         output.delete();
     }
 
+    /**
+     * Tests {@link MavenTestTimeExtractor}.
+     * 
+     * @throws IOException if IO operations fail
+     */
+    @Test
+    public void testEnvExtractor() throws IOException {
+        File base = new File("src/test/resources/pluginEnv");
+        File input = new File(base, "env.log");
+        File output = new File(FileUtils.getTempDirectory(), "surefire-time-extraction.csv");
+        output.delete();
+        MavenTestTimeExtractor.readTail(input, output);
+        Assert.assertTrue(output.exists());
+        
+        List<String> expected = Files.readAllLines(new File(base, "testTimesExpected.txt").toPath());        
+        List<String> extracted = Files.readAllLines(output.toPath());
+        extracted.forEach(l -> expected.remove(l));
+        Assert.assertTrue("Not matched expected lines: " + expected, expected.size() == 0);
+        
+        output.delete();
+    }
+
 }
