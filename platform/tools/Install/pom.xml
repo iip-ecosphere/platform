@@ -101,7 +101,7 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <artifactId>support.processinfo-OSHI</artifactId>
+            <artifactId>support.processInfo-oshi</artifactId>
             <groupId>de.iip-ecosphere.platform</groupId>
             <version>${project.version}</version>
         </dependency>
