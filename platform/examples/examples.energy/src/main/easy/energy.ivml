@@ -109,8 +109,8 @@ project Energy {
         
         input = {{type=refBy(opcIn)}},
         output = {{type=refBy(opcOut)}},
-        inInterface = {{type=refBy(opcIn), path="Objects/Machines/"}}, 
-        outInterface = {{type=refBy(opcOut), path="Objects/Machines/"}}
+        inInterface = {{type=refBy(opcIn), path="Objects/Sinumerik/Energy"}}, 
+        outInterface = {{type=refBy(opcOut), path="Objects/Sinumerik/Energy"}}
         /*operations = {
           FieldAssignmentOperation{field=myConnPltfIn.fields[1], 
             operation=AddDataTranslationOperation{

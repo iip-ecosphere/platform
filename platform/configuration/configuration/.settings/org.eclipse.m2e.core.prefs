@@ -1,5 +1,5 @@
-activeProfiles=Cfg
+activeProfiles=
 eclipse.m2.autoUpdateProjects=true
 eclipse.preferences.version=1
-resolveWorkspaceProjects=false
+resolveWorkspaceProjects=true
 version=1
