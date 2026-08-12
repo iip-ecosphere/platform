@@ -604,20 +604,6 @@ export class ListComponent extends Utils implements OnInit {
   public genTemplate(appId: string) {
     let inputVariables: InputVariable[] = [];
     inputVariables.push(ApiService.createAasOperationParameter("appId", AAS_TYPE_STRING, appId));
-    // const snackRef = this.snackBar.open(
-    //   `Generate application template for ${appId}, please wait...`,
-    //   undefined,
-    //   {
-    //     horizontalPosition: 'center',
-    //     verticalPosition: 'top'
-    //   }
-    // );
-    // const tempSub = this.websocketService.getMsgSubject().subscribe((value: string) => {
-    //   if (value.includes('"id":"Configuration"')) {
-    //     snackRef.dismiss();
-    //     tempSub.unsubscribe();
-    //   }
-    // })
     this.execFunctionInConfig("genAppsNoDepsAsync", inputVariables);
   }
 
@@ -658,20 +644,6 @@ export class ListComponent extends Utils implements OnInit {
     let fileName = fileInfo?.file.name || '';
     this.appFiles.delete(appId);
     inputVariables.push(ApiService.createAasOperationParameter("codeFile", AAS_TYPE_STRING, fileName));
-    // const snackRef = this.snackBar.open(
-    //   `Integrate the application with the uploaded template, please wait...`,
-    //   undefined,
-    //   {
-    //     horizontalPosition: 'center',
-    //     verticalPosition: 'top'
-    //   }
-    // );
-    // const tempSub = this.websocketService.getMsgSubject().subscribe((value: string) => {
-    //   if (value.includes('"id":"Configuration"')) {
-    //     snackRef.dismiss();
-    //     tempSub.unsubscribe();
-    //   }
-    // })
     this.execFunctionInConfig("genAppsAsync", inputVariables)
   }
 
@@ -715,7 +687,7 @@ export class ListComponent extends Utils implements OnInit {
         const ws: WebsocketService = new WebsocketService();
         ws.connect(taskUrl);
         const tempSub = ws.getMsgSubject().subscribe((value: any) => {
-          this.requestReceivedMessage(`${value}`, this.taskId, ST_PROCESS);
+          this.collector.receiveStatus(JSON.parse(value));
           if (value.includes('"id":"Configuration"')) {
             ws.close();
             tempSub.unsubscribe();
