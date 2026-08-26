@@ -175,7 +175,7 @@ docker exec -it mosquitto mosquitto_sub -h localhost -t topic_name
 ```
 -	To send payload to a topic
 ```
-docker exec mosquitto mosquitto_pub -h localhost -t **topic_name** -m '{payload}'
+docker exec mosquitto mosquitto_pub -h localhost -t topic_name -m '{payload}'
 ```
 
 #### Allow anonymous access and by user/password
