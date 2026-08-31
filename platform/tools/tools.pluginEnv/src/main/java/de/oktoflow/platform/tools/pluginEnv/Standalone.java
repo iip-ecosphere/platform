@@ -58,6 +58,10 @@ public class Standalone {
             out.print(File.pathSeparator);
         }
         out.print(entry);
+        File tmp = new File(entry);
+        if (!tmp.exists()) {
+            System.out.println("WARN: " + tmp + " does not exist");
+        }
         firstEntry = false;
     }
 
