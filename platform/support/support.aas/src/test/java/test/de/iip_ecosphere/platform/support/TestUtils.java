@@ -136,7 +136,7 @@ public class TestUtils {
                 public void run() {
                     System.exit(0);
                 }
-            }, 0, timeout);
+            }, timeout);
         }
         JUnitCore core = new JUnitCore();
         core.addListener(new MyRunListener());
