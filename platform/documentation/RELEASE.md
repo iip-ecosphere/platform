@@ -72,7 +72,8 @@ For performing a release...
   - `configuration.maven`
   - `platform`
   - `managementUi`
-- `examples`
+  - `examples`
+* Check/adjust) versions in `tools.pluginEnv`.
 * Finalize platform, prepare record on Zenodo
 * **Check** platform dependencies installation POM in **Install** package! 
 * First, commit `tooks.lib` and the maven plugins in `tool`, then platform dependencies, then `support` and the rest. In most of the other cases, only changes to the POM parent entry are required. 

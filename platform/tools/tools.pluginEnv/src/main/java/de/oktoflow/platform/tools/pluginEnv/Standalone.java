@@ -33,9 +33,10 @@ public class Standalone {
 
     private static String m2 = System.getProperty("user.home") + "/.m2/repository/";
     private static File dir = new File("target/standalone");
-    private static String oktoVer = "0.8.0";
+    private static String oktoVer = System.getProperty("okto.version", "0.8.1-SNAPSHOT");
     private static boolean firstEntry = true;
     private static Map<String, String> mapping = new HashMap<>();
+    private static String pwdAdjust = System.getProperty("okto.pwdAdjust", "");
     
     /**
      * Prints a classpath entry.
@@ -97,7 +98,10 @@ public class Standalone {
      * @throws IOException if I/O fails
      */
     public static void main(String[] args) throws IOException {
-        File pwd = new File("../..");
+        File pwd = new File("../.."); // for local git workspace
+        if (pwdAdjust.length() > 0) { // for different setup, e.g., experiment
+            pwd = new File(pwd, pwdAdjust);
+        }
         PrintStream out = new PrintStream(new FileOutputStream(new File(dir, "cp")));
         printEntry(out, m2 + "junit/junit/4.12/junit-4.12.jar");
         printEntry(out, m2 + "org/hamcrest/hamcrest-core/2.2\\hamcrest-core-2.2.jar");
