@@ -22,6 +22,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 /**
  * Combines the plugin classpath files in {@code target/standalone} into a single classpath file in 
  * {@code target/standalone/cp} adding a basic oktoflow testing environment. We might also do that via 
@@ -33,7 +41,7 @@ public class Standalone {
 
     private static String m2 = System.getProperty("user.home") + "/.m2/repository/";
     private static File dir = new File("target/standalone");
-    private static String oktoVer = System.getProperty("okto.version", "0.8.1-SNAPSHOT");
+    private static String oktoVer = System.getProperty("okto.version", "");
     private static boolean firstEntry = true;
     private static Map<String, String> mapping = new HashMap<>();
     private static String pwdAdjust = System.getProperty("okto.pwdAdjust", "");
@@ -92,16 +100,49 @@ public class Standalone {
     }
     
     /**
+     * Tries to obtain the actual oktoflow version from the POM, i.e., the version of the parent pom.
+     * 
+     * @return the version, may be empty
+     * @throws IOException if reading the file fails
+     */
+    private static String getOktoVer() throws IOException {
+        String result = "";
+        File pomFile = new File("pom.xml");
+        try {
+            Document doc = DocumentBuilderFactory.newInstance()
+                .newDocumentBuilder()
+                .parse(pomFile);
+
+            NodeList parents = doc.getElementsByTagName("parent");
+            if (parents.getLength() > 0) {
+                Element parent = (Element) parents.item(0);
+                NodeList versions = parent.getElementsByTagName("version");
+                if (versions.getLength() > 0) {
+                    result = versions.item(0).getTextContent().trim();
+                }
+            }
+        } catch (SAXException | ParserConfigurationException e) {
+            throw new IOException(e);
+        }        
+        return result;
+    }
+    
+    /**
      * Creates and writes the standalone classpath.
      * 
      * @param args ignored
      * @throws IOException if I/O fails
      */
     public static void main(String[] args) throws IOException {
+        if (oktoVer.length() == 0) {
+            oktoVer = getOktoVer();
+        }
+        System.out.println("Oktoflow version: " + oktoVer);        
         File pwd = new File("../.."); // for local git workspace
         if (pwdAdjust.length() > 0) { // for different setup, e.g., experiment
             pwd = new File(pwd, pwdAdjust);
         }
+        System.out.println("Classpath prefix: " + pwd);
         PrintStream out = new PrintStream(new FileOutputStream(new File(dir, "cp")));
         printEntry(out, m2 + "junit/junit/4.12/junit-4.12.jar");
         printEntry(out, m2 + "org/hamcrest/hamcrest-core/2.2\\hamcrest-core-2.2.jar");
