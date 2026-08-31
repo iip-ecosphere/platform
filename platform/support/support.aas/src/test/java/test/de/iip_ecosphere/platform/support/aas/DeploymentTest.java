@@ -81,9 +81,14 @@ public class DeploymentTest {
             .deploy(aas)
             .createServer()
             .start();
-        Assert.assertTrue(factory.isAvailable(spec, AasComponent.AAS_REPOSITORY));
+        Boolean availCanFail = Boolean.valueOf(System.getProperty("okto.test.aas.failAvailable", "true"));
+        if (availCanFail) {
+            Assert.assertTrue(factory.isAvailable(spec, AasComponent.AAS_REPOSITORY));
+        }
         Registry reg = factory.obtainRegistry(spec);
-        Assert.assertTrue(factory.isAvailable(spec, AasComponent.AAS_REGISTRY));
+        if (availCanFail) {
+            Assert.assertTrue(factory.isAvailable(spec, AasComponent.AAS_REGISTRY));
+        }
         aas = reg.retrieveAas(urn);
         Submodel sub = aas.createSubmodelBuilder("dynamic", null).build();
         server.deploy(aas, sub);
