@@ -57,6 +57,10 @@ public class OsUtilsTest {
         
         Assert.assertFalse(OsUtils.getBooleanPropertyOrEnv("iip.nonsense1", false));
         Assert.assertFalse(OsUtils.getBooleanProperty("iip.nonsense1", false));
+        
+        Assert.assertEquals(1, OsUtils.getIntProperty("iip.test.intVal", 1));
+        System.setProperty("iip.test.intVal", "2");
+        Assert.assertEquals(2, OsUtils.getIntProperty("iip.test.intVal", 1));
     }
     
     /**

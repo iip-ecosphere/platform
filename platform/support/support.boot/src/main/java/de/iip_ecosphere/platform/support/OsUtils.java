@@ -176,6 +176,22 @@ public class OsUtils {
     }
 
     /**
+     * Returns an integer value from the system properties.
+     * 
+     * @param key the key to look for
+     * @param dflt the default value for none
+     * @return the value, may by {@code dflt} for none
+     */
+    public static int getIntProperty(String key, int dflt) {
+        int result = dflt;
+        try {
+            result = Integer.parseInt(System.getProperty(key, String.valueOf(dflt)));
+        } catch (NumberFormatException e) {
+        }
+        return result;
+    }
+
+    /**
      * Returns a value from the system properties or system environment, either as given or all in capital 
      * characters with dots replaced by underscores.
      * 
