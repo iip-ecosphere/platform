@@ -180,6 +180,8 @@ DeployArtifact "${PREFIX}" "support.json-jackson" "$OKTO_VERSION" "java plugin"
 DeployArtifact "${PREFIX}" "support.http-apache" "$OKTO_VERSION" "java plugin"
 DeployArtifact "${PREFIX}" "support.bytecode-bytebuddy" "$OKTO_VERSION" "java plugin"
 
+DeployArtifact "${PREFIX}" "tools.pluginEnv" "$OKTO_VERSION" "mvn"
+
 DeployArtifact "${PREFIX}" "support.dfltSysMetrics" "$OKTO_VERSION" "java plugin"
 DeployArtifact "${PREFIX}" "support.metrics.plcNext" "$OKTO_VERSION" "java plugin"
 DeployArtifact "${PREFIX}" "support.metrics.bitmotec" "$OKTO_VERSION" "java plugin"

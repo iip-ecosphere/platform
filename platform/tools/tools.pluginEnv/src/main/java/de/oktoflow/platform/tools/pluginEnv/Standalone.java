@@ -40,11 +40,12 @@ import org.xml.sax.SAXException;
 public class Standalone {
 
     private static String m2 = System.getProperty("user.home") + "/.m2/repository/";
-    private static File dir = new File("target/standalone");
+    private static File dir = new File(System.getProperty("okto.files", "target/standalone"));
     private static String oktoVer = System.getProperty("okto.version", "");
     private static boolean firstEntry = true;
     private static Map<String, String> mapping = new HashMap<>();
     private static String pwdAdjust = System.getProperty("okto.pwdAdjust", "");
+    private static String basePwd = System.getProperty("okto.pwd", "../..");  // for local git workspace
     
     /**
      * Prints a classpath entry.
@@ -141,8 +142,8 @@ public class Standalone {
         if (oktoVer.length() == 0) {
             oktoVer = getOktoVer();
         }
-        System.out.println("Oktoflow version: " + oktoVer);        
-        File pwd = new File("../.."); // for local git workspace
+        System.out.println("Oktoflow version: " + oktoVer);
+        File pwd = new File(basePwd);
         if (pwdAdjust.length() > 0) { // for different setup, e.g., experiment
             pwd = new File(pwd, pwdAdjust);
         }
