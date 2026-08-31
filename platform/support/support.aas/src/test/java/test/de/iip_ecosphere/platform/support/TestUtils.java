@@ -17,6 +17,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.junit.runner.Description;
 import org.junit.runner.JUnitCore;
@@ -119,11 +121,23 @@ public class TestUtils {
     // checkstyle: resume exception type check
 
     /**
-     * Executes test cases with junit.
+     * Executes test cases with junit. The system property {@code okto.test.timeout} determines the timeout for 
+     * terminating the JVM in milliseconds (may be {@code 0} for none).
      * 
      * @param args the test suites/cases to run
      */
     public static void main(String[] args) {
+        int timeout = OsUtils.getIntProperty("okto.test.timeout", 0);
+        if (timeout > 0) {
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                
+                @Override
+                public void run() {
+                    System.exit(0);
+                }
+            }, 0, timeout);
+        }
         JUnitCore core = new JUnitCore();
         core.addListener(new MyRunListener());
         for (String s: args) {
