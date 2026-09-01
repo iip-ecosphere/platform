@@ -855,7 +855,14 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     protected String getIvmlSubpath(Project project, boolean asConst) {
         String result = getIvmlSubpath(project);
         if (null == result && asConst) {
-            result = ""; // not null
+            String name = project.getName();
+            if (PRJ_NAME_ALLCONSTANTS.equals(name)) {
+                if (asConst) {
+                    result = ""; // not null
+                }
+            } else if (isAllowedForModification(project)) {
+                result = ""; // not null
+            }
         }
         return result;
     }    
@@ -1587,49 +1594,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     }
     
     /**
-     * A "map" holding names/id to service mappings.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    private static class ServiceMap {
-        
-        private Map<String, IDecisionVariable> nameToService = new HashMap<>();
-        private Map<String, IDecisionVariable> idToService = new HashMap<>();
-        
-        /**
-         * Returns a service by id or by configured name.
-         * 
-         * @param svc the service id/name
-         * @return the resolved service, may be <b>null</b>
-         */
-        public IDecisionVariable getService(String svc) {
-            IDecisionVariable result = nameToService.get(svc);
-            if (null == result) {
-                result = idToService.get(svc);
-            }
-            return result;
-        }
-        
-        /**
-         * Adds a service.
-         * 
-         * @param var the configured variable representing the service
-         */
-        private void add(IDecisionVariable var) {
-            String name = var.getDeclaration().getName(); // just fallback
-            name = IvmlUtils.getStringValue(var.getNestedElement("name"), name);
-            if (null != name) {
-                nameToService.put(name, var);
-            }
-            String id = IvmlUtils.getStringValue(var.getNestedElement("id"), name);
-            if (null != id) {
-                idToService.put(id, var);
-            }
-        }
-        
-    }
-    
-    /**
      * Collects all declared services.
      * 
      * @param cfg the configuration to take the services from
@@ -1994,6 +1958,5 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         }
         return result;
     }
-
 
 }
