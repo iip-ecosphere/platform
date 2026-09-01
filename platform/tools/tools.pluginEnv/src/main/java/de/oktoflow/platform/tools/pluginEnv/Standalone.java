@@ -61,7 +61,7 @@ public class Standalone {
         out.print(entry);
         File tmp = new File(entry);
         if (!tmp.exists()) {
-            System.out.println("WARN: " + tmp + " does not exist");
+            System.out.println(" WARN: " + tmp + " does not exist");
         }
         firstEntry = false;
     }
@@ -148,7 +148,9 @@ public class Standalone {
             pwd = new File(pwd, pwdAdjust);
         }
         System.out.println("Classpath prefix: " + pwd);
-        PrintStream out = new PrintStream(new FileOutputStream(new File(dir, "cp")));
+        File outFile = new File(dir, "cp");
+        PrintStream out = new PrintStream(new FileOutputStream(outFile));
+        System.out.println("Adding oktoflow classpath entries...");
         printEntry(out, m2 + "junit/junit/4.12/junit-4.12.jar");
         printEntry(out, m2 + "org/hamcrest/hamcrest-core/2.2\\hamcrest-core-2.2.jar");
         printEntry(out, m2 + "org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar");
@@ -165,7 +167,7 @@ public class Standalone {
         File[] files = dir.listFiles();
         for (File f : files) {
             if (f.isFile() && !f.getName().equals("cp")) {
-                System.out.println(f.getAbsolutePath());            
+                System.out.println("Processing " + f.getAbsolutePath());            
                 List<String> lines = Files.readAllLines(f.toPath());
                 for (String l : lines) {
                     if (!l.startsWith("#")) {
@@ -202,6 +204,7 @@ public class Standalone {
         }
         out.flush();
         out.close();
+        System.out.println("Written classpath file " + outFile);
     }
 
 }
