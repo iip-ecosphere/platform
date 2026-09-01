@@ -18,6 +18,11 @@ In progress:
 
 ### Version 0.8.1 (Fall '26)
 
+In progress:
+
+* [#214](https://github.com/iip-ecosphere/platform/issues/214): Changing/Updating configuration elements from the management UI
+* [#200](https://github.com/iip-ecosphere/platform/issues/200): Harden development container
+
 Improvements:
 * Determined start sequence for standalone apps/tests: sinks, transformers/probes, sources
 * Improved type display consistency in managementUI
