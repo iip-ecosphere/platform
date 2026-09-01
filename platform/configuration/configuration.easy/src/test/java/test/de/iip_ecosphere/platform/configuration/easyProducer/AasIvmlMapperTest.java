@@ -553,6 +553,14 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         assertStringVar("a.b.D", mapper.getVariable("deviceIdProvider").getNestedElement("class"));
         assertStringVar("mg.art:art:1.2.4", mapper.getVariable("deviceIdProvider.artifact"));
         mapper.clearChanges();
+        
+        values.clear();
+        values.put("UNUSED_Real", "1.24");
+        mapper.changeValues(values);
+
+        assertRealVar(1.24, mapper.getVariable("UNUSED_Real"));
+        assertIvmlFileChange("AllConstants", false, "UNUSED_Real");
+        mapper.clearChanges();
 
         stopEasy(lcd);
         setupIvmlFiles(); // revert changes
@@ -866,7 +874,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
     }
 
     /**
-     * Asserts that {@code var} has the {@code expected} Boolean value.
+     * Asserts that {@code var} has the {@code expected} Integer value.
      * 
      * @param expected the expected value
      * @param var the variable
@@ -875,6 +883,17 @@ public class AasIvmlMapperTest extends TestWithPlugin {
     private void assertIntVar(int expected, IDecisionVariable var) {
         Assert.assertNotNull(var);
         Assert.assertEquals(expected, IvmlUtils.getIntValue(var, -1));
+    }
+
+    /**
+     * Asserts that {@code var} has the {@code expected} Real value.
+     * 
+     * @param expected the expected value
+     * @param var the variable
+     */
+    private void assertRealVar(double expected, IDecisionVariable var) {
+        Assert.assertNotNull(var);
+        Assert.assertEquals(expected, IvmlUtils.getRealValue(var, -1), 0.01);
     }
 
     /**

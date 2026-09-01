@@ -200,19 +200,15 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
     protected abstract String getIvmlSubpath(Project project);
     
     /**
-     * Returns the IVML subpath for the given project.
+     * Returns the IVML subpath for the given project, potentially returning a different path for top-level constants.
      * 
      * @param project the project
+     * @param asConst shall we assume a constant variable and turn a top-level project value <b>null</b> of 
+     *    {@link #getIvmlSubpath(Project)} into an empty top-level folder. 
      * @return the subpath, may be the name of {@code project} for a top-level or a non-writable project, may be
      *    empty for the top-level folder or a sub-folder
      */
-    protected String getIvmlSubpathWithFallback(Project project) {
-        String result = getIvmlSubpath(project);
-        if (null == result) {
-            result = project.getName();
-        }
-        return result;
-    }
+    protected abstract String getIvmlSubpath(Project project, boolean asConst);
     
     /**
      * Creates an IVML configuration (not meta-model) model path with {@code subpath} and for project {@code p}.
@@ -1226,8 +1222,8 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                 AbstractVariable varDecl = var.getDeclaration();
                 //Project target = varDecl.getProject();
                 Project target = adaptTarget(root, getVariableTarget(root, varDecl.getType(), varDecl.getName(), null));
-                String subpath = getIvmlSubpathWithFallback(target);
-                if (null == subpath) { // if it is one of the "writable" wildcard imports, may be superfluous
+                String subpath = getIvmlSubpath(target, var.getDeclaration().isConstant());
+                if (null == subpath) { // if it is one of the "writable" wildcard imports
                     target = root;
                 }
                 if (varDecl.getProject() == target) {

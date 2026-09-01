@@ -850,6 +850,15 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         }
         return subpath;
     }
+    
+    @Override
+    protected String getIvmlSubpath(Project project, boolean asConst) {
+        String result = getIvmlSubpath(project);
+        if (null == result && asConst) {
+            result = ""; // not null
+        }
+        return result;
+    }    
 
     /**
      * Returns the actual IVML config folder.

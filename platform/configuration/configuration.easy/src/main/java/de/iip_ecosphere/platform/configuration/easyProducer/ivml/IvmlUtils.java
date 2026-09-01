@@ -61,6 +61,7 @@ import net.ssehub.easy.varModel.model.filter.FilterType;
 import net.ssehub.easy.varModel.model.values.BooleanValue;
 import net.ssehub.easy.varModel.model.values.EnumValue;
 import net.ssehub.easy.varModel.model.values.IntValue;
+import net.ssehub.easy.varModel.model.values.RealValue;
 import net.ssehub.easy.varModel.model.values.StringValue;
 import net.ssehub.easy.varModel.model.values.Value;
 
@@ -267,6 +268,28 @@ public class IvmlUtils {
         }
         return result;
     }
+    
+    /**
+     * Returns a Real/Double value from the given {@code var}.
+     * 
+     * @param var the variable (may be <b>null</b>)
+     * @param deflt the default value to return if no value can be obtained
+     * @return the value or {@code deflt}
+     */
+    public static double getRealValue(IDecisionVariable var, double deflt) {
+        double result;
+        if (var == null) {
+            result = deflt;
+        } else {
+            Value val = var.getValue();
+            if (!(val instanceof RealValue)) {
+                result = deflt;
+            } else {
+                result = ((RealValue) val).getValue();
+            }
+        }
+        return result;
+    }    
 
     /**
      * Returns the name of {@code var} taking <b>null</b> into account.
