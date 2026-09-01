@@ -545,6 +545,14 @@ public class AasIvmlMapperTest extends TestWithPlugin {
             mapper.assertChange(n -> n.equals(name), ConfigurationChangeType.MODIFIED);
         }
         mapper.clearChanges();
+        
+        values.clear();
+        values.put("deviceIdProvider", "HostnameDeviceIdProvider{class=\"a.b.D\", artifact=\"mg.art:art:1.2.4\"}");
+        mapper.changeValues(values);
+
+        assertStringVar("a.b.D", mapper.getVariable("deviceIdProvider").getNestedElement("class"));
+        assertStringVar("mg.art:art:1.2.4", mapper.getVariable("deviceIdProvider.artifact"));
+        mapper.clearChanges();
 
         stopEasy(lcd);
         setupIvmlFiles(); // revert changes
