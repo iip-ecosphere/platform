@@ -41,6 +41,7 @@ public class Standalone {
 
     private static String m2 = System.getProperty("user.home") + "/.m2/repository/";
     private static File dir = new File(System.getProperty("okto.files", "target/standalone"));
+    private static File pom = new File(System.getProperty("okto.pom", "pom.xml"));
     private static String oktoVer = System.getProperty("okto.version", "");
     private static boolean firstEntry = true;
     private static Map<String, String> mapping = new HashMap<>();
@@ -112,11 +113,10 @@ public class Standalone {
      */
     private static String getOktoVer() throws IOException {
         String result = "";
-        File pomFile = new File("pom.xml");
         try {
             Document doc = DocumentBuilderFactory.newInstance()
                 .newDocumentBuilder()
-                .parse(pomFile);
+                .parse(pom);
 
             NodeList parents = doc.getElementsByTagName("parent");
             if (parents.getLength() > 0) {
@@ -124,6 +124,14 @@ public class Standalone {
                 NodeList versions = parent.getElementsByTagName("version");
                 if (versions.getLength() > 0) {
                     result = versions.item(0).getTextContent().trim();
+                    System.out.println("Using parent version " + result + " from " + pom);
+                }
+            }
+            if (result.length() == 0) {
+                NodeList versions = doc.getElementsByTagName("version");
+                if (versions.getLength() > 0) {
+                    result = versions.item(0).getTextContent().trim();
+                    System.out.println("Using version " + result + " from " + pom);
                 }
             }
         } catch (SAXException | ParserConfigurationException e) {
