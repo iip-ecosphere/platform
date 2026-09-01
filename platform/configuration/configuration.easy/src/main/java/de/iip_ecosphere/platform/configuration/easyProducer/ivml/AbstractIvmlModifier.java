@@ -1223,7 +1223,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                 //Project target = varDecl.getProject();
                 Project target = adaptTarget(root, getVariableTarget(root, varDecl.getType(), varDecl.getName(), null));
                 String subpath = getIvmlSubpath(target, var.getDeclaration().isConstant());
-                if (null == subpath) { // if it is one of the "writable" wildcard imports
+                if (null == subpath && null == target) { // if it is one of the "writable" wildcard imports
                     target = root;
                 }
                 if (varDecl.getProject() == target) {
