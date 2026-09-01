@@ -846,7 +846,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         } else if (projectName.startsWith("ApplicationPart")) {
             subpath = "apps";
         } else {
-            subpath = projectName;
+            subpath = null;
         }
         return subpath;
     }
