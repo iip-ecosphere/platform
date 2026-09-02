@@ -818,10 +818,14 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 prepareApplicationProject(result, root, meshes);
             }
             if (null == result) { // immediate fallback
-                if (null != varParent && isAllowedForModification(varParent)) {
-                    result = varParent;
+                if (null != varParent) {
+                    if (isAllowedForModification(varParent)) {
+                        result = varParent;
+                    } else {
+                        result = ModelQuery.findProject(root, PRJ_NAME_TECHSETUP);
+                    }
                 } else {
-                    result = ModelQuery.findProject(root, PRJ_NAME_TECHSETUP);
+                    result = ModelQuery.findProject(root, PRJ_NAME_ALLCONSTANTS);
                 }
             }
         }
