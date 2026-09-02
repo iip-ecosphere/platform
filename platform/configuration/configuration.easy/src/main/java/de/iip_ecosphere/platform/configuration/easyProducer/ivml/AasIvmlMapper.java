@@ -137,11 +137,11 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     public static final String META_TYPE_NAME = "meta";
     public static final Function<String, String> SHORTID_PREFIX_META = n -> "meta" + PseudoString.firstToUpperCase(n);
     public static final String PROGRESS_COMPONENT_ID = "Configuration";
-    protected static final String PRJ_NAME_PLATFCONFIG = "PlatformConfiguration";
-    protected static final String PRJ_NAME_ALLCONSTANTS = "AllConstants";
-    protected static final String PRJ_NAME_ALLSERVICES = "AllServices";
-    protected static final String PRJ_NAME_ALLTYPES = "AllTypes";
-    protected static final String PRJ_NAME_TECHSETUP = "TechnicalSetup";
+    public static final String PRJ_NAME_PLATFCONFIG = "PlatformConfiguration";
+    public static final String PRJ_NAME_ALLCONSTANTS = "AllConstants";
+    public static final String PRJ_NAME_ALLSERVICES = "AllServices";
+    public static final String PRJ_NAME_ALLTYPES = "AllTypes";
+    public static final String PRJ_NAME_TECHSETUP = "TechnicalSetup";
     private static final Map<String, String> PROJECT_MAPPING;
     private static final Map<String, String> PARENT_MAPPING;
     private static final Set<String> REQUIRED_TYPES;
@@ -788,8 +788,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     }
 
     @Override
-    protected Project getVariableTarget(Project root, IDatatype type, String name, List<String> meshes) 
-        throws ExecutionException {
+    protected Project getVariableTarget(Project root, Project varParent, IDatatype type, String name, 
+        List<String> meshes) throws ExecutionException {
         Project result = null;
         if (null != type) {
             for (Map.Entry<String, String> ent : PROJECT_MAPPING.entrySet()) {
@@ -818,7 +818,11 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 prepareApplicationProject(result, root, meshes);
             }
             if (null == result) { // immediate fallback
-                result = ModelQuery.findProject(root, PRJ_NAME_ALLCONSTANTS);
+                if (null != varParent && isAllowedForModification(varParent)) {
+                    result = varParent;
+                } else {
+                    result = ModelQuery.findProject(root, PRJ_NAME_TECHSETUP);
+                }
             }
         }
         if (null == result) { // extreme fallback
@@ -850,22 +854,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         }
         return subpath;
     }
-    
-    @Override
-    protected String getIvmlSubpath(Project project, boolean asConst) {
-        String result = getIvmlSubpath(project);
-        if (null == result) {
-            String name = project.getName();
-            if (PRJ_NAME_ALLCONSTANTS.equals(name)) {
-                if (asConst) {
-                    result = ""; // not null
-                }
-            } else if (isAllowedForModification(project)) {
-                result = ""; // not null
-            }
-        }
-        return result;
-    }    
 
     /**
      * Returns the actual IVML config folder.

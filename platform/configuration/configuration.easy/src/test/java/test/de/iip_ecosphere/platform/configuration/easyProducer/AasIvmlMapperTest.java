@@ -539,7 +539,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         assertStringVar("a.b.C", mapper.getVariable("deviceIdProvider").getNestedElement("class"));
         assertStringVar("mg.art:art:1.2.3", mapper.getVariable("deviceIdProvider.artifact"));
         
-        assertIvmlFileChange(MODEL_NAME, false, "instDir", "javaExe", "deviceIdProvider");
+        assertIvmlFileChange(AasIvmlMapper.PRJ_NAME_TECHSETUP, false, "instDir", "javaExe", "deviceIdProvider");
         mapper.assertChangesCount(values.size());
         for (String name : values.keySet()) {
             mapper.assertChange(n -> n.equals(name), ConfigurationChangeType.MODIFIED);
