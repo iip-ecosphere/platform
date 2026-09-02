@@ -561,7 +561,13 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         assertRealVar(1.24, mapper.getVariable("UNUSED_Real"));
         assertIvmlFileChange("AllConstants", false, "UNUSED_Real");
         mapper.clearChanges();
-
+        
+        values.clear();
+        values.put("feedback", "RecordType{name=\"Feedback\", fields={Field{name=\"data1\", type=refBy(StringType)}}}");
+        mapper.changeValues(values);
+        assertIvmlFileChange("AllTypes", false, "feedback");
+        mapper.clearChanges();
+        
         stopEasy(lcd);
         setupIvmlFiles(); // revert changes
     }

@@ -854,7 +854,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     @Override
     protected String getIvmlSubpath(Project project, boolean asConst) {
         String result = getIvmlSubpath(project);
-        if (null == result && asConst) {
+        if (null == result) {
             String name = project.getName();
             if (PRJ_NAME_ALLCONSTANTS.equals(name)) {
                 if (asConst) {
