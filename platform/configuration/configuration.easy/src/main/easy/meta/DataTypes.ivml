@@ -45,6 +45,10 @@ project DataTypes {
     def String mvnVersion(VersionedElement v) = 
        if (v.snapshot) then v.ver + "-SNAPSHOT" else v.ver endif;
     
+    // if new types occur, e.g., in extension, that shall be marked as service related -> AllServices
+    abstract compound TypeRelated {
+    }
+    
     abstract compound DataType {
         NonEmptyString name;
         Constraint isNameOk = isNameOk(self);

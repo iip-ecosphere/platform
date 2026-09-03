@@ -12,6 +12,10 @@ project Services {
    annotate String semanticId = "" to .;
    annotate Integer uiGroup = UiMandatoryGroup1 to .;
    
+   // if new types occur, e.g., in extension, that shall be marked as service related -> AllServices
+   abstract compound ServiceRelated {
+   }
+   
    // -------------------- service manager ------------------
    
    abstract compound ServiceManager {

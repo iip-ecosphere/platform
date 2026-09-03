@@ -540,11 +540,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         assertStringVar("mg.art:art:1.2.3", mapper.getVariable("deviceIdProvider.artifact"));
         
         assertIvmlFileChange(AasIvmlMapper.PRJ_NAME_TECHSETUP, false, "instDir", "javaExe", "deviceIdProvider");
-        mapper.assertChangesCount(values.size());
-        for (String name : values.keySet()) {
-            mapper.assertChange(n -> n.equals(name), ConfigurationChangeType.MODIFIED);
-        }
-        mapper.clearChanges();
+        assertAndClearChanges(values, mapper);
         
         values.clear();
         values.put("deviceIdProvider", "HostnameDeviceIdProvider{class=\"a.b.D\", artifact=\"mg.art:art:1.2.4\"}");
@@ -552,7 +548,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
 
         assertStringVar("a.b.D", mapper.getVariable("deviceIdProvider").getNestedElement("class"));
         assertStringVar("mg.art:art:1.2.4", mapper.getVariable("deviceIdProvider.artifact"));
-        mapper.clearChanges();
+        assertAndClearChanges(values, mapper);
         
         values.clear();
         values.put("UNUSED_Real", "1.24");
@@ -560,13 +556,13 @@ public class AasIvmlMapperTest extends TestWithPlugin {
 
         assertRealVar(1.24, mapper.getVariable("UNUSED_Real"));
         assertIvmlFileChange("AllConstants", false, "UNUSED_Real");
-        mapper.clearChanges();
+        assertAndClearChanges(values, mapper);
         
         values.clear();
         values.put("feedback", "RecordType{name=\"Feedback\", fields={Field{name=\"data1\", type=refBy(StringType)}}}");
         mapper.changeValues(values);
         assertIvmlFileChange("AllTypes", false, "feedback");
-        mapper.clearChanges();
+        assertAndClearChanges(values, mapper);
         
         stopEasy(lcd);
         setupIvmlFiles(); // revert changes
@@ -574,6 +570,21 @@ public class AasIvmlMapperTest extends TestWithPlugin {
     
     // checkstyle: stop method length check
 
+    /**
+     * Asserts that all keys in {@code value} have a corresponding change entry in {@code mapper}. Clears the changes
+     * on {@code mapper}.
+     * 
+     * @param values the values to assert the changes for
+     * @param mapper the mapper to assert the changes on, modified through {@link MyAasIvmlMapper#clearChanges()}
+     */
+    private static void assertAndClearChanges(Map<String, String> values, MyAasIvmlMapper mapper) {
+        mapper.assertChangesCount(values.size());
+        for (String name : values.keySet()) {
+            mapper.assertChange(n -> n.equals(name), ConfigurationChangeType.MODIFIED);
+        }
+        mapper.clearChanges();
+    }
+    
     /**
      * Tests the set/delete graph functions.
      * 

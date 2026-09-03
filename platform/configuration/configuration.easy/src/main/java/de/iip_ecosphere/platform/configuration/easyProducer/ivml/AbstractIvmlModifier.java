@@ -1243,7 +1243,6 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                     createAssignment(varDecl, ent.getValue(), target); 
                 }
                 projects.add(target);
-                notifyChange(var, ConfigurationChangeType.MODIFIED);
             } catch (ExecutionException e) {
                 history.rollback();
                 throw e;
@@ -1281,6 +1280,10 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                 getLogger().info("Writing IVML file {}", f);
             }
             reloadAndValidate(copies);
+            cfg = getVilConfiguration();
+            for (String varName: values.keySet()) {
+                notifyChange(getVariable(cfg, varName), ConfigurationChangeType.MODIFIED);
+            }
         }
     }
 

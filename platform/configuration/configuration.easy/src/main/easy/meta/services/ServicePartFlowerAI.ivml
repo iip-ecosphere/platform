@@ -5,7 +5,7 @@ project ServicePartFlowerAI {
    
    annotate BindingTime bindingTime = BindingTime::compile to .;
 
-   compound FlowerAiClient {
+   compound FlowerAiClient refines ServiceRelated {
        setOf(refTo(Dependency)) dependencies;
    }
    

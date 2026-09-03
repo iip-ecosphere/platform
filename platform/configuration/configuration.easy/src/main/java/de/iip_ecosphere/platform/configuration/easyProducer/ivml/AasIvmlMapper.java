@@ -170,10 +170,17 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         projectMap.put("Server", PRJ_NAME_ALLSERVICES);
         projectMap.put("Manufacturer", PRJ_NAME_ALLSERVICES);
         projectMap.put("Dependency", PRJ_NAME_ALLSERVICES);
+        projectMap.put("NameplateInfo", PRJ_NAME_ALLSERVICES);
+        projectMap.put("Manufacturer", PRJ_NAME_ALLSERVICES);
+        projectMap.put("StateMachine", PRJ_NAME_ALLSERVICES);
+        projectMap.put("ServiceRelated", PRJ_NAME_ALLSERVICES);
+        projectMap.put("EcsDevice", PRJ_NAME_ALLTYPES); // preliminary
+        projectMap.put("Plugin", PRJ_NAME_ALLTYPES); // preliminary
         projectMap.put("DataType", PRJ_NAME_ALLTYPES);
         projectMap.put("DisplayRow", PRJ_NAME_ALLTYPES);
         projectMap.put("DisplayPanel", PRJ_NAME_ALLTYPES);
         projectMap.put("AliasType", PRJ_NAME_ALLTYPES);
+        projectMap.put("TypeRelated", PRJ_NAME_ALLTYPES);
         PROJECT_MAPPING = Collections.unmodifiableMap(projectMap);
         
         Set<String> requiredTypes = new HashSet<>(); // not clean, would require reasoning or constraint analysis
