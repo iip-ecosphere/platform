@@ -1,48 +1,10 @@
 FROM dorowu/ubuntu-desktop-lxde-vnc:latest
-WORKDIR /root/platform/gen
 
-# ------ platform components -----------------------------------------------------------
-# Broker
-COPY broker/brokerJars/ brokerJars
-COPY broker/src/ src
-COPY broker/broker.sh broker.sh
-# Platform
-COPY plJars/ plJars
-COPY platform.sh platform.sh
-# ECS
-COPY ecsJars/ ecsJars
-COPY ecs.sh ecs.sh
-# Service Manger
-COPY svcJars/ svcJars
-COPY serviceMgr.sh serviceMgr.sh
-# Monitoring
-COPY monJars/ monJars
-COPY monitoring.sh monitoring.sh
-# UI
-COPY mgtUi/ mgtUi
-COPY mgtUi.sh mgtUi.sh
-# CLI
-COPY cli.sh cli.sh
-COPY deployment_plan.yaml artifacts/deployment_plan.yaml
-COPY SimpleMeshInstallTestingApp/target/SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar /root/platform/SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar
-# Starter scripts
-COPY brokerPl_starter.sh brokerPl_starter.sh
-COPY ecs_starter.sh ecs_starter.sh
-COPY serviceMgr_starter.sh serviceMgr_starter.sh
-COPY monitoring_starter.sh monitoring_starter.sh
-COPY ui_starter.sh ui_starter.sh
+RUN mkdir -p /root/.config
 
-# meta-model and model
-COPY target/easy /root/platform/target/easy
-COPY target/template/ /root/platform/src/main/easy/
+# ------ platform prerequisite -----------------------------------------------------------
 
-# getting install
-RUN mkdir -p /root/platform/Install \
- && wget -O /root/platform/install.tar.gz \
-    https://projects.sse.uni-hildesheim.de/oktoflow/install.tar.gz \
- && tar -xzf /root/platform/install.tar.gz -C /root/platform/Install
-
-RUN chmod 777 *.sh   
+WORKDIR /root/setup
 
 # ------ Eclipse ----------------------------------------------------------------------
 COPY eclipse/ /opt/eclipse
@@ -67,10 +29,6 @@ RUN python3 -m pip install websockets==11.0.2 pyyaml==6.0 pyflakes==3.2.0
 # ------ JAVA_HOME --------------------------------------------------------------------
 ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 ENV PATH=$JAVA_HOME/bin:$PATH
-
-# ------ Installing platform dependencies ---------------------------------------------
-RUN mkdir -p /root/platform/artifacts && chmod -f 777 /root/platform/artifacts
-RUN mvn -f /root/platform/Install/pom.xml -P DepsOnly install
 
 # ------ intalling newer version of firefox -------------------------------------------
 RUN apt-get update && apt-get install -y \
@@ -119,12 +77,72 @@ RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor 
 RUN apt-get update && apt-get install -y code \
     && rm -rf /var/lib/apt/lists/*
 
+# ------ platform operation -----------------------------------------------------------
+
+ARG PLATFORM_PATH="/opt/user/platform"
+
+WORKDIR ${PLATFORM_PATH}/gen
+
+# ------ platform components -----------------------------------------------------------
+# Broker
+COPY broker/brokerJars/ brokerJars
+COPY broker/src/ src
+COPY broker/broker.sh broker.sh
+# Platform
+COPY plJars/ plJars
+COPY platform.sh platform.sh
+# ECS
+COPY ecsJars/ ecsJars
+COPY ecs.sh ecs.sh
+# Service Manger
+COPY svcJars/ svcJars
+COPY serviceMgr.sh serviceMgr.sh
+# Monitoring
+COPY monJars/ monJars
+COPY monitoring.sh monitoring.sh
+# UI
+COPY mgtUi/ mgtUi
+COPY mgtUi.sh mgtUi.sh
+# CLI
+COPY cli.sh cli.sh
+COPY deployment_plan.yaml artifacts/deployment_plan.yaml
+COPY SimpleMeshInstallTestingApp/target/SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar ${PLATFORM_PATH}/SimpleMeshInstallTestingApp-0.1.0-SNAPSHOT-bin.jar
+
+# meta-model and model
+COPY target/easy ${PLATFORM_PATH}/target/easy
+COPY target/template/ ${PLATFORM_PATH}/src/main/easy/
+
+# getting install
+RUN mkdir -p ${PLATFORM_PATH}/Install \
+ && wget -O ${PLATFORM_PATH}/install.tar.gz \
+    https://projects.sse.uni-hildesheim.de/oktoflow/install.tar.gz \
+ && tar -xzf ${PLATFORM_PATH}/install.tar.gz -C ${PLATFORM_PATH}/Install  
+
+# ------ Installing platform dependencies ---------------------------------------------
+RUN mkdir -p ${PLATFORM_PATH}/artifacts && chmod -f 777 ${PLATFORM_PATH}/artifacts
+RUN mvn -f ${PLATFORM_PATH}/Install/pom.xml -P DepsOnly install
+
 # ------ Desktop setup ----------------------------------------------------------------
 # Icons
 COPY icon.xpm /opt/eclipse
 COPY eclipse.desktop /root/Desktop/eclipse.desktop
 COPY firefox.desktop /root/Desktop/firefox.desktop
 COPY vscode.desktop /root/Desktop/vscode.desktop
+
+# ------ Create user group ----------------------------------------------------------------
+RUN groupadd --gid 1001 platform
+RUN chown -R root:platform /opt/user/platform && \
+    chmod -R g+rwX /opt/user/platform && \
+    find /opt/user/platform -type d -exec chmod g+s {} \;
+
+# Starter scripts
+COPY brokerPl_starter.sh brokerPl_starter.sh
+COPY ecs_starter.sh ecs_starter.sh
+COPY serviceMgr_starter.sh serviceMgr_starter.sh
+COPY monitoring_starter.sh monitoring_starter.sh
+COPY ui_starter.sh ui_starter.sh
+COPY setup_desktop.sh setup_desktop.sh
+RUN chmod 777 *.sh 
 
 # running platform
 COPY platform.conf /etc/supervisor/conf.d/platform.conf
