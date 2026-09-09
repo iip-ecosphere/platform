@@ -4,7 +4,7 @@ project AllServices {
     
     annotate BindingTime bindingTime = BindingTime::compile to .;
     
-    Service mySourceService = JavaService {
+    JavaService mySourceService = {
         id = "SimpleSource",
         name = "Simple Data Source",
         description = "",
@@ -30,7 +30,7 @@ project AllServices {
         plugins = {refBy(BaSyx10Plugin)} // just for testing, would be specified individually at (AAS) connector
     };
     
-    Service myReceiverService = JavaService {
+    JavaService myReceiverService = {
         id = "SimpleReceiver",
         name = "Simple Data Receiver",
         description = "",
@@ -44,7 +44,7 @@ project AllServices {
     };
 
     // just the type for mgtUI testing    
-    Server myServer = JavaServer {
+    JavaServer myServer = {
       id = "myServer",
       description = "Unneeded server",
       ver = "0.0.1",
