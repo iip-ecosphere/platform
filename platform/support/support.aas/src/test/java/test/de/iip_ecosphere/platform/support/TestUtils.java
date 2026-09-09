@@ -122,19 +122,23 @@ public class TestUtils {
 
     /**
      * Executes test cases with junit. The system property {@code okto.test.timeout} determines the timeout for 
-     * terminating the JVM in milliseconds (may be {@code 0} for none).
+     * terminating the JVM in milliseconds (may be {@code 0} for none). The system property {@code okto.test.exit} 
+     * determines a {@code System.exit} after the last test if the value is not negative; the default is {@code -1} 
+     * disabling the {@code System.exit} call. If not negative, the value of {@code okto.test.exit} is also used for
+     * the eventual {@code System.exit} of {@code okto.test.timeout}, otherwise that uses {@code 0}.
      * 
      * @param args the test suites/cases to run
      */
     public static void main(String[] args) {
         int timeout = OsUtils.getIntProperty("okto.test.timeout", 0);
+        int exit = OsUtils.getIntProperty("okto.test.exit", -1);
         if (timeout > 0) {
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
                 
                 @Override
                 public void run() {
-                    System.exit(0);
+                    System.exit(exit < 0 ? 0 : exit);
                 }
             }, timeout);
         }
@@ -147,6 +151,9 @@ public class TestUtils {
             } catch (ClassNotFoundException e) {
                 System.out.println("Class " + s + " not found.");
             }
+        }
+        if (exit > 0) {
+            System.exit(exit);
         }
     }
 
