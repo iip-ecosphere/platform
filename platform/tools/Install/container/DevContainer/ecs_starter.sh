@@ -5,7 +5,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Log directory (create if missing)
-LOG_DIR="/root/platform/logs"
+LOG_DIR="/opt/user/platform/logs"
 mkdir -p "$LOG_DIR"
 
 sleep 20

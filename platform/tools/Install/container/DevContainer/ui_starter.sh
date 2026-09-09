@@ -3,7 +3,7 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-LOG_DIR="/root/platform/logs"
+LOG_DIR="/opt/user/platform/logs"
 mkdir -p "$LOG_DIR"
 
 while [ ! -f /run/iip-monitoring.pid ]

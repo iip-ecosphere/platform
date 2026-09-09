@@ -24,7 +24,7 @@ In contrast to the [manual installation](#manual-installation), we also provide 
 The platform can be installed on Windows and on Linux. Please note that special characters like whitespaces in folder names (in particular on Windows) may cause the installation or execution of the platform or examples to fail. The following steps are described and tested for Ubuntu 20.04.1 Linux. Installation on other Linux distributions or Windows may require adjustments.
 
 The platform is intended for distributed installation. In this explanation we exemplify such a distribution in terms of two machines: 
--  **server** (IP address 147.172.178.145) 
+-  **server** (IP address 127.0.0.1) 
 - and one **device** (IP address 147.172.178.143). 
 
 Please substitute the IP addresses in the steps below according to your local network setup. If you want to run the platform locally on a single machine, using `127.0.0.1` for both components is a valid choice. How to do configure the platform is describe in details in [**Adjust Platform Configuration**](#adjust-the-platform-configuration) (see below).
@@ -87,7 +87,7 @@ In general, there are several decisions that you may make now, e.g., the transpo
 
 #### Where will the central server be located? (required)
 
-As stated before, we assume that this will be 147.172.178.145, which is already the default IP in the platform configuration. If you want to use any other address, please open ``src/main/easy/TechnicalSetup.ivml``, search for ``platformServer`` (or 147.172.178.145) and adjust the IP there by the IP of your server.
+As stated before, we assume that this will be 127.0.0.1, which is already the default IP in the platform configuration. If you want to use any other address, please open ``src/main/easy/TechnicalSetup.ivml``, search for ``platformServer`` and adjust the IP there by the IP of your server.
 
 
 
@@ -124,7 +124,7 @@ and further we need to set the parent folder of the configuration model (called 
 
     modelBaseFolder = "/iip/actual";
     artifactsFolder = "/iip/actual/artifacts";
-    artifactsUriPrefix = "http://147.172.178.145:4200/download";
+    artifactsUriPrefix = "http://127.0.0.1:4200/download";
 
 To enable these settings, please go into the freeze-part at the end of ``TechnicalSetup.ivml`` and add
 

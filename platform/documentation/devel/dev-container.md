@@ -13,9 +13,10 @@ Pull the latest image from DockerHub:
 
 Start the container with: 
 
-    docker run -p 6080:80 -v /dev/shm:/dev/shm iipecosphere/dev-container:latest
+    docker run -p 6080:80 -e USER=usr -e PASSWORD=pwd -v /dev/shm:/dev/shm iipecosphere/dev-container:latest
  
 On your host machine, the development container is now available at  **`localhost:6080`** (open this in your browser).
+The current user in the container is **`usr`** with password **`pwd`**. To change them, modify the **`USER`** and **`PASSWORD`** parameters in the command above.
 
 ### Keeping changes (persistency)
 To preserve your changes inside the container, it must be properly stopped after the first start. First, check the container ID with:
