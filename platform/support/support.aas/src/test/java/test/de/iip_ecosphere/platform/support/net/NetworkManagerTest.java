@@ -301,6 +301,7 @@ public class NetworkManagerTest {
         ManagedServerAddress adr = mgr2.getPort("key");
         Assert.assertNotNull(adr);
         Assert.assertEquals(1232, adr.getPort());
+        f.delete();
     }
     
     /**
