@@ -49,6 +49,7 @@ public class PersistentLocalNetworkManagerTest {
         Assert.assertNotNull(mAddr);
         Assert.assertEquals(addr.getPort(), mAddr.getPort());
         Assert.assertEquals(addr.getHost(), mAddr.getHost());
+        FileUtils.deleteQuietly(f);
     }
 
 }
