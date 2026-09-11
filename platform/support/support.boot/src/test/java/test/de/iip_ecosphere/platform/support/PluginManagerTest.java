@@ -23,6 +23,7 @@ import org.junit.Assert;
 
 import de.iip_ecosphere.platform.support.plugins.URLPluginSetupDescriptor;
 import de.iip_ecosphere.platform.support.CollectionUtils;
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.plugins.ClasspathFilePluginSetupDescriptor;
 import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
@@ -140,12 +141,17 @@ public class PluginManagerTest {
 
         // the URL-based setup descriptor is used above, would lead to same result
         new ResourceClasspathPluginSetupDescriptor(resourceName);
+        // may have created a temporary file/folder
+        FileUtils.deleteQuietly(new File(FileUtils.getTempDirectory(), resourceName));
         
+        resourceName = "test-plugin.zip";
         // plugin jar extracted to temp, further contained files extracted there and classpath based on those
-        url = ResourceClasspathPluginSetupDescriptor.loadResourceSafe("test-plugin.zip");
+        url = ResourceClasspathPluginSetupDescriptor.loadResourceSafe(resourceName);
         Assert.assertNotNull(url);
         Assert.assertEquals(1, url.length);
         Assert.assertTrue(url[0].toString().contains(JAR));
+        // may have created a temporary file/folder
+        FileUtils.deleteQuietly(new File(FileUtils.getTempDirectory(), resourceName));
     }
 
     /**
