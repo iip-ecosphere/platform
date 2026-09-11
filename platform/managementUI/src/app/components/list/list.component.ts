@@ -515,6 +515,15 @@ export class ListComponent extends Utils implements OnInit {
       //component.showDropdown = false;
       component.category = this.currentTab;
       component.selectedType = this.selectedType;
+
+      // Subscribe to dialog close event
+      dialogRef.afterClosed().subscribe(result => {
+        const tabName = this.currentTab === '' ? 'Setup' : this.currentTab;
+        const selectedTab = this.visibleTabs.find(tab => tab.tabName === tabName);
+        if (selectedTab) {
+          this.getDisplayData(selectedTab?.tabName, selectedTab?.metaProject, selectedTab?.submodelElement)
+        }
+      });
     }
   }
 
@@ -526,7 +535,7 @@ export class ListComponent extends Utils implements OnInit {
       // Toast: upload finished
       this.snackBar.open(
         `Deleting: ${item.idShort}`,
-        'Close',
+        undefined,
         { 
           duration: 7000,
           horizontalPosition: 'center',

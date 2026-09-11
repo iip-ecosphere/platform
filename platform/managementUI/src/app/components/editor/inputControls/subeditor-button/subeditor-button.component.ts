@@ -64,7 +64,7 @@ export class SubeditorButtonComponent extends Utils implements OnInit {
       let uiGroups = this.ivmlFormatter.calculateUiGroupsInf(type, this.meta);
       if (uiGroups.length == 0) {
         let emptyType: IvmlRecordValue = createEmptyType(type.type);
-        this.saveEvent.emit({ idShort: type.name, value: emptyType, multipleInputs: type.multipleInputs });
+        this.saveEvent.emit({ index: -1, idShort: type.name, value: emptyType, multipleInputs: type.multipleInputs });
       } else {
         let parts = this.ivmlFormatter.partitionUiGroups(uiGroups);
         let dialogRef = this.subDialog.open(EditorComponent, this.configureDialog('80%', '80%', parts));
@@ -124,6 +124,7 @@ export class SubeditorButtonComponent extends Utils implements OnInit {
 }
 
 export interface SaveEvent {
+  index: number;
   idShort: string;
   value: IvmlRecordValue; 
   multipleInputs?: boolean;

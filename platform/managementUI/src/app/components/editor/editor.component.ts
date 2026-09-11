@@ -39,6 +39,7 @@ export class EditorComponent extends Utils implements OnInit {
   showInputs = true;
   showRequiredMsg = false;
   variableName = '';
+  updatedIndex: number = -1;
   ivmlType: string = "";
   feedback: string = "";
   requestFeedback: UserFeedback = {feedback: '', successful: false};
@@ -180,7 +181,7 @@ export class EditorComponent extends Utils implements OnInit {
     }
 
     let complexType: IvmlRecordValue = {};
-
+    this.showInputs = false;
     if (this.type) {
       this.transferUiGroups(this.uiGroups, complexType);
       if (!DataUtils.isEmpty(complexType)) {
@@ -195,7 +196,7 @@ export class EditorComponent extends Utils implements OnInit {
           }
           this.handleFeedback(this.requestFeedback);
         } else if (this.saveEvent) {
-          this.saveEvent.emit({ idShort: this.type.name, value: complexType, multipleInputs: this.type.multipleInputs });
+          this.saveEvent.emit({ index: this.updatedIndex, idShort: this.type.name, value: complexType, multipleInputs: this.type.multipleInputs });
           this.dialog.close();
         }
       }
@@ -212,9 +213,12 @@ export class EditorComponent extends Utils implements OnInit {
     let name = '';
     if (this.type && this.type.value) {
       prop = DataUtils.getProperty(this.type?.value, event.idShort);
-    } else {
-      prop = DataUtils.getEditorInputByName(this.uiGroups, event.idShort);
+    } 
+
+    if (!prop || prop.value === null) {
+       prop = DataUtils.getEditorInputByName(this.uiGroups, event.idShort);
     }
+    
     let host;
     if (event.multipleInputs) {
       host = { value: [] };
@@ -248,6 +252,7 @@ export class EditorComponent extends Utils implements OnInit {
     if (event.multipleInputs && (prop.value === null || prop.value === '')) {
       prop.value = [];
     }
+
     if (event.multipleInputs && prop.metaTypeKind == MTK_enum) {
       prop.value.push({value : resultProp?.value?.value, 
                        name: resultProp?.name?.value ?? resultProp?.value?.value, 
@@ -263,6 +268,8 @@ export class EditorComponent extends Utils implements OnInit {
                        name: resultProp?.name?.value || resultProp?.value?.value || name, 
                        _type: DataUtils.stripGenericType(type)});
     }
+
+    removeOldValue(prop.value, event.index);
   }
 
   private handleFeedback(feedback: UserFeedback) {
@@ -357,3 +364,12 @@ export class EditorComponent extends Utils implements OnInit {
     }
   }
 }
+
+function removeOldValue(value: any[],  index: number) {
+  if (index !== -1) {
+    const lastIndex = value.length -1;
+    value[index] = value[lastIndex];
+    value.splice(lastIndex, 1);
+  }
+}
+

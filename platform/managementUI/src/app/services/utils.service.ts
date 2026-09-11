@@ -171,9 +171,12 @@ export class Utils {
       } else {
         return element
       }
-    } else if(element.name){
+    } else if(element.name && !this.isObject(element.name)){
       // object with name
       return element.name;
+    } else if(element.name && element.name.value){
+      // object hod object with a name
+      return element.name.value;
     } else {
       // neseted AAS config value
       let idShort = '';
@@ -222,12 +225,17 @@ export class Utils {
           }
           idShort += this.getElementDisplayName(e, true);
         }
+      } else if (element.type && element.type.value) {
+        // AAS top-level value
+        idShort = element.type.value;
       } else if (this.isObject(element)) {
         const firstKey = Object.keys(element)[0];
-        if (Object.keys(element).length === 1) {
-          idShort = `{${firstKey}: '${element[firstKey].value}'}`
-        } else if (Object.keys(element).length > 1) {
-          idShort = `{${firstKey}: '${element[firstKey].value}', ... }`
+        if (element.hasOwnProperty("value") && element.value) {
+          if (Object.keys(element).length === 1) {
+            idShort = `{${firstKey}: '${element[firstKey].value}'}`
+          } else if (Object.keys(element).length > 1) {
+            idShort = `{${firstKey}: '${element[firstKey].value}', ... }`
+          }
         }
       } else {
         if (element && !DataUtils.isEmpty(element)) {
@@ -458,6 +466,21 @@ export class DataUtils {
   // public static findFieldType(_type: any, value: ResourceAttribute[]): Resource | undefined {
   //   return value.find(fieldType => fieldType.idShort === _type);
   // }
+
+  /**
+   * Update the Ivml type to match the meta type, in case of set, sequence, ref, or collection
+   * 
+   * @param type the type 
+   * @param metaType the metaType 
+   * @returns the update type matching the metaType
+   */
+  public static updateIvmlTypes(type: string, metaType: string) {
+    if (type == null || DataUtils.isIvmlSimpleType(metaType)) {
+      return type;
+    }
+    const geneticType = this.stripGenericType(metaType);
+    return metaType.replace(geneticType, type);
+  }
 
   /**
    * Strips the generic type name, returning the generics.

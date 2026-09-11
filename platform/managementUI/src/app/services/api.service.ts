@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PlatformArtifacts, PlatformResources, PlatformServices, ResourceAttribute, InputVariable, platformResponse, Resource, PlatformData, DEFAULT_AAS_OPERATION_TIMEOUT, JsonPlatformOperationResult, SubmodelElementCollection, allMetaTypes, MT_metaDisplayName, MT_metaTypeKind, MTK_container, MT_metaSize, DR_idShort, DR_type, MT_metaType, MTK_compound, MT_varValue, DR_displayName } from 'src/interfaces';
+import { PlatformArtifacts, PlatformResources, PlatformServices, ResourceAttribute, InputVariable, platformResponse, Resource, PlatformData, DEFAULT_AAS_OPERATION_TIMEOUT, JsonPlatformOperationResult, SubmodelElementCollection, allMetaTypes, MT_metaDisplayName, MT_metaTypeKind, MTK_container, MT_metaSize, DR_idShort, DR_type, MT_metaType, MTK_compound, MT_varValue, DR_displayName, MTK_enum, IVML_TYPE_PREFIX_enumeration } from 'src/interfaces';
 import { catchError, EMPTY, empty, firstValueFrom, map, Observable, Subject, throwError, timeout } from 'rxjs';
 import { Configuration, EnvConfigService } from './env-config.service';
 import { DataUtils, UtilsService } from './utils.service';
@@ -346,8 +346,10 @@ export class ApiService extends UtilsService {
       if (goOn && !allMetaTypes.includes(fieldName)) {
         let displayName = null;
         let val: any = null;
+        let valMetaType: any = null;
         if (this.isArray(value.value)) {
           displayName = DataUtils.getPropertyValue(value.value, MT_metaDisplayName);
+          valMetaType = DataUtils.getPropertyValue(value.value, MT_metaType);
           let fieldTypeKind = DataUtils.getPropertyValue(value.value, MT_metaTypeKind);
           if (fieldTypeKind == MTK_container) {
             let fieldSize = DataUtils.getPropertyValue(value.value, MT_metaSize);
@@ -364,7 +366,16 @@ export class ApiService extends UtilsService {
                 if (fProp && fProp.value) {
                   this.createRowValue(fProp.value, fVal, false, v => true);
                   if (!fVal[DR_idShort]) { // if already set from else below, don't overwrite
-                    let fId = fVal["id"] || fVal["name"] || fVal["type"] || String(i);
+                    const getValue = (data: any) => {
+                      if (!data) {
+                        return data;
+                      } else if (data.hasOwnProperty("value")) {
+                        return data.value;
+                      } else if (!this.isObject(data)) {
+                        return data;
+                      }
+                    }
+                    let fId = getValue(fVal["id"]) || getValue(fVal["name"]) || getValue(fVal["type"]) || String(i);
                     fVal[DR_idShort] = fId;
                   }
                   this.addPropertyFromData(fVal, DR_type, fProp.value, MT_metaType);
@@ -375,8 +386,14 @@ export class ApiService extends UtilsService {
           } else if (fieldTypeKind == MTK_compound) {
             val = {};
             this.createRowValue(value.value, val, false, v => true);
+          } else if (fieldTypeKind == MTK_enum) {
+            val = DataUtils.getPropertyValue(value.value, MT_varValue);
+            if (val) {
+              val = IVML_TYPE_PREFIX_enumeration + (valMetaType || "") + '.' + val;
+            } 
           } else {
             val = DataUtils.getPropertyValue(value.value, MT_varValue);
+            //val = DataUtils.updateIvmlTypes(val, valMetaType);
           }
         } else {
           result.idShort = value.value;
@@ -391,7 +408,7 @@ export class ApiService extends UtilsService {
           }
           result.push(instance);
         } else if (fieldName) {
-          result[fieldName] = val;
+          result[fieldName] = {value: val, _type: valMetaType};
         }
       }
     }

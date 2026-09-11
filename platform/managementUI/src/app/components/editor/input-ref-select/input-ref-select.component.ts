@@ -230,6 +230,7 @@ export class InputRefSelectComponent extends Utils implements OnInit {
     let dialogRef = this.subDialog.open(EditorComponent, this.configureDialog('80%', '80%', parts));
     let component = dialogRef.componentInstance;
     component.type = input;
+    component.updatedIndex = editIndex ?? undefined;
     component.metaBackup = this.meta;
     component.topLevel = false;
     component.saveEvent = this.saveEvent;
@@ -300,6 +301,7 @@ export class InputRefSelectComponent extends Utils implements OnInit {
 }
 
 export interface SaveEvent {
+  index: number;
   idShort: string;
   value: IvmlRecordValue; 
   multipleInputs?: boolean;
