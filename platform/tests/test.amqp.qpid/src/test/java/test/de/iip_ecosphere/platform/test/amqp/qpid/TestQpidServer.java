@@ -91,11 +91,18 @@ public class TestQpidServer extends AbstractTestServer {
                 // we just ignore this
             }
             if (dispose) {
-                String workDir = System.getProperty("QPID_WORK");
-                if (workDir != null) {
-                    FileUtils.deleteQuietly(new File(workDir));
-                }
+                cleanup();
             }
+        }
+    }
+
+    /**
+     * Cleaning up the work directory.
+     */
+    private static void cleanup() {
+        String workDir = System.getProperty("QPID_WORK");
+        if (workDir != null) {
+            FileUtils.deleteQuietly(new File(workDir));
         }
     }
 
@@ -111,6 +118,7 @@ public class TestQpidServer extends AbstractTestServer {
             FileUtils.deleteQuietly(tmpWork);
             System.setProperty("QPID_WORK", tmpWork.getAbsolutePath());
         } // leave it as it was, only within process-based plugin executions
+        cleanup();
         TestQpidServer server = new TestQpidServer(new ServerAddress(Schema.IGNORE, getInteger(args, 8883)));
         server.scheduleShutdownHook(true);
         server.start();
