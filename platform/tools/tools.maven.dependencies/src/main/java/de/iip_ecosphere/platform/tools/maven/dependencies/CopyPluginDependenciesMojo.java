@@ -206,6 +206,7 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
                                 File srcFile = new File(outputDirectory, token);
                                 File tgtFile = new File(outputDirectory, origToken);
                                 if (!tgtFile.exists() || tgtFile.lastModified() < srcFile.lastModified()) {
+                                    tgtFile.getParentFile().mkdirs();
                                     try {
                                         Files.copy(srcFile, tgtFile);
                                     } catch (IOException e) {
