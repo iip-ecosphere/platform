@@ -548,7 +548,6 @@ public interface ModelAccess {
      * Returns an enum property value.
      * 
      * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
-     * @param format the target date format (see {@link TimeUtils})
      * @param enumType enumeration target type
      * @return the property value
      * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
@@ -563,7 +562,6 @@ public interface ModelAccess {
      * 
      * @param qName the qualified name of the property (composed using {@link #getQSeparator()}).
      * @param lifetime cache of a node value in the cache, 0 = no caching, negative = forever, positive = lifetime
-     * @param format the target date format (see {@link TimeUtils})
      * @param enumType enumeration target type
      * @return the property value
      * @throws IOException in case that the access/conversion fails or reading properties is not implemented (see 
