@@ -27,17 +27,17 @@ For performing a release...
   - `support.http-apache`
   - `support.websocket-websocket`
   - `support.processInfo-oshi`
-  - `support.meter-micrometer`
+  - `support.metrics-micrometer`
   - `support.bytecode-bytebuddy`
   - `support.aas`
   - `support.sysmetrics.bitmotec`
   - `support.sysmetrics.plcnext`
-  - `support.aas.basyx`
-  - `support.aas.basyx.server`
+  - `support.aas.basyx` (for now, may require 2 runs)
+  - `support.aas.basyx.server` (for now, may require 2 runs)
   - `support.aas.basyx1_0`
   - `support.aas.basyx2.commons`
-  - `support.aas.basyx2.server`
-  - `support.aas.basyx2`
+  - `support.aas.basyx2.server` (for now, may require 2 runs)
+  - `support.aas.basyx2` (for now, may require 2 runs)
   - `support.iip-aas`
   - `transport`
   - `test.amqp.qpid`
@@ -50,22 +50,22 @@ For performing a release...
   - `connectors`  
   - `connectors.opcuav1`  
   - `connectors.mqttv3`  
-  - `services.environment` (with `-DskipTests`)
+  - `services.environment` (may fail if qpid remainders are still there, e.g., /tmp/qpid folder)
   - `services.environment.spring`
   - `services.spring.loader`
   - `services`
-  - `test.simplestream.spring`
+  - `test.simplestream.spring` (for now, may require 2 runs)
   - `services.spring`
   - `kiServices.functions`  
-  - `kiServices.rapidminer.rtsaFake` (with `-DskipTests`) 
-  - `kiServices.rapidminer.rtsa` (with `-DskipTests`) 
+  - `kiServices.rapidminer.rtsaFake` (if neither `JAVA8_HOME` is set to the JDK8 home directory nor `-Diip.test.java8` is set to the java binary in JDK8, `-DskipTests` may be needed) 
+  - `kiServices.rapidminer.rtsa` (if neither `JAVA8_HOME` is set to the JDK8 home directory nor `-Diip.test.java8` is set to the java binary in JDK8, `-DskipTests` may be needed)
   - `security.services.kodex`  
   - `deviceMgt`
   - `deviceMgt.basicRegistry`
   - `deviceMgt.s3mock`
   - `ecsRuntime`
   - `ecsRuntime.docker`
-  - `monitoring` (with `-DskipTests`)
+  - `monitoring`
   - `monitoring.prometheus`
   - `configuration.interface`
   - `configuration.easy` (initial build steps see [README.md](../configuration/configuration.easy/README.md))
