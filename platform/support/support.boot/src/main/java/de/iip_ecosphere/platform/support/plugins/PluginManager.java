@@ -174,10 +174,7 @@ public class PluginManager {
                 }
             }
         }
-        if (null == result) {
-            LoggerFactory.getLogger(PluginManager.class).error("Cannot find/instantiate plugin {}", 
-                (null == cls ? id : cls.getName()));
-        }
+        // no logging if null for non-plugin-based execution
         return result;
     }
 
