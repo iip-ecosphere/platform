@@ -70,6 +70,52 @@ public class NetUtils {
     }
 
     /**
+     * Returns, if possible, {@code count} different {@link #getEphemeralPort() ephemeral ports} with a default timeout
+     * of {@code 200} ms per port.
+     *  
+     * @param count the number of ports to return
+     * @return the ports, may be empty if {@code count} is {@code 0}, may be <b>null</b> if not enough different 
+     *     ephemeral ports were found within the given timeout or {@code count} was negative
+     * @see #getEphemeralPorts(int, long)
+     */
+    public static int[] getEphemeralPorts(int count) {
+        return getEphemeralPorts(count, 200);
+    }
+
+    /**
+     * Returns, if possible, {@code count} different {@link #getEphemeralPort() ephemeral ports}.
+     *  
+     * @param count the number of ports to return
+     * @param timeoutPerPort the timeout per port in ms, if {@code count} times {@code timeoutPerPort} elapses, the 
+     *     function stops.
+     * @return the ports may, be empty if {@code count} is {@code 0}, may be <b>null</b> if not enough different 
+     *     ephemeral ports were found within the given timeout or {@code count} was negative
+     * @see #getEphemeralPort()
+     */
+    public static int[] getEphemeralPorts(int count, long timeoutPerPort) {
+        int[] result = null;
+        if (count >= 0) { 
+            result = new int[count];
+            int pos = 0;
+            long endByTimeout = System.currentTimeMillis() + count * timeoutPerPort;
+            while (pos < result.length && System.currentTimeMillis() < endByTimeout) {
+                result[pos] = getEphemeralPort();
+                boolean contains = false;
+                for (int i = 0; !contains && i < pos; i++) {
+                    contains = result[i] == result[pos];
+                }
+                if (!contains) {
+                    pos++;
+                }
+            }
+            if (pos < result.length) {
+                result = null;
+            }
+        }
+        return result;
+    }
+
+    /**
      * Returns the own IP address filtered by the given decimal netMask/regular expression.
      * 
      * @param netMask the net mask, regular expression; if {@link #NO_MASK}, empty or <b>null</b>, 
