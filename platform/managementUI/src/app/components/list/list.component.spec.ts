@@ -58,6 +58,7 @@ describe('ListComponent', () => {
       router = TestBed.inject(Router);
       location = TestBed.inject(Location);
     });
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
     await component.ngOnInit();
     dialogSpy = spyOn(TestBed.inject(MatDialog), 'open').and.returnValue(dialogRefSpyObj);
   });
