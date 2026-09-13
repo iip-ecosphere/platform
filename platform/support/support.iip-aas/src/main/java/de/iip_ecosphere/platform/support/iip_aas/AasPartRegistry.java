@@ -620,18 +620,19 @@ public class AasPartRegistry {
             if (regPortSame) { // overwrite if not supported
                 regPortSame = AasFactory.getInstance().supportsSamePorts();
             }
+            int[] ports = NetUtils.getEphemeralPorts(5); // if possible, distinct ports, else ephemeral as fallback
             result.getServer().setHost(ServerAddress.LOCALHOST);
-            result.getServer().setPort(NetUtils.getEphemeralPort());
+            result.getServer().setPort(NetUtils.getPortSafe(ports, 0));
             result.getSubmodelServer().setHost(ServerAddress.LOCALHOST);
-            result.getSubmodelServer().setPort(NetUtils.getEphemeralPort());
+            result.getSubmodelServer().setPort(NetUtils.getPortSafe(ports, 1));
             result.getRegistry().setHost(ServerAddress.LOCALHOST);
             result.getRegistry().setPort(regPortSame ? result.getServer().getPort() 
-                : NetUtils.getEphemeralPort());
+                : NetUtils.getPortSafe(ports, 2));
             result.getSubmodelRegistry().setHost(ServerAddress.LOCALHOST);
             result.getSubmodelRegistry().setPort(regPortSame ? result.getServer().getPort() 
-                : NetUtils.getEphemeralPort());
+                : NetUtils.getPortSafe(ports, 3));
             result.getImplementation().setHost(ServerAddress.LOCALHOST);
-            result.getImplementation().setPort(NetUtils.getEphemeralPort()); // could both be the same?
+            result.getImplementation().setPort(NetUtils.getPortSafe(ports, 4)); // could both be the same?
             return result;
         }
 
