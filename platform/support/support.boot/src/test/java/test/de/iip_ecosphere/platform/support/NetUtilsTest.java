@@ -69,6 +69,22 @@ public class NetUtilsTest {
     }
 
     /**
+     * Tests {@link NetUtils#getPortSafe(int[], int)}.
+     */
+    @Test
+    public void testGetPortSafe() {
+        Assert.assertTrue(NetUtils.getPortSafe(null, 0) > 0); // ephemeral
+        int[] ports = new int[0];
+        Assert.assertTrue(NetUtils.getPortSafe(ports, 0) > 0); // ephemeral
+        Assert.assertTrue(NetUtils.getPortSafe(ports, -1) > 0); // ephemeral
+        ports = new int[] {1024, 1025};
+        Assert.assertTrue(NetUtils.getPortSafe(ports, ports.length) > 0); // ephemeral
+        Assert.assertTrue(NetUtils.getPortSafe(ports, -1) > 0); // ephemeral
+        Assert.assertEquals(NetUtils.getPortSafe(ports, 0), ports[0]); 
+        Assert.assertEquals(NetUtils.getPortSafe(ports, 1), ports[1]); 
+    }
+    
+    /**
      * Tests {@link NetUtils#getOwnHostname()}.
      */
     @Test

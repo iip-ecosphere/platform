@@ -116,6 +116,24 @@ public class NetUtils {
     }
 
     /**
+     * Returns the port at position {@code index} from {@code ports}. 
+     * 
+     * @param ports the ports array as, e.g., returned by {@link #getEphemeralPorts(int)}, may be <b>null</b>
+     * @param index the index of the port in {@code ports}, may be negative or larger than the range of {@code ports}
+     * @return the port, an {@link #getEphemeralPort() ephemeral port} if {@code port} is negative, larger than the 
+     *   range of {@code ports} or {@code ports} is <b>null</b>
+     */
+    public static int getPortSafe(int[] ports, int index) {
+        int result;
+        if (ports == null || index < 0 || index >= ports.length) {
+            result = getEphemeralPort();
+        } else {
+            result = ports[index];
+        }
+        return result;
+    }
+
+    /**
      * Returns the own IP address filtered by the given decimal netMask/regular expression.
      * 
      * @param netMask the net mask, regular expression; if {@link #NO_MASK}, empty or <b>null</b>, 
