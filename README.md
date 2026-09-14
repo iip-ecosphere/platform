@@ -17,16 +17,11 @@ For installation and first steps, see [install guide](platform/documentation/INS
 
 ## News
 
+* Preparations for release of version 0.8.1 started: EASy-Producer version 1.3.11 released
 * Updated list of tutorials/material in [the tutorials collection](platform/documentation/TUTORIALS.md).
 * Upcoming: Fast track build processes for apps, in particular through artifact update shortcuts in build processes and runtime update of Python services (see [app debugging](platform/documentation/devel/debugApps.md) for details). 
 * April 26: The new installation overview for oktoflow in terms of the [ReGaP installation flowchart](https://regap.de/community-assets/oktoflow-Installations-Flowchart/) is online.
-* 2026/04/26: Release of octoflow version 0.8. The artifacts are published to [Maven Central](https://mvnrepository.com/artifact/de.iip-ecosphere.platform), the platform handbook to [Zenodo](https://zenodo.org/records/8429785) and the containers on [Dockerhub](https://hub.docker.com/u/iipecosphere) after they are re-built based on this tag. Versioned installation can be found [here](https://projects.sse.uni-hildesheim.de/oktoflow/). Preparing `0.8.1-SNAPSHOT`.
-* Management UI supports oktoflow app modeling and realization , from empty model to integrated app. ReGaP-Video will follow soon.
-* ReGaP: Influx/Grafana based dashboarding for oktoflow apps via [oktoflow2grafana](https://github.com/iip-ecosphere/oktoflow2grafana) is working.
-* Updated (more agile) documentation of [configuration concepts](documentation/concepts/concepts.MD) as well as completely revised [platform handbook](documentation/PlatformHandbook.pdf)
-* INFLUX DB v3 connector for ReGaP.
-* Upcoming support for Asset Administration Shells metamodel v3 through BaSyx2
-* Support for Python 3.13 and virtual environments
+* On UI-Level: Upcoming support for Asset Administration Shells metamodel v3
 
 ## Overview
 
