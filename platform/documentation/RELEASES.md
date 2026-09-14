@@ -20,7 +20,6 @@ In progress:
 
 In progress:
 
-* [#214](https://github.com/iip-ecosphere/platform/issues/214): Changing/Updating configuration elements from the management UI
 * [#200](https://github.com/iip-ecosphere/platform/issues/200): Harden development container
 
 Improvements:
@@ -39,6 +38,7 @@ Improvements:
 * [#197](https://github.com/iip-ecosphere/platform/issues/197): Resources folder for apps built by management UI
 * [#198](https://github.com/iip-ecosphere/platform/issues/198): Create identity stores via IVML
 * [#199](https://github.com/iip-ecosphere/platform/issues/199): Log instantiation trace on management UI
+* [#214](https://github.com/iip-ecosphere/platform/issues/214): Changing/Updating configuration elements from the management UI
 
 Changes:
 * In particular if the start sequence state above is activated, source services shall not ingest data before/outside the `RUNNING` state 

@@ -54,8 +54,9 @@ The default folder for resources to be packaged directly into application artifa
 Ensure that the Maven `platformDependencies` are installed (see [install](../../tools/Install))
 
   * `mvn install`, for component updates `mvn -U install`
-  
-For running tests with plugins (tests are implied in `mvn install`) within the git workspace, please build all required plugins stated in the respective pom first. If built in the git workspace, the tests try to do a shortcut using the local JARs rather than those from Maven, which fails if there are no local builds.
+  * The initial build of `configuration.easy` requires multiple steps. Please refer to the [component documentation](../configuration/configuration.easy/README.md).
+
+A shortcut build path for the absolutely required components excluding all potential alternatives is summarized in the [release documentation](RELEASE.md). For running tests with plugins (tests are implied in `mvn install`) within the git workspace, please build all required plugins stated in the respective pom first. If built in the git workspace, the tests try to do a shortcut using the local JARs rather than those from Maven, which fails if there are no local builds.
 
 ## Failures
 
