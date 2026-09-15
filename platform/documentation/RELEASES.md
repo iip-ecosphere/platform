@@ -16,11 +16,7 @@ In progress:
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 * [#202](https://github.com/iip-ecosphere/platform/issues/202): Update dependencies/libraries (woth plugins)
 
-### Version 0.8.1 (Fall '26)
-
-In progress:
-
-* [#200](https://github.com/iip-ecosphere/platform/issues/200): Harden development container
+### Version 0.8.1 (2026/09/15)
 
 Improvements:
 * Determined start sequence for standalone apps/tests: sinks, transformers/probes, sources
@@ -39,6 +35,7 @@ Improvements:
 * [#198](https://github.com/iip-ecosphere/platform/issues/198): Create identity stores via IVML
 * [#199](https://github.com/iip-ecosphere/platform/issues/199): Log instantiation trace on management UI
 * [#214](https://github.com/iip-ecosphere/platform/issues/214): Changing/Updating configuration elements from the management UI
+* [#200](https://github.com/iip-ecosphere/platform/issues/200): Harden development container
 
 Changes:
 * In particular if the start sequence state above is activated, source services shall not ingest data before/outside the `RUNNING` state 
