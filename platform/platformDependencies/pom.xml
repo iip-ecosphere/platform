@@ -232,7 +232,7 @@
     <org.jacoco.maven.jacoco.version>0.8.12</org.jacoco.maven.jacoco.version>
     <org.spring.boot.maven.version>2.4.2</org.spring.boot.maven.version>
 
-    <net.ssehub.easyProducer.version>1.3.11-SNAPSHOT</net.ssehub.easyProducer.version>
+    <net.ssehub.easyProducer.version>1.3.11</net.ssehub.easyProducer.version>
 
     <maven.compiler.target>17</maven.compiler.target>
     <maven.compiler.source>17</maven.compiler.source>
