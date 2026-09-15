@@ -1,6 +1,11 @@
 #!/bin/bash
 
 USER_NAME="${USER:-osboxes}"
+
+# Remove osboxes from privileged groups
+gpasswd -d "$USER_NAME" sudo || true
+gpasswd -d "$USER_NAME" admin || true
+
 USER_HOME="/home/${USER_NAME}"
 DESKTOP="${USER_HOME}/Desktop"
 
