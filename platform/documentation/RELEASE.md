@@ -6,8 +6,8 @@ For performing a release...
 * Inform all developing parties that a release is on the way and no commits shall be done until the release is completed (assuming that all involved parties were informed before that outstanding commits shall be done so that the release can happen in a clean CI state).
 * Save relevant artifacts: install, documentation, container
 * Change the (non-SNAPSHOT) version number using the `ChangePomVersion` tool in `MvnCentral`, e.g., `java ChangePomVersion <pathToPlatform> --oldParentPOMVersion=0.7.1-SNAPSHOT --newParentPOMVersion=0.8.0 --oldPOMVersion=0.7.1-SNAPSHOT --newPOMVersion=0.8.0 --properties=iip.version --excludes=.*[/,\\]target[/,\\].*` Change manually
+  - the version number of EASy-Producer in `platformDependencies`
   - the version number in `DataTypes.ivml` in `configuration.configuration`. 
-  - the version number in `tools.pluginEnv`
 * For a minimal validation up to the configuration layer, build and deploy locally so that your IDE can initially build the remaining components
   - `tools.lib`
   - `tools.maven.python`
@@ -73,10 +73,14 @@ For performing a release...
   - `platform`
   - `managementUi`
   - `examples`
-* Check/adjust) versions in `tools.pluginEnv`.
 * Finalize platform, prepare record on Zenodo
 * **Check** platform dependencies installation POM in **Install** package! 
-* First, commit `tooks.lib` and the maven plugins in `tool`, then platform dependencies, then `support` and the rest. In most of the other cases, only changes to the POM parent entry are required. 
+* First, commit 
+  - `tools.lib`
+  - the Maven plugins in `tools`
+  - the parent poms in `platformDependencies`, `platformDependenciesBOM`, `platformDependenciesSpring` 
+  - `support` and `test`
+  - the the rest. 
 * Change version of IIP-examples to corresponding release commit
 * Check the CI that all builds are completed, all required plugins are there. Generated test-apps or examples will not be released.
 * Deploy to Maven central. On the deployment machine
