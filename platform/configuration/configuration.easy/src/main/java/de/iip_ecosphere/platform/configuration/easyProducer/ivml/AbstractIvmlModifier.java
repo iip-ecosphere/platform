@@ -201,7 +201,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
     
     /**
      * Returns the IVML subpath for the given project for an intended change, i.e., this method can enable writing to 
-     * {@link #isAllowedForModification(Project) modifiable IVML projects).
+     * {@link #isAllowedForModification(Project)} modifiable IVML projects).
      * 
      * @param project the project
      * @return the subpath, may be the name of {@code project} for a top-level or a non-writable project, may be
@@ -245,7 +245,6 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      * 
      * @param prj the project
      * @return {@code true} allowed, {@code false} else
-     * @see #getVariableTarget(Project, IDatatype, String, List)
      */
     protected boolean isAllowedForModification(Project prj) {
         return false; 
