@@ -32,12 +32,12 @@ For performing a release...
   - `support.aas`
   - `support.sysmetrics.bitmotec`
   - `support.sysmetrics.plcnext`
-  - `support.aas.basyx` (for now, may require 2 runs)
-  - `support.aas.basyx.server` (for now, may require 2 runs)
+  - `support.aas.basyx`
+  - `support.aas.basyx.server`
   - `support.aas.basyx1_0`
   - `support.aas.basyx2.commons`
-  - `support.aas.basyx2.server` (for now, may require 2 runs)
-  - `support.aas.basyx2` (for now, may require 2 runs)
+  - `support.aas.basyx2.server`
+  - `support.aas.basyx2`
   - `support.iip-aas`
   - `transport`
   - `test.amqp.qpid`
@@ -54,7 +54,7 @@ For performing a release...
   - `services.environment.spring`
   - `services.spring.loader`
   - `services`
-  - `test.simplestream.spring` (for now, may require 2 runs)
+  - `test.simplestream.spring`
   - `services.spring`
   - `kiServices.functions`  
   - `kiServices.rapidminer.rtsaFake` (if neither `JAVA8_HOME` is set to the JDK8 home directory nor `-Diip.test.java8` is set to the java binary in JDK8, `-DskipTests` may be needed) 
@@ -72,7 +72,7 @@ For performing a release...
   - `configuration.maven`
   - `platform`
   - `managementUi`
-  - `examples`
+  - `examples`  (may require 2 runs)
 * Finalize platform, prepare record on Zenodo
 * **Check** platform dependencies installation POM in **Install** package! 
 * First, commit 
