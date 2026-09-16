@@ -131,7 +131,22 @@ class CliBackend {
 
         private boolean hadException = false;
         private boolean expertMode = false;
-        
+
+        /**
+         * Creates a command interpreter.
+         */
+        AbstractCommandInterpreter() {
+        }
+
+        /**
+         * Creates a command interpreter with value takeover from the parent.
+         * 
+         * @param parent the parent to take values over
+         */
+        AbstractCommandInterpreter(AbstractCommandInterpreter parent) {
+            expertMode = parent.expertMode;
+        }
+
         /**
          * Prints the help.
          * 

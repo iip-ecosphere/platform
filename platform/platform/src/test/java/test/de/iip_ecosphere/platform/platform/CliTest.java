@@ -551,6 +551,12 @@ public class CliTest {
      * @param expectedErrors the expected number of errors
      */
     private static void test(String[] cmds, ErrorConsumer errorConsumer, int expectedErrors) {
+        if (Cli.ENABLE_EXPERT_MODE) {
+            String[] tmp = new String[cmds.length + 1];
+            tmp[0] = "--expert";
+            System.arraycopy(cmds, 0, tmp, 1, cmds.length);
+            cmds = tmp;
+        }
         String allCmds = "";
         for (String c: cmds) {
             allCmds += c + "\n";

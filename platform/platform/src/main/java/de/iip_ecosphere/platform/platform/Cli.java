@@ -94,6 +94,22 @@ public class Cli extends CliBackend {
     private abstract static class AbstractHelpCommandInterpreter extends AbstractCommandInterpreter {
 
         /**
+         * Creates a command interpreter.
+         */
+        AbstractHelpCommandInterpreter() {
+            super();
+        }
+
+        /**
+         * Creates a command interpreter with value takeover from the parent.
+         * 
+         * @param parent the parent to take values over
+         */
+        AbstractHelpCommandInterpreter(AbstractCommandInterpreter parent) {
+            super(parent);
+        }
+        
+        /**
          * Prints the help.
          * 
          * @param provider the command provider
@@ -179,7 +195,7 @@ public class Cli extends CliBackend {
                 if (null == resourceId) {
                     error("No resourceId given.");
                 } else {
-                    ServicesCommandInterpreter sci = new ServicesCommandInterpreter();
+                    ServicesCommandInterpreter sci = new ServicesCommandInterpreter(this);
                     exit = sci.interpret(provider, Level.SERVICES, resourceId);
                 }
                 break;
@@ -188,12 +204,12 @@ public class Cli extends CliBackend {
                 if (null == resourceId) {
                     error("No resourceId given.");
                 } else {
-                    ContainerCommandInterpreter cci = new ContainerCommandInterpreter();
+                    ContainerCommandInterpreter cci = new ContainerCommandInterpreter(this);
                     exit = cci.interpret(provider, Level.CONTAINER, resourceId);
                 }
                 break;
             case "resources":
-                ResourcesCommandInterpreter rci = new ResourcesCommandInterpreter();
+                ResourcesCommandInterpreter rci = new ResourcesCommandInterpreter(this);
                 exit = rci.interpret(provider, Level.RESOURCES);
                 break;
             case "deploy":
@@ -317,6 +333,15 @@ public class Cli extends CliBackend {
         private boolean changedArtifacts = false;
         private ServicesClient client;
 
+        /**
+         * Creates a command interpreter with value takeover from the parent.
+         * 
+         * @param parent the parent to take values over
+         */
+        ServicesCommandInterpreter(AbstractCommandInterpreter parent) {
+            super(parent);
+        }
+        
         @Override
         protected void initialize(String... args) throws IOException {
             client = getServicesFactory().create(args[0], "");
@@ -438,6 +463,15 @@ public class Cli extends CliBackend {
         private boolean changed = false;
         private EcsClient client;
         
+        /**
+         * Creates a command interpreter with value takeover from the parent.
+         * 
+         * @param parent the parent to take values over
+         */
+        ContainerCommandInterpreter(AbstractCommandInterpreter parent) {
+            super(parent);
+        }
+        
         @Override
         protected void initialize(String... args) throws IOException {
             client = getEcsFactory().create(args[0]);
@@ -479,6 +513,15 @@ public class Cli extends CliBackend {
      * @author Holger Eichelberger, SSE
      */
     private static class ResourcesCommandInterpreter extends AbstractHelpCommandInterpreter {
+        
+        /**
+         * Creates a command interpreter with value takeover from the parent.
+         * 
+         * @param parent the parent to take values over
+         */
+        ResourcesCommandInterpreter(AbstractCommandInterpreter parent) {
+            super(parent);
+        }
         
         @Override
         protected boolean interpretFurther(CommandProvider provider, Level level, String cmd) 
