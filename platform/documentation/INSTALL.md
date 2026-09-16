@@ -77,7 +77,7 @@ The trace above illustrates a shell-like interaction of the user with the CLI. T
  
 **Resources** are added automatically when an ECS runtime is executed. The trace above shows the properties listing for a resource with identifier `a005056C00008`. 
 
-**Containers** and **services** can be managed by stating the respective resource identifier after the command. Before starting containers/services, the respective item must be added to the platform, i.e., an add command for a container image or a service artifact must be specified. The items are stated in terms of URIs, at the moment usually files on the local file system.
+**Containers** and **services** can be managed by stating the respective resource identifier after the command. Before starting containers/services, the respective item must be added to the platform, i.e., an add command for a container image or a service artifact must be specified. The items are stated in terms of URIs, at the moment usually files on the local file system. As service start commands have high technical requirements, in particular for distributed execution, these commands are since version 0.8.2 only available via an expert mode to be set when starting the CLI.
 
 ### Typical sequence of CLI commands
 For illustration, we now present a one typical sequence of CLI commands. We assume that in the example installation environment `a005056C00008` is a listed resource and `http://localhost/container.tgz` is a valid container artifact with name `myContainer` as indicated by the associated deployment descriptor.
@@ -103,7 +103,7 @@ Container `myContainer` has the Service Manager installed and will execute subse
       ..
     exit
     
-The CLI is primarily intended for automation purposes and testing. While there are commands to start individual services or an entire application, all prerequisites for these commands must be met so that they can execute successfully. These prerequisites are taken into account by the `deploy`/`undeploy` commands that execute entire deployment plans as shown above. Both, the application artifact must be available in the central artifacts directory, the deployment plan may be referenced by URL or as local file name. We intend to hide the individual service start commands through an expert or testing mode in future versions.    
+The CLI is primarily intended for automation purposes and testing. While there are commands to start individual services or an entire application, all prerequisites for these commands must be met so that they can execute successfully. These prerequisites are taken into account by the `deploy`/`undeploy` commands that execute entire deployment plans as shown above. Both, the application artifact must be available in the central artifacts directory, the deployment plan may be referenced by URL or as local file name. Due to high technical prerequisites, the individual service start commands require since version 0.8.2 an mode flag on CLI startup.    
       
 ### Communication with Containers
 Please note that accessing, starting, and stopping containers or services requires specifying the corresponding resource identifier. When exiting the CLI, the CLI container will end. The platform container will continue operating until you stop it explicitly, e.g., using `docker ps` to obtain the container identifier of the running container and `docker stop <id>` to ultimately stop the container.

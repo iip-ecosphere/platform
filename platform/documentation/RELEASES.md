@@ -4,7 +4,6 @@
 
 In progress:
 
-* [#205](https://github.com/iip-ecosphere/platform/issues/205): Hide service start/stop commands in CLI
 * [#192](https://github.com/iip-ecosphere/platform/issues/192): More flexible connector value handling
 * [#180](https://github.com/iip-ecosphere/platform/issues/180): Add application templates to UI
 * [#183](https://github.com/iip-ecosphere/platform/issues/183): Enable AAS metamodel v3 in mgmt UI
@@ -15,6 +14,9 @@ In progress:
 * [#122](https://github.com/iip-ecosphere/platform/issues/122): Transparent encryption, RBAC on AAS (incl. UI authentication)
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 * [#202](https://github.com/iip-ecosphere/platform/issues/202): Update dependencies/libraries (woth plugins)
+
+Changes:
+* [#205](https://github.com/iip-ecosphere/platform/issues/205): Hide service start/stop commands in CLI, i.e., service commands like `add`, `startService` and `startAll` now require `--expert` due to their technical prerequisites. Please use deployment plans instead.
 
 ### Version 0.8.1 (2026/09/15)
 

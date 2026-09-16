@@ -144,6 +144,14 @@
 *Solution:* For containerized applications, please check the declared dependencies in the configuration model for their completeness. For non-containerized applications, please figure out, which account is executing the platform services, in particular the service manager, and complete the installation of missing dependencies for that user or as global dependencies. If multiple Python versions are installed on your target system, you may have to set the environment variable ``IIP_PYTHON`` to the respective Python binary. See also "Considerations for a Permanent or Distributed Installation" in the platform handbook.
 
 
+## Commands for starting services through the CLI are not "there"
+
+*Symptom:* You are trying to start an application manually through the CLI and service commands like `add`, `start` or `startAll` are not available/do not work anymore.
+
+*Reason:* These operations require expert knowledge, in particular when starting services in a distributed setup, e.g., artifacts must be in the correct places on all devices, services may have to be started in the correct sequence, etc. 
+
+*Solution:* Since version 0.8.2 we encourage using deployment plans, which take these prerequisites into account. However, if you absolutely need these service commands, you may specify `--expert` on CLI startup, but this is discouraged and since version 0.8.2 inteded only for testing.
+
 ## How do I upgrade platform/examples/applications
 
 *Symptom:* There is a new version of the platform. How can I upgrade?

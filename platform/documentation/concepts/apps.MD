@@ -8,7 +8,7 @@ In an app configuration, `MeshSource` (data source), `MeshProcessor` (processor)
 
 The tables summarize all configurable fields for mesh and application types. For details and background on the types and their relations see the [platform handbook](../PlatformHandbook.pdf), e.g., how values from servics are pulled during configuration validation into `MeshElement` instances to ensure a consistent configuration.
 
-Usually, applications run in distributed manner. Manually starting apps and their services is possible (through the platform CLI), but tedious. [Deployment plans](deploymentPlans.MD) allow for specifying the startup "program" of an app with respect to existing resources.
+Usually, applications run in distributed manner. Manually starting apps and their services is possible (through the platform CLI), but imposes technical requirements to be met (thus, since version 0.8.2 an expert flag on CLI startup is needed). [Deployment plans](deploymentPlans.MD) allow for specifying the startup "program" of an app with respect to existing resources.
 
 ## Application
 
