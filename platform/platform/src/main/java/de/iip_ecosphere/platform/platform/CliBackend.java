@@ -67,7 +67,7 @@ import de.iip_ecosphere.platform.support.net.UriResolver;
  */
 class CliBackend {
 
-    public static final boolean ENABLE_EXPERT_MODE = false; // -> version 0.8.2
+    public static final boolean ENABLE_EXPERT_MODE = true;
     public static final Consumer<String> DEFAULT_ERROR_CONSUMER = s -> { };
     private static ServicesClientFactory servicesFactory = ServicesClientFactory.DEFAULT;
     private static EcsClientFactory ecsFactory = EcsClientFactory.DEFAULT;
