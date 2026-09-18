@@ -666,6 +666,9 @@ export class IvmlFormatterService extends UtilsService {
 
               editorInput.meta = input;
               let typeGenerics = DataUtils.stripGenericType(editorInput.type);
+              while (!DataUtils.isIvmlSimpleType(typeGenerics)) {
+                typeGenerics = DataUtils.stripGenericType(typeGenerics);
+              }
               let foundType = meta?.value?.find(type => type.idShort === typeGenerics);
               if (foundType) {
                 editorInput.metaTypeKind = DataUtils.getPropertyValue(foundType.value, MT_metaTypeKind);
@@ -723,6 +726,8 @@ export class IvmlFormatterService extends UtilsService {
                 if (ivmlValue[input.idShort]) {
                   ivmlValue = ivmlValue[input.idShort];
                 } else if (editorInput.metaTypeKind != MTK_compound) {
+                  ivmlValue = editorInput.defaultValue;
+                } else if (editorInput.refTo) {
                   ivmlValue = editorInput.defaultValue;
                 }
 
