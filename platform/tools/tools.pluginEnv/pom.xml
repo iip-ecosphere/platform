@@ -40,7 +40,7 @@
       <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
-          <version>3.0.0</version>
+          <version>${org.codehaus.mojo.exec-maven-plugin.version}</version>
           <configuration>
               <mainClass>de.oktoflow.platform.tools.pluginEnv.Standalone</mainClass>
           </configuration>
