@@ -43,6 +43,7 @@
   </scm>
 
   <properties>
+    <org.apache.maven.deploy.version>3.1.1</org.apache.maven.deploy.version>
   </properties>
 
   <dependencyManagement>
@@ -50,6 +51,25 @@
     
     </dependencies>
   </dependencyManagement>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>${org.apache.maven.deploy.version}</version>
+      </plugin>     
+    </plugins>
+
+    <extensions>
+      <!-- Enabling the use of SSH -->
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+         <artifactId>wagon-ssh-external</artifactId>
+         <version>1.0-beta-6</version>
+      </extension>       
+    </extensions>
+  </build>
   
   <distributionManagement>
     <repository>
