@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>de.iip-ecosphere.platform</groupId>
+  <artifactId>toolsDependencies</artifactId>
+  <version>0.8.2-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>toolsDependencies with basic dependencies</name>
+  <description>The managed dependencies for the common tools of the oktoflow platform.</description>
+  <url>https://oktoflow.de/</url>
+
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+    <license>
+      <name>Eclipse Public License, Version 1.0</name>
+      <url>https://projects.eclipse.org/content/eclipse-public-license-1.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>eichelbe</id>
+      <name>Holger Eichelberger</name>
+      <email>eichelberger@sse.uni-hildesheim.de</email>
+      <url>https://sse.uni-hildesheim.de/mitglieder/dr-holger-eichelberger/</url>
+      <organization>SSE @ University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+  </developers>
+
+  <scm>
+    <url>https://github.com/iip-ecosphere/platform.git</url>
+  </scm>
+
+  <properties>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+    
+    </dependencies>
+  </dependencyManagement>
+  
+</project>
