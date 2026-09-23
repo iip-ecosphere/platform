@@ -214,7 +214,7 @@
        <!-- to be on the safe side if only platform shall be built -->
        <plugin>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>3.3.1</version>
+        <version>${org.apache.maven.resources.version}</version>
         <executions>
           <execution>
             <id>copy-resources</id>
@@ -241,7 +241,7 @@
        <plugin>
            <groupId>org.apache.maven.plugins</groupId>
            <artifactId>maven-assembly-plugin</artifactId>
-           <version>3.1.1</version>
+           <version>${org.apache.maven.assembly.version}</version>
            <executions>
                <execution>
                    <id>angular</id>
@@ -266,7 +266,7 @@
       <plugin>
         <groupId>com.coderplus.maven.plugins</groupId>
         <artifactId>copy-rename-maven-plugin</artifactId>
-        <version>1.0</version>
+        <version>${com.coderplus.maven.plugins.copy-rename-maven-plugin.version}</version>
         <executions>
           <execution>
             <id>copy-file</id>
@@ -285,7 +285,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.4.0</version>
+        <version>${org.codehaus.mojo.build-helper-maven-plugin.version}</version>
         <executions>
           <execution>
             <id>attach-artifacts</id>
