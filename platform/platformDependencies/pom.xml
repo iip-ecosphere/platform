@@ -7,8 +7,8 @@
   <packaging>pom</packaging>
 
   <name>platformDependencies</name>
-  <description>The managed dependencies and code styles of the IIP-Ecosphere platform.</description>
-  <url>https://www.iip-ecosphere.de/tt-plattformen/</url>
+  <description>The managed dependencies and code styles of the oktoflow platform.</description>
+  <url>https://oktoflow.de/</url>
   
   <licenses>
     <license>
@@ -235,6 +235,7 @@
     <org.apache.maven.source.version>3.2.0</org.apache.maven.source.version>
     <org.apache.maven.deploy.version>3.1.1</org.apache.maven.deploy.version>
     <org.apache.maven.resources.version>3.3.1</org.apache.maven.resources.version>
+    <org.apache.maven.antrun.version>3.1.0</org.apache.maven.antrun.version>
     <org.codehaus.mojo.exec-maven-plugin.version>3.0.0</org.codehaus.mojo.exec-maven-plugin.version>
     <org.codehaus.mojo.build-helper-maven-plugin.version>3.4.0</org.codehaus.mojo.build-helper-maven-plugin.version>
     <com.coderplus.maven.plugins.copy-rename-maven-plugin.version>1.0</com.coderplus.maven.plugins.copy-rename-maven-plugin.version>
