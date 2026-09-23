@@ -144,7 +144,7 @@
       <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.2.0</version>
+          <version>${org.apache.maven.dependency.version}</version>
           <executions>
               <execution>
                   <id>copy-dependencies</id>
@@ -166,7 +166,7 @@
        <plugin>
          <groupId>org.apache.maven.plugins</groupId>
          <artifactId>maven-assembly-plugin</artifactId>
-         <version>3.1.1</version>
+         <version>${org.apache.maven.assembly.version}</version>
          <executions>
              <execution>
                  <id>python</id>
@@ -254,7 +254,7 @@
         <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>${org.codehaus.mojo.exec-maven-plugin.version}</version>
                 <configuration>
                     <mainClass>test.de.iip_ecosphere.platform.services.environment.PythonCheck</mainClass>
                     <classpathScope>test</classpathScope>
