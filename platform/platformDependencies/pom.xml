@@ -234,9 +234,11 @@
     <org.apache.maven.clean.version>2.5</org.apache.maven.clean.version>
     <org.apache.maven.source.version>3.2.0</org.apache.maven.source.version>
     <org.apache.maven.deploy.version>3.1.1</org.apache.maven.deploy.version>
+    <org.apache.maven.resources.version>3.3.1</org.apache.maven.resources.version>
     <org.codehaus.mojo.exec-maven-plugin.version>3.0.0</org.codehaus.mojo.exec-maven-plugin.version>
+    <org.codehaus.mojo.build-helper-maven-plugin.version>3.4.0</org.codehaus.mojo.build-helper-maven-plugin.version>
+    <com.coderplus.maven.plugins.copy-rename-maven-plugin.version>1.0</com.coderplus.maven.plugins.copy-rename-maven-plugin.version>
     <org.jacoco.maven.jacoco.version>0.8.12</org.jacoco.maven.jacoco.version>
-    <org.jacoco.maven.resources.version>3.2.0</org.jacoco.maven.resources.version>
     <org.spring.boot.maven.version>2.4.2</org.spring.boot.maven.version>
     <eclipse.m2e.lifecycle.mapping>1.0.0</eclipse.m2e.lifecycle.mapping>
 
