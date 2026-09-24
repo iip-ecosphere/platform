@@ -153,6 +153,7 @@ DeployArtifact() {
 
 # deploy the individual artifacts
 
+DeployArtifact "${PREFIX}" "toolsDependencies" "$OKTO_VERSION" "java"
 DeployArtifact "${PREFIX}" "tools.lib" "$OKTO_VERSION" "java"
 DeployArtifact "${PREFIX}" "dependency-plugin" "$OKTO_VERSION" "mvn"
 DeployArtifact "${PREFIX}" "invoker-plugin" "$OKTO_VERSION" "mvn"
