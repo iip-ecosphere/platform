@@ -89,7 +89,7 @@
              <executions>
                  <execution>
                      <id>build-classpath-plugin</id>
-                     <phase>prepare</phase> <!-- Eclipse autobuild -->
+                     <phase>package</phase>
                      <goals>
                          <goal>build-plugin-classpath</goal>
                      </goals>
