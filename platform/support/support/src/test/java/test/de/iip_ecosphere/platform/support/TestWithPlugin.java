@@ -21,6 +21,7 @@ import org.junit.Before;
 import de.iip_ecosphere.platform.support.plugins.CurrentClassloaderPluginSetupDescriptor;
 import de.iip_ecosphere.platform.support.plugins.FolderClasspathPluginSetupDescriptor;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 
 /**
@@ -36,7 +37,8 @@ public class TestWithPlugin {
     private static List<PluginLocation> locations = new ArrayList<>();
     private static String installDir = "target/oktoPlugins";
     private static List<Runnable> runAfterLoading = new ArrayList<>();
-    private static boolean enableLocalPlugins = true;
+    // -> OKTO_PLUGINS_ENABLELOCAL
+    private static boolean enableLocalPlugins = OsUtils.getBooleanPropertyOrEnv("okto.plugins.enableLocal", true); 
 
     /**
      * Represents a plugin location.
