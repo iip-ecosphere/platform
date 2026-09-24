@@ -44,7 +44,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
-                <version>${org.codehaus.mojo.exec-maven-plugin.version}</version>
+                <version>3.0.0</version>
 				<configuration>
 					<mainClass>com.database.springbooth2database.SpringBootH2DatabaseApplication</mainClass>
 				</configuration>

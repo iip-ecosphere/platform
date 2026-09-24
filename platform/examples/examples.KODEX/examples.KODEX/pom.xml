@@ -79,7 +79,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>${org.codehaus.mojo.exec-maven-plugin.version}</version>
+                    <version>3.0.0</version>
 	                <configuration>
                       <mainClass>de.iip_ecosphere.platform.examples.SpringStartup</mainClass>
                       <arguments>
