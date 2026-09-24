@@ -144,8 +144,6 @@ public class TypeTranslators {
     
     /**
      * byte[] to String translator via base64 encoding.
-     * 
-     * @author Holger Eichelberger, SSE
      */
     public static final TypeTranslator<byte[], String> BYTEARRAY_TO_BASE64 = new TypeTranslator<byte[], String>() {
 
@@ -163,8 +161,6 @@ public class TypeTranslators {
 
     /**
      * String to byte[] translator via base64 encoding.
-     * 
-     * @author Holger Eichelberger, SSE
      */
     public static final TypeTranslator<String, byte[]> BASE64_TO_BYTEARRAY = new TypeTranslator<String, byte[]>() {
 
