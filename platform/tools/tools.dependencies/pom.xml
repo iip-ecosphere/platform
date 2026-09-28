@@ -84,7 +84,7 @@
   
       <org.apache.maven.deploy.version>3.1.1</org.apache.maven.deploy.version>
       <kr.motd.maven.os.version>1.6.2</kr.motd.maven.os.version>
-      <org.apache.maven.compiler.version>3.7.0</org.apache.maven.compiler.version>
+      <org.apache.maven.compiler.version>3.16.0</org.apache.maven.compiler.version>
       <org.apache.maven.javadoc.version>3.2.0</org.apache.maven.javadoc.version>
       <org.apache.maven.jar.version>3.2.0</org.apache.maven.jar.version>
       <org.apache.maven.surefire.version>3.0.0-M3</org.apache.maven.surefire.version>
