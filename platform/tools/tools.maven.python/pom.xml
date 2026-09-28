@@ -3,76 +3,17 @@
 
   <!-- Don't base this on platform dependencies! Used in platform dependencies, must be built before -->
 
-  <groupId>de.iip-ecosphere.platform</groupId>
   <artifactId>maven-python</artifactId>
   <packaging>maven-plugin</packaging>
-  <version>0.8.2-SNAPSHOT</version>
   <name>Maven Python Compile</name>
   <description>Embeds a Python compiler into Maven.</description>
-  <url>https://www.oktoflow.de</url>
 
-  <licenses>
-    <license>
-      <name>Apache License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-    <license>
-      <name>Eclipse Public License, Version 1.0</name>
-      <url>https://projects.eclipse.org/content/eclipse-public-license-1.0</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-
-  <developers>
-    <developer>
-      <id>eichelbe</id>
-      <name>Holger Eichelberger</name>
-      <email>eichelberger@sse.uni-hildesheim.de</email>
-      <url>https://sse.uni-hildesheim.de/mitglieder/dr-holger-eichelberger/</url>
-      <organization>SSE @ University of Hildesheim</organization>
-      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
-      <roles>
-        <role>architect</role>
-        <role>developer</role>
-      </roles>
-      <timezone>Europe/Berlin</timezone>
-    </developer>
-    <developer>
-      <id>JimmiAppel</id>
-      <name>Alexander Weber</name>
-      <email>weber@sse.uni-hildesheim.de</email>
-      <url>https://sse.uni-hildesheim.de/</url>
-      <organization>SSE @ University of Hildesheim</organization>
-      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>Europe/Berlin</timezone>
-    </developer>
-  </developers>  
-
-  <scm>
-    <url>https://github.com/iip-ecosphere/platform.git</url>
-  </scm>
-
-  <repositories>       
-    <repository>
-      <id>SSE-mvn</id> <!-- same ID as in easy-maven-settings.xml -->
-      <name>SSE</name>
-      <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
-      <layout>default</layout>
-    </repository>
-  </repositories>
-
-  <pluginRepositories>
-     <pluginRepository>
-       <id>SSE-plugins</id>
-       <name>SSE</name>
-       <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
-       <layout>default</layout>
-     </pluginRepository>
-  </pluginRepositories>
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>toolsDependencies</artifactId>
+     <version>0.8.2-SNAPSHOT</version>
+     <relativePath/>
+  </parent>
 
   <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -86,6 +27,7 @@
       <org.apache.maven.surefire.version>3.0.0-M3</org.apache.maven.surefire.version>
       <org.apache.maven.assembly.version>3.1.1</org.apache.maven.assembly.version>
       <org.jacoco.maven.jacoco.version>0.8.8</org.jacoco.maven.jacoco.version>
+      <org.apache.maven.source.version>3.2.0</org.apache.maven.source.version>
 
       <maven.compiler.target>8</maven.compiler.target>
       <maven.compiler.source>8</maven.compiler.source>	  
@@ -204,7 +146,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>3.2.0</version>
+            <version>${org.apache.maven.source.version}</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
