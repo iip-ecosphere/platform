@@ -10,6 +10,13 @@
   <description>The managed dependencies and code styles of the oktoflow platform.</description>
   <url>https://oktoflow.de/</url>
   
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>toolsDependencies</artifactId>
+     <version>0.8.2-SNAPSHOT</version>
+     <relativePath/>
+  </parent>
+  
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>
@@ -176,11 +183,6 @@
   </scm>
   
   <properties>
-    <jacocoArgLine/>
-    <surefireArgLine/>
-    <surefireCiLine/>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    
     <iip.version>0.8.2-SNAPSHOT</iip.version> <!-- project.version is always narrowest version -> plugins -->
 
     <org.slf4j.version>1.7.25</org.slf4j.version>
@@ -191,8 +193,6 @@
     <apache.commons.text.version>1.9</apache.commons.text.version>    
     <eclipse.paho.version>1.2.5</eclipse.paho.version>
     <protobuf.version>3.11.0</protobuf.version> <!-- works in HAISEM, may be upgraded -->
-    <!-- If changed, check against forced JUnit provider -->
-    <junit.version>4.12</junit.version>
     <rabbitmq.version>5.15.0</rabbitmq.version>
     <com.hivemq.version>2024.6</com.hivemq.version>
     <io.moquette.version>0.17</io.moquette.version>
@@ -222,26 +222,7 @@
     <org.springframework.spring-test.version>5.3.3</org.springframework.spring-test.version>
 
     <!-- for overriding/fixing local build processes -->
-    <kr.motd.maven.os.version>1.6.2</kr.motd.maven.os.version>
-    <org.xolstice.maven.protobuf.version>0.6.1</org.xolstice.maven.protobuf.version>
-    <org.apache.maven.compiler.version>3.7.0</org.apache.maven.compiler.version>
-    <org.apache.maven.dependency.version>3.11.0</org.apache.maven.dependency.version>
-    <org.apache.maven.shade.version>2.3</org.apache.maven.shade.version>
-    <org.apache.maven.javadoc.version>3.2.0</org.apache.maven.javadoc.version>
-    <org.apache.maven.jar.version>3.2.0</org.apache.maven.jar.version>
-    <org.apache.maven.surefire.version>3.0.0-M3</org.apache.maven.surefire.version>
-    <org.apache.maven.assembly.version>3.6.0</org.apache.maven.assembly.version>
-    <org.apache.maven.clean.version>2.5</org.apache.maven.clean.version>
-    <org.apache.maven.source.version>3.2.0</org.apache.maven.source.version>
-    <org.apache.maven.deploy.version>3.1.1</org.apache.maven.deploy.version>
-    <org.apache.maven.resources.version>3.3.1</org.apache.maven.resources.version>
-    <org.apache.maven.antrun.version>3.1.0</org.apache.maven.antrun.version>
-    <org.codehaus.mojo.exec-maven-plugin.version>3.0.0</org.codehaus.mojo.exec-maven-plugin.version>
-    <org.codehaus.mojo.build-helper-maven-plugin.version>3.4.0</org.codehaus.mojo.build-helper-maven-plugin.version>
-    <com.coderplus.maven.plugins.copy-rename-maven-plugin.version>1.0</com.coderplus.maven.plugins.copy-rename-maven-plugin.version>
-    <org.jacoco.maven.jacoco.version>0.8.12</org.jacoco.maven.jacoco.version>
     <org.spring.boot.maven.version>2.4.2</org.spring.boot.maven.version>
-    <eclipse.m2e.lifecycle.mapping>1.0.0</eclipse.m2e.lifecycle.mapping>
 
     <net.ssehub.easyProducer.version>1.3.12-SNAPSHOT</net.ssehub.easyProducer.version>
 
@@ -249,13 +230,6 @@
     <maven.compiler.source>17</maven.compiler.source>
     <java.encoding>Cp1252</java.encoding>
     
-    <maven.build.cache.exclude.value.1>gen</maven.build.cache.exclude.value.1> <!-- all examples -->
-    <maven.build.cache.exclude.value.2>tomcat.*</maven.build.cache.exclude.value.2> <!-- temporary test dir -->
-    <maven.build.cache.exclude.value.3>work</maven.build.cache.exclude.value.3> <!-- temporary test dir -->
-    <maven.build.cache.exclude.value.4>null</maven.build.cache.exclude.value.4> <!-- Docker cfg bug -->
-    
-    <maven.build.cache.enabled>false</maven.build.cache.enabled> <!--  fails on windows -->
-    <surefireProcessTimeout>3600</surefireProcessTimeout>
     <protobuf.skip>true</protobuf.skip>
     <jacoco.skip>true</jacoco.skip>
   </properties>
@@ -410,7 +384,8 @@
           </includes>
           <forkedProcessTimeoutInSeconds>${surefireProcessTimeout}</forkedProcessTimeoutInSeconds>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
-           <argLine>@{jacocoArgLine} @{surefireArgLine} @{surefireCiLine}</argLine>
+          <argLine>@{jacocoArgLine} @{surefireArgLine} @{surefireCiLine}</argLine>
+          <forkCount>${surefireForkCount}</forkCount>
         </configuration>
         <dependencies>
           <!-- Force using the latest JUnit 47 provider, consider also in lib dependencies; seems also to work with
