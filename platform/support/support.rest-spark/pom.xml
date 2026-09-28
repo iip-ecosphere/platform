@@ -78,17 +78,6 @@
 
   <build>
       <plugins>
-       <plugin>
-         <artifactId>maven-compiler-plugin</artifactId>
-         <version>${org.apache.maven.compiler.version}</version>
-           <configuration>
-             <!-- Must remain on Java 8 level, support level, rapidminer -->
-             <source>17</source>
-             <target>17</target>
-             <encoding>${java.encoding}</encoding>
-           </configuration>
-       </plugin>
-             
          <plugin>
              <groupId>de.iip-ecosphere.platform</groupId>
              <artifactId>dependency-plugin</artifactId>
