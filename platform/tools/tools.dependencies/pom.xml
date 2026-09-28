@@ -92,6 +92,7 @@
       <org.jacoco.maven.jacoco.version>0.8.8</org.jacoco.maven.jacoco.version>
       <org.apache.maven.source.version>3.2.0</org.apache.maven.source.version>
       <org.xolstice.maven.protobuf.version>0.6.1</org.xolstice.maven.protobuf.version>
+      <io.github.ascopes.protobuf.version>5.1.10</io.github.ascopes.protobuf.version>
       <org.apache.maven.dependency.version>3.11.0</org.apache.maven.dependency.version>
       <org.apache.maven.shade.version>2.3</org.apache.maven.shade.version>
       <org.apache.maven.clean.version>2.5</org.apache.maven.clean.version>
