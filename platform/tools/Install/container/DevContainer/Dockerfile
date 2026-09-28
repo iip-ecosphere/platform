@@ -31,6 +31,9 @@ RUN python3 -m pip install websockets==11.0.2 pyyaml==6.0 pyflakes==3.2.0
 ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 ENV PATH=$JAVA_HOME/bin:$PATH
 
+# ------ Python path --------------------------------------------------------------------
+ENV IIP_PYTHON=/usr/bin/python3
+
 # ------ intalling newer version of firefox -------------------------------------------
 RUN apt-get update && apt-get install -y \
     wget \
