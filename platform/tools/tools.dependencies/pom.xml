@@ -36,14 +36,79 @@
       </roles>
       <timezone>Europe/Berlin</timezone>
     </developer>
+    <developer>
+      <id>JimmiAppel</id>
+      <name>Alexander Weber</name>
+      <email>weber@sse.uni-hildesheim.de</email>
+      <url>https://sse.uni-hildesheim.de/</url>
+      <organization>SSE @ University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
   </developers>
 
   <scm>
     <url>https://github.com/iip-ecosphere/platform.git</url>
   </scm>
 
+  <repositories>       
+    <repository>
+      <id>SSE-mvn</id> <!-- same ID as in easy-maven-settings.xml -->
+      <name>SSE</name>
+      <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
+      <layout>default</layout>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+     <pluginRepository>
+       <id>SSE-plugins</id>
+       <name>SSE</name>
+       <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
+       <layout>default</layout>
+     </pluginRepository>
+  </pluginRepositories>
+
   <properties>
-    <org.apache.maven.deploy.version>3.1.1</org.apache.maven.deploy.version>
+      <jacocoArgLine/>
+      <surefireArgLine/>
+      <surefireCiLine/>
+      <surefireForkCount>1</surefireForkCount>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+     <!-- If changed, check against forced JUnit provider -->
+      <junit.version>4.12</junit.version>
+  
+      <org.apache.maven.deploy.version>3.1.1</org.apache.maven.deploy.version>
+      <kr.motd.maven.os.version>1.6.2</kr.motd.maven.os.version>
+      <org.apache.maven.compiler.version>3.7.0</org.apache.maven.compiler.version>
+      <org.apache.maven.javadoc.version>3.2.0</org.apache.maven.javadoc.version>
+      <org.apache.maven.jar.version>3.2.0</org.apache.maven.jar.version>
+      <org.apache.maven.surefire.version>3.0.0-M3</org.apache.maven.surefire.version>
+      <org.apache.maven.assembly.version>3.1.1</org.apache.maven.assembly.version>
+      <org.jacoco.maven.jacoco.version>0.8.8</org.jacoco.maven.jacoco.version>
+      <org.apache.maven.source.version>3.2.0</org.apache.maven.source.version>
+      <org.xolstice.maven.protobuf.version>0.6.1</org.xolstice.maven.protobuf.version>
+      <org.apache.maven.dependency.version>3.11.0</org.apache.maven.dependency.version>
+      <org.apache.maven.shade.version>2.3</org.apache.maven.shade.version>
+      <org.apache.maven.clean.version>2.5</org.apache.maven.clean.version>
+      <org.apache.maven.resources.version>3.3.1</org.apache.maven.resources.version>
+      <org.apache.maven.antrun.version>3.1.0</org.apache.maven.antrun.version>
+      <org.codehaus.mojo.exec-maven-plugin.version>3.0.0</org.codehaus.mojo.exec-maven-plugin.version>
+      <org.codehaus.mojo.build-helper-maven-plugin.version>3.4.0</org.codehaus.mojo.build-helper-maven-plugin.version>
+      <com.coderplus.maven.plugins.copy-rename-maven-plugin.version>1.0</com.coderplus.maven.plugins.copy-rename-maven-plugin.version>
+      <eclipse.m2e.lifecycle.mapping>1.0.0</eclipse.m2e.lifecycle.mapping>
+      
+      <maven.build.cache.exclude.value.1>gen</maven.build.cache.exclude.value.1> <!-- all examples -->
+      <maven.build.cache.exclude.value.2>tomcat.*</maven.build.cache.exclude.value.2> <!-- temporary test dir -->
+      <maven.build.cache.exclude.value.3>work</maven.build.cache.exclude.value.3> <!-- temporary test dir -->
+      <maven.build.cache.exclude.value.4>null</maven.build.cache.exclude.value.4> <!-- Docker cfg bug -->
+    
+      <maven.build.cache.enabled>false</maven.build.cache.enabled> <!--  fails on windows -->
+      <surefireProcessTimeout>3600</surefireProcessTimeout>
   </properties>
 
   <dependencyManagement>

@@ -1,3 +1,3 @@
-# Central managed dependencies for the oktoflow platform
+# Central dependencies for the tools components oktoflow platform
 
-Extension of platform dependencies by manged dependencies (BOM). Shall be used by all implementation components. 
+Fundamental platform and maven tool-level dependencies and build steps.
