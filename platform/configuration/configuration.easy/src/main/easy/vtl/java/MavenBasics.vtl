@@ -810,8 +810,35 @@ template MavenBasics(Configuration config, FileArtifact target) {
         profile;
     }
     
-    def XmlElement appendProtobufPlugins(XmlElement parent, String protoPluginVer="\\${org.xolstice.maven.protobuf.version}", String osPluginVer="\\${kr.motd.maven.os.version}") {
-        if (osPluginVer <> "") {
+    def XmlElement appendProtobufPlugins(XmlElement parent, String protoPluginVer="\\${io.github.ascopes.protobuf.version}", String osPluginVer="", String protobufVer="\\${protobuf.version}") {
+        XmlElement protoPlugin = appendPlugin(parent, "io.github.ascopes", "protobuf-maven-plugin", protoPluginVer, false);
+
+        XmlElement protoCfg = appendConfiguration(protoPlugin);
+        XmlElement protoCfgProtoc = new XmlElement(protoCfg, "protoc");
+        new XmlAttribute(protoCfgProtoc, "kind", "binary-maven");
+        new XmlElement(protoCfgProtoc, "version", protobufVer);
+        new XmlElement(protoCfg, "skip", "false");
+
+        XmlElement protoExec = appendExecutionsParent(protoPlugin);
+        XmlElement exec = new XmlElement(protoExec, "execution");
+        new XmlElement(exec, "id", "generate");
+        appendGoal(exec, "generate");
+        appendPhase(exec, "generate-sources");
+        XmlElement execCfg = appendConfiguration(exec);
+        XmlElement execCfgSrc = new XmlElement(execCfg, "sourceDirectories");
+        new XmlElement(execCfgSrc, "sourceDirectory", "\\${project.basedir}/src/main/proto");
+
+        //exec = new XmlElement(protoExec, "execution");
+        //new XmlElement(exec, "id", "generate-test");
+        //appendGoal(exec, "generate-test");
+        //appendPhase(exec, "generate-test-sources");
+        //execCfg = appendConfiguration(exec);
+        //execCfgSrc = new XmlElement(execCfg, "sourceDirectories");
+        //new XmlElement(execCfgSrc, "sourceDirectory", "\\${project.basedir}/src/test/proto");
+
+        protoPlugin;
+
+/*         if (osPluginVer <> "") {
             XmlElement osPlugin = appendPlugin(parent, "kr.motd.maven", "os-maven-plugin", osPluginVer, false);
             XmlElement osExec = appendExecutions(osPlugin);
             appendPhase(osExec, "initialize");
@@ -824,7 +851,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
         XmlElement protoGoals = appendGoals(protoExec);
         appendGoal(protoGoals, "compile");
         appendGoal(protoGoals, "test-compile");
-        protoPlugin;
+        protoPlugin;*/
     }
 
 }

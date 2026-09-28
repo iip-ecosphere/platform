@@ -107,34 +107,41 @@
     <plugins>
     
       <plugin>
-        <groupId>kr.motd.maven</groupId>
-        <artifactId>os-maven-plugin</artifactId>
-        <version>${kr.motd.maven.os.version}</version>
-        <executions>
-          <execution>
-            <phase>initialize</phase>
-            <goals>
-              <goal>detect</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>    
-    
-      <plugin>
-        <groupId>org.xolstice.maven.plugins</groupId>
+        <groupId>io.github.ascopes</groupId>
         <artifactId>protobuf-maven-plugin</artifactId>
-        <version>${org.xolstice.maven.protobuf.version}</version>
+        <version>${io.github.ascopes.protobuf.version}</version>
         <configuration>
-          <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
-        </configuration>    
+          <protoc kind="binary-maven">
+            <version>${protobuf.version}</version>
+          </protoc>
+          <skip>false</skip> <!-- override -->
+        </configuration>
         <executions>
-          <execution>
+          <!--<execution>
+            <id>generate</id>
             <goals>
-              <goal>compile</goal>
-              <goal>test-compile</goal>
+              <goal>generate</goal>
             </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <sourceDirectories>
+                <sourceDirectory>${project.basedir}/src/main/proto</sourceDirectory>
+              </sourceDirectories>          
+            </configuration>
+          </execution>-->
+          <execution>
+            <id>generate-test</id>
+            <goals>
+              <goal>generate-test</goal>
+            </goals>
+            <phase>generate-test-sources</phase>
+            <configuration>
+              <sourceDirectories>
+                <sourceDirectory>${project.basedir}/src/test/proto</sourceDirectory>
+              </sourceDirectories>          
+            </configuration>
           </execution>
-        </executions>
+        </executions>        
       </plugin>
     
         <plugin>
