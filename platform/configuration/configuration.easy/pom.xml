@@ -248,6 +248,7 @@
            <python-compile.skip>false</python-compile.skip>
            <maven.javadoc.skip>false</maven.javadoc.skip>
            <okto.test.easy.model.parent>${model.parent}</okto.test.easy.model.parent>
+           <surefireForkCount>0</surefireForkCount>
         </properties>
           <build>
             <plugins>
@@ -269,7 +270,7 @@
                <plugin>
                  <groupId>org.apache.maven.plugins</groupId>
                  <artifactId>maven-assembly-plugin</artifactId>
-                 <version>3.1.1</version>
+                 <version>${org.apache.maven.assembly.version}</version>
                  <executions>
                      <execution>
                          <id>easy</id>
@@ -318,7 +319,7 @@
               <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>${org.apache.maven.dependency.version}</version>
                 <executions>
                   <execution>
                     <id>copy</id>
@@ -349,7 +350,7 @@
                 <plugin>
                   <groupId>org.codehaus.mojo</groupId>
                   <artifactId>exec-maven-plugin</artifactId>
-                  <version>3.0.0</version>
+                  <version>${org.codehaus.mojo.exec-maven-plugin.version}</version>
                   <executions>
                       <execution>
                          <id>testAasIvml</id>
@@ -388,7 +389,7 @@
             <plugin>
               <groupId>org.codehaus.mojo</groupId>
               <artifactId>exec-maven-plugin</artifactId>
-              <version>3.0.0</version>
+              <version>${org.codehaus.mojo.exec-maven-plugin.version}</version>
               <configuration>
                 <mainClass>de.iip_ecosphere.platform.configuration.easyProducer.opcua.parser.DomParser</mainClass>
                 <classpathScope>runtime</classpathScope>
@@ -409,6 +410,7 @@
            <python-compile.skip>true</python-compile.skip>
            <maven.javadoc.skip>true</maven.javadoc.skip>
            <okto.test.easy.model.parent>${model.parent}</okto.test.easy.model.parent>
+           <maven.install.skip>true</maven.install.skip>
        </properties>       
 
        <build>

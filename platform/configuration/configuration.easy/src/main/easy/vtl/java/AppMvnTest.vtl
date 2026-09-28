@@ -84,7 +84,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);
         appendAssemblyDescriptors(assemblyPlugin, assemblies);
         new XmlComment(dep, "Your other plugins extending/overriding the parent build plugins go here or after.");
-        XmlElement execPlugin = appendPlugin(plugins, "org.codehaus.mojo", "exec-maven-plugin", "3.0.0", false);
+        XmlElement execPlugin = appendPlugin(plugins, "org.codehaus.mojo", "exec-maven-plugin", "\\${org.codehaus.mojo.exec-maven-plugin.version}", false);
         XmlElement execPluginExecs = appendExecutionsParent(execPlugin);
 
         String testClasspathFnExclusions = "${transportProtocolModule(config)}-${projectVersion}.jar";
@@ -161,7 +161,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
             gId+":"+appName+":"+appVersion, "bin", 
             "\\${project.build.directory}/apps", "${appName}.jar", type="jar", id="app", phase="validate");
         
-        execPlugin = appendPlugin(plugins, "org.codehaus.mojo", "exec-maven-plugin", "3.0.0", false);
+        execPlugin = appendPlugin(plugins, "org.codehaus.mojo", "exec-maven-plugin", "\\${org.codehaus.mojo.exec-maven-plugin.version}", false);
         execPluginExecs = appendExecutionsParent(execPlugin);
         exec = new XmlElement(execPluginExecs, "execution");
         new XmlElement(exec, "id", "app");
