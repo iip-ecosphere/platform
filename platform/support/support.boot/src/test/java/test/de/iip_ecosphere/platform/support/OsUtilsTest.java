@@ -75,4 +75,14 @@ public class OsUtilsTest {
         OsUtils.isMac();
     }
     
+    /**
+     * Tests {@link OsUtils#getUserHome()}, {@link OsUtils#getUserName()} and {@link OsUtils#getUserName(String)}.
+     */
+    @Test
+    public void testUser() {
+        OsUtils.getUserHome(); // usually not empty
+        OsUtils.getUserName(); // usually not empty
+        Assert.assertTrue(OsUtils.getUserName("***").length() > 0); 
+    }
+    
 }

@@ -41,9 +41,31 @@ public class OsUtils {
 
     /**
      * Returns the {@code user.home} System Property. User's home directory.
+     * 
+     * @return the user home
      */
     public static final String getUserHome() {
         return Commons.getInstance().getUserHome();
+    }
+
+    
+    /**
+     * Returns the {@code user.name} System Property. User's account name.
+     * 
+     * @param dflt the default value if there shall be none
+     * @return the user account name, {@code dflt} if there is none
+     */
+    public static final String getUserName(String dflt) {
+        return System.getProperty("user.name", dflt);
+    }
+
+    /**
+     * Returns the {@code user.name} System Property. User's account name.
+     * 
+     * @return the user account name, empty if there is none
+     */
+    public static final String getUserName() {
+        return getUserName("");
     }
     
     /**
