@@ -205,6 +205,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
     @Parameter(property = "configuration.skipMapDashboard")
     private String configSkipMapDashboard;
 
+    @Parameter(property = "iip.unpackResources") 
+    private String unpackResources;
+
     @Parameter(property = "profile")
     private boolean profile; // is maven-profiler active?
 
@@ -323,6 +326,7 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
             setAsProperty(sysProperties, "easy.docker.skip", easyDockerSkip);
             setAsProperty(sysProperties, "configuration.tracingLevel", configTracingLevel);
             setAsProperty(sysProperties, "configuration.skipMapDashboard", configSkipMapDashboard);
+            setAsProperty(sysProperties, "iip.unpackResources", unpackResources);
             value = disablePython || disableBuild;
             sysProperties.put("python-compile.skip", String.valueOf(value));
             value = disablePython || disableBuild || disableTests;
