@@ -153,18 +153,26 @@ public class CleaningUnpackMojo extends UnpackMojo {
         } else {
             execute = false;
             for (ArtifactItem ai : getArtifactItems()) {
-                boolean outDirExists = ai.getOutputDirectory().exists();
+                boolean outDirNull = ai.getOutputDirectory() == null;
+                if (outDirNull) {
+                    getLog().warn("Output direectory of " + ai.getArtifactId() + " not specified");
+                }
+                boolean outDirExists = !outDirNull && ai.getOutputDirectory().exists();
                 execute |= ai.isNeedsProcessing() || !outDirExists;
-                if (!execute && outDirExists && hasInitiallyAllowed()) {
-                    Set<String> allowed = getInitiallyAllowed(initiallyAllowed, initiallyAllowedFile, getLog());
-                    getLog().info("Output directory " + ai.getOutputDirectory() + " exists. "
-                        + "Checking for initially allowed files: " + allowed);
-                    execute = true;
-                    for (File f : ai.getOutputDirectory().listFiles()) {
-                        if (matches(f, allowed)) {
-                            getLog().info("Disabling execution as " + f + " is not initially allowed");
-                            execute = false;
+                if (!execute && outDirExists) {
+                    if (hasInitiallyAllowed()) {
+                        Set<String> allowed = getInitiallyAllowed(initiallyAllowed, initiallyAllowedFile, getLog());
+                        getLog().info("Output directory " + ai.getOutputDirectory() + " exists. "
+                            + "Checking for initially allowed files: " + allowed);
+                        execute = true;
+                        for (File f : ai.getOutputDirectory().listFiles()) {
+                            if (matches(f, allowed)) {
+                                getLog().info("Disabling execution as " + f + " is not initially allowed");
+                                execute = false;
+                            }
                         }
+                    } else {
+                        execute = true;
                     }
                 }
             }
