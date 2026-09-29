@@ -90,7 +90,7 @@
       <org.apache.maven.surefire.version>3.0.0-M3</org.apache.maven.surefire.version>
       <org.apache.maven.assembly.version>3.8.0</org.apache.maven.assembly.version>
       <org.jacoco.maven.jacoco.version>0.8.8</org.jacoco.maven.jacoco.version>
-      <org.apache.maven.source.version>3.2.0</org.apache.maven.source.version>
+      <org.apache.maven.source.version>3.4.0</org.apache.maven.source.version>
       <org.xolstice.maven.protobuf.version>0.6.1</org.xolstice.maven.protobuf.version>
       <io.github.ascopes.protobuf.version>5.1.10</io.github.ascopes.protobuf.version>
       <org.apache.maven.dependency.version>3.11.0</org.apache.maven.dependency.version>
