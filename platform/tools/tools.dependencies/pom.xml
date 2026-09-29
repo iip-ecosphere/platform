@@ -95,7 +95,7 @@
       <io.github.ascopes.protobuf.version>5.1.10</io.github.ascopes.protobuf.version>
       <org.apache.maven.dependency.version>3.11.0</org.apache.maven.dependency.version>
       <org.apache.maven.shade.version>2.3</org.apache.maven.shade.version>
-      <org.apache.maven.clean.version>2.5</org.apache.maven.clean.version>
+      <org.apache.maven.clean.version>3.5.0</org.apache.maven.clean.version>
       <org.apache.maven.resources.version>3.3.1</org.apache.maven.resources.version>
       <org.apache.maven.antrun.version>3.1.0</org.apache.maven.antrun.version>
       <org.codehaus.mojo.exec-maven-plugin.version>3.0.0</org.codehaus.mojo.exec-maven-plugin.version>
