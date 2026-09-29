@@ -13,10 +13,11 @@ In progress:
 * [#187](https://github.com/iip-ecosphere/platform/issues/187): Integrate expression editor
 * [#122](https://github.com/iip-ecosphere/platform/issues/122): Transparent encryption, RBAC on AAS (incl. UI authentication)
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
-* [#202](https://github.com/iip-ecosphere/platform/issues/202): Update dependencies/libraries (woth plugins)
+* [#202](https://github.com/iip-ecosphere/platform/issues/202): Update dependencies/libraries (plugins, mvn)
 
 Changes:
 * [#205](https://github.com/iip-ecosphere/platform/issues/205): Hide service start/stop commands in CLI, i.e., service commands like `add`, `startService` and `startAll` now require `--expert` due to their technical prerequisites. Please use deployment plans instead.
+* code template POM contains assembly for `resources` folder; if app is built by platform, deployed `resources` artefacts are considered and packaged into the app, e.g., for mock data files
 
 ### Version 0.8.1 (2026/09/15)
 

@@ -7,7 +7,7 @@ import IIPEcosphereBase;
 @advice(IIPEcosphere)
 vilScript IIPEcospherePartKodex (Project source, Configuration config, Project target) {
 
-    generateServiceResources(MeshElement no, KodexService service, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, sequenceOf(String) oktoPlugins, Boolean noDeps) = {
+    generateServiceResources(MeshElement no, KodexService service, Path appRoot, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, setOf(String) artifacts, sequenceOf(String) oktoPlugins, Boolean noDeps, setOf(String) implResources) = {
         IIPEcosphere cfg = config;
         String clsName = asTypeName(no.name);
         String serviceFolderName = toFolderName(no.impl.id);

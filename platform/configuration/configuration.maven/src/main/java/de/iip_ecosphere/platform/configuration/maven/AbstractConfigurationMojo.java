@@ -119,6 +119,9 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
     @Parameter(property = "configuration.inTest", required = false, defaultValue = "false")
     private boolean inTest;
 
+    @Parameter(property = "iip.unpackResources", required = false, defaultValue = "false") 
+    private boolean unpackResources;
+
     @Parameter(property = "configuration.changeCheckArtifacts", required = false, defaultValue = "")
     private String changeCheckArtifacts;
 
@@ -469,7 +472,8 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
                 executor.setAllTypes(allTypes)
                     .setAllServices(allServices)
                     .setIncremental(incremental)
-                    .setInTest(inTest);
+                    .setInTest(inTest)
+                    .setUnpackResources(unpackResources);
                 try {
                     if (asProcess) {
                         executor.executeAsProcess(getClass().getClassLoader(), resourcesDir, getTracingLevel(), 

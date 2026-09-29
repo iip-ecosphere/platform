@@ -108,28 +108,34 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
         properties.put(key, value);
         return this;
     }
-    
+
     @Override
     public PlatformInstantiation setAllTypes(boolean allTypes) {
-        setProperty(PROP_ALL_TYPES, String.valueOf(allTypes));
+        setProperty(PROP_ALL_TYPES, allTypes);
         return this;
     }
 
     @Override
     public PlatformInstantiation setAllServices(boolean allServices) {
-        setProperty(PROP_ALL_SERVICES, String.valueOf(allServices));
+        setProperty(PROP_ALL_SERVICES, allServices);
         return this;
     }
 
     @Override
     public PlatformInstantiation setIncremental(boolean incremental) {
-        setProperty(PROP_INCREMENTAL, String.valueOf(incremental));
+        setProperty(PROP_INCREMENTAL, incremental);
         return this;
     }
 
     @Override
     public PlatformInstantiation setInTest(boolean test) {
-        setProperty(Starter.IIP_TEST, String.valueOf(test));
+        setProperty(Starter.IIP_TEST, test);
+        return this;
+    }
+    
+    @Override
+    public PlatformInstantiation setUnpackResources(boolean unpack) {
+        setProperty(PlatformInstantiator.KEY_PROPERTY_UNPACKRESOURCES, unpack);
         return this;
     }
 
@@ -146,7 +152,8 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
         setAllTypes(OsUtils.getBooleanProperty(PROP_ALL_TYPES, false));
         setAllServices(OsUtils.getBooleanProperty(PROP_ALL_SERVICES, false));
         setIncremental(OsUtils.getBooleanProperty(PROP_INCREMENTAL, false));
-        setIncremental(OsUtils.getBooleanProperty(Starter.IIP_TEST, false));
+        setInTest(OsUtils.getBooleanProperty(Starter.IIP_TEST, false));
+        setUnpackResources(OsUtils.getBooleanProperty(PlatformInstantiator.KEY_PROPERTY_UNPACKRESOURCES, false));
         setLogPath(System.getProperty(PROP_LOG_PATH, ""));
     }
         

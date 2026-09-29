@@ -587,6 +587,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @throws ExecutionException when the instantiation fails
      */
     public Object instantiate(InstantiationMode mode, String appId, String codeFile) throws ExecutionException {
+        Object result = null;
         LoggerFactory.getLogger(getClass()).info("Instantiating app id '{}' mode {} codeFile '{}' asProcess {}", 
             appId, mode, codeFile, ConfigurationSetup.getSetup().getInstantiateAsProcess());
         TaskData lastTaskData = TaskUtils.getLastTaskData(); // may be wrong thread
@@ -611,7 +612,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         if (null != appId && appId.length() > 0) {
             System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, appId);
         }
-        Object result = null;
         try {
             ConfigurationLifecycleDescriptor.cleanOutputFolder();
             if (ConfigurationSetup.getSetup().getInstantiateAsProcess()) {
@@ -644,6 +644,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             if (null != appId) {
                 System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, "");
             }
+            System.setProperty(PlatformInstantiator.KEY_PROPERTY_UNPACKRESOURCES, "true");
             switch (mode) {
             case APPS_NO_DEPS:
                 result = collectTemplates(start);

@@ -4,7 +4,7 @@ import JavaMapping;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, sequenceOf(String) oktoPlugins, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, Boolean copyRuntimeDependencies=true, Boolean mapDisplay=false, String pluginOutputFolder="target/jars") {
+template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, sequenceOf(String) oktoPlugins, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, setOf(String) implResources, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, Boolean copyRuntimeDependencies=true, Boolean mapDisplay=false, String pluginOutputFolder="target/jars") {
 
     def XmlElement appendSpringBootPlugin(XmlElement plugins, String version="2.4.2", String mainClass="") {
         XmlElement plugin = appendPlugin(plugins, "org.springframework.boot", "spring-boot-maven-plugin", version, false);
@@ -19,8 +19,32 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             new XmlElement(cfg, "classifier", "bin");
         }
     }
+    
+    def appendResourceUnpack(XmlElement execs, setOf(String) implResources) {
+        if (isUnpackResources()) {
+            XmlElement exec = new XmlElement(execs, "execution");
+            new XmlElement(exec, "id", "unpack-resources");
+            appendGoal(exec, "unpack");
+            new XmlElement(exec, "phase", "process-resources");
+            XmlElement config = appendConfiguration(exec);
 
-    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, sequenceOf(String) oktoPlugins, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, Boolean copyRuntimeDependencies=true, Boolean mapDisplay=false, String pluginOutputFolder="target/jars") {
+            XmlElement artifactItems = new XmlElement(config, "artifactItems");
+            for (String art : implResources.asSequence()->sortedBy(a|a)) { // sortedBy for testing
+                sequenceOf(String) artList = art.split(":");
+                String groupId = artList[0];
+                String artId = artList[1];
+                String artVersion = artList[2];
+                XmlElement artifactItem = new XmlElement(artifactItems, "artifactItem");
+                appendDependency(artifactItem, artList[0], artList[1], artList[2], createDepElt=false, classifier="resources", type="zip");
+                new XmlElement(artifactItem, "overWrite", "true");
+                new XmlElement(artifactItem, "outputDirectory", "\\${project.basedir}");
+            }
+
+            new XmlElement(config, "skipIfNotFound", "true");
+        }
+    }
+
+    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, sequenceOf(String) oktoPlugins, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, setOf(String) implResources, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, Boolean copyRuntimeDependencies=true, Boolean mapDisplay=false, String pluginOutputFolder="target/jars") {
         String iipGroup = "de.iip-ecosphere.platform";
         String gId = groupId;
         if (length(gId) == 0) {
@@ -98,6 +122,8 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         XmlElement dependencyPlugin = appendMavenIipDependencyPlugin(plugins, ver=config.iipVer); // otherwise project's appVer
         XmlElement execs = new XmlElement(dependencyPlugin, "executions");
         appendMavenIipDependencyPluginTouchPluginsExecution(execs, "\\${project.build.directory}/deployed", phase="package");
+        appendResourceUnpack(execs, implResources);
+        
         /*if (isPythonUsed(usedServiceTypes)) {
             appendMavenDependencyPluginExecution(execs, "unpack", "${iipGroup}:services.environment:${projectVersion}", "python", "\\${project.basedir}/src/main/python", "pythonEnv.zip", type="zip");
         }*/

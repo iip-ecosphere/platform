@@ -55,6 +55,19 @@ public interface PlatformInstantiation {
      * @return <b>this</b> for chaining
      */
     public PlatformInstantiation setProperty(String key, String value);
+    
+    /**
+     * Sets a JVM Boolean system property for execution.
+     * 
+     * @param key the key
+     * @param value the value
+     * @return <b>this</b> for chaining
+     * @see #setProperty(String, String)
+     */
+    public default PlatformInstantiation setProperty(String key, boolean value) {
+        setProperty(key, String.valueOf(value));
+        return this;
+    }
 
     /**
      * Configures whether all types or just referenced types by apps shall be instantiated. 
@@ -87,6 +100,14 @@ public interface PlatformInstantiation {
      * @return <b>this</b> for chaining
      */
     public PlatformInstantiation setInTest(boolean test);
+
+    /**
+     * Configures whether the instantiation shall enforce unpacking of services resources in the build process.
+     * 
+     * @param unpack whether unpacking shall happen
+     * @return <b>this</b> for chaining
+     */
+    public PlatformInstantiation setUnpackResources(boolean unpack);
 
     /**
      * Sets the log path for transport-based distributed logging.

@@ -54,6 +54,7 @@ public class PlatformInstantiator {
     public static final String KEY_PROPERTY_INCREMENTAL = "easy.vil.incremental"; // maps to EASy-Producer
     public static final String KEY_PROPERTY_APPS = "iip.easy.apps";
     public static final String KEY_PROPERTY_TEST = "iip.tests";
+    public static final String KEY_PROPERTY_UNPACKRESOURCES = "iip.unpackResources";
     private static final String ARG_PROPS_START = "props>";
     private static final String ARG_PROPS_END = "<props";
     private static int exitCode = 0;
