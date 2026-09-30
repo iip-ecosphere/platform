@@ -614,6 +614,10 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         }
         try {
             ConfigurationLifecycleDescriptor.cleanOutputFolder();
+            System.setProperty(PlatformInstantiator.KEY_PROPERTY_UNPACKRESOURCES, "true");
+            if (null != appId) {
+                System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, "");
+            }
             if (ConfigurationSetup.getSetup().getInstantiateAsProcess()) {
                 EasySetup easy = ConfigurationSetup.getSetup().getEasyProducer();                
                 String[] args = {easy.getIvmlModelName(), toString(easy.getBase()), toString(easy.getGenTarget()), 
@@ -641,10 +645,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 ConfigurationLifecycleDescriptor.setLogConsumer(null);
                 ConfigurationLifecycleDescriptor.close(sender);
             }
-            if (null != appId) {
-                System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, "");
-            }
-            System.setProperty(PlatformInstantiator.KEY_PROPERTY_UNPACKRESOURCES, "true");
             switch (mode) {
             case APPS_NO_DEPS:
                 result = collectTemplates(start);
