@@ -155,6 +155,10 @@ template Basics(Configuration config, FileArtifact target) {
     def Boolean isUnpackResources() {
         getProperty("iip.unpackResources", "false") == "true";
     }
+
+    def Boolean isUnpackResourcesSkip() {
+        getProperty("iip.unpackResources.skip", "false") == "true";
+    }
 	
 	def setOf(MeshElement) nextMeshNodes(MeshElement elt, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
 	    getNextMeshNodes(elt, mappedMesh);

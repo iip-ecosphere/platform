@@ -38,6 +38,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         new XmlElement(properties, "iip.version", projectVersion);
         new XmlComment(properties, "Could be project.version, but that may differ depending on implementation, context, ...");
         new XmlElement(properties, "iip.resources", "resources");
+        new XmlElement(properties, "iip.unpackResources.skip", "false");
         projectVersion = "\\${iip.version}";
         
         XmlElement globalDeps = createDependencies(project);
