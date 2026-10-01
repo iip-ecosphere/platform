@@ -99,7 +99,7 @@
       <org.apache.maven.resources.version>3.5.0</org.apache.maven.resources.version>
       <org.apache.maven.antrun.version>3.2.0</org.apache.maven.antrun.version>
       <org.codehaus.mojo.exec-maven-plugin.version>3.0.0</org.codehaus.mojo.exec-maven-plugin.version>
-      <org.codehaus.mojo.build-helper-maven-plugin.version>3.4.0</org.codehaus.mojo.build-helper-maven-plugin.version>
+      <org.codehaus.mojo.build-helper-maven-plugin.version>3.6.2</org.codehaus.mojo.build-helper-maven-plugin.version>
       <eclipse.m2e.lifecycle.mapping>1.0.0</eclipse.m2e.lifecycle.mapping>
       
       <maven.build.cache.exclude.value.1>gen</maven.build.cache.exclude.value.1> <!-- all examples -->
