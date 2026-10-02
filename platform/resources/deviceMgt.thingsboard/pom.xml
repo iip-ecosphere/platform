@@ -27,6 +27,10 @@
         </snapshots>
     </repository>
   </repositories>
+  
+  <properties>
+    <surefireArgLine>-XX:+EnableDynamicAgentLoading</surefireArgLine> <!-- regression in surefire 3.6.0 SUREFIRE-3460 -->
+  </properties>
 
   <dependencies>
     <dependency>
