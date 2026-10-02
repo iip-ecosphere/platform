@@ -1,11 +1,14 @@
 package de.iip_ecosphere.platform.configuration.easyProducer.opcua.parser;
 
 import java.io.File;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -62,6 +65,7 @@ enum ElementType {
 public class DomParser {
 
     private static final String IVML_OUTPUT_PROPERTY = "opcua.ivml.output";
+    private static final int INDEX_THRESHOLD = 50;
     private static boolean verboseDefault = false;
     private static String usingIvmlFolder = System.getProperty(IVML_OUTPUT_PROPERTY, "target/opcua-parser");
     private static final Set<String> IDENTIFY_FIELDS_PERMITTED_REFERENCE_TYPE;
@@ -85,10 +89,23 @@ public class DomParser {
     private NodeList variableTypeList;
     private NodeList aliasList;
     private ArrayList<BaseType> hierarchy;
+    private BaseType nestedRootVariableParent;
+
     private boolean verbose = verboseDefault;
     private String baseNameSpace;
     private NodeList namespaceUris;
     private ArrayList<NodeList> externAliasLists;
+    // Prevent recursive structured data types from expanding their own definition indefinitely.
+    private final Set<String> externalDataTypesInProgress = new HashSet<>();
+    
+    private final Map<String, Element> objectTypeMap;
+    private final Map<String, Element> objectMap;
+    private final Map<String, Element> variableMap;
+    private final Map<String, Element> methodMap;
+    private final Map<String, Element> dataTypeMap;
+
+    private final Map<String, BaseType> hierarchyByNodeId = new HashMap<>();
+    private final Map<String, BaseType> hierarchyByVarName = new HashMap<>();
 
     // checkstyle: stop parameter number check
 
@@ -114,6 +131,43 @@ public class DomParser {
         this.variableTypeList = variableTypeList;
         this.aliasList = aliasList;
         this.hierarchy = hierarchy;
+        objectTypeMap = buildIndexIfBeneficial(objectTypeList);
+        objectMap = buildIndexIfBeneficial(objectList);
+        variableMap = buildIndexIfBeneficial(variableList);
+        methodMap = buildIndexIfBeneficial(methodList);
+        dataTypeMap = buildIndexIfBeneficial(dataTypeList);
+    }
+
+    /**
+     * Builds an index only when direct lookups are expected to be cheaper than
+     * repeatedly scanning the node list.
+     *
+     * @param nodes the node list to consider
+     * @return the index, or {@code null} when the list remains on the linear lookup path
+     */
+    private static Map<String, Element> buildIndexIfBeneficial(NodeList nodes) {
+        return nodes != null && nodes.getLength() > INDEX_THRESHOLD ? buildIndex(nodes) : null;
+    }
+
+    /**
+     * Builds a HashMap index from a NodeList, keyed by NodeId attribute.
+     *
+     * @param nodes the node list to index
+     * @return map from NodeId to Element
+     */
+    private static Map<String, Element> buildIndex(NodeList nodes) {
+        Map<String, Element> map = new HashMap<>();
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element e = getNextNodeElement(nodes, i);
+            if (e != null) {
+                String nodeId = e.getAttribute("NodeId");
+                if (nodeId != null && !nodeId.isEmpty()) {
+                    // Linear lookup returns the first matching element, so the index must do the same.
+                    map.putIfAbsent(nodeId, e);
+                }
+            }
+        }
+        return map;
     }
 
     /**
@@ -288,6 +342,22 @@ public class DomParser {
         }
         return dataType;
     }
+    
+    /**
+     * Resolves the target variable name for a field that references another object/method node.
+     * If that node was already fully created elsewhere in the hierarchy, its existing (canonical)
+     * varName is reused instead of predicting a new, parent-specific one. This avoids duplicate
+     * top-level definitions for nodes referenced from multiple places (e.g. shared FromState/ToState
+     * targets in state machines).
+     *
+     * @param f the field referencing the target node
+     * @param predictedName the name that would be used if the target has not been created yet
+     * @return the resolved target name
+     */
+    private String resolveFieldTargetName(FieldType f, String predictedName) {
+        BaseType existing = findInHierarchy(f.getNodeId());
+        return (existing != null) ? existing.getVarName() : predictedName;
+    }
 
     // checkstyle: resume method length check
 
@@ -304,11 +374,9 @@ public class DomParser {
             for (FieldType f : fields) {
                 if (f instanceof FieldVariableType) {
                     nop();
-                } else if (f instanceof FieldObjectType) {
-                    f.setDataType(BaseType.validateVarName(uaObject.getVarName() + f.getDisplayname()));
-                    fields.set(fields.indexOf(f), f);
-                } else if (f instanceof FieldMethodType) {
-                    f.setDataType(BaseType.validateVarName(uaObject.getVarName() + f.getDisplayname()));
+                } else if (f instanceof FieldObjectType || f instanceof FieldMethodType) {
+                    String predicted = BaseType.validateVarName(uaObject.getVarName() + f.getDisplayname());
+                    f.setDataType(resolveFieldTargetName(f, predicted));
                     fields.set(fields.indexOf(f), f);
                 }
             }
@@ -317,18 +385,15 @@ public class DomParser {
             for (FieldType f : fields) {
                 if (f instanceof FieldVariableType) {
                     nop();
-                } else if (f instanceof FieldObjectType) {
-                    f.setDataType(BaseType.validateVarName(uaMethod.getVarName() + f.getDisplayname()));
-                    fields.set(fields.indexOf(f), f);
-                } else if (f instanceof FieldMethodType) {
-                    f.setDataType(BaseType.validateVarName(uaMethod.getVarName() + f.getDisplayname()));
+                } else if (f instanceof FieldObjectType || f instanceof FieldMethodType) {
+                    String predicted = BaseType.validateVarName(uaMethod.getVarName() + f.getDisplayname());
+                    f.setDataType(resolveFieldTargetName(f, predicted));
                     fields.set(fields.indexOf(f), f);
                 }
             }
         }
-
     }
-
+    
     /**
      * Does nothing, just allows for code convention compliance while bugfixing.
      */
@@ -337,24 +402,43 @@ public class DomParser {
 
     /**
      * Checks the relations and returns a node with NodeId {@code currentNodeId}.
-     * 
+     * Uses a pre-built HashMap index for O(1) lookup instead of an O(n) linear scan.
+     *
      * @param currentNodeId the node id to search for
-     * @param nodes         the nodes to search
+     * @param map           the pre-built index for this NodeList
      * @return the found element
      */
+    private static Element checkRelation(String currentNodeId, Map<String, Element> map) {
+        return map != null ? map.get(currentNodeId) : null;
+    }
+
+    /**
+     * Looks up a relation in the index, falling back to a linear scan when no index was built.
+     *
+     * @param currentNodeId the node id to search for
+     * @param map the optional pre-built index
+     * @param fallback the node list to scan when {@code map} is {@code null}
+     * @return the found element, or {@code null} if there is no match
+     */
+    private Element checkRelationFast(String currentNodeId, Map<String, Element> map, NodeList fallback) {
+        return map != null ? map.get(currentNodeId) : checkRelation(currentNodeId, fallback);
+    }
+
+    /**
+     * Legacy overload - kept for call sites that pass dynamic NodeLists
+     * (e.g. from required model documents). Falls back to linear scan.
+     */
     private static Element checkRelation(String currentNodeId, NodeList nodes) {
-
-        Element relatedElement = null;
-
+        if (nodes == null) {
+            return null;
+        }
         for (int i = 0; i < nodes.getLength(); i++) {
             Element node = getNextNodeElement(nodes, i);
-            String nodeId = node.getAttribute("NodeId");
-            if (currentNodeId.equals(nodeId)) {
-                relatedElement = node;
-                i = nodes.getLength();
+            if (node != null && currentNodeId.equals(node.getAttribute("NodeId"))) {
+                return node;
             }
         }
-        return relatedElement;
+        return null;
     }
 
     /**
@@ -485,7 +569,7 @@ public class DomParser {
                         Element childNode = getNextNodeElement(childNodeList, j);
                         if (childNode != null && !childNode.getTagName().equals("References")) {
                             if (childNode.getTagName().equals("DisplayName")) {
-                                identifiedDataType = childNode.getTextContent().replaceAll("[\"_\\\\]", "");
+                                identifiedDataType = childNode.getTextContent().replaceAll("[\u201C\u201D\"_\\\\]", "");
                                 break;
                             }
                         }
@@ -558,30 +642,39 @@ public class DomParser {
      * @return the data type
      */
     private String retrieveAttributesForExternDataType(String nodeId) {
+        boolean resolveDefinition = externalDataTypesInProgress.add(nodeId);
         String dataType = "";
-        for (int k = 0; k < documents.length; k++) {
-            NodeList typeList = documents[k].getElementsByTagName("UADataType");
-            String externNodeId = nodeId;
-            if (externNodeId.contains("ns=")) {
-                externNodeId = externNodeId.substring(0, externNodeId.indexOf("=") + 1) + 1
-                        + externNodeId.substring(externNodeId.indexOf(";"), externNodeId.length());
-            }
-            Element element = checkRelation(externNodeId, typeList);
-            if (element != null) {
+        try {
+            for (int k = 0; k < documents.length; k++) {
+                NodeList typeList = documents[k].getElementsByTagName("UADataType");
+                String externNodeId = nodeId;
+                if (externNodeId.contains("ns=")) {
+                    externNodeId = externNodeId.substring(0, externNodeId.indexOf("=") + 1) + 1
+                            + externNodeId.substring(externNodeId.indexOf(";"), externNodeId.length());
+                }
+                Element element = checkRelation(externNodeId, typeList);
+                if (element != null) {
 
-                NodeList childNodeList = element.getChildNodes();
+                    NodeList childNodeList = element.getChildNodes();
 
-                for (int j = 0; j < childNodeList.getLength(); j++) {
-                    Element childNode = getNextNodeElement(childNodeList, j);
-                    if (childNode != null && !childNode.getTagName().equals("References")) {
-                        if (childNode.getTagName().equals("DisplayName")) {
-                            dataType = childNode.getTextContent().replaceAll("[\"_\\\\]", "");
-                            break;
+                    for (int j = 0; j < childNodeList.getLength(); j++) {
+                        Element childNode = getNextNodeElement(childNodeList, j);
+                        if (childNode != null && !childNode.getTagName().equals("References")) {
+                            if (childNode.getTagName().equals("DisplayName")) {
+                                dataType = childNode.getTextContent().replaceAll("[\u201C\u201D\"_\\\\]", "");
+                                break;
+                            }
                         }
                     }
+                    if (resolveDefinition) {
+                        retrieveAttributes(element, null, ElementType.DATATYPE, nodeId);
+                    }
+                    break;
                 }
-                retrieveAttributes(element, null, ElementType.DATATYPE, nodeId);
-                break;
+            }
+        } finally {
+            if (resolveDefinition) {
+                externalDataTypesInProgress.remove(nodeId);
             }
         }
         return dataType;
@@ -723,10 +816,10 @@ public class DomParser {
             Element childNode = getNextNodeElement(childNodeList, j);
             if (childNode != null && !childNode.getTagName().equals("References")) {
                 if (childNode.getTagName().equals("DisplayName")) {
-                    result.reference = childNode.getTextContent().replaceAll("[\"\\\\]", "");
+                    result.reference = childNode.getTextContent().replaceAll("[\u201C\u201D\"\\\\]", "");
                     result.displayName = result.reference;
                 } else if (childNode.getTagName().equals("Description")) {
-                    result.description = childNode.getTextContent().replaceAll("[\"\\\\]", "");
+                    result.description = childNode.getTextContent().replaceAll("[\u201C\u201D\"\\\\]", "");
                 } else if (childNode.getTagName().equals("Documentation")) {
                     result.documentation = childNode.getTextContent();
                 }
@@ -750,15 +843,15 @@ public class DomParser {
             if (refNode != null
                     && IDENTIFY_FIELDS_PERMITTED_REFERENCE_TYPE.contains(refNode.getAttribute("ReferenceType"))) {
                 String refId = refNode.getTextContent();
-                Element refElement = checkRelation(refId, variableList);
+                Element refElement = checkRelationFast(refId, variableMap, variableList);
                 if (refElement != null) {
                     retrieveAttributesForRefElement(fields, refId, refElement, ElementType.FIELDVARIABLE);
                 } else {
-                    refElement = checkRelation(refId, objectList);
+                    refElement = checkRelationFast(refId, objectMap, objectList);
                     if (refElement != null && !(refNode.getAttribute("IsForward").equals("false"))) {
                         retrieveAttributesForRefElement(fields, refId, refElement, ElementType.FIELDOBJECT);
                     } else {
-                        refElement = checkRelation(refId, methodList);
+                        refElement = checkRelationFast(refId, methodMap, methodList);
                         if (refElement != null) {
                             retrieveAttributesForRefElement(fields, refId, refElement, ElementType.FIELDMETHOD);
                         }
@@ -815,13 +908,64 @@ public class DomParser {
 
         for (FieldType field : subElements) {
             if (!(field instanceof FieldVariableType) && !(field instanceof FieldMethodType)) {
-                Element object = checkRelation(field.getNodeId(), objectList);
+                Element object = checkRelationFast(field.getNodeId(), objectMap, objectList);
                 retrieveAttributes(object, fields, ElementType.SUBOBJECT, null);
             } else if (!(field instanceof FieldVariableType) && !(field instanceof FieldObjectType)) {
-                Element method = checkRelation(field.getNodeId(), methodList);
+                Element method = checkRelationFast(field.getNodeId(), methodMap, methodList);
                 retrieveAttributes(method, fields, ElementType.SUBMETHOD, null);
             }
         }
+    }
+    
+    /**
+     * Retrieves variables nested below already created {@link RootVariableType} instances (e.g.
+     * quality/engineering-unit sub-properties of a composite measurement value type, a pattern
+     * introduced by the ECM/Energy companion specs and not previously present in supported inputs).
+     * Iterates to a fixed point to cover arbitrary nesting depth.
+     */
+    private void retrieveNestedRootVariables() {
+        java.util.Set<String> processed = new java.util.HashSet<>();
+        boolean added;
+        do {
+            added = false;
+            for (int i = 0; i < variableList.getLength(); i++) {
+                Element variable = getNextNodeElement(variableList, i);
+                if (variable != null) {
+                    String nodeId = variable.getAttribute("NodeId");
+                    if (!processed.contains(nodeId) && findInHierarchy(nodeId) == null) {
+                        BaseType parent = findRootVariableInHierarchy(variable.getAttribute("ParentNodeId"));
+                        if (parent != null) {
+                            processed.add(nodeId);
+                            nestedRootVariableParent = parent;
+                            retrieveRootElement(variable, ElementType.ROOTVARIABLE);
+                            nestedRootVariableParent = null;
+                            added = true;
+                        }
+                    }
+                }
+            }
+        } while (added);
+    }
+    
+    /**
+     * Finds an already created element in {@link #hierarchy} by its OPC UA node id.
+     *
+     * @param nodeId the node id to search for
+     * @return the found element or <b>null</b>
+     */
+    private BaseType findInHierarchy(String nodeId) {
+        return hierarchyByNodeId.get(nodeId);
+    }
+
+    /**
+     * Finds an already created {@link RootVariableType} in {@link #hierarchy} by its OPC UA node id.
+     *
+     * @param nodeId the node id to search for
+     * @return the found root variable or <b>null</b>
+     */
+    private BaseType findRootVariableInHierarchy(String nodeId) {
+        BaseType found = findInHierarchy(nodeId);
+        return (found instanceof RootVariableType) ? found : null;
     }
 
     // checkstyle: stop method length check
@@ -862,27 +1006,27 @@ public class DomParser {
             if (childNode != null && !childNode.getTagName().equals("References")) {
                 if (childNode.getTagName().equals("Description")) {
                     description = (childNode.getTextContent() + "@" + childNode.getAttribute("Locale"))
-                            .replaceAll("[\"\\\\]", "");
+                            .replaceAll("[\u201C\u201D\"\\\\]", "");
                 } else if (childNode.getTagName().equals("DisplayName")) {
-                    displayName = childNode.getTextContent().replaceAll("[\"_\\\\]", "");
+                    displayName = childNode.getTextContent().replaceAll("[\u201C\u201D\"_\\\\]", "");
                 } else if (childNode.getTagName().equals("Documentation")) {
-                    documentation = childNode.getTextContent().replaceAll("[\"\\\\]", "");
+                    documentation = childNode.getTextContent().replaceAll("[\u201C\u201D\"\\\\]", "");
                 } else if (childNode.getTagName().equals("Definition")) {
                     NodeList fields = childNode.getChildNodes();
 
                     for (int k = 0; k < fields.getLength(); k++) {
                         Element fieldNode = getNextNodeElement(fields, k);
                         if (fieldNode != null) {
-                            String fieldName = "_" + fieldNode.getAttribute("Name").replaceAll("[,\"\\\\]", "_");
+                            String fieldName = "_" + fieldNode.getAttribute("Name").replaceAll("[,\u201C\u201D\"\\\\]", "_");
                             if (fieldName.equals("") || fieldName.equals("_")) {
                                 fieldName = "placeholder_"
-                                        + childNode.getAttribute("Name").replaceAll("[/,\"\\\\]", "_");
+                                        + childNode.getAttribute("Name").replaceAll("[/,\u201C\u201D\"\\\\]", "_");
                             } else {
-                                fieldName = fieldName.replace("µ", "mu");
+                                fieldName = fieldName.replace("\u00B5", "mu");
                                 fieldName = fieldName.replace("/", "_per_");
-                                fieldName = fieldName.replace("²", "_toPowerOf2");
-                                fieldName = fieldName.replace("³", "_toPowerOf3");
-                                fieldName = fieldName.replace("°", "degree_");
+                                fieldName = fieldName.replace("\u00B2", "_toPowerOf2");
+                                fieldName = fieldName.replace("\u00B3", "_toPowerOf3");
+                                fieldName = fieldName.replace("\u00B0", "degree_");
                             }
                             String fieldDescription = getFieldDescription(fieldNode);
                             String fieldValue = fieldNode.getAttribute("Value");
@@ -942,10 +1086,10 @@ public class DomParser {
             if (fieldChildNode != null) {
                 if (fieldChildNode.getTagName().equals("Description")) {
                     if (fieldChildNode.getAttribute("Locale").equals("")) {
-                        fieldDescription = fieldChildNode.getTextContent().replaceAll("[\"\\\\]", "");
+                        fieldDescription = fieldChildNode.getTextContent().replaceAll("[\u201C\u201D\"\\\\]", "");
                     } else {
                         fieldDescription = (fieldChildNode.getTextContent() + "@"
-                                + fieldChildNode.getAttribute("Locale")).replaceAll("[\"\\\\]", "");
+                                + fieldChildNode.getAttribute("Locale")).replaceAll("[\u201C\u201D\"\\\\]", "");
                     }
                 }
             }
@@ -978,7 +1122,7 @@ public class DomParser {
         switch (type) {
         case ROOTOBJECT:
             ObjectType uaRootObject = new RootObjectType(id,
-                    element.getAttribute("BrowseName").replaceAll("[\"\\\\]", ""), displayName, description, optional,
+                    element.getAttribute("BrowseName").replaceAll("[\u201C\u201D\"\\\\]", ""), displayName, description, optional,
                     BaseType.validateVarName("opc" + typeDef),
                     retrieveParent(element.getAttribute("ParentNodeId"), objectTypeList), objectFields);
             uaRootObject.setVarName(retrieveParent(element.getAttribute("ParentNodeId"), objectTypeList) + displayName);
@@ -993,35 +1137,42 @@ public class DomParser {
         case ROOTVARIABLE:
             dataType = element.getAttribute("DataType");
             if (dataType.equals("EnumValueType")) {
-                Element relatedDataTypeElement = checkRelation(element.getAttribute("ParentNodeId"), dataTypeList);
-                NodeList dataChildNodeList = relatedDataTypeElement.getChildNodes();
-                for (int j = 0; j < dataChildNodeList.getLength(); j++) {
-                    Element childNode = getNextNodeElement(dataChildNodeList, j);
-                    if (childNode != null) {
-                        if (childNode.getTagName().equals("DisplayName")) {
-                            dataType = childNode.getTextContent();
+                Element relatedDataTypeElement = checkRelationFast(element.getAttribute("ParentNodeId"), dataTypeMap, dataTypeList);
+                if (relatedDataTypeElement != null) {
+                    NodeList dataChildNodeList = relatedDataTypeElement.getChildNodes();
+                    for (int j = 0; j < dataChildNodeList.getLength(); j++) {
+                        Element childNode = getNextNodeElement(dataChildNodeList, j);
+                        if (childNode != null) {
+                            if (childNode.getTagName().equals("DisplayName")) {
+                                dataType = childNode.getTextContent();
+                            }
                         }
                     }
+                } else {
+                    dataType = changeVariableDataTypes(dataType);
                 }
             } else {
                 dataType = changeVariableDataTypes(dataType);
-            }
+            }            
             String dimension = element.getAttribute("ArrayDimensions");
             if (dimension.contains(",")) {
                 dimension = dimension.substring(0, dimension.indexOf(","));
             }
+            String parentVarName = (nestedRootVariableParent != null)
+                    ? nestedRootVariableParent.getVarName()
+                    : retrieveParent(element.getAttribute("ParentNodeId"), objectTypeList);
             RootVariableType uaRootVariable = new RootVariableType(id,
-                    element.getAttribute("BrowseName").replaceAll("[\"\\\\]", ""), displayName, description, dataType,
+                    element.getAttribute("BrowseName").replaceAll("[\u201C\u201D\"\\\\]", ""), displayName, description, dataType,
                     BaseType.validateVarName("opc" + typeDef + "Type"), optional, element.getAttribute("AccessLevel"),
                     element.getAttribute("ValueRank"), dimension,
-                    retrieveParent(element.getAttribute("ParentNodeId"), objectTypeList));
-            uaRootVariable
-                    .setVarName(retrieveParent(element.getAttribute("ParentNodeId"), objectTypeList) + displayName);
+                    parentVarName);
+            uaRootVariable.setVarName(parentVarName + displayName);
             addElement(uaRootVariable, type);
             break;
         case ROOTMETHOD:
             RootMethodType uaRootMethod = new RootMethodType(id,
-                    element.getAttribute("BrowseName").replaceAll("[\"\\\\]", ""), displayName, description, optional,
+                    element.getAttribute("BrowseName").replaceAll("[\u201C\u201D\"\\\\]", ""), displayName, description, optional,
+
                     null, retrieveParent(element.getAttribute("ParentNodeId"), objectTypeList), objectFields);
             uaRootMethod.setVarName(retrieveParent(element.getAttribute("ParentNodeId"), objectTypeList) + displayName);
             if (!objectFields.isEmpty()) {
@@ -1033,34 +1184,42 @@ public class DomParser {
             }
             break;
         case SUBOBJECT:
-            ObjectType uaSubObject = new ObjectType(id, element.getAttribute("BrowseName").replaceAll("[\"\\\\]", ""),
-                    displayName, description, optional, BaseType.validateVarName(typeDef), objectFields);
-            uaSubObject.setVarName(searchVarName(uaSubObject, hierarchy));
-            if (!objectFields.isEmpty()) {
-                adaptDatatypesToModel(uaSubObject, null);
-            }
-            println(uaSubObject.toString());
-            hierarchy.add(uaSubObject);
-            if (!uaSubObject.getFields().isEmpty()) {
-                retrieveRelatedSubElements(uaSubObject.getFields());
+            if (findInHierarchy(id) == null) {
+                ObjectType uaSubObject = new ObjectType(id, element.getAttribute("BrowseName").replaceAll("[\u201C\u201D\"\\\\]", ""),
+                        displayName, description, optional, BaseType.validateVarName(typeDef), objectFields);
+                uaSubObject.setVarName(searchVarName(uaSubObject, hierarchy));
+                if (!objectFields.isEmpty()) {
+                    adaptDatatypesToModel(uaSubObject, null);
+                }
+                println(uaSubObject.toString());
+                hierarchy.add(uaSubObject);
+                hierarchyByNodeId.put(uaSubObject.getNodeId(), uaSubObject);
+                hierarchyByVarName.put(uaSubObject.getVarName(), uaSubObject);
+                if (!uaSubObject.getFields().isEmpty()) {
+                    retrieveRelatedSubElements(uaSubObject.getFields());
+                }
             }
             break;
         case SUBMETHOD:
-            MethodType uaMethod = new MethodType(id, element.getAttribute("BrowseName").replaceAll("[\"\\\\]", ""),
-                    displayName, description, optional, objectFields);
-            uaMethod.setVarName(searchVarName(uaMethod, hierarchy));
-            if (!objectFields.isEmpty()) {
-                adaptDatatypesToModel(null, uaMethod);
-            }
-            println(uaMethod.toString());
-            hierarchy.add(uaMethod);
-            if (!uaMethod.getFields().isEmpty()) {
-                retrieveRelatedSubElements(uaMethod.getFields());
+            if (findInHierarchy(id) == null) {
+                MethodType uaMethod = new MethodType(id, element.getAttribute("BrowseName").replaceAll("[\u201C\u201D\"\\\\]", ""),
+                        displayName, description, optional, objectFields);
+                uaMethod.setVarName(searchVarName(uaMethod, hierarchy));
+                if (!objectFields.isEmpty()) {
+                    adaptDatatypesToModel(null, uaMethod);
+                }
+                println(uaMethod.toString());
+                hierarchy.add(uaMethod);
+                hierarchyByNodeId.put(uaMethod.getNodeId(), uaMethod);
+                hierarchyByVarName.put(uaMethod.getVarName(), uaMethod);
+                if (!uaMethod.getFields().isEmpty()) {
+                    retrieveRelatedSubElements(uaMethod.getFields());
+                }
             }
             break;
         case FIELDOBJECT:
             FieldObjectType uaFieldObject = new FieldObjectType(id,
-                    element.getAttribute("BrowseName").replaceAll("[\"\\\\]", ""), displayName, description, "",
+                    element.getAttribute("BrowseName").replaceAll("[\u201C\u201D\"\\\\]", ""), displayName, description, "",
                     optional);
             uaFieldObject.setVarName("opc" + displayName);
             if (!checkRedundancy(uaFieldObject.getVarName(), subFields)) {
@@ -1070,7 +1229,7 @@ public class DomParser {
         case FIELDVARIABLE:
             dataType = element.getAttribute("DataType");
             if (dataType.equals("EnumValueType")) {
-                Element relatedDataTypeElement = checkRelation(element.getAttribute("ParentNodeId"), dataTypeList);
+                Element relatedDataTypeElement = checkRelationFast(element.getAttribute("ParentNodeId"), dataTypeMap, dataTypeList);
                 NodeList dataChildNodeList = relatedDataTypeElement.getChildNodes();
                 for (int j = 0; j < dataChildNodeList.getLength(); j++) {
                     Element childNode = getNextNodeElement(dataChildNodeList, j);
@@ -1088,7 +1247,7 @@ public class DomParser {
                 fieldDimension = fieldDimension.substring(0, fieldDimension.indexOf(","));
             }
             FieldVariableType uaFieldVariable = new FieldVariableType(id,
-                    element.getAttribute("BrowseName").replaceAll("[\"\\\\]", ""), displayName, description, dataType,
+                    element.getAttribute("BrowseName").replaceAll("[\u201C\u201D\"\\\\]", ""), displayName, description, dataType,
                     BaseType.validateVarName("opc" + typeDef + "Type"), optional, element.getAttribute("AccessLevel"),
                     element.getAttribute("ValueRank"), fieldDimension);
             uaFieldVariable.setVarName(retrieveParent(element.getAttribute("ParentNodeId"), objectList) + displayName);
@@ -1098,7 +1257,7 @@ public class DomParser {
             break;
         case FIELDMETHOD:
             FieldMethodType uaFieldMethod = new FieldMethodType(id,
-                    element.getAttribute("BrowseName").replaceAll("[\"\\\\]", ""), displayName, description, "",
+                    element.getAttribute("BrowseName").replaceAll("[\u201C\u201D\"\\\\]", ""), displayName, description, "",
                     optional);
             uaFieldMethod.setVarName("opc" + displayName);
             if (!checkRedundancy(uaFieldMethod.getVarName(), subFields)) {
@@ -1106,27 +1265,27 @@ public class DomParser {
             }
             break;
         case ENUM:
-            EnumType enumeration = new EnumType(id, element.getAttribute("BrowseName").replaceAll("[\"\\\\]", ""),
+            EnumType enumeration = new EnumType(id, element.getAttribute("BrowseName").replaceAll("[\u201C\u201D\"\\\\]", ""),
                     displayName, description, documentation, literals);
             enumeration.setVarName("opc" + displayName + "Type");
             addElement(enumeration, type);
             break;
         case DATATYPE:
-            DataType uaDataType = new DataType(id, element.getAttribute("BrowseName").replaceAll("[\"\\\\]", ""),
+            DataType uaDataType = new DataType(id, element.getAttribute("BrowseName").replaceAll("[\u201C\u201D\"\\\\]", ""),
                     displayName, description, documentation, dataLiterals);
             uaDataType.setVarName("opc" + displayName + "Type");
             addElement(uaDataType, type);
             break;
         case OBJECTTYPE:
             ObjectTypeType uaObjectType = new ObjectTypeType(id,
-                    element.getAttribute("BrowseName").replaceAll("[\"\\\\]", ""), displayName, description,
+                    element.getAttribute("BrowseName").replaceAll("[\u201C\u201D\"\\\\]", ""), displayName, description,
                     documentation);
             uaObjectType.setVarName("opc" + displayName);
             addElement(uaObjectType, type);
             break;
         case VARIABLETYPE:
             VariableTypeType uaVariableType = new VariableTypeType(id,
-                    element.getAttribute("BrowseName").replaceAll("[\"\\\\]", ""), displayName, description,
+                    element.getAttribute("BrowseName").replaceAll("[\u201C\u201D\"\\\\]", ""), displayName, description,
                     documentation, changeVariableDataTypes(element.getAttribute("DataType")));
             uaVariableType.setVarName("opc" + displayName + "Type");
             addElement(uaVariableType, type);
@@ -1143,12 +1302,26 @@ public class DomParser {
      * @param type    the element type
      */
     private void addElement(BaseType element, ElementType type) {
-        if (!checkRedundancy(element.getVarName(), null)) {
+        BaseType existing = findInHierarchy(element.getNodeId());
+        if (existing == null) {
+            if (!checkRedundancy(element.getVarName(), null)) {
+                println(element.toString());
+                hierarchy.add(element);
+                hierarchyByNodeId.put(element.getNodeId(), element);
+                hierarchyByVarName.put(element.getVarName(), element);
+            }
+        } else if (type == ElementType.ROOTOBJECT && !(existing instanceof RootObjectType)) {
+            element.setVarName(existing.getVarName());
+            hierarchy.remove(existing);
+            hierarchyByNodeId.remove(existing.getNodeId());
+            hierarchyByVarName.remove(existing.getVarName());
             println(element.toString());
             hierarchy.add(element);
+            hierarchyByNodeId.put(element.getNodeId(), element);
+            hierarchyByVarName.put(element.getVarName(), element);
         }
     }
-
+    
     /**
      * Checks for redundant/duplicate variable names in {@link #hierarchy}.
      * 
@@ -1157,23 +1330,16 @@ public class DomParser {
      * @return {@code true} if there are duplicates, {@code false} else
      */
     private boolean checkRedundancy(String varName, ArrayList<FieldType> list) {
-        boolean duplicateVar = false;
         if (list != null) {
             for (FieldType f : list) {
                 if (f.getVarName().equals(varName)) {
-                    duplicateVar = true;
-                    break;
+                    return true;
                 }
             }
+            return false;
         } else {
-            for (BaseType o : hierarchy) {
-                if (o.getVarName().equals(varName)) {
-                    duplicateVar = true;
-                    break;
-                }
-            }
+            return hierarchyByVarName.containsKey(varName);
         }
-        return duplicateVar;
     }
 
     /**
@@ -1217,6 +1383,48 @@ public class DomParser {
      */
     private static String toOsPath(String path) {
         return toOsPath(new File(path)); // normalize to OS paths
+    }
+
+    /**
+     * Adds the XML model files in {@code directory} to {@code files}.
+     *
+     * @param files the files to add to
+     * @param directory the directory to inspect
+     */
+    private static void addModelFiles(ArrayList<File> files, File directory) {
+        File[] candidates = directory.listFiles(file -> file.isFile()
+                && file.getName().toLowerCase().endsWith(".xml"));
+        if (candidates != null) {
+            Collections.addAll(files, candidates);
+        }
+    }
+
+    /**
+     * Normalizes a model name for matching URI-derived names with file names.
+     *
+     * @param name the model name
+     * @return the normalized model name
+     */
+    private static String normalizeModelName(String name) {
+        return name.replaceAll("[^A-Z0-9]", "");
+    }
+
+    /**
+     * Derives a normalized model name from {@code file}.
+     *
+     * @param file the model file
+     * @return the normalized model name
+     */
+    private static String getModelName(File file) {
+        String model = file.getName().toUpperCase();
+        if (model.equals("OPC.UA.NODESET2.XML")) {
+            return "UA";
+        }
+        model = StringUtils.removeEnd(model, ".NODESET2.XML");
+        if (model.startsWith("OPC.UA.")) {
+            model = model.substring("OPC.UA.".length());
+        }
+        return normalizeModelName(model);
     }
 
     /**
@@ -1265,7 +1473,7 @@ public class DomParser {
 
         boolean correct = false;
         File[] models = null;
-        File[] files = null;
+        ArrayList<File> files = new ArrayList<File>();
         ArrayList<File> foundFiles = new ArrayList<File>();
         File f = new File(path, "/RequiredModels");
         do {
@@ -1284,8 +1492,11 @@ public class DomParser {
                 }
             } else {
                 File requiredModels = new File(path, "/RequiredModels");
-                files = f.listFiles();
-                if (files.length == 0) {
+                files.clear();
+                foundFiles.clear();
+                addModelFiles(files, requiredModels);
+                addModelFiles(files, new File(path));
+                if (files.isEmpty()) {
                     System.out.println("The folder RequiredModels is still empty.");
                     System.out.println("Please add the following models to " + requiredModels.toString() + ":");
                     for (String s : uris) {
@@ -1297,24 +1508,11 @@ public class DomParser {
                     for (String s : uris) {
                         s = StringUtils.removeEnd(s.replace("http://opcfoundation.org/UA/", ""), "/").replace("/", ".")
                                 .toUpperCase();
+                        String requiredModelName = normalizeModelName(s);
 
-                        for (int i = 0; i < files.length; i++) {
-                            String model = null;
-                            if (toOsPath(files[i]).equals(toOsPath(path + "/RequiredModels/Opc.Ua.NodeSet2.xml"))) {
-                                model = "UA";
-                            } else {
-                                model = toOsPath(files[i]).toUpperCase()
-                                        .replace(toOsPath(path.toUpperCase() + "/REQUIREDMODELS/OPC.UA."), "")
-                                        .replace(".NODESET2.XML", "");
-                            }
-                            if (model.equals(s)) {
-                                if (model.equals("UA")) {
-                                    File rModel = new File(files[i].toString());
-                                    foundFiles.add(rModel);
-                                } else {
-                                    File rModel = new File(files[i].toString());
-                                    foundFiles.add(rModel);
-                                }
+                        for (File file : files) {
+                            if (getModelName(file).equals(requiredModelName)) {
+                                foundFiles.add(file);
                                 modelFound = true;
                                 break;
                             }
@@ -1333,6 +1531,7 @@ public class DomParser {
                         System.out.println("The following models are still missing:\n" + missingModels);
                     }
                 }
+
                 // Überprüfung, ob files fehlen und wenn, ja welche
             }
             if (!correct) {
@@ -1362,7 +1561,7 @@ public class DomParser {
             Element object = getNextNodeElement(objectList, i);
             if (object != null) {
                 String parentNodeId = object.getAttribute("ParentNodeId");
-                Element rootObject = checkRelation(parentNodeId, objectTypeList);
+                Element rootObject = checkRelationFast(parentNodeId, objectTypeMap, objectTypeList);
                 if (rootObject != null) {
                     retrieveRootElement(object, ElementType.ROOTOBJECT);
                 }
@@ -1373,7 +1572,7 @@ public class DomParser {
             Element variable = getNextNodeElement(variableList, i);
             if (variable != null) {
                 String parentNodeId = variable.getAttribute("ParentNodeId");
-                Element rootVariable = checkRelation(parentNodeId, objectTypeList);
+                Element rootVariable = checkRelationFast(parentNodeId, objectTypeMap, objectTypeList);
                 if (rootVariable != null) {
                     retrieveRootElement(variable, ElementType.ROOTVARIABLE);
                 }
@@ -1384,7 +1583,7 @@ public class DomParser {
             Element method = getNextNodeElement(methodList, i);
             if (method != null) {
                 String parentNodeId = method.getAttribute("ParentNodeId");
-                Element rootMethod = checkRelation(parentNodeId, objectTypeList);
+                Element rootMethod = checkRelationFast(parentNodeId, objectTypeMap, objectTypeList);
                 if (rootMethod != null) {
                     retrieveRootElement(method, ElementType.ROOTMETHOD);
                 }
@@ -1393,6 +1592,18 @@ public class DomParser {
         if (dataTypeList.getLength() > 0 || objectTypeList.getLength() > 0) {
             retrieveElementTypes();
         }
+        for (int i = 0; i < variableList.getLength(); i++) {
+            Element variable = getNextNodeElement(variableList, i);
+            if (variable != null) {
+                String parentNodeId = variable.getAttribute("ParentNodeId");
+                Element rootVariable = checkRelationFast(parentNodeId, objectTypeMap, objectTypeList);
+                if (rootVariable != null) {
+                    retrieveRootElement(variable, ElementType.ROOTVARIABLE);
+                }
+            }
+        }
+        retrieveNestedRootVariables();
+
     }
 
     /**

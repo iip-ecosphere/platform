@@ -1,0 +1,235 @@
+project Energy {
+
+    import IIPEcosphere;
+    import OpcUaDataTypes;
+    import OpcEnergy;
+
+    annotate BindingTime bindingTime = BindingTime::compile to .;
+
+    // ------------ component setup ------------------
+
+    serializer = Serializer::Json;
+    // serviceManager, containerManager are already defined    
+
+    aasServer = {
+        schema = AasSchema::HTTP,
+        port = 9001,
+        host = "127.0.0.1"
+    };
+    aasRegistryServer = {
+        schema = AasSchema::HTTP,
+        port = 9002,
+        host = "127.0.0.1",
+        path = "registry"
+    };
+    aasImplServer = {
+        port = 9003
+    };
+    aasProtocol = AasProtocolVabTcp{};
+
+    // ------------------ transport --------------------------
+
+    transportProtocol = TransportProtocolMQTTv5 {
+        port = 8883
+    };
+
+    serviceProtocol = ServiceProtocolMQTTv5 {};
+
+    // ------------------ resources/devicemgt ----------------
+
+    deviceRegistry = BasicDeviceRegistry {
+    };
+
+    deviceMgtStorage = S3MockDeviceMgtStorage {
+        host = "localhost",
+        port = 8884,
+        region = "local"
+    };
+
+    // just for testing, this instantiates app rather than platform
+    deviceMgtStorageServer = S3MockDeviceMgtStorageServer{};
+
+    // ------------ data types ------------------
+
+    RecordType opcIn = {
+        name = "OpcIn",
+        fields = {
+            Field {
+                name = "NonElectricalEnergy",
+                type = refBy(opcINonElectricalEnergyType),
+                cachingTime = CACHE_ALWAYS
+            }, Field {
+                name = "BaseFlow",
+                type = refBy(opcIBaseFlowType),
+                cachingTime = CACHE_ALWAYS
+            }, Field {
+                name = "VolumeFlow",
+                type = refBy(opcIVolumeFlowType),
+                cachingTime = CACHE_ALWAYS
+            }, Field {
+                name = "MassFlow",
+                type = refBy(opcIMassFlowType),
+                cachingTime = CACHE_ALWAYS
+            }
+        }
+    };
+    
+RecordType opcOut = {
+    name = "OpcOut",
+    fields = {
+        Field {
+            name = "NeEnergyImportHp",
+            type = refBy(DoubleType),
+            cachingTime = CACHE_ALWAYS
+        },
+        Field {
+            name = "NeEnergyExportHp",
+            type = refBy(DoubleType),
+            cachingTime = CACHE_ALWAYS
+        },
+        Field {
+            name = "Pressure",
+            type = refBy(FloatType),
+            cachingTime = CACHE_ALWAYS
+        },
+        Field {
+            name = "Temperature",
+            type = refBy(FloatType),
+            cachingTime = CACHE_ALWAYS
+        },
+        Field {
+            name = "Volume",
+            type = refBy(FloatType),
+            cachingTime = CACHE_ALWAYS
+        },
+        Field {
+            name = "VolumeFlowRate",
+            type = refBy(FloatType),
+            cachingTime = CACHE_ALWAYS
+        },
+        Field {
+            name = "Mass",
+            type = refBy(FloatType),
+            cachingTime = CACHE_ALWAYS
+        },
+        Field {
+            name = "MassFlowRate",
+            type = refBy(FloatType),
+            cachingTime = CACHE_ALWAYS
+        }
+    }
+};
+    // ------------ individual, reusable services ------------------
+
+    OpcUaV1Connector myOpcUaConn = {
+        id = "myOpcConn",
+        name = "myOpcConn example",
+        description = "",
+        ver = "0.1.0",
+        host = "127.0.0.1",
+    //host = "opcua.umati.app",
+        port = 4840, // default localhost
+        
+        input = {{type=refBy(opcIn)}},
+        output = {{type=refBy(opcOut)}},
+        inInterface = {{type=refBy(opcIn), path="Objects/Sinumerik/Energy/"}}, 
+        outInterface = {{type=refBy(opcOut), path="Objects/Sinumerik/Energy/"}}
+        /*operations = {
+          FieldAssignmentOperation{field=myConnPltfIn.fields[1], 
+            operation=AddDataTranslationOperation{
+                arguments={
+                    DataFieldAccess{field=myConnMachineOut.fields[0]},
+                    IntegerConstantDataOperation{value=100}}
+            }
+          }
+        }*/
+    };
+
+    // not really needed except for populating the interfaces package
+    Service myReceiverService = JavaService {
+        id = "OpcReceiver",
+        name = "OPC Receiver",
+        description = "",
+        ver = "0.1.0",
+        deployable = true,
+        class = "ReceiverImpl",
+        artifact = "",
+        kind = ServiceKind::SINK_SERVICE,
+        input = {{type=refBy(opcOut)}}
+    };
+
+    // --------------------- monitoring ---------------------------
+
+    // current default: no monitoring configured
+
+    // ------------------------- UI -------------------------------
+
+    // current default: no UI configured
+
+    // ------------ application and service nets ------------------
+
+    Application myApp = {
+        id = "EnergyOpcApp",
+        name = "Simple Energy OPC Demo App",
+        ver = "0.1.0",
+        description = "",
+        services = {refBy(myMesh)}        
+    };
+
+    ServiceMesh myMesh = {
+        description = "Energy Service Net",
+        sources = {refBy(mqttOpcSource)}
+    };
+
+    MeshSource mqttOpcSource = {
+       impl = refBy(myOpcUaConn),
+       next = {refBy(myConnMySourceMyReceiver)}
+    };
+
+    // needed to form a graph
+
+    MeshConnector myConnMySourceMyReceiver = {
+        name = "Source->Receiver",
+        next = refBy(myReceiver)
+    };
+
+    MeshSink myReceiver = {
+        impl = refBy(myReceiverService)
+    };
+
+    // ---------- generation setup ------------
+
+    sharedInterfaces = true;
+    sharedArtifact = "de.iip-ecosphere.platform:apps.EnergyOpcAppInterfaces:" + iipVer;
+
+    // ------------ freezing ------------------
+
+    freeze {
+        aas;
+        aasServer;
+        aasRegistryServer;
+        aasImplServer;
+        aasPersistency;
+        aasProtocol;
+        serializer;
+        transportProtocol;
+        serviceManager;
+        serviceProtocol;
+        containerManager;
+        deviceMgtStorageServer;
+        deviceMgtStorage;
+        deviceRegistry;
+        javaModuleOpts;
+        javaOpts;
+        pidDir;
+        sharedInterfaces;
+        sharedArtifact;
+        platformMonitoring;
+        managementUi;
+        artifactsFolder;
+        artifactsUriPrefix;
+        OpcEnergy; // now freeze also cachingTime
+        .; // every variable declared in this project
+    } but (f|f.bindingTime >= BindingTime.runtimeMon);
+
+}

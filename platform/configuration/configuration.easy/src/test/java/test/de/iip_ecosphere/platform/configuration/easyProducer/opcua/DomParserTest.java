@@ -19,9 +19,16 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import de.uni_hildesheim.sse.easy.loader.ManifestLoader;
@@ -37,6 +44,102 @@ import net.ssehub.easy.varModel.confModel.Configuration;
  * @author Holger Eichelberger, SSE
  */
 public class DomParserTest {
+
+    /**
+     * Tests the exact index threshold and verifies that indexed lookup keeps the
+     * first-match behavior of the original linear lookup.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testRelationIndexThresholdAndDuplicateIds()
+            throws ReflectiveOperationException, ParserConfigurationException {
+        Assert.assertNull(invokeBuildIndexIfBeneficial(createNodeList(50)));
+
+        NodeList indexedNodes = createNodeList(51);
+        Map<String, Element> thresholdIndex = invokeBuildIndexIfBeneficial(indexedNodes);
+        Assert.assertNotNull(thresholdIndex);
+        Assert.assertEquals(51, thresholdIndex.size());
+        Assert.assertSame(indexedNodes.item(50), thresholdIndex.get("node-50"));
+
+        Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        Element root = document.createElement("nodes");
+        document.appendChild(root);
+        Element first = appendNode(document, root, "duplicate");
+        first.setAttribute("marker", "first");
+        Element second = appendNode(document, root, "duplicate");
+        second.setAttribute("marker", "second");
+        appendNode(document, root, "");
+
+        Map<String, Element> duplicateIndex = invokeBuildIndex(root.getChildNodes());
+        Assert.assertEquals(1, duplicateIndex.size());
+        Assert.assertSame(first, duplicateIndex.get("duplicate"));
+        Assert.assertFalse(duplicateIndex.containsKey(""));
+    }
+
+    /**
+     * Creates a DOM node list with unique NodeIds.
+     *
+     * @param count the number of nodes
+     * @return the created node list
+     * @throws ParserConfigurationException shall not occur
+     */
+    private static NodeList createNodeList(int count) throws ParserConfigurationException {
+        Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        Element root = document.createElement("nodes");
+        document.appendChild(root);
+        for (int i = 0; i < count; i++) {
+            appendNode(document, root, "node-" + i);
+        }
+        return root.getChildNodes();
+    }
+
+    /**
+     * Appends a node to {@code root}.
+     *
+     * @param document the owning document
+     * @param root the parent element
+     * @param nodeId the NodeId value
+     * @return the appended element
+     */
+    private static Element appendNode(Document document, Element root, String nodeId) {
+        Element node = document.createElement("node");
+        if (nodeId != null) {
+            node.setAttribute("NodeId", nodeId);
+        }
+        root.appendChild(node);
+        return node;
+    }
+
+    /**
+     * Invokes the production index builder.
+     *
+     * @param nodes the nodes to index
+     * @return the index
+     * @throws ReflectiveOperationException shall not occur
+     */
+    @SuppressWarnings("unchecked")
+    private static Map<String, Element> invokeBuildIndex(NodeList nodes) throws ReflectiveOperationException {
+        Method method = DomParser.class.getDeclaredMethod("buildIndex", NodeList.class);
+        method.setAccessible(true);
+        return (Map<String, Element>) method.invoke(null, nodes);
+    }
+
+    /**
+     * Invokes the production index-threshold decision.
+     *
+     * @param nodes the nodes to consider
+     * @return the index, or {@code null}
+     * @throws ReflectiveOperationException shall not occur
+     */
+    @SuppressWarnings("unchecked")
+    private static Map<String, Element> invokeBuildIndexIfBeneficial(NodeList nodes)
+            throws ReflectiveOperationException {
+        Method method = DomParser.class.getDeclaredMethod("buildIndexIfBeneficial", NodeList.class);
+        method.setAccessible(true);
+        return (Map<String, Element>) method.invoke(null, nodes);
+    }
 
     /**
      * Tests creating and using a dedicated parser output folder.
@@ -331,6 +434,50 @@ public class DomParserTest {
     }
 
     /**
+     * Tests parsing the Machinery Jobs companion specification, including its
+     * self-referencing ISA95 parameter data type.
+     *
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testDomParserMachineryJobs() throws IOException {
+        File in = new File("src/test/resources/NodeSets/Opc.Ua.Machinery.Jobs.Nodeset2.xml");
+        Assert.assertTrue(in.isFile());
+        File out = new File("target/tmp/OpcMachineryJobs.ivml");
+        out.getParentFile().mkdirs();
+        DomParser.setDefaultVerbose(false);
+        DomParser.setUsingIvmlFolder("target/tmp");
+        DomParser.process(in, "MachineryJobs", out, false);
+
+        Assert.assertTrue(out.isFile());
+        String contents = FileUtils.readFileToString(out, Charset.forName("UTF-8"));
+        Assert.assertTrue(contents.contains("UADataType opcISA95ParameterDataTypeType = {"));
+        Assert.assertTrue(contents.contains("type = refBy(opcISA95ParameterDataTypeType)"));
+    }
+
+    /**
+     * Tests parsing Machinery Examples with sibling Machinery models as dependencies.
+     *
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testDomParserMachineryExamples() throws IOException {
+        File in = new File("src/test/resources/NodeSets/Opc.Ua.Machinery.Examples.NodeSet2.xml");
+        Assert.assertTrue(in.isFile());
+        File out = new File("target/tmp/OpcMachineryExamples.ivml");
+        out.getParentFile().mkdirs();
+        DomParser.setDefaultVerbose(false);
+        DomParser.setUsingIvmlFolder("target/tmp");
+        DomParser.process(in, "MachineryExamples", out, false);
+
+        Assert.assertTrue(out.isFile());
+        String contents = FileUtils.readFileToString(out, Charset.forName("UTF-8"));
+        Assert.assertTrue(contents.contains("UAObjectTypeType opcMachineryComponentIdentificationType = {"));
+        Assert.assertTrue(contents.contains("UAVariableTypeType opcProcessValueSetpointVariableTypeType = {"));
+        Assert.assertTrue(contents.contains("UAEnumType opcJobExecutionModeType = {"));
+    }
+
+    /**
      * Parses and checks a synthetic external-reference case.
      *
      * @param order the required-model order suffix
@@ -414,6 +561,30 @@ public class DomParserTest {
         Assert.assertEquals(exContents, outContents);
         Assert.assertTrue(outContents.contains("UADataType opcGuidType = {"));
     }
+    
+    /**
+     * Tests {@link DomParser} on the energy companion spec XML.
+     * 
+     * @throws IOException shall not occur
+     */
+    @Test
+    public void testDomParserEnergy() throws IOException {
+        File in = new File("src/test/resources/NodeSets/Opc.Ua.Machinery.Energy.NodeSet2.xml");
+        Assert.assertTrue(in.exists());
+        File tmp = new File("target/tmp");
+        tmp.mkdirs();
+        File out = new File(tmp, "OpcEnergy.ivml");
+        DomParser.setDefaultVerbose(false);
+        DomParser.setUsingIvmlFolder("target/tmp");
+        DomParser.process(in, "Energy", out, false);
+
+        Charset charset = Charset.forName("UTF-8");
+        File expected = new File("src/test/resources/OpcEnergy.ivml");
+        String exContents = normalize(FileUtils.readFileToString(expected, charset));
+        String outContents = normalize(FileUtils.readFileToString(out, charset));
+        Assert.assertEquals(exContents, outContents);
+    }
+
 
     /**
      * Helper function to indicate char differences to apply when string comparison fails.
