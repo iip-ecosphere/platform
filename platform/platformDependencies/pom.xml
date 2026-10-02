@@ -381,22 +381,13 @@
         <configuration>
           <reuseForks>false</reuseForks> <!-- run each suite in an own JVM (Spring binders) -->
           <includes> <!-- suites only, allow for multiple suites (Spring binders)  -->
-            <include>**/AllTests*.class</include>
+            <include>**/AllTests*</include>
           </includes>
           <forkedProcessTimeoutInSeconds>${surefireProcessTimeout}</forkedProcessTimeoutInSeconds>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <argLine>@{jacocoArgLine} @{surefireArgLine} @{surefireCiLine}</argLine>
           <forkCount>${surefireForkCount}</forkCount>
         </configuration>
-        <dependencies>
-          <!-- Force using the latest JUnit 47 provider, consider also in lib dependencies; seems also to work with
-               jUnit 4.12, but not with 4.13 ;)  -->
-          <dependency>
-            <groupId>org.apache.maven.surefire</groupId>
-            <artifactId>surefire-junit47</artifactId>
-            <version>${org.apache.maven.surefire.version}</version>
-          </dependency>
-        </dependencies>        
       </plugin>
       
       <plugin>
