@@ -248,7 +248,8 @@
            <python-compile.skip>false</python-compile.skip>
            <maven.javadoc.skip>false</maven.javadoc.skip>
            <okto.test.easy.model.parent>${model.parent}</okto.test.easy.model.parent>
-           <surefireForkCount>0</surefireForkCount>
+           <!-- required to let surefire JVMs terminate on windows, we keep it for now although surefire issues a warning -->
+           <surefireForkCount>0</surefireForkCount> 
         </properties>
           <build>
             <plugins>
