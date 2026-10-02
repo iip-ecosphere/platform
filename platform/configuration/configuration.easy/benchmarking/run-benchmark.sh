@@ -91,7 +91,7 @@ run_measurement() {
     echo "[$version] round=$round nodeset=$nodeset"
     (
         cd "$module"
-        timeout --foreground "${BENCHMARK_TIMEOUT:-30m}" mvn -q \
+        timeout --foreground "${BENCHMARK_TIMEOUT:-2h}" mvn -q \
             -PCfg \
             "-Dtest=$benchmark_class" \
             "-Dnodeset=$nodeset" \
