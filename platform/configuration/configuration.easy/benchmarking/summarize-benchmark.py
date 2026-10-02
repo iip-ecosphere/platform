@@ -39,7 +39,7 @@ def main():
         columns = (
             ["NodeSet", "FileSizeKB", "UAObjectTypeCountIn"]
             + [f"Run{i}Ms" for i in range(1, rounds + 1)]
-            + ["AvgMs", "MedianMs"]
+            + ["AvgMs", "MedianMs", "StdMs", "CvPct"]
             + list(STATIC)
         )
         target = out_dir / f"summary_{version}.csv"
@@ -50,12 +50,18 @@ def main():
                 runs = sorted(nodesets[nodeset], key=lambda r: int(r["Round"]))
                 times = [int(r["TotalMs"]) for r in runs]
                 first = runs[0]
+                mean = statistics.mean(times)
+                # sample standard deviation (n - 1); 0 if there is only one run
+                std = statistics.stdev(times) if len(times) > 1 else 0.0
+                cv = std / mean * 100 if mean else 0.0
                 out = {
                     "NodeSet": nodeset,
                     "FileSizeKB": first["FileSizeKB"],
                     "UAObjectTypeCountIn": first["UAObjectTypeCountIn"],
-                    "AvgMs": f"{statistics.mean(times):.1f}",
+                    "AvgMs": f"{mean:.1f}",
                     "MedianMs": f"{statistics.median(times):.1f}",
+                    "StdMs": f"{std:.1f}",
+                    "CvPct": f"{cv:.1f}",
                 }
                 for i, t in enumerate(times, 1):
                     out[f"Run{i}Ms"] = t
