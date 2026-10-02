@@ -599,7 +599,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
     
     // ------------------------------------------- maven Java testing (surefire) -----------------------------------------------
     
-    def XmlElement appendSurefirePlugin(XmlElement plugins, String ver="\\${org.apache.maven.surefire.version}", String include="**/AllTests.class", String depArtifact="surefire-junit47", Boolean tests=true) {
+    def XmlElement appendSurefirePlugin(XmlElement plugins, String ver="\\${org.apache.maven.surefire.version}", String include="**/AllTests*", String depArtifact="", Boolean tests=true) {
         XmlElement plugin = appendPlugin(plugins, "org.apache.maven.plugins", "maven-surefire-plugin", ver, false);
         XmlElement cfg = appendConfiguration(plugin);
         if (include.length() > 0) {
@@ -672,6 +672,18 @@ template MavenBasics(Configuration config, FileArtifact target) {
         config;
     }
     
+    def XmlElement appendMavenResourcesCopyIipResourcesPlatformExecution(XmlElement execs, IIPEcosphere config, Path base, sequenceOf(String) files, String phase="validate", String id="platf-res") {
+        appendMavenResourcesCopyResourcesExecution(execs, "copy-resources", mavenBuildOutputResourcesDir(), base.relativizeFolder(getResourcesFolder(config)+"/platform"), files, phase=phase, id=id);
+    }
+    
+    def XmlElement appendMavenResourcesCopyIipResourcesSoftwareExecution(XmlElement execs, IIPEcosphere config, Path base, sequenceOf(String) files, String phase="validate", String id="sw-res") {
+        appendMavenResourcesCopyResourcesExecution(execs, "copy-resources", mavenBuildOutputResourcesDir(), base.relativizeFolder(getResourcesFolder(config)+"/software"), files, phase=phase, id=id);
+    }
+
+    def XmlElement appendMavenResourcesCopyIipResourcesDevicesExecution(XmlElement execs, IIPEcosphere config, Path base, sequenceOf(String) files, String phase="validate", String id="dev-res") {
+        appendMavenResourcesCopyResourcesExecution(execs, "copy-resources", mavenBuildOutputResourcesDir(), base.relativizeFolder(getResourcesFolder(config)+"/devices"), files, phase=phase, id=id);
+    }
+    
     def String mavenBuildOutputDir() {
         "\\${project.build.outputDirectory}";
     }
@@ -679,7 +691,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
     def String mavenBuildOutputResourcesDir() {
         mavenBuildOutputDir() + "/resources";
     }
-
+    
     // ---------------------------- deployment ------------------------
     
     def addDistributionManagement(XmlElement dm, String repo, String id, String name, String url) {
