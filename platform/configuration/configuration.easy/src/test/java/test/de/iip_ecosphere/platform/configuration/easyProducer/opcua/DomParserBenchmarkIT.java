@@ -23,8 +23,10 @@ import org.junit.runners.Parameterized.Parameters;
 import de.iip_ecosphere.platform.configuration.easyProducer.opcua.parser.DomParser;
 
 /**
- * Runs one cold DomParser measurement for one explicitly selected NodeSet.
- * Each measurement must be started in a fresh JVM by {@code run-benchmark.sh}.
+ * Measures {@code DomParser.process} for one explicitly selected NodeSet in one JVM: first
+ * {@code benchmark.warmup} warm-up iterations, then {@code benchmark.iterations} measured iterations.
+ * Warm-up rows get round numbers 0, -1, ...; measured rows get 1..N. Every iteration is one CSV row.
+ * Each (version, NodeSet) pair must be started in a fresh JVM by {@code run-benchmark.sh}.
  */
 @RunWith(Parameterized.class)
 public class DomParserBenchmarkIT {
@@ -35,7 +37,8 @@ public class DomParserBenchmarkIT {
     private static final File CSV_FILE = new File(System.getProperty("benchmark.output",
             new File(OUT_DIR, "benchmark_results.csv").getPath()));
     private static final String VERSION = System.getProperty("benchmark.version", "unknown");
-    private static final int ROUND = Integer.getInteger("benchmark.round", 0);
+    private static final int WARMUP = Integer.getInteger("benchmark.warmup", 1);
+    private static final int ITERATIONS = Integer.getInteger("benchmark.iterations", 5);
 
     private final File nodeSetFile;
 
@@ -44,7 +47,7 @@ public class DomParserBenchmarkIT {
     }
 
     /**
-     * Selects exactly one NodeSet so that one Maven invocation produces one independent measurement.
+     * Selects exactly one NodeSet so that one Maven invocation produces the series of one NodeSet.
      *
      * @return the selected NodeSet
      */
@@ -69,7 +72,7 @@ public class DomParserBenchmarkIT {
     }
 
     /**
-     * Creates clean output files for this single measurement.
+     * Creates clean output files for this series.
      *
      * @throws IOException if the output files cannot be prepared
      */
@@ -77,7 +80,6 @@ public class DomParserBenchmarkIT {
     public static void setup() throws IOException {
         Files.createDirectories(OUT_DIR.toPath());
         Files.createDirectories(COLLECTOR_FILE.getParentFile().toPath());
-        Files.deleteIfExists(COLLECTOR_FILE.toPath());
         File csvParent = CSV_FILE.getAbsoluteFile().getParentFile();
         if (csvParent != null) {
             Files.createDirectories(csvParent.toPath());
@@ -100,8 +102,19 @@ public class DomParserBenchmarkIT {
         System.out.println("\nBenchmark complete. Results: " + CSV_FILE.getAbsolutePath());
     }
 
+    /** Output statistics that do not change between iterations. */
+    private static final class Metrics {
+        int ivmlLines;
+        int unknownTypes;
+        int rootObjectType;
+        int fieldVariableType;
+        int enumType;
+        int objectTypeType;
+        double ioRatio;
+    }
+
     /**
-     * Executes one complete generation process.
+     * Executes warm-up and measured iterations of the complete generation process.
      *
      * @throws IOException if benchmark input or output cannot be read or written
      */
@@ -114,77 +127,86 @@ public class DomParserBenchmarkIT {
         int uaObjectTypeCountIn = countOccurrences(xmlContent, "<UAObjectType ");
         int inputLines = xmlContent.split("\n").length;
 
-        long totalMs = -1;
-        RuntimeException failure = null;
-        String checkRequiredModels = "OK";
-        String checkRedundancy = "OK";
-        try {
-            DomParser.setUsingIvmlFolder(OUT_DIR.getPath());
-            long start = System.nanoTime();
-            DomParser.process(nodeSetFile, name, outFile, false);
-            totalMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
-        } catch (RuntimeException e) {
-            failure = e;
-            if (e.getMessage() != null && e.getMessage().contains("checkRequiredModels")) {
-                checkRequiredModels = "FAIL: " + sanitize(e.getMessage());
-            } else if (e.getMessage() != null && e.getMessage().contains("checkRedundancy")) {
-                checkRedundancy = "FAIL: " + sanitize(e.getMessage());
-            } else {
-                checkRequiredModels = "FAIL: " + e.getClass().getSimpleName();
+        Metrics metrics = new Metrics();
+        boolean metricsDone = false;
+        int total = WARMUP + ITERATIONS;
+        for (int i = 0; i < total; i++) {
+            int round = i - WARMUP + 1; // warm-up iterations are 0, -1, ...; measured ones start at 1
+
+            // every iteration starts from the same file state as a fresh JVM would
+            Files.deleteIfExists(COLLECTOR_FILE.toPath());
+            Files.deleteIfExists(outFile.toPath());
+
+            long totalMs = -1;
+            RuntimeException failure = null;
+            String checkRequiredModels = "OK";
+            String checkRedundancy = "OK";
+            try {
+                DomParser.setUsingIvmlFolder(OUT_DIR.getPath());
+                long start = System.nanoTime();
+                DomParser.process(nodeSetFile, name, outFile, false);
+                totalMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+            } catch (RuntimeException e) {
+                failure = e;
+                if (e.getMessage() != null && e.getMessage().contains("checkRequiredModels")) {
+                    checkRequiredModels = "FAIL: " + sanitize(e.getMessage());
+                } else if (e.getMessage() != null && e.getMessage().contains("checkRedundancy")) {
+                    checkRedundancy = "FAIL: " + sanitize(e.getMessage());
+                } else {
+                    checkRequiredModels = "FAIL: " + e.getClass().getSimpleName();
+                }
             }
-        }
 
-        int ivmlLines = 0;
-        String outputSha256 = "";
-        int unknownTypes = 0;
-        int rootObjectType = 0;
-        int fieldVariableType = 0;
-        int enumType = 0;
-        int objectTypeType = 0;
-        double ioRatio = 0;
-        if (failure == null && outFile.exists()) {
-            byte[] ivmlBytes = Files.readAllBytes(outFile.toPath());
-            String ivmlContent = new String(ivmlBytes, StandardCharsets.UTF_8);
-            ivmlLines = ivmlContent.split("\n").length;
-            outputSha256 = sha256(ivmlBytes);
-            unknownTypes = countOccurrences(ivmlContent, "opcUnknownDataType");
-            rootObjectType = countOccurrences(ivmlContent, "UARootObjectType");
-            fieldVariableType = countOccurrences(ivmlContent, "UAFieldVariableType");
-            enumType = countOccurrences(ivmlContent, "UAEnumType");
-            objectTypeType = countOccurrences(ivmlContent, "UAObjectTypeType");
-            ioRatio = inputLines > 0
-                    ? Math.round((double) ivmlLines / inputLines * 100.0) / 100.0
-                    : 0;
-        }
+            String outputSha256 = "";
+            if (failure == null && outFile.exists()) {
+                byte[] ivmlBytes = Files.readAllBytes(outFile.toPath());
+                outputSha256 = sha256(ivmlBytes);
+                if (!metricsDone) {
+                    String ivmlContent = new String(ivmlBytes, StandardCharsets.UTF_8);
+                    metrics.ivmlLines = ivmlContent.split("\n").length;
+                    metrics.unknownTypes = countOccurrences(ivmlContent, "opcUnknownDataType");
+                    metrics.rootObjectType = countOccurrences(ivmlContent, "UARootObjectType");
+                    metrics.fieldVariableType = countOccurrences(ivmlContent, "UAFieldVariableType");
+                    metrics.enumType = countOccurrences(ivmlContent, "UAEnumType");
+                    metrics.objectTypeType = countOccurrences(ivmlContent, "UAObjectTypeType");
+                    metrics.ioRatio = inputLines > 0
+                            ? Math.round((double) metrics.ivmlLines / inputLines * 100.0) / 100.0
+                            : 0;
+                    metricsDone = true;
+                }
+            }
 
-        String[] row = {
-            nodeSetFile.getName(),
-            VERSION,
-            String.valueOf(ROUND),
-            String.valueOf(fileSizeKB),
-            String.valueOf(uaObjectTypeCountIn),
-            String.valueOf(totalMs),
-            String.valueOf(ivmlLines),
-            outputSha256,
-            String.valueOf(unknownTypes),
-            String.valueOf(rootObjectType),
-            String.valueOf(fieldVariableType),
-            String.valueOf(enumType),
-            String.valueOf(objectTypeType),
-            String.valueOf(inputLines),
-            String.valueOf(ioRatio),
-            checkRequiredModels,
-            checkRedundancy
-        };
-        try (PrintWriter writer = new PrintWriter(new FileWriter(CSV_FILE, true))) {
-            writer.println(String.join(",", row));
-        }
+            String[] row = {
+                nodeSetFile.getName(),
+                VERSION,
+                String.valueOf(round),
+                String.valueOf(fileSizeKB),
+                String.valueOf(uaObjectTypeCountIn),
+                String.valueOf(totalMs),
+                String.valueOf(metrics.ivmlLines),
+                outputSha256,
+                String.valueOf(metrics.unknownTypes),
+                String.valueOf(metrics.rootObjectType),
+                String.valueOf(metrics.fieldVariableType),
+                String.valueOf(metrics.enumType),
+                String.valueOf(metrics.objectTypeType),
+                String.valueOf(inputLines),
+                String.valueOf(metrics.ioRatio),
+                checkRequiredModels,
+                checkRedundancy
+            };
+            try (PrintWriter writer = new PrintWriter(new FileWriter(CSV_FILE, true))) {
+                writer.println(String.join(",", row));
+            }
 
-        if (failure != null) {
-            throw new AssertionError("Benchmark failed for " + nodeSetFile.getName(), failure);
+            if (failure != null) {
+                throw new AssertionError("Benchmark failed for " + nodeSetFile.getName()
+                        + " in iteration " + round, failure);
+            }
+            System.out.printf("%-70s | %-7s round=%2d | total=%6d ms | ivml=%5d lines%n",
+                    nodeSetFile.getName(), round <= 0 ? "warm-up" : "measure", round, totalMs,
+                    metrics.ivmlLines);
         }
-        System.out.printf("%-70s | total=%4d ms | ivml=%5d lines%n",
-                nodeSetFile.getName(), totalMs, ivmlLines);
     }
 
     private static String sha256(byte[] content) {

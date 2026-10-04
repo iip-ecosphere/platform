@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if (( $# < 2 || $# > 4 )); then
-    echo "Usage: $0 BASELINE_WORKTREE OPTIMIZED_WORKTREE [ROUNDS] [RESULTS_DIR]" >&2
-    exit 2
-fi
-
 baseline_root=$(realpath "$1")
 optimized_root=$(realpath "$2")
 rounds=${3:-5}
+warmup=${WARMUP:-1} # warm-up iterations for normal NodeSets
+small_warmup=${SMALL_WARMUP:-4} # warm-up iterations for small NodeSets
+small_kb=${SMALL_KB:-300} # NodeSets smaller than this (KB) count as small
+heap=${HEAP:-4g}
 results_dir=${4:-"$PWD/benchmark-results-$(date +%Y%m%d-%H%M%S)"}
 mkdir -p "$results_dir/raw"
 results_dir=$(realpath "$results_dir")
@@ -17,18 +16,8 @@ module_path="platform/configuration/configuration.easy"
 baseline_module="$baseline_root/$module_path"
 optimized_module="$optimized_root/$module_path"
 benchmark_class="DomParserBenchmarkIT"
+benchmark_test="test.de.iip_ecosphere.platform.configuration.easyProducer.opcua.$benchmark_class"
 
-for command in java mvn python3 shuf timeout; do
-    if ! command -v "$command" >/dev/null 2>&1; then
-        echo "Required command is not installed: $command" >&2
-        exit 1
-    fi
-done
-
-if ! [[ "$rounds" =~ ^[1-9][0-9]*$ ]]; then
-    echo "ROUNDS must be a positive integer: $rounds" >&2
-    exit 2
-fi
 
 for module in "$baseline_module" "$optimized_module"; do
     if [[ ! -f "$module/pom.xml" ]]; then
@@ -48,7 +37,11 @@ done
     echo "baseline_commit=$(git -C "$baseline_root" rev-parse HEAD)"
     echo "optimized_commit=$(git -C "$optimized_root" rev-parse HEAD)"
     echo "rounds=$rounds"
-    echo "surefire_exit_timeout=${SUREFIRE_EXIT_TIMEOUT:-3}"
+    echo "warmup=$warmup"
+    echo "small_warmup=$small_warmup (NodeSets smaller than ${small_kb} KB)"
+    echo "heap=-Xms$heap -Xmx$heap"
+    echo "mode=one JVM per version and NodeSet, started directly with JUnitCore (no surefire)"
+    echo "mvn_offline=${MVN_OFFLINE:-0}"
     java -version
     mvn -version
 } >"$results_dir/environment.txt" 2>&1
@@ -70,53 +63,74 @@ for nodeset in "${nodesets[@]}"; do
     fi
 done
 
-echo "Compiling benchmark code in both worktrees..."
-(cd "$baseline_module" && mvn -q -PCfg -DskipTests test-compile)
-(cd "$optimized_module" && mvn -q -PCfg -DskipTests test-compile)
+echo "Compiling benchmark code and building classpaths..."
+for entry in "baseline:$baseline_module" "optimized:$optimized_module"; do
+    version=${entry%%:*}
+    module=${entry#*:}
+    (
+        cd "$module"
+        mvn ${MVN_OFFLINE:+-o} -q -PCfg -DskipTests test-compile
+        mvn ${MVN_OFFLINE:+-o} -q -PCfg dependency:build-classpath \
+            "-Dmdep.outputFile=$results_dir/classpath_${version}.txt"
+    )
+done
+
+warmup_for() {
+    local size_kb=$(( $(stat -c %s "$optimized_module/src/test/resources/NodeSets/$1") / 1024 ))
+    if (( size_kb < small_kb )); then
+        echo "$small_warmup"
+    else
+        echo "$warmup"
+    fi
+}
 
 run_measurement() {
     local version=$1
     local module=$2
-    local round=$3
-    local nodeset=$4
+    local nodeset=$3
     local safe_name=${nodeset//[^A-Za-z0-9._-]/_}
-    local output="$results_dir/raw/${version}_round${round}_${safe_name}.csv"
-
-    if [[ -f "$output" ]] && grep -q ',OK,OK$' "$output"; then
-        echo "[skip] version=$version round=$round nodeset=$nodeset"
-        return
-    fi
+    local output="$results_dir/raw/${version}_${safe_name}.csv"
+    local classpath_file="$results_dir/classpath_${version}.txt"
+    local w
+    w=$(warmup_for "$nodeset")
+    local expected=$((w + rounds))
 
     rm -f "$output"
-    echo "[$version] round=$round nodeset=$nodeset"
+    echo "[$(date +%T)] [$version] nodeset=$nodeset ($w warm-up + $rounds measured)"
+    local started=$SECONDS
+    local status=0
     (
         cd "$module"
-        timeout --foreground "${BENCHMARK_TIMEOUT:-2h}" mvn -q \
-            -PCfg \
-            "-Dtest=$benchmark_class" \
+        timeout --foreground "${BENCHMARK_TIMEOUT:-6h}" java "-Xms$heap" "-Xmx$heap" \
             "-Dnodeset=$nodeset" \
             "-Dbenchmark.version=$version" \
-            "-Dbenchmark.round=$round" \
+            "-Dbenchmark.warmup=$w" \
+            "-Dbenchmark.iterations=$rounds" \
             "-Dbenchmark.output=$output" \
-            "-DargLine=-Xms2g -Xmx2g" \
-            "-Dsurefire.exitTimeout=${SUREFIRE_EXIT_TIMEOUT:-3}" \
-            test </dev/null
-    )
+            -cp "target/classes:target/test-classes:$(cat "$classpath_file")" \
+            org.junit.runner.JUnitCore "$benchmark_test" \
+            </dev/null
+    ) || status=$?
+
+    local ok_rows=0
+    if [[ -f "$output" ]]; then
+        ok_rows=$(grep -c ',OK,OK$' "$output" || true)
+    fi
+    if (( ok_rows == expected )); then
+        echo "[$(date +%T)] [done] version=$version nodeset=$nodeset in $((SECONDS - started))s"
+        if (( status != 0 )); then
+            echo "[warn] version=$version nodeset=$nodeset: exit code $status, but all $expected iterations are recorded" >&2
+        fi
+        return 0
+    fi
+    echo "[error] version=$version nodeset=$nodeset: $ok_rows of $expected iterations recorded, exit code $status" >&2
+    return 1
 }
 
-for round in $(seq 1 "$rounds"); do
-    mapfile -t shuffled_nodesets < <(printf '%s\n' "${nodesets[@]}" | shuf)
-    index=0
-    for nodeset in "${shuffled_nodesets[@]}"; do
-        if (( (round + index) % 2 == 0 )); then
-            run_measurement baseline "$baseline_module" "$round" "$nodeset"
-            run_measurement optimized "$optimized_module" "$round" "$nodeset"
-        else
-            run_measurement optimized "$optimized_module" "$round" "$nodeset"
-            run_measurement baseline "$baseline_module" "$round" "$nodeset"
-        fi
-        ((index += 1))
-    done
+mapfile -t shuffled_nodesets < <(printf '%s\n' "${nodesets[@]}" | shuf)
+for nodeset in "${shuffled_nodesets[@]}"; do
+    run_measurement baseline "$baseline_module" "$nodeset"
+    run_measurement optimized "$optimized_module" "$nodeset"
 done
 
 mapfile -d '' -t result_files < <(find "$results_dir/raw" -type f -name '*.csv' -print0 | sort -z)
@@ -135,3 +149,4 @@ python3 "$(dirname "$0")/summarize-benchmark.py" "$combined" "$results_dir"
 
 echo "Benchmark complete."
 echo "Raw and summary results: $results_dir"
+
