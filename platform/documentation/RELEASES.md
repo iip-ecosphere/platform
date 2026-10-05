@@ -19,6 +19,7 @@ Changes:
 * [#205](https://github.com/iip-ecosphere/platform/issues/205): Hide service start/stop commands in CLI, i.e., service commands like `add`, `startService` and `startAll` now require `--expert` due to their technical prerequisites. Please use deployment plans instead.
 * code template POM contains assembly for `resources` folder requiring a manual sync of your service implementation POM with the template POM; if app is built by platform, deployed `resources` artefacts are considered and packaged into the app, e.g., for mock data files
 * version of build plugins in code template POMs now rely on parent POM properties. For better evolvability of your app, please ensure that these properties are taken over when you sync your POM with the respective code template (see constraints/rules in platform handbook)
+* in apps migrated to version 0.8.2, the update of versions of the build plugins in [#202](https://github.com/iip-ecosphere/platform/issues/202) may lead to missing maven (build plugin) dependencies, if the the Install package is not executed for that version at least once with `mvn -P DepsOnly install` and the build process is not at least once executed with `mvn install -Dunpack.force=true`
 
 ### Version 0.8.1 (2026/09/15)
 

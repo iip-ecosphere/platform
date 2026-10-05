@@ -126,6 +126,14 @@
        </systemProperty>
       </systemProperties>
 
+## My Maven build now emits something like "Could not transfer metadata /.meta/prefixes.txt"
+
+*Symptom:* You are executing maven 3.10.0, which has a new mechanism for speeding up dependency resolution. 
+
+*Reason:* The respective file for repository ids "SSE-mvn" or "SSE-plugins" is not yet in place. 
+
+*Solution:* The message is just a warning, you can safely ignore it. It may disappear when we add this file to our repository server.
+
 ## Installation error while building an Image Container during platform instantiation.
 
 *Symptom:* An error during the instantation due to an installation error in building an image container while installing Java or Python dependencies.
