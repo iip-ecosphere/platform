@@ -35,7 +35,11 @@ def main():
 
     hashes = defaultdict(dict)
     for version, nodesets in grouped.items():
-        rounds = max(len(runs) for runs in nodesets.values())
+        # warm-up rows have Round <= 0 and are excluded from times and statistics
+        rounds = max(
+            sum(1 for r in runs if int(r["Round"]) >= 1)
+            for runs in nodesets.values()
+        )
         columns = (
             ["NodeSet", "FileSizeKB", "UAObjectTypeCountIn"]
             + [f"Run{i}Ms" for i in range(1, rounds + 1)]
@@ -48,8 +52,12 @@ def main():
             writer.writeheader()
             for nodeset in sorted(nodesets):
                 runs = sorted(nodesets[nodeset], key=lambda r: int(r["Round"]))
-                times = [int(r["TotalMs"]) for r in runs]
-                first = runs[0]
+                measured = [r for r in runs if int(r["Round"]) >= 1]
+                if not measured:
+                    print(f"WARNING: no measured rows: {version} {nodeset}")
+                    continue
+                times = [int(r["TotalMs"]) for r in measured]
+                first = measured[0]
                 mean = statistics.mean(times)
                 # sample standard deviation (n - 1); 0 if there is only one run
                 std = statistics.stdev(times) if len(times) > 1 else 0.0
@@ -69,6 +77,7 @@ def main():
                     out[col] = first[col]
                 writer.writerow(out)
 
+                # hash check over all rows, warm-up included
                 run_hashes = {r["OutputSha256"] for r in runs}
                 if len(run_hashes) != 1 or "" in run_hashes:
                     print(f"WARNING: unstable or missing output hash: {version} {nodeset}")
