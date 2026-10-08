@@ -260,13 +260,6 @@
                         <version>${iip.version}</version>
                     </configuration>
                 </execution>
-            </executions>
-        </plugin>
-         <plugin>
-             <groupId>de.iip-ecosphere.platform</groupId>
-             <artifactId>dependency-plugin</artifactId>
-             <version>${project.version}</version>
-             <executions>
                  <execution>
                      <id>build-classpath-plugin</id>
                      <phase>prepare-package</phase>
