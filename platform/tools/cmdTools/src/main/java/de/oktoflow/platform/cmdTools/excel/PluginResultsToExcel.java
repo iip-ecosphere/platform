@@ -174,7 +174,9 @@ public class PluginResultsToExcel {
      * 
      * @param file the file to read
      * @param sheet the sheet to insert the data into
-     * @param space additional space
+     * @param startRow the start row where to insert
+     * @param rowSpace number of rows to be used for new entry
+     * @param count the number of entries processed leading to the insert column number
      */
     private static void csvToExcel(File file, Sheet sheet, int startRow, int rowSpace, int count) {
         System.out.println(" Processing " + file.getName());        
