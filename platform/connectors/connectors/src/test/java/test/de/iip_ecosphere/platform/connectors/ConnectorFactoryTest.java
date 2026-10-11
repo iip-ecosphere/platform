@@ -372,8 +372,6 @@ public class ConnectorFactoryTest {
 
     /**
      * Tests {@link ConnectorFactory}.
-     * 
-     * @author Holger Eichelberger, SSE
      */
     @Test
     public void testFactory() {
