@@ -102,12 +102,7 @@
       <org.codehaus.mojo.build-helper-maven-plugin.version>3.6.2</org.codehaus.mojo.build-helper-maven-plugin.version>
       <eclipse.m2e.lifecycle.mapping>1.0.0</eclipse.m2e.lifecycle.mapping>
       
-      <maven.build.cache.exclude.value.1>gen</maven.build.cache.exclude.value.1> <!-- all examples -->
-      <maven.build.cache.exclude.value.2>tomcat.*</maven.build.cache.exclude.value.2> <!-- temporary test dir -->
-      <maven.build.cache.exclude.value.3>work</maven.build.cache.exclude.value.3> <!-- temporary test dir -->
-      <maven.build.cache.exclude.value.4>null</maven.build.cache.exclude.value.4> <!-- Docker cfg bug -->
-    
-      <maven.build.cache.enabled>false</maven.build.cache.enabled> <!--  fails on windows -->
+      <maven.build.cache.enabled>false</maven.build.cache.enabled>
       <surefireProcessTimeout>3600</surefireProcessTimeout>
   </properties>
 
@@ -127,7 +122,15 @@
     </plugins>
 
     <extensions>
-      <!-- Enabling the use of SSH -->
+      <!-- failing with a NPE if multi project directory is not set, bug #503-->
+      <!--
+      <extension>
+        <groupId>org.apache.maven.extensions</groupId>
+        <artifactId>maven-build-cache-extension</artifactId>
+        <version>1.3.0</version>
+      </extension>
+      -->
+      <!-- Enabling SSH -->
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
          <artifactId>wagon-ssh-external</artifactId>
@@ -146,5 +149,23 @@
       <url>scpexe://projects.sse.uni-hildesheim.de/var/www/qm/maven/</url>
     </snapshotRepository>
   </distributionManagement>  
+  
+  <profiles>
+    <profile>
+      <id>WithCache</id>
+      <!-- if there is a global build cache file, not the usual location in .mvn, activate the build cache -->
+      <!-- in the past, it failed on windows. suggested configuration file is in tools.dependencies, copy it there -->
+      <!-- we do not aim for a global, distributed cache -->
+      <activation>
+        <file>
+          <exists>${user.home}/.m2/maven-build-cache-config.xml</exists>
+        </file>
+      </activation>
+      <properties>
+        <maven.build.cache.configPath>${user.home}/.m2/maven-build-cache-config.xml</maven.build.cache.configPath>
+        <maven.build.cache.enabled>true</maven.build.cache.enabled>
+      </properties>
+    </profile>
+  </profiles>
   
 </project>
