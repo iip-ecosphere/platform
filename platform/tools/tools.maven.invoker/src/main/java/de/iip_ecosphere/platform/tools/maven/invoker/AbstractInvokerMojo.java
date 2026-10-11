@@ -186,6 +186,15 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
 
     @Parameter(property = "iip.ciBuildId", defaultValue = "") 
     private String buildId;
+
+    @Parameter(property = "aether.remoteRepositoryFilter.prefixes.basedir", defaultValue = "") 
+    private String pfxBasedir;
+
+    @Parameter(property = "aether.remoteRepositoryFilter.prefixes.resolvePrefixFiles", defaultValue = "") 
+    private String resolvePfxFs;
+
+    @Parameter(property = "aether.remoteRepositoryFilter.prefixes.verifyDenied", defaultValue = "") 
+    private String verifyDenied;
     
     @Parameter(property = "iip.tests", defaultValue = "") 
     private String iipTests;
@@ -336,18 +345,13 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
             value = disableAppTests || disableTests;
             sysProperties.put("configuration.testApp.skip", String.valueOf(value));
         }
-        if (buildId != null && buildId.length() > 0) { // CI defined build id for time collector
-            sysProperties.put("iip.ciBuildId", buildId);
-        }
-        if (iipTests != null && iipTests.length() > 0) { // CI defined build id for model tests
-            sysProperties.put("iip.tests", iipTests);
-        }
-        if (oktoModelParent != null && oktoModelParent.length() > 0) {
-            sysProperties.put("okto.test.easy.model.parent", oktoModelParent);
-        }
-        if (oktoMvnHome != null && oktoMvnHome.length() > 0) { // CI defined maven
-            sysProperties.put("okto.mvn.home", oktoMvnHome);
-        }
+        setPropertyIfDefined(sysProperties, "iip.ciBuildId", buildId); // CI defined build id for time collector
+        setPropertyIfDefined(sysProperties, "iip.tests", iipTests); // CI defined build id for model tests
+        setPropertyIfDefined(sysProperties, "okto.test.easy.model.parent", oktoModelParent);
+        setPropertyIfDefined(sysProperties, "okto.mvn.home", oktoMvnHome);
+        setPropertyIfDefined(sysProperties, "aether.remoteRepositoryFilter.prefixes.basedir", pfxBasedir);
+        setPropertyIfDefined(sysProperties, "aether.remoteRepositoryFilter.prefixes.resolvePrefixFiles", resolvePfxFs);
+        setPropertyIfDefined(sysProperties, "aether.remoteRepositoryFilter.prefixes.verifyDenied", verifyDenied);
         String hashDir = pythonCompileHashDir;
         if (null == hashDir || hashDir.length() == 0) {
             hashDir = project.getBuild().getDirectory();
@@ -356,6 +360,20 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
         request.addShellEnvironment("PYTHON_COMPILE_HASHDIR", hashDir); // invoker -D not correct?, pass on 2 mvn levels
         request.setProperties(sysProperties);
         getLog().info("Setting sys properties " + request.getProperties());
+    }
+    
+    /**
+     * Sets {@code value} as value of the property {@code key} in {@code properties} if {@code value} is defined, 
+     * i.e., not <b>null</b> and not empty.
+     * 
+     * @param properties the properties to modify
+     * @param key the property key
+     * @param value the property value, may be empty or <b>null</b> to be ignored
+     */
+    private void setPropertyIfDefined(Properties properties, String key, String value) {
+        if (value != null && value.length() > 0) { // CI defined build id for time collector
+            properties.put(key, value);
+        }
     }
     
     /**
