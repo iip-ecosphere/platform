@@ -156,6 +156,21 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
         setUnpackResources(OsUtils.getBooleanProperty(PlatformInstantiator.KEY_PROPERTY_UNPACKRESOURCES, false));
         setLogPath(System.getProperty(PROP_LOG_PATH, ""));
     }
+
+    /**
+     * Takes over a system property if defined as argument.
+     * 
+     * @param key the property name/key
+     * @param args the command line arguments to add the property if defined
+     * 
+     * @see #createJvmArg(String, String)
+     */
+    private void takeOverJvmArg(String key, List<String> args) {
+        String prop = System.getProperty(key);
+        if (prop != null && prop.length() > 0) {
+            args.add(createJvmArg(key, prop));
+        }
+    }
         
     @Override
     public void executeAsProcess(ClassLoader loader, String resourcesDir, String tracingLevel, 
@@ -188,6 +203,11 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
         if (null != resourcesDir) {
             pArgs.add(createJvmArg("iip.resources", resourcesDir));
         }
+        takeOverJvmArg("aether.remoteRepositoryFilter.prefixes.basedir", pArgs);
+        takeOverJvmArg("aether.remoteRepositoryFilter.prefixes.resolvePrefixFiles", pArgs);
+        takeOverJvmArg("aether.remoteRepositoryFilter.prefixes.verifyDenied", pArgs);
+        takeOverJvmArg("maven.resolver.validation", pArgs);
+        
         try {
             getLogger().info("Calling platform instantiator as process with {}, tracing {}{}", 
                 java.util.Arrays.toString(args), tracingLevel, 
