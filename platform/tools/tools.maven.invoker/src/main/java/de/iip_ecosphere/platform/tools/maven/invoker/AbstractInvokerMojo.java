@@ -195,6 +195,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
 
     @Parameter(property = "aether.remoteRepositoryFilter.prefixes.verifyDenied", defaultValue = "") 
     private String verifyDenied;
+
+    @Parameter(property = "maven.resolver.validation", defaultValue = "") 
+    private String resolverValidation;
     
     @Parameter(property = "iip.tests", defaultValue = "") 
     private String iipTests;
@@ -352,6 +355,7 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
         setPropertyIfDefined(sysProperties, "aether.remoteRepositoryFilter.prefixes.basedir", pfxBasedir);
         setPropertyIfDefined(sysProperties, "aether.remoteRepositoryFilter.prefixes.resolvePrefixFiles", resolvePfxFs);
         setPropertyIfDefined(sysProperties, "aether.remoteRepositoryFilter.prefixes.verifyDenied", verifyDenied);
+        setPropertyIfDefined(sysProperties, "maven.resolver.validation", resolverValidation);
         String hashDir = pythonCompileHashDir;
         if (null == hashDir || hashDir.length() == 0) {
             hashDir = project.getBuild().getDirectory();
