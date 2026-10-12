@@ -17,17 +17,6 @@
 
   <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	  <maven.version>3.6.0</maven.version>
-      <junit.version>4.12</junit.version>
-
-      <kr.motd.maven.os.version>1.6.2</kr.motd.maven.os.version>
-      <org.apache.maven.compiler.version>3.7.0</org.apache.maven.compiler.version>
-      <org.apache.maven.javadoc.version>3.2.0</org.apache.maven.javadoc.version>
-      <org.apache.maven.jar.version>3.2.0</org.apache.maven.jar.version>
-      <org.apache.maven.surefire.version>3.0.0-M3</org.apache.maven.surefire.version>
-      <org.apache.maven.assembly.version>3.1.1</org.apache.maven.assembly.version>
-      <org.jacoco.maven.jacoco.version>0.8.8</org.jacoco.maven.jacoco.version>
-      <org.apache.maven.source.version>3.2.0</org.apache.maven.source.version>
 
       <maven.compiler.target>8</maven.compiler.target>
       <maven.compiler.source>8</maven.compiler.source>	  
@@ -50,33 +39,40 @@
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-core</artifactId>
         <version>${maven.version}</version><!--$NO-MVN-MAN-VER$-->
+        <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-compat</artifactId>
         <version>${maven.version}</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
-      <version>${maven.version}</version>
+      <version>${maven.plugin-annotations.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>file-management</artifactId>
-      <version>3.1.0</version>
+      <version>${maven.shared.file-management.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-      <version>1.16.0</version>
+      <version>1.22.1</version>
 	</dependency>
+    <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.21.0</version>
+    </dependency>	
 
     <dependency>
       <groupId>org.apache.maven.plugin-testing</groupId>
       <artifactId>maven-plugin-testing-harness</artifactId>
-      <version>3.3.0</version>
+      <version>${maven.plugin.testing.harness.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -175,8 +171,9 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-plugin-plugin</artifactId>
-            <version>${maven.version}</version>
+            <version>${maven.plugin.version}</version>
             <configuration>
+                <goalPrefix>python</goalPrefix>
             </configuration>
             <executions>
                 <execution>
@@ -241,19 +238,6 @@
           </plugins>
       </pluginManagement>
       
-    <extensions>
-        <!-- <extension>
-            <groupId>org.apache.maven.extensions</groupId>
-            <artifactId>maven-build-cache-extension</artifactId>
-            <version>1.2.0</version>
-        </extension>-->
-      <!-- Enabling the use of SSH -->
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-         <artifactId>wagon-ssh-external</artifactId>
-         <version>1.0-beta-6</version>
-      </extension>       
-    </extensions>
   </build>
 
   <profiles>
@@ -289,16 +273,5 @@
       </build>
     </profile>
   </profiles>
-
-  <distributionManagement>
-    <repository>
-      <id>sse-projects</id>
-      <url>scpexe://projects.sse.uni-hildesheim.de/var/www/qm/maven/</url>
-    </repository>
-    <snapshotRepository>
-      <id>sse-projects</id>
-      <url>scpexe://projects.sse.uni-hildesheim.de/var/www/qm/maven/</url>
-    </snapshotRepository>
-  </distributionManagement>  
 
 </project>
