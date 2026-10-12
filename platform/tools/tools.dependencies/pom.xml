@@ -102,6 +102,13 @@
       <org.codehaus.mojo.build-helper-maven-plugin.version>3.6.2</org.codehaus.mojo.build-helper-maven-plugin.version>
       <eclipse.m2e.lifecycle.mapping>1.0.0</eclipse.m2e.lifecycle.mapping>
       
+      <!-- for custom maven plugins -->
+      <maven.version>3.9.7</maven.version>
+      <maven.plugin-annotations.version>3.9.0</maven.plugin-annotations.version>
+      <maven.shared.file-management.version>3.2.0</maven.shared.file-management.version>
+      <maven.plugin.testing.harness.version>3.3.0</maven.plugin.testing.harness.version>
+      <maven.plugin.version>3.6.0</maven.plugin.version>
+      
       <maven.build.cache.enabled>false</maven.build.cache.enabled>
       <surefireProcessTimeout>3600</surefireProcessTimeout>
   </properties>
