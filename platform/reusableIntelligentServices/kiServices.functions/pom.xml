@@ -52,9 +52,10 @@
   </dependencies>
   <build>
   	<plugins>
-  	<plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
+  	
+  	  <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
            <version>${org.apache.maven.assembly.version}</version>
            <executions>
                <execution>
@@ -89,6 +90,24 @@
                </execution>
            </executions>
        </plugin>
+       
+        <!-- future: overriding platformDependencies, tests work differently in here -->
+         <plugin>
+            <groupId>de.iip-ecosphere.platform</groupId>
+            <artifactId>maven-python</artifactId>
+            <version>${project.version}</version>
+            <executions>
+                <execution>
+                    <id>compile</id>
+                    <goals>
+                        <goal>compile-python</goal>
+                    </goals>
+                    <configuration>
+                        <failOnError>true</failOnError>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>       
         
   	</plugins>
   </build>
