@@ -78,6 +78,9 @@
       <surefireCiLine/>
       <surefireForkCount>1</surefireForkCount>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <maven.compiler.target>8</maven.compiler.target>
+      <maven.compiler.source>8</maven.compiler.source>    
+      <java.encoding>Cp1252</java.encoding>
 
      <!-- If changed, check against forced JUnit provider -->
       <junit.version>4.12</junit.version>
@@ -104,10 +107,11 @@
       
       <!-- for custom maven plugins -->
       <maven.version>3.9.7</maven.version>
-      <maven.plugin-annotations.version>3.9.0</maven.plugin-annotations.version>
+	  <maven.aether.version>3.1.1</maven.aether.version>
+	  <maven.plugin.version>3.15.2</maven.plugin.version>
+      <maven.plugin-annotations.version>3.15.2</maven.plugin-annotations.version>
       <maven.shared.file-management.version>3.2.0</maven.shared.file-management.version>
       <maven.plugin.testing.harness.version>3.3.0</maven.plugin.testing.harness.version>
-      <maven.plugin.version>3.6.0</maven.plugin.version>
       
       <maven.build.cache.enabled>false</maven.build.cache.enabled>
       <surefireProcessTimeout>3600</surefireProcessTimeout>
@@ -115,18 +119,287 @@
 
   <dependencyManagement>
     <dependencies>
-    
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   
   <build>
+  
     <plugins>
+	  <plugin>
+		 <artifactId>maven-compiler-plugin</artifactId>
+		 <version>${org.apache.maven.compiler.version}</version>
+		 <configuration>
+		   <!-- Somehow it does not work with properties, at least on my side -->
+		   <source>${maven.compiler.source}</source>
+		   <target>${maven.compiler.target}</target>
+		   <encoding>${java.encoding}</encoding>
+		   <compilerArgs>
+			 <arg>-Xlint:-options</arg>
+		   </compilerArgs>
+		 </configuration>
+	   </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>${org.apache.maven.source.version}</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>      
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${org.apache.maven.surefire.version}</version>
+        <configuration>
+          <reuseForks>false</reuseForks> <!-- run each suite in an own JVM (Spring binders) -->
+          <includes> <!-- suites only, allow for multiple suites (Spring binders)  -->
+            <include>**/AllTests*</include>
+          </includes>
+          <forkedProcessTimeoutInSeconds>${surefireProcessTimeout}</forkedProcessTimeoutInSeconds>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          <argLine>@{jacocoArgLine} @{surefireArgLine} @{surefireCiLine}</argLine>
+          <forkCount>${surefireForkCount}</forkCount>
+        </configuration>
+      </plugin>
+
+	   <!-- Java 11 complains about links from non-module to module see 
+		   https://stackoverflow.com/questions/58836862/jdk-11-and-javadoc -->       
+	   <plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-javadoc-plugin</artifactId>
+		<version>${org.apache.maven.javadoc.version}</version>
+		<configuration>
+		  <show>private</show>
+		  <encoding>${java.encoding}</encoding>
+		  <source>8</source>
+		  <excludePackageNames>*.proto.*</excludePackageNames>
+		  <failOnError>false</failOnError>
+		  <detectJavaApiLink>false</detectJavaApiLink> 
+		  <detectOfflineLinks>false</detectOfflineLinks>
+		  <doclint>all,-missing</doclint>
+		</configuration>
+		<executions>
+		  <execution>
+			<id>default-cli</id>
+			<goals>
+			  <goal>javadoc</goal>
+			  <goal>test-javadoc</goal>
+			  <goal>jar</goal>
+			  <goal>test-jar</goal>
+			</goals>
+		  </execution>
+		</executions>
+	  </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>${org.apache.maven.jar.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
         <version>${org.apache.maven.deploy.version}</version>
       </plugin>     
+
     </plugins>
+	
+    <pluginManagement>
+        <plugins>
+            <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+            <plugin>
+                <groupId>org.eclipse.m2e</groupId>
+                <artifactId>lifecycle-mapping</artifactId>
+                <version>${eclipse.m2e.lifecycle.mapping}</version>
+                <configuration>
+                    <lifecycleMappingMetadata>
+                        <pluginExecutions>
+                            <pluginExecution>
+                                <pluginExecutionFilter>
+                                    <groupId>
+                                        org.apache.maven.plugins
+                                    </groupId>
+                                    <artifactId>
+                                        maven-dependency-plugin
+                                    </artifactId>
+                                    <versionRange>
+                                        [3.1.2,)
+                                    </versionRange>
+                                    <goals>
+                                        <goal>unpack</goal>
+                                        <goal>copy</goal>
+                                        <goal>build-classpath</goal>                                        
+                                        <goal>unpack-dependencies</goal>
+                                        <goal>copy-dependencies</goal>
+                                    </goals>
+                                </pluginExecutionFilter>
+                                <action>
+                                    <ignore/>
+                                </action>
+                            </pluginExecution>
+                            <pluginExecution>
+                                <pluginExecutionFilter>
+                                    <groupId>
+                                        de.iip-ecosphere.platform
+                                    </groupId>
+                                    <artifactId>
+                                        maven-python
+                                    </artifactId>
+                                    <versionRange>
+                                        [${iip.version},)
+                                    </versionRange>
+                                    <goals>
+                                        <goal>compile-python</goal>
+                                        <goal>test-python</goal>
+                                    </goals>
+                                </pluginExecutionFilter>
+                                <action>
+                                    <ignore/>
+                                </action>
+                            </pluginExecution>
+                            <pluginExecution>
+                                <pluginExecutionFilter>
+                                    <groupId>
+                                        org.apache.maven.plugins
+                                    </groupId>
+                                    <artifactId>
+                                        maven-antrun-plugin
+                                    </artifactId>
+                                    <versionRange>
+                                        [1.8,)
+                                    </versionRange>
+                                    <goals>
+                                        <goal>run</goal>
+                                    </goals>
+                                </pluginExecutionFilter>
+                                <action>
+                                    <ignore/>
+                                </action>
+                            </pluginExecution>
+                            <pluginExecution>
+                                <pluginExecutionFilter>
+                                    <groupId>
+                                        org.apache.maven.plugins
+                                    </groupId>
+                                    <artifactId>
+                                        maven-plugin-plugin
+                                    </artifactId>
+                                    <versionRange>
+                                        [3.2,)
+                                    </versionRange>
+                                    <goals>
+                                        <goal>descriptor</goal>
+                                        <goal>helpmojo</goal>
+                                    </goals>
+                                </pluginExecutionFilter>
+                                <action>
+                                    <ignore/>
+                                </action>
+                            </pluginExecution>
+                            <pluginExecution>
+                                <pluginExecutionFilter>
+                                    <groupId>
+                                        de.iip-ecosphere.platform
+                                    </groupId>
+                                    <artifactId>
+                                        dependency-plugin
+                                    </artifactId>
+                                    <versionRange>
+                                        [${iip.version},)
+                                    </versionRange>
+                                    <goals>
+                                        <goal>unpack</goal>
+                                        <goal>unpack-plugins</goal>
+                                        <goal>copy</goal>
+                                        <goal>build-classpath</goal>                                        
+                                        <goal>build-plugin-classpath</goal>                                        
+                                        <goal>unpack-dependencies</goal>
+                                        <goal>copy-dependencies</goal>
+                                        <goal>copy-plugin-dependencies</goal>
+                                        <goal>assemble-plugin</goal>
+                                        <goal>split-classpath</goal>
+                                    </goals>
+                                </pluginExecutionFilter>
+                                <action>
+                                    <ignore/>
+                                </action>
+                            </pluginExecution>
+                            <pluginExecution>
+                                <pluginExecutionFilter>
+                                    <groupId>
+                                        de.iip-ecosphere.platform
+                                    </groupId>
+                                    <artifactId>
+                                        configuration-plugin
+                                    </artifactId>
+                                    <versionRange>
+                                        [${iip.version},)
+                                    </versionRange>
+                                    <goals>
+                                        <goal>generateAppsNoDeps</goal>
+                                        <goal>generateApps</goal>
+                                        <goal>generateBroker</goal>
+                                        <goal>generateInterfaces</goal>
+                                        <goal>generatePlatform</goal>
+                                        <goal>generateAll</goal>
+                                        <goal>textFile</goal>
+                                        <goal>ngBuild</goal>
+                                        <goal>ngTest</goal>
+                                    </goals>
+                                </pluginExecutionFilter>
+                                <action>
+                                    <ignore/>
+                                </action>
+                            </pluginExecution>
+                            <pluginExecution>
+                                <pluginExecutionFilter>
+                                    <groupId>
+                                        de.iip-ecosphere.platform
+                                    </groupId>
+                                    <artifactId>
+                                        invoker-plugin
+                                    </artifactId>
+                                    <versionRange>
+                                        [${iip.version},)
+                                    </versionRange>
+                                    <goals>
+                                        <goal>install</goal>
+                                        <goal>generate-sources</goal>
+                                    </goals>
+                                </pluginExecutionFilter>
+                                <action>
+                                    <ignore/>
+                                </action>
+                            </pluginExecution>
+                        </pluginExecutions>
+                    </lifecycleMappingMetadata>
+                </configuration>
+            </plugin>
+        </plugins>
+    </pluginManagement>
 
     <extensions>
       <!-- failing with a NPE if multi project directory is not set, bug #503-->
@@ -158,6 +431,40 @@
   </distributionManagement>  
   
   <profiles>
+    <profile>
+      <id>CI</id>
+      <activation>
+        <property>
+          <name>inCI</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${org.jacoco.maven.jacoco.version}</version>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>prepare-agent</goal>
+                    </goals>
+                    <configuration>
+                        <propertyName>jacocoArgLine</propertyName>
+                    </configuration>
+                </execution>
+                <execution>
+                    <id>report</id>
+                    <phase>test</phase>
+                    <goals>
+                        <goal>report</goal>
+                    </goals>
+                </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
     <profile>
       <id>WithCache</id>
       <!-- if there is a global build cache file, not the usual location in .mvn, activate the build cache -->
