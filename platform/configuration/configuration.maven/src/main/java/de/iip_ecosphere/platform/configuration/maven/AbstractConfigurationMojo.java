@@ -27,12 +27,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.maven.artifact.resolver.ArtifactResolver;
+import javax.inject.Inject;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
@@ -59,16 +59,11 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession session;
     
-    @Component
     private ProjectBuilder projectBuilder;
 
-    @Component
-    private ArtifactResolver resolver;
-    
     @Parameter(defaultValue = "${project.remotePluginRepositories}", readonly = true)
     private List<RemoteRepository> remoteRepos;
     
-    @Component
     private RepositorySystem repoSystem;
     
     @Parameter(defaultValue = "${mojoExecution}", readonly = true, required = true)
@@ -141,6 +136,19 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
      */
     @Parameter
     private File mavenHome;
+
+    /**
+     * Creates an instance.
+     * 
+     * @param projectBuilder the project builder
+     * @param repoSystem the repo system
+     */
+    @Inject
+    public AbstractConfigurationMojo(ProjectBuilder projectBuilder, 
+        RepositorySystem repoSystem) {
+        this.projectBuilder = projectBuilder;
+        this.repoSystem = repoSystem;
+    }
 
     @Override
     public MavenProject getProject() {

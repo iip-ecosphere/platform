@@ -12,9 +12,13 @@
 
 package de.iip_ecosphere.platform.configuration.maven;
 
+import javax.inject.Inject;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.ProjectBuilder;
+import org.eclipse.aether.RepositorySystem;
 
 import de.iip_ecosphere.platform.configuration.cfg.ConfigurationFactory;
 
@@ -28,6 +32,18 @@ public abstract class AbstractAppsConfigurationMojo extends AbstractConfiguratio
     @Parameter(property = "configuration.apps", required = false, defaultValue = "")
     private String apps = "";
 
+    /**
+     * Creates an instance.
+     * 
+     * @param projectBuilder the project builder
+     * @param repoSystem the repo system
+     */
+    @Inject
+    public AbstractAppsConfigurationMojo(ProjectBuilder projectBuilder, 
+        RepositorySystem repoSystem) {
+        super(projectBuilder, repoSystem);
+    }
+    
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         ConfigurationFactory.hintAppsToInstantiate(apps);

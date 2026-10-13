@@ -12,8 +12,12 @@
 
 package de.iip_ecosphere.platform.configuration.maven;
 
+import javax.inject.Inject;
+
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.project.ProjectBuilder;
+import org.eclipse.aether.RepositorySystem;
 
 /**
  * Generates the configured applications without dependencies to the implementing services.
@@ -23,6 +27,18 @@ import org.apache.maven.plugins.annotations.Mojo;
 @Mojo(name = "generateAppsNoDeps", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
 public class GenerateAppsNoDepsMojo extends AbstractAppsConfigurationMojo {
 
+    /**
+     * Creates an instance.
+     * 
+     * @param projectBuilder the project builder
+     * @param repoSystem the repo system
+     */
+    @Inject
+    public GenerateAppsNoDepsMojo(ProjectBuilder projectBuilder, 
+        RepositorySystem repoSystem) {
+        super(projectBuilder, repoSystem);
+    }
+    
     @Override
     public String getStartRule() {
         return "generateAppsNoDeps";

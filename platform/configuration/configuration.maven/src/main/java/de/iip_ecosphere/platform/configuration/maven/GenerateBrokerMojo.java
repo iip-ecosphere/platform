@@ -15,8 +15,12 @@ package de.iip_ecosphere.platform.configuration.maven;
 
 import java.io.File;
 
+import javax.inject.Inject;
+
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.project.ProjectBuilder;
+import org.eclipse.aether.RepositorySystem;
 
 /**
  * Generates the default/testing broker.
@@ -26,6 +30,18 @@ import org.apache.maven.plugins.annotations.Mojo;
 @Mojo(name = "generateBroker", defaultPhase = LifecyclePhase.PACKAGE)
 public class GenerateBrokerMojo extends AbstractConfigurationMojo {
 
+    /**
+     * Creates an instance.
+     * 
+     * @param projectBuilder the project builder
+     * @param repoSystem the repo system
+     */
+    @Inject
+    public GenerateBrokerMojo(ProjectBuilder projectBuilder, 
+        RepositorySystem repoSystem) {
+        super(projectBuilder, repoSystem);
+    }
+    
     @Override
     public String getStartRule() {
         return "generateBroker";

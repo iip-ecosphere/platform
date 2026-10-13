@@ -6,11 +6,6 @@
   <name>Maven Configuration Plugin</name>
   <description>Integrates the configuration commands as Maven plugin.</description>
 
-  <properties>
-	  <maven.plugin.version>3.13.1</maven.plugin.version>
-	  <maven.aether.version>3.1.1</maven.aether.version>
-  </properties>
-
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependencies</artifactId>

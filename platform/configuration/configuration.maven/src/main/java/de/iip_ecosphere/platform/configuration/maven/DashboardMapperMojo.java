@@ -28,13 +28,14 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutionException;
 
+import javax.inject.Inject;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -78,10 +79,8 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
     @Parameter(defaultValue = "${plugin.version}", readonly = true)
     private String pluginVersion;    
 
-    @Component
     private RepositorySystem repoSystem;
 
-    @Component
     private ProjectBuilder projectBuilder;
     
     @Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
@@ -126,6 +125,19 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
 
     private DependencyResolver resolver;
 
+    /**
+     * Creates an instance.
+     * 
+     * @param projectBuilder the project builder
+     * @param repoSystem the repo system
+     */
+    @Inject
+    public DashboardMapperMojo(ProjectBuilder projectBuilder, 
+        RepositorySystem repoSystem) {
+        this.projectBuilder = projectBuilder;
+        this.repoSystem = repoSystem;
+    }
+    
     @Override
     public MavenSession getSession() {
         return session;

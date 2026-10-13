@@ -13,8 +13,12 @@
 
 package de.iip_ecosphere.platform.configuration.maven;
 
+import javax.inject.Inject;
+
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.project.ProjectBuilder;
+import org.eclipse.aether.RepositorySystem;
 
 /**
  * Instantiates the platform components.
@@ -24,6 +28,18 @@ import org.apache.maven.plugins.annotations.Mojo;
 @Mojo(name = "generatePlatform", defaultPhase = LifecyclePhase.PACKAGE)
 public class GeneratePlatformMojo extends AbstractConfigurationMojo {
 
+    /**
+     * Creates an instance.
+     * 
+     * @param projectBuilder the project builder
+     * @param repoSystem the repo system
+     */
+    @Inject
+    public GeneratePlatformMojo(ProjectBuilder projectBuilder, 
+        RepositorySystem repoSystem) {
+        super(projectBuilder, repoSystem);
+    }
+    
     @Override
     protected boolean enableRun(String metaModelDir, String modelDir, String outputDir) {
         return !checkChanged() || super.enableRun(metaModelDir, modelDir, outputDir);

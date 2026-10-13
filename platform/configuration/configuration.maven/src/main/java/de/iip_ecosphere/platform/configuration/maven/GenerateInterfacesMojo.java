@@ -13,8 +13,12 @@
 
 package de.iip_ecosphere.platform.configuration.maven;
 
+import javax.inject.Inject;
+
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.project.ProjectBuilder;
+import org.eclipse.aether.RepositorySystem;
 
 /**
  * Generates only the service/data interfaces, no application parts.
@@ -24,6 +28,18 @@ import org.apache.maven.plugins.annotations.Mojo;
 @Mojo(name = "generateInterfaces", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
 public class GenerateInterfacesMojo extends AbstractConfigurationMojo {
 
+    /**
+     * Creates an instance.
+     * 
+     * @param projectBuilder the project builder
+     * @param repoSystem the repo system
+     */
+    @Inject
+    public GenerateInterfacesMojo(ProjectBuilder projectBuilder, 
+        RepositorySystem repoSystem) {
+        super(projectBuilder, repoSystem);
+    }
+    
     @Override
     public String getStartRule() {
         return "generateInterfaces";

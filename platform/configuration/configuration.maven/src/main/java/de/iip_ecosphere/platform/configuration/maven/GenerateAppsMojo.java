@@ -13,9 +13,13 @@
 
 package de.iip_ecosphere.platform.configuration.maven;
 
+import javax.inject.Inject;
+
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.ProjectBuilder;
+import org.eclipse.aether.RepositorySystem;
 
 import de.iip_ecosphere.platform.support.collector.Collector;
 
@@ -29,6 +33,18 @@ public class GenerateAppsMojo extends AbstractAppsConfigurationMojo {
 
     @Parameter(property = "configuration.checkChanged", required = false, defaultValue = "false")
     private boolean checkChanged;
+
+    /**
+     * Creates an instance.
+     * 
+     * @param projectBuilder the project builder
+     * @param repoSystem the repo system
+     */
+    @Inject
+    public GenerateAppsMojo(ProjectBuilder projectBuilder, 
+        RepositorySystem repoSystem) {
+        super(projectBuilder, repoSystem);
+    }
     
     @Override
     public String getStartRule() {
