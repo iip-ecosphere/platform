@@ -12,6 +12,11 @@
      <version>0.8.2-SNAPSHOT</version>
      <relativePath/>
   </parent>
+  
+  <properties>
+      <maven.compiler.target>8</maven.compiler.target>
+      <maven.compiler.source>8</maven.compiler.source>    
+  </properties>
 
   <dependencies>
     
@@ -61,16 +66,6 @@
   
   <build>
     <plugins>
-       <plugin>
-         <artifactId>maven-compiler-plugin</artifactId>
-         <version>${org.apache.maven.compiler.version}</version>
-           <configuration>
-             <!-- Must be the JDK of RTSA -->
-             <source>8</source>
-             <target>8</target>
-             <encoding>${java.encoding}</encoding>
-           </configuration>
-       </plugin>      
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
