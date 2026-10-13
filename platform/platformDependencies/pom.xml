@@ -389,34 +389,6 @@
           <forkCount>${surefireForkCount}</forkCount>
         </configuration>
       </plugin>
-      
-      <plugin>
-         <groupId>de.iip-ecosphere.platform</groupId>
-         <artifactId>maven-python</artifactId>
-         <version>${iip.version}</version>
-         <executions>
-             <execution>
-                 <id>py-compile</id>
-                 <goals>
-                     <goal>compile-python</goal>
-                 </goals>
-             </execution>
-             <execution>
-                 <id>py-test</id>
-                 <goals>
-                     <goal>test-python</goal>
-                 </goals>
-                 <configuration>
-                   <fileset>
-                     <directory>src/test/python</directory>
-                     <includes>
-                         <include>**/*Test.py</include>
-                     </includes>
-                   </fileset>                            
-                 </configuration>                        
-             </execution>
-         </executions>
-     </plugin>
      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
