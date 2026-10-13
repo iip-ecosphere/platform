@@ -351,9 +351,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
 
                 String appVersion = getAppMvnVersion(a);
                 oktoPlugins = cleanAppTestPlugins(config, oktoPlugins);
-                FolderArtifact resFolder = "./resources"; // if not there, maven assembly will complain
-                FolderArtifact resFolderIpr = "./resources.ipr";
-                if ((resFolder.exists() or resFolderIpr.exists()) and !isUnpackResourcesSkip()) { 
+                FolderArtifact resFolder = "${appRoot}/resources"; // if not there, maven assembly will complain
+                FolderArtifact resFolderIpr = "${appRoot}/resources.ipr";
+                if (((resFolder.exists() or resFolderIpr.exists()) and !isUnpackResourcesSkip()) or isUnpackResources()) { 
                     Path assemblySrc = "${appRoot}/${assemblyRel}";
                     assemblySrc.mkdir();
                     vilTemplateProcessor("TemplatesResourcesAssembly", config, "${assemblySrc}/resources.xml");
