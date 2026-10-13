@@ -146,6 +146,20 @@
                              <attach>true</attach>
                          </configuration>
                      </execution>
+                    <execution>
+                        <id>resources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${project.basedir}/src/main/assembly/resources.xml</descriptor>
+                            </descriptors>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <attach>true</attach>
+                        </configuration>
+                    </execution>
                  </executions>
              </plugin>
               <plugin>
