@@ -20,6 +20,7 @@ import org.apache.qpid.server.model.Broker;
 import org.slf4j.LoggerFactory;
 
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -114,7 +115,8 @@ public class TestQpidServer extends AbstractTestServer {
      */
     public static void main(String[] args) {
         if (applyBaseDir(args, 1, "./src/test") != null) {
-            File tmpWork = new File(FileUtils.getTempDirectory(), "qpid");
+            File tmpWork = new File(FileUtils.getTempDirectory(), 
+                "qpid-" + OsUtils.getUserName("1")); // "1" usually not needed, ensure directory name
             FileUtils.deleteQuietly(tmpWork);
             System.setProperty("QPID_WORK", tmpWork.getAbsolutePath());
         } // leave it as it was, only within process-based plugin executions
