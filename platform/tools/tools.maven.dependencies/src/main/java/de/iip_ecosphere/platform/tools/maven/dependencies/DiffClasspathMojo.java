@@ -14,14 +14,22 @@ package de.iip_ecosphere.platform.tools.maven.dependencies;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -29,7 +37,12 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.plugins.dependency.AbstractDependencyMojo;
 import org.apache.maven.plugins.dependency.utils.DependencyStatusSets;
 import org.apache.maven.plugins.dependency.utils.DependencyUtil;
+import org.apache.maven.plugins.dependency.utils.ResolverUtil;
+import org.apache.maven.plugins.dependency.utils.translators.ArtifactTranslator;
+import org.apache.maven.plugins.dependency.utils.translators.ClassifierTypeTranslator;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -44,6 +57,9 @@ import org.apache.maven.shared.artifact.filter.collection.TypeFilter;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolver;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
 import org.codehaus.plexus.util.StringUtils;
+import org.eclipse.aether.resolution.ArtifactDescriptorException;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 /**
  * Reused build-classpath Mojo to write a diffed classpath from {@link DiffClasspathMojo#rootCoordinates} and the 
@@ -56,10 +72,8 @@ import org.codehaus.plexus.util.StringUtils;
     defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true )
 public class DiffClasspathMojo extends org.apache.maven.plugins.dependency.fromDependencies.BuildClasspathMojo {
 
-    @Component
     private ArtifactResolver artifactResolver;
     
-    @Component
     private ProjectBuilder projectBuilder;
 
     @Parameter( property = "mdep.outputFile", required = true )
@@ -70,6 +84,46 @@ public class DiffClasspathMojo extends org.apache.maven.plugins.dependency.fromD
 
     @Parameter( property = "mdep.rootCoordinates", required = true )
     private Set<String> rootCoordinates;
+    
+    @Parameter( defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true )
+    private List<ArtifactRepository> remoteArtifactRepositories;
+    
+    private ArtifactHandlerManager artifactHandlerManager;
+    
+    private ResolverUtil resolverUtil;
+
+    // checkstyle: stop parameter number check
+    
+    /**
+     * Creates a mojo instance.
+     * 
+     * @param session the maven session
+     * @param buildContext the build context
+     * @param project the project instance
+     * @param resolverUtil the resolver util instance
+     * @param projectBuilder the project builder
+     * @param artifactHandlerManager the artifact handler manager
+     * @param projectHelper the project helper
+     * @param artifactResolver the artifact resolver instance
+     */    
+    @Inject
+    protected DiffClasspathMojo(
+        MavenSession session,
+        BuildContext buildContext,
+        MavenProject project,
+        ResolverUtil resolverUtil,
+        ProjectBuilder projectBuilder,
+        ArtifactHandlerManager artifactHandlerManager,
+        MavenProjectHelper projectHelper,
+        ArtifactResolver artifactResolver) {
+        super(session, buildContext, project, resolverUtil, projectBuilder, artifactHandlerManager, projectHelper);
+        this.artifactHandlerManager = artifactHandlerManager;
+        this.resolverUtil = resolverUtil;
+        this.projectBuilder = projectBuilder;
+        this.artifactResolver = artifactResolver;
+    }
+
+    // checkstyle: resume parameter number check
 
     @Override
     public void setOutputFile(File outputFile) {
@@ -199,7 +253,82 @@ public class DiffClasspathMojo extends org.apache.maven.plugins.dependency.fromD
 
         return status;
     }
+    
+    // >>> taken over as private now, may need updating
 
+    /**
+     * Transform artifacts.
+     *
+     * @param artifacts set of artifacts {@link Artifact}
+     * @param stopOnFailure true/false
+     * @return DependencyStatusSets - Bean of TreeSets that contains information on the projects dependencies
+     * @throws MojoExecutionException in case of an error
+     */
+    private DependencyStatusSets getClassifierTranslatedDependencies(Set<Artifact> artifacts, boolean stopOnFailure)
+            throws MojoExecutionException {
+        Set<Artifact> unResolvedArtifacts = new LinkedHashSet<>();
+        Set<Artifact> resolvedArtifacts = artifacts;
+        DependencyStatusSets status = new DependencyStatusSets();
+
+        // possibly translate artifacts into a new set of artifacts based on the
+        // classifier and type
+        // if this did something, we need to resolve the new artifacts
+        if (classifier != null && !classifier.isEmpty()) {
+            ArtifactTranslator translator =
+                    new ClassifierTypeTranslator(artifactHandlerManager, this.classifier, this.type);
+            Collection<org.eclipse.aether.artifact.Artifact> coordinates = translator.translate(artifacts, getLog());
+
+            status = filterMarkedDependencies(artifacts);
+
+            // the unskipped artifacts are in the resolved set.
+            artifacts = status.getResolvedDependencies();
+
+            // resolve the rest of the artifacts
+            resolvedArtifacts = resolve(new LinkedHashSet<>(coordinates), stopOnFailure);
+
+            // calculate the artifacts not resolved.
+            unResolvedArtifacts.addAll(artifacts);
+            unResolvedArtifacts.removeAll(resolvedArtifacts);
+        }
+
+        // return a bean of all 3 sets.
+        status.setResolvedDependencies(resolvedArtifacts);
+        status.setUnResolvedDependencies(unResolvedArtifacts);
+
+        return status;
+    }
+    
+    /**
+     * Resolves artifacts.
+     * 
+     * @param artifacts the set of artifacts
+     * @param stopOnFailure <code>true</code> if we should fail with exception if an artifact couldn't be resolved
+     *            <code>false</code> otherwise
+     * @return the resolved artifacts. {@link Artifact}.
+     * @throws MojoExecutionException in case of error
+     */
+    private Set<Artifact> resolve(Set<org.eclipse.aether.artifact.Artifact> artifacts, boolean stopOnFailure)
+            throws MojoExecutionException {
+
+        Set<Artifact> resolvedArtifacts = new LinkedHashSet<>();
+        for (org.eclipse.aether.artifact.Artifact artifact : artifacts) {
+            try {
+                org.eclipse.aether.artifact.Artifact resolveArtifact =
+                        resolverUtil.resolveArtifact(artifact, getProject().getRemoteProjectRepositories());
+                resolvedArtifacts.add(RepositoryUtils.toArtifact(resolveArtifact));
+            } catch (ArtifactResolutionException | ArtifactDescriptorException ex) {
+                // an error occurred during resolution, log it and continue
+                getLog().debug("error resolving: " + artifact, ex);
+                if (stopOnFailure) {
+                    throw new MojoExecutionException("error resolving: " + artifact, ex);
+                }
+            }
+        }
+        return resolvedArtifacts;
+    }
+    
+    // <<< taken over as private now, may need updating
+    
     /**
      * Creates a maven project instance from the given artifact. Taken over from {@link AbstractDependencyMojo} as
      * not accessible.
@@ -231,7 +360,9 @@ public class DiffClasspathMojo extends org.apache.maven.plugins.dependency.fromD
                 break;
             }
             try {
-                ProjectBuildingRequest buildingRequest = newResolveArtifactProjectBuildingRequest();
+                ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(
+                    session.getProjectBuildingRequest());
+                buildingRequest.setRemoteRepositories(remoteArtifactRepositories);
                 Artifact resolvedArtifact = artifactResolver.resolveArtifact(buildingRequest, project.getArtifact())
                     .getArtifact();
                 artifacts.add(resolvedArtifact);

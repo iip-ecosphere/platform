@@ -26,20 +26,25 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.function.Function;
 
+import javax.inject.Inject;
+
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.project.DefaultProjectBuildingRequest;
+import org.apache.maven.plugins.dependency.utils.ResolverUtil;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.project.ProjectBuilder;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 /**
  * Reused build-classpath Mojo, allowing to prepend/append classpath elements not part of the Maven classpath.
@@ -108,11 +113,49 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
     @Parameter( defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true )
     private List<ArtifactRepository> remoteArtifactRepositories;
     
-    @Component
     private RepositorySystem repoSystem;
     
     private Set<String> oldEntries;
 
+    // checkstyle: stop parameter number check
+
+    /**
+     * Creates a mojo instance.
+     * 
+     * @param session the session
+     * @param buildContext the build context
+     * @param project the project
+     * @param resolverUtil the resolver utilities
+     * @param projectBuilder the project builder
+     * @param artifactHandlerManager the artifact handler manager
+     * @param projectHelper the project helper
+     * @param repoSystem the repository system
+     */
+    @Inject
+    protected BuildClasspathMojo(
+        MavenSession session,
+        BuildContext buildContext,
+        MavenProject project,
+        ResolverUtil resolverUtil,
+        ProjectBuilder projectBuilder,
+        ArtifactHandlerManager artifactHandlerManager,
+        MavenProjectHelper projectHelper,
+        RepositorySystem repoSystem) {
+        super(session, buildContext, project, resolverUtil, projectBuilder, artifactHandlerManager, projectHelper);
+        this.repoSystem = repoSystem;
+    }    
+
+    // checkstyle: resume parameter number check
+
+    /**
+     * Returns the repository system instance.
+     * 
+     * @return the repository system instance
+     */
+    protected RepositorySystem getRepositorySystem() {
+        return repoSystem;
+    }
+    
     @Override
     public void setOutputFile(File outputFile) {
         super.setOutputFile(outputFile);
@@ -389,14 +432,5 @@ public class BuildClasspathMojo extends org.apache.maven.plugins.dependency.from
             }
         }
     }
-
-    @Override
-    public ProjectBuildingRequest newResolveArtifactProjectBuildingRequest() {
-        // no artifact resolution so far
-        ProjectBuildingRequest buildingRequest =
-            new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
-        buildingRequest.setRemoteRepositories(remoteArtifactRepositories);
-        return buildingRequest;
-    }
-
+    
 }

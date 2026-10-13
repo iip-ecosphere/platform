@@ -23,17 +23,25 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.plugins.dependency.utils.ResolverUtil;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.project.ProjectBuilder;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 import de.oktoflow.platform.tools.lib.loader.Constants;
 import de.oktoflow.platform.tools.lib.loader.Constants.UnpackMode;
@@ -79,9 +87,6 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
 
     @Parameter(defaultValue = "${repositorySystemSession}", readonly = true)
     private RepositorySystemSession repoSession;
-
-    @Component
-    private RepositorySystem repoSystem;
     
     public enum JslMode {
         OFF,
@@ -90,6 +95,36 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
         ERROR,
         FAIL
     }
+    
+    // checkstyle: stop parameter number check
+    
+    /**
+     * Creates a mojo instance.
+     * 
+     * @param session the maven session
+     * @param buildContext the build context
+     * @param project the project instance
+     * @param resolverUtil the resolver util instance
+     * @param projectBuilder the project builder
+     * @param artifactHandlerManager the artifact handler manager
+     * @param projectHelper the project helper
+     * @param repoSystem the repository system
+     */
+    @Inject
+    protected BuildPluginClasspathMojo(
+        MavenSession session,
+        BuildContext buildContext,
+        MavenProject project,
+        ResolverUtil resolverUtil,
+        ProjectBuilder projectBuilder,
+        ArtifactHandlerManager artifactHandlerManager,
+        MavenProjectHelper projectHelper,
+        RepositorySystem repoSystem) {
+        super(session, buildContext, project, resolverUtil, projectBuilder, artifactHandlerManager, projectHelper, 
+            repoSystem);
+    }     
+
+    // checkstyle: resume parameter number check
 
     /**
      * Returns the relative target directory.
@@ -168,7 +203,7 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
         }
         if (file != null) {
             if (unpackMode == UnpackMode.RESOLVE || unpackMode == UnpackMode.SNAPSHOTS) {
-                Resolver resolver = new Resolver(repoSystem, repoSession, remoteRepositories, getLog());
+                Resolver resolver = new Resolver(getRepositorySystem(), repoSession, remoteRepositories, getLog());
                 Set<Artifact> artifacts = getResolvedDependencies(true);
                 resolver.writeResolvedFile(file, artifacts, a -> unpackMode, a -> resolver.resolveToUrl(a), 
                     a -> a.getArtifactId(), a -> a.getVersion(), false);

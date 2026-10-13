@@ -32,21 +32,24 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.plugins.dependency.fromConfiguration.ArtifactItem;
-import org.apache.maven.project.DefaultProjectBuildingRequest;
-import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.plugins.dependency.utils.ResolverUtil;
+import org.apache.maven.plugins.dependency.utils.UnpackUtil;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.codehaus.plexus.components.io.filemappers.FileMapper;
 import org.eclipse.aether.RepositorySystem;
@@ -54,6 +57,7 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 import de.oktoflow.platform.tools.lib.loader.Constants;
 import de.oktoflow.platform.tools.lib.loader.Constants.UnpackMode;
@@ -117,7 +121,6 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
     @Parameter( defaultValue = "${session}", readonly = true, required = true )
     private MavenSession session;
 
-    @Component
     private RepositorySystem repoSystem;
     
     private Map<String, List<String>> pluginAppends = new HashMap<>();
@@ -285,6 +288,34 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
         }
         
     }
+    
+    // checkstyle: stop parameter number check
+
+    /**
+     * Creates a mojo instance.
+     * 
+     * @param session the session
+     * @param buildContext the build context
+     * @param project the project instance
+     * @param artifactHandlerManager the artifact handler manager
+     * @param unpackUtil the unpack utility instance
+     * @param repositorySystem the repository system
+     * @param resolverUtil the resolver utilities
+     */
+    @Inject
+    public UnpackPluginMojo(
+        MavenSession session,
+        BuildContext buildContext,
+        MavenProject project,
+        ArtifactHandlerManager artifactHandlerManager,
+        UnpackUtil unpackUtil,
+        RepositorySystem repositorySystem,
+        ResolverUtil resolverUtil) {
+        super(session, buildContext, project, artifactHandlerManager, unpackUtil, repositorySystem, resolverUtil);
+        this.repoSystem = repositorySystem; 
+    }    
+    
+    // checkstyle: resume parameter number check    
     
     @Override
     public void doExecute() throws MojoExecutionException, MojoFailureException {
@@ -1213,15 +1244,6 @@ public class UnpackPluginMojo extends CleaningUnpackMojo {
             getLog().warn("Cannot resolve to artifact, keeping path: " + path);
         }
         return resolved;
-    }
-
-    @Override
-    public ProjectBuildingRequest newResolveArtifactProjectBuildingRequest() {
-        // no artifact resolution so far
-        ProjectBuildingRequest buildingRequest =
-            new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
-        buildingRequest.setRemoteRepositories(remoteArtifactRepositories);
-        return buildingRequest;
     }
 
 }

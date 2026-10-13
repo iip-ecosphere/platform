@@ -21,8 +21,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOCase;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -31,8 +35,13 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.dependency.fromConfiguration.ArtifactItem;
 import org.apache.maven.plugins.dependency.fromConfiguration.UnpackMojo;
+import org.apache.maven.plugins.dependency.utils.ResolverUtil;
+import org.apache.maven.plugins.dependency.utils.UnpackUtil;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
+import org.eclipse.aether.RepositorySystem;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 import de.iip_ecosphere.platform.tools.maven.python.FilesetUtils;
 
@@ -71,6 +80,33 @@ public class CleaningUnpackMojo extends UnpackMojo {
     @Parameter( property = "unpack.logCleanup", required = false, defaultValue = "false" )
     private boolean logCleanup;
 
+    // checkstyle: stop parameter number check
+
+    /**
+     * Creates a mojo instance.
+     * 
+     * @param session the session
+     * @param buildContext the build context
+     * @param project the project instance
+     * @param artifactHandlerManager the artifact handler manager
+     * @param unpackUtil the unpack utility instance
+     * @param repositorySystem the repository system
+     * @param resolverUtil the resolver utilities
+     */
+    @Inject
+    public CleaningUnpackMojo(
+        MavenSession session,
+        BuildContext buildContext,
+        MavenProject project,
+        ArtifactHandlerManager artifactHandlerManager,
+        UnpackUtil unpackUtil,
+        RepositorySystem repositorySystem,
+        ResolverUtil resolverUtil) {
+        super(session, buildContext, project, artifactHandlerManager, unpackUtil, repositorySystem, resolverUtil);
+    }    
+    
+    // checkstyle: resume parameter number check
+    
     /**
      * Returns whether there is a setup for initially allowed files, considering {@link #initiallyAllowedFile} and 
      * {@link #initiallyAllowed}.

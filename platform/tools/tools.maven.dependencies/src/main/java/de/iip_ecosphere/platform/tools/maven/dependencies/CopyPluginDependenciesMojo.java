@@ -16,19 +16,30 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import javax.inject.Inject;
+
 import org.apache.commons.io.IOUtils;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-
-import com.google.common.io.Files;
+import org.apache.maven.plugins.dependency.utils.CopyUtil;
+import org.apache.maven.plugins.dependency.utils.ResolverUtil;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.shared.transfer.artifact.install.ArtifactInstaller;
+import org.apache.maven.shared.transfer.repository.RepositoryManager;
+import org.eclipse.aether.RepositorySystem;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 
@@ -58,6 +69,40 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
 
     @Parameter( property = "mdep.createIndex", defaultValue = "true")
     private boolean createIndex;
+
+    // checkstyle: stop parameter number check
+
+    /**
+     * Creates a mojo instance.
+     * 
+     * @param session the maven session
+     * @param buildContext the build context
+     * @param project the maven project
+     * @param resolverUtil the resolver util instance
+     * @param repositoryManager the repository manager
+     * @param projectBuilder the project builder
+     * @param artifactHandlerManager the artifact handler manager
+     * @param copyUtil the copy util instance
+     * @param installer the installer
+     * @param repoSystem the repository system instance
+     */
+    @Inject
+    public CopyPluginDependenciesMojo(
+        MavenSession session,
+        BuildContext buildContext,
+        MavenProject project,
+        ResolverUtil resolverUtil,
+        RepositoryManager repositoryManager,
+        ProjectBuilder projectBuilder,
+        ArtifactHandlerManager artifactHandlerManager,
+        CopyUtil copyUtil,
+        ArtifactInstaller installer,
+        RepositorySystem repoSystem) {
+        super(session, buildContext, project, resolverUtil, repositoryManager, projectBuilder, artifactHandlerManager, 
+            copyUtil, installer, repoSystem);
+    }      
+
+    // checkstyle: resume parameter number check
 
     @Override
     protected void doExecute() throws MojoExecutionException {
@@ -208,7 +253,7 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
                                 if (!tgtFile.exists() || tgtFile.lastModified() < srcFile.lastModified()) {
                                     tgtFile.getParentFile().mkdirs();
                                     try {
-                                        Files.copy(srcFile, tgtFile);
+                                        Files.copy(srcFile.toPath(), tgtFile.toPath());
                                     } catch (IOException e) {
                                         getLog().warn("Cannot copy dependency " + token + ": " + e.getMessage());
                                     }

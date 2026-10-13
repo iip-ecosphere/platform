@@ -17,19 +17,9 @@
 
   <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	  <maven.version>3.6.0</maven.version>
-      <junit.version>4.12</junit.version>
+	  <maven.plugin.version>3.15.2</maven.plugin.version>
+      <maven.plugin-annotations.version>3.15.2</maven.plugin-annotations.version>
 
-      <kr.motd.maven.os.version>1.6.2</kr.motd.maven.os.version>
-      <org.apache.maven.compiler.version>3.7.0</org.apache.maven.compiler.version>
-      <org.apache.maven.javadoc.version>3.2.0</org.apache.maven.javadoc.version>
-      <org.apache.maven.jar.version>3.2.0</org.apache.maven.jar.version>
-      <org.apache.maven.surefire.version>3.0.0-M3</org.apache.maven.surefire.version>
-      <org.apache.maven.assembly.version>3.1.1</org.apache.maven.assembly.version>
-      <org.jacoco.maven.jacoco.version>0.8.8</org.jacoco.maven.jacoco.version>
-      <org.apache.maven.source.version>3.2.0</org.apache.maven.source.version>
-      <org.apache.maven.dependency.version>3.11.0</org.apache.maven.dependency.version>
-      
       <maven.compiler.target>11</maven.compiler.target>
       <maven.compiler.source>11</maven.compiler.source>
       <java.encoding>Cp1252</java.encoding>
@@ -45,37 +35,40 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
       <version>${maven.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-core</artifactId>
-        <version>${maven.version}</version><!--$NO-MVN-MAN-VER$-->
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <version>${maven.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-compat</artifactId>
-        <version>${maven.version}</version>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-compat</artifactId>
+      <version>${maven.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
-      <version>${maven.version}</version>
+      <version>${maven.plugin-annotations.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>file-management</artifactId>
-      <version>3.1.0</version>
+      <version>${maven.shared.file-management.version}</version>
     </dependency>    
     <dependency>
        <groupId>org.apache.maven.plugins</groupId>
        <artifactId>maven-dependency-plugin</artifactId>
-       <version>3.2.0</version>
+       <version>${org.apache.maven.dependency.version}</version>
     </dependency>
     <dependency>
        <groupId>org.apache.maven.plugins</groupId>
        <artifactId>maven-assembly-plugin</artifactId>
-       <version>3.8.0</version>
+       <version>${org.apache.maven.assembly.version}</version>
     </dependency>
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
@@ -86,7 +79,7 @@
     <dependency>
       <groupId>org.apache.maven.plugin-testing</groupId>
       <artifactId>maven-plugin-testing-harness</artifactId>
-      <version>3.3.0</version>
+      <version>${maven.plugin.testing.harness.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -108,7 +101,10 @@
                <source>${maven.compiler.source}</source>
                <target>${maven.compiler.target}</target>
                <encoding>${java.encoding}</encoding>
-             </configuration>
+               <compilerArgs>
+                 <arg>-Xlint:-options</arg>
+               </compilerArgs>
+               </configuration>
            </plugin>
 
            <!-- Java 11 complains about links from non-module to module see 
@@ -185,8 +181,8 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-plugin-plugin</artifactId>
-            <version>${maven.version}</version>
             <configuration>
+                <goalPrefix>dependency</goalPrefix>
             </configuration>
             <executions>
                 <execution>
@@ -212,7 +208,7 @@
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-plugin-plugin</artifactId>
-              <version>${maven.version}</version>
+              <version>${maven.plugin.version}</version>
             </plugin>
             
             <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->

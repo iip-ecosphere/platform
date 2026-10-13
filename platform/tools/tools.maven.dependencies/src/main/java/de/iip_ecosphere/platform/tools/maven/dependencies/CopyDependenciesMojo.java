@@ -18,18 +18,26 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.project.DefaultProjectBuildingRequest;
-import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.plugins.dependency.utils.CopyUtil;
+import org.apache.maven.plugins.dependency.utils.ResolverUtil;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.shared.transfer.artifact.install.ArtifactInstaller;
+import org.apache.maven.shared.transfer.repository.RepositoryManager;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 /**
  * Reused build-classpath Mojo.
@@ -52,8 +60,40 @@ public class CopyDependenciesMojo extends org.apache.maven.plugins.dependency.fr
     @Parameter( defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true )
     private List<ArtifactRepository> remoteArtifactRepositories;
     
-    @Component
     private RepositorySystem repoSystem;
+    
+    // checkstyle: stop parameter number check
+
+    /**
+     * Creates a mojo instance.
+     * 
+     * @param session the session
+     * @param buildContext the build context
+     * @param project the project
+     * @param resolverUtil the resolver utilities
+     * @param projectBuilder the project builder
+     * @param artifactHandlerManager the artifact handler manager
+     * @param installer the installer
+     * @param repoSystem the repository system instance
+     */
+    @Inject
+    public CopyDependenciesMojo(
+        MavenSession session,
+        BuildContext buildContext,
+        MavenProject project,
+        ResolverUtil resolverUtil,
+        RepositoryManager repositoryManager,
+        ProjectBuilder projectBuilder,
+        ArtifactHandlerManager artifactHandlerManager,
+        CopyUtil copyUtil,
+        ArtifactInstaller installer,
+        RepositorySystem repoSystem) {
+        super(session, buildContext, project, resolverUtil, repositoryManager, projectBuilder, artifactHandlerManager, 
+            copyUtil, installer);
+        this.repoSystem = repoSystem;
+    }
+    
+    // checkstyle: resume parameter number check
 
     @Override
     protected void doExecute() throws MojoExecutionException {
@@ -70,15 +110,6 @@ public class CopyDependenciesMojo extends org.apache.maven.plugins.dependency.fr
                 }
             }
         }
-    }
-    
-    @Override
-    public ProjectBuildingRequest newResolveArtifactProjectBuildingRequest() {
-        // no artifact resolution so far
-        ProjectBuildingRequest buildingRequest =
-            new DefaultProjectBuildingRequest(session.getProjectBuildingRequest());
-        buildingRequest.setRemoteRepositories(remoteArtifactRepositories);
-        return buildingRequest;
     }
 
 }

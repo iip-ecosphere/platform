@@ -12,8 +12,14 @@
 
 package de.iip_ecosphere.platform.tools.maven.dependencies;
 
+import javax.inject.Inject;
+
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.dependency.graph.DependencyCollectorBuilder;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 
 /**
  * Just maps tree into this plugin.
@@ -22,5 +28,22 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  */
 @Mojo( name = "tree", requiresDependencyCollection = ResolutionScope.TEST, threadSafe = true )
 public class TreeMojo extends org.apache.maven.plugins.dependency.tree.TreeMojo {
+
+    /**
+     * Creates a mojo instance.
+     * 
+     * @param project the project
+     * @param session the session
+     * @param dependencyCollectorBuilder the dependency collector builder
+     * @param dependencyGraphBuilder the dependency graph builder
+     */
+    @Inject
+    public TreeMojo(
+        MavenProject project,
+        MavenSession session,
+        DependencyCollectorBuilder dependencyCollectorBuilder,
+        DependencyGraphBuilder dependencyGraphBuilder) {
+        super(project, session, dependencyCollectorBuilder, dependencyGraphBuilder);
+    }    
 
 }
