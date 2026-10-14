@@ -30,7 +30,11 @@ template JavaConnectorFactoryDescriptor(IIPEcosphere config, JavaCodeArtifact ta
 
     @DispatchCase
     def produceAdd(ChannelConnector conn, JavaCodeMethod m) {
-        produce(conn, "supplyMulti", m);
+        String adapterSupplyName = "supply";
+        if (getOutChannels(conn).size() > 1) {
+            adapterSupplyName = "supplyMulti";
+        }
+        produce(conn, adapterSupplyName, m);
     }
     
     def produce(Connector conn, String adapterSupplyName, JavaCodeMethod m) {
