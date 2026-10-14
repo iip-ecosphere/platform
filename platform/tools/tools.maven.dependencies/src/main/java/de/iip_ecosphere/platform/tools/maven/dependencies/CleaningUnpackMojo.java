@@ -191,6 +191,7 @@ public class CleaningUnpackMojo extends UnpackMojo {
             execute = false;
             getLog().info("Checking artifacts...");
             for (ArtifactItem ai : getArtifactItems()) {
+                getLog().info(" - " + ai);
                 boolean outDirNull = ai.getOutputDirectory() == null;
                 if (outDirNull) {
                     getLog().warn("Output directory of " + ai.getArtifactId() + " not specified");
