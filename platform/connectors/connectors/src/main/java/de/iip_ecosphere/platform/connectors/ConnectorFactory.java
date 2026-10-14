@@ -263,7 +263,8 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
             ConnectorFactoryCreator creator = desc.getCreator(serviceId);
             if (creator != null) {
                 ConnectorParameter p = null == params ? creator.createConnectorParameter() : params;
-                ProtocolAdapter<O, I, CO, CI> adapter = creator.createProtocolAdapter(oClass, iClass, coClass, ciClass);
+                ProtocolAdapter<O, I, CO, CI>[] adapter = creator.createProtocolAdapter(
+                    oClass, iClass, coClass, ciClass);
                 result = createConnector(creator.getPluginId(), p, adapter);
             }
         }

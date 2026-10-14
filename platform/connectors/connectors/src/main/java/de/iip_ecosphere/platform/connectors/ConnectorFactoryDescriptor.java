@@ -55,7 +55,7 @@ public interface ConnectorFactoryDescriptor {
          * @param ciClass the actual type of {@code CI}
          * @return the connector protocol adapter
          */
-        public <O, I, CO, CI> ProtocolAdapter<O, I, CO, CI> createProtocolAdapter(Class<O> oClass, Class<I> iClass, 
+        public <O, I, CO, CI> ProtocolAdapter<O, I, CO, CI>[] createProtocolAdapter(Class<O> oClass, Class<I> iClass, 
             Class<CO> coClass, Class<CI> ciClass);
 
     }

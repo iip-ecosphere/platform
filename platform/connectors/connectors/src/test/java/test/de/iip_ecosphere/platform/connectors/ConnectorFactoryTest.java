@@ -410,6 +410,7 @@ public class ConnectorFactoryTest {
     public static class MyConnectorFactoryDescriptor extends DefaultConnectorFactoryDescriptor {
 
         public static final String SERVICE_ID = "myServiceId"; // typically generated into the service hierarchy
+        public static final String SERVICE_ID2 = "myServiceId2"; // typically generated into the service hierarchy
 
         /**
          * Creates the descriptor, registering {@link #SERVICE_ID} with a default connector factory creator for 
@@ -419,6 +420,10 @@ public class ConnectorFactoryTest {
             addCreator(SERVICE_ID, new DefaultConnectorFactoryCreator(MyOpcUaConnector.class.getName())
                 .supply(() -> createConnectorParameter())
                 .supply(() -> createProtocolAdapter(), DataItem.class, Object.class, Object.class, Object.class));
+            addCreator(SERVICE_ID2, new DefaultConnectorFactoryCreator(MyOpcUaConnector.class.getName())
+                .supply(() -> createConnectorParameter())
+                .supplyMulti(() -> createProtocolAdapterMulti(), DataItem.class, Object.class, Object.class, 
+                    Object.class));
         }
 
         /**
@@ -429,7 +434,7 @@ public class ConnectorFactoryTest {
         public static ConnectorParameter createConnectorParameter() {
             return ConnectorParameterBuilder.newBuilder("", 1).build(); // values irrelevant
         }
-        
+
         /**
          * Creates a protocol adapter. Emulates a method typically created for a connector instance.
          * 
@@ -437,6 +442,18 @@ public class ConnectorFactoryTest {
          */
         public static ProtocolAdapter<DataItem, Object, Object, Object> createProtocolAdapter() {
             return new MyOpcProtocolAdapter();
+        }
+
+        /**
+         * Creates a protocol adapter. Emulates a method typically created for a connector instance.
+         * 
+         * @return the connector parameter
+         */
+        public static ProtocolAdapter<DataItem, Object, Object, Object>[] createProtocolAdapterMulti() {
+            @SuppressWarnings("unchecked")
+            ProtocolAdapter<DataItem, Object, Object, Object>[] result = new ProtocolAdapter[1];
+            result[0] = new MyOpcProtocolAdapter();
+            return result;
         }
         
     }
@@ -455,6 +472,9 @@ public class ConnectorFactoryTest {
         ConnectorParameter param = ConnectorFactory.createConnectorParameter(MyConnectorFactoryDescriptor.SERVICE_ID);
         Assert.assertNotNull(param);
         conn = ConnectorFactory.createConnector(MyConnectorFactoryDescriptor.SERVICE_ID, param, 
+            DataItem.class, Object.class, Object.class, Object.class);
+        Assert.assertNotNull(conn);
+        conn = ConnectorFactory.createConnector(MyConnectorFactoryDescriptor.SERVICE_ID2, param, 
             DataItem.class, Object.class, Object.class, Object.class);
         Assert.assertNotNull(conn);
 

@@ -40,41 +40,36 @@ public class DefaultConnectorFactoryDescriptor implements ConnectorFactoryDescri
     }
     
     /**
-     * Type-safe protocol adapter supplier. Doesn't work without as Java does not allow casting from/to a supplier 
-     * with inner wildcard type parameters.
-     * 
+     * A protocol supplier.
+
      * @param <O> the output type from the underlying machine/platform
      * @param <I> the input type to the underlying machine/platform
      * @param <CO> the output type of the connector
      * @param <CI> the input type of the connector
      * @author Holger Eichelberger, SSE
      */
-    protected static class ProtocolAdapterSupplier<O, I, CO, CI> {
+    protected abstract static class ProtocolAdapterSupplier<O, I, CO, CI> {
 
-        private Supplier<ProtocolAdapter<O, I, CO, CI>> protoSupplier;
-        private Class<O> oClass;
-        private Class<I> iClass;
-        private Class<CO> coClass;
-        private Class<CI> ciClass;
-       
+        protected Class<O> oClass;
+        protected Class<I> iClass;
+        protected Class<CO> coClass;
+        protected Class<CI> ciClass;
+
         /**
          * Creates a supplier with type instances.
          * 
-         * @param protoSupplier the supplier
          * @param oClass the type for {@code O}
          * @param iClass the type for {@code I}
          * @param coClass the type for {@code CO}
          * @param ciClass the type for {@code CI}
          */
-        protected ProtocolAdapterSupplier(Supplier<ProtocolAdapter<O, I, CO, CI>> protoSupplier, 
-            Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
-            this.protoSupplier = protoSupplier;
+        protected ProtocolAdapterSupplier(Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
             this.oClass = oClass;
             this.iClass = iClass;
             this.coClass = coClass;
             this.ciClass = ciClass;
         }
-        
+
         /**
          * Returns an instance if apparently type-compatible.
          * 
@@ -88,12 +83,90 @@ public class DefaultConnectorFactoryDescriptor implements ConnectorFactoryDescri
          * @param ciClass the type for {@code CIT}
          * @return the instance or <b>null</b> if it is not possible to create/cast an instance
          */
+        public abstract <OT, IT, COT, CIT> ProtocolAdapter<OT, IT, COT, CIT>[] get(Class<OT> oClass, Class<IT> iClass, 
+            Class<COT> coClass, Class<CIT> ciClass);
+
+    }
+
+    /**
+     * Type-safe protocol adapter supplier for multiple adapters. Doesn't work without as Java does not allow casting 
+     * from/to a supplier with inner wildcard type parameters.
+     * 
+     * @param <O> the output type from the underlying machine/platform
+     * @param <I> the input type to the underlying machine/platform
+     * @param <CO> the output type of the connector
+     * @param <CI> the input type of the connector
+     * @author Holger Eichelberger, SSE
+     */
+    protected static class SingleProtocolAdapterSupplier<O, I, CO, CI> extends ProtocolAdapterSupplier<O, I, CO, CI> {
+
+        private Supplier<ProtocolAdapter<O, I, CO, CI>> protoSupplier;
+       
+        /**
+         * Creates a supplier with type instances.
+         * 
+         * @param protoSupplier the supplier
+         * @param oClass the type for {@code O}
+         * @param iClass the type for {@code I}
+         * @param coClass the type for {@code CO}
+         * @param ciClass the type for {@code CI}
+         */
+        protected SingleProtocolAdapterSupplier(Supplier<ProtocolAdapter<O, I, CO, CI>> protoSupplier, 
+            Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
+            super(oClass, iClass, coClass, ciClass);
+            this.protoSupplier = protoSupplier;
+        }
+        
+        @Override
         @SuppressWarnings("unchecked")
-        public <OT, IT, COT, CIT> ProtocolAdapter<OT, IT, COT, CIT> get(Class<OT> oClass, Class<IT> iClass, 
+        public <OT, IT, COT, CIT> ProtocolAdapter<OT, IT, COT, CIT>[] get(Class<OT> oClass, Class<IT> iClass, 
             Class<COT> coClass, Class<CIT> ciClass) {
-            ProtocolAdapter<OT, IT, COT, CIT> result = null;
+            ProtocolAdapter<OT, IT, COT, CIT>[] result = null;
             if (this.oClass == oClass && this.iClass == iClass && this.coClass == coClass && this.ciClass == ciClass) {
-                result = (ProtocolAdapter<OT, IT, COT, CIT>) protoSupplier.get();
+                result = new ProtocolAdapter[1];
+                result[0] = (ProtocolAdapter<OT, IT, COT, CIT>) protoSupplier.get();
+            }
+            return result;
+        }
+        
+    }
+
+    /**
+     * Type-safe protocol adapter supplier for multiple adapters. Doesn't work without as Java does not allow casting 
+     * from/to a supplier with inner wildcard type parameters.
+     * 
+     * @param <O> the output type from the underlying machine/platform
+     * @param <I> the input type to the underlying machine/platform
+     * @param <CO> the output type of the connector
+     * @param <CI> the input type of the connector
+     * @author Holger Eichelberger, SSE
+     */
+    protected static class ArrayProtocolAdapterSupplier<O, I, CO, CI> extends ProtocolAdapterSupplier<O, I, CO, CI> {
+
+        private Supplier<ProtocolAdapter<O, I, CO, CI>[]> protoSupplier;
+       
+        /**
+         * Creates a supplier with type instances.
+         * 
+         * @param protoSupplier the supplier
+         * @param oClass the type for {@code O}
+         * @param iClass the type for {@code I}
+         * @param coClass the type for {@code CO}
+         * @param ciClass the type for {@code CI}
+         */
+        protected ArrayProtocolAdapterSupplier(Supplier<ProtocolAdapter<O, I, CO, CI>[]> protoSupplier, 
+            Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
+            super(oClass, iClass, coClass, ciClass);
+            this.protoSupplier = protoSupplier;
+        }
+        
+        @Override
+        @SuppressWarnings("unchecked")
+        public <OT, IT, COT, CIT> ProtocolAdapter<OT, IT, COT, CIT>[] get(Class<OT> oClass, Class<IT> iClass, 
+            Class<COT> coClass, Class<CIT> ciClass) {
+            ProtocolAdapter<OT, IT, COT, CIT>[] result = null;
+            if (this.oClass == oClass && this.iClass == iClass && this.coClass == coClass && this.ciClass == ciClass) {
+                result = (ProtocolAdapter<OT, IT, COT, CIT>[]) protoSupplier.get();
             }
             return result;
         }
@@ -112,8 +185,8 @@ public class DefaultConnectorFactoryDescriptor implements ConnectorFactoryDescri
         private ProtocolAdapterSupplier<?, ?, ?, ?> protoSupplier;
 
         /**
-         * Creates a factory creator instance for a given {@code pluginId}. Requires calls to 
-         * {@code #supply(Supplier)} and {@code #supply(Supplier, Class, Class, Class, Class)} after instance creation.
+         * Creates a factory creator instance for a given {@code pluginId}. Requires calls to the supplier-methods
+         * after instance creation.
          * 
          * @param pluginId the plugin id
          */
@@ -149,9 +222,33 @@ public class DefaultConnectorFactoryDescriptor implements ConnectorFactoryDescri
          * @return <b>this</b> for chaining
          */
         public <O, I, CO, CI> DefaultConnectorFactoryCreator supply(
-            Supplier<ProtocolAdapter<O, I, CO, CI>> protoSupplier, Class<O> oClass, Class<I> iClass, Class<CO> coClass, 
-            Class<CI> ciClass) {
-            this.protoSupplier = new ProtocolAdapterSupplier<O, I, CO, CI>(protoSupplier, 
+            Supplier<ProtocolAdapter<O, I, CO, CI>> protoSupplier, Class<O> oClass, Class<I> iClass, 
+            Class<CO> coClass, Class<CI> ciClass) {
+            this.protoSupplier = new SingleProtocolAdapterSupplier<O, I, CO, CI>(protoSupplier, 
+                oClass, iClass, coClass, ciClass);
+            return this;
+        }
+
+        
+        /**
+         * Adds a protocol adapter supplier.
+         * 
+         * @param <O> the output type from the underlying machine/platform
+         * @param <I> the input type to the underlying machine/platform
+         * @param <CO> the output type of the connector
+         * @param <CI> the input type of the connector
+         * @param protoSupplier the supplier to be called, may be <b>null</b> but then 
+         *     {@link #createProtocolAdapter(Class, Class, Class, Class)} will return <b>null</b>
+         * @param oClass the type for {@code O}
+         * @param iClass the type for {@code I}
+         * @param coClass the type for {@code CO}
+         * @param ciClass the type for {@code CI}
+         * @return <b>this</b> for chaining
+         */
+        public <O, I, CO, CI> DefaultConnectorFactoryCreator supplyMulti(
+            Supplier<ProtocolAdapter<O, I, CO, CI>[]> protoSupplier, Class<O> oClass, Class<I> iClass, 
+            Class<CO> coClass, Class<CI> ciClass) {
+            this.protoSupplier = new ArrayProtocolAdapterSupplier<O, I, CO, CI>(protoSupplier, 
                 oClass, iClass, coClass, ciClass);
             return this;
         }
@@ -167,7 +264,7 @@ public class DefaultConnectorFactoryDescriptor implements ConnectorFactoryDescri
         }
 
         @Override
-        public <O, I, CO, CI> ProtocolAdapter<O, I, CO, CI> createProtocolAdapter(Class<O> oClass,
+        public <O, I, CO, CI> ProtocolAdapter<O, I, CO, CI>[] createProtocolAdapter(Class<O> oClass,
                 Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
             return null != protoSupplier ? protoSupplier.get(oClass, iClass, coClass, ciClass) : null;
         }
