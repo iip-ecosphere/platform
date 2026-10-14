@@ -41,6 +41,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.transfer.artifact.resolve.ArtifactResolverException;
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 import de.iip_ecosphere.platform.tools.maven.python.FilesetUtils;
@@ -227,7 +228,8 @@ public class CleaningUnpackMojo extends UnpackMojo {
             try {
                 super.doExecute();
             } catch (MojoExecutionException e) {
-                if (skipIfNotFound && e.getCause() instanceof ArtifactResolverException) {
+                if (skipIfNotFound && (e.getCause() instanceof ArtifactResolverException 
+                    || e.getCause() instanceof ArtifactResolutionException)) {
                     getLog().info("Artifact not found. Skipping execution. (" + e.getMessage() + ")");
                 } else {
                     throw e;
