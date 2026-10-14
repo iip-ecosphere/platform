@@ -225,12 +225,16 @@ public class CleaningUnpackMojo extends UnpackMojo {
         }        
         getLog().info("About to unpack: execute " + execute + " forceCleanup " + forceCleanup);
         if (execute) {
+            getLog().info("About to execute...");
             if (!forceCleanup) {
                 FilesetUtils.deletePaths(cleanup, getCleanupLog());
             }
             try {
+                getLog().info("Executing...");
                 super.doExecute();
+                getLog().info("Executed...");
             } catch (MojoExecutionException e) {
+                getLog().info("Exception..." + e.getClass().getName() + e.getMessage());
                 if (skipIfNotFound && (e.getCause() instanceof ArtifactResolverException 
                     || e.getCause() instanceof ArtifactResolutionException)) {
                     getLog().info("Artifact not found. Skipping execution. (" + e.getMessage() + ")");
