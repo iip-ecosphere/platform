@@ -14,9 +14,12 @@ package de.iip_ecosphere.platform.connectors;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
 import java.util.function.Supplier;
 
+import de.iip_ecosphere.platform.connectors.ConnectorFactoryDescriptor.ConnectorFactoryCreator;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
+import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.plugins.Plugin;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
@@ -67,6 +70,27 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
         return hasService(params)
             && params.getService().getVersion() != null 
             && params.getService().getVersion().getSegmentCount() > 0;
+    }
+
+    /**
+     * Creates a connector instance.
+     * 
+     * @param <O> the output type from the underlying machine/platform
+     * @param <I> the input type to the underlying machine/platform
+     * @param <CO> the output type of the connector
+     * @param <CI> the input type of the connector
+     * @param <A> the adapter type
+     * @param cls the class or plugin id of the connector or of the connector factory indirectly creating 
+     *    the connector. Connectors must have at least a one-arg public constructor taking {@code adapters}
+     * @param params the connector parameters supplier
+     * @param adapter the protocol adapters to create the connector for
+     * @return the connector instance or <b>null</b> if none can be created
+     * @see #createConnector(String, Supplier, ProtocolAdapter...)
+     */
+    @SafeVarargs
+    public static <O, I, CO, CI, A extends ProtocolAdapter<O, I, CO, CI>> 
+        Connector<O, I, CO, CI> createConnector(String cls, ConnectorParameter params, A... adapter) {
+        return createConnector(cls, () -> params, adapter);
     }
     
     /**
@@ -172,6 +196,80 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
             result = plugin.getInstance().createConnector(selector, params, adapter);
         }
         return result;
-    }    
+    }
+
+    /**
+     * Creates the default  connector parameter for a given {@code serviceId}.
+     * 
+     * @return the connector parameter instance or <b>null</b> if no instance can be created
+     */
+    public static ConnectorParameter createConnectorParameter(String serviceId) {
+        ConnectorParameter result = null;
+        Iterator<ConnectorFactoryDescriptor> iter 
+            = ServiceLoaderUtils.load(ConnectorFactoryDescriptor.class).iterator();
+        while (iter.hasNext() && result == null) {
+            ConnectorFactoryDescriptor desc = iter.next();
+            ConnectorFactoryCreator creator = desc.getCreator(serviceId);
+            if (creator != null) {
+                result = creator.createConnectorParameter();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Creates a connector for a given {@code serviceId}.
+     * 
+     * @param <O> the output type from the underlying machine/platform
+     * @param <I> the input type to the underlying machine/platform
+     * @param <CO> the output type of the connector
+     * @param <CI> the input type of the connector
+     * @param serviceId the id of the service to create the connector for (not the plugin id!)
+     * @param oClass the actual type of {@code O}
+     * @param iClass the actual type of {@code I}
+     * @param coClass the actual type of {@code CO}
+     * @param ciClass the actual type of {@code CI}
+     * @return the connector or <b>null</b> if no connector can be created
+     */
+    public static <O, I, CO, CI> Connector<O, I, CO, CI> createConnector(String serviceId, 
+        Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
+        return createConnector(serviceId, null, oClass, iClass, coClass, ciClass);
+    }
     
+    // checkstyle: stop parameter number check
+    
+    /**
+     * Creates a connector for a given {@code serviceId}.
+     * 
+     * @param <O> the output type from the underlying machine/platform
+     * @param <I> the input type to the underlying machine/platform
+     * @param <CO> the output type of the connector
+     * @param <CI> the input type of the connector
+     * @param serviceId the id of the service to create the connector for (not the plugin id!)
+     * @param params connector params to use, may be <b>null</b> for implicitly obtaining the default connector params
+     * @param oClass the actual type of {@code O}
+     * @param iClass the actual type of {@code I}
+     * @param coClass the actual type of {@code CO}
+     * @param ciClass the actual type of {@code CI}
+     * @return the connector or <b>null</b> if no connector can be created
+     */
+    public static <O, I, CO, CI> Connector<O, I, CO, CI> createConnector(String serviceId, ConnectorParameter params,
+        Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
+        Connector<O, I, CO, CI> result = null;
+        Iterator<ConnectorFactoryDescriptor> iter 
+            = ServiceLoaderUtils.load(ConnectorFactoryDescriptor.class).iterator();
+        while (iter.hasNext() && result == null) {
+            ConnectorFactoryDescriptor desc = iter.next();
+            ConnectorFactoryCreator creator = desc.getCreator(serviceId);
+            if (creator != null) {
+                ConnectorParameter p = null == params ? creator.createConnectorParameter() : params;
+                ProtocolAdapter<O, I, CO, CI> adapter = creator.createProtocolAdapter(oClass, iClass, coClass, ciClass);
+                result = createConnector(creator.getPluginId(), p, adapter);
+            }
+        }
+        return result;
+    }
+    
+    // checkstyle: resume parameter number check
+
 }

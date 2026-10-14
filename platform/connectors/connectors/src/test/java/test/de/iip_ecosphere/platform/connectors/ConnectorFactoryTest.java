@@ -22,6 +22,7 @@ import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorFactory;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
+import de.iip_ecosphere.platform.connectors.DefaultConnectorFactoryDescriptor;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
@@ -395,9 +396,81 @@ public class ConnectorFactoryTest {
         mc = ConnectorFactory.createConnector(
             MyMqttConnectorFactory.class.getName(), () -> v3p, new MyMqttProtocolAdapter());
         Assert.assertTrue(mc instanceof MyMqttv3Connector);
+        // using the shortcut, implicit supplier creation
         mc = ConnectorFactory.createConnector(
-            MyMqttConnectorFactory.class.getName(), () -> v0p, new MyMqttProtocolAdapter());
+            MyMqttConnectorFactory.class.getName(), v0p, new MyMqttProtocolAdapter());
         Assert.assertTrue(mc instanceof MyMqttv3Connector);
+    }
+
+    /**
+     * A test connector factory descriptor for the "connector" defined above, hooked in via JSL.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static class MyConnectorFactoryDescriptor extends DefaultConnectorFactoryDescriptor {
+
+        public static final String SERVICE_ID = "myServiceId"; // typically generated into the service hierarchy
+
+        /**
+         * Creates the descriptor, registering {@link #SERVICE_ID} with a default connector factory creator for 
+         * {@link MyOpcUaConnector} using {@link #createConnectorParameter()} and {@link #createProtocolAdapter()}.
+         */
+        public MyConnectorFactoryDescriptor() {
+            addCreator(SERVICE_ID, new DefaultConnectorFactoryCreator(MyOpcUaConnector.class.getName())
+                .supply(() -> createConnectorParameter())
+                .supply(() -> createProtocolAdapter(), DataItem.class, Object.class, Object.class, Object.class));
+        }
+
+        /**
+         * Creates a connector parameter. Emulates a method typically created for a connector instance.
+         * 
+         * @return the connector parameter
+         */
+        public static ConnectorParameter createConnectorParameter() {
+            return ConnectorParameterBuilder.newBuilder("", 1).build(); // values irrelevant
+        }
+        
+        /**
+         * Creates a protocol adapter. Emulates a method typically created for a connector instance.
+         * 
+         * @return the connector parameter
+         */
+        public static ProtocolAdapter<DataItem, Object, Object, Object> createProtocolAdapter() {
+            return new MyOpcProtocolAdapter();
+        }
+        
+    }
+    
+    /**
+     * Tests {@link ConnectorFactory#createConnector(String, Class, Class, Class, Class)}.
+     */
+    @Test
+    public void createConnectorForServiceId() {
+        // typical generated code fragment, e.g., connector connectivity test
+        Connector<DataItem, Object, Object, Object> conn = ConnectorFactory.createConnector(
+            MyConnectorFactoryDescriptor.SERVICE_ID, DataItem.class, Object.class, Object.class, Object.class);
+        Assert.assertNotNull(conn);
+
+        // with explicit/supplied connector parameter
+        ConnectorParameter param = ConnectorFactory.createConnectorParameter(MyConnectorFactoryDescriptor.SERVICE_ID);
+        Assert.assertNotNull(param);
+        conn = ConnectorFactory.createConnector(MyConnectorFactoryDescriptor.SERVICE_ID, param, 
+            DataItem.class, Object.class, Object.class, Object.class);
+        Assert.assertNotNull(conn);
+
+        // shall fail, not provided serviceId
+        Assert.assertNull(ConnectorFactory.createConnectorParameter(""));
+        // shall fail, not provided serviceId
+        Assert.assertNull(ConnectorFactory.createConnectorParameter(null));
+        // shall fail, not provided serviceId
+        Assert.assertNull(ConnectorFactory.createConnector("", 
+            DataItem.class, Object.class, Object.class, Object.class));
+        // shall fail, not provided serviceId
+        Assert.assertNull(ConnectorFactory.createConnector(null, 
+            DataItem.class, Object.class, Object.class, Object.class));
+        // shall fail, wrong type parameter types
+        Assert.assertNull(ConnectorFactory.createConnector(null, 
+            Object.class, Object.class, Object.class, Object.class));
     }
 
 }
