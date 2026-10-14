@@ -160,7 +160,7 @@ template JavaServiceImplStateMachine(Configuration config, JavaCodeArtifact targ
     
     def main(Configuration config, JavaCodeArtifact target, String pkg, JavaService service) {
         String clsName = asTypeName(service.name);
-        mainCls = codeCreateClass(target, pkg, clsName, "IIP-Ecosphere service with state machine for service \'${service.name}\'");
+        mainCls = codeCreateClass(target, pkg, clsName, "Service with state machine for service \'${service.name}\'");
         mainCls.addExtends("iip.impl.${clsName}Impl");
         StateMachine sm = service.stateMachine;
         

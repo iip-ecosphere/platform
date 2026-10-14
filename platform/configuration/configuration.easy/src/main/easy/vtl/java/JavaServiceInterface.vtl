@@ -11,7 +11,7 @@ template JavaServiceInterface(Configuration config, JavaCodeArtifact target, Ser
     
     def main(Configuration config, JavaCodeArtifact target, ServiceBase service, String pkg) {
         String clsName = asTypeName(service.name);
-        mainCls = codeCreateClass(target, pkg, clsName + "Interface", "IIP-Ecosphere service interface for \'${service.name}\'");
+        mainCls = codeCreateClass(target, pkg, clsName + "Interface", "Service interface for \'${service.name}\'");
         mainCls.asInterface();
         mainCls.addExtends("de.iip_ecosphere.platform.services.environment.Service");
         mainCls.addAttribute("String", "SERVICE_ID").addStringInitializer(service.id).setPublicStaticFinal();

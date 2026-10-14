@@ -212,6 +212,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 elements = elements->sortedBy(n|n.name).toSequence(); // for testing
                 
                 vilTemplateProcessor("JavaSpringCloudStreamStarter", config, "${javaSrc}/iip/Starter.java", pkg="iip", serializers=javaSerializers);
+                vilTemplateProcessor("JavaConnectorFactoryDescriptor", config,  "${javaNodesSrc}/AppConnectorFactoryDescriptor.java", nodes=elements, pkg=javaNodesPackage);
+                vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/de.iip_ecosphere.platform.connectors.ConnectorFactoryDescriptor", descriptor="iip.nodes.AppConnectorFactoryDescriptor");
     
                 vilTemplateProcessor("JavaSpringCloudStreamYaml", config, "${resourcesSrc}/application.yml", mappedMesh=mappedMesh, nodes=elements, app=a);
                 vilTemplateProcessor("SpringCloudStreamDeploymentDescriptor", config, "${resourcesSrc}/deployment.yml", app=a, elements=elements);

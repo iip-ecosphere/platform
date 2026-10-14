@@ -117,6 +117,15 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
         getConnectorGenerics(conn, conn.input.get(0), conn.output.get(0), withMachine, pkg=pkg, typeAdd=typeAdd, prefix=prefix);
     }
     
+    def addConnectorGenericsAsArgs(Connector conn, IOType inType, IOType outType, boolean withMachine, JavaCodeMethodCall call, String pkg = "", String typeAdd="") {
+        if (withMachine) {
+            call.classArg(getMachineOutputTypeName(conn) + typeAdd);
+            call.classArg(getMachineInputTypeName(conn) + typeAdd);
+        }
+        call.classArg(getConnectorGenericsType(outType, pkg) + typeAdd);
+        call.classArg(getConnectorGenericsType(inType, pkg) + typeAdd);
+    }    
+    
     def getConnectorGenerics(Connector conn, IOType inType, IOType outType, boolean withMachine, String pkg = "", String typeAdd="", String prefix="") {
         String type = "<" + prefix;
         if (withMachine) {

@@ -101,7 +101,7 @@ template JavaServiceTestTemplate(Configuration config, JavaCodeArtifact target, 
     def main(Configuration config, JavaCodeArtifact target, JavaService service, String pkg) {
         JavaPath jp = service.class;
         String clsName = jp.getName();
-        mainCls = codeCreateClass(target, pkg, clsName + "Test", 'IIP-Ecosphere service jUnit test for \'${service.name}\'');
+        mainCls = codeCreateClass(target, pkg, clsName + "Test", 'Service jUnit test for \'${service.name}\'');
         mainCls.addAttribute(service.class, "service");
         produceForInputTypes(service);
         produceForOutputTypes(service);

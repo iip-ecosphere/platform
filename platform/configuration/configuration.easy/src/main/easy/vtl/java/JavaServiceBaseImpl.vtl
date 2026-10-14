@@ -173,7 +173,7 @@ template JavaServiceBaseImpl(Configuration config, JavaCodeArtifact target, Serv
         produceForInputTypes(service);
         produceForOutputTypes(service);
 
-        mainCls = codeCreateClass(target, pkg, clsName + "Impl", "IIP-Ecosphere supporting service implementation for \'${service.name}\'");
+        mainCls = codeCreateClass(target, pkg, clsName + "Impl", "Supporting service implementation for \'${service.name}\'");
         mainCls.setAbstract();
         mainCls.addExtends("de.iip_ecosphere.platform.services.environment.DefaultServiceImpl");
         mainCls.addInterface("iip.interfaces." + clsName + "Interface");

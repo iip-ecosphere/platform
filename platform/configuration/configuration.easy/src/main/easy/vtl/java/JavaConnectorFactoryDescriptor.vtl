@@ -1,0 +1,74 @@
+import Basics;
+import JavaBasics;
+import ServiceBasics;
+import MeshBasics;
+import JavaConnector;
+
+@advice(IIPEcosphere)
+@indent(indentation = 4, additional = 0)
+@format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120)
+template JavaConnectorFactoryDescriptor(IIPEcosphere config, JavaCodeArtifact target, sequenceOf(MeshElement) nodes, String pkg) {
+    
+    def main(IIPEcosphere config, JavaCodeArtifact target, sequenceOf(MeshElement) nodes, String pkg) {
+        JavaCodeClass mainCls = codeCreateClass(target, pkg, target.getPlainName(), "App-wide connector factory descriptor");
+        mainCls.addExtends("de.iip_ecosphere.platform.connectors.DefaultConnectorFactoryDescriptor");
+        mainCls.addConstructor("Called via JSL, registers connector creation.").(cons|{
+            for (MeshElement n: nodes) {
+                produceAdd(n.impl, cons);
+            }
+        });
+    }
+
+    @DispatchBasis    
+    def produceAdd(ServiceBase service, JavaCodeMethod m) {
+    }
+
+    @DispatchCase
+    def produceAdd(Connector conn, JavaCodeMethod m) {
+        sequenceOf(ConnectorTypes) cTypes = pairTypes(conn);
+        while(cTypes.size() > 1) { // for now, limit to 1 in test
+            cTypes.removeLast();
+        }
+        
+        String clsName = asTypeName(conn.name);
+        String connFqn = getConnectorCls(conn);
+        m.addImport("iip.nodes.${clsName}");
+        
+        for (ConnectorTypes cType : cTypes) {
+            IOType outType = cType.outType;
+            IOType inType = cType.inType;
+        
+            JavaCodeLambdaExpression paramSupplier = new JavaCodeLambdaExpression();
+            paramSupplier.call("${clsName}.createConnectorParameter");
+            JavaCodeLambdaExpression adapterSupplier = new JavaCodeLambdaExpression();
+            adapterSupplier.call("${clsName}.createConnectorAdapter");
+            
+            m.call("addCreator")
+              .stringArg(conn.id)
+              .newArg("de.iip_ecosphere.platform.connectors.DefaultConnectorFactoryDescriptor.DefaultConnectorFactoryCreator")
+                .stringArg(connFqn)
+                .call("supply").(c|{
+                    c.arg(paramSupplier);
+                }).call("supply").(c|{
+                    c.arg(adapterSupplier);
+                    addConnectorGenericsAsArgs(conn, inType, outType, true, c);
+                });
+
+/*
+
+            addCreator(SERVICE_ID, new DefaultConnectorFactoryCreator(MyOpcUaConnector.class.getName())
+                .supply(() -> createConnectorParameter())
+                .supply(() -> createProtocolAdapter(), DataItem.class, Object.class, Object.class, Object.class));
+
+        addCreator("myRoutingConnector", new DefaultConnectorFactoryCreator(
+            "de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.ConnectorImpl", () -> MyRoutingConnector.
+            createConnectorParameter(), () -> MyRoutingConnector.createConnectorAdapter(Object.
+            class, Object.class, RoutingConnOut.class, RoutingConnIn.class)));
+ 
+ 
+ */
+            
+        }
+    }
+    
+}
