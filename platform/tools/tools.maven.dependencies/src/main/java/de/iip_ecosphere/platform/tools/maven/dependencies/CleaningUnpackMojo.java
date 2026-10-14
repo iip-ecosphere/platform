@@ -214,7 +214,8 @@ public class CleaningUnpackMojo extends UnpackMojo {
                         execute = true;
                     }
                 }
-                getLog().info(" - " + ai + " unpack: " + true);
+                getLog().info(" - " + ai + " unpack: " + true + " overwrite: " + ai.getOverWrite() + " outDir: " 
+                        + ai.getOutputDirectory());
             }
             if (skipIfExists != null && skipIfExists.toString().length() > 0) {
                 if (skipIfExists.exists()) {
