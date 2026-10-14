@@ -25,6 +25,15 @@ template JavaConnectorFactoryDescriptor(IIPEcosphere config, JavaCodeArtifact ta
 
     @DispatchCase
     def produceAdd(Connector conn, JavaCodeMethod m) {
+        produce(conn, "supply", m);
+    }
+
+    @DispatchCase
+    def produceAdd(ChannelConnector conn, JavaCodeMethod m) {
+        produce(conn, "supplyMulti", m);
+    }
+    
+    def produce(Connector conn, String adapterSupplyName, JavaCodeMethod m) {
         sequenceOf(ConnectorTypes) cTypes = pairTypes(conn);
         while(cTypes.size() > 1) { // for now, limit to 1 in test
             cTypes.removeLast();
@@ -49,25 +58,10 @@ template JavaConnectorFactoryDescriptor(IIPEcosphere config, JavaCodeArtifact ta
                 .stringArg(connFqn)
                 .call("supply").(c|{
                     c.arg(paramSupplier);
-                }).call("supply").(c|{
+                }).call(adapterSupplyName).(c|{
                     c.arg(adapterSupplier);
                     addConnectorGenericsAsArgs(conn, inType, outType, true, c);
                 });
-
-/*
-
-            addCreator(SERVICE_ID, new DefaultConnectorFactoryCreator(MyOpcUaConnector.class.getName())
-                .supply(() -> createConnectorParameter())
-                .supply(() -> createProtocolAdapter(), DataItem.class, Object.class, Object.class, Object.class));
-
-        addCreator("myRoutingConnector", new DefaultConnectorFactoryCreator(
-            "de.iip_ecosphere.platform.test.apps.serviceImpl.routingTest.ConnectorImpl", () -> MyRoutingConnector.
-            createConnectorParameter(), () -> MyRoutingConnector.createConnectorAdapter(Object.
-            class, Object.class, RoutingConnOut.class, RoutingConnIn.class)));
- 
- 
- */
-            
         }
     }
     

@@ -119,8 +119,8 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
     
     def addConnectorGenericsAsArgs(Connector conn, IOType inType, IOType outType, boolean withMachine, JavaCodeMethodCall call, String pkg = "", String typeAdd="") {
         if (withMachine) {
-            call.classArg(getMachineOutputTypeName(conn) + typeAdd);
-            call.classArg(getMachineInputTypeName(conn) + typeAdd);
+            call.arg(getMachineOutputTypeName(conn) + typeAdd + ".class");
+            call.arg(getMachineInputTypeName(conn) + typeAdd + ".class");
         }
         call.classArg(getConnectorGenericsType(outType, pkg) + typeAdd);
         call.classArg(getConnectorGenericsType(inType, pkg) + typeAdd);
