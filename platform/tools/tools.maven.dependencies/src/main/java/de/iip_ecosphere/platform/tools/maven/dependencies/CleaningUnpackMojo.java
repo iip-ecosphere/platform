@@ -189,10 +189,11 @@ public class CleaningUnpackMojo extends UnpackMojo {
             execute = true;
         } else {
             execute = false;
+            getLog().info("Checking artifacts...");
             for (ArtifactItem ai : getArtifactItems()) {
                 boolean outDirNull = ai.getOutputDirectory() == null;
                 if (outDirNull) {
-                    getLog().warn("Output direectory of " + ai.getArtifactId() + " not specified");
+                    getLog().warn("Output directory of " + ai.getArtifactId() + " not specified");
                 }
                 boolean outDirExists = !outDirNull && ai.getOutputDirectory().exists();
                 execute |= ai.isNeedsProcessing() || !outDirExists;
@@ -213,6 +214,7 @@ public class CleaningUnpackMojo extends UnpackMojo {
                     }
                 }
             }
+            getLog().info("Checking artifacts... " + execute);
             if (skipIfExists != null && skipIfExists.toString().length() > 0) {
                 if (skipIfExists.exists()) {
                     getLog().info("Disabling execution as " + skipIfExists + " exists");
@@ -220,7 +222,7 @@ public class CleaningUnpackMojo extends UnpackMojo {
                 }
             }            
         }        
-        
+        getLog().info("About to unpack: execute " + execute + " forceCleanup " + forceCleanup);
         if (execute) {
             if (!forceCleanup) {
                 FilesetUtils.deletePaths(cleanup, getCleanupLog());
