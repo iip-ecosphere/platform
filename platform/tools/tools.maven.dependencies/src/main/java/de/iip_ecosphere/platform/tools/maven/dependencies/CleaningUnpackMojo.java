@@ -80,6 +80,8 @@ public class CleaningUnpackMojo extends UnpackMojo {
 
     @Parameter( property = "unpack.logCleanup", required = false, defaultValue = "false" )
     private boolean logCleanup;
+    
+    private boolean execute;
 
     // checkstyle: stop parameter number check
 
@@ -184,14 +186,12 @@ public class CleaningUnpackMojo extends UnpackMojo {
         if (forceCleanup) {
             FilesetUtils.deletePaths(cleanup, getCleanupLog());
         }
-        boolean execute;
         if (force) {
             execute = true;
         } else {
             execute = false;
             getLog().info("Checking artifacts...");
             for (ArtifactItem ai : getArtifactItems()) {
-                getLog().info(" - " + ai);
                 boolean outDirNull = ai.getOutputDirectory() == null;
                 if (outDirNull) {
                     getLog().warn("Output directory of " + ai.getArtifactId() + " not specified");
@@ -214,8 +214,8 @@ public class CleaningUnpackMojo extends UnpackMojo {
                         execute = true;
                     }
                 }
+                getLog().info(" - " + ai + " unpack: " + true);
             }
-            getLog().info("Checking artifacts... " + execute);
             if (skipIfExists != null && skipIfExists.toString().length() > 0) {
                 if (skipIfExists.exists()) {
                     getLog().info("Disabling execution as " + skipIfExists + " exists");
@@ -223,18 +223,13 @@ public class CleaningUnpackMojo extends UnpackMojo {
                 }
             }            
         }        
-        getLog().info("About to unpack: execute " + execute + " forceCleanup " + forceCleanup);
         if (execute) {
-            getLog().info("About to execute...");
             if (!forceCleanup) {
                 FilesetUtils.deletePaths(cleanup, getCleanupLog());
             }
             try {
-                getLog().info("Executing...");
                 super.doExecute();
-                getLog().info("Executed...");
             } catch (MojoExecutionException e) {
-                getLog().info("Exception..." + e.getClass().getName() + e.getMessage());
                 if (skipIfNotFound && (e.getCause() instanceof ArtifactResolverException 
                     || e.getCause() instanceof ArtifactResolutionException)) {
                     getLog().info("Artifact not found. Skipping execution. (" + e.getMessage() + ")");
@@ -244,6 +239,21 @@ public class CleaningUnpackMojo extends UnpackMojo {
             }
         }
     }
+    
+    
+    @Override
+    public boolean isSkip() {
+        boolean skip;
+        if (execute || force) {
+            skip = false;
+        } else {
+            skip = super.isSkip();
+            if (skip) {
+                getLog().info("Skipping execution (original)");
+            }
+        }
+        return skip;
+    }    
     
     /**
      * Sets the forceCleanup flag.
@@ -297,6 +307,6 @@ public class CleaningUnpackMojo extends UnpackMojo {
      */
     public void setForce(boolean force) {
         this.force = force;
-    }        
+    }
     
 }
