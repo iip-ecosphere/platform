@@ -165,7 +165,8 @@ public class DefaultConnectorFactoryDescriptor implements ConnectorFactoryDescri
             Supplier<String> inPathSupplier, Supplier<String> outPathSupplier, Class<OT> oClass, Class<IT> iClass, 
             Class<COT> coClass, Class<CIT> ciClass) {
             ProtocolAdapter<OT, IT, COT, CIT>[] result = null;
-            if (this.oClass == oClass && this.iClass == iClass && this.coClass == coClass && this.ciClass == ciClass) {
+            if (oClass.isAssignableFrom(this.oClass) && iClass.isAssignableFrom(this.iClass) 
+                && coClass.isAssignableFrom(this.coClass) && ciClass.isAssignableFrom(this.ciClass)) {
                 result = new ProtocolAdapter[1];
                 result[0] = (ProtocolAdapter<OT, IT, COT, CIT>) protoSupplier.get(metrics, log, 
                     inPathSupplier, outPathSupplier);
@@ -214,7 +215,8 @@ public class DefaultConnectorFactoryDescriptor implements ConnectorFactoryDescri
             Supplier<String> inPathSupplier, Supplier<String> outPathSupplier, Class<OT> oClass, Class<IT> iClass, 
             Class<COT> coClass, Class<CIT> ciClass) {
             ProtocolAdapter<OT, IT, COT, CIT>[] result = null;
-            if (this.oClass == oClass && this.iClass == iClass && this.coClass == coClass && this.ciClass == ciClass) {
+            if (oClass.isAssignableFrom(this.oClass) && iClass.isAssignableFrom(this.iClass) 
+                && coClass.isAssignableFrom(this.coClass) && ciClass.isAssignableFrom(this.ciClass)) {
                 result = (ProtocolAdapter<OT, IT, COT, CIT>[]) protoSupplier.get(metrics, log, 
                     inPathSupplier, outPathSupplier);
             }
@@ -257,7 +259,7 @@ public class DefaultConnectorFactoryDescriptor implements ConnectorFactoryDescri
         @SuppressWarnings("unchecked")
         public <TT> ChanneledSerializer<TT> get(Class<TT> cls) {
             ChanneledSerializer<TT> result = null;
-            if (this.cls == cls) {
+            if (cls.isAssignableFrom(this.cls)) {
                 result = (ChanneledSerializer<TT>) supplier.get();
             }
             return result;
