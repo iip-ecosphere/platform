@@ -185,6 +185,46 @@ public interface MetricsProvider {
     }
     
     /**
+     * Supplies access to a time measurement.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    public static interface TimeSupplier {
+
+        /**
+         * Returns the time value.
+         * 
+         * @return the time value (usually ms, depends on utilizing call)
+         */
+        public long get();
+        
+    }    
+    
+    /**
+     * Record milliseconds time.
+     * 
+     * @param timer the timer to record the time on
+     * @param timeSupplier the time supplier returning the time after executing {@code function}
+     * @param function the function to execute
+     */
+    public static void recordMsTime(Timer timer, TimeSupplier timeSupplier, Runnable function) {
+        function.run();
+        timer.record(timeSupplier.get(), TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Record nanoseconds time.
+     * 
+     * @param timer the timer to record the time on
+     * @param timeSupplier the time supplier returning the time after executing {@code function}
+     * @param function the function to execute
+     */
+    public static void recordNsTime(Timer timer, TimeSupplier timeSupplier, Runnable function) {
+        function.run();
+        timer.record(timeSupplier.get(), TimeUnit.NANOSECONDS);
+    }
+    
+    /**
      * Adds a service to be updated regularly regarding its monitoring data. Services are 
      * not added multiple times.
      * 
