@@ -624,12 +624,13 @@ public abstract class AbstractProcessService<I, SI, SO, O> extends AbstractRunna
      * 
      * @param provider the metrics provider instance
      */
-    public void attachMetricsProvider(MetricsProvider provider) {
-        if (null != provider) { // standalone
+    public void attachMetricsProvider(de.iip_ecosphere.platform.support.metrics.MetricsProvider provider) {
+        if (provider instanceof MetricsProvider) { // standalone
+            MetricsProvider mProvider = (MetricsProvider) provider;
             MetricsFactory.buildGauge("service." + getId() + ".process.memory.used", 
                  () -> null == osProcess ? 0 : osProcess.getVirtualSize())
                     .description("Used memory of the attached process")
-                    .baseUnit(provider.getMemoryBaseUnit().stringValue()).register(provider.getRegistry());
+                    .baseUnit(mProvider.getMemoryBaseUnit().stringValue()).register(provider.getRegistry());
         }
     }
     

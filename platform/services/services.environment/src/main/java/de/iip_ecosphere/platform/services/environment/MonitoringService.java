@@ -12,7 +12,7 @@
 
 package de.iip_ecosphere.platform.services.environment;
 
-import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
+import de.iip_ecosphere.platform.support.metrics.MetricsProvider;
 
 /**
  * Extended service interface to gain access to the {@link MetricsProvider}. Intended for services that perform
@@ -20,14 +20,7 @@ import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsPro
  * 
  * @author Holger Eichelberger, SSE
  */
-public interface MonitoringService extends Service {
-    
-    /**
-     * Attaches the metrics provider.
-     * 
-     * @param provider the metrics provider instance
-     */
-    public void attachMetricsProvider(MetricsProvider provider);
+public interface MonitoringService extends Service, de.iip_ecosphere.platform.support.metrics.MonitoringService {
 
     /**
      * Sets up a service with {@code provider}.

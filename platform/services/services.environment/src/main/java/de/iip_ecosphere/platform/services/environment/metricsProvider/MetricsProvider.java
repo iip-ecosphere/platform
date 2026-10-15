@@ -48,6 +48,7 @@ import de.iip_ecosphere.platform.support.metrics.MeterFilter;
 import de.iip_ecosphere.platform.support.metrics.MeterFilter.MeterFilterReply;
 import de.iip_ecosphere.platform.support.metrics.MeterRegistry;
 import de.iip_ecosphere.platform.support.metrics.MetricsFactory;
+import de.iip_ecosphere.platform.support.metrics.MonitoringService;
 import de.iip_ecosphere.platform.support.metrics.SystemMetrics;
 import de.iip_ecosphere.platform.support.metrics.SystemMetricsFactory;
 import de.iip_ecosphere.platform.support.metrics.Tag;
@@ -483,12 +484,12 @@ public class MetricsProvider implements de.iip_ecosphere.platform.support.metric
         if (!counters.containsKey(counterId)) {
             addCounter(counterId);
         }
-        increaseCounterBy(counters.get(counterId), value);
+        de.iip_ecosphere.platform.support.metrics.MetricsProvider.increaseCounterBy(counters.get(counterId), value);
     }
-
+    
     /**
      * Helper method to increase/increment the given {@code counter} by the specified {@code value} if {@code data}
-     * is not <b>null</b>. Does nothing if {@code counter} is <b>null</b>.
+     * is not <b>null</b>. Does nothing if {@code counter} is <b>null</b>. [convenience]
      * 
      * @param counter the counter
      * @param value the value
@@ -496,25 +497,20 @@ public class MetricsProvider implements de.iip_ecosphere.platform.support.metric
      * @return {@code data}
      */
     public static <T> T increaseCounterBy(Counter counter, double value, T data) {
-        if (null != data) {
-            increaseCounterBy(counter, value);
-        }
-        return data;
+        return de.iip_ecosphere.platform.support.metrics.MetricsProvider.increaseCounterBy(counter, value, data);
     }
 
     
     /**
      * Helper method to increase/increment the given {@code counter} by the specified {@code value}.
-     * Does nothing if {@code counter} is <b>null</b>.
+     * Does nothing if {@code counter} is <b>null</b>. [convenience]
      * 
      * @param counter the counter
      * @param value the value
      */
     public static void increaseCounterBy(Counter counter, double value) {
-        if (null != counter) {
-            counter.increment(value);
-        }
-    }
+        de.iip_ecosphere.platform.support.metrics.MetricsProvider.increaseCounterBy(counter, value);
+    }    
 
     /**
      * Supplies access to a time measurement.
@@ -763,13 +759,14 @@ public class MetricsProvider implements de.iip_ecosphere.platform.support.metric
      * 
      * @param service the service, ignored if <b>null</b>
      */
-    public void addService(UpdatingMonitoringService service) {
-        if (null != service) {
+    public void addService(MonitoringService service) {
+        if (service instanceof UpdatingMonitoringService) {
+            UpdatingMonitoringService uService = (UpdatingMonitoringService) service;
             if (null == updaters) {
                 updaters = new ArrayList<>();
             }
-            if (!updaters.contains(service)) { // prevent double updates
-                updaters.add(service);
+            if (!updaters.contains(uService)) { // prevent double updates
+                updaters.add(uService);
             }
         }
     }
@@ -1235,52 +1232,7 @@ public class MetricsProvider implements de.iip_ecosphere.platform.support.metric
         return sb.toString();
     }
 
-    /**
-     * Creates and registers a default service received counter. The device id tag will be set from 
-     * {@link de.iip_ecosphere.platform.support.iip_aas.Id#getDeviceId()}.
-     * 
-     * @param serviceName the static name/id of the service
-     * @param serviceId the (complete) id of the service
-     * @param appId the id of the application
-     * @param appInstanceId the id of the application instance, as validated by 
-     *     {@link ServiceBase#validateApplicationInstanceId(String)}
-     * @return the registered counter instance
-     * @see #createServiceSentReceivedCounter(boolean, String, String, String, String)
-     */
-    public Counter createServiceReceivedCounter(String serviceName, String serviceId, 
-        String appId, String appInstanceId) {
-        return createServiceSentReceivedCounter(true, serviceName, serviceId, appId, appInstanceId);
-    }
-
-    /**
-     * Creates and registers a default service sent counter. The device id tag will be set from 
-     * {@link de.iip_ecosphere.platform.support.iip_aas.Id#getDeviceId()}.
-     * 
-     * @param serviceName the static name/id of the service
-     * @param serviceId the (complete) id of the service
-     * @param appId the id of the application
-     * @param appInstanceId the id of the application instance, as validated by 
-     *     {@link ServiceBase#validateApplicationInstanceId(String)}
-     * @return the registered counter instance
-     * @see #createServiceSentReceivedCounter(boolean, String, String, String, String)
-     */
-    public Counter createServiceSentCounter(String serviceName, String serviceId, 
-        String appId, String appInstanceId) {
-        return createServiceSentReceivedCounter(false, serviceName, serviceId, appId, appInstanceId);
-    }
-
-    /**
-     * Creates and registers a default service send/receive counter. The device id tag will be set from 
-     * {@link de.iip_ecosphere.platform.support.iip_aas.Id#getDeviceId()}.
-     * 
-     * @param receive is it for receiving ({@code true}) or sending
-     * @param serviceName the static name/id of the service
-     * @param serviceId the (complete) id of the service
-     * @param appId the id of the application
-     * @param appInstanceId the id of the application instance, as validated by 
-     *     {@link ServiceBase#validateApplicationInstanceId(String)}
-     * @return the registered counter instance
-     */
+    @Override
     public Counter createServiceSentReceivedCounter(boolean receive, String serviceName, String serviceId, 
         String appId, String appInstanceId) {
         String description;

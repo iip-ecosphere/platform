@@ -73,10 +73,10 @@ public class MonitoringServiceTest {
      */
     private static class MyMonitoringService extends MyService implements MonitoringService {
 
-        protected MetricsProvider provider;
+        protected de.iip_ecosphere.platform.support.metrics.MetricsProvider provider;
         
         @Override
-        public void attachMetricsProvider(MetricsProvider provider) {
+        public void attachMetricsProvider(de.iip_ecosphere.platform.support.metrics.MetricsProvider provider) {
             this.provider = provider;
         }
         
