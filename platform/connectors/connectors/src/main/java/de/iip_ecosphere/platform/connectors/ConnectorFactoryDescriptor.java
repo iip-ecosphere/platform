@@ -12,10 +12,12 @@
 
 package de.iip_ecosphere.platform.connectors;
 
+import java.io.File;
 import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.ChanneledConnectorOutputTypeAdapter.ChanneledSerializer;
+import de.iip_ecosphere.platform.support.metrics.MetricsProvider;
 
 /**
  * JSL descriptor for application-provided connector instance creation.
@@ -45,22 +47,6 @@ public interface ConnectorFactoryDescriptor {
          */
         public ConnectorParameter createConnectorParameter();
         
-        /**
-         * Creates the default connector protocol adapter.
-         * 
-         * @param <O> the output type from the underlying machine/platform
-         * @param <I> the input type to the underlying machine/platform
-         * @param <CO> the output type of the connector
-         * @param <CI> the input type of the connector
-         * @param oClass the actual type of {@code O}
-         * @param iClass the actual type of {@code I}
-         * @param coClass the actual type of {@code CO}
-         * @param ciClass the actual type of {@code CI}
-         * @return the connector protocol adapter
-         */
-        public <O, I, CO, CI> ProtocolAdapter<O, I, CO, CI>[] createProtocolAdapter(Class<O> oClass, Class<I> iClass, 
-            Class<CO> coClass, Class<CI> ciClass);
-
         // checkstyle: stop parameter number check
 
         /**
@@ -70,6 +56,9 @@ public interface ConnectorFactoryDescriptor {
          * @param <I> the input type to the underlying machine/platform
          * @param <CO> the output type of the connector
          * @param <CI> the input type of the connector
+         * @param metrics the metrics provider to use, <b>null</b> for no metric measurements
+         * @param log the log file to use to record individual measurements in experiments, <b>null</b> for no logging.
+         *     Only becomes active if {@code metrics} is not <b>null</b>
          * @param inPathSupplier function returning the actual input base path to use for data accesses, may be 
          *     <b>null</b>
          * @param outPathSupplier function returning the actual output base path to use for data accesses, may be 
@@ -80,8 +69,9 @@ public interface ConnectorFactoryDescriptor {
          * @param ciClass the actual type of {@code CI}
          * @return the connector protocol adapter
          */
-        public <O, I, CO, CI> ProtocolAdapter<O, I, CO, CI>[] createProtocolAdapter(Supplier<String> inPathSupplier, 
-            Supplier<String> outPathSupplier, Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass);
+        public <O, I, CO, CI> ProtocolAdapter<O, I, CO, CI>[] createProtocolAdapter(MetricsProvider metrics, File log, 
+            Supplier<String> inPathSupplier, Supplier<String> outPathSupplier, Class<O> oClass, Class<I> iClass, 
+            Class<CO> coClass, Class<CI> ciClass);
 
         // checkstyle: resume parameter number check
 

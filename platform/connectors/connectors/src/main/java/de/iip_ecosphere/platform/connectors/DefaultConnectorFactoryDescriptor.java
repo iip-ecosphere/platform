@@ -12,12 +12,14 @@
 
 package de.iip_ecosphere.platform.connectors;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.ChanneledConnectorOutputTypeAdapter.ChanneledSerializer;
+import de.iip_ecosphere.platform.support.metrics.MetricsProvider;
 
 /**
  * Implements a default (type-safe) connector factory descriptor.
@@ -51,13 +53,17 @@ public class DefaultConnectorFactoryDescriptor implements ConnectorFactoryDescri
         /**
          * Supplies the value.
          * 
+         * @param metrics the metrics provider to use, <b>null</b> for no metric measurements
+         * @param log the log file to use to record individual measurements in experiments, <b>null</b> for no logging.
+         *     Only becomes active if {@code metrics} is not <b>null</b>
          * @param inPathSupplier function returning the actual input base path to use for data accesses, may be 
          *     <b>null</b>
          * @param outPathSupplier function returning the actual output base path to use for data accesses, may be 
          *     <b>null</b>
          * @return the value
          */
-        public R get(Supplier<String> inPathSupplier, Supplier<String> outPathSupplier);
+        public R get(MetricsProvider metrics, File log, Supplier<String> inPathSupplier, 
+            Supplier<String> outPathSupplier);
         
     }
     
@@ -92,22 +98,6 @@ public class DefaultConnectorFactoryDescriptor implements ConnectorFactoryDescri
             this.ciClass = ciClass;
         }
 
-        /**
-         * Returns an instance if apparently type-compatible.
-         * 
-         * @param <OT> the desired output type from the underlying machine/platform
-         * @param <IT> the desired input type to the underlying machine/platform
-         * @param <COT> the desired output type of the connector
-         * @param <CIT> the desired input type of the connector
-         * @param oClass the type for {@code OT}
-         * @param iClass the type for {@code IT}
-         * @param coClass the type for {@code COT}
-         * @param ciClass the type for {@code CIT}
-         * @return the instance or <b>null</b> if it is not possible to create/cast an instance
-         */
-        public abstract <OT, IT, COT, CIT> ProtocolAdapter<OT, IT, COT, CIT>[] get(Class<OT> oClass, Class<IT> iClass, 
-            Class<COT> coClass, Class<CIT> ciClass);
-
         // checkstyle: stop parameter number check
 
         /**
@@ -117,63 +107,25 @@ public class DefaultConnectorFactoryDescriptor implements ConnectorFactoryDescri
          * @param <IT> the desired input type to the underlying machine/platform
          * @param <COT> the desired output type of the connector
          * @param <CIT> the desired input type of the connector
+         * @param metrics the metrics provider to use, <b>null</b> for no metric measurements
+         * @param log the log file to use to record individual measurements in experiments, <b>null</b> for no logging.
+         *     Only becomes active if {@code metrics} is not <b>null</b>
+         * @param inPathSupplier function returning the actual input base path to use for data accesses, may be 
+         *     <b>null</b>
+         * @param outPathSupplier function returning the actual output base path to use for data accesses, may be 
+         *     <b>null</b>
          * @param oClass the type for {@code OT}
          * @param iClass the type for {@code IT}
          * @param coClass the type for {@code COT}
          * @param ciClass the type for {@code CIT}
          * @return the instance or <b>null</b> if it is not possible to create/cast an instance
          */
-        public <OT, IT, COT, CIT> ProtocolAdapter<OT, IT, COT, CIT>[] get(Supplier<String> inPathSupplier, 
-            Supplier<String> outPathSupplier, Class<OT> oClass, Class<IT> iClass, 
-            Class<COT> coClass, Class<CIT> ciClass) {
-            return get(oClass, iClass, coClass, ciClass);
-        }
+        public abstract <OT, IT, COT, CIT> ProtocolAdapter<OT, IT, COT, CIT>[] get(MetricsProvider metrics, File log, 
+            Supplier<String> inPathSupplier, Supplier<String> outPathSupplier, Class<OT> oClass, Class<IT> iClass, 
+            Class<COT> coClass, Class<CIT> ciClass);
 
         // checkstyle: resume parameter number check
 
-    }
-
-    /**
-     * Type-safe protocol adapter supplier for multiple adapters. Doesn't work without as Java does not allow casting 
-     * from/to a supplier with inner wildcard type parameters.
-     * 
-     * @param <O> the output type from the underlying machine/platform
-     * @param <I> the input type to the underlying machine/platform
-     * @param <CO> the output type of the connector
-     * @param <CI> the input type of the connector
-     * @author Holger Eichelberger, SSE
-     */
-    protected static class SingleProtocolAdapterSupplier<O, I, CO, CI> extends ProtocolAdapterSupplier<O, I, CO, CI> {
-
-        private Supplier<ProtocolAdapter<O, I, CO, CI>> protoSupplier;
-       
-        /**
-         * Creates a supplier with type instances.
-         * 
-         * @param protoSupplier the supplier
-         * @param oClass the type for {@code O}
-         * @param iClass the type for {@code I}
-         * @param coClass the type for {@code CO}
-         * @param ciClass the type for {@code CI}
-         */
-        protected SingleProtocolAdapterSupplier(Supplier<ProtocolAdapter<O, I, CO, CI>> protoSupplier, 
-            Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
-            super(oClass, iClass, coClass, ciClass);
-            this.protoSupplier = protoSupplier;
-        }
-        
-        @Override
-        @SuppressWarnings("unchecked")
-        public <OT, IT, COT, CIT> ProtocolAdapter<OT, IT, COT, CIT>[] get(Class<OT> oClass, Class<IT> iClass, 
-            Class<COT> coClass, Class<CIT> ciClass) {
-            ProtocolAdapter<OT, IT, COT, CIT>[] result = null;
-            if (this.oClass == oClass && this.iClass == iClass && this.coClass == coClass && this.ciClass == ciClass) {
-                result = new ProtocolAdapter[1];
-                result[0] = (ProtocolAdapter<OT, IT, COT, CIT>) protoSupplier.get();
-            }
-            return result;
-        }
-        
     }
 
     /**
@@ -204,72 +156,25 @@ public class DefaultConnectorFactoryDescriptor implements ConnectorFactoryDescri
             super(oClass, iClass, coClass, ciClass);
             this.protoSupplier = protoSupplier;
         }
-
-        @Override
-        public <OT, IT, COT, CIT> ProtocolAdapter<OT, IT, COT, CIT>[] get(Class<OT> oClass, Class<IT> iClass, 
-            Class<COT> coClass, Class<CIT> ciClass) {
-            return get(null, null, oClass, iClass, coClass, ciClass);
-        }
         
         // checkstyle: stop parameter number check
 
         @Override
         @SuppressWarnings("unchecked")
-        public <OT, IT, COT, CIT> ProtocolAdapter<OT, IT, COT, CIT>[] get(Supplier<String> inPathSupplier, 
-            Supplier<String> outPathSupplier, Class<OT> oClass, Class<IT> iClass, Class<COT> coClass, 
-            Class<CIT> ciClass) {
+        public <OT, IT, COT, CIT> ProtocolAdapter<OT, IT, COT, CIT>[] get(MetricsProvider metrics, File log, 
+            Supplier<String> inPathSupplier, Supplier<String> outPathSupplier, Class<OT> oClass, Class<IT> iClass, 
+            Class<COT> coClass, Class<CIT> ciClass) {
             ProtocolAdapter<OT, IT, COT, CIT>[] result = null;
             if (this.oClass == oClass && this.iClass == iClass && this.coClass == coClass && this.ciClass == ciClass) {
                 result = new ProtocolAdapter[1];
-                result[0] = (ProtocolAdapter<OT, IT, COT, CIT>) protoSupplier.get(inPathSupplier, outPathSupplier);
+                result[0] = (ProtocolAdapter<OT, IT, COT, CIT>) protoSupplier.get(metrics, log, 
+                    inPathSupplier, outPathSupplier);
             }
             return result;
         }
 
         // checkstyle: resume parameter number check
 
-    }
-
-    /**
-     * Type-safe protocol adapter supplier for multiple adapters. Doesn't work without as Java does not allow casting 
-     * from/to a supplier with inner wildcard type parameters.
-     * 
-     * @param <O> the output type from the underlying machine/platform
-     * @param <I> the input type to the underlying machine/platform
-     * @param <CO> the output type of the connector
-     * @param <CI> the input type of the connector
-     * @author Holger Eichelberger, SSE
-     */
-    protected static class ArrayProtocolAdapterSupplier<O, I, CO, CI> extends ProtocolAdapterSupplier<O, I, CO, CI> {
-
-        private Supplier<ProtocolAdapter<O, I, CO, CI>[]> protoSupplier;
-       
-        /**
-         * Creates a supplier with type instances.
-         * 
-         * @param protoSupplier the supplier
-         * @param oClass the type for {@code O}
-         * @param iClass the type for {@code I}
-         * @param coClass the type for {@code CO}
-         * @param ciClass the type for {@code CI}
-         */
-        protected ArrayProtocolAdapterSupplier(Supplier<ProtocolAdapter<O, I, CO, CI>[]> protoSupplier, 
-            Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
-            super(oClass, iClass, coClass, ciClass);
-            this.protoSupplier = protoSupplier;
-        }
-        
-        @Override
-        @SuppressWarnings("unchecked")
-        public <OT, IT, COT, CIT> ProtocolAdapter<OT, IT, COT, CIT>[] get(Class<OT> oClass, Class<IT> iClass, 
-            Class<COT> coClass, Class<CIT> ciClass) {
-            ProtocolAdapter<OT, IT, COT, CIT>[] result = null;
-            if (this.oClass == oClass && this.iClass == iClass && this.coClass == coClass && this.ciClass == ciClass) {
-                result = (ProtocolAdapter<OT, IT, COT, CIT>[]) protoSupplier.get();
-            }
-            return result;
-        }
-        
     }
 
     /**
@@ -301,22 +206,17 @@ public class DefaultConnectorFactoryDescriptor implements ConnectorFactoryDescri
             this.protoSupplier = protoSupplier;
         }
 
-        @Override
-        public <OT, IT, COT, CIT> ProtocolAdapter<OT, IT, COT, CIT>[] get(Class<OT> oClass, Class<IT> iClass, 
-            Class<COT> coClass, Class<CIT> ciClass) {
-            return get(null, null, oClass, iClass, coClass, ciClass);
-        }
-
         // checkstyle: stop parameter number check
 
         @Override
         @SuppressWarnings("unchecked")
-        public <OT, IT, COT, CIT> ProtocolAdapter<OT, IT, COT, CIT>[] get(Supplier<String> inPathSupplier, 
-            Supplier<String> outPathSupplier, Class<OT> oClass, Class<IT> iClass, Class<COT> coClass, 
-            Class<CIT> ciClass) {
+        public <OT, IT, COT, CIT> ProtocolAdapter<OT, IT, COT, CIT>[] get(MetricsProvider metrics, File log, 
+            Supplier<String> inPathSupplier, Supplier<String> outPathSupplier, Class<OT> oClass, Class<IT> iClass, 
+            Class<COT> coClass, Class<CIT> ciClass) {
             ProtocolAdapter<OT, IT, COT, CIT>[] result = null;
             if (this.oClass == oClass && this.iClass == iClass && this.coClass == coClass && this.ciClass == ciClass) {
-                result = (ProtocolAdapter<OT, IT, COT, CIT>[]) protoSupplier.get(inPathSupplier, outPathSupplier);
+                result = (ProtocolAdapter<OT, IT, COT, CIT>[]) protoSupplier.get(metrics, log, 
+                    inPathSupplier, outPathSupplier);
             }
             return result;
         }
@@ -399,29 +299,6 @@ public class DefaultConnectorFactoryDescriptor implements ConnectorFactoryDescri
             this.connSupplier = connSupplier;
             return this;
         }
-
-        /**
-         * Adds a protocol adapter supplier.
-         * 
-         * @param <O> the output type from the underlying machine/platform
-         * @param <I> the input type to the underlying machine/platform
-         * @param <CO> the output type of the connector
-         * @param <CI> the input type of the connector
-         * @param protoSupplier the supplier to be called, may be <b>null</b> but then 
-         *     {@link #createProtocolAdapter(Class, Class, Class, Class)} will return <b>null</b>
-         * @param oClass the type for {@code O}
-         * @param iClass the type for {@code I}
-         * @param coClass the type for {@code CO}
-         * @param ciClass the type for {@code CI}
-         * @return <b>this</b> for chaining
-         */
-        public <O, I, CO, CI> DefaultConnectorFactoryCreator supply(
-            Supplier<ProtocolAdapter<O, I, CO, CI>> protoSupplier, Class<O> oClass, Class<I> iClass, 
-            Class<CO> coClass, Class<CI> ciClass) {
-            this.protoSupplier = new SingleProtocolAdapterSupplier<O, I, CO, CI>(protoSupplier, 
-                oClass, iClass, coClass, ciClass);
-            return this;
-        }
         
         /**
          * Adds a protocol adapter supplier.
@@ -430,8 +307,7 @@ public class DefaultConnectorFactoryDescriptor implements ConnectorFactoryDescri
          * @param <I> the input type to the underlying machine/platform
          * @param <CO> the output type of the connector
          * @param <CI> the input type of the connector
-         * @param protoSupplier the supplier to be called, may be <b>null</b> but then 
-         *     {@link #createProtocolAdapter(Class, Class, Class, Class)} will return <b>null</b>
+         * @param protoSupplier the supplier to be called, may be <b>null</b>, will return <b>null</b>
          * @param oClass the type for {@code O}
          * @param iClass the type for {@code I}
          * @param coClass the type for {@code CO}
@@ -445,29 +321,6 @@ public class DefaultConnectorFactoryDescriptor implements ConnectorFactoryDescri
                 oClass, iClass, coClass, ciClass);
             return this;
         }
-        
-        /**
-         * Adds a protocol adapter supplier.
-         * 
-         * @param <O> the output type from the underlying machine/platform
-         * @param <I> the input type to the underlying machine/platform
-         * @param <CO> the output type of the connector
-         * @param <CI> the input type of the connector
-         * @param protoSupplier the supplier to be called, may be <b>null</b> but then 
-         *     {@link #createProtocolAdapter(Class, Class, Class, Class)} will return <b>null</b>
-         * @param oClass the type for {@code O}
-         * @param iClass the type for {@code I}
-         * @param coClass the type for {@code CO}
-         * @param ciClass the type for {@code CI}
-         * @return <b>this</b> for chaining
-         */
-        public <O, I, CO, CI> DefaultConnectorFactoryCreator supplyMulti(
-            Supplier<ProtocolAdapter<O, I, CO, CI>[]> protoSupplier, Class<O> oClass, Class<I> iClass, 
-            Class<CO> coClass, Class<CI> ciClass) {
-            this.protoSupplier = new ArrayProtocolAdapterSupplier<O, I, CO, CI>(protoSupplier, 
-                oClass, iClass, coClass, ciClass);
-            return this;
-        }
 
         /**
          * Adds a protocol adapter supplier.
@@ -476,8 +329,7 @@ public class DefaultConnectorFactoryDescriptor implements ConnectorFactoryDescri
          * @param <I> the input type to the underlying machine/platform
          * @param <CO> the output type of the connector
          * @param <CI> the input type of the connector
-         * @param protoSupplier the supplier to be called, may be <b>null</b> but then 
-         *     {@link #createProtocolAdapter(Class, Class, Class, Class)} will return <b>null</b>
+         * @param protoSupplier the supplier to be called, may be <b>null</b>, will return <b>null</b>
          * @param oClass the type for {@code O}
          * @param iClass the type for {@code I}
          * @param coClass the type for {@code CO}
@@ -534,19 +386,14 @@ public class DefaultConnectorFactoryDescriptor implements ConnectorFactoryDescri
             return null != connSupplier ? connSupplier.get() : null;
         }
 
-        @Override
-        public <O, I, CO, CI> ProtocolAdapter<O, I, CO, CI>[] createProtocolAdapter(Class<O> oClass,
-                Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
-            return null != protoSupplier ? protoSupplier.get(oClass, iClass, coClass, ciClass) : null;
-        }
-
         // checkstyle: stop parameter number check
 
         @Override
-        public <O, I, CO, CI> ProtocolAdapter<O, I, CO, CI>[] createProtocolAdapter(Supplier<String> inPathSupplier, 
-            Supplier<String> outPathSupplier, Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
-            return null != protoSupplier ? protoSupplier.get(inPathSupplier, outPathSupplier, oClass, iClass, 
-                coClass, ciClass) : null;
+        public <O, I, CO, CI> ProtocolAdapter<O, I, CO, CI>[] createProtocolAdapter(MetricsProvider metrics, File log, 
+            Supplier<String> inPathSupplier, Supplier<String> outPathSupplier, Class<O> oClass, Class<I> iClass, 
+            Class<CO> coClass, Class<CI> ciClass) {
+            return null != protoSupplier ? protoSupplier.get(metrics, log, inPathSupplier, outPathSupplier, oClass, 
+                iClass, coClass, ciClass) : null;
         }
 
         // checkstyle: resume parameter number check

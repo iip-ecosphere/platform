@@ -12,6 +12,7 @@
 
 package de.iip_ecosphere.platform.connectors;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
@@ -22,6 +23,7 @@ import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.ChanneledConnectorOutputTypeAdapter.ChanneledSerializer;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.iip_ecosphere.platform.support.metrics.MetricsProvider;
 import de.iip_ecosphere.platform.support.plugins.Plugin;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
@@ -234,7 +236,7 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
      */
     public static <O, I, CO, CI> Connector<O, I, CO, CI> createConnector(String serviceId, 
         Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
-        return createConnector(serviceId, null, null, null, oClass, iClass, coClass, ciClass);
+        return createConnector(serviceId, null, null, null, null, null, oClass, iClass, coClass, ciClass);
     }
     
     // checkstyle: stop parameter number check
@@ -256,32 +258,9 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
      */
     public static <O, I, CO, CI> Connector<O, I, CO, CI> createConnector(String serviceId, ConnectorParameter params,
         Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
-        return createConnector(serviceId, params, null, null, oClass, iClass, coClass, ciClass);
+        return createConnector(serviceId, params, null, null, null, null, oClass, iClass, coClass, ciClass);
     }
-
-    /**
-     * Creates a connector for a given {@code serviceId}.
-     * 
-     * @param <O> the output type from the underlying machine/platform
-     * @param <I> the input type to the underlying machine/platform
-     * @param <CO> the output type of the connector
-     * @param <CI> the input type of the connector
-     * @param serviceId the id of the service to create the connector for (not the plugin id!)
-     * @param inPathSupplier function returning the actual input base path to use for data accesses, may be <b>null</b>
-     * @param outPathSupplier function returning the actual output base path to use for data accesses, may be 
-     *     <b>null</b>
-     * @param oClass the actual type of {@code O}
-     * @param iClass the actual type of {@code I}
-     * @param coClass the actual type of {@code CO}
-     * @param ciClass the actual type of {@code CI}
-     * @return the connector or <b>null</b> if no connector can be created
-     */
-    public static <O, I, CO, CI> Connector<O, I, CO, CI> createConnector(String serviceId, 
-        Supplier<String> inPathSupplier, Supplier<String> outPathSupplier,
-        Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
-        return createConnector(serviceId, null, inPathSupplier, outPathSupplier, oClass, iClass, coClass, ciClass);
-    }
-
+    
     /**
      * Creates a connector for a given {@code serviceId}.
      * 
@@ -303,6 +282,105 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
     public static <O, I, CO, CI> Connector<O, I, CO, CI> createConnector(String serviceId, ConnectorParameter params,
         Supplier<String> inPathSupplier, Supplier<String> outPathSupplier,
         Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
+        return createConnector(serviceId, params, null, null, inPathSupplier, outPathSupplier, oClass, iClass, 
+            coClass, ciClass);
+    }    
+
+    /**
+     * Creates a connector for a given {@code serviceId}.
+     * 
+     * @param <O> the output type from the underlying machine/platform
+     * @param <I> the input type to the underlying machine/platform
+     * @param <CO> the output type of the connector
+     * @param <CI> the input type of the connector
+     * @param serviceId the id of the service to create the connector for (not the plugin id!)
+     * @param inPathSupplier function returning the actual input base path to use for data accesses, may be <b>null</b>
+     * @param outPathSupplier function returning the actual output base path to use for data accesses, may be 
+     *     <b>null</b>
+     * @param oClass the actual type of {@code O}
+     * @param iClass the actual type of {@code I}
+     * @param coClass the actual type of {@code CO}
+     * @param ciClass the actual type of {@code CI}
+     * @return the connector or <b>null</b> if no connector can be created
+     */
+    public static <O, I, CO, CI> Connector<O, I, CO, CI> createConnector(String serviceId, 
+        Supplier<String> inPathSupplier, Supplier<String> outPathSupplier,
+        Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
+        return createConnector(serviceId, null, null, null, inPathSupplier, outPathSupplier, oClass, iClass, 
+            coClass, ciClass);
+    }
+
+    /**
+     * Creates a connector for a given {@code serviceId}.
+     * 
+     * @param <O> the output type from the underlying machine/platform
+     * @param <I> the input type to the underlying machine/platform
+     * @param <CO> the output type of the connector
+     * @param <CI> the input type of the connector
+     * @param serviceId the id of the service to create the connector for (not the plugin id!)
+     * becomes active if {@code metrics} is not <b>null</b>
+     * @param metrics the metrics provider to use, <b>null</b> for no metric measurements
+     * @param log the log file to use to record individual measurements in experiments, <b>null</b> for no logging. Only
+     * @param oClass the actual type of {@code O}
+     * @param iClass the actual type of {@code I}
+     * @param coClass the actual type of {@code CO}
+     * @param ciClass the actual type of {@code CI}
+     * @return the connector or <b>null</b> if no connector can be created
+     */
+    public static <O, I, CO, CI> Connector<O, I, CO, CI> createConnector(String serviceId,
+        MetricsProvider metrics, File log, Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
+        return createConnector(serviceId, null, metrics, log, null, null, oClass, iClass, 
+            coClass, ciClass);
+    }
+
+    /**
+     * Creates a connector for a given {@code serviceId}.
+     * 
+     * @param <O> the output type from the underlying machine/platform
+     * @param <I> the input type to the underlying machine/platform
+     * @param <CO> the output type of the connector
+     * @param <CI> the input type of the connector
+     * @param serviceId the id of the service to create the connector for (not the plugin id!)
+     * @param params connector params to use, may be <b>null</b> for implicitly obtaining the default connector params
+     * becomes active if {@code metrics} is not <b>null</b>
+     * @param metrics the metrics provider to use, <b>null</b> for no metric measurements
+     * @param log the log file to use to record individual measurements in experiments, <b>null</b> for no logging. Only
+     * @param oClass the actual type of {@code O}
+     * @param iClass the actual type of {@code I}
+     * @param coClass the actual type of {@code CO}
+     * @param ciClass the actual type of {@code CI}
+     * @return the connector or <b>null</b> if no connector can be created
+     */
+    public static <O, I, CO, CI> Connector<O, I, CO, CI> createConnector(String serviceId, ConnectorParameter params,
+        MetricsProvider metrics, File log, Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
+        return createConnector(serviceId, params, metrics, log, null, null, oClass, iClass, 
+            coClass, ciClass);
+    }
+
+    /**
+     * Creates a connector for a given {@code serviceId}.
+     * 
+     * @param <O> the output type from the underlying machine/platform
+     * @param <I> the input type to the underlying machine/platform
+     * @param <CO> the output type of the connector
+     * @param <CI> the input type of the connector
+     * @param serviceId the id of the service to create the connector for (not the plugin id!)
+     * @param params connector params to use, may be <b>null</b> for implicitly obtaining the default connector params
+     * @param metrics the metrics provider to use, <b>null</b> for no metric measurements
+     * @param log the log file to use to record individual measurements in experiments, <b>null</b> for no logging. Only
+     * becomes active if {@code metrics} is not <b>null</b>
+     * @param inPathSupplier function returning the actual input base path to use for data accesses, may be <b>null</b>
+     * @param outPathSupplier function returning the actual output base path to use for data accesses, may be 
+     *     <b>null</b>
+     * @param oClass the actual type of {@code O}
+     * @param iClass the actual type of {@code I}
+     * @param coClass the actual type of {@code CO}
+     * @param ciClass the actual type of {@code CI}
+     * @return the connector or <b>null</b> if no connector can be created
+     */
+    public static <O, I, CO, CI> Connector<O, I, CO, CI> createConnector(String serviceId, ConnectorParameter params,
+        MetricsProvider metrics, File log, Supplier<String> inPathSupplier, Supplier<String> outPathSupplier,
+        Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
         Connector<O, I, CO, CI> result = null;
         Iterator<ConnectorFactoryDescriptor> iter 
             = ServiceLoaderUtils.load(ConnectorFactoryDescriptor.class).iterator();
@@ -311,13 +389,8 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
             ConnectorFactoryCreator creator = desc.getCreator(serviceId);
             if (creator != null) {
                 ConnectorParameter p = null == params ? creator.createConnectorParameter() : params;
-                ProtocolAdapter<O, I, CO, CI>[] adapter;
-                if (inPathSupplier == null && outPathSupplier == null) {
-                    adapter = creator.createProtocolAdapter(oClass, iClass, coClass, ciClass);
-                } else {
-                    adapter = creator.createProtocolAdapter(inPathSupplier, outPathSupplier, 
-                        oClass, iClass, coClass, ciClass);
-                }
+                ProtocolAdapter<O, I, CO, CI>[] adapter = creator.createProtocolAdapter(metrics, log, inPathSupplier, 
+                    outPathSupplier, oClass, iClass, coClass, ciClass);
                 result = createConnector(creator.getPluginId(), p, adapter);
             }
         }

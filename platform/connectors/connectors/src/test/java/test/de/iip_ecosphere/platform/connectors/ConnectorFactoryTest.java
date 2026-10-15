@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.connectors;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
@@ -28,6 +29,7 @@ import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.ChanneledConnectorOutputTypeAdapter.ChanneledSerializer;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.support.iip_aas.NameplateSetup.Service;
+import de.iip_ecosphere.platform.support.metrics.MetricsProvider;
 import de.iip_ecosphere.platform.support.Version;
 
 import org.junit.Assert;
@@ -454,14 +456,14 @@ public class ConnectorFactoryTest {
         public MyConnectorFactoryDescriptor() {
             addCreator(SERVICE_ID, new DefaultConnectorFactoryCreator(MyOpcUaConnector.class.getName())
                 .supply(() -> createConnectorParameter())
-                .supply(() -> createProtocolAdapter(), DataItem.class, Object.class, Object.class, Object.class)
-                .supply((i, o) -> createProtocolAdapter(), DataItem.class, Object.class, Object.class, Object.class)
+                .supply((m, l, i, o) -> createProtocolAdapter(), DataItem.class, Object.class, Object.class, 
+                    Object.class)
                 .supplyForInput(() -> new ObjectSerializer(), Object.class)
                 // usually also supplyForOutput
             );
             addCreator(SERVICE_ID2, new DefaultConnectorFactoryCreator(MyOpcUaConnector.class.getName())
                 .supply(() -> createConnectorParameter())
-                .supplyMulti(() -> createProtocolAdapterMulti(), DataItem.class, Object.class, Object.class, 
+                .supplyMulti((m, l, i, o) -> createProtocolAdapterMulti(), DataItem.class, Object.class, Object.class, 
                     Object.class)
                 // usually also supplyForInput
                 .supplyForOutput(() -> new ObjectSerializer(), Object.class)
@@ -510,6 +512,8 @@ public class ConnectorFactoryTest {
             MyConnectorFactoryDescriptor.SERVICE_ID, DataItem.class, Object.class, Object.class, Object.class);
         Assert.assertNotNull(conn);
 
+        MetricsProvider metrics = null;
+        File log = new File("log.log");
         // with explicit/supplied connector parameter
         ConnectorParameter param = ConnectorFactory.createConnectorParameter(MyConnectorFactoryDescriptor.SERVICE_ID);
         Assert.assertNotNull(param);
@@ -518,6 +522,9 @@ public class ConnectorFactoryTest {
         Assert.assertNotNull(conn);
         conn = ConnectorFactory.createConnector(MyConnectorFactoryDescriptor.SERVICE_ID, param, () -> "", () -> "",
             DataItem.class, Object.class, Object.class, Object.class);
+        Assert.assertNotNull(conn);
+        conn = ConnectorFactory.createConnector(MyConnectorFactoryDescriptor.SERVICE_ID, param, metrics, log,
+                DataItem.class, Object.class, Object.class, Object.class);
         Assert.assertNotNull(conn);
         conn = ConnectorFactory.createConnector(MyConnectorFactoryDescriptor.SERVICE_ID2, param, 
             DataItem.class, Object.class, Object.class, Object.class);
