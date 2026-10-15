@@ -511,45 +511,27 @@ public class MetricsProvider implements de.iip_ecosphere.platform.support.metric
     public static void increaseCounterBy(Counter counter, double value) {
         de.iip_ecosphere.platform.support.metrics.MetricsProvider.increaseCounterBy(counter, value);
     }    
-
-    /**
-     * Supplies access to a time measurement.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    public static interface TimeSupplier {
-
-        /**
-         * Returns the time value.
-         * 
-         * @return the time value (usually ms, depends on utilizing call)
-         */
-        public long get();
-        
-    }
     
     /**
-     * Record milliseconds time.
+     * Record milliseconds time. [convenience]
      * 
      * @param timer the timer to record the time on
      * @param timeSupplier the time supplier returning the time after executing {@code function}
      * @param function the function to execute
      */
     public static void recordMsTime(Timer timer, TimeSupplier timeSupplier, Runnable function) {
-        function.run();
-        timer.record(timeSupplier.get(), TimeUnit.MILLISECONDS);
+        de.iip_ecosphere.platform.support.metrics.MetricsProvider.recordMsTime(timer, timeSupplier, function);
     }
 
     /**
-     * Record nanoseconds time.
+     * Record nanoseconds time. [convenience]
      * 
      * @param timer the timer to record the time on
      * @param timeSupplier the time supplier returning the time after executing {@code function}
      * @param function the function to execute
      */
     public static void recordNsTime(Timer timer, TimeSupplier timeSupplier, Runnable function) {
-        function.run();
-        timer.record(timeSupplier.get(), TimeUnit.NANOSECONDS);
+        de.iip_ecosphere.platform.support.metrics.MetricsProvider.recordNsTime(timer, timeSupplier, function);
     }
 
     /**
