@@ -58,10 +58,12 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         appendExclusion(e, "org.springframework.boot", "spring-boot-starter-actuator"); 
         appendExclusion(e, "org.springframework.boot", "spring-boot"); 
         d = appendDependency(dep, gId, appName, appVersion);
+        appendOptional(d);
         e = appendExclusions(d);
         appendExclusion(e, "org.springframework.boot", "spring-boot-starter-web");
         appendExclusion(e, "org.springframework.boot", "spring-boot-starter-actuator"); 
-        appendDependency(dep, gId, appName, appVersion, scope="test", type="test-jar");
+        d = appendDependency(dep, gId, appName, appVersion, scope="test", type="test-jar");
+        appendOptional(d);
         appendDependencies(globalDeps, oktoPlugins, projectVersion, enable=withoutPlugins(config));
      
         XmlElement build = createMavenBuildElement(profile, "", false);

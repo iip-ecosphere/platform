@@ -71,22 +71,28 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     // called from tests/platform instantiator, don't change signature
     generateInterfaces(Project source, Configuration config, Project target) = {
         setMaxSteps(config, true, 0, 7);
-        generateApps(source, config, target, false, false);
+        generateApps(source, config, target, true, false, true, false, false);
     }
 
     // called from tests/platform instantiator, don't change signature
     generateApps(Project source, Configuration config, Project target) = {
         setMaxSteps(config, true, 1, 7);
-        generateApps(source, config, target, true, false);
+        generateApps(source, config, target, true, true, true, false, true);
     }
 
     // called from tests/platform instantiator, don't change signature
     generateAppsNoDeps(Project source, Configuration config, Project target) = {
         setMaxSteps(config, true, 1, 7);
-        generateApps(source, config, target, true, true);
+        generateApps(source, config, target, true, true, true, true, true);
+    }
+
+    // called from tests/platform instantiator, don't change signature
+    generateCodeTemplates(Project source, Configuration config, Project target) = {
+        setMaxSteps(config, true, 1, 7);
+        generateApps(source, config, target, false, true, false, false, true);
     }
     
-    protected generateApps(Project source, Configuration config, Project target, Boolean apps, Boolean noDeps) = {
+    protected generateApps(Project source, Configuration config, Project target, Boolean genInterfaces, Boolean apps, Boolean genApps, Boolean noDeps, Boolean genTemplates) = {
         IIPEcosphere cfg = config;
         setOf(RecordType) recordTypes = getRecordTypes();
         setOf(Application) applications = getApplications();
@@ -147,7 +153,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 };
             }
 
-            if (apps) {
+            if (apps or genTemplates) {
                 buildServices(a, target);
                 advanceProgress("Instantiating app '" + a.name + "'");
                 // generate service classes and service integration
@@ -168,29 +174,31 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     for (MeshElement no : nodes) {
                         ServiceBase impl = no.impl;
                         String clsName = asTypeName(no.name);
-                        generateServiceElements(appRoot, config, artifacts, no, no.impl);
-                        // connector gen references connector impl, in case of non-specific connector may not yet be there
-                        Boolean genElt = not(noDeps) or (noDeps and not(no.impl.isTypeOf(Connector)));
-                        if (genElt) {
-                            vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, 
-                                "${javaNodesSrc}/${clsName}.java", 
-                                elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, 
-                                familyInterface="", familyMember=no.impl, nodes=nodes2);
+                        if (genApps) {
+                            generateServiceElements(appRoot, config, artifacts, no, no.impl);
+                            // connector gen references connector impl, in case of non-specific connector may not yet be there
+                            Boolean genElt = not(noDeps) or (noDeps and not(no.impl.isTypeOf(Connector)));
+                            if (genElt) {
+                                vilTemplateProcessor("JavaSpringCloudStreamMeshElement", config, 
+                                    "${javaNodesSrc}/${clsName}.java", 
+                                    elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, 
+                                    familyInterface="", familyMember=no.impl, nodes=nodes2);
+                            }
+                            if (not(noDeps)) {
+                                vilTemplateProcessor("JavaSpringCloudStreamMeshElementTest", config, 
+                                    "${javaNodesTestSrc}/${clsName}Test.java", 
+                                    elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, 
+                                    familyInterface="", familyMember=no.impl, nodes=nodes2, serializers=javaSerializers);
+                            }
+                            setOf(Service) mbs = {};
+                            generateNestedServices(no, no.impl, javaNodesSrc, javaNodesTestSrc, clsName, javaNodesPackage, 
+                                a, artifacts, noDeps, mbs, nodes2, javaSerializers);
+                            generateServiceResources(no, no.impl, appRoot, bins, assemblies, resources, artifacts, oktoPlugins, noDeps, implResources);
+                            for (Service m: mbs) {
+                                generateServiceResources(no, m, appRoot, bins, assemblies, resources, artifacts, oktoPlugins, noDeps, implResources);
+                            }
                         }
-                        if (not(noDeps)) {
-                            vilTemplateProcessor("JavaSpringCloudStreamMeshElementTest", config, 
-                                "${javaNodesTestSrc}/${clsName}Test.java", 
-                                elt=no, pkg=javaNodesPackage, app=a, sharedInterfaces=cfg.sharedInterfaces, 
-                                familyInterface="", familyMember=no.impl, nodes=nodes2, serializers=javaSerializers);
-                        }
-                        setOf(Service) mbs = {};
-                        generateNestedServices(no, no.impl, javaNodesSrc, javaNodesTestSrc, clsName, javaNodesPackage, 
-                            a, artifacts, noDeps, mbs, nodes2, javaSerializers);
                         elements.add(no);
-                        generateServiceResources(no, no.impl, appRoot, bins, assemblies, resources, artifacts, oktoPlugins, noDeps, implResources);
-                        for (Service m: mbs) {
-                            generateServiceResources(no, m, appRoot, bins, assemblies, resources, artifacts, oktoPlugins, noDeps, implResources);
-                        }
                         for (Dependency d: impl.dependencies) {
                             collectMavenDependencies(d, artifacts);
                         }
@@ -198,85 +206,87 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                             oktoPlugins.add(plugin.artifact + "*"); // 'mark' as optional
                         }
                     };
-                    
-                    for (Server ser: a.servers) {
-                        generateServer(config, ser, appRoot, noDeps, assemblies, artifacts);
-                        addArtifacts(ser.artifacts, ser.artifact, bins, noDeps);                        
+                    if (genApps) {
+                        for (Server ser: a.servers) {
+                            generateServer(config, ser, appRoot, noDeps, assemblies, artifacts);
+                            addArtifacts(ser.artifacts, ser.artifact, bins, noDeps);                        
+                        }
                     }
                 };
-                // processes the appJSL entries to individual files
-                for (String k: appJsl.getKeys()) {
-                  vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/${k}", descriptors=appJsl.get(k));
-                }
-                
                 elements = elements->sortedBy(n|n.name).toSequence(); // for testing
-                
-                vilTemplateProcessor("JavaSpringCloudStreamStarter", config, "${javaSrc}/iip/Starter.java", pkg="iip", serializers=javaSerializers);
-                vilTemplateProcessor("JavaConnectorFactoryDescriptor", config,  "${javaNodesSrc}/AppConnectorFactoryDescriptor.java", nodes=elements, pkg=javaNodesPackage);
-                vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/de.iip_ecosphere.platform.connectors.ConnectorFactoryDescriptor", descriptor="iip.nodes.AppConnectorFactoryDescriptor");
-    
-                vilTemplateProcessor("JavaSpringCloudStreamYaml", config, "${resourcesSrc}/application.yml", mappedMesh=mappedMesh, nodes=elements, app=a);
-                vilTemplateProcessor("SpringCloudStreamDeploymentDescriptor", config, "${resourcesSrc}/deployment.yml", app=a, elements=elements);
-                if (enablesPackaging(a, AppPackagingSchema::ZipWithClasspath)) {
-                    vilTemplateProcessor("JavaSpringCloudStreamAssembly", config, "${assemblySrc}/spring.xml");
-                    addAssemblyInfo(assemblies, "spring", "${assemblyRel}/spring.xml", "package", mvnProjectBuildDir);
-                }
-                vilTemplateProcessor("JavaLogbackXml", config, "${resourcesSrc}/logback.xml");
-                identityStoreJsl(resourcesSrc, cfg);
-                deviceIdProviderJsl(resourcesSrc, cfg);
-    
-                if (not(cfg.sharedInterfaces)) {
-                    vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
-                    addAssemblyInfo(assemblies, "interfaces", "${assemblyRel}/javaInterfaces.xml", "package", mvnProjectBuildDir);
 
-                    if (isPythonUsed(usedServiceTypes)) {
-                        vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
-                        addAssemblyInfo(assemblies, "python", "${assemblyRel}/pythonInterfaces.xml", "package", mvnProjectBuildDir);
+                if (genApps) {                
+                    // processes the appJSL entries to individual files
+                    for (String k: appJsl.getKeys()) {
+                      vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/${k}", descriptors=appJsl.get(k));
                     }
+                    
+                    vilTemplateProcessor("JavaSpringCloudStreamStarter", config, "${javaSrc}/iip/Starter.java", pkg="iip", serializers=javaSerializers);
+                    vilTemplateProcessor("JavaConnectorFactoryDescriptor", config,  "${javaNodesSrc}/AppConnectorFactoryDescriptor.java", nodes=elements, pkg=javaNodesPackage);
+                    vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/de.iip_ecosphere.platform.connectors.ConnectorFactoryDescriptor", descriptor="iip.nodes.AppConnectorFactoryDescriptor");
+        
+                    vilTemplateProcessor("JavaSpringCloudStreamYaml", config, "${resourcesSrc}/application.yml", mappedMesh=mappedMesh, nodes=elements, app=a);
+                    vilTemplateProcessor("SpringCloudStreamDeploymentDescriptor", config, "${resourcesSrc}/deployment.yml", app=a, elements=elements);
+                    if (enablesPackaging(a, AppPackagingSchema::ZipWithClasspath)) {
+                        vilTemplateProcessor("JavaSpringCloudStreamAssembly", config, "${assemblySrc}/spring.xml");
+                        addAssemblyInfo(assemblies, "spring", "${assemblyRel}/spring.xml", "package", mvnProjectBuildDir);
+                    }
+                    vilTemplateProcessor("JavaLogbackXml", config, "${resourcesSrc}/logback.xml");
+                    identityStoreJsl(resourcesSrc, cfg);
+                    deviceIdProviderJsl(resourcesSrc, cfg);
+        
+                    if (not(cfg.sharedInterfaces)) {
+                        vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
+                        addAssemblyInfo(assemblies, "interfaces", "${assemblyRel}/javaInterfaces.xml", "package", mvnProjectBuildDir);
+    
+                        if (isPythonUsed(usedServiceTypes)) {
+                            vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
+                            addAssemblyInfo(assemblies, "python", "${assemblyRel}/pythonInterfaces.xml", "package", mvnProjectBuildDir);
+                        }
+                    }
+                    if (a.identityStore <> null and a.identityStore.includeInApplication) {
+                        vilTemplateProcessor("TemplatesIdentityStoreYaml", config, "${resourcesSrc}/identityStore.yml", app=a);
+                    }
+                    
+                    resources = postProcessResources(resources, "-/", getResourcesFolder(config) + "/");
+                    Boolean copyDependencies = enablesPackaging(a, AppPackagingSchema::ZipWithClasspath); // may be more...
+                    // partition according to container strategy
+                    String appVersion = getAppMvnVersion(a);
+                    setOf(DisplayPanel) displayPanels = DisplayPanel.allInstances();
+                    Boolean mapToDisplay = getBooleanValueSafe(cfg.alwaysMapDashboard, false) 
+                        or (displayPanels.size() > 0 and getServiceTypes()->select(s|mapsToDashboard(s)).size() > 0);      
+                    String pluginOutputFolder = "target/jars";
+                    vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, oktoPlugins=oktoPlugins, bins=bins, assemblies=assemblies, resources=resources, 
+                        starterCls=appStarterCls, appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests, copyRuntimeDependencies=copyDependencies, mapDisplay=mapToDisplay, pluginOutputFolder=pluginOutputFolder, implResources=implResources);
+                    PropertiesFileArtifact pluginCfg = "${appRoot}/pluginCfg.properties";
+                    if (cfg.withPlugins) {
+                        pluginCfg.setValue("pluginFolder", "target/plugins");
+                        pluginCfg.save();
+                    } else {
+                        pluginCfg.delete();
+                    }
+                    vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
+                    generatePlugins(cfg, appRoot);
+                    mvn(appRoot);
+    
+                    String appArtifact;
+                    if (platformInstantiation) {
+                        appArtifact = generateServiceContainer(appRoot, cfg, a, elements);
+                    }
+                    
+                    if (appArtifact == null or appArtifact.length() == 0) {
+                        appArtifact = appName + "-" + appVersion + "-bin.jar"; // currently not other packaging
+                    }
+                    generateDeploymentPlans(appRoot, cfg, a, elements, appArtifact);
                 }
-                if (a.identityStore <> null and a.identityStore.includeInApplication) {
-                    vilTemplateProcessor("TemplatesIdentityStoreYaml", config, "${resourcesSrc}/identityStore.yml", app=a);
-                }
-                
-                resources = postProcessResources(resources, "-/", getResourcesFolder(config) + "/");
-                Boolean copyDependencies = enablesPackaging(a, AppPackagingSchema::ZipWithClasspath); // may be more...
-                // partition according to container strategy
-                String appVersion = getAppMvnVersion(a);
-                setOf(DisplayPanel) displayPanels = DisplayPanel.allInstances();
-                Boolean mapToDisplay = getBooleanValueSafe(cfg.alwaysMapDashboard, false) 
-                    or (displayPanels.size() > 0 and getServiceTypes()->select(s|mapsToDashboard(s)).size() > 0);      
-                String pluginOutputFolder = "target/jars";
-                vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, oktoPlugins=oktoPlugins, bins=bins, assemblies=assemblies, resources=resources, 
-                    starterCls=appStarterCls, appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests, copyRuntimeDependencies=copyDependencies, mapDisplay=mapToDisplay, pluginOutputFolder=pluginOutputFolder, implResources=implResources);
-                PropertiesFileArtifact pluginCfg = "${appRoot}/pluginCfg.properties";
-                if (cfg.withPlugins) {
-                    pluginCfg.setValue("pluginFolder", "target/plugins");
-                    pluginCfg.save();
-                } else {
-                    pluginCfg.delete();
-                }
-                vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
-                generatePlugins(cfg, appRoot);
-                mvn(appRoot);
 
-                String appArtifact;
-                if (platformInstantiation) {
-                    appArtifact = generateServiceContainer(appRoot, cfg, a, elements);
-                }
-                
-                if (appArtifact == null or appArtifact.length() == 0) {
-                    appArtifact = appName + "-" + appVersion + "-bin.jar"; // currently not other packaging
-                }
-                generateDeploymentPlans(appRoot, cfg, a, elements, appArtifact);
                 allElements = allElements.union(elements);
-                
                 if (a.createContainer) {
                     allAppsContainersElements = allAppsContainersElements.union(elements);
                 }
             }
             
-            Boolean withTemplate = true; // preliminary
-            if (withTemplate) {
+            if (genTemplates) {
                 advanceProgress("Instantiating app template '" + a.name + "'");
                 appRoot = "${target}/templates/eclipse/impl.${appName}";
                 appRoot.mkdir();

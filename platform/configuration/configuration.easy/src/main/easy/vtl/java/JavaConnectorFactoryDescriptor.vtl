@@ -84,12 +84,12 @@ template JavaConnectorFactoryDescriptor(IIPEcosphere config, JavaCodeArtifact ta
         
             JavaCodeLambdaExpression paramSupplier = new JavaCodeLambdaExpression();
             paramSupplier.call("${clsName}.createConnectorParameter");
-            JavaCodeLambdaExpression adapterSupplier = new JavaCodeLambdaExpression();
-            adapterSupplier.call("${clsName}.createConnectorAdapter");
             JavaCodeLambdaExpression pathAdapterSupplier = new JavaCodeLambdaExpression();
+            pathAdapterSupplier.var("m");
+            pathAdapterSupplier.var("l");
             pathAdapterSupplier.var("i");
             pathAdapterSupplier.var("o");
-            pathAdapterSupplier.call("${clsName}.createConnectorAdapter").arg("i").arg("o");
+            pathAdapterSupplier.call("${clsName}.createConnectorAdapter").arg("m").arg("l").arg("i").arg("o");
             
             m.call("addCreator")
               .stringArg(conn.id)
@@ -97,9 +97,6 @@ template JavaConnectorFactoryDescriptor(IIPEcosphere config, JavaCodeArtifact ta
                 .stringArg(connFqn)
                 .call("supply").(c|{
                     c.arg(paramSupplier);
-                }).call(adapterSupplyName).(c|{
-                    c.arg(adapterSupplier);
-                    addConnectorGenericsAsArgs(conn, inType, outType, true, c);
                 }).call(adapterSupplyName).(c|{
                     c.arg(pathAdapterSupplier);
                     addConnectorGenericsAsArgs(conn, inType, outType, true, c);

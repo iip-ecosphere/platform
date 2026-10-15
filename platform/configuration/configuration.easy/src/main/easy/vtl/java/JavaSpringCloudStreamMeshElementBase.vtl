@@ -622,7 +622,7 @@ block;
             c.method(adapterType(conn, cType.inType, cType.outType, false, true), methodName, "Creates the connector adapter. [public for testing]").setStatic().(m|{
                 JavaCodeMethodCall r = new JavaCodeMethodCall(methodName);            
                 if (withMetrics) {
-                    m.param("de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider", "metrics", "the metrics provider to use, <b>null</b> for no metric measurements");
+                    m.param("de.iip_ecosphere.platform.support.metrics.MetricsProvider", "metrics", "the metrics provider to use, <b>null</b> for no metric measurements");
                     m.param("java.io.File", "log", "the log file to use to record individual measurements in experiments, <b>null</b> for no logging. Only becomes active if {@code metrics} is not <b>null</b>");
                     r.arg("metrics").arg("log");
                 } else {
@@ -1149,7 +1149,7 @@ block;
         mainCls.attribute("String", "activated").annotate("org.springframework.beans.factory.annotation.Value").stringArg("\\${iip.service.${serviceId}:true}");
         mainCls.attribute("org.springframework.cloud.stream.function.StreamBridge", "streamBridge").annotate("org.springframework.beans.factory.annotation.Autowired");
         generateServiceAttribute(elt, impl, mainCls);
-        mainCls.attribute("de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider", "metrics").annotate("org.springframework.beans.factory.annotation.Autowired");
+        mainCls.attribute("de.iip_ecosphere.platform.support.metrics.MetricsProvider", "metrics").annotate("org.springframework.beans.factory.annotation.Autowired");
         mainCls.attribute("de.iip_ecosphere.platform.support.metrics.Counter", "serviceSent");
         mainCls.attribute("de.iip_ecosphere.platform.support.metrics.Counter", "serviceReceived");
         mainCls.attribute("de.iip_ecosphere.platform.support.metrics.Timer", "processingTime");
@@ -1160,7 +1160,7 @@ block;
         mainCls.constructor("Creates an instance.").(m|{
             if (familyInterface <> "") {
                m.param("org.springframework.cloud.stream.function.StreamBridge", "streamBridge", "the stream bridge");
-               m.param("de.iip_ecosphere.platform.services.environment.spring.metricsProvider.MetricsProvider", "metrics", "the metrics provider");
+               m.param("de.iip_ecosphere.platform.support.metrics.MetricsProvider", "metrics", "the metrics provider");
                m.assign("this.streamBridge", "streamBridge");
                m.assign("this.metrics", "metrics");
             }
