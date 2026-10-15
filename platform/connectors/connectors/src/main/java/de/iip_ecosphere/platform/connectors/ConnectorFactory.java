@@ -19,6 +19,7 @@ import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.connectors.ConnectorFactoryDescriptor.ConnectorFactoryCreator;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
+import de.iip_ecosphere.platform.connectors.types.ChanneledConnectorOutputTypeAdapter.ChanneledSerializer;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.plugins.Plugin;
@@ -233,11 +234,11 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
      */
     public static <O, I, CO, CI> Connector<O, I, CO, CI> createConnector(String serviceId, 
         Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
-        return createConnector(serviceId, null, oClass, iClass, coClass, ciClass);
+        return createConnector(serviceId, null, null, null, oClass, iClass, coClass, ciClass);
     }
     
     // checkstyle: stop parameter number check
-    
+
     /**
      * Creates a connector for a given {@code serviceId}.
      * 
@@ -255,6 +256,53 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
      */
     public static <O, I, CO, CI> Connector<O, I, CO, CI> createConnector(String serviceId, ConnectorParameter params,
         Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
+        return createConnector(serviceId, params, null, null, oClass, iClass, coClass, ciClass);
+    }
+
+    /**
+     * Creates a connector for a given {@code serviceId}.
+     * 
+     * @param <O> the output type from the underlying machine/platform
+     * @param <I> the input type to the underlying machine/platform
+     * @param <CO> the output type of the connector
+     * @param <CI> the input type of the connector
+     * @param serviceId the id of the service to create the connector for (not the plugin id!)
+     * @param inPathSupplier function returning the actual input base path to use for data accesses, may be <b>null</b>
+     * @param outPathSupplier function returning the actual output base path to use for data accesses, may be 
+     *     <b>null</b>
+     * @param oClass the actual type of {@code O}
+     * @param iClass the actual type of {@code I}
+     * @param coClass the actual type of {@code CO}
+     * @param ciClass the actual type of {@code CI}
+     * @return the connector or <b>null</b> if no connector can be created
+     */
+    public static <O, I, CO, CI> Connector<O, I, CO, CI> createConnector(String serviceId, 
+        Supplier<String> inPathSupplier, Supplier<String> outPathSupplier,
+        Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
+        return createConnector(serviceId, null, inPathSupplier, outPathSupplier, oClass, iClass, coClass, ciClass);
+    }
+
+    /**
+     * Creates a connector for a given {@code serviceId}.
+     * 
+     * @param <O> the output type from the underlying machine/platform
+     * @param <I> the input type to the underlying machine/platform
+     * @param <CO> the output type of the connector
+     * @param <CI> the input type of the connector
+     * @param serviceId the id of the service to create the connector for (not the plugin id!)
+     * @param params connector params to use, may be <b>null</b> for implicitly obtaining the default connector params
+     * @param inPathSupplier function returning the actual input base path to use for data accesses, may be <b>null</b>
+     * @param outPathSupplier function returning the actual output base path to use for data accesses, may be 
+     *     <b>null</b>
+     * @param oClass the actual type of {@code O}
+     * @param iClass the actual type of {@code I}
+     * @param coClass the actual type of {@code CO}
+     * @param ciClass the actual type of {@code CI}
+     * @return the connector or <b>null</b> if no connector can be created
+     */
+    public static <O, I, CO, CI> Connector<O, I, CO, CI> createConnector(String serviceId, ConnectorParameter params,
+        Supplier<String> inPathSupplier, Supplier<String> outPathSupplier,
+        Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass) {
         Connector<O, I, CO, CI> result = null;
         Iterator<ConnectorFactoryDescriptor> iter 
             = ServiceLoaderUtils.load(ConnectorFactoryDescriptor.class).iterator();
@@ -263,8 +311,13 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
             ConnectorFactoryCreator creator = desc.getCreator(serviceId);
             if (creator != null) {
                 ConnectorParameter p = null == params ? creator.createConnectorParameter() : params;
-                ProtocolAdapter<O, I, CO, CI>[] adapter = creator.createProtocolAdapter(
-                    oClass, iClass, coClass, ciClass);
+                ProtocolAdapter<O, I, CO, CI>[] adapter;
+                if (inPathSupplier == null && outPathSupplier == null) {
+                    adapter = creator.createProtocolAdapter(oClass, iClass, coClass, ciClass);
+                } else {
+                    adapter = creator.createProtocolAdapter(inPathSupplier, outPathSupplier, 
+                        oClass, iClass, coClass, ciClass);
+                }
                 result = createConnector(creator.getPluginId(), p, adapter);
             }
         }
@@ -272,5 +325,32 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
     }
     
     // checkstyle: resume parameter number check
+    
+    /**
+     * Creates a channeled input/output serializer for the given {@code serviceId} and the given type {@code cls}.
+     * 
+     * @param <T> the data type
+     * @param serviceId the service id
+     * @param input input (parser) or output formatter
+     * @param cls the data type
+     * @return the serializer or <b>null</b> if unknown
+     */
+    public static <T> ChanneledSerializer<T> createChanneledSerializer(String serviceId, boolean input, Class<T> cls) {
+        ChanneledSerializer<T> result = null;
+        Iterator<ConnectorFactoryDescriptor> iter 
+            = ServiceLoaderUtils.load(ConnectorFactoryDescriptor.class).iterator();
+        while (iter.hasNext() && result == null) {
+            ConnectorFactoryDescriptor desc = iter.next();
+            ConnectorFactoryCreator creator = desc.getCreator(serviceId);
+            if (creator != null) {
+                if (input) {
+                    result = creator.createChanneledInputSerializer(cls);
+                } else {
+                    result = creator.createChanneledOutputSerializer(cls);
+                }
+            }
+        }
+        return result;
+    }
 
 }

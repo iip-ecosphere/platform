@@ -12,7 +12,10 @@
 
 package de.iip_ecosphere.platform.connectors;
 
+import java.util.function.Supplier;
+
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
+import de.iip_ecosphere.platform.connectors.types.ChanneledConnectorOutputTypeAdapter.ChanneledSerializer;
 
 /**
  * JSL descriptor for application-provided connector instance creation.
@@ -57,6 +60,48 @@ public interface ConnectorFactoryDescriptor {
          */
         public <O, I, CO, CI> ProtocolAdapter<O, I, CO, CI>[] createProtocolAdapter(Class<O> oClass, Class<I> iClass, 
             Class<CO> coClass, Class<CI> ciClass);
+
+        // checkstyle: stop parameter number check
+
+        /**
+         * Creates the default connector protocol adapter.
+         * 
+         * @param <O> the output type from the underlying machine/platform
+         * @param <I> the input type to the underlying machine/platform
+         * @param <CO> the output type of the connector
+         * @param <CI> the input type of the connector
+         * @param inPathSupplier function returning the actual input base path to use for data accesses, may be 
+         *     <b>null</b>
+         * @param outPathSupplier function returning the actual output base path to use for data accesses, may be 
+         *     <b>null</b>
+         * @param oClass the actual type of {@code O}
+         * @param iClass the actual type of {@code I}
+         * @param coClass the actual type of {@code CO}
+         * @param ciClass the actual type of {@code CI}
+         * @return the connector protocol adapter
+         */
+        public <O, I, CO, CI> ProtocolAdapter<O, I, CO, CI>[] createProtocolAdapter(Supplier<String> inPathSupplier, 
+            Supplier<String> outPathSupplier, Class<O> oClass, Class<I> iClass, Class<CO> coClass, Class<CI> ciClass);
+
+        // checkstyle: resume parameter number check
+
+        /**
+         * Creates a channeled input serializer for the given {@code serviceId} and the given type {@code cls}.
+         * 
+         * @param <T> the data type
+         * @param cls the data type
+         * @return the serializer or <b>null</b> if unknown
+         */
+        public <T> ChanneledSerializer<T> createChanneledInputSerializer(Class<T> cls);
+
+        /**
+         * Creates a channeled output serializer for the given {@code serviceId} and the given type {@code cls}.
+         * 
+         * @param <T> the data type
+         * @param cls the data type
+         * @return the serializer or <b>null</b> if unknown
+         */
+        public <T> ChanneledSerializer<T> createChanneledOutputSerializer(Class<T> cls);
 
     }
 

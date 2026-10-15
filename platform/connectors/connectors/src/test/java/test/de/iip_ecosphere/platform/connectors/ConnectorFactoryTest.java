@@ -25,6 +25,7 @@ import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParamete
 import de.iip_ecosphere.platform.connectors.DefaultConnectorFactoryDescriptor;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ChannelProtocolAdapter;
+import de.iip_ecosphere.platform.connectors.types.ChanneledConnectorOutputTypeAdapter.ChanneledSerializer;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.support.iip_aas.NameplateSetup.Service;
 import de.iip_ecosphere.platform.support.Version;
@@ -403,6 +404,40 @@ public class ConnectorFactoryTest {
     }
 
     /**
+     * A channeled serializer for supplying.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class ObjectSerializer implements ChanneledSerializer<Object> {
+
+        @Override
+        public Object clone(Object origin) throws IOException {
+            return origin;
+        }
+
+        @Override
+        public Class<Object> getType() {
+            return Object.class;
+        }
+
+        @Override
+        public Object from(byte[] data) throws IOException {
+            return data;
+        }
+
+        @Override
+        public byte[] to(Object source) throws IOException {
+            return source.toString().getBytes();
+        }
+
+        @Override
+        public Object from(String channel, byte[] data) throws IOException {
+            return data;
+        }
+        
+    }
+
+    /**
      * A test connector factory descriptor for the "connector" defined above, hooked in via JSL.
      * 
      * @author Holger Eichelberger, SSE
@@ -419,11 +454,18 @@ public class ConnectorFactoryTest {
         public MyConnectorFactoryDescriptor() {
             addCreator(SERVICE_ID, new DefaultConnectorFactoryCreator(MyOpcUaConnector.class.getName())
                 .supply(() -> createConnectorParameter())
-                .supply(() -> createProtocolAdapter(), DataItem.class, Object.class, Object.class, Object.class));
+                .supply(() -> createProtocolAdapter(), DataItem.class, Object.class, Object.class, Object.class)
+                .supply((i, o) -> createProtocolAdapter(), DataItem.class, Object.class, Object.class, Object.class)
+                .supplyForInput(() -> new ObjectSerializer(), Object.class)
+                // usually also supplyForOutput
+            );
             addCreator(SERVICE_ID2, new DefaultConnectorFactoryCreator(MyOpcUaConnector.class.getName())
                 .supply(() -> createConnectorParameter())
                 .supplyMulti(() -> createProtocolAdapterMulti(), DataItem.class, Object.class, Object.class, 
-                    Object.class));
+                    Object.class)
+                // usually also supplyForInput
+                .supplyForOutput(() -> new ObjectSerializer(), Object.class)
+            );
         }
 
         /**
@@ -474,9 +516,15 @@ public class ConnectorFactoryTest {
         conn = ConnectorFactory.createConnector(MyConnectorFactoryDescriptor.SERVICE_ID, param, 
             DataItem.class, Object.class, Object.class, Object.class);
         Assert.assertNotNull(conn);
+        conn = ConnectorFactory.createConnector(MyConnectorFactoryDescriptor.SERVICE_ID, param, () -> "", () -> "",
+            DataItem.class, Object.class, Object.class, Object.class);
+        Assert.assertNotNull(conn);
         conn = ConnectorFactory.createConnector(MyConnectorFactoryDescriptor.SERVICE_ID2, param, 
             DataItem.class, Object.class, Object.class, Object.class);
         Assert.assertNotNull(conn);
+        conn = ConnectorFactory.createConnector(MyConnectorFactoryDescriptor.SERVICE_ID2, param, () -> "", () -> "",
+            DataItem.class, Object.class, Object.class, Object.class);
+        Assert.assertNotNull(conn); // not supplied, but fallback
 
         // shall fail, not provided serviceId
         Assert.assertNull(ConnectorFactory.createConnectorParameter(""));
@@ -491,6 +539,20 @@ public class ConnectorFactoryTest {
         // shall fail, wrong type parameter types
         Assert.assertNull(ConnectorFactory.createConnector(null, 
             Object.class, Object.class, Object.class, Object.class));
+
+        Assert.assertNotNull(
+            ConnectorFactory.createChanneledSerializer(MyConnectorFactoryDescriptor.SERVICE_ID, true, Object.class));
+        Assert.assertNull(
+            ConnectorFactory.createChanneledSerializer(MyConnectorFactoryDescriptor.SERVICE_ID, true, Integer.class));
+        Assert.assertNull(
+            ConnectorFactory.createChanneledSerializer(MyConnectorFactoryDescriptor.SERVICE_ID, false, Object.class));
+
+        Assert.assertNull(
+            ConnectorFactory.createChanneledSerializer(MyConnectorFactoryDescriptor.SERVICE_ID2, true, Object.class));
+        Assert.assertNotNull(
+            ConnectorFactory.createChanneledSerializer(MyConnectorFactoryDescriptor.SERVICE_ID2, false, Object.class));
+        Assert.assertNull(
+            ConnectorFactory.createChanneledSerializer(MyConnectorFactoryDescriptor.SERVICE_ID2, false, Integer.class));
     }
 
 }
