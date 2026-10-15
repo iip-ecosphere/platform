@@ -73,7 +73,7 @@ import de.iip_ecosphere.platform.support.metrics.Timer;
  * 
  * @author Miguel Gomez
  */
-public class MetricsProvider {
+public class MetricsProvider implements de.iip_ecosphere.platform.support.metrics.MetricsProvider {
 
     /**
      * Tag matching predicate. Pre-matched deviceIds assumed.
@@ -241,20 +241,12 @@ public class MetricsProvider {
         this.monitorNonNative = monitorNonNative;
     }
     
-    /**
-     * Returns the meter registry.
-     * 
-     * @return the meter registry
-     */
+    @Override
     public MeterRegistry getRegistry() {
         return registry;
     }
-    
-    /**
-     * Returns the clock used in the underlying meter registry.
-     * 
-     * @return the clock
-     */
+
+    @Override
     public Clock getClock() {
         return clock;
     }
@@ -414,16 +406,7 @@ public class MetricsProvider {
         return timers.size();
     }
 
-    /**
-     * Adds a gauge value to the MeterRegistry.<br>
-     * If the identifier does not correspond to an existing gauge, a new gauge will
-     * be created and registered. If it is an existing gauge, the value will simply
-     * be modified.
-     * 
-     * @param gaugeId identifier for the gauge
-     * @param value   value we want to set the gauge to
-     * @throws IllegalArgumentException if the identifier is null
-     */
+    @Override
     public void addGaugeValue(String gaugeId, double value) {
         if (gaugeId == null) {
             throw new IllegalArgumentException("gaugeId" + NULL_ARG);
@@ -436,12 +419,7 @@ public class MetricsProvider {
         }
     }
 
-    /**
-     * Remove a custom gauge from the Meter Registry.
-     * 
-     * @param gaugeId identifier of the custom gauge
-     * @throws IllegalArgumentException if there is no gauge with that identifier
-     */
+    @Override
     public void removeGauge(String gaugeId) {
         if (!gauges.containsKey(gaugeId)) {
             throw new IllegalArgumentException(gaugeId + ID_NOT_FOUND_ERRMSG);
@@ -494,17 +472,7 @@ public class MetricsProvider {
         counters.put(counterId, counter);
     }
 
-    /**
-     * Increases the counter by a certain value.<br>
-     * If the identifier does not correspond to an existing counter, a new counter
-     * will be created and registered. If it is an existing counter, the value will
-     * simply be incremented by the amount requested.
-     * 
-     * @param counterId identifier of the custom counter
-     * @param value     the amount we want to increases the counter
-     * @throws IllegalArgumentException if {@code value} is negative or if
-     *                                  {@code counterId} is null
-     */
+    @Override
     public void increaseCounterBy(String counterId, double value) {
         if (counterId == null) {
             throw new IllegalArgumentException("counterId" + NULL_ARG);
@@ -680,13 +648,7 @@ public class MetricsProvider {
         registry.remove(timerId);
     }
 
-    /**
-     * Records the execution of a runnable using a timer.
-     * 
-     * @param timerId  identifier of the custom timer
-     * @param runnable runnable function that we want to record
-     * @throws IllegalArgumentException if the runnable or the identifier are null
-     */
+    @Override
     public void recordWithTimer(String timerId, Runnable runnable) {
         if (runnable == null) {
             throw new IllegalArgumentException("runnable" + NULL_ARG);
@@ -698,15 +660,7 @@ public class MetricsProvider {
         timers.get(timerId).record(runnable);
     }
 
-    /**
-     * Records the execution of a supplier using a timer.
-     * 
-     * @param <T>      the datatype that the supplier returns
-     * @param timerId  identifier of the custom timer
-     * @param supplier supplier function that we want to record
-     * @throws IllegalArgumentException if the identifier or the supplier are null
-     * @return the value returned by the supplier
-     */
+    @Override
     public <T> T recordWithTimer(String timerId, Supplier<T> supplier) {
         if (supplier == null) {
             throw new IllegalArgumentException("supplier" + NULL_ARG);
@@ -718,15 +672,7 @@ public class MetricsProvider {
         return timers.get(timerId).record(supplier);
     }
 
-    /**
-     * Adds time from a specific timer.
-     * 
-     * @param timerId identifier of the custom timer
-     * @param time    amount of time we want to record
-     * @param unit    base unit of the time we want to record
-     * @throws IllegalArgumentException if the identifier or the supplier are null
-     * @throws IllegalArgumentException if the {@code time} is negative
-     */
+    @Override
     public void recordWithTimer(String timerId, long time, TimeUnit unit) {
         if (time < 0) {
             throw new IllegalArgumentException("cannot record negative time!");

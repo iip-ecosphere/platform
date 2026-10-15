@@ -25,6 +25,7 @@ import de.iip_ecosphere.platform.connectors.types.ConnectorOutputTypeTranslator;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.metrics.Clock;
+import de.iip_ecosphere.platform.support.metrics.MetricsProvider;
 
 /**
  * Implements a monitoring wrapper for {@link TranslatingProtocolAdapter} to be instrumented into by generation.
