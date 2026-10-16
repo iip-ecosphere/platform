@@ -82,7 +82,7 @@
               <groupId>de.iip-ecosphere.platform</groupId>
               <version>${project.version}</version>
             </dependency>    
-            <dependency>
+            <dependency> <!-- exception, needed for measurement-->
               <artifactId>SimpleVDWOPCDemoApp</artifactId>
               <groupId>de.iip-ecosphere.platform.apps</groupId>
               <version>0.1.0-SNAPSHOT</version> <!-- from config -->
@@ -218,18 +218,18 @@
                    <artifactId>configuration-plugin</artifactId>
                    <version>${project.version}</version>
                    <executions>
-	                   <execution>
-	                      <id>generateAppsNoDeps</id>
-	                      <goals>
-	                          <goal>generateAppsNoDeps</goal>
-	                      </goals>
-	                   </execution>
-                       <execution>
-                         <id>generateApps</id>
-                         <goals>
-                           <goal>generateApps</goal>
-                         </goals>
-                       </execution>
+                        <execution>
+                            <id>generateBootstrappedApps</id>
+                            <goals>
+                                <goal>generateBootstrappedApps</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>generateAppsDirect</id>
+                            <goals>
+                                <goal>generateAppsDirect</goal>
+                            </goals>
+                        </execution>
 	                    <execution>
 	                        <id>testApp</id>
 	                        <goals>
@@ -330,6 +330,7 @@
                         <invokeGoal>package</invokeGoal>
                       </invokeGoals>
                       <disableBuild>true</disableBuild>
+                      <skipGenerateSources>true</skipGenerateSources>
                     </configuration>
                   </execution>
                 </executions>

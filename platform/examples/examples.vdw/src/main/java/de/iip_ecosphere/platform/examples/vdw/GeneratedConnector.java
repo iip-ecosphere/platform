@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorFactory;
+import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.services.environment.metricsProvider.MetricsProvider;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
@@ -25,7 +26,6 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import iip.datatypes.OpcIn;
 import iip.datatypes.OpcOut;
-import iip.nodes.MyOpcConnExample;
 
 /**
  * Runs the generated connector.
@@ -90,11 +90,11 @@ public class GeneratedConnector {
      */
     public static Connector<Object, Object, OpcOut, OpcIn> createPlatformConnector(
         ReceptionCallback<OpcOut> callback) throws IOException {
+        ConnectorParameter params = ConnectorFactory.createConnectorParameter("myOpcConn");
         Connector<Object, Object, OpcOut, OpcIn> conn = ConnectorFactory.createConnector(
-            "de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector", 
-            () -> MyOpcConnExample.createConnectorParameter(), 
-            MyOpcConnExample.createConnectorAdapter(metrics, new File("opcTest.txt")));
-        conn.connect(MyOpcConnExample.createConnectorParameter());
+            "myOpcConn", params, metrics, new File("opcTest.txt"), Object.class, Object.class, 
+            OpcOut.class, OpcIn.class);
+        conn.connect(params);
         conn.setReceptionCallback(callback);
         return conn;
     }
