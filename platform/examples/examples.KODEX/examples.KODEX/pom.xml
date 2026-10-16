@@ -35,7 +35,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <optional>true</optional>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -72,6 +71,8 @@
                 <artifactId>SimpleKodexTestingApp</artifactId>
                 <groupId>de.iip-ecosphere.platform.apps</groupId>
                 <version>0.1.0-SNAPSHOT</version> <!-- from config -->
+                <scope>test</scope>
+                <optional>true</optional>
            </dependency>
         </dependencies>
         <build>
@@ -152,16 +153,16 @@
                           </goals>
                         </execution>
                         <execution>
-                          <id>generateAppsNoDeps</id>
-                          <goals>
-                            <goal>generateAppsNoDeps</goal>
-                          </goals>
+                            <id>generateBootstrappedApps</id>
+                            <goals>
+                                <goal>generateBootstrappedApps</goal>
+                            </goals>
                         </execution>
                         <execution>
-                          <id>generateApps</id>
-                          <goals>
-                            <goal>generateApps</goal>
-                          </goals>
+                            <id>generateAppsDirect</id>
+                            <goals>
+                                <goal>generateAppsDirect</goal>
+                            </goals>
                         </execution>
 	                   <execution>
 	                       <id>testApp</id>
@@ -271,6 +272,7 @@
                         <invokeGoal>package</invokeGoal>
                       </invokeGoals>
                       <disableBuild>true</disableBuild>
+                      <skipGenerateSources>true</skipGenerateSources>
                     </configuration>
                   </execution>
                 </executions>
