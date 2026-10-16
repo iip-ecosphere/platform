@@ -136,18 +136,18 @@
 						<artifactId>configuration-plugin</artifactId>
 						<version>${project.version}</version>
 						<executions>
-							<execution>
-								<id>generateAppsNoDeps</id>
-								<goals>
-									<goal>generateAppsNoDeps</goal>
-								</goals>
-							</execution>
-							<execution>
-								<id>generateApps</id>
-								<goals>
-									<goal>generateApps</goal>
-								</goals>
-							</execution>
+                            <execution>
+                                <id>generateBootstrappedApps</id>
+                                <goals>
+                                    <goal>generateBootstrappedApps</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>generateAppsDirect</id>
+                                <goals>
+                                    <goal>generateAppsDirect</goal>
+                                </goals>
+                            </execution>
 							<!--<execution>
 								<id>testApp</id>
 								<goals>
@@ -248,6 +248,7 @@
 										<invokeGoal>package</invokeGoal>
 									</invokeGoals>
 									<disableBuild>true</disableBuild>
+                                    <skipGenerateSources>true</skipGenerateSources>
 								</configuration>
 							</execution>
 						</executions>
