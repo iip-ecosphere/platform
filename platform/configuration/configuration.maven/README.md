@@ -5,9 +5,12 @@ Maven plugin for the following platform configuration tasks (represented as Mave
 # Platform instantiation
 
 * ``generateInterfaces`` (default lifecycle phase `generate-sources`): generate app interfaces, but no apps - executed only if `outputDirectory` is empty or IVML files in `modelDirectory`are newer than `outputDirectory`
+* ``generateBootstrappedApps`` (default lifecycle phase `generate-sources`): generate a minimal skeleton app for bootstrapping service implementation - executed only if `outputDirectory` is empty or IVML files in `modelDirectory` are newer than `outputDirectory`
 * ``generateAppsNoDeps`` (default lifecycle phase `generate-sources`): app interfaces with apps, but without dependencies to artifacts - executed only if `outputDirectory` is empty or IVML files in `modelDirectory` are newer than `outputDirectory`
 * ``generateApps`` (default lifecycle phase `package`): app interfaces with apps including artifact dependencies - executed always
+* ``generateAppsDirect`` (default lifecycle phase `package`): apps including artifact dependencies but no interfaces or code templates - executed always
 * ``generateCodeTemplates`` (default lifecycle phase `generate-sources`): app code templates without app/interfaces - executed always
+* ``generateInterfacesAndCodeTemplates`` (default lifecycle phase `generate-sources`): generate app interfaces and code templates, but no apps - executed only if `outputDirectory` is empty or IVML files in `modelDirectory`are newer than `outputDirectory`
 * ``generateBroker`` (default lifecycle phase `package`): create a sample broker - executed only if `outputDirectory` is empty or IVML files in `modelDirectory` are newer than `outputDirectory`
 * ``generatePlatform`` (default lifecycle phase `package`): exclusively platform components - executed only if `outputDirectory` is empty or IVML files in `modelDirectory` are newer than `outputDirectory`
 * ``generateAll`` (default lifecycle phase `package`): generate everything (except for ``generateApi``)

@@ -130,6 +130,9 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
     @Parameter(property = "configuration.skip", required = false, defaultValue = "false")
     private boolean skip;
 
+    @Parameter(property = "configuration.skipGenerateSources", required = false, defaultValue = "false")
+    private boolean skipGenerateSources;
+
     /**
      * The home directory of the Maven installation to use for the forked builds. Defaults to the current Maven
      * installation.
@@ -560,6 +563,19 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
     @Override
     public RepositorySystem getRepoSystem() {
         return repoSystem;
+    }
+    
+    /**
+     * Disables execution if {@link #skipGenerateSources} is true, else returns {@code enable}.
+     * 
+     * @return {@code true} if enabled, {@code false} if disabled
+     */
+    protected boolean enableBySkipGenerateSources(boolean enable) {
+        boolean result = enable;
+        if (skipGenerateSources) {
+            result = false;
+        }
+        return result;
     }
 
 }

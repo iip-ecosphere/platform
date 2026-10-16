@@ -46,7 +46,7 @@ public class GenerateCodeTemplatesMojo extends AbstractAppsConfigurationMojo {
     
     @Override
     protected boolean enableRun(String metaModelDir, String modelDir, String outputDir) {
-        return !checkChanged() || super.enableRun(metaModelDir, modelDir, outputDir);
+        return enableBySkipGenerateSources(!checkChanged() || super.enableRun(metaModelDir, modelDir, outputDir));
     }
 
 }
