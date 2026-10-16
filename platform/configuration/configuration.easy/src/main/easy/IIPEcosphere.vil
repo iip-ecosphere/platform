@@ -195,8 +195,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     for (MeshElement no : nodes) {
                         ServiceBase impl = no.impl;
                         String clsName = asTypeName(no.name);
+                        generateServiceElements(appRoot, config, artifacts, no, no.impl);
                         if (genApps) {
-                            generateServiceElements(appRoot, config, artifacts, no, no.impl);
                             // connector gen references connector impl, in case of non-specific connector may not yet be there
                             Boolean genElt = not(noDeps) or (noDeps and not(no.impl.isTypeOf(Connector)));
                             if (genElt) {
@@ -238,6 +238,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
 
                 if (genApps or bootstrapApp) {
                     vilTemplateProcessor("JavaSpringCloudStreamStarter", config, "${javaSrc}/iip/Starter.java", pkg="iip", serializers=javaSerializers, bootstrapApp=bootstrapApp);
+                    String factoryName = asTypeName(a.name + "ConnectorFactoryDescriptor");
+                    vilTemplateProcessor("JavaConnectorFactoryDescriptor", config,  "${javaNodesSrc}/${factoryName}.java", nodes=elements, pkg=javaNodesPackage, bootstrapApp=bootstrapApp);
+                    vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/de.iip_ecosphere.platform.connectors.ConnectorFactoryDescriptor", descriptor="iip.nodes.${factoryName}");
                 }
 
                 if (genApps) {                
@@ -245,9 +248,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     for (String k: appJsl.getKeys()) {
                       vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/${k}", descriptors=appJsl.get(k));
                     }
-                    
-                    vilTemplateProcessor("JavaConnectorFactoryDescriptor", config,  "${javaNodesSrc}/AppConnectorFactoryDescriptor.java", nodes=elements, pkg=javaNodesPackage);
-                    vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/de.iip_ecosphere.platform.connectors.ConnectorFactoryDescriptor", descriptor="iip.nodes.AppConnectorFactoryDescriptor");
         
                     vilTemplateProcessor("JavaSpringCloudStreamYaml", config, "${resourcesSrc}/application.yml", mappedMesh=mappedMesh, nodes=elements, app=a);
                     vilTemplateProcessor("SpringCloudStreamDeploymentDescriptor", config, "${resourcesSrc}/deployment.yml", app=a, elements=elements);

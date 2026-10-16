@@ -7,35 +7,34 @@ import JavaConnector;
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
 @format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120)
-template JavaConnectorFactoryDescriptor(IIPEcosphere config, JavaCodeArtifact target, sequenceOf(MeshElement) nodes, String pkg) {
+template JavaConnectorFactoryDescriptor(IIPEcosphere config, JavaCodeArtifact target, sequenceOf(MeshElement) nodes, String pkg, Boolean bootstrapApp) {
     
-    def main(IIPEcosphere config, JavaCodeArtifact target, sequenceOf(MeshElement) nodes, String pkg) {
+    def main(IIPEcosphere config, JavaCodeArtifact target, sequenceOf(MeshElement) nodes, String pkg, Boolean bootstrapApp) {
         JavaCodeClass mainCls = codeCreateClass(target, pkg, target.getPlainName(), "App-wide connector factory descriptor");
         mainCls.addExtends("de.iip_ecosphere.platform.connectors.DefaultConnectorFactoryDescriptor");
         mainCls.addConstructor("Called via JSL, registers connector creation.").(cons|{
             for (MeshElement n: nodes) {
-                produceAdd(n.impl, cons);
+                produceAdd(n.impl, cons, bootstrapApp);
             }
         });
     }
 
     @DispatchBasis    
-    def produceAdd(ServiceBase service, JavaCodeMethod m) {
+    def produceAdd(ServiceBase service, JavaCodeMethod m, Boolean bootstrapApp) {
     }
 
     @DispatchCase
-    def produceAdd(Connector conn, JavaCodeMethod m) {
-        produce(conn, "supply", "", "", m);
+    def produceAdd(Connector conn, JavaCodeMethod m, Boolean bootstrapApp) {
+        produce(conn, "supply", "", "", m, bootstrapApp);
     }
 
     @DispatchCase
-    def produceAdd(ChannelConnector conn, JavaCodeMethod m) {
+    def produceAdd(ChannelConnector conn, JavaCodeMethod m, Boolean bootstrapApp) {
         String adapterSupplyName = "supply";
         if (getOutChannels(conn).size() > 1) {
             adapterSupplyName = "supplyMulti";
         }
-// determine names
-        produce(conn, adapterSupplyName, "", "", m);
+        produce(conn, adapterSupplyName, "", "", m, bootstrapApp);
     }
     
     @DispatchBasis
@@ -66,7 +65,7 @@ template JavaConnectorFactoryDescriptor(IIPEcosphere config, JavaCodeArtifact ta
         formatterName;
     }
     
-    def produce(Connector conn, String adapterSupplyName, String inSerializer, String outSerializer, JavaCodeMethod m) {
+    def produce(Connector conn, String adapterSupplyName, String inSerializer, String outSerializer, JavaCodeMethod m, Boolean bootstrapApp) {
         sequenceOf(ConnectorTypes) cTypes = pairTypes(conn);
         while(cTypes.size() > 1) { // for now, limit to 1 in test
             cTypes.removeLast();
@@ -74,7 +73,9 @@ template JavaConnectorFactoryDescriptor(IIPEcosphere config, JavaCodeArtifact ta
         
         String clsName = asTypeName(conn.name);
         String connFqn = getConnectorCls(conn);
-        m.addImport("iip.nodes.${clsName}");
+        if (!bootstrapApp) {
+            m.addImport("iip.nodes.${clsName}");
+        }
         
         for (ConnectorTypes cType : cTypes) {
             IOType outType = cType.outType;
@@ -91,31 +92,34 @@ template JavaConnectorFactoryDescriptor(IIPEcosphere config, JavaCodeArtifact ta
             pathAdapterSupplier.var("o");
             pathAdapterSupplier.call("${clsName}.createConnectorAdapter").arg("m").arg("l").arg("i").arg("o");
             
-            m.call("addCreator")
+            JavaCodeMethodCall cl = m.call("addCreator")
               .stringArg(conn.id)
               .newArg("de.iip_ecosphere.platform.connectors.DefaultConnectorFactoryDescriptor.DefaultConnectorFactoryCreator")
-                .stringArg(connFqn)
-                .call("supply").(c|{
+                .stringArg(connFqn);
+            if (!bootstrapApp) {
+                cl.call("supply").(c|{
                     c.arg(paramSupplier);
                 }).call(adapterSupplyName).(c|{
                     c.arg(pathAdapterSupplier);
                     addConnectorGenericsAsArgs(conn, inType, outType, true, c);
-                }).(c|{
-                    String parserName = getParserName(conn, cType);
-                    if (parserName <> "") {
-                        JavaCodeLambdaExpression supplier = new JavaCodeLambdaExpression();
-                        supplier.expr(new JavaCodeConstructorCall("iip.nodes.${parserName}"));
-                        String pltfInTypeNameQn = asTypeName(toQualifiedTypeName(platfIn));
-                        c.call("supplyForInput").arg(supplier).classArg(pltfInTypeNameQn);
-                    }
-                    String formatterName = getFormatterName(conn, cType);
-                    if (formatterName <> "") {
-                        JavaCodeLambdaExpression supplier = new JavaCodeLambdaExpression();
-                        supplier.expr(new JavaCodeConstructorCall("iip.nodes.${formatterName}"));
-                        String pltfOutTypeNameQn = asTypeName(toQualifiedTypeName(platfOut));
-                        c.call("supplyForOutput").arg(supplier).classArg(pltfOutTypeNameQn);
-                    }
                 });
+            }
+            cl.(c|{
+                String parserName = getParserName(conn, cType);
+                if (parserName <> "") {
+                    JavaCodeLambdaExpression supplier = new JavaCodeLambdaExpression();
+                    supplier.expr(new JavaCodeConstructorCall("iip.nodes.${parserName}"));
+                    String pltfInTypeNameQn = asTypeName(toQualifiedTypeName(platfIn));
+                    c.call("supplyForInput").arg(supplier).classArg(pltfInTypeNameQn);
+                }
+                String formatterName = getFormatterName(conn, cType);
+                if (formatterName <> "") {
+                    JavaCodeLambdaExpression supplier = new JavaCodeLambdaExpression();
+                    supplier.expr(new JavaCodeConstructorCall("iip.nodes.${formatterName}"));
+                    String pltfOutTypeNameQn = asTypeName(toQualifiedTypeName(platfOut));
+                    c.call("supplyForOutput").arg(supplier).classArg(pltfOutTypeNameQn);
+                }
+            });
         }
     }
     
