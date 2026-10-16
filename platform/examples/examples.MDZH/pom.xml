@@ -77,6 +77,8 @@
 		      <artifactId>MDZHPCFApp</artifactId>
 		      <groupId>de.iip-ecosphere.platform.apps</groupId>
 		      <version>0.1.0-SNAPSHOT</version> <!-- from config -->
+		      <optional>true</optional>
+		      <scope>test</scope>
    			 </dependency>
    		     <dependency>
                <groupId>de.iip-ecosphere.platform</groupId>
@@ -242,6 +244,7 @@
                             <logRegExprs>
                                 <logRegExpr>.*RECEIVED.*</logRegExpr>
                             </logRegExprs>
+                            <skip>true</skip> <!-- not developed so far -->
                         </configuration>
                     </execution>
 	            </executions>

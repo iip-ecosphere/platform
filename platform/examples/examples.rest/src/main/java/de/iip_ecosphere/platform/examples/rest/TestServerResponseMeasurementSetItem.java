@@ -2,8 +2,6 @@ package de.iip_ecosphere.platform.examples.rest;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import test.de.iip_ecosphere.platform.examples.rest.TestServerValueMeasurement;
-
 public class TestServerResponseMeasurementSetItem {
 
     private String href;

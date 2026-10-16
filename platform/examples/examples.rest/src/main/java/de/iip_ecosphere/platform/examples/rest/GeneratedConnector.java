@@ -4,15 +4,10 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.junit.Assert;
-
+import de.iip_ecosphere.platform.connectors.Connector;
+import de.iip_ecosphere.platform.connectors.ConnectorFactory;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
-import de.iip_ecosphere.platform.connectors.rest.RESTConnector;
-import de.iip_ecosphere.platform.connectors.rest.RESTItem;
-import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
-import de.iip_ecosphere.platform.examples.rest.mixed.MachineInputMixed;
-import de.iip_ecosphere.platform.examples.rest.mixed.MachineOutputMixed;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.TimeUtils;
@@ -24,8 +19,6 @@ import iip.datatypes.RestPhoenixEEMResponseTariffNumber;
 import iip.datatypes.RestPhoenixEEMResponseTariffNumberImpl;
 import iip.datatypes.RestPhoenixRwEEMMixed;
 import iip.datatypes.RestPhoenixRwEEMMixedImpl;
-import iip.nodes.MyRestConnEEMMixedExample;
-import test.de.iip_ecosphere.platform.examples.rest.TestServerEEM;
 
 
 public class GeneratedConnector {
@@ -68,7 +61,7 @@ public class GeneratedConnector {
 
         };
         
-        RESTConnector<RestPhoenixEEMMixed, RestPhoenixRwEEMMixed> conn = createPlatformConnector(cb);
+        Connector<Object, Object, RestPhoenixEEMMixed, RestPhoenixRwEEMMixed> conn = createPlatformConnector(cb);
         conn.request(true);       
         RestPhoenixEEMMixed rest = restReference.get();        
         while (rest == null) {
@@ -76,20 +69,20 @@ public class GeneratedConnector {
             rest = restReference.get();
         }
         
-        Assert.assertNotNull(rest);
-        Assert.assertEquals(3, rest.getTn1().getValue());
-        Assert.assertEquals(null, rest.getTn2().getValue());
-        Assert.assertEquals(50.000, rest.getF().getValue());
-        Assert.assertEquals(229.845, rest.getU1().getValue());
-        Assert.assertEquals(229.805, rest.getU2().getValue());
-        Assert.assertEquals(229.853, rest.getU3().getValue());
-        Assert.assertEquals(2.533, rest.getAll().getItems()[7].getValue());
-        Assert.assertEquals(2.468, rest.getAll().getItems()[8].getValue());
-        Assert.assertEquals(2.476, rest.getAll().getItems()[9].getValue());           
-        Assert.assertEquals("Device information", rest.getInformation().getRootItems()[0].getDescription());
-        Assert.assertEquals("Instantaneous values", rest.getInformation().getRootItems()[1].getDescription());
-        Assert.assertEquals("EEM-MA370", rest.getInformation().getInfoItems()[0].getValue());
-        Assert.assertEquals("2.0", rest.getInformation().getInfoItems()[1].getValue()); 
+        assertNotNull(rest);
+        assertEquals(3, rest.getTn1().getValue());
+        assertEquals(null, rest.getTn2().getValue());
+        assertEquals(50.000, rest.getF().getValue());
+        assertEquals(229.845, rest.getU1().getValue());
+        assertEquals(229.805, rest.getU2().getValue());
+        assertEquals(229.853, rest.getU3().getValue());
+        assertEquals(2.533, rest.getAll().getItems()[7].getValue());
+        assertEquals(2.468, rest.getAll().getItems()[8].getValue());
+        assertEquals(2.476, rest.getAll().getItems()[9].getValue());           
+        assertEquals("Device information", rest.getInformation().getRootItems()[0].getDescription());
+        assertEquals("Instantaneous values", rest.getInformation().getRootItems()[1].getDescription());
+        assertEquals("EEM-MA370", rest.getInformation().getInfoItems()[0].getValue());
+        assertEquals("2.0", rest.getInformation().getInfoItems()[1].getValue()); 
 
         RestPhoenixRwEEMMixed input = new RestPhoenixRwEEMMixedImpl();
         RestPhoenixEEMResponseTariffNumber tn1 =  rest.getTn1();
@@ -110,13 +103,13 @@ public class GeneratedConnector {
         conn.request(true);
         rest = restReference.get();
 
-        Assert.assertEquals(1, rest.getTn1().getValue());    
-        Assert.assertEquals("/api/v1/measurements/tn2", rest.getTn2().getContext());
-        Assert.assertEquals("tn2", rest.getTn2().getId());
-        Assert.assertEquals("timestamp", rest.getTn2().getTimestamp());
-        Assert.assertEquals("TN2", rest.getTn2().getName());
-        Assert.assertEquals(1, rest.getTn2().getValue());
-        Assert.assertEquals("Tariff Number 2", rest.getTn2().getDescription());
+        assertEquals(1, rest.getTn1().getValue());    
+        assertEquals("/api/v1/measurements/tn2", rest.getTn2().getContext());
+        assertEquals("tn2", rest.getTn2().getId());
+        assertEquals("timestamp", rest.getTn2().getTimestamp());
+        assertEquals("TN2", rest.getTn2().getName());
+        assertEquals(1, rest.getTn2().getValue());
+        assertEquals("Tariff Number 2", rest.getTn2().getDescription());
 
         System.out.println("Sleeping to flush...");
         TimeUtils.sleep(1000);
@@ -133,16 +126,15 @@ public class GeneratedConnector {
      * @return the connector instance
      * @throws IOException if creating the connector fails
      */
-    @SuppressWarnings("unchecked")
-    public static RESTConnector<RestPhoenixEEMMixed, RestPhoenixRwEEMMixed> createPlatformConnector(
-            ReceptionCallback<RestPhoenixEEMMixed> callback) throws IOException {
-        TranslatingProtocolAdapter<RESTItem, Object, RestPhoenixEEMMixed, RestPhoenixRwEEMMixed> adapter = 
-                MyRestConnEEMMixedExample.createConnectorAdapter();
-        
-        RESTConnector<RestPhoenixEEMMixed, RestPhoenixRwEEMMixed> conn = new RESTConnector<>(adapter);
+    public static Connector<Object, Object, RestPhoenixEEMMixed, RestPhoenixRwEEMMixed> createPlatformConnector(
+        ReceptionCallback<RestPhoenixEEMMixed> callback) throws IOException {
+        ConnectorParameter param = ConnectorFactory.createConnectorParameter("myRestConnEEMMixed");
+        Connector<Object, Object, RestPhoenixEEMMixed, RestPhoenixRwEEMMixed> conn = ConnectorFactory.createConnector(
+            "myRestConnEEMMixed", param, Object.class, Object.class, RestPhoenixEEMMixed.class, 
+            RestPhoenixRwEEMMixed.class);
         // see iip.nodes.MyRestConnEEMMixedExampleExtension.java
         conn.setInstanceIdentification("myRestConnEEMMixed example"); 
-        conn.connect(adjustConnectorParameter(MyRestConnEEMMixedExample.createConnectorParameter()));
+        conn.connect(adjustConnectorParameter(param));
         conn.setReceptionCallback(callback);
         return conn;
     }
@@ -164,6 +156,49 @@ public class GeneratedConnector {
         return testParameter.build();
         
     }
+
+    /**
+     * Poor man's assert. Original was intertwined between test and non-test classes.
+     * 
+     * @param expected the expected value
+     * @param value the actual value
+     */
+    public static void assertNotNull(Object value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Value must not be null");
+        }
+    }
     
+    /**
+     * Poor man's assert. Original was intertwined between test and non-test classes.
+     * 
+     * @param expected the expected value
+     * @param value the actual value
+     */
+    public static void assertEquals(Object expected, Object value) {
+        if (expected == null) {
+            if (value != null) {
+                throw new IllegalArgumentException("Values do not match: " + expected + " " + value);
+            }
+        } else {
+            if (expected instanceof Double && value instanceof Double) {
+                double eDbl = (Double) expected;
+                double vDbl = (Double) value;
+                if (Math.abs(eDbl - vDbl) > 0.01) {
+                    throw new IllegalArgumentException("Values differ more than 0.01: " + expected + " " + value);
+                }
+            }
+            if (expected instanceof Float && value instanceof Float) {
+                float eFlt = (Float) expected;
+                float vFlt = (Float) value;
+                if (Math.abs(eFlt - vFlt) > 0.01) {
+                    throw new IllegalArgumentException("Values differ more than 0.01: " + expected + " " + value);
+                }
+            }
+            if (!expected.equals(value)) {
+                throw new IllegalArgumentException("Values do not match: " + expected + " " + value);
+            }
+        }
+    }
 
 }

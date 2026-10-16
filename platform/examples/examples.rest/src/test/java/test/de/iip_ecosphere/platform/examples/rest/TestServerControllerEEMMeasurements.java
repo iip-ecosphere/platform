@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSingleRestType;
+import de.iip_ecosphere.platform.examples.rest.TestServerValueMeasurement;
 import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSetRestType;
 import de.iip_ecosphere.platform.examples.rest.TestServerResponseMeasurementSetItem;
 

@@ -16,10 +16,11 @@ import java.io.IOException;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.connectors.Connector;
+import de.iip_ecosphere.platform.connectors.ConnectorFactory;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.events.SimpleTimeseriesQuery;
 import de.iip_ecosphere.platform.connectors.events.SimpleTimeseriesQuery.TimeKind;
-import de.iip_ecosphere.platform.connectors.influx.InfluxConnector;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
@@ -27,7 +28,6 @@ import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 import iip.datatypes.InfluxEnergyData;
 import iip.datatypes.InfluxEnergyDataImpl;
-import iip.nodes.InfluxDbCloudConnector;
 
 /**
  * Simple test for the influx connector.
@@ -66,11 +66,10 @@ public class InfluxConnectorTest {
         SerializerRegistry.registerSerializer(iip.serializers.EmptySerializer.class);
         SerializerRegistry.registerSerializer(iip.serializers.EmptyImplSerializer.class);
 
-        ConnectorParameter params = InfluxDbCloudConnector.createConnectorParameter(); // or own and customize
+        ConnectorParameter params = ConnectorFactory.createConnectorParameter("InfluxCloudConn");
+        Connector<Object, Object, InfluxEnergyData, InfluxEnergyData> conn = ConnectorFactory.createConnector(
+            "InfluxCloudConn", params, Object.class, Object.class, InfluxEnergyData.class, InfluxEnergyData.class);
 
-        InfluxConnector<InfluxEnergyData, InfluxEnergyData> conn = 
-            new InfluxConnector<InfluxEnergyData, InfluxEnergyData>(
-                InfluxDbCloudConnector.createConnectorAdapter());
         Runtime.getRuntime().addShutdownHook(new Thread(() -> conn.disconnectSafe()));
         conn.connect(params);
         conn.setReceptionCallback(callback);

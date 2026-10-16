@@ -17,6 +17,7 @@ import de.iip_ecosphere.platform.connectors.rest.RESTConnector;
 import de.iip_ecosphere.platform.connectors.rest.RESTItem;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
+import de.iip_ecosphere.platform.examples.rest.TestServerEEM;
 import de.iip_ecosphere.platform.examples.rest.TestServerResponseTariffNumberRestType;
 import de.iip_ecosphere.platform.examples.rest.mixed.MachineInputMixed;
 import de.iip_ecosphere.platform.examples.rest.mixed.MachineInputTranslatorMixed;

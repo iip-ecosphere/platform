@@ -14,12 +14,14 @@ package test.de.iip_ecosphere.platform.examples.python.connectivity;
 
 import java.io.IOException;
 
+import de.iip_ecosphere.platform.connectors.Connector;
+import de.iip_ecosphere.platform.connectors.ConnectorFactory;
+import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
 import iip.datatypes.LaserOutput;
 import iip.datatypes.MdzhConfigOutput;
-import iip.nodes.EngravingLaserOPCConnector;
 
 //MAY BE DELETED, NOT PERMANENT !!!
 
@@ -56,10 +58,11 @@ public class LaserOpcTest {
         SerializerRegistry.registerSerializer(iip.serializers.LaserOutputImplSerializer.class);
         SerializerRegistry.registerSerializer(iip.serializers.LaserOutputSerializer.class);
         
-        de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector<LaserOutput, MdzhConfigOutput> conn = 
-            new de.iip_ecosphere.platform.connectors.opcuav1.OpcUaConnector<>(
-                EngravingLaserOPCConnector.createConnectorAdapter());
-        conn.connect(EngravingLaserOPCConnector.createConnectorParameter());
+        // as configured, or create own and customize
+        ConnectorParameter params = ConnectorFactory.createConnectorParameter("EngravingLaserOpcConn");
+        Connector<Object, Object, LaserOutput, MdzhConfigOutput> conn = ConnectorFactory.createConnector(
+            "EngravingLaserOpcConn", params, Object.class, Object.class, LaserOutput.class, MdzhConfigOutput.class);
+        conn.connect(params);
         conn.setReceptionCallback(callback);
         conn.notificationsChanged(false); // force sampling independent of model
 

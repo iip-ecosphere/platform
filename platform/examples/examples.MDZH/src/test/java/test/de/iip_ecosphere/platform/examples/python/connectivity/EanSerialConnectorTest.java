@@ -16,14 +16,14 @@ import java.io.IOException;
 
 import org.slf4j.LoggerFactory;
 
+import de.iip_ecosphere.platform.connectors.Connector;
+import de.iip_ecosphere.platform.connectors.ConnectorFactory;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import de.iip_ecosphere.platform.transport.serialization.SerializerRegistry;
-import de.oktoflow.platform.connectors.serial.JSerialCommConnector;
 import iip.datatypes.EanScannerOutput;
 import iip.datatypes.Empty;
-import iip.nodes.SerialEANCodeScanner;
 
 /**
  * Tests the connection to the serial EAN scanner.
@@ -59,11 +59,9 @@ public class EanSerialConnectorTest {
         SerializerRegistry.registerSerializer(iip.serializers.EmptySerializer.class);
         SerializerRegistry.registerSerializer(iip.serializers.EmptyImplSerializer.class);
 
-        ConnectorParameter params = SerialEANCodeScanner
-            .createConnectorParameter(); // or own and customize
-        
-        JSerialCommConnector<EanScannerOutput, Empty> conn = new JSerialCommConnector<>(
-            SerialEANCodeScanner.createConnectorAdapter());
+        ConnectorParameter params = ConnectorFactory.createConnectorParameter("EanScanner");
+        Connector<byte[], byte[], EanScannerOutput, Empty> conn = ConnectorFactory.createConnector("EanScanner", params,
+            byte[].class, byte[].class, EanScannerOutput.class, Empty.class);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> conn.disconnectSafe()));
         conn.connect(params);
         conn.setReceptionCallback(callback);
