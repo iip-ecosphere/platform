@@ -71,28 +71,49 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     // called from tests/platform instantiator, don't change signature
     generateInterfaces(Project source, Configuration config, Project target) = {
         setMaxSteps(config, true, 0, 7);
-        generateApps(source, config, target, true, false, true, false, false);
+        generateApps(source, config, target, true, false, false, true, false, false);
     }
+    
+    // called from tests/platform instantiator, don't change signature
+    generateInterfacesAndCodeTemplates(Project source, Configuration config, Project target) = {
+        setMaxSteps(config, true, 0, 7);
+        generateApps(source, config, target, true, false, false, false, false, true);
+    }    
 
     // called from tests/platform instantiator, don't change signature
     generateApps(Project source, Configuration config, Project target) = {
         setMaxSteps(config, true, 1, 7);
-        generateApps(source, config, target, true, true, true, false, true);
+        generateApps(source, config, target, true, true, false, true, false, true);
+    }
+
+    // called from tests/platform instantiator, don't change signature
+    generateBootstrappedApps(Project source, Configuration config, Project target) = {
+        setMaxSteps(config, true, 1, 7);
+        generateApps(source, config, target, true, true, true, false, true, true);
     }
 
     // called from tests/platform instantiator, don't change signature
     generateAppsNoDeps(Project source, Configuration config, Project target) = {
         setMaxSteps(config, true, 1, 7);
-        generateApps(source, config, target, true, true, true, true, true);
+        generateApps(source, config, target, true, true, false, true, true, true);
     }
 
     // called from tests/platform instantiator, don't change signature
     generateCodeTemplates(Project source, Configuration config, Project target) = {
         setMaxSteps(config, true, 1, 7);
-        generateApps(source, config, target, false, true, false, false, true);
+        generateApps(source, config, target, false, true, false, false, false, true);
+    }
+
+    // called from tests/platform instantiator, don't change signature
+    generateAppsDirect(Project source, Configuration config, Project target) = {
+        setMaxSteps(config, true, 1, 7);
+        generateApps(source, config, target, false, true, false, true, false, false);
     }
     
-    protected generateApps(Project source, Configuration config, Project target, Boolean genInterfaces, Boolean apps, Boolean genApps, Boolean noDeps, Boolean genTemplates) = {
+    // adjust PlatformInstantiator.cleanOutputFolder
+    
+    protected generateApps(Project source, Configuration config, Project target, Boolean genInterfaces, Boolean apps, 
+        Boolean bootstrapApp, Boolean genApps, Boolean noDeps, Boolean genTemplates) = {
         IIPEcosphere cfg = config;
         setOf(RecordType) recordTypes = getRecordTypes();
         setOf(Application) applications = getApplications();
@@ -105,7 +126,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         setOf(String) artifactsShared = {};
         if (cfg.sharedInterfaces) {
             advanceProgress("Instantiating shared interfaces");
-            generateSharedInterfaces(config, target, javaSerializersShared, artifactsShared);
+            generateSharedInterfaces(config, target, javaSerializersShared, artifactsShared, genInterfaces);
         }
         
         for (Application a : applications->sortedBy(a|a.id)) { // sortedBy for testing
@@ -133,7 +154,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
 
             assemblySrc.mkdir();
             // generate data classes and serializers
-            if (not(cfg.sharedInterfaces)) {
+            if (not(cfg.sharedInterfaces) and genInterfaces) {
                 javaDatatypesSrc.mkdir();
                 javaSerializersSrc.mkdir();
                 generateEnums(javaDatatypesSrc, pySrc);    
@@ -215,13 +236,16 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 };
                 elements = elements->sortedBy(n|n.name).toSequence(); // for testing
 
+                if (genApps or bootstrapApp) {
+                    vilTemplateProcessor("JavaSpringCloudStreamStarter", config, "${javaSrc}/iip/Starter.java", pkg="iip", serializers=javaSerializers, bootstrapApp=bootstrapApp);
+                }
+
                 if (genApps) {                
                     // processes the appJSL entries to individual files
                     for (String k: appJsl.getKeys()) {
                       vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/${k}", descriptors=appJsl.get(k));
                     }
                     
-                    vilTemplateProcessor("JavaSpringCloudStreamStarter", config, "${javaSrc}/iip/Starter.java", pkg="iip", serializers=javaSerializers);
                     vilTemplateProcessor("JavaConnectorFactoryDescriptor", config,  "${javaNodesSrc}/AppConnectorFactoryDescriptor.java", nodes=elements, pkg=javaNodesPackage);
                     vilTemplateProcessor("JavaServices", cfg, "${resourcesSrc}/META-INF/services/de.iip_ecosphere.platform.connectors.ConnectorFactoryDescriptor", descriptor="iip.nodes.AppConnectorFactoryDescriptor");
         
@@ -247,7 +271,10 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     if (a.identityStore <> null and a.identityStore.includeInApplication) {
                         vilTemplateProcessor("TemplatesIdentityStoreYaml", config, "${resourcesSrc}/identityStore.yml", app=a);
                     }
+                    vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
+                }
                     
+                if (genApps or bootstrapApp) {
                     resources = postProcessResources(resources, "-/", getResourcesFolder(config) + "/");
                     Boolean copyDependencies = enablesPackaging(a, AppPackagingSchema::ZipWithClasspath); // may be more...
                     // partition according to container strategy
@@ -257,7 +284,8 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                         or (displayPanels.size() > 0 and getServiceTypes()->select(s|mapsToDashboard(s)).size() > 0);      
                     String pluginOutputFolder = "target/jars";
                     vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, oktoPlugins=oktoPlugins, bins=bins, assemblies=assemblies, resources=resources, 
-                        starterCls=appStarterCls, appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests, copyRuntimeDependencies=copyDependencies, mapDisplay=mapToDisplay, pluginOutputFolder=pluginOutputFolder, implResources=implResources);
+                        starterCls=appStarterCls, appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests, copyRuntimeDependencies=copyDependencies, mapDisplay=mapToDisplay, 
+                        pluginOutputFolder=pluginOutputFolder, implResources=implResources, bootstrapApp=bootstrapApp);
                     PropertiesFileArtifact pluginCfg = "${appRoot}/pluginCfg.properties";
                     if (cfg.withPlugins) {
                         pluginCfg.setValue("pluginFolder", "target/plugins");
@@ -265,7 +293,6 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     } else {
                         pluginCfg.delete();
                     }
-                    vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=appName, srvFolderName="IIP-apps-${appName}");
                     generatePlugins(cfg, appRoot);
                     mvn(appRoot);
     
@@ -2266,12 +2293,14 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         }
     }
     
-    generateSharedInterfaces(Configuration config, Project target, setOf(String) javaSerializers, setOf(String) artifacts) = {
+    generateSharedInterfaces(Configuration config, Project target, setOf(String) javaSerializers, setOf(String) artifacts, Boolean generate) = {
         IIPEcosphere cfg = config;
         setOf(Application) applications = Application.allInstances(); // do not prune here, keep interfaces stable
         initUsedServiceTypes(applications);        
         Path appRoot = "${target}/ApplicationInterfaces";
-        appRoot.mkdir();
+        if (generate) {
+            appRoot.mkdir();
+        }
 
         setOf(RecordType) recordTypes = getRecordTypes();
         setOf(ServiceBase) serviceTypes = getServiceTypes();
@@ -2284,64 +2313,72 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         Path javaSerializersSrc = "${javaSrc}/${toPath(javaSerializersPackage)}";
         Path javaInterfacesSrc = "${javaSrc}/${toPath(javaInterfacesPackage)}";
 
-        javaDatatypesSrc.mkdir();
-        javaInterfacesSrc.mkdir();
-        javaSerializersSrc.mkdir();
-        assemblySrc.mkdir();
+        if (generate) {
+            javaDatatypesSrc.mkdir();
+            javaInterfacesSrc.mkdir();
+            javaSerializersSrc.mkdir();
+            assemblySrc.mkdir();
+        }
         
         setOf(String) bins = {}; 
         setOf(AssemblyInfo) assemblies = {}; 
         setOf(String) resources = {}; 
         setOf(String) implResources = {};
         sequenceOf(MeshElement) elements = {};
-        generateEnums(javaDatatypesSrc, pySrc);    
+        if (generate) {
+            generateEnums(javaDatatypesSrc, pySrc);    
+        }
         for (RecordType r : recordTypes) {
             // generate for all languages and according to serializer settings
             String clsName = asTypeName(r.name);
-            vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, 
-                pkg=javaDatatypesPackage, interface=true, sharedInterfaces=true, impl=true);
-            vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}Impl.java", type=r, 
-                pkg=javaDatatypesPackage, interface=false, sharedInterfaces=true, impl=true);
-            generateSerializer(cfg, "${javaSerializersSrc}/${clsName}Serializer.java", r, appRoot, true, impl=false);
             javaSerializers.add("${javaSerializersPackage}.${clsName}Serializer");
-            generateSerializer(cfg, "${javaSerializersSrc}/${clsName}ImplSerializer.java", r, appRoot, true, impl=true);
             javaSerializers.add("${javaSerializersPackage}.${clsName}ImplSerializer");
-            if (isPythonUsed(usedServiceTypes)) {
-                vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r, interface=true, 
-                    sharedInterfaces=true);
-                vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}Impl.py", type=r, interface=false, 
-                    sharedInterfaces=true);
-                vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/serializers/${clsName}Serializer.py", type=r, 
-                    sharedInterfaces=true);
+            if (generate) {
+                vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}.java", type=r, 
+                    pkg=javaDatatypesPackage, interface=true, sharedInterfaces=true, impl=true);
+                vilTemplateProcessor("JavaType", config, "${javaDatatypesSrc}/${clsName}Impl.java", type=r, 
+                    pkg=javaDatatypesPackage, interface=false, sharedInterfaces=true, impl=true);
+                generateSerializer(cfg, "${javaSerializersSrc}/${clsName}Serializer.java", r, appRoot, true, impl=false);
+                generateSerializer(cfg, "${javaSerializersSrc}/${clsName}ImplSerializer.java", r, appRoot, true, impl=true);
+                if (isPythonUsed(usedServiceTypes)) {
+                    vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}.py", type=r, interface=true, 
+                        sharedInterfaces=true);
+                    vilTemplateProcessor("PythonType", config, "${pySrc}/datatypes/${clsName}Impl.py", type=r, interface=false, 
+                        sharedInterfaces=true);
+                    vilTemplateProcessor("PythonJsonSerializer", config, "${pySrc}/serializers/${clsName}Serializer.py", type=r, 
+                        sharedInterfaces=true);
+                }
             }
         };
         
-        for (ServiceBase s : serviceTypes) {
-            generateServiceInterfaces(appRoot, config, s);
-        }
-		
-		for (Server s : serverTypes) {
-			generateServerInterface(config, s, appRoot);
-		}
-
-        
-        //vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
-        //addAssemblyInfo(assemblies, "interfaces", "${assemblyRel}/javaInterfaces.xml", "package", mvnProjectBuildDir);
-        if (isPythonUsed(usedServiceTypes)) {
-            vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
-            addAssemblyInfo(assemblies, "python", "${assemblyRel}/pythonInterfaces.xml", "package", mvnProjectBuildDir);
-        }
-        
-        // partition according to container strategy
-        
-        sequenceOf(String) artList = cfg.sharedArtifact.split(":");
-        sequenceOf(String) oktoPlugins = getOktoflowPlugins(cfg, withAas=false, withTransportModule=false);
-        vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, oktoPlugins=oktoPlugins, bins=bins, assemblies=assemblies, resources=resources, starterCls=appStarterCls, 
-            appName=artList[1], appVersion=artList[2], appDescription="Shared application interfaces", tests=tests, springPackaging=false, groupId=artList[0], ifArtifact=true, implResources=implResources);
-        vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=artList[1], srvFolderName="IIP-apps-${artList[1]}");
+        if (generate) {
+            for (ServiceBase s : serviceTypes) {
+                generateServiceInterfaces(appRoot, config, s);
+            }
+    		
+    		for (Server s : serverTypes) {
+    			generateServerInterface(config, s, appRoot);
+    		}
+    
             
-        mvn(appRoot);
-        zip(appRoot, appRoot, "${target}/ApplicationInterfaces.zip");
+            //vilTemplateProcessor("JavaInterfaceAssembly", config, "${assemblySrc}/javaInterfaces.xml");
+            //addAssemblyInfo(assemblies, "interfaces", "${assemblyRel}/javaInterfaces.xml", "package", mvnProjectBuildDir);
+            if (isPythonUsed(usedServiceTypes)) {
+                vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/pythonInterfaces.xml", withServices=false, dependency="");
+                addAssemblyInfo(assemblies, "python", "${assemblyRel}/pythonInterfaces.xml", "package", mvnProjectBuildDir);
+            }
+            
+            // partition according to container strategy
+            
+            sequenceOf(String) artList = cfg.sharedArtifact.split(":");
+            sequenceOf(String) oktoPlugins = getOktoflowPlugins(cfg, withAas=false, withTransportModule=false);
+            vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, oktoPlugins=oktoPlugins, bins=bins, assemblies=assemblies, resources=resources, starterCls=appStarterCls, 
+                appName=artList[1], appVersion=artList[2], appDescription="Shared application interfaces", tests=tests, springPackaging=false, groupId=artList[0], ifArtifact=true, implResources=implResources);
+            vilTemplateProcessor("AppAnt", config, "${appRoot}/build-jk.xml", artifactPrefix=artList[1], srvFolderName="IIP-apps-${artList[1]}");
+                
+            mvn(appRoot);
+            zip(appRoot, appRoot, "${target}/ApplicationInterfaces.zip");
+        }
 
         artifacts.add(cfg.sharedArtifact);
     }

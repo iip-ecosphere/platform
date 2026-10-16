@@ -420,6 +420,7 @@ public class ConfigurationManager {
         if (executor != null) {
             try {
                 long start = System.currentTimeMillis();
+                getLogger().info("EASy-Producer instantiating with rule '{}'", startRuleName);
                 executor.setVilStartRuleName(startRuleName);
                 executor.executeVil();
                 getLogger().info("EASy-Producer instantiation done in {} ms", System.currentTimeMillis() - start);

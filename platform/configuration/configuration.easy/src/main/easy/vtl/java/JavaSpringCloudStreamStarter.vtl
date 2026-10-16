@@ -4,9 +4,9 @@ import SpringBasics;
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
 @format(profile="java", profileArg_javadocIndent=" * ", lineLength = 120)
-template JavaSpringCloudStreamStarter(Configuration config, JavaCodeArtifact target, String pkg, setOf(String) serializers) {
+template JavaSpringCloudStreamStarter(Configuration config, JavaCodeArtifact target, String pkg, setOf(String) serializers, Boolean bootstrapApp) {
 
-    def main(Configuration config, JavaCodeArtifact target, String pkg, setOf(String) serializers) {
+    def main(Configuration config, JavaCodeArtifact target, String pkg, setOf(String) serializers, Boolean bootstrapApp) {
         JavaCodeClass mainCls = codeCreateClass(target, pkg, "Starter", "Service artifact starter");
         mainCls.addAnnotation("org.springframework.boot.autoconfigure.SpringBootApplication");
         mainCls.addAnnotation("org.springframework.context.annotation.ComponentScan")
@@ -28,7 +28,9 @@ template JavaSpringCloudStreamStarter(Configuration config, JavaCodeArtifact tar
             m.addReturn(new JavaCodeConstructorCall("de.iip_ecosphere.platform.transport.spring.SerializerMessageConverter"), "the custom message converter");
         });
         mainCls.addMethod("", "registerSerializers", "Registers required, generated serializers.").setStatic().(m|{
-            generateSerializerRegistration(serializers, m);
+            if (!bootstrapApp) {
+                generateSerializerRegistration(serializers, m);
+            }
         });
         mainCls.addMainMethod().(m|{
             m.getJavadocComment().setComment("Starts the service chain.");

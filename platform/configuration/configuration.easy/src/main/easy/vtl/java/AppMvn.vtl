@@ -4,7 +4,10 @@ import JavaMapping;
 
 @advice(IIPEcosphere)
 @indent(indentation = 4, additional = 0)
-template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, sequenceOf(String) oktoPlugins, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, setOf(String) implResources, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, Boolean copyRuntimeDependencies=true, Boolean mapDisplay=false, String pluginOutputFolder="target/jars") {
+template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, sequenceOf(String) oktoPlugins, 
+    setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, String starterCls, String appName, String appVersion, 
+    String appDescription, Boolean tests, setOf(String) implResources, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, 
+    Boolean copyRuntimeDependencies=true, Boolean mapDisplay=false, String pluginOutputFolder="target/jars", Boolean bootstrapApp=false) {
 
     def XmlElement appendSpringBootPlugin(XmlElement plugins, String version="2.4.2", String mainClass="") {
         XmlElement plugin = appendPlugin(plugins, "org.springframework.boot", "spring-boot-maven-plugin", version, false);
@@ -44,7 +47,10 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         }
     }
 
-    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, sequenceOf(String) oktoPlugins, setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, String starterCls, String appName, String appVersion, String appDescription, Boolean tests, setOf(String) implResources, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, Boolean copyRuntimeDependencies=true, Boolean mapDisplay=false, String pluginOutputFolder="target/jars") {
+    def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, sequenceOf(String) oktoPlugins, 
+        setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, String starterCls, String appName, String appVersion, 
+        String appDescription, Boolean tests, setOf(String) implResources, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, 
+        Boolean copyRuntimeDependencies=true, Boolean mapDisplay=false, String pluginOutputFolder="target/jars", Boolean bootstrapApp=false) {
         String iipGroup = "de.iip-ecosphere.platform";
         String gId = groupId;
         if (length(gId) == 0) {
@@ -72,7 +78,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         appendDependency(dep, iipGroup, "transport", projectVersion);
         appendDependency(dep, iipGroup, "connectors", projectVersion);
         appendDependency(dep, iipGroup, "services.environment", projectVersion);
-        // TURN THIS INTO XML
+        
         XmlElement d;
         if (!ifArtifact) {
             appendDependency(dep, iipGroup, serviceEnvironmentModule(config), projectVersion);
@@ -100,7 +106,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             appendArtifact(dep, art, projectVersion);
         }
         d = appendDependency(dep, "org.glassfish", "jakarta.el", ver="\\${org.glassfish.jakarta.el.version}");
-        new XmlElement(d, "optional", "false");
+        appendOptional(d, value="false");        
 
         if (!ifArtifact) {
             appendDependency(dep, "org.springframework", "spring-test", scope="test");
@@ -110,90 +116,92 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             appendDependency(dep, "org.springframework.boot", "spring-boot-test", scope="test");
             appendDependency(dep, "org.springframework.cloud", "spring-cloud-stream", type="test-jar", scope="test", classifier="test-binder");
         }
-        
-        XmlElement plugins = createMavenBuildElement(profile, "", true);
-        XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);
-        appendAssemblyDescriptors(assemblyPlugin, assemblies);
-        //appendIipPythonPlugin(plugins, projectVersion);
-        if (springPackaging) {
-            appendSpringBootPlugin(plugins, "2.4.2", "${starterCls}");
-        }
-
-        XmlElement dependencyPlugin = appendMavenIipDependencyPlugin(plugins, ver=config.iipVer); // otherwise project's appVer
-        XmlElement execs = new XmlElement(dependencyPlugin, "executions");
-        appendMavenIipDependencyPluginTouchPluginsExecution(execs, "\\${project.build.directory}/deployed", phase="package");
-        appendResourceUnpack(execs, implResources);
-        
-        /*if (isPythonUsed(usedServiceTypes)) {
-            appendMavenDependencyPluginExecution(execs, "unpack", "${iipGroup}:services.environment:${projectVersion}", "python", "\\${project.basedir}/src/main/python", "pythonEnv.zip", type="zip");
-        }*/
-        if (not(ifArtifact)) {
-            appendMavenIipDependencyPluginUnpackPluginsExecution(execs, oktoPlugins, projectVersion, enable=withPlugins(config), outputDir=pluginOutputFolder);
-        }
-        mapOf(String, XmlElement) goalItems = {}; 
-        for (DependencyArtifact bin: bins.asSequence()->sortedBy(b|b.artifact)) { // sortedBy for testing
-            if (goalItems.containsKey(bin.goal)) {
-                appendMavenDependencyPluginArtifactItem(goalItems.get(bin.goal), bin.artifact, bin.classifier, 
-                    bin.outputDir, bin.destFileName, type=bin.type);
-            } else {
-                XmlElement items = appendMavenDependencyPluginExecution(execs, bin.goal, bin.artifact, bin.classifier, 
-                    bin.outputDir, bin.destFileName, type=bin.type, id=bin.goal + "-unpack");
-                goalItems.add(bin.goal, items);
-            }
-        }
-        if (withPlugins(config) and not(ifArtifact)) {
-            sequenceOf(String) archiveFiles = {};
-            archiveFiles.add("\\${project.build.directory}/\\${project.artifactId}-\\${project.version}-bin.jar");
-            appendMavenDependencyPluginExecutionSplitClasspath(execs, archiveFiles);
-        }
-        
-        XmlElement depPlugin = appendMavenResourcesPlugin(plugins);
-        XmlElement rExecs = appendExecutionsParent(depPlugin);
-        if (resources.size() > 0) {
-            mapOf(String, sequenceOf(String)) resMap = {};
-            for (ResourceInfo res: resources.asSequence()->sortedBy(r|r.srcDir)) { // sortedBy for testing
-                if (not(resMap.containsKey(res.srcDir))) {
-                    resMap.add(res.srcDir, {});
-                }
-                resMap.get(res.srcDir).add(res.file);
-            }
-            for (String res: resMap.keys().asSequence()->sortedBy(b|b)) { // sortedBy for testing
-                appendMavenResourcesCopyResourcesExecution(rExecs, "copy-resources", "\\${project.build.outputDirectory}", res, resMap.get(res));
-            }
-        }
-
-        sequenceOf(String) files = defltOktoResourceFiles();
-        appendMavenResourcesCopyResourcesExecution(rExecs, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder(config)+"/platform", files, id="platf-res");
-        appendMavenResourcesCopyResourcesExecution(rExecs, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder(config)+"/software", files, id="sw-res");
-        
-        if (copyRuntimeDependencies) {
-            // prependGroupId as in Spring, fails otherwise with jakarta.el, zip excludes required for now
-            String zipExcludes = "tomcat-catalina, tomcat-coyote, tomcat-util, tomcat-api, tomcat-annotations-api, tomcat-util, tomcat-jaspic-api, tomcat-jni, tomcat-juli, tomcat-servlet-api, tomcat-util, tomcat-util-scan, tomcat-el-api";
-            appendMavenDependencyPluginCopyDepsExecution(execs, jarDir="\\${project.build.directory}/jars", copyOwn=false, 
-                phase="prepare-package", prependGroupId=false, excludeIds=zipExcludes, includeScope="runtime");
-        } 
-        appendMavenDependencyPluginBuildClasspathExecution(execs, outputFile="\\${project.build.directory}/classes/classpath", 
-            prependGroupId=false, prefix="jars", fileSeparator="/", pathSeparator=":", includeScope="runtime"); 
             
-        appendCleanPlugin(plugins, include="*-bin.jar,*-spring.jar");
-        appendDeploymentPlugins(plugins, config);
-        
-        if (!ifArtifact and mapDisplay and !isInTestAndSkipConfigPlugin()) {
-            XmlElement configPlugin = appendPlugin(plugins, "de.iip-ecosphere.platform", "configuration-plugin", projectVersion, false);
-            XmlElement configPluginExec = appendExecutions(configPlugin);
-            new XmlElement(configPluginExec, "id", "mapDashboard");
-            appendGoal(configPluginExec, "mapDashboard");
-            XmlElement configPluginCfg = appendConfiguration(configPluginExec);
-            new XmlElement(configPluginCfg, "projectDirectory", getResourcesFolder(config)+"/..");
-            new XmlElement(configPluginCfg, "outputFile", "\\${project.build.directory}/dashboard-" + toFolderName(appName) + ".json");
-            if (isDefined(config.dashboardPushURI) and config.dashboardPushURI <> "") {
-                new XmlElement(configPluginCfg, "postUrl", config.dashboardPushURI);
+        if (!bootstrapApp) {
+            XmlElement plugins = createMavenBuildElement(profile, "", true);
+            XmlElement assemblyPlugin = appendAssemblyPlugin(plugins);
+            appendAssemblyDescriptors(assemblyPlugin, assemblies);
+            //appendIipPythonPlugin(plugins, projectVersion);
+            if (springPackaging) {
+                appendSpringBootPlugin(plugins, "2.4.2", "${starterCls}");
             }
-        }
-        
-        if (ifArtifact) {
-            if (config.serializer==Serializer::ProtoBuf) {
-                appendProtobufPlugins(plugins);
+    
+            XmlElement dependencyPlugin = appendMavenIipDependencyPlugin(plugins, ver=config.iipVer); // otherwise project's appVer
+            XmlElement execs = new XmlElement(dependencyPlugin, "executions");
+            appendMavenIipDependencyPluginTouchPluginsExecution(execs, "\\${project.build.directory}/deployed", phase="package");
+            appendResourceUnpack(execs, implResources);
+            
+            /*if (isPythonUsed(usedServiceTypes)) {
+                appendMavenDependencyPluginExecution(execs, "unpack", "${iipGroup}:services.environment:${projectVersion}", "python", "\\${project.basedir}/src/main/python", "pythonEnv.zip", type="zip");
+            }*/
+            if (not(ifArtifact)) {
+                appendMavenIipDependencyPluginUnpackPluginsExecution(execs, oktoPlugins, projectVersion, enable=withPlugins(config), outputDir=pluginOutputFolder);
+            }
+            mapOf(String, XmlElement) goalItems = {}; 
+            for (DependencyArtifact bin: bins.asSequence()->sortedBy(b|b.artifact)) { // sortedBy for testing
+                if (goalItems.containsKey(bin.goal)) {
+                    appendMavenDependencyPluginArtifactItem(goalItems.get(bin.goal), bin.artifact, bin.classifier, 
+                        bin.outputDir, bin.destFileName, type=bin.type);
+                } else {
+                    XmlElement items = appendMavenDependencyPluginExecution(execs, bin.goal, bin.artifact, bin.classifier, 
+                        bin.outputDir, bin.destFileName, type=bin.type, id=bin.goal + "-unpack");
+                    goalItems.add(bin.goal, items);
+                }
+            }
+            if (withPlugins(config) and not(ifArtifact)) {
+                sequenceOf(String) archiveFiles = {};
+                archiveFiles.add("\\${project.build.directory}/\\${project.artifactId}-\\${project.version}-bin.jar");
+                appendMavenDependencyPluginExecutionSplitClasspath(execs, archiveFiles);
+            }
+            
+            XmlElement depPlugin = appendMavenResourcesPlugin(plugins);
+            XmlElement rExecs = appendExecutionsParent(depPlugin);
+            if (resources.size() > 0) {
+                mapOf(String, sequenceOf(String)) resMap = {};
+                for (ResourceInfo res: resources.asSequence()->sortedBy(r|r.srcDir)) { // sortedBy for testing
+                    if (not(resMap.containsKey(res.srcDir))) {
+                        resMap.add(res.srcDir, {});
+                    }
+                    resMap.get(res.srcDir).add(res.file);
+                }
+                for (String res: resMap.keys().asSequence()->sortedBy(b|b)) { // sortedBy for testing
+                    appendMavenResourcesCopyResourcesExecution(rExecs, "copy-resources", "\\${project.build.outputDirectory}", res, resMap.get(res));
+                }
+            }
+    
+            sequenceOf(String) files = defltOktoResourceFiles();
+            appendMavenResourcesCopyIipResourcesPlatformExecution(rExecs, config, target.getPath().getParent(), files);
+            appendMavenResourcesCopyIipResourcesSoftwareExecution(rExecs, config, target.getPath().getParent(), files);
+            
+            if (copyRuntimeDependencies) {
+                // prependGroupId as in Spring, fails otherwise with jakarta.el, zip excludes required for now
+                String zipExcludes = "tomcat-catalina, tomcat-coyote, tomcat-util, tomcat-api, tomcat-annotations-api, tomcat-util, tomcat-jaspic-api, tomcat-jni, tomcat-juli, tomcat-servlet-api, tomcat-util, tomcat-util-scan, tomcat-el-api";
+                appendMavenDependencyPluginCopyDepsExecution(execs, jarDir="\\${project.build.directory}/jars", copyOwn=false, 
+                    phase="prepare-package", prependGroupId=false, excludeIds=zipExcludes, includeScope="runtime");
+            } 
+            appendMavenDependencyPluginBuildClasspathExecution(execs, outputFile="\\${project.build.directory}/classes/classpath", 
+                prependGroupId=false, prefix="jars", fileSeparator="/", pathSeparator=":", includeScope="runtime"); 
+                
+            appendCleanPlugin(plugins, include="*-bin.jar,*-spring.jar");
+            appendDeploymentPlugins(plugins, config);
+            
+            if (!ifArtifact and mapDisplay and !isInTestAndSkipConfigPlugin()) {
+                XmlElement configPlugin = appendPlugin(plugins, "de.iip-ecosphere.platform", "configuration-plugin", projectVersion, false);
+                XmlElement configPluginExec = appendExecutions(configPlugin);
+                new XmlElement(configPluginExec, "id", "mapDashboard");
+                appendGoal(configPluginExec, "mapDashboard");
+                XmlElement configPluginCfg = appendConfiguration(configPluginExec);
+                new XmlElement(configPluginCfg, "projectDirectory", getResourcesFolder(config)+"/..");
+                new XmlElement(configPluginCfg, "outputFile", "\\${project.build.directory}/dashboard-" + toFolderName(appName) + ".json");
+                if (isDefined(config.dashboardPushURI) and config.dashboardPushURI <> "") {
+                    new XmlElement(configPluginCfg, "postUrl", config.dashboardPushURI);
+                }
+            }
+            
+            if (ifArtifact) {
+                if (config.serializer==Serializer::ProtoBuf) {
+                    appendProtobufPlugins(plugins);
+                }
             }
         }
     }
