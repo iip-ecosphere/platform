@@ -31,7 +31,6 @@ import de.iip_ecosphere.platform.support.metrics.Clock;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 import iip.datatypes.ModbusPhoenixEEM;
 import iip.datatypes.ModbusPhoenixRwEEM;
-import iip.nodes.MyModbusConnExample;
 
 /**
  * Runs the generated connector.
@@ -74,7 +73,7 @@ public class GeneratedConnector {
     public static void test(boolean startServer) throws IOException {
         
         if (startServer) {
-            server = new ModbusServer(MyModbusConnExample.createConnectorParameter());
+            server = new ModbusServer(ConnectorFactory.createConnectorParameter("myModbusConn"));
             server.start();
         }
         
@@ -130,7 +129,8 @@ public class GeneratedConnector {
         new Thread(logger).start();
         
         if (startServer) {
-            server = new ModbusServer(adjustParameter(MyModbusConnExample.createConnectorParameter(), USE_FREE_PORT));
+            server = new ModbusServer(adjustParameter(ConnectorFactory.createConnectorParameter("myModbusConn"), 
+                USE_FREE_PORT));
             server.start();
         }
 
@@ -187,11 +187,10 @@ public class GeneratedConnector {
      */
     public static Connector<Object, Object, ModbusPhoenixEEM, ModbusPhoenixRwEEM> createPlatformConnector(
             ReceptionCallback<ModbusPhoenixEEM> callback) throws IOException {
+        ConnectorParameter params = ConnectorFactory.createConnectorParameter("myModbusConn");
         Connector<Object, Object, ModbusPhoenixEEM, ModbusPhoenixRwEEM> conn = ConnectorFactory.createConnector(
-            "de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusTcpIpConnector", 
-            () -> MyModbusConnExample.createConnectorParameter(),
-            MyModbusConnExample.createConnectorAdapter());
-        conn.connect(adjustParameter(MyModbusConnExample.createConnectorParameter(), false));
+            "myModbusConn", params, Object.class, Object.class, ModbusPhoenixEEM.class, ModbusPhoenixRwEEM.class);
+        conn.connect(adjustParameter(params, false));
         conn.setReceptionCallback(callback);
         return conn;
     }

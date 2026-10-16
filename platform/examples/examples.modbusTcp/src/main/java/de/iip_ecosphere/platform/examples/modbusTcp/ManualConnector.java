@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.connectors.Connector;
+import de.iip_ecosphere.platform.connectors.ConnectorFactory;
 import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusItem;
 import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusTcpIpConnector;
 import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
@@ -30,7 +31,6 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.metrics.Clock;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
-import iip.nodes.MyModbusConnExample;
 
 /**
  * Simple app to run the connector.
@@ -112,7 +112,7 @@ public class ManualConnector {
     public static void test(boolean startServer) throws IOException {
         
         if (startServer) {
-            server = new ModbusServer(MyModbusConnExample.createConnectorParameter());
+            server = new ModbusServer(ConnectorFactory.createConnectorParameter("myModbusConn"));
             server.start();
         }
         
@@ -140,7 +140,7 @@ public class ManualConnector {
 
         });
 
-        connector.connect(MyModbusConnExample.createConnectorParameter());
+        connector.connect(ConnectorFactory.createConnectorParameter("myModbusConn"));
         
         boolean run = true;
         
@@ -175,7 +175,7 @@ public class ManualConnector {
         new Thread(logger).start();
     
         if (startServer) {
-            server = new ModbusServer(MyModbusConnExample.createConnectorParameter());
+            server = new ModbusServer(ConnectorFactory.createConnectorParameter("myModbusConn"));
             server.start();
         }
         
@@ -203,7 +203,7 @@ public class ManualConnector {
 
         });
 
-        connector.connect(MyModbusConnExample.createConnectorParameter());
+        connector.connect(ConnectorFactory.createConnectorParameter("myModbusConn"));
 
         for (int i = 0; i < MAX; i++) {
             

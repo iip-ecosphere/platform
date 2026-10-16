@@ -25,8 +25,7 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.support.resources.FolderResourceResolver;
 import de.iip_ecosphere.platform.support.resources.ResourceLoader;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
-import iip.nodes.MyModbusConnExample;
-import iip.nodes.MyModbusSentronConnExample;
+import de.iip_ecosphere.platform.connectors.ConnectorFactory;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
 import de.iip_ecosphere.platform.connectors.modbustcpipv1.ModbusTcpIpConnector;
@@ -65,7 +64,7 @@ public class ModbusConnectorTest {
 
         System.out.println("manualConnectorTest()");
 
-        ConnectorParameter param = MyModbusConnExample.createConnectorParameter();
+        ConnectorParameter param = ConnectorFactory.createConnectorParameter("myModbusConn");
         ConnectorParameterBuilder builder = ConnectorParameterBuilder.newBuilder(param);
         String serverSettings = EEMFunctionTest.createServerSettings();
         System.out.println(serverSettings);
@@ -95,7 +94,7 @@ public class ModbusConnectorTest {
 
         System.out.println("generatedConnectorTest()");
 
-        ConnectorParameter param = MyModbusConnExample.createConnectorParameter();
+        ConnectorParameter param = ConnectorFactory.createConnectorParameter("myModbusConn");
         ConnectorParameterBuilder builder = ConnectorParameterBuilder.newBuilder(param);
         String serverSettings = EEMFunctionTest.createServerSettings();
         System.out.println(serverSettings);
@@ -124,7 +123,7 @@ public class ModbusConnectorTest {
 
         System.out.println("generatedConnectorSentronTest()");
 
-        ConnectorParameter param = MyModbusSentronConnExample.createConnectorParameter();
+        ConnectorParameter param = ConnectorFactory.createConnectorParameter("myModbusSentronConn");
         ConnectorParameterBuilder builder = ConnectorParameterBuilder.newBuilder(param);
         String serverSettings = SentronFunctionTest.createServerSettings();
         System.out.println(serverSettings);
