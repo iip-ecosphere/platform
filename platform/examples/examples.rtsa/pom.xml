@@ -56,12 +56,13 @@
 			      <artifactId>SimpleRTSADemoFlowApp</artifactId>
 			      <groupId>de.iip-ecosphere.platform.apps</groupId>
 			      <version>0.1.0-SNAPSHOT</version> <!-- from config -->
+			      <scope>test</scope>
 			    </dependency>
-		  <dependency>
+		        <dependency>
 					<artifactId>apps.ExampleRTSAAppInterfaces</artifactId>
 					<groupId>de.iip-ecosphere.platform</groupId>
 					<version>${project.version}</version>
-	 	</dependency> 
+	 	        </dependency> 
         </dependencies>
         <build>
           <plugins>
@@ -152,18 +153,18 @@
                             <goal>generateBroker</goal>
                           </goals>
                         </execution>
-	                <execution>
-	                    <id>generateAppsNoDeps</id>
-	                    <goals>
-	                        <goal>generateAppsNoDeps</goal>
-	                    </goals>
-	                </execution>
-	                <execution>
-	                    <id>generateApps</id>
-	                    <goals>
-	                        <goal>generateApps</goal>
-	                    </goals>
-	                </execution>
+                        <execution>
+                            <id>generateBootstrappedApps</id>
+                            <goals>
+                                <goal>generateBootstrappedApps</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>generateAppsDirect</id>
+                            <goals>
+                                <goal>generateAppsDirect</goal>
+                            </goals>
+                        </execution>
                     <execution>
                         <id>testApp</id>
                         <goals>
@@ -258,6 +259,7 @@
                                 </invokeGoals>
                                 <disableBuild>true</disableBuild>
                             </configuration>
+                            <skipGenerateSources>true</skipGenerateSources>
                         </execution>
                     </executions>
                 </plugin>
