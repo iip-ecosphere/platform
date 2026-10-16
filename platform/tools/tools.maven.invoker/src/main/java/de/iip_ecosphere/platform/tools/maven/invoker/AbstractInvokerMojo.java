@@ -447,9 +447,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
                 request.setUserSettingsFile(execRequest.getUserSettingsFile());
             }
             File tmp = execRequest.getUserSettingsFile();
-            if (null == settings) {
+            /*if (null == settings) { // overrides with that from maven installation, often empty :/
                 tmp = execRequest.getGlobalSettingsFile();
-            }
+            }*/
             if (null != tmp && tmp.exists()) {
                 settings = tmp.getAbsolutePath();
             }
