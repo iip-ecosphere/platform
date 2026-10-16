@@ -17,12 +17,17 @@ For installation and first steps, see [install guide](platform/documentation/INS
 
 ## News
 
-* 8.10.2026: Upgrade of build processes - oktoflow builds with Maven 3.10.0 (not yet mandatory)
+* 16.10.2026: Faster app build processes possible, shown in oktoflow app examples
+* 8.10.2026: Upgrade of build processes - oktoflow builds with Maven 3.9.16; also 3.10.0 works, but currently not for staged builds
 * 15.9.2026: Release of oktoflow version 0.8.1, EASy-Producer version 1.3.11
 * Updated list of tutorials/material in [the tutorials collection](platform/documentation/TUTORIALS.md).
 * Upcoming: Fast track build processes for apps, in particular through artifact update shortcuts in build processes and runtime update of Python services (see [app debugging](platform/documentation/devel/debugApps.md) for details). 
 * April 26: The new installation overview for oktoflow in terms of the [ReGaP installation flowchart](https://regap.de/community-assets/oktoflow-Installations-Flowchart/) is online.
 * On UI-Level: Upcoming support for Asset Administration Shells metamodel v3
+
+## Copilot Business
+
+Thanks for asking for Copilot Business via github.com. However, the requests do not indicate who is requesting that, so we cannot know whether just some agent is asking for something, that we would have to pay (if there is any budget...).
 
 ## Overview
 

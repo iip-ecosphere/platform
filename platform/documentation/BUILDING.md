@@ -27,7 +27,7 @@ The following build steps are automatically executed by an all-in-one example bu
 
 The generated code template contains helper scripts for Windows/Linux that call a default variant of the build process (`build.bat`, `build.sh`).
 Sometimes, it makes sense to execute individual steps separately, e.g., `mvn -P EasyGen configuration:generateAppsNoDeps` for a run building all integration code files leaving out all dependencies (no deps). Although this application may not run, the build process creates the application templates in this step.
-Currently the goals `generateInterfaces`, `generateAppsNoDeps` and `generateApps` create as last step the application templates.
+Currently the goals `generateInterfaces`, `generateAppsNoDeps` and `generateApps` create as last step the application templates, while more recent goals like `generateBootstrappedApps` or `generateAppsDirect` allow for more efficient build processes.
 
 ## Updating artifacts
 

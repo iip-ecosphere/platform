@@ -106,7 +106,6 @@
 
 *Solution:* Freeze your variables in the right place. If it is a pre-defined variable, freeze them in one of the top-level IVML modules/projects of your configuration. Services, applications, or meshes are typically frozen in the file where they are defined as new variables. In this case, freezing usually happens automatically as these modules declare a freeze block containing a â€œ.â€� (freeze all new variables in this project). Please consider that a frozen variable intentionally cannot be changed anymore in IVML projects that import the project where the variable was frozen.
 
-
 ## My application/example build process unintendedly executes Java tests/Javadoc
 
 *Symptom:* You execute a one-step maven build process, usually for a all-in-one application/example. Thereby Java test/Javadoc errors occur, although the application/example shall be built correctly and also individual build steps can be executed successfully.
@@ -125,6 +124,16 @@
         <value>true</value>
        </systemProperty>
       </systemProperties>
+      
+Besides that, there is the flag `withDocs` in the application type of the configuration model that you may disable.
+
+## App/platform builds seem to loose performance.
+      
+*Symptom:* App or platform builds seem to take longer than before/expected.
+
+*Reason:* In version 0.8.1, we improved the speed of the build processes. However, further updates to the build processes may also negatively affect performance. In version 0.8.2 we upgraded the build software, which without further settings may affect the build speed.
+
+*Solution:* Future versions of build system components may allow for speedups. So far, one easy step is to set `-Daether.remoteRepositoryFilter.prefixes.verifyDenied=false`, for permanent use add this to your environment variable `MAVEN_ARGS`.
 
 ## Installation error while building an Image Container during platform instantiation.
 
