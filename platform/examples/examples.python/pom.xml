@@ -68,7 +68,8 @@
 	    	<dependency>
 		      <artifactId>SimplePythonDemoFlowApp</artifactId>
 		      <groupId>de.iip-ecosphere.platform.apps</groupId>
-		      <version>0.1.0-SNAPSHOT</version> <!-- from config -->
+		      <version>0.1.0-SNAPSHOT</version>
+              <scope>test</scope>
    			 </dependency>
 	    </dependencies>
         <build>
@@ -234,15 +235,15 @@
                         </goals>
                     </execution>
 	                <execution>
-	                    <id>generateAppsNoDeps</id>
+	                    <id>generateBootstrappedApps</id>
 	                    <goals>
-	                        <goal>generateAppsNoDeps</goal>
+	                        <goal>generateBootstrappedApps</goal>
 	                    </goals>
 	                </execution>
 	                <execution>
-	                    <id>generateApps</id>
+	                    <id>generateAppsDirect</id>
 	                    <goals>
-	                        <goal>generateApps</goal>
+	                        <goal>generateAppsDirect</goal>
 	                    </goals>
 	                </execution>
                     <execution>
@@ -339,6 +340,7 @@
                                     <invokeGoal>package</invokeGoal>
                                 </invokeGoals>
                                 <disableBuild>true</disableBuild>
+                                <skipGenerateSources>true</skipGenerateSources>
                             </configuration>
                         </execution>
                     </executions>
