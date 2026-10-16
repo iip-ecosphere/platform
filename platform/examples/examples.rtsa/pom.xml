@@ -258,8 +258,8 @@
                                     <invokeGoal>package</invokeGoal>
                                 </invokeGoals>
                                 <disableBuild>true</disableBuild>
+                                <skipGenerateSources>true</skipGenerateSources>
                             </configuration>
-                            <skipGenerateSources>true</skipGenerateSources>
                         </execution>
                     </executions>
                 </plugin>
