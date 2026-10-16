@@ -221,7 +221,8 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
     }
 
     /**
-     * Creates a connector for a given {@code serviceId}.
+     * Creates a connector for a given {@code serviceId}. Connector instances may only be available after the app 
+     * build process has been completed once.
      * 
      * @param <O> the output type from the underlying machine/platform
      * @param <I> the input type to the underlying machine/platform
@@ -242,7 +243,8 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
     // checkstyle: stop parameter number check
 
     /**
-     * Creates a connector for a given {@code serviceId}.
+     * Creates a connector for a given {@code serviceId}. Connector instances may only be available after the app 
+     * build process has been completed once.
      * 
      * @param <O> the output type from the underlying machine/platform
      * @param <I> the input type to the underlying machine/platform
@@ -262,7 +264,8 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
     }
     
     /**
-     * Creates a connector for a given {@code serviceId}.
+     * Creates a connector for a given {@code serviceId}. Connector instances may only be available after the app 
+     * build process has been completed once.
      * 
      * @param <O> the output type from the underlying machine/platform
      * @param <I> the input type to the underlying machine/platform
@@ -287,7 +290,8 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
     }    
 
     /**
-     * Creates a connector for a given {@code serviceId}.
+     * Creates a connector for a given {@code serviceId}. Connector instances may only be available after the app 
+     * build process has been completed once.
      * 
      * @param <O> the output type from the underlying machine/platform
      * @param <I> the input type to the underlying machine/platform
@@ -311,7 +315,8 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
     }
 
     /**
-     * Creates a connector for a given {@code serviceId}.
+     * Creates a connector for a given {@code serviceId}. Connector instances may only be available after the app 
+     * build process has been completed once.
      * 
      * @param <O> the output type from the underlying machine/platform
      * @param <I> the input type to the underlying machine/platform
@@ -334,7 +339,8 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
     }
 
     /**
-     * Creates a connector for a given {@code serviceId}.
+     * Creates a connector for a given {@code serviceId}. Connector instances may only be available after the app 
+     * build process has been completed once.
      * 
      * @param <O> the output type from the underlying machine/platform
      * @param <I> the input type to the underlying machine/platform
@@ -358,7 +364,8 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
     }
 
     /**
-     * Creates a connector for a given {@code serviceId}.
+     * Creates a connector for a given {@code serviceId}. Connector instances may only be available after the app 
+     * build process has been completed once.
      * 
      * @param <O> the output type from the underlying machine/platform
      * @param <I> the input type to the underlying machine/platform
@@ -400,7 +407,9 @@ public interface ConnectorFactory<O, I, CO, CI, A extends ProtocolAdapter<O, I, 
     // checkstyle: resume parameter number check
     
     /**
-     * Creates a channeled input/output serializer for the given {@code serviceId} and the given type {@code cls}.
+     * Creates a channeled input/output serializer for the given {@code serviceId} and the given type {@code cls}. If 
+     * serializers are registered, they shall be available already in early app build stages so that service unit test 
+     * can rely on the instances.
      * 
      * @param <T> the data type
      * @param serviceId the service id

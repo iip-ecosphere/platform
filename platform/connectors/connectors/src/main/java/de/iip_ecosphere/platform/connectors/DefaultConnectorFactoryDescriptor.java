@@ -274,20 +274,20 @@ public class DefaultConnectorFactoryDescriptor implements ConnectorFactoryDescri
      */
     public static class DefaultConnectorFactoryCreator implements ConnectorFactoryCreator {
 
-        private String pluginId;
+        private String serviceId;
         private Supplier<ConnectorParameter> connSupplier;
         private ProtocolAdapterSupplier<?, ?, ?, ?> protoSupplier;
         private Map<Class<?>, SerializerSupplier<?>> inputSerializerSupplier = new HashMap<>();
         private Map<Class<?>, SerializerSupplier<?>> outputSerializerSupplier = new HashMap<>();
 
         /**
-         * Creates a factory creator instance for a given {@code pluginId}. Requires calls to the supplier-methods
+         * Creates a factory creator instance for a given {@code servuceId}. Requires calls to the supplier-methods
          * after instance creation.
          * 
-         * @param pluginId the plugin id
+         * @param serviceId the service id
          */
-        public DefaultConnectorFactoryCreator(String pluginId) {
-            this.pluginId = pluginId;
+        public DefaultConnectorFactoryCreator(String serviceId) {
+            this.serviceId = serviceId;
         }
         
         /**
@@ -380,7 +380,7 @@ public class DefaultConnectorFactoryDescriptor implements ConnectorFactoryDescri
 
         @Override
         public String getPluginId() {
-            return pluginId;
+            return serviceId;
         }
         
         @Override
