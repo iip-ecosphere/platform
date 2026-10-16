@@ -91,18 +91,18 @@
                       <goal>generateBroker</goal>
                   </goals>
               </execution>
-              <execution>
-                  <id>generateAppsNoDeps</id>
-                  <goals>
-                      <goal>generateAppsNoDeps</goal>
-                  </goals>
-              </execution>
-              <execution>
-                  <id>generateApps</id>
-                  <goals>
-                      <goal>generateApps</goal>
-                  </goals>
-              </execution>
+                <execution>
+                    <id>generateBootstrappedApps</id>
+                    <goals>
+                        <goal>generateBootstrappedApps</goal>
+                    </goals>
+                </execution>
+                <execution>
+                    <id>generateAppsDirect</id>
+                    <goals>
+                        <goal>generateAppsDirect</goal>
+                    </goals>
+                </execution>
                <!-- does not find generated classes at runtime -->
                <execution> 
                    <id>testApp</id>
