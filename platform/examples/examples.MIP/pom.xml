@@ -71,6 +71,7 @@
 		      <artifactId>SimpleMipApp</artifactId>
 		      <groupId>de.iip-ecosphere.platform.apps</groupId>
 		      <version>0.1.0-SNAPSHOT</version> <!-- from config -->
+		      <scope>test</scope>
    			 </dependency>
 	    </dependencies>
         <build>
@@ -210,18 +211,18 @@
                             <goal>generateBroker</goal>
                         </goals>
                     </execution>
-	                <execution>
-	                    <id>generateAppsNoDeps</id>
-	                    <goals>
-	                        <goal>generateAppsNoDeps</goal>
-	                    </goals>
-	                </execution>
-	                <execution>
-	                    <id>generateApps</id>
-	                    <goals>
-	                        <goal>generateApps</goal>
-	                    </goals>
-	                </execution>
+                    <execution>
+                        <id>generateBootstrappedApps</id>
+                        <goals>
+                            <goal>generateBootstrappedApps</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>generateAppsDirect</id>
+                        <goals>
+                            <goal>generateAppsDirect</goal>
+                        </goals>
+                    </execution>
 	                <!-- no test here, cannot be tested without sensor hardware, no digi twin so far -->
 	            </executions>
 	            <configuration>
@@ -302,6 +303,7 @@
                                     <invokeGoal>package</invokeGoal>
                                 </invokeGoals>
                                 <disableBuild>true</disableBuild>
+                                <skipGenerateSources>true</skipGenerateSources>
                             </configuration>
                         </execution>
                     </executions>
