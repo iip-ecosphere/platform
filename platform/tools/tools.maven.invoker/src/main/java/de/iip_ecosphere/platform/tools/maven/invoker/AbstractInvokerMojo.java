@@ -439,11 +439,16 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
      */
     private void passThroughEnvSettings(final InvocationRequest request) {
         String settings = System.getenv("MAVEN_SETTINGS_PATH");
+        if (settings != null && !new File(settings).exists()) { // given but does not exist -> not set
+            settings = null;
+        }
         if (null == settings) {
             if (null != execRequest.getGlobalSettingsFile() && execRequest.getGlobalSettingsFile().exists()) {
+                getLog().info("Taking over global settings file " + execRequest.getGlobalSettingsFile());
                 request.setGlobalSettingsFile(execRequest.getGlobalSettingsFile());
             }
             if (null != execRequest.getUserSettingsFile() && execRequest.getUserSettingsFile().exists()) {
+                getLog().info("Taking over user settings file " + execRequest.getUserSettingsFile());
                 request.setUserSettingsFile(execRequest.getUserSettingsFile());
             }
             File tmp = execRequest.getUserSettingsFile();
@@ -455,11 +460,12 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
             }
         } else {
             request.setUserSettingsFile(new File(settings));
+            getLog().info("User settings file  " + request.getUserSettingsFile());
         }
         if (null != settings) {
             request.addShellEnvironment("MAVEN_SETTINGS_PATH", settings);
+            getLog().info("Passing on env settings " + request.getShellEnvironments());
         }
-        getLog().info("Passing on env settings " + request.getShellEnvironments());
     }
     
     /**
