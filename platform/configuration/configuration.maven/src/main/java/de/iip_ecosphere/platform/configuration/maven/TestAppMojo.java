@@ -472,7 +472,7 @@ public class TestAppMojo extends AbstractLoggingMojo {
         if (null == sPath) {
             sPath = null != request.getUserSettingsFile() ? request.getUserSettingsFile().getPath() : null;
         }
-        if (null != sPath) {
+        if (null != sPath && new File(sPath).exists()) {
             testBuilder.addArgument("-s");
             testBuilder.addArgument(sPath);
         }
