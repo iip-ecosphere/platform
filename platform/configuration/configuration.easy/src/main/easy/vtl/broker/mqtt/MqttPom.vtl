@@ -36,19 +36,6 @@ template MqttPom(IIPEcosphere config, FileArtifact target, String ver) {
             <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
             <layout>default</layout>
           </repository>
-        
-          <repository>
-            <id>bintray</id>
-            <url>https://jcenter.bintray.com</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-                <updatePolicy>never</updatePolicy> <!-- local installs -->
-            </snapshots>
-          </repository>
         </repositories>
     
         <build>

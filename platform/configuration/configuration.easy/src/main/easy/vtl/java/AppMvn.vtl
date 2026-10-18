@@ -130,6 +130,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             XmlElement execs = new XmlElement(dependencyPlugin, "executions");
             appendMavenIipDependencyPluginTouchPluginsExecution(execs, "\\${project.build.directory}/deployed", phase="package");
             appendResourceUnpack(execs, implResources);
+            appendMavenDependencyPluginOverWrite(dependencyPlugin); // default settings -> overwriteSnapshots
             
             /*if (isPythonUsed(usedServiceTypes)) {
                 appendMavenDependencyPluginExecution(execs, "unpack", "${iipGroup}:services.environment:${projectVersion}", "python", "\\${project.basedir}/src/main/python", "pythonEnv.zip", type="zip");
