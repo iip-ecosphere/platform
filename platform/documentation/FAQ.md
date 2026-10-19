@@ -1,6 +1,6 @@
 # oktoflow platform FAQ
 
-## Management UI does not show information
+## #1 Management UI does not show information
 
 *Symptom:* The management UI does not show information rather than a text about CORS.
 
@@ -8,7 +8,7 @@
 
 *Solution:* Add the variable ``aasAccessControlAllowOrigin`` to your configuration model, usually to ``TechnicalSettings.ivml``. Typical value for this variable is ``"*"``, but you may want to set something more specific here. By default, this variable is currently not set in the configuration meta model, but we added it to the install package in version 0.7.0. Please note that CORS settings are not completely passed to the AAS infrastructure until version 0.6.0, i.e., you need to have version 0.7.0.
 
-## Error parsing HTTP header
+## #2 Error parsing HTTP header
 
 *Symptom:* A part of the platform (platform server, ECS runtime, service manager or platform command line interface) issues an exception with the following message:
 ``org.apache.coyote.http11.AbstractHttp11Processor.process Error parsing HTTP request header Note: further occurrences of HTTP header parsing errors will be logged at DEBUG level.``
@@ -17,7 +17,7 @@
 
 *Solution:* Ensure that the certificates for client and server side do match.
 
-## Maven artifact missing
+## #3 Maven artifact missing
 
 *Symptom:* While working with the platform against a release version in Maven, it appears that one of the (non-java) artifacts is missing.
 
@@ -25,7 +25,15 @@
 
 *Solution:* Please let us know about the problem via GitHub. 
 
-## *XXX* has been compiled by a more recent version of the Java Runtime
+## #4 Maven cannot resolve an artifact
+
+*Symptom:* Maven complains about `The following artifacts could not be resolved` or  `Artifact XYZ is present in the local repository, but cached from a remote repository ID that is unavailable in current build context, verifying that is downloadable from...`. It may already have worked, but it is failing now.
+
+*Reason:* In version 0.8.2, we try to get rid of explicit repository definitions in the build specifications. They were required in previous versions as not all needed artifacts were resolvable via Maven Central. However, the artifact may already be on your computer, but Maven just does not recognize it to be from the correct repository. The problem may occur differently on different systems, depending on when artifacts have been resolved.
+
+*Solution:* Find the artifact in your local Maven repo (usually in your home directory under `.m2`), delete that artifact there and re-run the build with `-U`. Also `-Daether.artifactResolver.existenceCheckRelabel=true` may be a solution, but please apply this setting only until your issues are resolved. 
+
+## #5 *XXX* has been compiled by a more recent version of the Java Runtime
 
 *Symptom:* While executing in particular central parts of the platform, this error message/exception may occur.
 
@@ -33,13 +41,13 @@
 
 *Solution:* We have nailed down the versions of the respective components, requiring at least JDK 11 for oktoflow. Oktoflow and its build processes run up to JDK 16. However, the usable JDKs warn about illegal reflection accesses for some libraries. Getting rid of these libraries would require support for more modern JDKs (see below).
 
-## Why does the platform not run on more recent JDKs?
+## #6 Why does the platform not run on more recent JDKs?
 
 *Symptom:* When you run oktoflow with a JDK more recent than version 16, it fails to start.
 
 *Reason:* In it's core, oktoflow uses EASy-Producer, which, in turn, uses core components of Eclipse as well as xtext for domain-specific languages. However, switching over to a recent Eclipse and the respective dependencies is a non-trivial process, that may render oktoflow and its containers useless for the migration time. We started a migration process, which carefully explores these components and hopefully allows us upgrading EASy-Producer first. Then, we plan to migrate oktoflow.
 
-## Platform code cannot be setup in Eclipse, e.g., parent POM missing
+## #7 Platform code cannot be setup in Eclipse, e.g., parent POM missing
 
 *Symptom:* Your IDE reports missing Maven artifacts and shows compilation errors, in particular the parent POM of the platform is missing. Similarly, the code style checking may fail due to missing style definition file.
 
@@ -47,7 +55,7 @@
 
 *Solution:* Please refer to the [code setup guide](https://github.com/iip-ecosphere/platform/tree/main/platform/documentation/INSTALL.MD).
 
-## Unknown platform coding conventions
+## #8 Unknown platform coding conventions
 
 *Symptom:* After a first contact with the platform code it seems that you are missing detailed information about applied conventions on how to write code and you cannot find all conventions in this document.
 
@@ -55,7 +63,7 @@
 
 *Solution:* Please refer to the platform coding guidelines in GitHub.
 
-## Maven does not find app dependencies
+## #9 Maven does not find app dependencies
 
 *Symptom:* When executing the platform instantiation, Maven complains about missing dependencies.
 
@@ -63,7 +71,7 @@
 
 *Solution:* Please open a shell, navigate into the respective directory of the app or the app installations and run mvn install. 
 
-## Execution of application fails due to Java CompileError
+## #10 Execution of application fails due to Java CompileError
 
 *Symptom:* An app is built correctly but when starting it, a Java CompileError occurs and prevents the app from starting up. The messages indicate that packages are missing that are actually in the app fat jar.
 
@@ -71,7 +79,7 @@
 
 *Solution:* Please remove any local compiler setup from your POM files and run Maven on app implementation and app project again.
 
-## Services do not start due to problems with javax.el.ExpressionFactory
+## #11 Services do not start due to problems with javax.el.ExpressionFactory
 
 *Symptom:* When starting services, the service manager reports class loading or instantiation problems for ``javax.el.ExpressionFactory``.
 
@@ -79,7 +87,7 @@
 
 *Solution:* Identify all interfaces and implementations of EL and exclude superfluous ones from the dependencies. Alternatively, try to enforce a class loading sequence that loads jakarta.el before all other EL interfaces and implementations. Typically, the generated parts and the default Spring service packaging take care of that. Similarly, the ZIP service artifact including an explicit classpath file are packaged to consider this issue, but due the use of wildcards for ZIP service artifacts not containing a classpath file, an intended class loading sequence cannot be guaranteed then.
  
-## Service execution through platform fails
+## #12 Service execution through platform fails
 
 *Symptom:* When starting services through the platform, the service manager reports a state change to FAILED instead of RUNNING.
 
@@ -90,7 +98,7 @@
 
 *Solution:* Depending on the actual reason, e.g., failures in service code must be solved or communication failures can be addressed by correct network configuration (including the respective settings in container descriptors). Timing issues often occur when the waitingTime for the service manager is not set correctly. The default value is 1 minute, but on resource-constrained devices, 2 or 3 minutes may be more adequate.
 
-## Why do platform scripts always/not check for recent dependency snapshots
+## #13 Why do platform scripts always/not check for recent dependency snapshots
 
 *Symptom:* When starting platform services/applications or executing build commands, the Maven build process may check for most recent snapshots. 
 
@@ -98,7 +106,7 @@
 
 *Solution:* You can decide on the update behavior, per build process using the maven switch `-U` or globally via the maven settings file (cf. [build command summary](BUILDING.md#mvn-update-behavior)).
 
-## My configuration settings do not affect the instantiation
+## #14 My configuration settings do not affect the instantiation
 
 *Symptom:* You changed settings in the configuration model by assigning new values to variables. This does not seem to have an effect on the instantiation.
 
@@ -106,7 +114,7 @@
 
 *Solution:* Freeze your variables in the right place. If it is a pre-defined variable, freeze them in one of the top-level IVML modules/projects of your configuration. Services, applications, or meshes are typically frozen in the file where they are defined as new variables. In this case, freezing usually happens automatically as these modules declare a freeze block containing a â€œ.â€� (freeze all new variables in this project). Please consider that a frozen variable intentionally cannot be changed anymore in IVML projects that import the project where the variable was frozen.
 
-## My application/example build process unintendedly executes Java tests/Javadoc
+## #15 My application/example build process unintendedly executes Java tests/Javadoc
 
 *Symptom:* You execute a one-step maven build process, usually for a all-in-one application/example. Thereby Java test/Javadoc errors occur, although the application/example shall be built correctly and also individual build steps can be executed successfully.
 
@@ -127,7 +135,7 @@
       
 Besides that, there is the flag `withDocs` in the application type of the configuration model that you may disable.
 
-## App/platform builds seem to loose performance.
+## #16 App/platform builds seem to loose performance.
       
 *Symptom:* App or platform builds seem to take longer than before/expected.
 
@@ -135,7 +143,7 @@ Besides that, there is the flag `withDocs` in the application type of the config
 
 *Solution:* Future versions of build system components may allow for speedups. So far, one easy step is to set `-Daether.remoteRepositoryFilter.prefixes.verifyDenied=false`, for permanent use add this to your environment variable `MAVEN_ARGS`.
 
-## Installation error while building an Image Container during platform instantiation.
+## #17 Installation error while building an Image Container during platform instantiation.
 
 *Symptom:* An error during the instantation due to an installation error in building an image container while installing Java or Python dependencies.
 
@@ -143,8 +151,7 @@ Besides that, there is the flag `withDocs` in the application type of the config
 
 *Solution:* Change the base image version to an older (or if available and feasible, newer) version where the issues does not occur. Unfortunately, this may require some tries and may lead to some errors. In the example above, we changed ``python:3.8.17-slim-buster`` to ``python:3.8.16-slim-buster``, which then allowed for an installation of Java 11.
 
-
-## Python dependency/module not found
+## #18 Python dependency/module not found
 
 *Symptom:* You are trying to deploy an application with Python services and Python complains about missing dependencies, i.e., module names that cannot be resolved.
 
@@ -153,7 +160,7 @@ Besides that, there is the flag `withDocs` in the application type of the config
 *Solution:* For containerized applications, please check the declared dependencies in the configuration model for their completeness. For non-containerized applications, please figure out, which account is executing the platform services, in particular the service manager, and complete the installation of missing dependencies for that user or as global dependencies. If multiple Python versions are installed on your target system, you may have to set the environment variable ``IIP_PYTHON`` to the respective Python binary. See also "Considerations for a Permanent or Distributed Installation" in the platform handbook.
 
 
-## Commands for starting services through the CLI are not "there"
+## #19 Commands for starting services through the CLI are not "there"
 
 *Symptom:* You are trying to start an application manually through the CLI and service commands like `add`, `start` or `startAll` are not available/do not work anymore.
 
@@ -161,7 +168,7 @@ Besides that, there is the flag `withDocs` in the application type of the config
 
 *Solution:* Since version 0.8.2 we encourage using deployment plans, which take these prerequisites into account. However, if you absolutely need these service commands, you may specify `--expert` on CLI startup, but this is discouraged and since version 0.8.2 inteded only for testing.
 
-## How do I upgrade platform/examples/applications
+## #20 How do I upgrade platform/examples/applications
 
 *Symptom:* There is a new version of the platform. How can I upgrade?
 
@@ -176,7 +183,7 @@ Besides that, there is the flag `withDocs` in the application type of the config
   * Example: Update the code via git and then run `mvn -U install -Dunpack.force=true` in the main folder of the example.
 
 
-## There is a strange warning about illegal access operations. Is this problematic or dangerous?
+## #21 There is a strange warning about illegal access operations. Is this problematic or dangerous?
 
 *Symptom:* When starting platform services, there is output like (*XXX*, *YYY*, *ZZZ* substituted accordingly) like
 
@@ -193,7 +200,7 @@ Is this problematic or dangerous?
 *Solution:* This message shall have disappeared after the migration to JDK 17 (see [#106](https://github.com/iip-ecosphere/platform/issues/106) and our [migration story](MigrationStory.md)), but may re-occur with JDK 21.
 
 
-## When I work with more than one own example, builds are failing
+## #22 When I work with more than one own example, builds are failing
 
 *Symptom:* There are more than two (own) all-in-one examples that seem to be conflicting during build.
 
@@ -207,7 +214,7 @@ Is this problematic or dangerous?
 After changing the values, run `mvn install` on all affected all-in-one examples.
 
 
-## My Python service is not loading its (model) files
+## #23 My Python service is not loading its (model) files
 
 *Symptom:* There is a Python service that shall load a model/data file. As Python services are packed by the build process and unpacked in a different (temporary) folder, combined there with Python files from platform and code generation, there might be some confusion where data files are located. In any case, local/absolute paths are discouraged.
 
@@ -218,7 +225,7 @@ After changing the values, run `mvn install` on all affected all-in-one examples
   * Check `src/main/assembly/python.yml` whether in addition to `**/*.py` also your model extensions are listed, e.g., `<include>**/*.pkl</include>`. Then run the build process of your application, to be on the safe side with `-U`.
 
 
-## My Python service does not emit anything when I call print or printf
+## #24 My Python service does not emit anything when I call print or printf
 
 *Symptom:* You do not see any or delayed Python output when you call print or printf in the application log.
 
@@ -227,7 +234,7 @@ After changing the values, run `mvn install` on all affected all-in-one examples
 *Solution:* On regular Python calls of oktoflow (service integration, Python function calls) we now apply the Python argument -u, which disables standard stream buffering. Non-commandline stream integrations, e.g. webservices, log to usual streams, i.e., print to sysout.
 
 
-## I try to run tests locally but I do get strange NullPointerExceptions
+## #25 I try to run tests locally but I do get strange NullPointerExceptions
 
 *Symptom:* You run some tests with Maven or IDE and run into NullPointerExceptions.
 
@@ -235,7 +242,7 @@ After changing the values, run `mvn install` on all affected all-in-one examples
 
 *Solution:* Force building the missing plugins first, in particular those in services, such as for logging, websockets, rest, json, yaml.
 
-## My App is not running. What to do?
+## #26 My App is not running. What to do?
 
 *Symptom:* You are completed with your app mesh and service implementation, but the expected results do not show up.
 
@@ -243,7 +250,7 @@ After changing the values, run `mvn install` on all affected all-in-one examples
 
 *Solution:* We provide a [debugging checklist](DEBUGGING.md) with reasons and explanations that we identified over time. If you identify issues in the platform, please let us know.
 
-## I need a certain time format, but the provided types do not work. What to do?
+## #27 I need a certain time format, but the provided types do not work. What to do?
 
 *Symptom:* Using the wrong date/time type may end in a parsing exception.
 
@@ -251,7 +258,7 @@ After changing the values, run `mvn install` on all affected all-in-one examples
 
 *Solution:* We provide a generic date/time type for which you can specify the format (in Java meta-format). For details, see the [types configuration summary](concepts/types.MD).
 
-## The platform version is changing. What to do?
+## #28 The platform version is changing. What to do?
 
 *Symptom:* There is a new version of the platform and you are not receiving updates.
 
@@ -259,7 +266,7 @@ After changing the values, run `mvn install` on all affected all-in-one examples
 
 *Solution:* If you want to migrate to the newer version, you have to change the artifact coordinate of the platform in the build specification. Please see [versioning](devel/versioning.md).
 
-## I shall specify artifact coordinates in the configuration model. What is the format?
+## #29 I shall specify artifact coordinates in the configuration model. What is the format?
 
 *Symptom:* To specify the location where a service implementation can be found, artifact coordinates are needed (typically besides some form of naming within the coordinate, e.g., a fully qualified class name). Where do these coordinates come from? Is there a list?
 

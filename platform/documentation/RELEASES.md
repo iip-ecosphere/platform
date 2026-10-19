@@ -14,12 +14,12 @@ In progress:
 * [#122](https://github.com/iip-ecosphere/platform/issues/122): Transparent encryption, RBAC on AAS (incl. UI authentication)
 * [#117](https://github.com/iip-ecosphere/platform/issues/117): Multiple service managers per device
 * [#202](https://github.com/iip-ecosphere/platform/issues/202): Update dependencies/libraries (plugins, mvn)
-* [#217](https://github.com/iip-ecosphere/platform/issues/217): Disable/remove unused maven repos
 
 Improvements:
 * [#202](https://github.com/iip-ecosphere/platform/issues/202): Update dependencies/libraries (plugins, mvn)
 * [#216](https://github.com/iip-ecosphere/platform/issues/216): Disentagle service and app dependencies
 * [#205](https://github.com/iip-ecosphere/platform/issues/216): Hide service start/stop commands in CLI, i.e., service commands like `add`, `startService` and `startAll` now require `--expert` due to their technical prerequisites. Please use deployment plans instead.
+* [#217](https://github.com/iip-ecosphere/platform/issues/217): Disable/remove unused maven repos
 
 Changes:
 * code template POM contains assembly for `resources` folder requiring a manual sync of your service implementation POM with the template POM; if app is built by platform, deployed `resources` artefacts are considered and packaged into the app, e.g., for mock data files
@@ -27,6 +27,7 @@ Changes:
 * in apps migrated to version 0.8.2, the update of versions of the build plugins in [#202](https://github.com/iip-ecosphere/platform/issues/202) may lead to missing maven (build plugin) dependencies, if the the Install package is not executed for that version at least once with `mvn -P DepsOnly install` and the build process is not at least once executed with `mvn install -Dunpack.force=true`
 * also check for the connector connectivity tests (based on `ConnectorFactory`) and the POM in the template declaring the application as optional dependency
 * for [#216](https://github.com/iip-ecosphere/platform/issues/216), app templates now recommend app dependencies in `test` rather than `compile` scope. `ConnectorFactory` and generated descriptors require rebuild of apps with `mvn install -Dunpack.force=true`
+* maven artifact resolution issues may occur due to [#217](https://github.com/iip-ecosphere/platform/issues/217). See [FAQ](FAQ.md) #4
 
 ### Version 0.8.1 (2026/09/15)
 
