@@ -230,59 +230,5 @@
     <protobuf.skip>true</protobuf.skip>
     <jacoco.skip>true</jacoco.skip>
   </properties>
-
-  <repositories>       
-    <repository>
-      <id>SSE-mvn</id> <!-- same ID as in easy-maven-settings.xml -->
-      <name>SSE</name>
-      <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
-      <layout>default</layout>
-    </repository>
-    
-	<repository>
-	    <id>central</id> <!-- same ID as in easy-maven-settings.xml -->
-	    <url>https://repo1.maven.org/maven2</url>
-        <snapshots>
-            <enabled>false</enabled>
-            <updatePolicy>never</updatePolicy> <!-- local installs -->
-        </snapshots>
-	</repository>
-	
-    <repository>
-	    <id>bintray</id>
-	    <url>https://jcenter.bintray.com</url>
-        <releases>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-        </releases>
-        <snapshots>
-            <enabled>false</enabled>
-            <updatePolicy>never</updatePolicy> <!-- local installs -->
-        </snapshots>
-	</repository>
-	
-    <repository>
-        <id>redhat</id> <!-- springsource "moved"" from bintray to redhat-->
-        <url>https://maven.repository.redhat.com/ga/</url>
-        <releases>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-        </releases>
-        <snapshots>
-            <enabled>false</enabled>
-            <updatePolicy>never</updatePolicy> <!-- local installs -->
-        </snapshots>
-    </repository>
-    
-  </repositories>
-  
-  <pluginRepositories>
-     <pluginRepository>
-       <id>SSE-plugins</id>
-       <name>SSE</name>
-       <url>https://projects.sse.uni-hildesheim.de/qm/maven/</url>
-       <layout>default</layout>
-     </pluginRepository>
-  </pluginRepositories>
   
 </project>
