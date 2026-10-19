@@ -1,0 +1,6 @@
+/target/
+/gen/
+/tmp/
+/opcTest.txt
+/log
+.DS_Store
