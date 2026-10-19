@@ -197,8 +197,8 @@ public class CleaningUnpackMojo extends UnpackMojo {
                     getLog().warn("Output directory of " + ai.getArtifactId() + " not specified");
                 }
                 boolean outDirExists = !outDirNull && ai.getOutputDirectory().exists();
-                execute |= ai.isNeedsProcessing() || !outDirExists;
-                if (!execute && outDirExists) {
+                boolean exec = ai.isNeedsProcessing() || !outDirExists;
+                if (!exec && outDirExists) {
                     if (hasInitiallyAllowed()) {
                         Set<String> allowed = getInitiallyAllowed(initiallyAllowed, initiallyAllowedFile, getLog());
                         getLog().info("Output directory " + ai.getOutputDirectory() + " exists. "
@@ -213,8 +213,10 @@ public class CleaningUnpackMojo extends UnpackMojo {
                     } else {
                         execute = true;
                     }
+                } else {
+                    execute = true;
                 }
-                getLog().info(" - " + ai + " unpack: " + true + " overwrite: " + ai.getOverWrite() + " outDir: " 
+                getLog().info(" - " + ai + " unpack: " + execute + " overwrite: " + ai.getOverWrite() + " outDir: " 
                         + ai.getOutputDirectory());
             }
             if (skipIfExists != null && skipIfExists.toString().length() > 0) {
