@@ -152,6 +152,10 @@ template Basics(Configuration config, FileArtifact target) {
         getProperty("iip.test", "false") == "true";
     }
 
+    def Boolean isUpdateSnapshots() {
+        getProperty("iip.updateSnapshots", "false") == "true";
+    }
+
     def Boolean isUnpackResources() {
         getProperty("iip.unpackResources", "false") == "true";
     }

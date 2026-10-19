@@ -43,11 +43,11 @@ import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationLifecyc
 import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator.InstantiationConfigurer;
 import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator.NonCleaningInstantiationConfigurer;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.AasIvmlMapper;
-import de.iip_ecosphere.platform.configuration.easyProducer.ivml.AasIvmlMapper.InstantiationMode;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.DefaultEdge;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.DefaultGraph;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.DefaultNode;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.GraphFormat;
+import de.iip_ecosphere.platform.configuration.easyProducer.ivml.InstantiationMode;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlGraphMapper;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlGraphMapper.IvmlGraphEdge;

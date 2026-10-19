@@ -13,7 +13,6 @@
 package de.iip_ecosphere.platform.configuration.easyProducer.ivml;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -24,7 +23,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
@@ -45,22 +43,18 @@ import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlGraphMapper.IvmlGraph;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlGraphMapper.IvmlGraphEdge;
 import de.iip_ecosphere.platform.configuration.easyProducer.ivml.IvmlGraphMapper.IvmlGraphNode;
-import de.iip_ecosphere.platform.support.aas.IdentifierType;
 import de.iip_ecosphere.platform.support.aas.InvocablesCreator;
 import de.iip_ecosphere.platform.support.aas.LangString;
-import de.iip_ecosphere.platform.support.aas.Operation.OperationBuilder;
 import de.iip_ecosphere.platform.support.aas.Property.PropertyBuilder;
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.aas.Registry;
 import de.iip_ecosphere.platform.support.aas.Submodel;
 import de.iip_ecosphere.platform.support.aas.Submodel.SubmodelBuilder;
-import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection.SubmodelElementCollectionBuilder;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.TaskRegistry;
-import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor;
@@ -101,6 +95,7 @@ import net.ssehub.easy.varModel.model.values.Value;
 import net.ssehub.easy.varModel.model.values.ValueDoesNotMatchTypeException;
 
 import static de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationManager.*;
+import static de.iip_ecosphere.platform.configuration.easyProducer.ivml.AasMapperUtils.*;
 
 /**
  * Maps an IVML configuration generically into an AAS with references to IIP-Ecosphere.
@@ -120,6 +115,10 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     public static final String OP_RENAME_VARIABLE = "renameVariable";
     public static final String OP_UPDATE_ARTIFACTS = "updateArtifactsAsync";
     public static final String OP_GEN_INTERFACES = "genInterfacesAsync";
+    public static final String OP_GEN_INTERFACES_AND_CODE_TEMPLATES = "genInterfacesAndCodeTemplatesAsync";
+    public static final String OP_GEN_BOOTSTRAPPED_APPS = "genBootstrappedAppsAsync";
+    public static final String OP_GEN_CODE_TEMPLATES = "genCodeTemplatesAsync";
+    public static final String OP_GEN_APPS_DIRECT = "genAppsDirectAsync";
     public static final String OP_GEN_APPS_NO_DEPS = "genAppsNoDepsAsync";
     public static final String OP_GEN_APPS = "genAppsAsync";
     public static final String OP_GET_TEMPLATES = "getTemplates";
@@ -136,7 +135,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         v -> !"Any".equals(IvmlDatatypeVisitor.getUnqualifiedType(v.getType()));
     public static final String META_TYPE_NAME = "meta";
     public static final Function<String, String> SHORTID_PREFIX_META = n -> "meta" + PseudoString.firstToUpperCase(n);
-    public static final String PROGRESS_COMPONENT_ID = "Configuration";
+    public static final String PROGRESS_COMPONENT_ID = AasMapperUtils.PROGRESS_COMPONENT_ID;
     public static final String PRJ_NAME_PLATFCONFIG = "PlatformConfiguration";
     public static final String PRJ_NAME_ALLCONSTANTS = "AllConstants";
     public static final String PRJ_NAME_ALLSERVICES = "AllServices";
@@ -155,8 +154,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     private Map<String, SubmodelElementContainerBuilder> types = new HashMap<>();
     
     static {
-        // tech settings -> parent
-        Map<String, String> parentMap = new HashMap<>();
+        Map<String, String> parentMap = new HashMap<>(); // tech settings -> parent
         parentMap.put("Aas", PRJ_NAME_TECHSETUP);
         parentMap.put("Transport", PRJ_NAME_TECHSETUP);
         parentMap.put("Services", PRJ_NAME_TECHSETUP);
@@ -164,8 +162,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         parentMap.put("UI", PRJ_NAME_TECHSETUP);
         PARENT_MAPPING = Collections.unmodifiableMap(parentMap);
 
-        // new variable parent type -> project
-        Map<String, String> projectMap = new HashMap<>();
+        Map<String, String> projectMap = new HashMap<>(); // new variable parent type -> project
         projectMap.put("ServiceBase", PRJ_NAME_ALLSERVICES);
         projectMap.put("Server", PRJ_NAME_ALLSERVICES);
         projectMap.put("Manufacturer", PRJ_NAME_ALLSERVICES);
@@ -357,18 +354,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     }
     
     /**
-     * Creates a AAS collection representing an IVML type.
-     * 
-     * @param smBuilder the submodel builder
-     * @param typeName the type name (turned into an AAS shortID)
-     * @return the collection builder
-     */
-    private static SubmodelElementCollectionBuilder createTypeCollectionBuilder(SubmodelBuilder smBuilder, 
-        String typeName) {
-        return smBuilder.createSubmodelElementCollectionBuilder(AasUtils.fixId(typeName));
-    }
-    
-    /**
      * Binds the AAS operations.
      * 
      * @param sBuilder the server builder
@@ -436,10 +421,10 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 return null;
             }, getAasOperationCompletedListener())
         );
-
         bindInstantiationOperations(sBuilder);
         bindTemplateOperations(sBuilder);
     }
+    
 
     /**
      * Binds the AAS instantiation operations (ensure static lambda functions).
@@ -447,30 +432,14 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
      * @param sBuilder the server builder
      */
     private static void bindInstantiationOperations(ProtocolServerBuilder sBuilder) {
-        // generate Interfaces, generate Templates
-        sBuilder.defineOperation(OP_GEN_APPS, 
-            new JsonResultWrapper(a -> {
-                return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
-                    p -> getAasIvmlMapper().instantiate(InstantiationMode.APPS, AasUtils.readString(p), 
-                        AasUtils.readString(p, 1))
-                    , a);
-            })
-        );
-        sBuilder.defineOperation(OP_GEN_APPS_NO_DEPS, 
-            new JsonResultWrapper(a -> {
-                return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
-                    p -> getAasIvmlMapper().instantiate(InstantiationMode.APPS_NO_DEPS, AasUtils.readString(p), null)
-                    , a);
-            })
-        );
-        sBuilder.defineOperation(OP_GEN_INTERFACES, 
-            new JsonResultWrapper(a -> {
-                return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
-                    // second param optional, may be empty -> null
-                    p -> getAasIvmlMapper().instantiate(InstantiationMode.INTERFACES, AasUtils.readString(p), null)
-                    , a);
-            })
-        );
+        bindInstantiationOperation(sBuilder, OP_GEN_APPS, InstantiationMode.APPS, true);
+        bindInstantiationOperation(sBuilder, OP_GEN_APPS_NO_DEPS, InstantiationMode.APPS_NO_DEPS, false);
+        bindInstantiationOperation(sBuilder, OP_GEN_INTERFACES, InstantiationMode.INTERFACES, false);
+        bindInstantiationOperation(sBuilder, OP_GEN_INTERFACES_AND_CODE_TEMPLATES, 
+            InstantiationMode.INTERFACES_AND_CODE_TEMPLATES, false);
+        bindInstantiationOperation(sBuilder, OP_GEN_BOOTSTRAPPED_APPS, InstantiationMode.BOOTSTRAPPED_APPS, false);
+        bindInstantiationOperation(sBuilder, OP_GEN_CODE_TEMPLATES, InstantiationMode.CODE_TEMPLATES, false);
+        bindInstantiationOperation(sBuilder, OP_GEN_APPS_DIRECT, InstantiationMode.APPS_DIRECT, false);
         sBuilder.defineOperation(OP_UPDATE_ARTIFACTS, 
             new JsonResultWrapper(a -> {
                 return TaskUtils.executeAsTask(PROGRESS_COMPONENT_ID, 
@@ -616,7 +585,10 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             ConfigurationLifecycleDescriptor.cleanOutputFolder();
             System.setProperty(PlatformInstantiator.KEY_PROPERTY_UNPACKRESOURCES, "true");
             if (null != appId) {
-                System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, "");
+                System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, appId);
+            }
+            if (mode.isUpdateSnapshots()) {
+                System.setProperty(PlatformInstantiator.KEY_PROPERTY_UPDATE_SNAPSHOTS, "true");
             }
             if (ConfigurationSetup.getSetup().getInstantiateAsProcess()) {
                 EasySetup easy = ConfigurationSetup.getSetup().getEasyProducer();                
@@ -663,53 +635,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         }
         return result;
     }
-    
-    /**
-     * Checking and fixing ZIP file conventions for instantiation. The instantiation requires that
-     * either the project is directly located in the root folder of the ZIP or in a single contained
-     * folder having the same name as the ZIP file. If possible, through renaming/copying, we fix the 
-     * second situation here.
-     * 
-     * @param file the original ZIP file
-     * @return the fixed ZIP file, may be {@code file}
-     */
-    private static File fixZipConvention(File file) {
-        File result = file;
-        Set<String> folders = new HashSet<String>();
-        Set<String> files = new HashSet<String>();
-        try {
-            ZipUtils.listFiles(new FileInputStream(file), f -> true, f -> {
-                String path = f.toString();
-                int pos = path.indexOf("/");
-                if (pos > 0) {
-                    folders.add(path.substring(0, pos));
-                } else {
-                    files.add(path);
-                }
-            });
-        } catch (IOException e) {
-            LoggerFactory.getLogger(AasIvmlMapper.class).warn("Cannot scan ZIP: {}", e.getMessage());
-        }
-        if (folders.size() == 1 && files.size() == 0) {
-            String name = file.getName();
-            if (name.endsWith(".zip")) {
-                name = name.substring(0, name.length() - 4);
-            }
-            Optional<String> folder = folders.stream().findAny();
-            if (folder.isPresent() && !name.equals(folder.get())) {
-                result = new File(FileUtils.getTempDirectory(), folder.get() + ".zip");
-                try {
-                    Files.copy(file.toPath(), result.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    LoggerFactory.getLogger(AasIvmlMapper.class).info("Zip convention: Using {} instead of {}", 
-                        result, file);
-                } catch (IOException e) {
-                    LoggerFactory.getLogger(AasIvmlMapper.class).warn("Cannot copy ZIP: {}", e.getMessage());
-                    result = file; // stay with the original
-                }
-            }
-        }
-        return result;
-    }
 
     /**
      * Collects the generated templates, copies them to {@link ConfigurationSetup#getArtifactsFolder()} and returns 
@@ -745,56 +670,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             });
         return JsonUtils.toJson(tmp);
     }
-    
-    /**
-     * Returns whether {@code file} is acceptable for template copying/publishing.
-     * 
-     * @param file the file to check
-     * @param startTime the start timestamp of the generation
-     * @return {@code true} for acceptable, {@code false} else
-     */
-    private static boolean acceptTemplateFile(File file, long startTime) {
-        boolean accept = file.isDirectory();
-        if (!accept && file.getName().endsWith(".zip")) {
-            accept = file.getName().startsWith("impl.") || file.getName().startsWith("ApplicationInterfaces.");
-            //accept &= file.lastModified() > startTime;
-        }
-        return accept;
-    }
-    
-    /**
-     * Instantiation modes.
-     * 
-     * @author Holger Eichelberger, SSE
-     */
-    public enum InstantiationMode {
         
-        APPS_NO_DEPS("generateAppsNoDeps"),
-        APPS("generateApps"),
-        INTERFACES("generateInterfaces");
-        
-        private String startRuleName;
-
-        /**
-         * Creates an instantiation mode constant.
-         * 
-         * @param startRuleName the start rule name
-         */
-        private InstantiationMode(String startRuleName) {
-            this.startRuleName = startRuleName;
-        }
-        
-        /**
-         * Returns the start rule name.
-         * 
-         * @return the start rule name
-         */
-        public String getStartRuleName() {
-            return startRuleName;
-        }
-        
-    }
-
     @Override
     protected Project getVariableTarget(Project root, Project varParent, IDatatype type, String name, 
         List<String> meshes) throws ExecutionException {
@@ -852,7 +728,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             || PRJ_NAME_TECHSETUP.equals(name);
     }
 
-    
     @Override
     protected String getIvmlSubpath(Project project) {
         String projectName = project.getName();
@@ -1018,16 +893,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             }
         }
         return val;
-    }
-    
-    /**
-     * Returns whether {@code string} is a non-empty string.
-     * 
-     * @param string the string to test
-     * @return {@code true} for a non-empty string, {@code false} for an empty string or <b>null</b>
-     */
-    private static boolean isNonEmptyString(String string) {
-        return string != null && string.length() > 0;
     }
 
     /**
@@ -1380,7 +1245,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                         ContainerValue cValue = (ContainerValue) val;
                         for (int v = 0; v < cValue.getElementSize(); v++) {
                             Value mVal = cValue.getElement(v);
-                            if (isRefWithName(appName, cfg, mVal)) {
+                            if (IvmlUtils.isRefWithName(appName, cfg, mVal)) {
                                 replaced = true;
                                 meshes.add(results.meshVar);
                             } else {
@@ -1403,29 +1268,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             setValue(appVar, appValueEx);
         }
         results.commitChanges(ConfigurationChangeType.DELETED);
-    }
-
-    /**
-     * Returns if {@code mVal} is a reference to a variable with a field name with value {@code name}.
-     * 
-     * @param name the name to look for
-     * @param cfg the configuration to resolve the reference
-     * @param mVal the value possibly containing a reference value
-     * @return {@code true} if it is a reference with the desired property, {@code false} else
-     */
-    private static boolean isRefWithName(String name, net.ssehub.easy.varModel.confModel.Configuration cfg, 
-        Value mVal) {
-        boolean result = false;
-        if (mVal instanceof ReferenceValue) {
-            ReferenceValue rVal = (ReferenceValue) mVal;
-            IDecisionVariable var2 = cfg.getDecision(rVal.getValue());
-            Object var2n = getValue(var2.getNestedElement("name"));
-            String var2Name = null == var2n ? "" : var2n.toString();
-            if (var2Name.equals(name)) {
-                result = true;
-            }
-        }
-        return result;
     }
     
     @Override
@@ -1483,24 +1325,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         }
         return node.getName();
     }
-    
-    /**
-     * Turns {@code string} into an identifier, i.e., each non-Java identifier characters into a "_".
-     * 
-     * @param string the string to be checked
-     * @return the validated string, potentially modified to be an id
-     */
-    private static String toId(String string) {
-        StringBuffer result = new StringBuffer();
-        for (int i = 0; i < string.length(); i++) {
-            char c = string.charAt(i);
-            if (!Character.isJavaIdentifierPart(c)) {
-                c = '_';
-            }
-            result.append(c);
-        }
-        return result.toString();
-    }
 
     /**
      * Creates a mesh project for {@code graph}.
@@ -1527,7 +1351,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         final IDatatype connectorType = ModelQuery.findType(root, "MeshConnector", null);
         final IDatatype serviceType = ModelQuery.findType(root, "ServiceBase", null);
         final IDatatype meshType = ModelQuery.findType(root, "ServiceMesh", null);
-        ServiceMap services = collectServices(cfg, serviceType);
+        ServiceMap services = IvmlUtils.collectServices(cfg, serviceType);
         Map<IvmlGraphNode, DecisionVariableDeclaration> nodeMap = new HashMap<>();
         Map<DecisionVariableDeclaration, String> valueMap = new HashMap<>();
         List<DecisionVariableDeclaration> sources = new ArrayList<>();
@@ -1543,7 +1367,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             DecisionVariableDeclaration nodeVar = new DecisionVariableDeclaration(toId("node_" 
                 + validateName(n, nodeMap.size())), type, results.meshProject);
             String nodeValEx = "{pos_x=" + n.getXPos() + ",pos_y=" + n.getYPos() 
-                + ",impl=" + IvmlUtils.getVarNameSafe(findServiceVar(services, n.getImpl()), "null")
+                + ",impl=" + IvmlUtils.getVarNameSafe(IvmlUtils.findServiceVar(services, n.getImpl()), "null")
                 + ",next = {";
             valueMap.put(nodeVar, nodeValEx);
             results.addToMeshProject(nodeVar, ConfigurationChangeType.CREATED);
@@ -1594,42 +1418,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     }
     
     /**
-     * Collects all declared services.
-     * 
-     * @param cfg the configuration to take the services from
-     * @param serviceType the IVML data type used to select services
-     * @return a mapping between service names and configured IVML variables
-     */
-    private static ServiceMap collectServices(net.ssehub.easy.varModel.confModel.Configuration cfg, 
-        IDatatype serviceType) {
-        ServiceMap result = new ServiceMap();
-        Iterator<IDecisionVariable> iter = cfg.iterator();
-        while (iter.hasNext()) {
-            IDecisionVariable cVar = iter.next();
-            if (serviceType.isAssignableFrom(cVar.getDeclaration().getType())) {
-                result.add(cVar);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Finds a service as IVML variable. 
-     * 
-     * @param services the mapped services
-     * @param name the service name to search for
-     * @return the service IVML variable, or <b>null</b> for not found
-     */
-    private static AbstractVariable findServiceVar(ServiceMap services, String name) {
-        AbstractVariable result = null;
-        IDecisionVariable cVar = services.getService(name);
-        if (null != cVar) {
-            result = cVar.getDeclaration();
-        }
-        return result;
-    }
-    
-    /**
      * Adds the default AAS operations for obtaining information on the configuration model / changing the model.
      * 
      * @param smBuilder the submodel builder representing the target
@@ -1677,20 +1465,16 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         createOperationBuilder(smBuilder, OP_DELETE_VARIABLE, iCreator)
             .addInputVariable("varName", Type.STRING)
             .build(aDesc);
-        createOperationBuilder(smBuilder, OP_GEN_APPS, iCreator)
-            .addInputVariable("appId", Type.STRING)
-            .addInputVariable("codeFile", Type.STRING)
-            .build(Type.STRING, aDesc);
-        createOperationBuilder(smBuilder, OP_GEN_APPS_NO_DEPS, iCreator)
-            .addInputVariable("appId", Type.STRING)
-            .build(Type.STRING, aDesc);
-        createOperationBuilder(smBuilder, OP_GEN_INTERFACES, iCreator)
-            .addInputVariable("appId", Type.STRING)
-            .build(Type.STRING, aDesc);
+        addInstantiateOperation(smBuilder, OP_GEN_APPS, iCreator, aDesc, true);
+        addInstantiateOperation(smBuilder, OP_GEN_APPS_NO_DEPS, iCreator, aDesc, false);
+        addInstantiateOperation(smBuilder, OP_GEN_INTERFACES, iCreator, aDesc, false);
+        addInstantiateOperation(smBuilder, OP_GEN_INTERFACES_AND_CODE_TEMPLATES, iCreator, aDesc, false);
+        addInstantiateOperation(smBuilder, OP_GEN_BOOTSTRAPPED_APPS, iCreator, aDesc, false);
+        addInstantiateOperation(smBuilder, OP_GEN_CODE_TEMPLATES, iCreator, aDesc, false);
+        addInstantiateOperation(smBuilder, OP_GEN_APPS_DIRECT, iCreator, aDesc, false);
         createOperationBuilder(smBuilder, OP_UPDATE_ARTIFACTS, iCreator)
             .addInputVariable("appName", Type.STRING)
             .build(Type.STRING, aDesc);
-
         createOperationBuilder(smBuilder, OP_GET_TEMPLATES, iCreator)
             .build(Type.STRING, aDesc);
         createOperationBuilder(smBuilder, OP_INSTANTIATE_TEMPLATE, iCreator)
@@ -1712,48 +1496,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     }
     
     /**
-     * Creates an operation builder on {@code smBuilder} with {@code opName} as operation and invocable name using 
-     * {@code iCreator} as invocable creator.
-     * 
-     * @param smBuilder the submodel builder to create the operation on
-     * @param opName the operation name used also as invocable name
-     * @param iCreator the invocables creator for creating the invocable
-     * @return the operation builder instance
-     */
-    private static OperationBuilder createOperationBuilder(SubmodelBuilder smBuilder, String opName, 
-        InvocablesCreator iCreator) {
-        return smBuilder.createOperationBuilder(opName)
-            .setInvocable(iCreator.createInvocable(opName));
-    }
-    
-    /**
-     * Returns the language to be used for {@link LangString}.
-     * 
-     * @return the language
-     */
-    static String getLang() {
-        return ModelInfo.getLocale().getLanguage();
-    }
-    
-    /**
-     * Returns the string value of {@code var}. If the value is empty, return <b>null</b>.
-     * 
-     * @param var the variable to read the string value from
-     * @return the string value or <b>null</b>
-     */
-    static String getStringValueEmptyNull(IDecisionVariable var) {
-        String result = null;
-        Object val = getValue(var);
-        if (null != val) {
-            result = val.toString();
-            if (result.length() == 0) {
-                result = null;
-            }
-        }
-        return result;
-    }
-    
-    /**
      * Maps a single variable {@code var} into {@code builder}.
      * 
      * @param var the variable to map as source
@@ -1769,16 +1511,16 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             //IDatatype varType = null == var.getValue() || var.getValue() == NullValue.INSTANCE 
             //    ? decl.getType() : var.getValue().getType(); // including null values causes reasoning issues
             IDatatype rVarType = DerivedDatatype.resolveToBasis(varType);
-            String lang = getLang();
+            String lang = IvmlUtils.getLang();
             String semanticId = null;
             String displayName = null;
             for (int a = 0; a < var.getAttributesCount(); a++) {
                 IDecisionVariable attribute = var.getAttribute(a);
                 String attributeName = attribute.getDeclaration().getName();
                 if ("semanticId".equals(attributeName)) {
-                    semanticId = getStringValueEmptyNull(attribute);
+                    semanticId = IvmlUtils.getStringValueEmptyNull(attribute);
                 } else if ("displayName".equals(attributeName)) {
-                    displayName = getStringValueEmptyNull(attribute);
+                    displayName = IvmlUtils.getStringValueEmptyNull(attribute);
                 }
             }
             SubmodelElementContainerBuilder varBuilder;
@@ -1806,11 +1548,10 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             } else {
                 String propName = id == null ? varName : id;
                 varBuilder = builder.createSubmodelElementCollectionBuilder(AasUtils.fixId(propName));
-                Object aasValue = getValue(var);
+                Object aasValue = IvmlUtils.getValue(var);
                 varType.accept(TYPE_VISITOR); // resolved anyway
                 Type aasType = TYPE_VISITOR.getAasType();
-                // prop name "value" is/was reserved by BaSyx/AAS
-                PropertyBuilder pb = varBuilder.createPropertyBuilder(AasUtils.fixId("varValue")); 
+                PropertyBuilder pb = varBuilder.createPropertyBuilder(AasUtils.fixId("varValue")); // reserved prop name
                 pb.setValue(aasType, aasValue);
                 setSemanticId(pb, semanticId);
                 pb.build();
@@ -1869,37 +1610,6 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             LoggerFactory.getLogger(AasIvmlMapper.class).warn(
                 "Cannot find type ServiceBase. No service will have a AAS URL. {}", e.getMessage());
         }
-    }
-    
-    /**
-     * Sets a semantic id if available. 
-     * 
-     * @param pBuilder the property builder
-     * @param semanticId the semantic id, may be <b>null</b>
-     */
-    private static void setSemanticId(PropertyBuilder pBuilder, String semanticId) {
-        if (null != semanticId) {
-            if (!semanticId.startsWith(IdentifierType.IRDI_PREFIX)) {
-                semanticId = IdentifierType.IRDI_PREFIX + semanticId;
-            }
-            pBuilder.setSemanticId(semanticId);
-        }
-    }
-
-    /**
-     * Returns the value of a variable.
-     * 
-     * @param var the variable
-     * @return the value
-     */
-    private static Object getValue(IDecisionVariable var) {
-        Object aasValue = null;
-        if (null != var && null != var.getValue()) {
-            ValueVisitor valueVisitor = new ValueVisitor();
-            var.getValue().accept(valueVisitor);
-            aasValue = valueVisitor.getAasValue();
-        }
-        return aasValue;
     }
 
     /**

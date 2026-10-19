@@ -14,10 +14,13 @@ package de.iip_ecosphere.platform.configuration.easyProducer.ivml;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import de.iip_ecosphere.platform.configuration.easyProducer.ModelInfo;
+import de.iip_ecosphere.platform.support.aas.LangString;
 import net.ssehub.easy.basics.messages.Status;
 import net.ssehub.easy.reasoning.core.reasoner.Message;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
@@ -62,6 +65,7 @@ import net.ssehub.easy.varModel.model.values.BooleanValue;
 import net.ssehub.easy.varModel.model.values.EnumValue;
 import net.ssehub.easy.varModel.model.values.IntValue;
 import net.ssehub.easy.varModel.model.values.RealValue;
+import net.ssehub.easy.varModel.model.values.ReferenceValue;
 import net.ssehub.easy.varModel.model.values.StringValue;
 import net.ssehub.easy.varModel.model.values.Value;
 
@@ -806,6 +810,108 @@ public class IvmlUtils {
         IDecisionVariable result = cfg.getDecision(decl);
         if (null == result) {
             result = cfg.createDecision(decl);
+        }
+        return result;
+    }
+    
+    /**
+     * Returns the language to be used for {@link LangString}.
+     * 
+     * @return the language
+     */
+    public static String getLang() {
+        return ModelInfo.getLocale().getLanguage();
+    }
+    
+    /**
+     * Returns the value of a variable.
+     * 
+     * @param var the variable
+     * @return the value
+     */
+    public static Object getValue(IDecisionVariable var) {
+        Object aasValue = null;
+        if (null != var && null != var.getValue()) {
+            ValueVisitor valueVisitor = new ValueVisitor();
+            var.getValue().accept(valueVisitor);
+            aasValue = valueVisitor.getAasValue();
+        }
+        return aasValue;
+    }
+    
+    /**
+     * Returns the string value of {@code var}. If the value is empty, return <b>null</b>.
+     * 
+     * @param var the variable to read the string value from
+     * @return the string value or <b>null</b>
+     */
+    public static String getStringValueEmptyNull(IDecisionVariable var) {
+        String result = null;
+        Object val = getValue(var);
+        if (null != val) {
+            result = val.toString();
+            if (result.length() == 0) {
+                result = null;
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Returns if {@code mVal} is a reference to a variable with a field name with value {@code name}.
+     * 
+     * @param name the name to look for
+     * @param cfg the configuration to resolve the reference
+     * @param mVal the value possibly containing a reference value
+     * @return {@code true} if it is a reference with the desired property, {@code false} else
+     */
+    static boolean isRefWithName(String name, net.ssehub.easy.varModel.confModel.Configuration cfg, 
+        Value mVal) {
+        boolean result = false;
+        if (mVal instanceof ReferenceValue) {
+            ReferenceValue rVal = (ReferenceValue) mVal;
+            IDecisionVariable var2 = cfg.getDecision(rVal.getValue());
+            Object var2n = IvmlUtils.getValue(var2.getNestedElement("name"));
+            String var2Name = null == var2n ? "" : var2n.toString();
+            if (var2Name.equals(name)) {
+                result = true;
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Collects all declared services.
+     * 
+     * @param cfg the configuration to take the services from
+     * @param serviceType the IVML data type used to select services
+     * @return a mapping between service names and configured IVML variables
+     */
+    static ServiceMap collectServices(net.ssehub.easy.varModel.confModel.Configuration cfg, 
+        IDatatype serviceType) {
+        ServiceMap result = new ServiceMap();
+        Iterator<IDecisionVariable> iter = cfg.iterator();
+        while (iter.hasNext()) {
+            IDecisionVariable cVar = iter.next();
+            if (serviceType.isAssignableFrom(cVar.getDeclaration().getType())) {
+                result.add(cVar);
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Finds a service as IVML variable. 
+     * 
+     * @param services the mapped services
+     * @param name the service name to search for
+     * @return the service IVML variable, or <b>null</b> for not found
+     */
+    static AbstractVariable findServiceVar(ServiceMap services, String name) {
+        AbstractVariable result = null;
+        IDecisionVariable cVar = services.getService(name);
+        if (null != cVar) {
+            result = cVar.getDeclaration();
         }
         return result;
     }

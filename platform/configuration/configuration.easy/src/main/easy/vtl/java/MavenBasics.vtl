@@ -218,19 +218,19 @@ template MavenBasics(Configuration config, FileArtifact target) {
         appendPlugin(plugins, "de.iip-ecosphere.platform", "dependency-plugin", ver, false);
     } 
 
-    def XmlElement appendMavenDependencyPluginOverWrite(XmlElement plugin, Boolean overWriteSnapshots=true, Boolean overWriteReleases=false, Boolean overWriteIfNewer=true) {
-        if (plugin.getName() == "plugin") {
-            plugin = appendConfiguration(plugin);
+    def XmlElement appendMavenDependencyPluginOverWrite(XmlElement parent, Boolean overWriteSnapshots=true, Boolean overWriteReleases=false, Boolean overWriteIfNewer=true, Boolean appendConfiguration=true) {
+        if (appendConfiguration and parent.getName() <> "configuration") {
+            parent = appendConfiguration(parent);
         }
         
         if (overWriteSnapshots) { // default is false
-            new XmlElement(plugin, "overWriteSnapshots", "true");
+            new XmlElement(parent, "overWriteSnapshots", "true");
         }
         if (overWriteReleases) { // default is false
-            new XmlElement(plugin, "overWriteReleases", "true");
+            new XmlElement(parent, "overWriteReleases", "true");
         }
         if (!overWriteIfNewer) { // default is false
-            new XmlElement(plugin, "overWriteReleases", "false");
+            new XmlElement(parent, "overWriteReleases", "false");
         }
     }
     

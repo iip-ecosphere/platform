@@ -151,7 +151,7 @@ class TypeMapper {
         if (type instanceof ModelElement) { // for contained types, e.g., compound
             String comment = ModelInfo.getCommentSafe((ModelElement) type);
             if (comment != null && comment.length() > 0) {
-                typeB.setDescription(new LangString(AasIvmlMapper.getLang(), comment));
+                typeB.setDescription(new LangString(IvmlUtils.getLang(), comment));
             }
         }
     }
@@ -528,7 +528,7 @@ class TypeMapper {
         // if we get into trouble with property ids, we have to sub-structure that
         String slotName = AasUtils.fixId(slot.getName());
         if (!doneSlots.containsKey(slotName) && variableFilter.test(slot)) {
-            String lang = AasIvmlMapper.getLang();
+            String lang = IvmlUtils.getLang();
             IDatatype slotType = slot.getType();
             SubmodelElementCollectionBuilder propB = typeB.createSubmodelElementCollectionBuilder(slotName);
             doneSlots.put(slotName, propB);
