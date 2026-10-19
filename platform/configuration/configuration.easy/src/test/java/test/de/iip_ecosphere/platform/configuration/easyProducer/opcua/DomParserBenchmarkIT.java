@@ -42,6 +42,11 @@ public class DomParserBenchmarkIT {
 
     private final File nodeSetFile;
 
+    /**
+     * Creates an instance for the given {@code noteSetFile}.
+     * 
+     * @param nodeSetFile the file to create the isntance for
+     */
     public DomParserBenchmarkIT(File nodeSetFile) {
         this.nodeSetFile = nodeSetFile;
     }
@@ -104,14 +109,16 @@ public class DomParserBenchmarkIT {
 
     /** Output statistics that do not change between iterations. */
     private static final class Metrics {
-        int ivmlLines;
-        int unknownTypes;
-        int rootObjectType;
-        int fieldVariableType;
-        int enumType;
-        int objectTypeType;
-        double ioRatio;
+        private int ivmlLines;
+        private int unknownTypes;
+        private int rootObjectType;
+        private int fieldVariableType;
+        private int enumType;
+        private int objectTypeType;
+        private double ioRatio;
     }
+    
+    // checkstyle: stop exception type check
 
     /**
      * Executes warm-up and measured iterations of the complete generation process.
@@ -177,23 +184,12 @@ public class DomParserBenchmarkIT {
             }
 
             String[] row = {
-                nodeSetFile.getName(),
-                VERSION,
-                String.valueOf(round),
-                String.valueOf(fileSizeKB),
-                String.valueOf(uaObjectTypeCountIn),
-                String.valueOf(totalMs),
-                String.valueOf(metrics.ivmlLines),
-                outputSha256,
-                String.valueOf(metrics.unknownTypes),
-                String.valueOf(metrics.rootObjectType),
-                String.valueOf(metrics.fieldVariableType),
-                String.valueOf(metrics.enumType),
-                String.valueOf(metrics.objectTypeType),
-                String.valueOf(inputLines),
-                String.valueOf(metrics.ioRatio),
-                checkRequiredModels,
-                checkRedundancy
+                nodeSetFile.getName(), VERSION, String.valueOf(round), String.valueOf(fileSizeKB),
+                String.valueOf(uaObjectTypeCountIn), String.valueOf(totalMs), String.valueOf(metrics.ivmlLines),
+                outputSha256, String.valueOf(metrics.unknownTypes), String.valueOf(metrics.rootObjectType),
+                String.valueOf(metrics.fieldVariableType), String.valueOf(metrics.enumType),
+                String.valueOf(metrics.objectTypeType), String.valueOf(inputLines), String.valueOf(metrics.ioRatio),
+                checkRequiredModels, checkRedundancy
             };
             try (PrintWriter writer = new PrintWriter(new FileWriter(CSV_FILE, true))) {
                 writer.println(String.join(",", row));
@@ -209,6 +205,16 @@ public class DomParserBenchmarkIT {
         }
     }
 
+    // checkstyle: resume exception type check
+
+    /**
+     * Computes the SHA-256 hash of the given content and returns it as a
+     * lowercase hexadecimal string.
+     *
+     * @param content the byte array to hash
+     * @return the SHA-256 hash as a hexadecimal string
+     * @throws IllegalStateException if the SHA-256 algorithm is not available
+     */
     private static String sha256(byte[] content) {
         try {
             return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(content));
@@ -217,10 +223,25 @@ public class DomParserBenchmarkIT {
         }
     }
 
+    /**
+     * Sanitizes the given text by replacing commas with semicolons and
+     * carriage returns and line feeds with spaces.
+     *
+     * @param text the text to sanitize
+     * @return the sanitized text
+     */
     private static String sanitize(String text) {
         return text.replace(",", ";").replace("\r", " ").replace("\n", " ");
     }
 
+    /**
+     * Counts the number of non-overlapping occurrences of the given pattern
+     * in the specified text.
+     *
+     * @param text the text to search
+     * @param pattern the pattern to count
+     * @return the number of non-overlapping occurrences of the pattern
+     */
     private static int countOccurrences(String text, String pattern) {
         int count = 0;
         int index = 0;
@@ -230,4 +251,5 @@ public class DomParserBenchmarkIT {
         }
         return count;
     }
+    
 }
