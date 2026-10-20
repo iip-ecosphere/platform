@@ -54,6 +54,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElementContainerBuilder;
 import de.iip_ecosphere.platform.support.aas.Type;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.TaskRegistry;
 import de.iip_ecosphere.platform.support.TaskRegistry.TaskData;
 import de.iip_ecosphere.platform.support.aas.AasUtils;
@@ -546,6 +547,32 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     }
     
     /**
+     * Returns the (expected) resources directory in {@code base}.
+     * 
+     * @param base the base directory
+     * @return the existing resources directory or <b>null</b>
+     */
+    private String getResourcesDir(File base) {
+        File resourcesDir = new File(base, "resources.ipr");
+        if (!resourcesDir.exists()) {
+            resourcesDir = new File(base, "resources");
+            if (!resourcesDir.exists()) {
+                resourcesDir = null;
+            }
+        }
+        return null == resourcesDir ? null : resourcesDir.toString();
+    }
+    
+    /**
+     * Returns the class loader of this class.
+     * 
+     * @return the class loader
+     */
+    private ClassLoader getClassLoader() {
+        return getClass().getClassLoader();
+    }
+    
+    /**
      * Instantiates according to the given {@code configurer}.
      * 
      * @param mode the instantiation mode
@@ -571,34 +598,30 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             if (f.exists()) {
                 f = fixZipConvention(f);
                 LoggerFactory.getLogger(AasIvmlMapper.class).info("Integrating {} in {}", codeFile, f);
-                System.setProperty("iip.easy.impl", f.getAbsolutePath());
+                OsUtils.setProperty("iip.easy.impl", f.getAbsolutePath());
             }
         }
-        System.setProperty("KEY_PROPERTY_TRACING", "TOP");
-        PlatformInstantiator.setTraceFilter();
-        //ConfigurationManager.cleanGenTarget();
+        OsUtils.setProperty("KEY_PROPERTY_TRACING", "TOP");
+        PlatformInstantiator.setTraceFilter(); //ConfigurationManager.cleanGenTarget();
         long start = System.currentTimeMillis();
-        if (null != appId && appId.length() > 0) {
-            System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, appId);
-        }
+        OsUtils.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, appId); // ignored if appId is null
         try {
             ConfigurationLifecycleDescriptor.cleanOutputFolder();
-            System.setProperty(PlatformInstantiator.KEY_PROPERTY_UNPACKRESOURCES, "true");
-            if (null != appId) {
-                System.setProperty(PlatformInstantiator.KEY_PROPERTY_APPS, appId);
-            }
+            OsUtils.setProperty(PlatformInstantiator.KEY_PROPERTY_UNPACKRESOURCES, "true");
             if (mode.isUpdateSnapshots()) {
-                System.setProperty(PlatformInstantiator.KEY_PROPERTY_UPDATE_SNAPSHOTS, "true");
+                OsUtils.setProperty(PlatformInstantiator.KEY_PROPERTY_UPDATE_SNAPSHOTS, "true");
             }
+            EasySetup easy = ConfigurationSetup.getSetup().getEasyProducer();                
             if (ConfigurationSetup.getSetup().getInstantiateAsProcess()) {
-                EasySetup easy = ConfigurationSetup.getSetup().getEasyProducer();                
                 String[] args = {easy.getIvmlModelName(), toString(easy.getBase()), toString(easy.getGenTarget()), 
                     mode.getStartRuleName(), toString(easy.getIvmlMetaModelFolder())};            
                 PlatformInstantiation inst = ConfigurationFactory.createInstantiator(null, null);
                 inst.setLogPath(logPath);                
                 inst.takeOverProperties();
-                inst.executeAsProcess(getClass().getClassLoader(), null, "TOP", null, args);
+                inst.executeAsProcess(getClassLoader(), getResourcesDir(easy.getGenTarget()), "TOP", null, args);
             } else {
+                OsUtils.setProperty("KEY_PROPERTY_TRACING", "TOP");
+                OsUtils.setProperty("configuration.resourcesDirectory", getResourcesDir(easy.getGenTarget()));
                 final ExecutionMode execMode = ExecutionMode.FULL;
                 SenderCloseable sender = ConfigurationLifecycleDescriptor.setTransportLogConsumer(
                     logPath, execMode, lastTaskData);
@@ -617,21 +640,37 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 ConfigurationLifecycleDescriptor.setLogConsumer(null);
                 ConfigurationLifecycleDescriptor.close(sender);
             }
-            switch (mode) {
-            case APPS_NO_DEPS:
-                result = collectTemplates(start);
-                break;
-            case APPS:
-                break;
-            case INTERFACES:
-                result = collectTemplates(start);
-                break;
-            default:
-                break;
-            }
+            result = collectResult(mode, result, start);
             ConfigurationManager.setTaskData(beforeTaskData);
         } catch (ModelManagementException e) {
             throw new ExecutionException(e.getMessage(), e);
+        }
+        return result;
+    }
+    
+    /**
+     * Collects the instantiation result.
+     * 
+     * @param mode the instantiation mode
+     * @param result the instantiation result known so far
+     * @param start the start timestamp
+     * @return the result, may be {@code result}
+     */
+    private Object collectResult(InstantiationMode mode, Object result, long start) {
+        switch (mode) {
+        case APPS_NO_DEPS:
+        case BOOTSTRAPPED_APPS:
+            result = collectTemplates(start);
+            break;
+        case APPS:
+            break;
+        case INTERFACES:
+        case INTERFACES_AND_CODE_TEMPLATES:
+        case CODE_TEMPLATES:
+            result = collectTemplates(start);
+            break;
+        default:
+            break;
         }
         return result;
     }
