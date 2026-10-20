@@ -278,5 +278,17 @@ public class OsUtils {
     public static boolean isAtLeastJava9() {
         return Commons.getInstance().isAtLeastJava9();
     }
+    
+    /**
+     * Sets a system property. [move to OSUtils]
+     * 
+     * @param key the name of the system property (ignored if <b>null</b>)
+     * @param value the value (ignored if <b>null</b>)
+     */
+    public static void setProperty(String key, String value) {
+        if (null != key && null != value) {
+            System.setProperty(key, value);
+        }
+    }
 
 }

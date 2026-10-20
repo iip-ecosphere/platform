@@ -46,7 +46,7 @@ public class OsUtilsTest {
 
     /**
      * Tests {@link OsUtils#getPropertyOrEnv(String, String)}, {@link OsUtils#getPropertyOrEnv(String)} and 
-     * implicitly {@link OsUtils#getEnv(String)}.
+     * implicitly {@link OsUtils#getEnv(String)} and {@link OsUtils#setProperty(String, String)}.
      */
     @Test
     public void testSystemPropertyOrEnv() {
@@ -59,7 +59,7 @@ public class OsUtilsTest {
         Assert.assertFalse(OsUtils.getBooleanProperty("iip.nonsense1", false));
         
         Assert.assertEquals(1, OsUtils.getIntProperty("iip.test.intVal", 1));
-        System.setProperty("iip.test.intVal", "2");
+        OsUtils.setProperty("iip.test.intVal", "2");
         Assert.assertEquals(2, OsUtils.getIntProperty("iip.test.intVal", 1));
     }
     
