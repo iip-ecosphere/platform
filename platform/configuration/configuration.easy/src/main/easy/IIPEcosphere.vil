@@ -275,7 +275,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 }
                     
                 if (genApps or bootstrapApp) {
-                    resources = postProcessResources(resources, "-/", getResourcesFolder(config) + "/");
+                    resources = postProcessResources(resources, "-/", appRoot.relativizeFolder(getResourcesFolder(config)) + "/");
                     Boolean copyDependencies = enablesPackaging(a, AppPackagingSchema::ZipWithClasspath); // may be more...
                     // partition according to container strategy
                     String appVersion = getAppMvnVersion(a);
