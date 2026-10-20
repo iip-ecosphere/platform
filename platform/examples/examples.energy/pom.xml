@@ -9,7 +9,7 @@
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependenciesBOM</artifactId>
-     <version>0.8.1-SNAPSHOT</version>
+     <version>0.8.2-SNAPSHOT</version>
      <relativePath/>
   </parent>
 
@@ -209,15 +209,15 @@
                    <version>${project.version}</version>
                    <executions>
 	                   <execution>
-	                      <id>generateAppsNoDeps</id>
+	                      <id>generateBootstrappedApps</id>
 	                      <goals>
-	                          <goal>generateAppsNoDeps</goal>
+	                          <goal>generateBootstrappedApps</goal>
 	                      </goals>
 	                   </execution>
                        <execution>
-                         <id>generateApps</id>
+                         <id>generateAppsDirect</id>
                          <goals>
-                           <goal>generateApps</goal>
+                           <goal>generateAppsDirect</goal>
                          </goals>
                        </execution>
 	                    <execution>
@@ -233,7 +233,7 @@
 	                            </mvnArgs>
 	                            <brokerPort>0</brokerPort>
 	                            <logRegExprs>
-	                                <logRegExpr>.*UMATI OPCUA Connector test.*</logRegExpr>
+	                                <logRegExpr>.*Energy OPCUA Connector test.*</logRegExpr>
 	                            </logRegExprs>
 	                        </configuration>
 	                    </execution>
@@ -320,6 +320,7 @@
                         <invokeGoal>package</invokeGoal>
                       </invokeGoals>
                       <disableBuild>true</disableBuild>
+                      <skipGenerateSources>true</skipGenerateSources>
                     </configuration>
                   </execution>
                 </executions>

@@ -46,7 +46,7 @@ public class GeneratedConnector {
     public static void main(String[] args) throws IOException {
         if (args.length > 0 && "--skip".equals(args[0])) {
             // our Jenkins cannot contact the umati server. well let's figure out whether it could run at all
-            System.out.println("UMATI OPCUA Connector test");
+            System.out.println("Energy OPCUA Connector test");
             System.exit(0);
         }
         ActiveAasBase.setNotificationMode(NotificationMode.NONE); // disable AAS connector registration
@@ -55,8 +55,7 @@ public class GeneratedConnector {
 
             @Override
             public void received(OpcOut data) {
-                System.out.println("RCV " + data.getState().getMachine() + "\n" 
-                    + data.getIdentification());
+                System.out.println("RCV " + data);
                 count.incrementAndGet();
             }
             

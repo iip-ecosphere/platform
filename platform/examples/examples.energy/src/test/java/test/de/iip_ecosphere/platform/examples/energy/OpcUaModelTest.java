@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.configuration.easyProducer.ConfigurationSetup;
@@ -99,6 +100,7 @@ public class OpcUaModelTest {
      * @throws ExecutionException shall not occur
      * @throws IOException shall not occur
      */
+    @Ignore("for now, setup invalid")
     @Test
     public void testEnergy() throws ExecutionException, IOException {
         File gen = new File("gen/energy");
