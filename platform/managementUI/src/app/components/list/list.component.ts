@@ -14,6 +14,7 @@ import { IvmlFormatterService } from 'src/app/components/services/ivml/ivml-form
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfigExpertModeService } from '../../services/config-expert-mode.service';
 import { OnlyIdPipe } from 'src/app/pipes/only-id.pipe';
+import { ConfigDashboardingModeService } from 'src/app/services/config-dashboarding-mode.service';
 
 /**
  * Information on a file being uploaded.
@@ -58,6 +59,7 @@ export class ListComponent extends Utils implements OnInit {
   currentTab = "";
   selectedTabIndex = 0;
   currentExpertMode = false;
+  currentDashboardingMode = false;
   rawData: any;
   filteredData: any;
   varValue = "varValue"
@@ -78,7 +80,8 @@ export class ListComponent extends Utils implements OnInit {
     private snackBar: MatSnackBar,
     private onlyId: OnlyIdPipe,
     private ivmlFormatter: IvmlFormatterService, 
-    public configExpertMode: ConfigExpertModeService) {
+    public configExpertMode: ConfigExpertModeService,
+    public configDashboardingMode: ConfigDashboardingModeService) {
     super();
     this.sub = websocketService.getMsgSubject().subscribe((value: any) => {
       collector.receiveStatus(JSON.parse(value))
@@ -110,6 +113,12 @@ export class ListComponent extends Utils implements OnInit {
   ]
   defaultNormalTab = 'Types'
 
+  dashboardingTabsParam = [
+    { tabName: "Display", metaProject: "AllTypes", submodelElement: null },
+    { tabName: "Types", metaProject: "AllTypes", submodelElement: null },
+  ]
+  defaultdashboardingTabs = 'Display'
+
   // Display ---------------------------------------------------------------------
   paramToDisplay = [
     ["ver", "Version: ", ""],
@@ -134,9 +143,14 @@ export class ListComponent extends Utils implements OnInit {
   }
 
   ngDoCheck() {
-    if (this.currentExpertMode !== this.configExpertMode.expertMode) {
+    if (this.currentExpertMode !== this.configExpertMode.expertMode
+      || this.currentDashboardingMode !== this.configDashboardingMode.dashboardingMode
+    ) {
       if (this.configExpertMode.expertMode) {
         this.selectedTabIndex = this.expertTabsParam.findIndex(tab => tab.tabName === this.currentTab);
+        //this.currentTab = 'Setup';
+      } else if (this.configDashboardingMode.dashboardingMode) {
+        this.selectedTabIndex = this.dashboardingTabsParam.findIndex(tab => tab.tabName === this.currentTab);
         //this.currentTab = 'Setup';
       } else {
         this.selectedTabIndex = this.normalTabsParam.findIndex(tab => tab.tabName === this.currentTab);
@@ -146,6 +160,7 @@ export class ListComponent extends Utils implements OnInit {
         }
       }
       this.currentExpertMode = this.configExpertMode.expertMode;
+      this.currentDashboardingMode = this.configDashboardingMode.dashboardingMode;
       this.populateMeta();
     }
   }
@@ -750,10 +765,15 @@ export class ListComponent extends Utils implements OnInit {
    * @returns the list of tabs
    */
   get visibleTabs() {
-    if (!this.configExpertMode.expertMode) {
-      return this.normalTabsParam;
+    if (this.configDashboardingMode.dashboardingMode) {
+      return this.dashboardingTabsParam;
     }
-    return this.expertTabsParam;
+
+    if (this.configExpertMode.expertMode) {
+      return this.expertTabsParam;
+    }
+
+    return this.normalTabsParam;
   }
 
 }
