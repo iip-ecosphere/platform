@@ -4,6 +4,7 @@ import { ApiService } from './services/api.service';
 import { EnvConfigService } from './services/env-config.service';
 import { UserService } from './services/user.service';
 import { ConfigExpertModeService } from './services/config-expert-mode.service';
+import { ConfigDashboardingModeService } from './services/config-dashboarding-mode.service';
 
 @Component({
     selector: 'app-root',
@@ -20,7 +21,7 @@ export class AppComponent implements OnInit{
     isRelease: undefined,
   };
 
-  constructor(private api: ApiService, private cfg: EnvConfigService, private user:UserService, public configExpertMode: ConfigExpertModeService) {}
+  constructor(private api: ApiService, private cfg: EnvConfigService, private user:UserService, public configExpertMode: ConfigExpertModeService, public configDashboardingMode: ConfigDashboardingModeService) {}
 
   async ngOnInit() {
     const response = await this.api.getPlatformData();
@@ -62,7 +63,18 @@ export class AppComponent implements OnInit{
   }
 
   onExpertModeChange(checked: boolean) {
+    if (checked) {
+      this.configDashboardingMode.dashboardingMode = false;
+    }
+
     this.configExpertMode.expertMode = checked;
   }
-  
+
+  onDashboardingModeChange(checked: boolean) {
+    if (checked) {
+      this.configExpertMode.expertMode = false;
+    }
+
+    this.configDashboardingMode.dashboardingMode = checked;
+  }
 }

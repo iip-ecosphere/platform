@@ -32,6 +32,14 @@
         </mat-checkbox>
         Expert Mode
       </span>
+      <span>
+        <mat-checkbox
+          [(ngModel)]="configDashboardingMode.dashboardingMode"
+          (change)="onDashboardingModeChange($event.checked)"
+          (click)="$event.stopPropagation()">
+        </mat-checkbox>
+        Dashboarding Mode
+      </span>
     &nbsp;)
   </a>
   <a mat-tab-link [routerLink]="'services'"> Runtime </a>
