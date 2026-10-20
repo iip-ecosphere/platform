@@ -80,7 +80,10 @@ public class CleaningUnpackMojo extends UnpackMojo {
 
     @Parameter( property = "unpack.logCleanup", required = false, defaultValue = "false" )
     private boolean logCleanup;
-    
+
+    @Parameter( property = "unpack.defaultEncoding", required = false, defaultValue = "UTF-8" )
+    private String defaultEncoding;
+
     private boolean execute;
 
     // checkstyle: stop parameter number check
@@ -192,6 +195,9 @@ public class CleaningUnpackMojo extends UnpackMojo {
             execute = false;
             getLog().info("Checking artifacts...");
             for (ArtifactItem ai : getArtifactItems()) {
+                if (null == ai.getEncoding()) {
+                    ai.setEncoding(defaultEncoding);
+                }
                 boolean outDirNull = ai.getOutputDirectory() == null;
                 if (outDirNull) {
                     getLog().warn("Output directory of " + ai.getArtifactId() + " not specified");
@@ -217,7 +223,7 @@ public class CleaningUnpackMojo extends UnpackMojo {
                     execute = true;
                 }
                 getLog().info(" - " + ai + " unpack: " + execute + " overwrite: " + ai.getOverWrite() + " outDir: " 
-                        + ai.getOutputDirectory());
+                        + ai.getOutputDirectory() + " encoding " + ai.getEncoding());
             }
             if (skipIfExists != null && skipIfExists.toString().length() > 0) {
                 if (skipIfExists.exists()) {

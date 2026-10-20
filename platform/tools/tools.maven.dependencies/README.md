@@ -53,6 +53,7 @@ The extended unpack goal supports the following additional configuration setting
   - `skipIfExists` (default `false`, user property `unpack.skipIfExists`) skips the execution of this plugin if the file or folder specified in this property exists.
   - `forceCleanup` (default `false`, user property `unpack.forceCleanup`) forces the cleanup of `cleanup` before doing any checks/validating the artifacts/executing the plugin.
   - `logCleanup` (default `false`, user property `unpack.logCleanup`) enables/disables logging the cleaned up files
+  - `defaultEncoding` (default `UTF-8`, user property `unpack.defaultEncoding`) sets the default encoding in case that none is specified, a required property at least since maven 3.9.17. Usually, the encoding is taken from the property `project.build.sourceEncoding`.
   
 ## copy-dependencies goal
 
