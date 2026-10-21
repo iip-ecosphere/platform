@@ -236,6 +236,12 @@ export class Utils {
           } else if (Object.keys(element).length > 1) {
             idShort = `{${firstKey}: '${element[firstKey].value}', ... }`
           }
+        } else if (element[firstKey] && element[firstKey].hasOwnProperty("value") && element[firstKey].value) {
+          if (Object.keys(element).length === 1) {
+            idShort = `{${firstKey}: '${element[firstKey].value}'}`
+          } else if (Object.keys(element).length > 1) {
+            idShort = `{${firstKey}: '${element[firstKey].value}', ... }`
+          }
         }
       } else {
         if (element && !DataUtils.isEmpty(element)) {

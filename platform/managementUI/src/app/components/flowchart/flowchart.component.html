@@ -67,7 +67,7 @@
           style="font-size:14px; margin-right: 1%; margin-left: 1%;"
           ngDefaultControl [(ngModel)]=meshName>
 
-        <button mat-raised-button class="button" (click)="create()">create</button>
+        <button mat-raised-button class="button" (click)="create()">{{ getButtonLabel() }}</button>
       </mat-card>
 
       <!--
