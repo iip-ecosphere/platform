@@ -37,6 +37,78 @@
       <timezone>Europe/Berlin</timezone>
     </developer>
     <developer>
+      <id>staciwa</id>
+      <name>Monika Staciwa</name>
+      <organization>SSE @ University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+    <developer>
+      <id>casado</id>
+      <name>Miguel Gomez Casado</name>
+      <organization>University of Valladolid/University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+    <developer>
+      <id>alamoush</id>
+      <name>Ahmad Alamoush</name>
+      <organization>University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/mitglieder/ahmad-alamoush/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+    <developer>
+      <id>pidun</id>
+      <name>Dennis Pidun</name>
+      <organization>University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+    <developer>
+      <id>noehre</id>
+      <name>Marcel NÃ¶hre</name>
+      <organization>University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+    <developer>
+      <id>bettelsc</id>
+      <name>Constantin Bettels</name>
+      <organization>University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+    <developer>
+      <id>ChrisKHil</id>
+      <name>Christopher Knappe</name>
+      <email>knappe@uni-hildesheim.de</email>
+      <url>https://sse.uni-hildesheim.de/</url>
+      <organization>SSE @ University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+    <developer>
       <id>JimmiAppel</id>
       <name>Alexander Weber</name>
       <email>weber@sse.uni-hildesheim.de</email>
@@ -48,7 +120,99 @@
       </roles>
       <timezone>Europe/Berlin</timezone>
     </developer>
-  </developers>
+    <developer>
+      <id>Cepok</id>
+      <name>Jan-Hendrik Cepok</name>
+      <email>cepokj@uni-hildesheim.de</email>
+      <url>https://sse.uni-hildesheim.de/</url>
+      <organization>SSE @ University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+    <developer>
+      <id>schulzlu</id>
+      <name>Luca Schulz</name>
+      <email>schulzlu@uni-hildesheim.de</email>
+      <url>https://sse.uni-hildesheim.de/</url>
+      <organization>SSE @ University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+    <developer>
+      <id>nikolajew</id>
+      <name>Christian Nikolajew</name>
+      <email>nikolajew@uni-hildesheim.de</email>
+      <url>https://sse.uni-hildesheim.de/</url>
+      <organization>SSE @ University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+    <developer>
+      <id>kschmid</id>
+      <name>Klaus Schmid</name>
+      <email>schmid@sse.uni-hildesheim.de</email>
+      <url>https://sse.uni-hildesheim.de/</url>
+      <organization>SSE @ University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+    <developer>
+      <id>elizaveta-andreeva</id>
+      <name>Elizaveta Andreeva</name>
+      <url>https://uni-hildesheim.de/</url>
+      <organization>University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+    <developer>
+      <id>ivioje</id>
+      <name>Eboreime Rhoda</name>
+      <url>https://uni-hildesheim.de/</url>
+      <organization>University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+    <developer>
+      <id>Ullah</id>
+      <name>Muhammad Asad Ullah</name>
+      <url>https://uni-hildesheim.de/</url>
+      <organization>University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+    <developer>
+      <id>adjroloh</id>
+      <name>Kodjo Adjroloh</name>
+      <url>https://uni-hildesheim.de/</url>
+      <organization>University of Hildesheim</organization>
+      <organizationUrl>https://sse.uni-hildesheim.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+    </developer>
+  </developers>  
 
   <scm>
     <url>https://github.com/iip-ecosphere/platform.git</url>
