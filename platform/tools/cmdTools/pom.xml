@@ -17,6 +17,20 @@
     <maven.compiler.target>17</maven.compiler.target>
     <maven.compiler.source>17</maven.compiler.source>
     <java.encoding>Cp1252</java.encoding>
+    <jenkins.html.file>test.html</jenkins.html.file>
+    <workspace.basedir>${project.basedir}/../..</workspace.basedir>
+    <repo.basedir>${settings.localRepository}</repo.basedir>
+    <minVer>0.2.0</minVer>
+    <maxVer>${project.version}</maxVer>
+    <includingMaxVer>false</includingMaxVer>
+    <includingReleases>true</includingReleases>
+    <simulate>false</simulate>
+    
+    <oldParentPOMVersion>${project.version}</oldParentPOMVersion>
+    <newParentPOMVersion></newParentPOMVersion>
+    <oldPOMVersion>${project.version}</oldPOMVersion>
+    <newPOMVersion></newPOMVersion>
+    
   </properties>
   
   <dependencies>
@@ -55,5 +69,105 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  
+  <build>
+    <plugins>
+       <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>${org.codehaus.mojo.exec-maven-plugin.version}</version>
+          <executions>
+              <execution>
+                 <id>cleanTemp</id>
+                 <configuration>
+                     <mainClass>de.oktoflow.platform.cmdTools.CleanTemp</mainClass>
+                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
+                 </configuration>
+              </execution>
+              <execution>
+                 <id>jenkinsHtmlParser</id>
+                 <configuration>
+                     <mainClass>de.oktoflow.platform.cmdTools.JenkinsHtmlParser</mainClass>
+                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
+                     <arguments>
+                         <argument>${jenkins.html.file}</argument>
+                     </arguments>
+                 </configuration>
+              </execution>
+              <execution>
+                 <id>cleanDumps</id>
+                 <configuration>
+                     <mainClass>de.oktoflow.platform.cmdTools.CleanDumps</mainClass>
+                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
+                     <arguments>
+                         <argument>${workspace.basedir}</argument>
+                     </arguments>
+                 </configuration>
+              </execution>
+              <execution>
+                 <id>cleanDumps</id>
+                 <configuration>
+                     <mainClass>de.oktoflow.platform.cmdTools.CleanMvnSnapshots</mainClass>
+                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
+                 </configuration>
+              </execution>
+              <execution>
+                 <id>cleanMvnSnapshots</id>
+                 <configuration>
+                     <mainClass>de.oktoflow.platform.cmdTools.CleanMvnSnapshots</mainClass>
+                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
+                 </configuration>
+              </execution>
+              <execution>
+                 <id>cleanMvnArtifactsWorkspace</id>
+                 <configuration>
+                     <mainClass>de.oktoflow.platform.cmdTools.CleanMvnArtifacts</mainClass>
+                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
+                     <arguments>
+                         <argument>${workspace.basedir}</argument>
+                         <argument>--minVer=${minVer}</argument>
+                         <argument>--maxVer=${maxVer}</argument>
+                         <argument>--includingMaxVer=${includingMaxVer}</argument>
+                         <argument>--releases=${includingReleases}</argument>
+                         <argument>--simulate=${simulate}</argument>
+                     </arguments>
+                 </configuration>
+              </execution>
+              <execution>
+                 <id>cleanMvnArtifactsRepo</id>
+                 <configuration>
+                     <mainClass>de.oktoflow.platform.cmdTools.CleanMvnArtifacts</mainClass>
+                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
+                     <arguments>
+                         <argument>${repo.basedir}</argument>
+                         <argument>--minVer=${minVer}</argument>
+                         <argument>--maxVer=${maxVer}</argument>
+                         <argument>--includingMaxVer=${includingMaxVer}</argument>
+                         <argument>--releases=${includingReleases}</argument>
+                         <argument>--simulate=${simulate}</argument>
+                     </arguments>
+                 </configuration>
+              </execution>
+              <execution>
+                 <id>changePomVersion</id>
+                 <configuration>
+                     <mainClass>de.oktoflow.platform.cmdTools.ChangePomVersion</mainClass>
+                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
+                     <arguments>
+                         <argument>${workspace.basedir}</argument>
+                         <argument>--oldParentPOMVersion=${oldParentPOMVersion}</argument>
+                         <argument>--newParentPOMVersion=${newParentPOMVersion}</argument>
+                         <argument>--oldPOMVersion=${oldPOMVersion}</argument>
+                         <argument>--newPOMVersion=${newPOMVersion}</argument>
+                         <argument>--properties=iip.version</argument>
+                         <argument>--excludes=.*[/,\\]target[/,\\].*</argument>
+                         <argument>--simulate ${simulate}</argument>
+                     </arguments>
+                 </configuration>
+              </execution>
+          </executions>
+        </plugin>    
+    </plugins>
+  </build>
   
 </project>

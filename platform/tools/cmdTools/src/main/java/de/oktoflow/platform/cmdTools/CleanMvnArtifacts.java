@@ -29,6 +29,7 @@ public class CleanMvnArtifacts {
     private static final String SNAPSHOT_SUFFIX = "-SNAPSHOT";
     private static Version minVer;
     private static Version maxVer;
+    private static boolean includingMaxVer = true;
     private static boolean includeReleases;
     private static boolean onRepo;
     private static boolean simulate;
@@ -47,13 +48,16 @@ public class CleanMvnArtifacts {
             System.out.println(" --releases: shall also release files be cleaned up, else only snapshots");
             System.out.println(" --repo: do we operate on a Maven repository or a workspace");
             System.out.println(" --minVer: minimum version to consider, do not delete smaller; optional");
-            System.out.println(" --maxVer: maxiumuzm version to consider, do not delete larger; optional");
+            System.out.println(" --maxVer: maximum version to consider, do not delete larger; optional");
+            System.out.println(" --includingMaxVer: shall the specified maximum version be included in the "
+                + "operation or not; optional");
         } else {
             File base = new File(args[0]);
             includeReleases = CmdLine.getBooleanArg(args, "releases", false);
             onRepo = CmdLine.getBooleanArg(args, "repo", false);
             minVer = toVersion(CmdLine.getArg(args, "minVer", null), false);
             maxVer = toVersion(CmdLine.getArg(args, "maxVer", null), false);
+            includingMaxVer = CmdLine.getBooleanArg(args, "includingMaxVer", true);
             if (minVer == null && maxVer == null) {
                 System.err.println("Either minVer or maxVer must be given. Else, we would delete everything.");
             }
@@ -197,7 +201,12 @@ public class CleanMvnArtifacts {
         boolean result;
         if (version != null) {
             boolean minVerOk = (null == minVer || minVer.compareTo(version) <= 0);
-            boolean maxVerOk = (null == maxVer || version.compareTo(maxVer) <= 0);
+            boolean maxVerOk;
+            if (includingMaxVer) {
+                maxVerOk = (null == maxVer || version.compareTo(maxVer) <= 0);
+            } else {
+                maxVerOk = (null == maxVer || version.compareTo(maxVer) < 0);
+            }
             result = minVerOk && maxVerOk;
         } else {
             result = false;
