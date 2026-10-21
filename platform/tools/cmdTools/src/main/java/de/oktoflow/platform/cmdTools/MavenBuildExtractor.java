@@ -74,7 +74,7 @@ public class MavenBuildExtractor {
 
                 final String surefireReportsPath = "target/surefire-reports/";
 
-                File pluginFile = new File(inputFolder, surefireReportsPath + PLUGIN_FILE_NAME);
+                File pluginFile = fileOrAllTestsFile(new File(inputFolder, surefireReportsPath + PLUGIN_FILE_NAME));
                 if (pluginFile.exists()) { // non-plugin execution
                     File pluginOutFile = new File(outputFolder, PLUGIN_OUT_FILE_NAME);
                     pluginOutFile = appendSuffix(pluginOutFile, OUT_FILE_SUFFIX);
@@ -94,13 +94,38 @@ public class MavenBuildExtractor {
             System.exit(1);
         }
     }
+    
+    /**
+     * Checks whether {@code file} exists and if not, searches in the parent folder of {@code file} for a surefire
+     * console recording ({@code output}) file for the {@code AllTests} test suite. Introduced for more recent
+     * surefire versions.
+     * 
+     * @param file the file to check (may be <b>null</b>)
+     * @return {@code file} or, if found, the output file of the {@code AllTests} test suite
+     */
+    private static File fileOrAllTestsFile(File file) {
+        File result = file;
+        if (null != file && !file.exists()) {
+            File[] files = file.getParentFile().listFiles(); 
+            if (files != null) {
+                for (File f: files) {
+                    if (f.getName().endsWith(".AllTests-output.txt")) {
+                        result = f;
+                        break;
+                    }
+                }
+            }
+        }
+        return result;
+    }
 
     /**
      * Finds the BaSyx log file.
      * 
      * @param inputFolder the input folder
      * @param surefireReportsPath the surefire reports path
-     * @return the basyx file, may be <b>null</b>
+     * @return the Basyx file, the output file of the {@code AllTests} test suite, or <b>null</b>
+     * @see #fileOrAllTestsFile(File)
      */
     private static File findBasyxFile(File inputFolder, String surefireReportsPath) {
         File basyxFile = null;
@@ -120,7 +145,7 @@ public class MavenBuildExtractor {
         } else {
             basyxFile = new File(inputFolder, surefireReportsPath + basyxFileName);
         }
-        return basyxFile;
+        return fileOrAllTestsFile(basyxFile);
     }
 
     /**
