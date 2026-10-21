@@ -105,13 +105,6 @@
                  </configuration>
               </execution>
               <execution>
-                 <id>cleanDumps</id>
-                 <configuration>
-                     <mainClass>de.oktoflow.platform.cmdTools.CleanMvnSnapshots</mainClass>
-                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
-                 </configuration>
-              </execution>
-              <execution>
                  <id>cleanMvnSnapshots</id>
                  <configuration>
                      <mainClass>de.oktoflow.platform.cmdTools.CleanMvnSnapshots</mainClass>
