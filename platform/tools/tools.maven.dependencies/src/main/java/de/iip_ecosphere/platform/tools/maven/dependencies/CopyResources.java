@@ -46,6 +46,9 @@ public class CopyResources extends AbstractMojo {
     @Parameter(required = false)
     private boolean failOnError = true;
 
+    @Parameter(required = false)
+    private boolean failOnNotExists = false;
+
     @Parameter( defaultValue = "${project.basedir}", required = true, readonly = true )
     private File basedir;
     
@@ -120,30 +123,37 @@ public class CopyResources extends AbstractMojo {
             if (!dirSet && r.directories != null && r.directories.size() > 0) {
                 for (String d : r.directories) {
                     if (r.setDirectoryIfExists(d)) {
+                        dirSet = true;
                         break;
                     }
                 }
             }
-            if (getLog().isDebugEnabled()) {
-                getLog().info("Using target directory " + r.getDirectory());
-            }
-            List<File> files = getResourceFiles(r);
-            if (r.isFiltering()) {
-                getLog().warn("Filtering is currently not supported for files in directory " + dir);
-            }
-            outputDirectory.mkdirs();
-            for (File f: files) {
-                try {
-                    File target = new File(outputDirectory, f.getName());
-                    if (getLog().isDebugEnabled()) {
-                        getLog().info("Copying " + f + " to " + target);
+            if (dirSet) {
+                if (getLog().isDebugEnabled()) {
+                    getLog().info("Using target directory " + r.getDirectory());
+                }
+                List<File> files = getResourceFiles(r);
+                if (r.isFiltering()) {
+                    getLog().warn("Filtering is currently not supported for files in directory " + dir);
+                }
+                outputDirectory.mkdirs();
+                for (File f: files) {
+                    try {
+                        File target = new File(outputDirectory, f.getName());
+                        if (getLog().isDebugEnabled()) {
+                            getLog().info("Copying " + f + " to " + target);
+                        }
+                        Files.copy(f.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        countFiles++;
+                    } catch (IOException e) {
+                        getLog().error("Copying file " + f + " failed: " + e.getClass().getSimpleName() + " " 
+                            + e.getMessage());
+                        failed = true;
                     }
-                    Files.copy(f.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    countFiles++;
-                } catch (IOException e) {
-                    getLog().error("Copying file " + f + " failed: " + e.getClass().getSimpleName() + " " 
-                        + e.getMessage());
-                    failed = true;
+                }
+            } else {
+                if (failOnNotExists) {
+                    throw new MojoExecutionException("None of the specified source directories exists.");
                 }
             }
             r.setDirectory(dir);
