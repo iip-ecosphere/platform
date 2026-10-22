@@ -104,7 +104,7 @@ public class StringUtilsTest {
     }
     
     /**
-     * Tests {@link StringUtils#equals(String, String)}.
+     * Tests {@link StringUtils#equals(String, String)} and {@link StringUtils#equalsNotNull(String, String)}.
      */
     @Test
     public void testEquals() {
@@ -113,6 +113,12 @@ public class StringUtilsTest {
         Assert.assertFalse(StringUtils.equals("", null));
         Assert.assertTrue(StringUtils.equals("", ""));
         Assert.assertTrue(StringUtils.equals("abba", "abba"));
+
+        Assert.assertFalse(StringUtils.equalsNotNull(null, null));
+        Assert.assertFalse(StringUtils.equalsNotNull(null, ""));
+        Assert.assertFalse(StringUtils.equalsNotNull("", null));
+        Assert.assertTrue(StringUtils.equalsNotNull("", ""));
+        Assert.assertTrue(StringUtils.equalsNotNull("abba", "abba"));
     }
 
 }
