@@ -762,7 +762,8 @@ public class IvmlDashboardMapper implements DashboardMapper {
                                     dp.influx = influx;
                                     dp.influxDb = influxDb;
                                     dp.fields.add(fld);
-                                } else if (dp.unit.equals(fld.unit) && dp.type.equals(fld.panelType)) {
+                                } else if (StringUtils.equalsNotNull(dp.unit, fld.unit) 
+                                    && StringUtils.equalsNotNull(dp.type, fld.panelType)) {
                                     fld.displayPanels.add(dp);
                                     dp.fields.add(fld);
                                 } else {

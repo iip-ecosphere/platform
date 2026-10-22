@@ -28,7 +28,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             XmlElement exec = new XmlElement(execs, "execution");
             new XmlElement(exec, "id", "unpack-resources");
             appendGoal(exec, "unpack");
-            new XmlElement(exec, "phase", "process-resources");
+            new XmlElement(exec, "phase", "validate");
             XmlElement config = appendConfiguration(exec);
 
             XmlElement artifactItems = new XmlElement(config, "artifactItems");
@@ -128,7 +128,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             }
     
             XmlElement dependencyPlugin = appendMavenIipDependencyPlugin(plugins, ver=config.iipVer); // otherwise project's appVer
-            XmlElement execs = new XmlElement(dependencyPlugin, "executions");
+            XmlElement execs = appendExecutionsParent(dependencyPlugin);
             appendMavenIipDependencyPluginTouchPluginsExecution(execs, "\\${project.build.directory}/deployed", phase="package");
             appendResourceUnpack(execs, implResources);
             
@@ -155,8 +155,8 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
                 appendMavenDependencyPluginExecutionSplitClasspath(execs, archiveFiles);
             }
             
-            XmlElement depPlugin = appendMavenResourcesPlugin(plugins);
-            XmlElement rExecs = appendExecutionsParent(depPlugin);
+            //XmlElement depPlugin = appendMavenResourcesPlugin(plugins);
+            //XmlElement rExecs = appendExecutionsParent(depPlugin);
             if (resources.size() > 0) {
                 mapOf(String, sequenceOf(String)) resMap = {};
                 for (ResourceInfo res: resources.asSequence()->sortedBy(r|r.srcDir)) { // sortedBy for testing
@@ -166,13 +166,13 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
                     resMap.get(res.srcDir).add(res.file);
                 }
                 for (String res: resMap.keys().asSequence()->sortedBy(b|b)) { // sortedBy for testing
-                    appendMavenResourcesCopyResourcesExecution(rExecs, "copy-resources", "\\${project.build.outputDirectory}", res, resMap.get(res));
+                    appendMavenResourcesCopyResourcesExecution(execs, "copy-resources", "\\${project.build.outputDirectory}", res, resMap.get(res));
                 }
             }
     
             sequenceOf(String) files = defltOktoResourceFiles();
-            appendMavenResourcesCopyIipResourcesPlatformExecution(rExecs, config, target.getPath().getParent(), files);
-            appendMavenResourcesCopyIipResourcesSoftwareExecution(rExecs, config, target.getPath().getParent(), files);
+            appendMavenResourcesCopyIipResourcesPlatformExecution(execs, config, target.getPath().getParent(), files, prependResourceDirs=true);
+            appendMavenResourcesCopyIipResourcesSoftwareExecution(execs, config, target.getPath().getParent(), files, prependResourceDirs=true);
             
             if (copyRuntimeDependencies) {
                 // prependGroupId as in Spring, fails otherwise with jakarta.el, zip excludes required for now

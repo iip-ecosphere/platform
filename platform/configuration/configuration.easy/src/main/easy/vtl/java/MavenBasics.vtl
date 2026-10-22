@@ -672,7 +672,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
         execs;
     }
     
-    def XmlElement appendMavenResourcesCopyResourcesExecution(XmlElement execs, String goal, String outputDirectory, String resourceDirectory, sequenceOf(String) files, String phase="validate", String id="") {
+    def XmlElement appendMavenResourcesCopyResourcesExecution(XmlElement execs, String goal, String outputDirectory, String resourceDirectory, sequenceOf(String) files, String phase="validate", String id="", Boolean prependResourceDirs=false) {
         XmlElement exec = new XmlElement(execs, "execution");
         if (length(id) == 0) { // fallback
             id = goal;
@@ -684,6 +684,9 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(config, "outputDirectory", outputDirectory);
         XmlElement resources = new XmlElement(config, "resources");
         XmlElement resource = new XmlElement(resources, "resource");
+        if (prependResourceDirs) {
+            new XmlElement(resource, "prependResourceDirectories", "true");
+        }
         new XmlElement(resource, "directory", resourceDirectory);
         new XmlElement(resource, "filtering", "false");
         for (String f: files->sortedBy(g|g)) { // sorted for testing
@@ -692,16 +695,16 @@ template MavenBasics(Configuration config, FileArtifact target) {
         config;
     }
     
-    def XmlElement appendMavenResourcesCopyIipResourcesPlatformExecution(XmlElement execs, IIPEcosphere config, Path base, sequenceOf(String) files, String phase="validate", String id="platf-res") {
-        appendMavenResourcesCopyResourcesExecution(execs, "copy-resources", mavenBuildOutputResourcesDir(), base.relativizeFolder(getResourcesFolder(config)+"/platform"), files, phase=phase, id=id);
+    def XmlElement appendMavenResourcesCopyIipResourcesPlatformExecution(XmlElement execs, IIPEcosphere config, Path base, sequenceOf(String) files, String phase="validate", String id="platf-res", Boolean prependResourceDirs=false) {
+        appendMavenResourcesCopyResourcesExecution(execs, "copy-resources", mavenBuildOutputResourcesDir(), base.relativizeFolder(getResourcesFolder(config)+"/platform"), files, phase=phase, id=id, prependResourceDirs=prependResourceDirs);
     }
     
-    def XmlElement appendMavenResourcesCopyIipResourcesSoftwareExecution(XmlElement execs, IIPEcosphere config, Path base, sequenceOf(String) files, String phase="validate", String id="sw-res") {
-        appendMavenResourcesCopyResourcesExecution(execs, "copy-resources", mavenBuildOutputResourcesDir(), base.relativizeFolder(getResourcesFolder(config)+"/software"), files, phase=phase, id=id);
+    def XmlElement appendMavenResourcesCopyIipResourcesSoftwareExecution(XmlElement execs, IIPEcosphere config, Path base, sequenceOf(String) files, String phase="validate", String id="sw-res", Boolean prependResourceDirs=false) {
+        appendMavenResourcesCopyResourcesExecution(execs, "copy-resources", mavenBuildOutputResourcesDir(), base.relativizeFolder(getResourcesFolder(config)+"/software"), files, phase=phase, id=id, prependResourceDirs=prependResourceDirs);
     }
 
-    def XmlElement appendMavenResourcesCopyIipResourcesDevicesExecution(XmlElement execs, IIPEcosphere config, Path base, sequenceOf(String) files, String phase="validate", String id="dev-res") {
-        appendMavenResourcesCopyResourcesExecution(execs, "copy-resources", mavenBuildOutputResourcesDir(), base.relativizeFolder(getResourcesFolder(config)+"/devices"), files, phase=phase, id=id);
+    def XmlElement appendMavenResourcesCopyIipResourcesDevicesExecution(XmlElement execs, IIPEcosphere config, Path base, sequenceOf(String) files, String phase="validate", String id="dev-res", Boolean prependResourceDirs=false) {
+        appendMavenResourcesCopyResourcesExecution(execs, "copy-resources", mavenBuildOutputResourcesDir(), base.relativizeFolder(getResourcesFolder(config)+"/devices"), files, phase=phase, id=id, prependResourceDirs=prependResourceDirs);
     }
     
     def String mavenBuildOutputDir() {

@@ -547,7 +547,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     }
     
     /**
-     * Returns the (expected) resources directory in {@code base}.
+     * Returns the (expected) resources directory in {@code base}. For building apps, the directory may not be known 
+     * before running the build process.
      * 
      * @param base the base directory
      * @return the existing resources directory or <b>null</b>
