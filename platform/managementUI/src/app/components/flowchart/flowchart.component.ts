@@ -223,12 +223,14 @@ export class FlowchartComponent implements OnInit {
           + iconHtml + "</div></td><td style=\"background-color:rgb(247,247,247)\"><div style=\"text-align: right\">"
           + busInHtml + busOutHtml + "</div></td></tr></table>" +
           "<h3> " + a.data.id + "</h3>" +
-          "<p class=\"subtext-small\">"+ a.data.type + "</p>" +
-          "<p class=\"subtext-small\">"+ a.data.kind + "</p>" +
+          "<p class=\"subtext-small\">type: "+ a.data.type + "</p>" +
+          "<p class=\"subtext-small\">kind: "+ a.data.kind + "</p>" +
           "</div>";
 
         busIn = [];
         busOut = [];
+        a.data = {};
+        a.class = '';
       }
       this.editor.import(graph2);
     }
@@ -236,6 +238,7 @@ export class FlowchartComponent implements OnInit {
 
   public selectMesh(mesh: string) {
     this.getGraph(mesh);
+    this.buttenLabel = "Save"
     this.meshName = this.getMeshName(mesh);
   }
 
@@ -283,17 +286,29 @@ export class FlowchartComponent implements OnInit {
 
       let name = this.getServiceValue(this.selectedService, "name")
       let kind = this.getServiceValue(this.selectedService, "kind")
-      let ver = this.getServiceValue(this.selectedService, "ver")
       let id = this.getServiceValue(this.selectedService, "id")
+      let type = this.getServiceValue(this.selectedService, "metaType")
+
+      let iconHtml = this.assignIcon(type as string, true);
+
+      let html = "<div style=\"width:100%;\">" +
+          "<table style=\"width:100%; margin-top: 0px\"><tr><td style=\"background-color:rgb(247,247,247)\"><div style=\"text-align: left\">"
+          + iconHtml + "</div></td></tr></table>" +
+          "<h3> " + id + "</h3>" +
+          "<p class=\"subtext-small\">type: "+ type + "</p>" +
+          "<p class=\"subtext-small\">kind: "+ kind + "</p>" +
+          "</div>";
 
       console.log("name of the node: " + name)
-      this.editor.addNode(name, 1, 1, event.layerX, event.layerY, '', {},
-        '<div>'
-        + id + '<br><p class="subtext">name: '
-        + name + '</p><p class="subtext">kind: '
-        + kind + '</p><p class="subtext">ver: '
-        + ver + '</p><div>'
-        , false);
+      this.editor.addNode(name, 
+                          1, 
+                          1, 
+                          event.layerX, 
+                          event.layerY, 
+                          '', 
+                          {},
+                          html, 
+                          false);
       this.selectedService = undefined;
     }
   }
@@ -302,8 +317,12 @@ export class FlowchartComponent implements OnInit {
     let result = null
     if (service.value) {
       let values = service.value.find((x: { idShort: string; }) => x.idShort == idShortValue).value
-      let varValue = values.find((x: {idShort: string;}) => x.idShort == "varValue").value
-      result = varValue
+      if (Array.isArray(values)) {
+        let varValue = values.find((x: {idShort: string;}) => x.idShort == "varValue").value
+        result = varValue
+      } else {
+        result = values;
+      }
     }
     return result
   }
@@ -325,8 +344,13 @@ export class FlowchartComponent implements OnInit {
     return this.route.snapshot.paramMap.get('mesh') ?? "";
   }
 
+  buttenLabel:string = "";
+
   public getButtonLabel() : string {
-    return this.meshName ? "Save" : "Create";
+    if (this.buttenLabel == "") {
+      return this.route.snapshot.paramMap.get('mesh') ? "Save" : "Create";
+    }
+    return this.buttenLabel;
   }
 
 }
