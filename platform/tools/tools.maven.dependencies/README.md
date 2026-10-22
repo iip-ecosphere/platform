@@ -87,6 +87,40 @@ The ``copy`` goal is the same as in the original plugin and included here just f
 
 The ``tree`` goal is the same as in the original plugin and included here just for convenience.
 
+## copy-resources
+
+The ``copy-resources`` is a variant of the equally named goal of the maven resources plugin, however, tailored for the use in oktoflow, in particular considering multiple potential source directories at build time. A potential execution looks like:
+
+```
+    <execution>
+        <id>platf-res</id>
+        <goals>
+            <goal>copy-resources</goal>
+        </goals>
+        <phase>validate</phase>
+        <configuration>
+            <outputDirectory>${project.build.outputDirectory}/resources</outputDirectory>
+            <resources>
+                <resource>
+                    <directory>W:\offlineFiles\git\IIP-ecosphere\platform\platform\configuration\configuration.easy\resources.ipr/platform</directory>
+                    <filtering>false</filtering>
+                    <include>*.jpg</include>
+                    <include>*.json</include>
+                    <include>*.png</include>
+                    <include>*.yml</include>
+                </resource>
+            </resources>
+        </configuration>
+    </execution>
+
+```
+
+The following parameters are supported:
+* `resources` the resources to be copied from `directory`. Similar to the resources-plugin, but without filtering. May specify includes/excludes with usual patterns. If `prependResourceDirectories` is `true`, the project-local top-level folders `resources.ipr` and `resources` are considered as source if existing. Then `directory` and, if not existing, additional entires from the string list `directories` are considered.
+* `outputDirectory` the mandatory directory where resources shall be written to. If `outputDirectory` is not existing, it will be created.
+* `skip` (user property `-Dmaven.resources.skip`, default `false`) whether the execution shall be skipped
+* `failOnError` (default `true`) whether copying exceptions shall fail the plugin execution
+
 ## delete goal
 
 The delete goal allows to just delete files and directories. At it's core, it is similar to the
