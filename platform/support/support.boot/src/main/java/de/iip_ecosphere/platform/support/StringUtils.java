@@ -251,4 +251,21 @@ public class StringUtils {
         return toArray(toTokenList(tokenizer));
     }
 
+    /**
+     * Checks for string equality, allowing {@code s1} or {@code s2} to be <b>null</b>.
+     * 
+     * @param s1 the first string
+     * @param s2 the second string
+     * @return if both arguments are <b>null</b> or {@code s1.equals(s2)}
+     */
+    public static boolean equals(String s1, String s2) {
+        boolean result = false;
+        if (s1 == null) {
+            result = (s2 == null);
+        } else {
+            result = s1.equals(s2);
+        }
+        return result;
+    } 
+
 }

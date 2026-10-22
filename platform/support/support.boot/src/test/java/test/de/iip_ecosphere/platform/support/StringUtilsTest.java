@@ -102,5 +102,17 @@ public class StringUtilsTest {
         StringUtils.replaceOnce("", "", "");
         StringUtils.toString(new Object());
     }
+    
+    /**
+     * Tests {@link StringUtils#equals(String, String)}.
+     */
+    @Test
+    public void testEquals() {
+        Assert.assertTrue(StringUtils.equals(null, null));
+        Assert.assertFalse(StringUtils.equals(null, ""));
+        Assert.assertFalse(StringUtils.equals("", null));
+        Assert.assertTrue(StringUtils.equals("", ""));
+        Assert.assertTrue(StringUtils.equals("abba", "abba"));
+    }
 
 }
