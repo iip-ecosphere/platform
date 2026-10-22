@@ -62,7 +62,7 @@ public class BaSyxAasFactory extends AbstractBaSyxAasFactory {
 
     @Override
     public String getName() {
-        return "AAS/BaSyx v2 M5";
+        return "AAS/BaSyx v2 M8";
     }
 
     @Override

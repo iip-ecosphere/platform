@@ -12,7 +12,7 @@
 
 package de.iip_ecosphere.platform.support.aas.basyx2.server.apps.security;
 
-import org.eclipse.digitaltwin.basyx.submodelrepository.feature.authorization.SubmodelTargetInformation;
+import org.eclipse.digitaltwin.basyx.submodelservice.feature.authorization.SubmodelTargetInformation;
 
 import de.iip_ecosphere.platform.support.CollectionUtils;
 import de.iip_ecosphere.platform.support.aas.AuthenticationDescriptor.RbacRule;

@@ -29,8 +29,8 @@ import org.eclipse.digitaltwin.basyx.authorization.rbac.SimpleRbacPermissionReso
 import org.eclipse.digitaltwin.basyx.authorization.rbac.TargetInformation;
 import org.eclipse.digitaltwin.basyx.authorization.rbac.TargetPermissionVerifier;
 import org.eclipse.digitaltwin.basyx.authorization.rules.rbac.backend.inmemory.InMemoryAuthorizationRbacStorage;
-import org.eclipse.digitaltwin.basyx.submodelrepository.feature.authorization.SubmodelTargetInformation;
-import org.eclipse.digitaltwin.basyx.submodelrepository.feature.authorization.rbac.SubmodelTargetPermissionVerifier;
+import org.eclipse.digitaltwin.basyx.submodelservice.feature.authorization.SubmodelTargetInformation;
+import org.eclipse.digitaltwin.basyx.submodelservice.feature.authorization.rbac.SubmodelTargetPermissionVerifier;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 

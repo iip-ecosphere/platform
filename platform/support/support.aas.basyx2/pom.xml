@@ -13,8 +13,8 @@
   </parent>
   
   <properties>
-    <basyx.version>2.0.0-milestone-05</basyx.version>
-    <aas4j.version>1.0.4</aas4j.version>
+    <basyx.version>2.0.0-milestone-08</basyx.version>
+    <aas4j.version>2.0.0</aas4j.version>
   </properties>
   
   

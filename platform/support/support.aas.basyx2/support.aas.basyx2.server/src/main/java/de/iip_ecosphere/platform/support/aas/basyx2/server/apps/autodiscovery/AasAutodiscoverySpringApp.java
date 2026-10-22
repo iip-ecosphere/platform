@@ -1,7 +1,6 @@
 package de.iip_ecosphere.platform.support.aas.basyx2.server.apps.autodiscovery;
 
-import org.eclipse.digitaltwin.basyx.aasdiscoveryservice.backend.CrudAasDiscoveryFactory;
-import org.eclipse.digitaltwin.basyx.aasdiscoveryservice.backend.inmemory.InMemoryAasDiscoveryDocumentBackend;
+import org.eclipse.digitaltwin.basyx.aasdiscoveryservice.client.ConnectedAasDiscoveryService;
 import org.eclipse.digitaltwin.basyx.aasdiscoveryservice.core.AasDiscoveryService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +12,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
 
 import de.iip_ecosphere.platform.support.aas.basyx2.server.apps.common.BaSyxNames;
+import de.iip_ecosphere.platform.support.setup.CmdLine;
 
 /**
  * Spring application for starting an in-memory Autodiscovery service.
@@ -30,34 +30,26 @@ import de.iip_ecosphere.platform.support.aas.basyx2.server.apps.common.BaSyxName
 })
 public class AasAutodiscoverySpringApp {
 
+    private static String baseUrl;
+
     /**
      * Starts the application.
      * 
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        baseUrl = CmdLine.getArg(args, "baseURL", "http://localhost"); // initial
         SpringApplication.run(AasAutodiscoverySpringApp.class, args);
-    }
-
-    /**
-     * Returns the AAS discovery document backend.
-     * 
-     * @return the backend
-     */
-    @Bean
-    public InMemoryAasDiscoveryDocumentBackend backend() {
-        return new InMemoryAasDiscoveryDocumentBackend();
     }
     
     /**
      * Returns the AAS discovery service.
      * 
-     * @param backend the backend, as injected by {@link #backend()}
      * @return the disovery service
      */
     @Bean
-    public AasDiscoveryService aasDiscoveryService(InMemoryAasDiscoveryDocumentBackend backend) {
-        return new CrudAasDiscoveryFactory(backend, "default").create();
+    public AasDiscoveryService aasDiscoveryService() {
+        return new ConnectedAasDiscoveryService(baseUrl);
     } 
     
 }

@@ -13,7 +13,7 @@
   </parent>
   
   <properties>
-    <basyx.version>2.0.0-milestone-05</basyx.version>
+    <basyx.version>2.0.0-milestone-08</basyx.version>
   </properties>
   
   <dependencyManagement>
@@ -198,7 +198,7 @@
     <!--aas discovery service -->
     <dependency>
         <groupId>org.eclipse.digitaltwin.basyx</groupId>
-        <artifactId>basyx.aasdiscoveryservice-backend-inmemory</artifactId>
+        <artifactId>basyx.aasdiscoveryservice-backend</artifactId>
         <version>${basyx.version}</version>
     </dependency>
     <dependency>

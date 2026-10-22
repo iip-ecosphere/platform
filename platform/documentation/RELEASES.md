@@ -20,6 +20,7 @@ Improvements:
 * [#216](https://github.com/iip-ecosphere/platform/issues/216): Disentagle service and app dependencies
 * [#205](https://github.com/iip-ecosphere/platform/issues/216): Hide service start/stop commands in CLI, i.e., service commands like `add`, `startService` and `startAll` now require `--expert` due to their technical prerequisites. Please use deployment plans instead.
 * [#217](https://github.com/iip-ecosphere/platform/issues/217): Disable/remove unused maven repos
+* Upgrade of BaSyx>2 integration to BaSyx2 milestone 8.
 
 Changes:
 * code template POM contains assembly for `resources` folder requiring a manual sync of your service implementation POM with the template POM; if app is built by platform, deployed `resources` artefacts are considered and packaged into the app, e.g., for mock data files
