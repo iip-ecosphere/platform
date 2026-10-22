@@ -215,7 +215,7 @@ export class EditorComponent extends Utils implements OnInit {
       prop = DataUtils.getProperty(this.type?.value, event.idShort);
     } 
 
-    if (!prop || prop.value === null) {
+    if (!prop || !prop.value || prop.value === null) {
        prop = DataUtils.getEditorInputByName(this.uiGroups, event.idShort);
     }
     

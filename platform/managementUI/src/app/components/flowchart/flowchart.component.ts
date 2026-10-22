@@ -236,6 +236,7 @@ export class FlowchartComponent implements OnInit {
 
   public selectMesh(mesh: string) {
     this.getGraph(mesh);
+    this.meshName = this.getMeshName(mesh);
   }
 
   public displayAttribute(attribute: string) {
@@ -307,14 +308,25 @@ export class FlowchartComponent implements OnInit {
     return result
   }
 
-  meshName:string = ""
-
+  meshName:string = this.getMeshName();
+  
   public async create() {
     let drawflowRaw = JSON.stringify(this.editor.drawflow.drawflow.Home.data);
     let drawflow = drawflowRaw.replace("drawflow: ", "");
     let feedbackInternal = await this.ivmlFormatter.setMesh("", "", this.meshName, drawflow);
     const dialogRef = this.dialog.open(MeshFeedbackComponent, {});
     dialogRef.componentInstance.feedback = feedbackInternal.feedback;
+  }
+
+  private getMeshName(name? : string) : string {
+    if (name) {
+      return name;
+    }
+    return this.route.snapshot.paramMap.get('mesh') ?? "";
+  }
+
+  public getButtonLabel() : string {
+    return this.meshName ? "Save" : "Create";
   }
 
 }
