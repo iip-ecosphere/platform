@@ -230,7 +230,6 @@ export class FlowchartComponent implements OnInit {
         busIn = [];
         busOut = [];
         a.data = {};
-        a.class = '';
       }
       this.editor.import(graph2);
     }
