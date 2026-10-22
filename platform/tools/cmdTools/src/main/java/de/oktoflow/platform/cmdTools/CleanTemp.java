@@ -49,6 +49,8 @@ public class CleanTemp {
                 delete |= name.startsWith("hivemq_");
                 delete |= name.startsWith("support.updater-test_");
                 delete |= name.startsWith("support-boot");
+                delete |= name.startsWith("okto-instantiate_");
+                delete |= name.startsWith("okto-artifacts_");
                 if (delete) {
                     if (simulate) {
                         System.out.println("May delete " + f);
