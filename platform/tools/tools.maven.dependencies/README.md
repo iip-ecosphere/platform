@@ -116,10 +116,13 @@ The ``copy-resources`` is a variant of the equally named goal of the maven resou
 ```
 
 The following parameters are supported:
-* `resources` the resources to be copied from `directory`. Similar to the resources-plugin, but without filtering. May specify includes/excludes with usual patterns. If `prependResourceDirectories` is `true`, the project-local top-level folders `resources.ipr` and `resources` are considered as source if existing. Then `directory` and, if not existing, additional entires from the string list `directories` are considered.
+* `resources` the resources to be copied from `directory`, similar to the resources-plugin, but without filtering. May specify includes/excludes with usual patterns. If `prependResourceDirectories` is `true`, starting with `${project.basedir}` and its parent folders (at least one level, up to `maxLevels`) are searched for contained folders `resources.ipr` or `resources` and the first existing in this sequence postfixed with the original folder name of `directory` is taken as source directory; then `directory` and, if not existing, additional entires from the string list `directories` are considered.
+* `prependResourceDirectories` enables first searching the parent levels of `${project.basedir}` as stated above
+* `maxLevels` the maximum number of parent levels (default `5`)  of `${project.basedir}` to be considerd if `prependResourceDirectories` is `true`.
 * `outputDirectory` the mandatory directory where resources shall be written to. If `outputDirectory` is not existing, it will be created.
 * `skip` (user property `-Dmaven.resources.skip`, default `false`) whether the execution shall be skipped
 * `failOnError` (default `true`) whether copying exceptions shall fail the plugin execution
+* `failOnNotExists` (default `false`) whether a not existing source directory shall fail the plugin execution
 
 ## delete goal
 

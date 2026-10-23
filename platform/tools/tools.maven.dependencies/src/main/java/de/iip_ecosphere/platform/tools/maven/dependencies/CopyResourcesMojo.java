@@ -32,7 +32,7 @@ import org.codehaus.plexus.util.DirectoryScanner;
  * @author Holger Eichelberger, SSE
  */
 @Mojo(name = "copy-resources", threadSafe = true)
-public class CopyResources extends AbstractMojo {
+public class CopyResourcesMojo extends AbstractMojo {
 
     @Parameter(required = true)
     private List<Resource> resources;
@@ -48,6 +48,9 @@ public class CopyResources extends AbstractMojo {
 
     @Parameter(required = false)
     private boolean failOnNotExists = false;
+    
+    @Parameter()
+    private int maxLevels = 5; // typical example prj/target/gen/name/app    
 
     @Parameter( defaultValue = "${project.basedir}", required = true, readonly = true )
     private File basedir;
@@ -66,8 +69,24 @@ public class CopyResources extends AbstractMojo {
          */
         private boolean setDirectoryIfExists(String dir) {
             boolean done = false;
-            if (new File(dir).exists()) {
+            if (dir != null && dir.length() > 0
+                && new File(dir).exists()) {
                 setDirectory(dir);
+                done = true;
+            }
+            return done;
+        }
+
+        /**
+         * Sets {@code dir} as directory of this resource if {@code dir} exists.
+         * 
+         * @param dir the directory to set
+         * @return {@code true} if {@code dir} exists and the directory has been changed
+         */
+        private boolean setDirectoryIfExists(File dir) {
+            boolean done = false;
+            if (dir != null && dir.exists()) {
+                setDirectory(dir.getAbsolutePath());
                 done = true;
             }
             return done;
@@ -112,14 +131,26 @@ public class CopyResources extends AbstractMojo {
         int countFiles = 0;
         for (Resource r : resources) {
             String dir = r.getDirectory();
+            String dirName = new File(dir).getName();
             boolean dirSet = false;
             if (r.prependResourceDirectories) {
-                dirSet = r.setDirectoryIfExists(basedir + "/resources.ipr");
-                if (!dirSet) {
-                    dirSet = r.setDirectoryIfExists(basedir + "/resources");
+                int levels = Math.max(1, maxLevels);
+                File d = basedir;
+                while (!dirSet && d != null && levels > 0) {
+                    if (getLog().isDebugEnabled()) {
+                        getLog().info("Checking parent directory " + d);
+                    }
+                    dirSet = r.setDirectoryIfExists(new File(d, "resources.ipr/" + dirName));
+                    if (!dirSet) {
+                        dirSet = r.setDirectoryIfExists(new File(d, "/resources/" + dirName));
+                    }
+                    d = d.getParentFile();
+                    levels--;
                 }
             }
-            dirSet = r.setDirectoryIfExists(dir);
+            if (!dirSet) {
+                dirSet = r.setDirectoryIfExists(dir);
+            }
             if (!dirSet && r.directories != null && r.directories.size() > 0) {
                 for (String d : r.directories) {
                     if (r.setDirectoryIfExists(d)) {
@@ -129,9 +160,7 @@ public class CopyResources extends AbstractMojo {
                 }
             }
             if (dirSet) {
-                if (getLog().isDebugEnabled()) {
-                    getLog().info("Using target directory " + r.getDirectory());
-                }
+                getLog().info("Using source directory " + r.getDirectory());
                 List<File> files = getResourceFiles(r);
                 if (r.isFiltering()) {
                     getLog().warn("Filtering is currently not supported for files in directory " + dir);
