@@ -561,7 +561,11 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 resourcesDir = null;
             }
         }
-        return null == resourcesDir ? null : resourcesDir.toString();
+        String result = null == resourcesDir ? null : resourcesDir.getAbsolutePath();
+        if (null != result) {
+            LoggerFactory.getLogger(this).info("Using resources directory " + result);
+        }
+        return result;
     }
     
     /**

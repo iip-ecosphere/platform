@@ -71,6 +71,7 @@ public abstract class AbstractIvmlTests extends TestWithPlugin {
         if (!f.exists()) {
             f = new File("resources");
         }
+        System.out.println("Test setting iip.resources to " + f.getAbsolutePath());
         System.setProperty("iip.resources", f.getAbsolutePath());
         PlatformInstantiator.setTraceFilter();
     }
