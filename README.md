@@ -17,8 +17,9 @@ For installation and first steps, see [install guide](platform/documentation/INS
 
 ## News
 
+* 19.10.2026: Upgrade of OPC UA translator as well as `examples.energy` for OPC 40001-4 by Elizaveta Andreeva, Muhammad Asad Ullah, Rhoda Ikhuohon-Eboreime and Kodjo Adjroloh
+* 19.10.2026: Upgrade of build processes completed - oktoflow builds with Maven 3.9.16; also 3.10.0 works, but currently not for staged builds
 * 16.10.2026: Faster app build processes possible, shown in oktoflow app examples
-* 8.10.2026: Upgrade of build processes - oktoflow builds with Maven 3.9.16; also 3.10.0 works, but currently not for staged builds
 * 15.9.2026: Release of oktoflow version 0.8.1, EASy-Producer version 1.3.11
 * Updated list of tutorials/material in [the tutorials collection](platform/documentation/TUTORIALS.md).
 * Upcoming: Fast track build processes for apps, in particular through artifact update shortcuts in build processes and runtime update of Python services (see [app debugging](platform/documentation/devel/debugApps.md) for details). 
@@ -67,9 +68,10 @@ The demonstrations and further experiments confirmed compatibility in particular
 * Beckhoff ADS
 
 ## Publications
+* Holger Eichelberger, Maven Build Processes of the Model-Driven IIoT Platform oktoflow - A Performance Analysis, Symposium on Software Performance 2026, to appear, [SSP](https://www.performance-symposium.org/wp-content/uploads/2026/10/Eichelberger_Maven_Build_Processes_of_the_Model-Driven_IIoT_Platform_oktoflow.pdf)
 * Holger Eichelberger, Christian Sauer, Amir Shayan Ahmadian, Christian Kröher, Industry 4.0/IIoT Platforms for manufacturing systems - A systematic review contrasting the scientific and the industrial side, Journal of Information and Software Technology, 107650, 2024, [DOI](https://doi.org/10.1016/j.infsof.2024.107650)
-* Christian Nikolajew, Holger Eichelberger, Industry 4.0 Connectors - A Performance Experiment with Modbus/TCP, Symposium on Software Performance (SSP'24), to appear, [arxiv](http://arxiv.org/abs/2410.15813)
-* Alexander Weber, Jobst Hildebrand, Holger Eichelberger, ADS Performance Revisited, Symposium on Software Performance (SSP'24), to appear, [arxiv](http://arxiv.org/abs/2410.15853)
+* Christian Nikolajew, Holger Eichelberger, Industry 4.0 Connectors - A Performance Experiment with Modbus/TCP, Symposium on Software Performance (SSP'24), Softwaretechnik-Trends 45 (1), [GI](https://dl.gi.de/items/7760d380-74ee-4879-93e7-4c36cf1ded74), [arxiv](http://arxiv.org/abs/2410.15813)
+* Alexander Weber, Jobst Hildebrand, Holger Eichelberger, ADS Performance Revisited, Symposium on Software Performance (SSP'24), Softwaretechnik-Trends 45 (1), [GI](https://dl.gi.de/items/a5f7cbb7-a485-4473-bb24-cb606032ea96), [arxiv](http://arxiv.org/abs/2410.15853)
 * Ahmad Alamoush, Holger Eichelberger, Open source container orchestration for Industry 4.0 - requirements and systematic feature analysis, International Journal on Software Tools for Technology Transfer, 26 (4) [DOI](https://doi.org/10.1007/s10009-024-00767-w)
 * Holger Eichelberger, Alexander Weber, Model-Driven Realization of IDTA Submodel Specifications: The Good, the Bad, the Incompatible?, IEEE 28th International Conference on Emerging Technologies and Factory Automation (ETFA'24), pp. 1-8, [DOI](10.1109/ETFA61755.2024.10710924)
 * Leonhard Faubel, Thomas Woudsma, Benjamin Kloepper, Holger Eichelberger, Fabian Buelow, Klaus Schmid, MLOps for Cyber-Physical Production Systems: Challenges and Solutions, IEEE Software, [DOI](https://doi.org/10.1109/MS.2024.3441101), [arxiv](https://arxiv.org/abs/2406.14470)
