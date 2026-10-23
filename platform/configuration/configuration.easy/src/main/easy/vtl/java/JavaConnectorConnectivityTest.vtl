@@ -36,6 +36,36 @@ template JavaConnectorConnectivityTest(IIPEcosphere config, JavaCodeArtifact tar
             });
         });
     }
+    
+    @DispatchBasis
+    def genEnable(Connector conn, JavaCodeMethod mainClsMain) {
+        Integer sampling = getIntegerValueSafe(conn.samplingPeriod, -1);
+        if (sampling <= 0) { // not defined, not enabled
+            mainClsMain.call("conn.enableNotifications").arg("false");
+        }
+    }
+
+    @DispatchBasis
+    def genEnable(ChannelConnector conn, JavaCodeMethod mainClsMain) {
+        // shall be ready for delivering data
+    }
+
+    @DispatchBasis
+    def genConfigureNotificationInterval(Connector conn, JavaCodeMethod mainClsMain) {
+        Integer sampling = getIntegerValueSafe(conn.samplingPeriod, -1);
+        if (sampling <= 0) { // not defined, not enabled
+            JavaCodeMethodCall r = new JavaCodeMethodCall("de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder.newBuilder", JavaCodeImportScope.METHOD_CLASS_IMPORT).arg("params");
+            r.call("setNotificationInterval").arg("1000");
+            r.call("build");
+            mainClsMain.assign("params", r);
+        }
+    }
+
+    @DispatchBasis
+    def genConfigureNotificationInterval(ChannelConnector conn, JavaCodeMethod mainClsMain) {
+        // shall be ready for delivering data
+    }
+
 
     def main(IIPEcosphere config, JavaCodeArtifact target, Connector conn, String pkg) {
         String clsName = asTypeName(conn.name);
@@ -83,6 +113,7 @@ template JavaConnectorConnectivityTest(IIPEcosphere config, JavaCodeArtifact tar
             createParam.stringArg(conn.id);
             mainClsMain.addVariable("de.iip_ecosphere.platform.connectors.ConnectorParameter", "params", createParam);
             mainClsMain.addEmptyLine();
+            genConfigureNotificationInterval(conn, mainClsMain);
     
             String connGen = getConnectorGenerics(conn, inType, outType, true);
             JavaCodeMethodCall init = new JavaCodeMethodCall("de.iip_ecosphere.platform.connectors.ConnectorFactory.createConnector", JavaCodeImportScope.METHOD_CLASS_IMPORT);
@@ -91,16 +122,19 @@ template JavaConnectorConnectivityTest(IIPEcosphere config, JavaCodeArtifact tar
             addConnectorGenericsAsArgs(conn, inType, outType, true, init);
             
             mainClsMain.var("de.iip_ecosphere.platform.connectors.Connector" + connGen, "conn").initializer(init);
+    
+            codeAddShutdownHook(mainClsMain, "conn.disconnectSafe()");
+            mainClsMain.addCall("conn.connect").addArgument("params");
+
             mainClsMain.SystemOutPrintln().addStringArgument("Connector fields (if accessible):");
             mainClsMain.addCall("de.iip_ecosphere.platform.connectors.ConnectorField.printFields", JavaCodeImportScope.CLASS).(c|{
                 c.addCallArgument("conn.enumerateFields").addStringArgument("");
                 c.addArgument("System.out");
             });
             mainClsMain.addSLComment("conn.emitSomeData(); // might be useful for debugging");
-    
-            codeAddShutdownHook(mainClsMain, "conn.disconnectSafe()");
-            mainClsMain.addCall("conn.connect").addArgument("params");
+
             mainClsMain.addSLComment("if polling connector, enable: conn.enableNotifications(false);");
+            genEnable(conn, mainClsMain);
             mainClsMain.addCall("conn.setReceptionCallback").addArgument("callback");        
             mainClsMain.addCall("System.out.println").addStringArgument("Connector ${conn.name} created...");
             
