@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="examples.energy" default="maven" basedir=".">
+<project name="examples.energy" default="maven" basedir="." xmlns:if="ant:if" >
 	<!-- import of the global SSE Jenkins properties -->
 	<property file="${user.home}/global-build.properties"/>
 	<property file="${user.home}/qualimaster-build.properties"/>
@@ -7,14 +7,48 @@
 	
     <!-- intentionally nothing here; shall not be deployed, shall not be tested as unsnure whether VDW server is 
     operational at that point in time; only manual testing so far -->
-	<target name="maven"> 
+	<target name="maven">
+        <exec executable="docker" failonerror="false">
+            <arg value="rm"/>
+            <arg value="-f"/>
+            <arg value="examples-energy-opc-container"/>
+        </exec>
+        <mkdir dir="tmp/docker-lua-scripts"/>
+        <copy file="src/test/resources/custom.energy.script.lua" tofile="tmp/docker-lua-scripts/simulation.lua"/>
+        <exec executable="docker" failonerror="false" resultproperty="docker.start.result">
+            <arg value="run"/>
+            <arg value="-d"/>
+            <arg value="--rm"/>
+            <arg value="--name"/>
+            <arg value="examples-energy-opc-container"/>
+            <arg value="-p"/>
+            <arg value="4840:49947"/>
+            <arg value="-v"/>
+            <arg value="${basedir}/tmp/docker-lua-scripts/:/docker-lua-scripts/"/>
+            <arg value="iotechsys/opc-ua-sim:1.2"/>
+            <arg value="-l"/>
+            <arg value="/docker-lua-scripts/simulation.lua"/>
+        </exec>
+        <condition property="docker.started">
+            <equals arg1="${docker.start.result}" arg2="0"/>
+        </condition>
         <maven pomFile="pom.xml" goal="install">
             <arg value="-Dunpack.force=true"/>
             <arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
-        	<arg value="-Dtest.docker.skip=true"/>
-            <arg value="-Dtest.enable.umati=false"/>
-        	<arg value="-Dtest.exec.args=--skip"/>
+            <arg value="-Dtest.docker.skip=true"/>
+            <arg value="-Dtest.exec.args=ok" if:true="${docker.started}"/>
+            <arg value="-Dtest.exec.regEx=.*RCV OpcOutImpl.*" if:true="${docker.started}"/>
             <arg value="-Dokto.mvn.home=${maven.bin.dir}/bin"/>
         </maven>
+        <exec executable="docker" failonerror="false">
+            <arg value="stop"/>
+            <arg value="examples-energy-opc-container"/>
+        </exec>
+	    <exec executable="docker" failonerror="false">
+            <arg value="rm"/>
+            <arg value="-f"/>
+            <arg value="examples-energy-opc-container"/>
+        </exec>
+        <delete dir="tmp"/>
 	</target>
 </project>

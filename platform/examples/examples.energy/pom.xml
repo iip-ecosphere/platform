@@ -69,6 +69,7 @@
         <iip.resources>resources</iip.resources>
         <test.docker.skip>true</test.docker.skip> <!-- default for local execution -->
         <test.exec.args>--skip</test.exec.args>
+        <test.exec.regEx>.*Energy OPCUA Connector test.*</test.exec.regEx>
         <iip.gen>target/gen/energy</iip.gen>
   </properties>
 
@@ -233,7 +234,7 @@
 	                            </mvnArgs>
 	                            <brokerPort>0</brokerPort>
 	                            <logRegExprs>
-	                                <logRegExpr>.*Energy OPCUA Connector test.*</logRegExpr>
+	                                <logRegExpr>${test.exec.regEx}</logRegExpr>
 	                            </logRegExprs>
 	                        </configuration>
 	                    </execution>
