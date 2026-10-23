@@ -62,10 +62,13 @@ template JavaConnectorConnectivityTest(IIPEcosphere config, JavaCodeArtifact tar
             String platfOutClsName = toTypeName(platfOut);
             target.addImport("iip.datatypes.${platfOutClsName}");
             target.addImport("iip.datatypes.${platfInClsName}");
+            target.addImport("de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode");
             String connFqn = getConnectorCls(conn);
             target.addImport(connFqn);
             JavaPath connFqnPath = connFqn;
 
+            mainClsMain.addCall("de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.setNotificationMode", JavaCodeImportScope.CLASS)
+                .addArgument("NotificationMode.NONE");
             addSerializerRegistration(mainClsMain, platfIn);
             addSerializerRegistration(mainClsMain, platfOut);
             addCallback(mainCls, platfIn, "callback");
