@@ -1422,6 +1422,8 @@ public class OpcUaConnector<CO, CI> extends AbstractConnector<DataItem, Object, 
             } catch (UaException e) {
                 LoggerFactory.getLogger(this).info("Field enumeration failed: {}", e.getMessage());
             }
+        } else {
+            LoggerFactory.getLogger(this).info("Connector not connected for field enumeration!");
         }
         return result;
     }
