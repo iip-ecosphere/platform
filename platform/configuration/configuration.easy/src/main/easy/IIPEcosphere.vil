@@ -597,9 +597,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 Path testResourcesSrc = "${appRoot}/src/test/resources";
                 vilTemplateProcessor("TemplatesTestDataJson", config, "${testResourcesSrc}/testData-${clsName}.json.tmpl", elt=no);
             }
-            p = appRoot + "/src/test/java/iip/nodes";
-            vilTemplateProcessor("JavaServiceTestTemplate", config, "${p}/${jp.getName()}Test.java", service=service, pkg="iip.nodes");
-            javaTests.add("iip.nodes.${jp.getName()}Test");
+            p = appRoot + "/src/test/java/" + jp.getPathSegments().toPath();
+            vilTemplateProcessor("JavaServiceTestTemplate", config, "${p}/${jp.getName()}Test.java", service=service, pkg=jp.getPathSegments());
+            javaTests.add(jp.getPathSegments()+"."+jp.getName() + "Test");
             generateTemplateArtifacts(appRoot, service.artifacts, assemblies);
         }
     }
