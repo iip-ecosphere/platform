@@ -199,6 +199,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
     @Parameter(property = "aether.artifactResolver.existenceCheckRelabel", defaultValue = "") 
     private String existenceCheckRelabel;
 
+    @Parameter(property = "test.exec.args", defaultValue = "") 
+    private String testExecArgs;
+
     @Parameter(property = "maven.resolver.validation", defaultValue = "") 
     private String resolverValidation;
     
@@ -363,6 +366,7 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
         setPropertyIfDefined(sysProperties, "aether.remoteRepositoryFilter.prefixes.resolvePrefixFiles", resolvePfxFs);
         setPropertyIfDefined(sysProperties, "aether.remoteRepositoryFilter.prefixes.verifyDenied", verifyDenied);
         setPropertyIfDefined(sysProperties, "aether.artifactResolver.existenceCheckRelabel", existenceCheckRelabel);
+        setPropertyIfDefined(sysProperties, "test.exec.args", testExecArgs);
         setPropertyIfDefined(sysProperties, "maven.resolver.validation", resolverValidation);
         String hashDir = pythonCompileHashDir;
         if (null == hashDir || hashDir.length() == 0) {
