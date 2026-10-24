@@ -6,8 +6,44 @@ template TemplatesVsCodeEnvProject(IIPEcosphere config, FileArtifact target) {
         // initial, focuses on workspace root not project, unclear; no input
         String sep = target.getPathSeparator();
         '{
-             "python.pythonPath": "\\${PYTHONPATH}${sep}\\${workspaceRoot}/target/pyEnv/iip${sep}\\${workspaceRoot}/target/pySrc"
+            "python.analysis.extraPaths": [
+                "\\${workspaceFolder}/target/pyEnv/iip",
+                "\\${workspaceFolder}/target/pySrc"
+            ],
+            "terminal.integrated.env.windows": {
+                "PYTHONPATH": "\\${workspaceFolder}/target/pyEnv/iip;\\${workspaceFolder}/target/pySrc"
+            },
+            "terminal.integrated.env.osx": {
+                "PYTHONPATH": "\\${workspaceFolder}/target/pyEnv/iip:\\${workspaceFolder}/target/pySrc"
+            },
+            "terminal.integrated.env.linux": {
+                "PYTHONPATH": "\\${workspaceFolder}/target/pyEnv/iip:\\${workspaceFolder}/target/pySrc"
+            }
         }'
     }
+    
+/*
+ 
+{
+    // Verhindert gelbe/rote Schlangenlinien im Editor (plattformunabhängig)
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/py/py-a",
+        "${workspaceFolder}/py/py-b"
+    ],
+
+    // Setzt den PYTHONPATH für das integrierte Terminal (je nach OS)
+    "terminal.integrated.env.windows": {
+        "PYTHONPATH": "${workspaceFolder}/py/py-a;${workspaceFolder}/py/py-b"
+    },
+    "terminal.integrated.env.osx": {
+        "PYTHONPATH": "${workspaceFolder}/py/py-a:${workspaceFolder}/py/py-b"
+    },
+    "terminal.integrated.env.linux": {
+        "PYTHONPATH": "${workspaceFolder}/py/py-a:${workspaceFolder}/py/py-b"
+    }
+} 
+ 
+ */        
+    
 	
 }

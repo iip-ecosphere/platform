@@ -13,7 +13,8 @@ public enum InstantiationMode {
     INTERFACES_AND_CODE_TEMPLATES("generateInterfacesAndCodeTemplates", false),
     BOOTSTRAPPED_APPS("generateBootstrappedApps", false),
     CODE_TEMPLATES("generateCodeTemplates", false),
-    APPS_DIRECT("generateAppsDirect", true);
+    APPS_DIRECT("generateAppsDirect", true),
+    APPS_TEMPLATES_DIRECT("generateAppsTemplatesDirect", true);
     
     private String startRuleName;
     private boolean updateSnapshots;

@@ -109,6 +109,12 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
         setMaxSteps(config, true, 1, 7);
         generateApps(source, config, target, false, true, false, true, false, false);
     }
+
+    // called from tests/platform instantiator, don't change signature
+    generateAppsTemplatesDirect(Project source, Configuration config, Project target) = {
+        setMaxSteps(config, true, 1, 7);
+        generateApps(source, config, target, false, true, false, true, false, true);
+    }
     
     // adjust PlatformInstantiator.cleanOutputFolder
     
@@ -346,7 +352,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 Path vsCodeSettings = "${appRoot}/.vscode";
                 vsCodeSettings.mkdir();
                 vilTemplateProcessor("TemplatesVsCodeEnvProject", config, "${vsCodeSettings}/settings.json");
-                vilTemplateProcessor("TemplatesVsCodeExtraPathProject", config, "${vsCodeSettings}/pref.json");
+                //vilTemplateProcessor("TemplatesVsCodeExtraPathProject", config, "${vsCodeSettings}/pref.json");
 
                 setOf(AssemblyInfo) assemblies = {}; 
                 mapOf(MeshElement, setOf(MeshConnector)) mappedMesh = {};

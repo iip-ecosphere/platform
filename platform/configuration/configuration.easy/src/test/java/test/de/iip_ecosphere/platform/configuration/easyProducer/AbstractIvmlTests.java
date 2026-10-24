@@ -595,6 +595,36 @@ public abstract class AbstractIvmlTests extends TestWithPlugin {
     }
 
     /**
+     * Helper method to configure for partial instantiation, i.e., app bootstrapping.
+     * 
+     * @param cfg the configurer instance
+     * @return {@code cfg}
+     */
+    public static InstantiationConfigurer genBootstrap(InstantiationConfigurer cfg) {
+        return cfg.setStartRuleName("generateBootstrappedApps");
+    }
+
+    /**
+     * Helper method to configure for partial instantiation, i.e., apps without interfaces and templates.
+     * 
+     * @param cfg the configurer instance
+     * @return {@code cfg}
+     */
+    public static InstantiationConfigurer genDirect(InstantiationConfigurer cfg) {
+        return cfg.setStartRuleName("generateAppsDirect");
+    }
+
+    /**
+     * Helper method to configure for partial instantiation, i.e., apps without interfaces but with templates.
+     * 
+     * @param cfg the configurer instance
+     * @return {@code cfg}
+     */
+    public static InstantiationConfigurer genATDirect(InstantiationConfigurer cfg) {
+        return cfg.setStartRuleName("generateAppsTemplatesDirect");
+    }
+
+    /**
      * Helper method to configure for partial instantiation, i.e., apps without dependencies and no platform components.
      * 
      * @param cfg the configurer instance

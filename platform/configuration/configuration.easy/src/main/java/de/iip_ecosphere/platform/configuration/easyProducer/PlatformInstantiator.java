@@ -604,7 +604,7 @@ public class PlatformInstantiator {
             Set<String> templatesStartRuleNames = CollectionUtils.toSet(
                 "generateInterfacesAndCodeTemplates", "generateBootstrappedApps", "generateCodeTemplates");
             Set<String> appStartRuleNames = CollectionUtils.toSet(
-                "generateBootstrappedApps", "generateAppsDirect");
+                "generateBootstrappedApps", "generateAppsDirect", "generateAppsTemplatesDirect");
             Set<String> brokerStartRuleNames = CollectionUtils.toSet("generateBroker");
 
             boolean deleteAll = true;
