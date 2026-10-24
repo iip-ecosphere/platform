@@ -1,0 +1,15 @@
+{
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/target/pyEnv/iip",
+        "${workspaceFolder}/target/pySrc"
+    ],
+    "terminal.integrated.env.windows": {
+        "PYTHONPATH": "${workspaceFolder}/target/pyEnv/iip;${workspaceFolder}/target/pySrc"
+    },
+    "terminal.integrated.env.osx": {
+        "PYTHONPATH": "${workspaceFolder}/target/pyEnv/iip:${workspaceFolder}/target/pySrc"
+    },
+    "terminal.integrated.env.linux": {
+        "PYTHONPATH": "${workspaceFolder}/target/pyEnv/iip:${workspaceFolder}/target/pySrc"
+    }
+}
