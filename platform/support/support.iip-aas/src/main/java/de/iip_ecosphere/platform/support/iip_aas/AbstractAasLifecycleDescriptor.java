@@ -242,10 +242,7 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
         try { 
             LoggerFactory.getLogger(getClass()).info("Probing AAS registry {} and repository {} for {} ms", 
                 regAdr, serverAdr, startupTimeout);
-            if (!TimeUtils.waitFor(() -> {
-                return !factory.isAvailable(setup, AasComponent.AAS_REGISTRY) 
-                    || !factory.isAvailable(setup, AasComponent.AAS_REPOSITORY) || !iipAasExists();
-            }, startupTimeout, 500)) {
+            if (!TimeUtils.waitFor(() -> !isAvailable(factory, setup), startupTimeout, 500)) {
                 LoggerFactory.getLogger(getClass()).error("No AAS registry/server reached within {} ms", 
                     startupTimeout);
             } else {
@@ -256,6 +253,25 @@ public class AbstractAasLifecycleDescriptor implements LifecycleDescriptor {
             LoggerFactory.getLogger(getClass()).warn("Cannot wait for AAS registry/server. AAS registry "
                 + "{} or server {} URL invalid: {}", regAdr, serverAdr, e.getMessage());
         }
+    }
+    
+    /**
+     * Returns whether the AAS setup is available.
+     * 
+     * @param factory the AAS factory
+     * @param setup the setup
+     * @return {@code true} for available, {@code false} else
+     */
+    protected boolean isAvailable(AasFactory factory, AasSetup setup) {
+        boolean result = false;
+        boolean reg = factory.isAvailable(setup, AasComponent.AAS_REGISTRY);
+        if (reg) {
+            boolean repo = factory.isAvailable(setup, AasComponent.AAS_REPOSITORY);
+            if (repo) {
+                result = iipAasExists();
+            }
+        }
+        return result;
     }
     
     /**
