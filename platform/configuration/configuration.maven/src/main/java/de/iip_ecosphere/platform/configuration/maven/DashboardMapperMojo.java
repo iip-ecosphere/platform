@@ -95,7 +95,10 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
 
     @Parameter(property = "configuration.projectDirectory", required = false, defaultValue = "")
     private String projectDirectory;
-
+    
+    @Parameter(property = "configuration.modelDirectory", required = false, defaultValue = "src/main/easy")
+    private String modelDirectory;
+    
     @Parameter(property = "configuration.metaModelDirectory", required = false, defaultValue = "target/easy")
     private String metaModelDirectory;
     
@@ -122,6 +125,9 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
 
     @Parameter(property = "configuration.failOnError", required = false, defaultValue = "false")
     private boolean failOnError;
+    
+    @Parameter(defaultValue = "${project.basedir}", required = true, readonly = true)
+    private File basedir;
 
     private DependencyResolver resolver;
 
@@ -196,8 +202,17 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
         MavenLogger.install(getLog());
 
         DashboardMapper mapper = ConfigurationFactory.createDashboardMapper();
-        File prjDir = toFile(projectDirectory, "");
-        MapperParams params = new MapperParams(mainConfiguration, prjDir)
+        File prjDir;
+        if (projectDirectory == null || projectDirectory.equals("")) {
+            prjDir = basedir;
+        } else {
+            prjDir = toFile(projectDirectory, "");
+        }
+        File modelDir = new File(prjDir, modelDirectory);
+        if (!modelDir.exists()) {
+            modelDir = prjDir;
+        }
+        MapperParams params = new MapperParams(mainConfiguration, modelDir)
             .setMetaModelFolder(toMetamodelDirectory(metaModelDirectory, prjDir))
             .setOutputFile(toFile(outputFile))
             .setPluginId(pluginId)
