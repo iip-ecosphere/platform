@@ -91,6 +91,7 @@ public class TestQpidServer extends AbstractTestServer {
             } catch (IllegalStateException e) {
                 // we just ignore this
             }
+            systemLauncher = null;
             if (dispose) {
                 cleanup();
             }
