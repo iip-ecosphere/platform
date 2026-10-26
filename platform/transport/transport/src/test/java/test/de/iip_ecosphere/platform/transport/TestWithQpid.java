@@ -25,7 +25,7 @@ import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
  */
 public class TestWithQpid extends TestWithPlugin {
 
-    protected Server qpid;
+    private Server qpid;
 
     static {
         addPluginLocation("tests", "test.amqp.qpid", true);
@@ -43,10 +43,36 @@ public class TestWithQpid extends TestWithPlugin {
      */
     @After
     public void stopQpid() {
-        Server.stop(qpid, true);
-        qpid = null;
+        if (null != qpid) {
+            Server.stop(qpid, true);
+            qpid = null;
+        }
     }
     
+    /**
+     * Sets the instance, ensuring that if there is already an instance that it is stopped.
+     * 
+     * @param instance the new instance
+     * @return {@code instance}
+     */
+    public Server setQpid(Server instance) {
+        Server.stop(qpid, true);
+        qpid = instance;
+        return qpid;
+    }
+
+    /**
+     * Sets and starts the instance, ensuring that if there is already an instance that it is stopped.
+     * 
+     * @param instance the new instance
+     * @return {@code instance}
+     */
+    public Server setAndStartQpid(Server instance) {
+        Server result = setQpid(instance);
+        result.start();
+        return result;
+    }
+
     /**
      * Creates a qpid instance via plugin.
      * 
