@@ -19,6 +19,8 @@
     <org.springframework.boot.version>2.4.3</org.springframework.boot.version>
     <org.springframework.cloud.version>3.1.1</org.springframework.cloud.version>
     <org.springframework.spring-test.version>5.3.3</org.springframework.spring-test.version>
+    
+    <org.spring.boot.maven.version>2.4.2</org.spring.boot.maven.version> <!-- depends on spring.boot -->
   </properties>
 
   <dependencyManagement>
