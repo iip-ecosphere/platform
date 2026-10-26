@@ -23,6 +23,7 @@ numberResponseTimeSamples = 0
 responseFunction = None # one arg, response data in respective format; returns response or None
 outStore = {}
 id = 0
+updating = {}
 
 def updateResponseTime(startTime):
     """ Update the global average response time
@@ -106,7 +107,10 @@ def start(a):
         default="", help='JSON value map to be passed to the service for initial reconfiguration.')
     parser.add_argument('--subst', dest='subst', action='store', nargs=1, type=str, required=False,
         default="", help='JSON type-type map to be considered when creating type instances.')
-        
+    parser.add_argument('--reload', dest='reload', action='store_true', required=False,
+        default="", help='Enable/disable service code reload.')
+    
+    global args    
     args = parser.parse_args(a)
     consoleMode = len(args.mode) > 0 and args.mode[0]=='console'
     wsMode = len(args.mode) > 0 and (args.mode[0]=='WS' or args.mode[0]=='ws')
@@ -121,6 +125,7 @@ def start(a):
         ingestorFunction = wsIngestResult
     print("oktoflow Python ServiceEnvironment [sys.path]: " + str(sys.path))
     
+    global modulesPath
     modulesPath = getArg(args.modulesPath)
     sys.path.append(modulesPath)
     # dynamically load (generated) modules
@@ -182,7 +187,7 @@ def getArg(arg):
    else:
        return arg
 
-def loadModules(modulesPath, modulesDir, asService):
+def loadModules(modulesPath, modulesDir, asService, reload=False):
     if len(modulesDir) > 0:
         path = modulesPath + "/" + modulesDir
         files = os.listdir(path)
@@ -192,6 +197,8 @@ def loadModules(modulesPath, modulesDir, asService):
                 moduleName = modulesDir + "." + split[0]
                 #sys.stderr.write("loading " + moduleName + " in " + path + "\n")
                 try:
+                    if reload:
+                        sys.modules.pop(moduleName, None)                
                     module = importlib.import_module(moduleName)
                     if asService:
                         # module shall register itself; fallback if somebody removed the registration call
@@ -216,10 +223,19 @@ def processRequest(sId, type, data):
             service = Registry.services.get(sId)
             if service:
                 if type == '*setstate':
-                    service.setState(ServiceState[str(data)])
+                    newState = ServiceState[str(data)]
+                    service.setState(newState)
+                    if newState == ServiceState.UPDATING:
+                        updating[sId] = True
+                    else: # may be more specific
+                        if sId in updating and updating[sId]:
+                            del updating[sId]
+                            if getArg(args.reload):
+                                loadModules(modulesPath, getArg(args.servicesPackage), True, True)
+                                service.updated()
                 elif type == '*migrate':
                     service.migrate(data)
-                elif type == '*update':
+                elif type == '*update': # just notifies service itself about pre-update actions
                     service.update(data)
                 elif type == '*switch':
                     service.switchTo(data)

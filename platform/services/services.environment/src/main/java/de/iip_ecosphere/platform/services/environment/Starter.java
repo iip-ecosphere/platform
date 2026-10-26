@@ -551,15 +551,17 @@ public class Starter {
                             .filter(s -> s.getState() == ServiceState.RUNNING)
                             .collect(Collectors.toList());
                         Collections.sort(services, Service.START_COMPARATOR);
-                        List<Service> servicesRev = new ArrayList<>(services);
-                        Collections.reverse(servicesRev);
-                        getLogger().info("Stopping services {}", toServiceIds(servicesRev));
-                        servicesRev.forEach(s -> s.stopData());
-                        servicesRev.forEach(s -> setStateQuietly(s, ServiceState.STOPPING, ServiceState.STOPPED));
+                        List<Service> servicesStop = new ArrayList<>(services);
+                        servicesStop.removeIf(s -> !s.requiresReStartOnUpdate());
+                        List<Service> servicesStart = new ArrayList<>(servicesStop);
+                        Collections.reverse(servicesStop);
+                        getLogger().info("Stopping services {}", toServiceIds(servicesStop));
+                        services.forEach(s -> s.stopData());
+                        servicesStop.forEach(s -> setStateQuietly(s, ServiceState.STOPPING, ServiceState.STOPPED));
                         getLogger().info("Updating services {}", toServiceIds(services));
                         updateServices(services, updateLocation);
                         getLogger().info("Re-starting services {}", toServiceIds(services));
-                        services.forEach(s -> setStateQuietly(s, ServiceState.STARTING, ServiceState.RUNNING));
+                        servicesStart.forEach(s -> setStateQuietly(s, ServiceState.STARTING, ServiceState.RUNNING));
                         services.forEach(s -> s.startData());
                         getLogger().info("Update completed");
                     }

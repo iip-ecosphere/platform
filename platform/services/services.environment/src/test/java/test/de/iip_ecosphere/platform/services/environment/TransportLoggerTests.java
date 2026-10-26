@@ -47,8 +47,7 @@ public class TransportLoggerTests extends TestWithQpid {
         final String setupFile = "--setupFile=./src/test/resources/envSetup.yml";
 
         ServerAddress broker = new ServerAddress(Schema.IGNORE);
-        qpid = TestWithQpid.fromPlugin(broker);
-        qpid.start();
+        setAndStartQpid(fromPlugin(broker));
 
         AtomicInteger loopCount = new AtomicInteger(0);
         AtomicInteger receivedCount = new AtomicInteger(0);
@@ -86,7 +85,7 @@ public class TransportLoggerTests extends TestWithQpid {
         FileUtils.deleteQuietly(out);
 
         TransportLogger.shutdown();
-        qpid.stop(true);
+        stopQpid();
     }
     
     /**

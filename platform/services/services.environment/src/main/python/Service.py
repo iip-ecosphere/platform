@@ -19,8 +19,9 @@ class ServiceState(Enum):
     RECOVERING = 12
     RECOVERED = 13
     RECONFIGURING = 14
-    UNDEPLOYING = 15
-    UNKOWN = 16
+    UPDATING = 15
+    UNDEPLOYING = 16
+    UNKOWN = 17
 
 class ServiceKind(Enum):
     """Denotes the service kind. Names and ordinals must be aligned with Java."""
@@ -146,11 +147,20 @@ class Service:
         pass
         
     def update(self, location:str):
-        """Updates the service by the service in the given URL location. This operation is responsible for stopping
-        the running service (if needed), replacing it, starting the new service.
+        """Updates the service by the service in the given URL location. This operation is being called to notify about
+        a running service update, requiring the service to save its states and free its resources. An implementation
+        may perform a full update cycle, stop-update-start, or, when service reloading is enabled a short 
+        update cycle update-updated.
         
         Parameters:
           location -- the location from where to update the service (str)
+        """
+        
+        pass
+
+    def updated(self):
+        """Notifies the service that the update has been completed in a short update cycle, i.e., start will not be 
+        rather than required resources and state shall be restored now.
         """
         
         pass

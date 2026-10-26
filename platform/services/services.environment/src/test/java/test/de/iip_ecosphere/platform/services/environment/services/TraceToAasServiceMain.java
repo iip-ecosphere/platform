@@ -89,6 +89,7 @@ public class TraceToAasServiceMain {
     public static void startup(String host, int aasRegistryPort, int aasServerPort, int aasProtocolPort) {
         oldWaitForAas = AbstractAasLifecycleDescriptor.setWaitForIipAas(false);
         ServerAddress broker = new ServerAddress(Schema.IGNORE);
+        Server.stop(qpid, true);
         qpid = TestWithQpid.fromPlugin(broker);
         qpid.start();
         
@@ -147,6 +148,7 @@ public class TraceToAasServiceMain {
         registryServer.stop(true);
         aasServer.stop(true);        
         qpid.stop(true);
+        qpid = null;
         Transport.releaseConnector(false);  // allow for reuse, next test
     }
     

@@ -47,8 +47,7 @@ public class TransportToWsConverterTest extends TestWithQpid {
     @Test
     public void testConverter() {
         ServerAddress broker = new ServerAddress(Schema.IGNORE);
-        qpid = TestWithQpid.fromPlugin(broker);
-        qpid.start();
+        setAndStartQpid(fromPlugin(broker));
 
         AtomicInteger count = new AtomicInteger();
         TransportSetup transSetup = new TransportSetup();
@@ -86,7 +85,7 @@ public class TransportToWsConverterTest extends TestWithQpid {
         
         Assert.assertTrue(count.get() > 3); // actually 4, one may get "lost" under pressure
                 
-        qpid.stop(true);
+        stopQpid();
         Transport.releaseConnector(false); // allow for reuse, next test
     }
     
@@ -96,8 +95,7 @@ public class TransportToWsConverterTest extends TestWithQpid {
     @Test 
     public void testFactory() {
         ServerAddress broker = new ServerAddress(Schema.IGNORE);
-        qpid = TestWithQpid.fromPlugin(broker);
-        qpid.start();
+        setAndStartQpid(fromPlugin(broker));
         Assert.assertNotNull(TransportConverterFactory.getInstance());
 
         AtomicInteger count = new AtomicInteger();
@@ -138,7 +136,7 @@ public class TransportToWsConverterTest extends TestWithQpid {
         
         Assert.assertEquals(4, count.get());
                 
-        qpid.stop(true);
+        stopQpid();
         Transport.releaseConnector(false); // allow for reuse, next test
     }
 

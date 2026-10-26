@@ -58,6 +58,7 @@ import de.oktoflow.platform.tools.lib.PythonUtils;
 public abstract class AbstractPythonProcessService extends AbstractRunnablesService implements GenericMultiTypeService {
 
     public static final char TYPE_SEPARATOR_CHAR = '|';
+    public static final boolean UPDATE_WITH_RESTART = true;
     
     private File home;
     private List<String> pythonArgs;
@@ -389,6 +390,9 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
             } 
             args.add("--subst");
             args.add(getTypeSubstitutionsJson());
+            if (!UPDATE_WITH_RESTART) {
+                args.add("--reload");
+            }
             File pyExec = getPythonExecutable();
             int unbufferPos = 0; // python -u 
             if ("conda".equals(pyExec.getName())) {
@@ -788,5 +792,10 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
             }
         }
     }
+    
+    @Override
+    public boolean requiresReStartOnUpdate() {
+        return UPDATE_WITH_RESTART;
+    } 
  
 }

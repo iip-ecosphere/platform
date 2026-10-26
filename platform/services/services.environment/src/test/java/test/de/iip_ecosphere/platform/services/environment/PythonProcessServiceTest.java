@@ -41,7 +41,6 @@ import de.iip_ecosphere.platform.services.environment.YamlServer;
 import de.iip_ecosphere.platform.services.environment.YamlService;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.Schema;
-import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
@@ -64,7 +63,6 @@ import test.de.iip_ecosphere.platform.transport.TestWithQpid;
 public class PythonProcessServiceTest extends TestWithQpid {
 
     private String stringParam = null;
-    private Server qpid;
     
     /**
      * Composes the basic command line arguments for this test. We assume that the service modules are in the 
@@ -260,8 +258,7 @@ public class PythonProcessServiceTest extends TestWithQpid {
     public void testAsyncClientServer() throws IOException, ExecutionException {
         NotificationMode mo = ActiveAasBase.setNotificationMode(NotificationMode.NONE); // no AAS here
         ServerAddress broker = new ServerAddress(Schema.IGNORE);
-        qpid = TestWithQpid.fromPlugin(broker);
-        qpid.start();
+        setAndStartQpid(fromPlugin(broker));
         EnvironmentSetup setup = EnvironmentSetup.readFromYaml(EnvironmentSetup.class, 
             new FileInputStream("src/test/resources/envSetup.yml"));
         setup.getTransport().setPort(broker.getPort());
@@ -318,7 +315,7 @@ public class PythonProcessServiceTest extends TestWithQpid {
         TimeUtils.sleep(2000);
 
         Transport.releaseConnector(false); // don't stay off, allow reconnect
-        stopBroker();
+        stopQpid();
         ActiveAasBase.setNotificationMode(mo);
         Transport.setTransportSetup(su);
     }
@@ -328,10 +325,7 @@ public class PythonProcessServiceTest extends TestWithQpid {
      */
     @After
     public void stopBroker() {
-        if (null != qpid) {
-            qpid.stop(true);
-            qpid = null;
-        }
+        stopQpid();
     }
     
     /**

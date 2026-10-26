@@ -111,6 +111,15 @@ public interface Service extends ParameterConfigurerProvider, ServiceBase {
     public void update(URI location) throws ExecutionException;
     
     /**
+     * Returns whether a service requires a re-start on {@link #update(URI)} or whether this can be handled in-place.
+     * 
+     * @return {@code true} for full stop-update-start cycle, {@code false} for just update
+     */
+    public default boolean requiresReStartOnUpdate() {
+        return true;
+    }
+    
+    /**
      * Switches to an interface-compatible service. This method cares for stopping the old service, performing
      * a handover if adequate, starting the {@code target} service. [adaptation]
      * 
