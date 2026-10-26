@@ -9,7 +9,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
     String appDescription, Boolean tests, setOf(String) implResources, Boolean springPackaging=true, String groupId="", Boolean ifArtifact=false, 
     Boolean copyRuntimeDependencies=true, Boolean mapDisplay=false, String pluginOutputFolder="target/jars", Boolean bootstrapApp=false) {
 
-    def XmlElement appendSpringBootPlugin(XmlElement plugins, String version="2.4.2", String mainClass="") {
+    def XmlElement appendSpringBootPlugin(XmlElement plugins, String version="\\${org.spring.boot.maven.version}", String mainClass="") {
         XmlElement plugin = appendPlugin(plugins, "org.springframework.boot", "spring-boot-maven-plugin", version, false);
         XmlElement config = appendConfiguration(plugin);
         new XmlElement(config, "addResources", "false");
@@ -124,7 +124,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             appendAssemblyDescriptors(assemblyPlugin, assemblies);
             //appendIipPythonPlugin(plugins, projectVersion);
             if (springPackaging) {
-                appendSpringBootPlugin(plugins, "2.4.2", "${starterCls}");
+                appendSpringBootPlugin(plugins, "\\${org.spring.boot.maven.version}", "${starterCls}");
             }
     
             XmlElement dependencyPlugin = appendMavenIipDependencyPlugin(plugins, ver=config.iipVer); // otherwise project's appVer
