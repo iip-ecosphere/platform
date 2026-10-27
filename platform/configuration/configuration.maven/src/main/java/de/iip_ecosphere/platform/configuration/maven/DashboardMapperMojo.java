@@ -208,12 +208,9 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
         } else {
             prjDir = toFile(projectDirectory, "");
         }
-        File modelDir = new File(prjDir, modelDirectory);
-        if (!modelDir.exists()) {
-            modelDir = prjDir;
-        }
+        File modelDir = toModelDirectory(modelDirectory, prjDir, "src/main/easy");
         MapperParams params = new MapperParams(mainConfiguration, modelDir)
-            .setMetaModelFolder(toMetamodelDirectory(metaModelDirectory, prjDir))
+            .setMetaModelFolder(toModelDirectory(metaModelDirectory, prjDir, "target/easy", "src/main/easy"))
             .setOutputFile(toFile(outputFile))
             .setPluginId(pluginId)
             .setPostUrl(postUrl)
@@ -248,39 +245,47 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
     }
     
     /**
-     * Turns the specified {@code path} into the metamodel directory. If absolute, take {@code path}. If not,
-     * try to validate {@code path}, alternatively "target/easy" and "src/main/easy" whether they can be found in 
+     * Turns the specified {@code path} into a model directory. If absolute, take {@code path}. If not,
+     * try to validate {@code path}, alternatively {@code fldrs} in the given sequence whether they can be found in 
      * {@code projectDirectory} or one of its parent directories. This search is needed in particular for test setups
      * where the actual meta model resides in a parent directory and we do not want to include that path in all uses
      * of this plugin.
      * 
      * @param path the specified path, may be empty or <b>null</b> for none specified
      * @param projectDirectory the project directory to start searching at
+     * @param fldrs relative folders to search for
      * @return the meta model folder
      */
-    private File toMetamodelDirectory(String path, File projectDirectory) {
-        File result = null;
-        List<String> folders = new ArrayList<>();
-        folders.add("target/easy");
-        folders.add("src/main/easy");
-        if (path != null && path.length() > 0 && !folders.contains(path)) {
-            File tmp = new File(path);
-            if (tmp.isAbsolute()) {
-                result = tmp;
-            } else {
+    private File toModelDirectory(String path, File projectDirectory, String... fldrs) {
+        File result = new File(path);
+        if (!result.isAbsolute()) {
+            result = null;
+            List<String> folders = new ArrayList<>();
+            for (String f : fldrs) {
+                folders.add(f);
+            }
+            if (!folders.contains(path)) { // may be relative and different from default
                 folders.add(path);
             }
-        }            
-        File dir = projectDirectory;
-        while (result == null && dir != null) {
-            for (String f : folders) {
-                File tmp = new File(dir, f);
-                if (tmp.exists()) {
+            if (path != null && path.length() > 0 && !folders.contains(path)) {
+                File tmp = new File(path);
+                if (tmp.isAbsolute()) {
                     result = tmp;
-                    break;
+                } else {
+                    folders.add(path);
                 }
+            }            
+            File dir = projectDirectory;
+            while (result == null && dir != null) {
+                for (String f : folders) {
+                    File tmp = new File(dir, f);
+                    if (tmp.exists()) {
+                        result = tmp;
+                        break;
+                    }
+                }
+                dir = dir.getParentFile();
             }
-            dir = dir.getParentFile();
         }
         return result;
     }
