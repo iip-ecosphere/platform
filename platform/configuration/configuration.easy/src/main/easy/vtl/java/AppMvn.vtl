@@ -187,12 +187,14 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             appendDeploymentPlugins(plugins, config);
             
             if (!ifArtifact and mapDisplay and !isInTestAndSkipConfigPlugin()) {
+                //appendEasyModelDependencyPluginUnpack(execs, projectVersion); // mapper needs target/easy
+
                 XmlElement configPlugin = appendPlugin(plugins, "de.iip-ecosphere.platform", "configuration-plugin", projectVersion, false);
                 XmlElement configPluginExec = appendExecutions(configPlugin);
                 new XmlElement(configPluginExec, "id", "mapDashboard");
                 appendGoal(configPluginExec, "mapDashboard");
                 XmlElement configPluginCfg = appendConfiguration(configPluginExec);
-                new XmlElement(configPluginCfg, "projectDirectory", getResourcesFolder(config)+"/..");
+                new XmlElement(configPluginCfg, "projectDirectory", getPlatformHome(config));
                 new XmlElement(configPluginCfg, "outputFile", "\\${project.build.directory}/dashboard-" + toFolderName(appName) + ".json");
                 if (isDefined(config.dashboardPushURI) and config.dashboardPushURI <> "") {
                     new XmlElement(configPluginCfg, "postUrl", config.dashboardPushURI);

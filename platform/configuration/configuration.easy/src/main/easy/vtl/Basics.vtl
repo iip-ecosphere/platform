@@ -163,6 +163,10 @@ template Basics(Configuration config, FileArtifact target) {
     def Boolean isUnpackResourcesSkip() {
         getProperty("iip.unpackResources.skip", "false") == "true";
     }
+
+    def String getPlatformHome(IIPEcosphere config) {
+        getProperty("iip.homeDir", getResourcesFolder(config)+"/..");
+    }
 	
 	def setOf(MeshElement) nextMeshNodes(MeshElement elt, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
 	    getNextMeshNodes(elt, mappedMesh);
