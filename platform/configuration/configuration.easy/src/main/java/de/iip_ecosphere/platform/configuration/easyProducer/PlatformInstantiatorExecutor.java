@@ -207,6 +207,7 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
         takeOverJvmArg("aether.remoteRepositoryFilter.prefixes.resolvePrefixFiles", pArgs);
         takeOverJvmArg("aether.remoteRepositoryFilter.prefixes.verifyDenied", pArgs);
         takeOverJvmArg("maven.resolver.validation", pArgs);
+        takeOverJvmArg(PlatformInstantiator.KEY_PROPERTY_HOME_DIR, pArgs);
         
         try {
             getLogger().info("Calling platform instantiator as process with {}, tracing {}{}", 

@@ -616,7 +616,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
             if (mode.isUpdateSnapshots()) {
                 OsUtils.setProperty(PlatformInstantiator.KEY_PROPERTY_UPDATE_SNAPSHOTS, "true");
             }
-            OsUtils.setProperty("iip.homeDir", new File(".").getAbsolutePath());
+            OsUtils.setProperty(PlatformInstantiator.KEY_PROPERTY_HOME_DIR, new File(".").getAbsolutePath());
             EasySetup easy = ConfigurationSetup.getSetup().getEasyProducer();                
             if (ConfigurationSetup.getSetup().getInstantiateAsProcess()) {
                 String[] args = {easy.getIvmlModelName(), toString(easy.getBase()), toString(easy.getGenTarget()), 
