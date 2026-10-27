@@ -14,6 +14,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     Boolean tests = true;
     setOf(String) usedServiceTypes = {};
     mapOf(String, sequenceOf(String)) appJsl = {};
+    mapOf(String, String) serviceFiles = {};
     
     main(Project source, Configuration config, Project target) = {
         platformInstantiation = true;
@@ -292,6 +293,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     vilTemplateProcessor("AppMvn", config, "${appRoot}/pom.xml", usedServiceTypes=usedServiceTypes, artifacts=artifacts, oktoPlugins=oktoPlugins, bins=bins, assemblies=assemblies, resources=resources, 
                         starterCls=appStarterCls, appName=appName, appVersion=appVersion, appDescription=a.description, tests=tests, copyRuntimeDependencies=copyDependencies, mapDisplay=mapToDisplay, 
                         pluginOutputFolder=pluginOutputFolder, implResources=implResources, bootstrapApp=bootstrapApp);
+                    PropertiesFileArtifact serviceCfg = "${appRoot}/services.properties";
+                    serviceCfg.setValues(serviceFiles);
+                    serviceCfg.save();
                     PropertiesFileArtifact pluginCfg = "${appRoot}/pluginCfg.properties";
                     if (cfg.withPlugins) {
                         pluginCfg.setValue("pluginFolder", "target/plugins");
@@ -411,6 +415,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                 
                 zip(appRoot, appRoot, "${target}/templates/eclipse/impl.${appName}.zip");
             }
+            serviceFiles.clear();
         };
         if (platformInstantiation) {
             generateAllAppsContainers(config, target, allAppsContainersElements);
@@ -2244,6 +2249,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             addArtifacts(service.artifacts, service.artifact, bins, noDeps);
             implResources.add(service.artifact);
         }
+        serviceFiles.add("-" + service.id, service.id); // pseudo file path
     }
 
     @DispatchCase
@@ -2266,6 +2272,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
             artifacts.add(artifact);
         }
         vilTemplateProcessor("PythonAssembly", config, "${assemblySrc}/python_${serviceFolderName}.xml", withServices=true, dependency=artifact, dependency2=shArtifact, id="python_${serviceFolderName}");
+        serviceFiles.add("classes/python_${serviceFolderName}.zip", service.id); // file paths with /
         if (not(noDeps)) {
             addAssemblyInfo(assemblies, "python_${serviceFolderName}", "${assemblyRel}/python_${serviceFolderName}.xml", "prepare-package", "${mvnProjectBuildDir}/classes", finalName="python_${serviceFolderName}");
             addArtifact(service, artifacts, oktoPlugins);

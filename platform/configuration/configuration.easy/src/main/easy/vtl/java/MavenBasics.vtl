@@ -258,7 +258,22 @@ template MavenBasics(Configuration config, FileArtifact target) {
         execs;
     }
     
-    def XmlElement appendMavenDependencyPluginExecution(XmlElement execs, String goal, String artifact, String classifier, String outputDir, String destFileName, String type="jar", String phase="process-sources", String id="", Boolean skipIfNotFound=false, String skipIfNotFoundComment="") {
+    def XmlElement appendEasyModelDependencyPluginUnpack(XmlElement execs, String ver) {
+        String outDir = "\\${project.build.directory}/easy";
+        XmlElement items = appendMavenDependencyPluginExecution(execs, "unpack", "de.iip-ecosphere.platform:configuration.configuration:${ver}", "easy", outDir, "model.jar", id="unpack-easy", type="zip", phase="validate", excludes="cfg/*.*");
+        XmlElement cfg = items.getParent();
+        XmlElement cleanup = new XmlElement(cfg, "cleanup");
+        new XmlElement(cleanup, "directory", outDir);
+        XmlElement includes = new XmlElement(cleanup, "includes");
+        new XmlElement(includes, "include", "cfg");
+        new XmlElement(includes, "include", "files");
+        new XmlElement(includes, "include", "meta");
+        new XmlElement(includes, "include", "vtl");
+        new XmlElement(includes, "include", "IIPEcosphere*.*");
+        appendMavenDependencyPluginOverWrite(cfg);
+    }
+    
+    def XmlElement appendMavenDependencyPluginExecution(XmlElement execs, String goal, String artifact, String classifier, String outputDir, String destFileName, String type="jar", String phase="process-sources", String id="", Boolean skipIfNotFound=false, String skipIfNotFoundComment="", String excludes="") {
         XmlElement exec = new XmlElement(execs, "execution");
         if (length(id) == 0) { // fallback
             id = goal;
@@ -268,7 +283,10 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(exec, "phase", phase);
         XmlElement config = appendConfiguration(exec);
         XmlElement items = new XmlElement(config, "artifactItems");
-        appendMavenDependencyPluginArtifactItem(items, artifact, classifier, outputDir, destFileName, type=type);        
+        XmlElement item = appendMavenDependencyPluginArtifactItem(items, artifact, classifier, outputDir, destFileName, type=type);
+        if (excludes <> "") {
+            new XmlElement(item, "excludes", excludes);
+        }
         if (skipIfNotFound) {
             if (skipIfNotFoundComment <> "") {
                 new XmlComment(config, skipIfNotFoundComment);
