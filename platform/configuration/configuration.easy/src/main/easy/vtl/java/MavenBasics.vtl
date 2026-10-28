@@ -859,6 +859,8 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(props, "maven.javadoc.skip", "true");
         new XmlElement(props, "maven.test.skip", "true");
         new XmlElement(props, "jacoco.skip", "true");
+        new XmlElement(props, "maven.source.skip", "true");
+        new XmlElement(props, "maven.clean.skip", "true");
         new XmlElement(props, "configuration.skip", "true");
         profile;
     }
