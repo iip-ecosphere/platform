@@ -192,7 +192,8 @@ Touches a file.
 Further settings:
 - `skip` (default `false`, user setting `-Dtouch.skip`) skips the execution 
 - `file` (default unset, required, user setting `-Dtouch.file`) the file to touch
-- `deleteBefore` (default `false`, required, user setting `-Dtouch.deleteBefore`) whether the ``file`` shall be deleted before touching
+- `deleteBefore` (default `false`, user setting `-Dtouch.deleteBefore`) whether the `file` shall be deleted before touching
+- `onServiceUpdates` (default `true`, user setting `-touch.onServiceUpdates`) whether changed services shall be recorded in `file` (rather than just an empty file), requiring `services.properties` in the oktoflow app being present and filled with the service mapping
 
 ## update-archive goal
 
@@ -305,6 +306,7 @@ The inherited setting ``excludeArtifactIds`` shall be configured in a way that p
 
 Further settings are:
 - `createIndex` (default `true`, user property `mdep.createIndex`) whether a classpath index file shall be created for the plugin
+- `incrementalIndex` (default `false`, user property `mdep.incrementalIndex`) whether existing index files and contents hashing information shall be considered to incrementally build/update the index; may require 2 initial runs to show effect
 - `asTest` include test code (default `false`).
 - `clean` delete jars in target folder (default `false`, user properts `mdep.clean`).
 

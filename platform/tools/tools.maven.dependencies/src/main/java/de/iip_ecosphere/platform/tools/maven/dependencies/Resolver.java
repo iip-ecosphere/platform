@@ -15,21 +15,12 @@ package de.iip_ecosphere.platform.tools.maven.dependencies;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.dependency.fromConfiguration.ArtifactItem;
@@ -437,72 +428,6 @@ class Resolver {
             // well, take getName()
         }
         return result.replace('\\', '/');
-    }
-    
-    /**
-     * Turns an IOException to a message.
-     * 
-     * @param ex the exception
-     * @return the message
-     */
-    static String toMessage(IOException ex) {
-        return ex.getClass().getSimpleName() + " " + ex.getMessage();
-    }
-    
-    /**
-     * Returns the MD5 hash of {@code file}, whereby for ZIP file the hash of the contents is returned.
-     * 
-     * @param file the file to hash
-     * @param log the logger
-     * @return the MD5 hash, <b>null</b> if hashing is not possible (see log)
-     */
-    static String getMD5(File file, Log log) {
-        String result = null;
-        try {
-            MessageDigest digest = MessageDigest.getInstance("MD5");
-            if (file.getName().endsWith(".zip")) {
-                calcZipContents(digest, file);
-            } else {
-                digest.update(Files.readAllBytes(file.toPath()));
-            }
-            byte[] hashBytes = digest.digest();
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : hashBytes) {
-                hexString.append(String.format("%02x", b));
-            }
-            result = hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            log.warn("Hashing not possible, MD5 digest not available");
-        } catch (IOException e) {
-            log.warn("Hashing not possible for " + file + ": " + toMessage(e));
-        }
-        return result;
-    }
-
-    /**
-     * Returns the MD5 hash of the contents of the ZIP {@code file}.
-     * 
-     * @param digest the digest to update
-     * @param file the ZIP file to hash
-     */
-    static void calcZipContents(MessageDigest digest, File file) throws IOException {
-        try (ZipFile zipFile = new ZipFile(file)) {
-            List<? extends ZipEntry> entries = Collections.list(zipFile.entries());
-            entries.sort(Comparator.comparing(ZipEntry::getName)); // guarantee deterministic ordering
-            byte[] buffer = new byte[8192];
-            for (ZipEntry entry : entries) {
-                // Skip directories, we only care about file contents
-                if (!entry.isDirectory()) {
-                    digest.update(entry.getName().getBytes(StandardCharsets.UTF_8));
-                    try (InputStream inputStream = zipFile.getInputStream(entry)) {
-                        int bytesRead;
-                        while ((bytesRead = inputStream.read(buffer)) != -1) {
-                            digest.update(buffer, 0, bytesRead);
-                        }
-                    }
-                }
-            }
-        }
     }
     
 }

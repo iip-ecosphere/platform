@@ -27,8 +27,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
 import static de.iip_ecosphere.platform.tools.maven.dependencies.Resolver.normalize;
-import static de.iip_ecosphere.platform.tools.maven.dependencies.Resolver.toMessage;
-import static de.iip_ecosphere.platform.tools.maven.dependencies.Resolver.getMD5;
+import static de.oktoflow.platform.tools.lib.HashUtils.toMessage;
+import static de.oktoflow.platform.tools.lib.HashUtils.getMD5;
 
 /**
  * A simple "touch" command, filling the touch file with service ids from {@code services.properties} if respective 
@@ -156,7 +156,7 @@ public class TouchMojo extends AbstractMojo {
             filePath = filePath.substring(basePath.length());
         }
         String oldHash = hashes.getProperty(filePath);
-        String newHash = getMD5(file, getLog());
+        String newHash = getMD5(file, true, s -> getLog());
         hashes.put(filePath, newHash);
         if (oldHash == null || newHash == null || !oldHash.equals(newHash)) {
             result = true;

@@ -14,12 +14,15 @@ package de.iip_ecosphere.platform.tools.maven.dependencies;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 import javax.inject.Inject;
@@ -41,6 +44,7 @@ import org.apache.maven.shared.transfer.repository.RepositoryManager;
 import org.eclipse.aether.RepositorySystem;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
+import de.oktoflow.platform.tools.lib.HashUtils;
 import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 
 /**
@@ -69,6 +73,9 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
 
     @Parameter( property = "mdep.createIndex", defaultValue = "true")
     private boolean createIndex;
+
+    @Parameter( property = "mdep.incrementalIndex", defaultValue = "false")
+    private boolean incrementalIndex;
 
     // checkstyle: stop parameter number check
 
@@ -100,7 +107,53 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
         RepositorySystem repoSystem) {
         super(session, buildContext, project, resolverUtil, repositoryManager, projectBuilder, artifactHandlerManager, 
             copyUtil, installer, repoSystem);
-    }      
+    }
+    
+    /**
+     * Returns the hashes file object.
+     * 
+     * @return the hashes file object
+     */
+    private File getHashFile() {
+        return new File(targetDirectory, "classpath" + (asTest ? "-test" : "") + ".fpf");
+    }
+
+    /**
+     * Reads the hashes file.
+     * 
+     * @return the hashes file contents (resource-hash mapping), may be <b>empty</b> or null
+     * @see #getHashFile()
+     */
+    private Properties readHashes() {
+        Properties hashes = null;
+        if (incrementalIndex) {
+            hashes = new Properties();
+            File file = getHashFile();
+            try (FileReader reader = new FileReader(file)) {
+                hashes.load(reader);
+            } catch (IOException e) {
+                getLog().warn("Cannot read hash file " + file + ": " + HashUtils.toMessage(e));
+            }
+        }
+        return hashes;
+    }
+
+    /**
+     * Writes the hashes file (resource-hash mapping).
+     * 
+     * @param hashes the hashes file, may be <b>empty</b> or null
+     * @see #getHashFile()
+     */
+    private void writeHashes(Properties hashes) {
+        if (incrementalIndex && hashes != null) {
+            File file = getHashFile();
+            try (FileWriter writer = new FileWriter(file)) {
+                hashes.store(writer, "Contents hash file for " + (asTest ? "-test" : "") + " classpath index file");
+            } catch (IOException e) {
+                getLog().warn("Cannot write hash file " + file + ": " + HashUtils.toMessage(e));
+            }
+        }        
+    }
 
     // checkstyle: resume parameter number check
 
@@ -136,6 +189,15 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
             if (jars.size() > 0) {
                 try {
                     long start = System.currentTimeMillis();
+                    Properties hashes = readHashes();
+                    LoaderIndex oldIdx = null;
+                    if (incrementalIndex && index.exists()) {
+                        try {
+                            oldIdx = LoaderIndex.fromFile(index);
+                        } catch (IOException e) {
+                            getLog().warn("Cannot read index " + index + ". Ignoring.");
+                        }
+                    }
                     getLog().info("Indexing classes...");
                     LoaderIndex idx = new LoaderIndex();
                     idx.setFileLocationProvider(f -> {
@@ -147,8 +209,9 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
                         return path;
                     });
                     LoaderIndex.addToIndex(idx, jars, 
-                        ex -> getLog().warn(ex.getClass().getSimpleName() + " " + ex.getMessage()));
+                        ex -> getLog().warn(ex.getClass().getSimpleName() + " " + ex.getMessage()), hashes, oldIdx);
                     LoaderIndex.toFile(idx, index);
+                    writeHashes(hashes);
                     getLog().info("Stored class index to " + index + " " + idx.getClassesCount() + " classes and " 
                         + idx.getResourcesCount() + " resources in " + idx.getLocationsCount() + " locations in " 
                         + (System.currentTimeMillis() - start) + " ms");
