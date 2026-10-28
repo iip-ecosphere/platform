@@ -287,6 +287,12 @@ public class DashboardMapperMojo extends AbstractLoggingMojo implements Caller {
                 dir = dir.getParentFile();
             }
         }
+        if (result == null) {  // do not return null
+            result = new File(projectDirectory, path);
+            if (!result.exists()) {
+                result = new File(path); // revert to initial
+            }
+        }
         return result;
     }
 
