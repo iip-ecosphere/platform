@@ -18,12 +18,15 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.regex.Pattern;
+
+import de.oktoflow.platform.tools.lib.HashUtils;
 
 /**
  * Represents the class loader index.
@@ -63,7 +66,24 @@ public class LoaderIndex implements Serializable {
     private Map<String, String> classIndex = new HashMap<>();
     private Map<String, String> resourceIndex = new HashMap<>();
     private transient Function<File, String> fileLocationProvider = f -> f.toString();
+    private transient IncrementalListener incrementalListener = null;
 
+    /**
+     * Informs about changes to an index in case of incremental updates.
+     */
+    public interface IncrementalListener {
+
+        /**
+         * Is called when a location is processed.
+         * 
+         * @param location the location
+         * @param update if {@code true} the information about the location is updated/processed, if {@code false} the 
+         *     information is taken over as the location was not changed based on known hashes
+         */
+        public void notify(String location, boolean update);
+
+    }
+    
     /**
      * Defines the file location provider, a function that turns a file into a location string. Only used/valid while 
      * creating indexes. The location provider can be used to turn absolute jar file names into relative ones.
@@ -74,6 +94,15 @@ public class LoaderIndex implements Serializable {
         if (null != provider) {
             fileLocationProvider = provider;
         }
+    }
+
+    /**
+     * Defines a listener, which is called if an index is updated incrementally.
+     * 
+     * @param incrementalListener the listener, may be <b>null</b>
+     */
+    public void setIncrementalListener(IncrementalListener incrementalListener) {
+        this.incrementalListener = incrementalListener;
     }
     
     /**
@@ -99,9 +128,27 @@ public class LoaderIndex implements Serializable {
      * @throws IOException if adding files fails
      */
     public static LoaderIndex createIndex(List<Path> jars, Consumer<IOException> consumer) throws IOException {
-        return addToIndex(new LoaderIndex(), jars, consumer);
+        return createIndex(jars, consumer, null, null);
     }
-    
+
+    /**
+     * Creates an index for a given set of JAR files. Paths will be stored relatively to ease relocation.
+     * Updates the {@link #files} list in the specified sequence of {@code jars}. Non-incremental as no hashes are 
+     * considered.
+     *
+     * @param jars list of jar files
+     * @param consumer optional exception consumer to tolerantly handle IO exceptions, exceptions are thrown if 
+     *     <b>null</b>
+     * @param hashes jar to MD5 hash collection, may be empty or <b>null</b>
+     * @param oldIndex to take files from
+     * @return plugin index
+     * @throws IOException if adding files fails
+     */
+    public static LoaderIndex createIndex(List<Path> jars, Consumer<IOException> consumer, Properties hashes, 
+        LoaderIndex oldIndex) throws IOException {
+        return addToIndex(new LoaderIndex(), jars, consumer, hashes, oldIndex);
+    }
+
     /**
      * Adds the given {@code jars} to {@code index}. Paths will be stored relatively to ease relocation.
      * Updates the {@link #files} list in the specified sequence of {@code jars}.
@@ -115,15 +162,98 @@ public class LoaderIndex implements Serializable {
      */
     public static LoaderIndex addToIndex(LoaderIndex index, List<Path> jars, Consumer<IOException> consumer) 
         throws IOException {
+        return addToIndex(index, jars, consumer, null, null);
+    }
+    
+    /**
+     * Adds the given {@code jars} to {@code index}. Paths will be stored relatively to ease relocation.
+     * Updates the {@link #files} list in the specified sequence of {@code jars}. Non-incremental as no hashes are 
+     * considered.
+     *
+     * @param index the index to add the information to 
+     * @param jars list of jar files
+     * @param consumer optional exception consumer to tolerantly handle IO exceptions, exceptions are thrown if 
+     *     <b>null</b>
+     * @param hashes jar to MD5 hash collection, may be empty or <b>null</b>
+     * @return {@code index}
+     * @throws IOException if adding files fails
+     */
+    public static LoaderIndex addToIndex(LoaderIndex index, List<Path> jars, Consumer<IOException> consumer, 
+        Properties hashes, LoaderIndex oldIndex) throws IOException {
+        IncrementalInfo info = null;
+        if (null != hashes) {
+            info = new IncrementalInfo();
+            info.hashes = hashes;
+            info.populate(oldIndex);
+        }
         for (Path jarPath : jars) {
-            addToIndex(index, jarPath.toFile(), null, consumer);
+            addToIndex(index, jarPath.toFile(), null, consumer, info);
         }
         return index;
     }
     
     /**
+     * Stores prepared index hash information for transfer in incremental mode.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class IncrementalInfo {
+        
+        private Properties hashes;
+        private Map<String, List<String>> locationToClasses;
+        private Map<String, List<String>> locationToResources;
+
+        /**
+         * Hashes index entries from {@code mapping} in {@code index} to {@code resourceMapping}.
+         * 
+         * @param mapping the mapping to be hashed
+         * @param index the source index
+         * @param resourceMapping the resource mapping to be modified as side effect, i.e., location to resources
+         */
+        private static void hash(Map<String, String> mapping, LoaderIndex index, 
+            Map<String, List<String>> resourceMapping) {
+            for (Map.Entry<String, String> ent : mapping.entrySet()) {
+                String[] locs = splitResourceLocations(ent.getValue());
+                if (null != locs) {
+                    for (String l : locs) {
+                        String loc = index.locationIndex.get(l);
+                        if (null != loc) {
+                            resourceMapping.computeIfAbsent(loc, k -> new ArrayList<>()).add(ent.getKey());
+                        }
+                    }
+                }
+            }
+        }
+
+        /**
+         * Populates the mapping from {@code index}.
+         * 
+         * @param index the existing index to populate from, may be <b>null</b> then the mappins remain <b>null</b>
+         */
+        private void populate(LoaderIndex index) {
+            if (null != index) {
+                locationToClasses = new HashMap<>();
+                locationToResources = new HashMap<>();
+                hash(index.classIndex, index, locationToClasses);
+                hash(index.resourceIndex, index, locationToResources);
+            }
+        }
+        
+        /**
+         * Returns whether this instance was populated from an index.
+         * 
+         * @return {@code true} for populated, {@code false} else
+         */
+        private boolean isPopulated() {
+            return locationToClasses != null && locationToResources != null;
+        }
+
+    }
+
+    /**
      * Adds the given {@code jarFile} to {@code index}. If given, {@code location} replaces the relative path of 
-     * {@code jarFile} in the index entry. Updates the {@link #files} list by adding {@code jarFile}.
+     * {@code jarFile} in the index entry. Updates the {@link #files} list by adding {@code jarFile}. Non-incremental 
+     * as no hashes are considered.
      * 
      * @param index the index
      * @param jarFile the jarFile to index
@@ -136,27 +266,86 @@ public class LoaderIndex implements Serializable {
      */
     public static int addToIndex(LoaderIndex index, File jarFile, String location, Consumer<IOException> consumer) 
         throws IOException {
+        return addToIndex(index, jarFile, location, consumer, null);
+    }
+ 
+    /**
+     * Adds the given {@code jarFile} to {@code index}. If given, {@code location} replaces the relative path of 
+     * {@code jarFile} in the index entry. Updates the {@link #files} list by adding {@code jarFile}.
+     * 
+     * @param index the index
+     * @param jarFile the jarFile to index
+     * @param location optional actual location of {@code jarFile}, e.g., for relocation; if <b>null</b> or empty, 
+     *   use the relative path of {@code jarFile} instead
+     * @param consumer optional exception consumer to tolerantly handle IO exceptions, exceptions are thrown if 
+     *     <b>null</b>
+     * @param incInfo incremental information, may be <b>null</b>
+     * @return the number of processed/added entries
+     * @throws IOException if {@code jarFile} cannot be opened
+     */
+    static int addToIndex(LoaderIndex index, File jarFile, String location, Consumer<IOException> consumer, 
+        IncrementalInfo incInfo) throws IOException {
         String jarLocation = index.getFileLocationProvider().apply(jarFile);
         if (null == location || location.length() == 0) {
             location = jarLocation;
         }
         int entryCount = 0;
-        try (JarFile jar = new JarFile(jarFile)) {
-            Enumeration<JarEntry> entries = jar.entries();
-            while (entries.hasMoreElements()) {
-                JarEntry entry = entries.nextElement();
-                addEntry(index, entry, jarLocation);
-                entryCount++;
-            }
-            index.files.add(jarLocation);
-        } catch (IOException e) {
-            if (null == consumer) {
-                throw e;
+        boolean process = true;
+        if (null != incInfo) {
+            process = false;
+            String oldHash = incInfo.hashes.getProperty(jarFile.getPath());
+            String newHash = HashUtils.getMD5(jarFile, true, s -> { });
+            if (oldHash == null || newHash == null || !oldHash.equals(newHash) || !incInfo.isPopulated()) {
+                process = true;
             } else {
-                consumer.accept(e);
+                ensureLocation(index, jarLocation);
+                transfer(incInfo.locationToClasses, jarLocation, index, index.classIndex);
+                transfer(incInfo.locationToResources, jarLocation, index, index.resourceIndex);
             }
+            if (index.incrementalListener != null) {
+                index.incrementalListener.notify(jarLocation, process);
+            }
+            incInfo.hashes.setProperty(jarFile.getPath(), newHash);
+        }
+        if (process) {
+            try (JarFile jar = new JarFile(jarFile)) {
+                Enumeration<JarEntry> entries = jar.entries();
+                while (entries.hasMoreElements()) {
+                    JarEntry entry = entries.nextElement();
+                    addEntry(index, entry, jarLocation);
+                    entryCount++;
+                }
+                index.files.add(jarLocation);
+            } catch (IOException e) {
+                if (null == consumer) {
+                    throw e;
+                } else {
+                    consumer.accept(e);
+                }
+            }
+        } else {
+            index.files.add(jarLocation);
         }
         return entryCount;
+    }
+    
+    /**
+     * Transfers index entries from src (from {@link IncrementalInfo}) for {@code jarLocation} to {@code index} 
+     * into {@code indexMap}.
+     * 
+     * @param src the source map (may be <b>null</b> if uninitialized or no old index during population)
+     * @param jarLocation the JAR location
+     * @param index the target location index
+     * @param indexMap the target map within {@code index}, to be modified as side effect
+     */
+    private static void transfer(Map<String, List<String>> src, String jarLocation, LoaderIndex index, 
+        Map<String, String> indexMap) {
+        if (src != null) {
+            List<String> lst = src.get(jarLocation);
+            if (null != lst) {
+                lst.forEach(l -> addToIndex(index, indexMap, l, jarLocation, true));
+            }
+        }
     }
 
     /**
@@ -229,6 +418,23 @@ public class LoaderIndex implements Serializable {
     }
 
     /**
+     * Ensures the given {@code location} in the mappings of {@code index}.
+     * 
+     * @param index the index
+     * @param location the location
+     * @return the (encoded, mapped) location
+     */
+    private static String ensureLocation(LoaderIndex index, String location) {
+        String loc = index.locationReverseIndex.get(location);
+        if (null == loc) {
+            loc = String.valueOf(index.locationIndex.size());
+            index.locationIndex.put(loc, location);
+            index.locationReverseIndex.put(location, loc);
+        }
+        return loc;
+    }
+
+    /**
      * Adds the resource {@code name} in {@code location} to {@code map} and adjusts the location index in 
      * {@code index}.
      * 
@@ -241,12 +447,7 @@ public class LoaderIndex implements Serializable {
      */
     private static void addToIndex(LoaderIndex index, Map<String, String> map, String name, String location, 
         boolean append) {
-        String loc = index.locationReverseIndex.get(location);
-        if (null == loc) {
-            loc = String.valueOf(index.locationIndex.size());
-            index.locationIndex.put(loc, location);
-            index.locationReverseIndex.put(location, loc);
-        }
+        String loc = ensureLocation(index, location);
         String known = map.get(name);
         if (append) {
             if (known != null) {
@@ -350,6 +551,15 @@ public class LoaderIndex implements Serializable {
         return resourceIndex;
     }
 
+    /**
+     * Returns the number of known files.
+     * 
+     * @return the number of known files
+     */
+    public int getFilesCount() {
+        return files.size();
+    }
+    
     /**
      * Returns the number of known classes.
      * 
