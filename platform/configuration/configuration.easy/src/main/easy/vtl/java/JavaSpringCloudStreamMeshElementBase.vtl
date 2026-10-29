@@ -493,7 +493,7 @@ block;
             block = updateHandlerBlock;
         }
         block.assign(attrName).callQualified("de.iip_ecosphere.platform.services.environment.AbstractService.createInstance").stringArg(className)
-            .classArg(serviceType).stringArg(service.id).stringArg(getDeploymentDescriptorPath());
+            .classArg(serviceType).stringArg(service.id).stringArg(getDeploymentDescriptorPath()).arg(attrName);
         if (updateHandlerPresent) {
             updateHandlerBlock.return(attrName);
             m.addCall("get").qualifiedBy(updateHandlerName);
