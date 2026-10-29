@@ -188,7 +188,30 @@ public abstract class AbstractService implements Service {
         String deploymentDescFile) {
         return createInstance(loader, className, cls, serviceId, deploymentDescFile);
     }
-    
+
+    /**
+     * Convenience method for creating service instances using the class loader of this class. This method is intended
+     * for runtime updates where potentially the created instance may be <b>null</b> and shall not accidentally 
+     * overwrite an existing instance.
+     * 
+     * @param <S> the service type (parent interface of <code>className</code>)
+     * @param className the name of the service class (must implement {@link Service} and provide a no-argument 
+     *     constructor) or the plugin id
+     * @param cls the class to cast to
+     * @param serviceId the id of the service as given in {@code deploymentDescFile} (may be <b>null</b>, then the 
+     *     default constructor is invoked)
+     * @param deploymentDescFile the resource name of the deployment descriptor containing a YAML artifact with the 
+     *     service description (may be <b>null</b>, then the default constructor is invoked)
+     * @param actualInstance the actual running instance
+     * @return the service instance ({@code actualInstance} if the service cannot be found/initialized)
+     * @see #createInstance(String, Class, String, String)
+     */
+    public static <S extends Service> S createInstance(String className, Class<S> cls, String serviceId, 
+        String deploymentDescFile, S actualInstance) {
+        S newInstance = createInstance(className, cls, serviceId, deploymentDescFile);
+        return null == newInstance ? actualInstance : newInstance;
+    }
+
     /**
      * Loads a resource as stream from {@code loader}, first with given name, as fallback using {@code resource}
      * without leading slashes (may be present after ZIP unpacking), else as file (may be present after ZIP unpacking).
