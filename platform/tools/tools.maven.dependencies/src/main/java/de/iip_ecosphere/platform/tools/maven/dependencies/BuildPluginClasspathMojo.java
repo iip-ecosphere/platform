@@ -73,6 +73,9 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
     @Parameter( required = false )
     private boolean asTest;
 
+    @Parameter( required = false, defaultValue = "false" )
+    private boolean copyArtifacts;
+
     @Parameter( defaultValue = "${project.build.directory}", readonly = true )
     private File targetDirectory;
 
@@ -194,6 +197,13 @@ public class BuildPluginClasspathMojo extends BuildClasspathMojo {
         setPrepends(prepends);
         composeBefores(null);
         super.doExecute();
+        
+        if (copyArtifacts) {
+            Layers.copyGroupArtifact(targetDirectory, null, "jar", getProject(), getLog());
+            if (asTest) {
+                Layers.copyGroupArtifact(targetDirectory, "tests", "jar", getProject(), getLog());
+            }
+        }
 
         File file = null;
         if (resolvedFile == null || resolvedFile.equals("*")) {
