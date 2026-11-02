@@ -45,7 +45,12 @@ public enum ServiceKind {
      * A server process being executed in the environment of a service to utilize the communication 
      * capabilities of the service/transport/parameters. Internal service kind.
      */
-    SERVER(0);
+    SERVER(0),
+    
+    /**
+     * A stub service, not really operational.
+     */
+    NOT_AVAILABLE(0);
     
     /**
      * Comparator for default start sequence, lowest priority first.

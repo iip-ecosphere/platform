@@ -13,17 +13,19 @@
 package de.iip_ecosphere.platform.services.environment;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -104,7 +106,7 @@ public class Starter {
     private static Server cmdServer;
     private static Server appServer;
     private static Map<String, Integer> servicePorts = new HashMap<>();
-    private static Map<String, Service> mappedServices = new HashMap<>();
+    private static Map<String, Service> mappedServices = Collections.synchronizedMap(new HashMap<>());
     private static Map<String, Supplier<? extends Service>> updateHandlers = new HashMap<>();
     private static boolean serviceAutostart = false; // shall be off, done by platform, only for testing
     private static boolean enforceStartSequence = true; // default since 0.8.1
@@ -512,6 +514,20 @@ public class Starter {
     }
     
     /**
+     * Returns the service mapped by this starter. These are typically all services executed within the same JVM.
+     * 
+     * @param serviceId the serviceId, ignored if <b>null</b>
+     * @return the service if known, an instance of {@link NotAvailableService} else
+     */
+    public static Service getMappedServiceSafe(String serviceId) {
+        Service result = Starter.getMappedService(serviceId);
+        if (null == result) {
+            result = new NotAvailableService(serviceId); // may be cached, may pollute cache
+        }
+        return result;
+    }
+    
+    /**
      * Returns the update handler mapped by this starter. MAy be available for services executed within the same JVM.
      * 
      * @param serviceId the serviceId, ignored if <b>null</b>
@@ -550,20 +566,36 @@ public class Starter {
                             .stream()
                             .filter(s -> s.getState() == ServiceState.RUNNING)
                             .collect(Collectors.toList());
+                        Properties changedServices = new Properties();
+                        try (FileReader reader = new FileReader(file)) {
+                            changedServices.load(reader);
+                        } catch (IOException e) {
+                            getLogger().warn("Cannot read {}. Enabling all services for update.", file);
+                        }
                         Collections.sort(services, Service.START_COMPARATOR);
                         List<Service> servicesStop = new ArrayList<>(services);
-                        servicesStop.removeIf(s -> !s.requiresReStartOnUpdate());
                         List<Service> servicesStart = new ArrayList<>(servicesStop);
                         Collections.reverse(servicesStop);
-                        getLogger().info("Stopping services {}", toServiceIds(servicesStop));
-                        services.forEach(s -> s.stopData());
-                        servicesStop.forEach(s -> setStateQuietly(s, ServiceState.STOPPING, ServiceState.STOPPED));
-                        getLogger().info("Updating services {}", toServiceIds(services));
-                        updateServices(services, updateLocation);
-                        getLogger().info("Re-starting services {}", toServiceIds(services));
-                        servicesStart.forEach(s -> setStateQuietly(s, ServiceState.STARTING, ServiceState.RUNNING));
-                        services.forEach(s -> s.startData());
-                        getLogger().info("Update completed");
+                        List<Service> servicesUpdate = new ArrayList<>(services);
+                        if (!changedServices.isEmpty()) { // simple touch without change detection
+                            servicesUpdate.removeIf(s -> !changedServices.containsKey(s.getId()));
+                        }
+                        if (!servicesUpdate.isEmpty()) {
+                            getLogger().info("Passivating services {}", toServiceIds(servicesStop));
+                            services.forEach(s -> s.stopData());
+                            servicesStop.forEach(s -> setStateQuietly(s, 
+                                ServiceState.PASSIVATING, ServiceState.PASSIVATED));
+                            getLogger().info("Updating services {}", toServiceIds(servicesUpdate));
+                            updateServices(servicesUpdate, updateLocation, changedServices);
+                            reMapServices(servicesStart);
+                            getLogger().info("Re-starting services {}", toServiceIds(services));
+                            servicesStart.forEach(s -> setStateQuietly(s, 
+                                ServiceState.ACTIVATING, ServiceState.RUNNING));
+                            services.forEach(s -> s.startData());
+                            getLogger().info("Update completed");
+                        } else {
+                            getLogger().info("No changed services detected. Skipping update.");
+                        }
                     }
                 };
                 FileAlterationObserver obs = commons.createFileAlterationObserver(folder.getAbsolutePath(), 
@@ -575,6 +607,23 @@ public class Starter {
                     getLogger().info("Watching file changes on {}", folder);
                 } catch (ExecutionException e) {
                     getLogger().warn("Cannot watch file changes on {}: {}", folder, e.getMessage());
+                }
+            }
+        }
+    }
+    
+    /**
+     * Re-maps the given services so that we now operate further on updated service instances.
+     * 
+     * @param services the services to be remapped, may be changed as a side effect
+     */
+    private static void reMapServices(List<Service> services) {
+        for (int s = 0; s < services.size(); s++) {
+            Service service = services.get(s);
+            if (null != service) {
+                service = getMappedService(service.getId()); // safe??
+                if (null != service) {
+                    services.set(s, service);
                 }
             }
         }
@@ -763,12 +812,12 @@ public class Starter {
     public static void mapService(ServiceMapper mapper, Service service, boolean enableAutostart, 
         Supplier<? extends Service> updateHandler) {
         if (null != service && service.getId() != null) {
-            mappedServices.put(service.getId(), service);
+            setService(service);
             if (null != updateHandlers) {
                 updateHandlers.put(service.getId(), updateHandler);
             }
             if (null != mapper && null != Starter.getProtocolBuilder()) {
-                mapper.mapService(service);
+                mapper.mapService(service.getId());
             }
             if (enableAutostart) {
                 autostartService(service);
@@ -779,6 +828,15 @@ public class Starter {
                 t.printStackTrace(System.out);
             }
         }
+    }
+ 
+    /**
+     * Finally sets/maps the service.
+     * 
+     * @param service the service to set/map
+     */
+    static void setService(Service service) {
+        mappedServices.put(service.getId(), service);
     }
 
     /**
@@ -807,51 +865,156 @@ public class Starter {
             }
         }
     }
-    
+
     /**
-     * Updates the given {@code services}.
+     * Finds the home directory of the (containing) app.
      * 
-     * @param services the services to update
-     * @param location the location potentially containing the service update
+     * @param location the update location where to start searching
+     * @return the app home, or {@code location}
+     * @see #findAppHome(File)
      */
-    private static void updateServices(List<Service> services, URI location) {
-        Set<String> doneArtifacts = new HashSet<>();
+    private static File findAppHome(URI location) {
         File base;
         try {
             base = new File(location);
         } catch (IllegalArgumentException e) {
             base = new File("");
         }
+        return findAppHome(base);
+    }
+    
+    /**
+     * Finds the home directory of the (containing) app.
+     * 
+     * @param location the update location where to start searching
+     * @return the app home, or {@code location}
+     */
+    private static File findAppHome(File location) {
+        File result = location;
+        if (result.isFile()) {
+            result = result.getParentFile();
+        }
+        if (result.isDirectory() && result.getName().equals("target")) {
+            result = result.getParentFile();
+        }
+        File iter = result;
+        while (iter != null && !iter.getName().equals("target")) {
+            iter = iter.getParentFile(); 
+        }
+        if (null != iter) {
+            result = iter;
+            if (result.getName().equals("target")) {
+                result = result.getParentFile();
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Updates the given {@code services}.
+     * 
+     * @param services the services to update
+     * @param location the location potentially containing the service update
+     * @param changedServices service id status mapping (j=java, a=artifact)
+     */
+    private static void updateServices(List<Service> services, URI location, Properties changedServices) {
+        Map<String, Boolean> doneArtifacts = new HashMap<>();
+        File base = findAppHome(location); 
+        List<Service> servicesToUpdate = new ArrayList<>();
         for (Service s : services) {
-            String artifact = s.getArtifact();
-            if (null != artifact && artifact.length() > 0) {
-                String[] parts = artifact.split(":");
-                if (parts.length > 0) {
-                    artifact = parts[0] + "." + parts[1]; // see generation
-                } else {
-                    artifact = null;
+            Object status = changedServices.get(s.getId());
+            if ("j".equals(status)) {
+                if (reloadJavaService(s, base, doneArtifacts)) {
+                    servicesToUpdate.add(s);
                 }
+            } else {
+                servicesToUpdate.add(s);
+            }
+        }
+        servicesToUpdate.forEach(s -> updateQuietly(s, location));
+    }
+
+    /**
+     * Reloads a Java service, i.e., sets up the plugin loader so that the service can be re-instantiated.
+     * 
+     * @param service the service
+     * @param base the base directory
+     * @param doneArtifacts states for already completed artifacts (state may be {@code true} for done and 
+     *     {@code false} for not done/failed).
+     * @return {@code true} for success, {@code false} else
+     */
+    private static boolean reloadJavaService(Service service, File base, Map<String, Boolean> doneArtifacts)  {
+        boolean done = false;
+        String artifact = service.getArtifact();
+        if (null != artifact && artifact.length() > 0) {
+            String[] parts = artifact.split(":");
+            if (parts.length > 0) {
+                artifact = parts[0] + "." + parts[1]; // see generation
             } else {
                 artifact = null;
             }
-            if (null != artifact && !doneArtifacts.contains(artifact)) {
-                doneArtifacts.add(artifact);
-                ClassLoader sCl = s.getClass().getClassLoader();
+        } else {
+            artifact = null;
+        }
+        if (null != artifact) {
+            Boolean doneState = doneArtifacts.get(artifact);
+            if (null == doneState) {
+                ClassLoader sCl = service.getClass().getClassLoader();
                 InputStream cp = ResourceLoader.getResourceAsStream(sCl, artifact);
                 InputStream idx = null;
                 if (null != cp) {
                     idx = ResourceLoader.getResourceAsStream(sCl, artifact + ".idx");
                     try {
-                        PluginSetupDescriptor psd = new StreamClasspathPluginSetupDescriptor(cp, idx, base);
+                        PluginSetupDescriptor psd = new StreamClasspathPluginSetupDescriptor(cp, idx, base, 
+                            Starter::cpfAdjustment);
                         PluginManager.registerPlugin(psd, true);
+                        done = true;
                     } catch (IOException e) {
-                        getLogger().warn("Cannot create plugin setup descriptor for '{}': {}", 
-                            s.getArtifact(), e.getMessage());
+                        getLogger().warn("Cannot create plugin setup descriptor for '{}', Skipping.: {}", 
+                            service.getArtifact(), e.getMessage());
                     }
                 }
+                doneArtifacts.put(artifact, done);
+            } else { // 
+                done = doneState.booleanValue();
             }
         }
-        services.forEach(s -> updateQuietly(s, location));
+        return done;
+    }
+
+    /**
+     * Adjusts individual classpath entries, in particular those directly located in the {@code target} folder, which
+     * the JVM after loading them may keep open, i.e., cannot be overwritten.
+     * 
+     * @param file the file to adjust (if needed)
+     * @return the adjusted file or {@code file}
+     */
+    private static File cpfAdjustment(File file) {
+        File result = file;
+        File fileParent = file.getParentFile();
+        if (null != fileParent && "target".equals(fileParent.getName())) {
+            try {
+                String name = result.getName();
+                String suffix = "";
+                int pos = name.lastIndexOf('.');
+                if (pos > 0) {
+                    suffix = name.substring(pos);
+                    name = name.substring(0, pos);
+                }
+                name += "-" + System.currentTimeMillis();
+                File parent = new File(FileUtils.getTempDirectory(), fileParent.getName());
+                parent.mkdirs();
+                result = new File(parent, name + suffix);
+                Files.copy(file.toPath(), result.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                getLogger().info("Using '{}' in classpath", result);
+                result.deleteOnExit();
+            } catch (IOException e) {
+                result = file; // reset
+                getLogger().error("Cannot copy classpath entry '{}' to '{}'. Next service update will likely not "
+                    + "take up changes in Java services: {}", file, result, e.getMessage());
+            }
+        }
+        return result;
     }
 
     /**

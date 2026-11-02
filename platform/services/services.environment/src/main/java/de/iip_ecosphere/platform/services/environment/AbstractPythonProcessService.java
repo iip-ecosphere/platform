@@ -35,6 +35,7 @@ import de.iip_ecosphere.platform.services.environment.GenericMultiTypeServiceImp
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.StringUtils;
+import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.ZipUtils;
 import de.iip_ecosphere.platform.support.function.ExecutionConsumer;
 import de.iip_ecosphere.platform.support.json.Json;
@@ -58,7 +59,7 @@ import de.oktoflow.platform.tools.lib.PythonUtils;
 public abstract class AbstractPythonProcessService extends AbstractRunnablesService implements GenericMultiTypeService {
 
     public static final char TYPE_SEPARATOR_CHAR = '|';
-    public static final boolean UPDATE_WITH_RESTART = true;
+    public static final boolean UPDATE_WITH_RESTART = false;
     
     private File home;
     private List<String> pythonArgs;
@@ -585,6 +586,24 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
     }
     
     @Override
+    protected ServiceState doPassivate() throws ExecutionException {
+        ServiceState result = ServiceState.PASSIVATED;
+        if (UPDATE_WITH_RESTART) {
+            result = super.doPassivate(); // call stop
+        } // do we need to stop ingestion??
+        return result;
+    }
+
+    @Override
+    protected ServiceState doActivate() throws ExecutionException {
+        ServiceState result = ServiceState.RUNNING;
+        if (UPDATE_WITH_RESTART) {
+            result = super.doActivate(); // call start
+        } // do we need to re-start ingestion??
+        return result;
+    }    
+    
+    @Override
     protected ServiceState stop() {
         if (!callbacks.isEmpty()) {
             TransportConnector conn = Transport.getConnector();
@@ -787,15 +806,11 @@ public abstract class AbstractPythonProcessService extends AbstractRunnablesServ
                 exc = new ExecutionException(e);
             }
             setState(state);
+            TimeUtils.sleep(500); // for now, update-handshake would be better
             if (null != exc) {
                 throw exc;
             }
         }
     }
     
-    @Override
-    public boolean requiresReStartOnUpdate() {
-        return UPDATE_WITH_RESTART;
-    } 
- 
 }

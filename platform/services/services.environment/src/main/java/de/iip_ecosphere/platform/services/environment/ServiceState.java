@@ -133,14 +133,14 @@ public enum ServiceState {
         addValidTransition(RECONFIGURING, RUNNING, PASSIVATING);
         addValidTransition(PASSIVATING, PASSIVATED);
         addValidTransition(PASSIVATED, MIGRATING, UPDATING, ACTIVATING);
-        addValidTransition(MIGRATING, ACTIVATING);
+        addValidTransition(MIGRATING, PASSIVATED, ACTIVATING);
         addValidTransition(ACTIVATING, RUNNING);
         addValidTransition(FAILED, RECOVERING, STOPPING, STOPPED);
         addValidTransition(RECOVERING, RECOVERED);
         addValidTransition(RECOVERED, RUNNING);
         addValidTransition(STOPPING, STOPPED, DEPLOYING); // pragmatic if connection is already down
         addValidTransition(STOPPED, AVAILABLE, DEPLOYING, UPDATING, STARTING, STOPPING); // pragmatic if connection down
-        addValidTransition(UPDATING, CREATED, PASSIVATED, STOPPED);
+        addValidTransition(UPDATING, CREATED, PASSIVATED, ACTIVATING, STOPPED);
         addValidTransition(UNDEPLOYING, UNKNOWN);
     }
     

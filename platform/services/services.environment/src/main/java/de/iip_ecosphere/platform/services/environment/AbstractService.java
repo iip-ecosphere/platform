@@ -209,6 +209,11 @@ public abstract class AbstractService implements Service {
     public static <S extends Service> S createInstance(String className, Class<S> cls, String serviceId, 
         String deploymentDescFile, S actualInstance) {
         S newInstance = createInstance(className, cls, serviceId, deploymentDescFile);
+        if (null != actualInstance && null != newInstance ) {
+            if (actualInstance.getClass() == newInstance.getClass()) {
+                newInstance = actualInstance;
+            }
+        }
         return null == newInstance ? actualInstance : newInstance;
     }
 
@@ -641,6 +646,12 @@ public abstract class AbstractService implements Service {
         case STOPPING:
             next = stop();
             break;
+        case PASSIVATING:
+            next = doPassivate();
+            break;
+        case ACTIVATING:
+            next = doActivate();
+            break;
         default:
             break;
         }
@@ -692,20 +703,43 @@ public abstract class AbstractService implements Service {
     public void activate() throws ExecutionException {
         if (getState() == ServiceState.PASSIVATED) {
             setState(ServiceState.ACTIVATING);
-            start();
-            setState(ServiceState.RUNNING);
+            setState(doActivate());
         }
+    }
+    
+    /**
+     * The actual actions for {@link #activate()}, being called when we transitioned from 
+     * {@link ServiceState#PASSIVATED} to {@link ServiceState#ACTIVATING}. Calls {@link #start()} as default behavior.
+     * Called from {@code #activate()} and {@link #setState(ServiceState)}.
+     * 
+     * @return the next service state, usually {@link ServiceState#RUNNING}
+     * @throws ExecutionException if the execution fails
+     */
+    protected ServiceState doActivate() throws ExecutionException {
+        return start();
     }
 
     @Override
     public void passivate() throws ExecutionException {
         if (getState() == ServiceState.RUNNING) {
             setState(ServiceState.PASSIVATING);
-            stop();
-            setState(ServiceState.PASSIVATED);
+            setState(doPassivate());
         }
     }
     
+    /**
+     * The actual actions for {@link #passivate()}, being called when we transitioned from 
+     * {@link ServiceState#RUNNING} to {@link ServiceState#PASSIVATING}. Calls {@link #stop()} as default behavior.
+     * Called from {@code #passivate()} and {@link #setState(ServiceState)}.
+     * 
+     * @return the next service state, usually {@link ServiceState#PASSIVATED}
+     * @throws ExecutionException if the execution fails
+     */
+    protected ServiceState doPassivate() throws ExecutionException {
+        stop();
+        return ServiceState.PASSIVATED;
+    }
+
     /**
      * Helper method to add parameter configurers to {@code configurers} (without getter for rollback).
      *  
