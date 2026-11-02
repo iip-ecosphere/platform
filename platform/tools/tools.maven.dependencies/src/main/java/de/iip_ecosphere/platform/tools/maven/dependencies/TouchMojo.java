@@ -16,9 +16,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.inject.Inject;
@@ -73,7 +73,7 @@ public class TouchMojo extends AbstractMojo {
     
     private String basePath;
     
-    private Set<String> checkedArtifacts = new HashSet<>();
+    private Map<String, Boolean> checkedArtifacts = new HashMap<>();
     
     /**
      * POM.
@@ -201,14 +201,17 @@ public class TouchMojo extends AbstractMojo {
         StringTokenizer javaArts = new StringTokenizer(arts, ",");
         while (javaArts.hasMoreTokens()) {
             String artifact = javaArts.nextToken();
-            if (!artifact.contains(":python:") && !checkedArtifacts.contains(artifact)) {
-                String artifactName = Resolver.toFileName(artifact, true);      
-                if (null != artifactName && artifactName.length() > 0 && artifactName.endsWith(".jar")) {
-                    File art = findArtifact(new File(buildDir, artifactName));
-                    isChanged = changed(art, hashes);
+            Boolean artifactChanged = checkedArtifacts.get(artifact);
+            if (null == artifactChanged) {
+                if (!artifact.contains(":python:")) {
+                    String artifactName = Resolver.toFileName(artifact, true);      
+                    if (null != artifactName && artifactName.length() > 0 && artifactName.endsWith(".jar")) {
+                        File art = findArtifact(new File(buildDir, artifactName));
+                        isChanged = changed(art, hashes);
+                    }
                 }
+                checkedArtifacts.put(artifact, isChanged);
             }
-            checkedArtifacts.add(artifact);
         }
         return isChanged;
     }

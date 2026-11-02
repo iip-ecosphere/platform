@@ -121,6 +121,13 @@ public interface ProtocolServerBuilder extends Builder<Server> {
     }
     
     /**
+     * Enables/disables overwriting of existing definitions.
+     * 
+     * @param enable enables/disables overwriting of existing definitions
+     */
+    public void enableOverwrite(boolean enable);
+    
+    /**
      * Defines a service function.
      * 
      * @param name the name of the operation

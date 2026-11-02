@@ -122,6 +122,11 @@ public class SimpleOperationsProvider implements OperationsProvider {
     @Override
     public Set<String> getServiceOperations(boolean qualified) {
         return getOperations(SERVICE_PREFIX, qualified);
+    }
+
+    @Override
+    public void enableOverwrite(boolean enable) {
+        // enables override by default;
     }    
 
 }

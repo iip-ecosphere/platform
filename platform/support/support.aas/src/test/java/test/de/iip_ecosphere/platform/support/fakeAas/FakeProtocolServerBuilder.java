@@ -20,6 +20,11 @@ public class FakeProtocolServerBuilder implements ProtocolServerBuilder {
     public Server build() {
         return new NoOpServer();
     }
+    
+    @Override
+    public void enableOverwrite(boolean enable) {
+        // ignore
+    }
 
     @Override
     public ProtocolServerBuilder defineOperation(String name, Function<Object[], Object> function) {

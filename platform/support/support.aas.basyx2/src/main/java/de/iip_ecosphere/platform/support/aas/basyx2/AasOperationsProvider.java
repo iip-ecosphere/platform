@@ -94,6 +94,7 @@ public class AasOperationsProvider extends HashMap<String, Object> implements Op
     private Map<String, Property> properties = new HashMap<>();
     private Map<String, Function<Object[], Object>> operationFunctions = new HashMap<>();
     private Interceptor interceptor; // TODO set interceptor
+    private boolean enableOverwrite = false;
 
     /**
      * The main kinds of entries.
@@ -220,6 +221,11 @@ public class AasOperationsProvider extends HashMap<String, Object> implements Op
         public void setInterceptor(Interceptor interceptor) {
             instance.setInterceptor(interceptor);
         }
+
+        @Override
+        public void enableOverwrite(boolean enable) {
+            instance.enableOverwrite(enable);
+        }
         
     }
     
@@ -280,6 +286,22 @@ public class AasOperationsProvider extends HashMap<String, Object> implements Op
     @Override
     public AasOperationsProvider defineOperation(String category, String name, Function<Object[], Object> function) {
         name = AbstractAasRestInvocablesCreator.fixName(name);
+        if (enableOverwrite) {
+            Function<Object[], Object> op = getOperation(category, name);
+            if (null != op) {
+                String uname = null;
+                for (Map.Entry<String, Function<Object[], Object>> ent : operationFunctions.entrySet()) {
+                    if (ent.getValue() == op) {
+                        uname = ent.getKey();
+                        break;
+                    }
+                }
+                if (null != uname) {
+                    operationFunctions.remove(uname);
+                }
+                operations.get(category).remove(name);
+            }
+        }
         String uName = makeUnique(operationFunctions, category + "/" + name);
         Map<String, Entry> o = this.operations.get(category);
         if (null == o) {
@@ -359,6 +381,10 @@ public class AasOperationsProvider extends HashMap<String, Object> implements Op
 
     @Override
     public AasOperationsProvider defineProperty(String name, Supplier<Object> get, Consumer<Object> set) {
+        if (enableOverwrite) {
+            properties.remove(name);
+            status.remove(name);
+        }
         name = AbstractAasRestInvocablesCreator.fixName(name);
         properties.put(name, new Property(get, set));
         status.put(name, new Entry(Kind.PROPERTY, name));
@@ -391,6 +417,13 @@ public class AasOperationsProvider extends HashMap<String, Object> implements Op
     @Override
     public void setInterceptor(Interceptor interceptor) {
         this.interceptor = interceptor;
+    }
+
+    @Override
+    public void enableOverwrite(boolean enable) {
+        enableOverwrite = enable;
+        // TODO Auto-generated method stub
+        
     }
     
 

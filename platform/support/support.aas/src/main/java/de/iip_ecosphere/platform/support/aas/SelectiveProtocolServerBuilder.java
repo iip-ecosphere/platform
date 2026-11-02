@@ -92,5 +92,10 @@ public class SelectiveProtocolServerBuilder implements ProtocolServerBuilder {
         builder2.setInterceptor(interceptor);
     }
 
+    @Override
+    public void enableOverwrite(boolean enable) {
+        builder1.enableOverwrite(enable);
+        builder2.enableOverwrite(enable);
+    }
 
 }

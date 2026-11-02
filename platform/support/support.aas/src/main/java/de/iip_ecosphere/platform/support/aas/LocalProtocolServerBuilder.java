@@ -44,6 +44,11 @@ public class LocalProtocolServerBuilder implements ProtocolServerBuilder {
     }
 
     @Override
+    public void enableOverwrite(boolean enable) {
+        this.instance.enableOverwrite(enable);
+    }
+    
+    @Override
     public ProtocolServerBuilder defineOperation(String name, Function<Object[], Object> function) {
         instance.defineServiceFunction(name, function);
         return this;

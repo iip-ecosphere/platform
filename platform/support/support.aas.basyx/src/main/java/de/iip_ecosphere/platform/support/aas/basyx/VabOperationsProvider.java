@@ -112,6 +112,7 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
     private Map<String, Property> properties = new HashMap<>();
     private Map<String, Function<Object[], Object>> operationFunctions = new HashMap<>();
     private Interceptor interceptor;
+    private boolean enableOverwrite = false;
 
     /**
      * The main kinds of entries.
@@ -203,6 +204,11 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
         }
         
         @Override
+        public void enableOverwrite(boolean enable) {
+            instance.enableOverwrite(enable);
+        }
+        
+        @Override
         public VabTcpOperationsBuilder defineOperation(String name, Function<Object[], Object> function) {
             instance.defineServiceFunction(name, function);
             return this;
@@ -280,6 +286,11 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
             this.port = cSetup.getServerAddress().getPort();
             this.instance = new VabOperationsProvider();
             this.kstore = schema == Schema.HTTPS ? cSetup.getKeyStore() : null;
+        }
+        
+        @Override
+        public void enableOverwrite(boolean enable) {
+            instance.enableOverwrite(enable);
         }
 
         @Override
@@ -383,9 +394,30 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
         }
         return uName;
     }
+    
+    @Override
+    public void enableOverwrite(boolean enable) {
+        enableOverwrite = enable;
+    }    
 
     @Override
     public VabOperationsProvider defineOperation(String category, String name, Function<Object[], Object> function) {
+        if (enableOverwrite) {
+            Function<Object[], Object> op = getOperation(category, name);
+            if (null != op) {
+                String uname = null;
+                for (Map.Entry<String, Function<Object[], Object>> ent : operationFunctions.entrySet()) {
+                    if (ent.getValue() == op) {
+                        uname = ent.getKey();
+                        break;
+                    }
+                }
+                if (null != uname) {
+                    operationFunctions.remove(uname);
+                }
+                operations.get(category).remove(name);
+            }
+        }
         String uName = makeUnique(operationFunctions, category + "/" + name);
         Map<String, Entry> o = this.operations.get(category);
         if (null == o) {
@@ -463,6 +495,10 @@ public class VabOperationsProvider extends HashMap<String, Object> implements Op
 
     @Override
     public VabOperationsProvider defineProperty(String name, Supplier<Object> get, Consumer<Object> set) {
+        if (enableOverwrite) {
+            properties.remove(name);
+            status.remove(name);
+        }
         properties.put(name, new Property(get, set));
         status.put(name, new Entry(Kind.PROPERTY, name));
         LoggerFactory.getLogger(getClass()).info("Property " + name + " defined");

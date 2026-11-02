@@ -69,6 +69,13 @@ public interface OperationsProvider {
     }
     
     /**
+     * Enables/disables overwriting of existing definitions.
+     * 
+     * @param enable enables/disables overwriting of existing definitions
+     */
+    public void enableOverwrite(boolean enable);
+    
+    /**
      * Defines an operation.
      * 
      * @param category the category
