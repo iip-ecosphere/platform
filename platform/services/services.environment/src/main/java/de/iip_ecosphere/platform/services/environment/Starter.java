@@ -817,7 +817,8 @@ public class Starter {
                 updateHandlers.put(service.getId(), updateHandler);
             }
             if (null != mapper && null != Starter.getProtocolBuilder()) {
-                mapper.mapService(service.getId());
+                //mapper.mapService(service.getId());
+                mapper.mapService(service);
             }
             if (enableAutostart) {
                 autostartService(service);

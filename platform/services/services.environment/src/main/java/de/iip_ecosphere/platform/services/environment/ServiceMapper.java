@@ -17,12 +17,10 @@ import static de.iip_ecosphere.platform.support.aas.AasUtils.*;
 import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import de.iip_ecosphere.platform.support.aas.ProtocolServerBuilder;
 import de.iip_ecosphere.platform.support.json.JsonResultWrapper;
-import de.iip_ecosphere.platform.support.json.JsonResultWrapper.ExceptionFunction;
 import de.iip_ecosphere.platform.transport.Transport;
 import de.iip_ecosphere.platform.transport.status.TraceRecord;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
@@ -79,100 +77,197 @@ public class ServiceMapper {
      * 
      * @param service the service to define
      */
-    public void mapService(Service service) { // move to testing
+    /*public void mapService(Service service) { // move to testing
         mapService(service.getId());
         Starter.setService(service);
-    }
-
-    /**
-     * Defines an AAS property with supplier, obtaining the service from {@code Starter} at runtime. Suppliers are
-     * not used in AAS v3 anymore, just for AAS v2.
-     * 
-     * @param serviceId the service ID to create the property for
-     * @param name the name of the property
-     * @param supplierCreator the supplier creator, receiving a service instance supplier as context, delivering the 
-     *     actual property supplier eventually using the service instance supplier
-     */
-    private void defineProperty(String serviceId, String name, 
-        Function<Supplier<Service>, Supplier<Object>> supplierCreator) {
-        builder.defineProperty(getQName(serviceId, name), 
-            supplierCreator.apply(() -> Starter.getMappedServiceSafe(serviceId)), null); 
-    }
-
-    /**
-     * Defines an AAS operation through a function, obtaining the service from {@code Starter} at runtime. 
-     * 
-     * @param serviceId the service ID to create the property for
-     * @param name the name of the operation
-     * @param functionCreator the function creator, receiving a service instance supplier as context, delivering the 
-     *     actual function eventually using the service instance supplier
-     */
-    private void defineOperation(String serviceId, String name, 
-        Function<Supplier<Service>, ExceptionFunction> functionCreator) {
-        ExceptionFunction func = functionCreator.apply(() -> Starter.getMappedServiceSafe(serviceId));
-        builder.defineOperation(getQName(serviceId, name), 
-            new JsonResultWrapper(p -> func.apply(p))
-        );
-    }
+    }*/
 
     /**
      * Maps the given service onto the protocol service builder. Does not register the service in {@link Starter}.
      * 
      * @param serviceId the id of the service to define
      */
-    public void mapService(String serviceId) {
+    /*public void mapService(String serviceId) {
         try {
-            defineProperty(serviceId, NAME_PROP_ID, s -> () -> s.get().getId());
-            defineProperty(serviceId, NAME_PROP_DESCRIPTION, s -> () -> s.get().getDescription());
-            defineProperty(serviceId, NAME_PROP_ARTIFACT, s -> () -> s.get().getArtifact());
-            defineProperty(serviceId, NAME_PROP_VERSION, s -> () -> s.get().getVersion().toString());
-            defineProperty(serviceId, NAME_PROP_KIND, s -> () -> s.get().getKind().toString());
-            defineProperty(serviceId, NAME_PROP_STATE, s -> () -> s.get().getState().toString());
-            defineProperty(serviceId, NAME_PROP_NAME, s -> () -> s.get().getName());
-            defineProperty(serviceId, NAME_PROP_DEPLOYABLE, s -> () -> s.get().isDeployable());
-            defineProperty(serviceId, NAME_PROP_TOPLEVEL, s -> () -> s.get().isTopLevel());
-
-            defineOperation(serviceId, NAME_OP_ACTIVATE, s -> p -> {
-                s.get().activate(); 
-                return null; 
-            });
-            defineOperation(serviceId, NAME_OP_PASSIVATE, s -> p -> {
-                s.get().passivate(); 
-                return null; 
-            });
-            defineOperation(serviceId, NAME_OP_MIGRATE, s -> p -> {
-                s.get().migrate(readString(p)); 
-                return null; 
-            });
-            defineOperation(serviceId, NAME_OP_RECONF, s -> p -> {
-                Map<String, String> values = readMap(p, 0, null);
-                Service service = s.get();
-                Transport.sendTraceRecord(new TraceRecord(service.getId(), "reconfigure", values)); // disable?
-                service.reconfigure(values); 
-                return null;
-            });
-            defineOperation(serviceId, NAME_OP_GET_STATE, s -> p -> {
-                return s.get().getState().toString();
-            });
-            defineOperation(serviceId, NAME_OP_SET_STATE, s -> p -> {
-                ServiceState state = ServiceState.valueOf(readString(p, 0, "")); // exception -> wrapper
-                Service service = s.get();
-                service.setState(state);
-                LoggerFactory.getLogger(ServiceMapper.class).info("Setting state " + state 
-                    + " on " + service.getId() + " -> " + service.getState());
-                return null;
-            });
-            defineOperation(serviceId, NAME_OP_SWITCH, s -> p -> {
-                s.get().switchTo(readString(p));
-                return null;
-            });
-            defineOperation(serviceId, NAME_OP_UPDATE, s -> p -> {
-                updateService(s.get(), readUri(p, 0, EMPTY_URI));
-                return null;
-            });
+            builder.defineProperty(getQName(serviceId, NAME_PROP_ID), 
+                () -> Starter.getMappedServiceSafe(serviceId).getId(), null);
+            builder.defineProperty(getQName(serviceId, NAME_PROP_DESCRIPTION), 
+                () -> Starter.getMappedServiceSafe(serviceId).getDescription(), null);
+            builder.defineProperty(getQName(serviceId, NAME_PROP_ARTIFACT), 
+                () -> Starter.getMappedServiceSafe(serviceId).getArtifact(), null);
+            builder.defineProperty(getQName(serviceId, NAME_PROP_VERSION), 
+                () -> Starter.getMappedServiceSafe(serviceId).getVersion().toString(), null);
+            builder.defineProperty(getQName(serviceId, NAME_PROP_KIND), 
+                () -> Starter.getMappedServiceSafe(serviceId).getKind().toString(), null);
+            builder.defineProperty(getQName(serviceId, NAME_PROP_STATE), // just in case
+                () -> Starter.getMappedServiceSafe(serviceId).getState().toString(), null);
+            builder.defineProperty(getQName(serviceId, NAME_PROP_NAME), 
+                () -> Starter.getMappedServiceSafe(serviceId).getName(), null);
+            builder.defineProperty(getQName(serviceId, NAME_PROP_DEPLOYABLE), 
+                () -> Starter.getMappedServiceSafe(serviceId).isDeployable(), null);
+            builder.defineProperty(getQName(serviceId, NAME_PROP_TOPLEVEL), 
+                () -> Starter.getMappedServiceSafe(serviceId).isTopLevel(), null);
+            builder.defineOperation(getQName(serviceId, NAME_OP_ACTIVATE), 
+                new JsonResultWrapper(p -> {
+                    Starter.getMappedServiceSafe(serviceId).activate(); 
+                    return null;
+                }
+            ));
+            builder.defineOperation(getQName(serviceId, NAME_OP_PASSIVATE), 
+                new JsonResultWrapper(p -> {
+                    Starter.getMappedServiceSafe(serviceId).passivate(); 
+                    return null;
+                }
+            ));
+            builder.defineOperation(getQName(serviceId, NAME_OP_MIGRATE), 
+                new JsonResultWrapper(p -> {
+                    Starter.getMappedServiceSafe(serviceId).migrate(readString(p)); 
+                    return null;
+                }
+            ));
+            builder.defineOperation(getQName(serviceId, NAME_OP_RECONF), 
+                new JsonResultWrapper(p -> {
+                    Map<String, String> values = readMap(p, 0, null);
+                    Transport.sendTraceRecord(new TraceRecord(serviceId, "reconfigure", values)); // disable?
+                    Starter.getMappedServiceSafe(serviceId).reconfigure(values); 
+                    return null;
+                }
+            ));
+            builder.defineOperation(getQName(serviceId, NAME_OP_GET_STATE), 
+                    new JsonResultWrapper(p -> {
+                        return Starter.getMappedServiceSafe(serviceId).getState().toString();
+                    }
+                ));
+            builder.defineOperation(getQName(serviceId, NAME_OP_SET_STATE), 
+                new JsonResultWrapper(p -> {
+                    ServiceState state = ServiceState.valueOf(readString(p, 0, "")); // exception -> wrapper
+                    Service service = Starter.getMappedServiceSafe(serviceId);
+                    service.setState(state);
+                    LoggerFactory.getLogger(ServiceMapper.class).info("Setting state " + state 
+                        + " on " + serviceId + " -> " + service.getState());
+                    return null;
+                }
+            ));
+            builder.defineOperation(getQName(serviceId, NAME_OP_SWITCH), 
+                new JsonResultWrapper(p -> {
+                    Starter.getMappedServiceSafe(serviceId).switchTo(readString(p));
+                    return null;
+                }
+            ));
+            defineUpdateOperation(builder, serviceId);
         } catch (IllegalArgumentException e) {
             LoggerFactory.getLogger(ServiceMapper.class).error("Cannot map/register service: " + e.getMessage());
         }
+    }*/
+    
+    /**
+     * Defines the update operation taking into account {@link Starter#getUpdateHandler(String)}.
+     * 
+     * @param builder the builder 
+     * @param serviceId the service to map the operation to
+     */
+    /*private static void defineUpdateOperation(final ProtocolServerBuilder builder, final String serviceId) {
+        builder.defineOperation(getQName(serviceId, NAME_OP_UPDATE), 
+            new JsonResultWrapper(p -> {
+                updateService(Starter.getMappedServiceSafe(serviceId), readUri(p, 0, EMPTY_URI));
+                return null;
+            }
+        ));
+    }*/
+    
+    
+    /**
+     * Maps the given service onto the protocol service builder.
+     * Maps the given service onto the protocol service builder. Registers the service 
+     * calling {@link Starter#setService(Service)}. [testing]
+     * 
+     * @param service the service to define
+     */
+    public void mapService(Service service) {
+        try {
+            builder.defineProperty(getQName(service, NAME_PROP_ID), 
+                () -> service.getId(), null);
+            builder.defineProperty(getQName(service, NAME_PROP_DESCRIPTION), 
+                () -> service.getDescription(), null);
+            builder.defineProperty(getQName(service, NAME_PROP_ARTIFACT), 
+                () -> service.getArtifact(), null);
+            builder.defineProperty(getQName(service, NAME_PROP_VERSION), 
+                () -> service.getVersion().toString(), null);
+            builder.defineProperty(getQName(service, NAME_PROP_KIND), 
+                () -> service.getKind().toString(), null);
+            builder.defineProperty(getQName(service, NAME_PROP_STATE), // just in case
+                () -> service.getState().toString(), null);
+            builder.defineProperty(getQName(service, NAME_PROP_NAME), 
+                () -> service.getName(), null);
+            builder.defineProperty(getQName(service, NAME_PROP_DEPLOYABLE), 
+                () -> service.isDeployable(), null);
+            builder.defineProperty(getQName(service, NAME_PROP_TOPLEVEL), 
+                () -> service.isTopLevel(), null);
+            builder.defineOperation(getQName(service, NAME_OP_ACTIVATE), 
+                new JsonResultWrapper(p -> {
+                    service.activate(); 
+                    return null;
+                }
+            ));
+            builder.defineOperation(getQName(service, NAME_OP_PASSIVATE), 
+                new JsonResultWrapper(p -> {
+                    service.passivate(); 
+                    return null;
+                }
+            ));
+            builder.defineOperation(getQName(service, NAME_OP_MIGRATE), 
+                new JsonResultWrapper(p -> {
+                    service.migrate(readString(p)); 
+                    return null;
+                }
+            ));
+            builder.defineOperation(getQName(service, NAME_OP_RECONF), 
+                new JsonResultWrapper(p -> {
+                    Map<String, String> values = readMap(p, 0, null);
+                    Transport.sendTraceRecord(new TraceRecord(service.getId(), "reconfigure", values)); // disable?
+                    service.reconfigure(values); 
+                    return null;
+                }
+            ));
+            builder.defineOperation(getQName(service, NAME_OP_GET_STATE), 
+                    new JsonResultWrapper(p -> {
+                        return service.getState().toString();
+                    }
+                ));
+            builder.defineOperation(getQName(service, NAME_OP_SET_STATE), 
+                new JsonResultWrapper(p -> {
+                    ServiceState state = ServiceState.valueOf(readString(p, 0, "")); // exception -> wrapper
+                    service.setState(state);
+                    LoggerFactory.getLogger(ServiceMapper.class).info("Setting state " + state 
+                        + " on " + service.getId() + " -> " + service.getState());
+                    return null;
+                }
+            ));
+            builder.defineOperation(getQName(service, NAME_OP_SWITCH), 
+                new JsonResultWrapper(p -> {
+                    service.switchTo(readString(p));
+                    return null;
+                }
+            ));
+            defineUpdateOperation(builder, service);
+        } catch (IllegalArgumentException e) {
+            LoggerFactory.getLogger(ServiceMapper.class).error("Cannot map/register service: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Defines the update operation taking into account {@link Starter#getUpdateHandler(String)}.
+     * 
+     * @param builder the builder 
+     * @param service the service to map the operation to
+     */
+    private static void defineUpdateOperation(final ProtocolServerBuilder builder, final Service service) {
+        builder.defineOperation(getQName(service, NAME_OP_UPDATE), 
+            new JsonResultWrapper(p -> {
+                updateService(service, readUri(p, 0, EMPTY_URI));
+                return null;
+            }
+        ));
     }
     
     /**
