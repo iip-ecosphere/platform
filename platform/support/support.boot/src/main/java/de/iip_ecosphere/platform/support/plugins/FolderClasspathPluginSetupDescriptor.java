@@ -24,8 +24,10 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
+import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.IOUtils;
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.ZipUtils;
@@ -174,7 +176,7 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
         }
         return result;
     }
-
+    
     /**
      * Loads a classpath file relative to the actual jars and returns the specified classpath entries as URLs. 
      * Logs errors and  exceptions.
@@ -187,6 +189,23 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
      */
     static URL[] loadClasspathFileSafe(InputStream in, File base, boolean descriptorOnly, File[] appends) 
         throws IOException {
+        return loadClasspathFileSafe(in, base, descriptorOnly, appends, null);
+    }
+
+    /**
+     * Loads a classpath file relative to the actual jars and returns the specified classpath entries as URLs. 
+     * Logs errors and  exceptions.
+     * 
+     * @param in the classpath stream
+     * @param base the base folder use to make relative classpath entries absolute
+     * @param descriptorOnly only the first/two entries, the full thing else
+     * @param appends further classpath files that shall be appended, e.g., logging, may be <b>null</b>
+     * @param cpfFunc the adjustment function, may be <b>null</b> for none. <b>null</b> return values of {@code func} 
+     *     are ignored
+     * @return the URLs, may be empty
+     */
+    static URL[] loadClasspathFileSafe(InputStream in, File base, boolean descriptorOnly, File[] appends, 
+        Function<File, File> cpfFunc) throws IOException {
         URL[] result = null;
         ClasspathFile cpf = readClasspathFile(in, base);
         if (null != appends) {
@@ -203,6 +222,7 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
                 }
             }
         }
+        adjustClasspath(cpf, cpfFunc);
         List<File> entries = new ArrayList<File>(cpf.entries);
         if (descriptorOnly) {
             if (entries.size() > 1) {
@@ -264,6 +284,24 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
     }
     
     /**
+     * Adjusts the entires of the classpath file {@code cpf}, keeping the positions and size as before.
+     * 
+     * @param cpf the classpath file
+     * @param cpfFunc the adjustment function, may be <b>null</b> for none. <b>null</b> return values of {@code func} 
+     *     are ignored
+     */
+    private static void adjustClasspath(ClasspathFile cpf, Function<File, File> cpfFunc) {
+        if (null != cpfFunc) {
+            for (int f = 0; f < cpf.entries.size(); f++) {
+                File newF = cpfFunc.apply(cpf.entries.get(f));
+                if (null != newF) {
+                    cpf.entries.set(f, newF);
+                }
+            }
+        }
+    }
+    
+    /**
      * Reads a classpath setting from {@code line}.
      * 
      * @param line the line to read from
@@ -293,6 +331,7 @@ public class FolderClasspathPluginSetupDescriptor extends URLPluginSetupDescript
     public static ClasspathFile readClasspathFile(InputStream in, File base) throws IOException {
         ClasspathFile result = new ClasspathFile();
         List<String> contents = IOUtils.readLines(in);
+        FileUtils.closeQuietly(in);
         AtomicReference<String> unpackMode = new AtomicReference<>(null);
         AtomicReference<String> baseDir = new AtomicReference<>(null);
         for (String line : contents) {

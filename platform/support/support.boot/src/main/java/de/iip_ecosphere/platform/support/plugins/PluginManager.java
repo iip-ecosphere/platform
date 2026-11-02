@@ -353,7 +353,7 @@ public class PluginManager {
         if ((onlyNew && !isKnown) || !onlyNew) {
             for (String id : ids) {
                 Plugin<?> known = plugins.get(id);
-                if (null == known) {
+                if (null == known || force) {
                     plugins.put(id, plugin);
                     descriptors.put(id, desc);
                     LoggerFactory.getLogger(PluginManager.class).info("Plugin {} registered", id);
@@ -363,6 +363,8 @@ public class PluginManager {
             if (null == pls) {
                 pls = new ArrayList<>();
                 pluginsByType.put(pluginClass, pls);
+            } else if (force) {
+                pls.clear(); // only previous plugin??
             }
             if (dflt) {
                 pls.add(0, plugin);

@@ -13,6 +13,7 @@
 package de.iip_ecosphere.platform.support;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -105,6 +106,16 @@ public class IOUtils {
      */
     public static void write(byte[] data, OutputStream outputStream) throws IOException {
         Commons.getInstance().write(data, outputStream);
+    }
+    
+    /**
+     * Closes a closable quietly. [convenience]
+     * 
+     * @param closable the closable, may be <b>null</b>
+     * @see FileUtils#closeQuietly(Closeable)
+     */
+    public static void closeQuietly(Closeable closable) {
+        FileUtils.closeQuietly(null);
     }
 
 }

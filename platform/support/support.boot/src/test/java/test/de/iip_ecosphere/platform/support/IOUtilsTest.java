@@ -12,6 +12,7 @@
 
 package test.de.iip_ecosphere.platform.support;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -43,6 +44,23 @@ public class IOUtilsTest {
         lines = IOUtils.readLines(ResourceLoader.getResourceAsStream("identityStore.yml"), Charset.defaultCharset());
         Assert.assertNotNull(lines);
         Assert.assertTrue(lines.size() > 0);
+    }
+
+    /**
+     * Tests closing quietly.
+     */
+    @Test 
+    public void testCloseQuietly() {
+        IOUtils.closeQuietly(null);
+        Closeable cl = new Closeable() {
+
+            @Override
+            public void close() throws IOException {
+                throw new IOException();
+            }
+            
+        };
+        IOUtils.closeQuietly(cl);
     }
 
 }

@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.iip_ecosphere.platform.support.IOUtils;
 import de.iip_ecosphere.platform.support.NetUtils;
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
@@ -147,6 +148,7 @@ public class URLPluginSetupDescriptor implements PluginSetupDescriptor {
      */
     protected ClassLoader createClassLoader(URL[] urls, ClassLoader parent) {
         ClassLoader result = null;
+        InputStream idxStream = getIndexStream();
         if (ChildFirstClassLoader.useChildFirst()) {
             LoaderIndex index = null;
             if (OsUtils.getBooleanEnv("OKTO_USE_PLUGIN_INDEXES", true)) {
@@ -158,7 +160,6 @@ public class URLPluginSetupDescriptor implements PluginSetupDescriptor {
                         logFailingIndex(e);
                     }
                 }
-                InputStream idxStream = getIndexStream();
                 if (null != idxStream) {
                     try {
                         index = LoaderIndex.fromStream(idxStream);
@@ -192,6 +193,7 @@ public class URLPluginSetupDescriptor implements PluginSetupDescriptor {
         } else {
             result = new URLClassLoader(urls, parent);
         }
+        IOUtils.closeQuietly(idxStream); // close anyway
         return result;
     }
     
