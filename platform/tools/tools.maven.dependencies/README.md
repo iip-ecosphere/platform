@@ -194,6 +194,8 @@ Further settings:
 - `file` (default unset, required, user setting `-Dtouch.file`) the file to touch
 - `deleteBefore` (default `false`, user setting `-Dtouch.deleteBefore`) whether the `file` shall be deleted before touching
 - `onServiceUpdates` (default `true`, user setting `-touch.onServiceUpdates`) whether changed services shall be recorded in `file` (rather than just an empty file), requiring `services.properties` in the oktoflow app being present and filled with the service mapping
+- `passJava` (default `false`, user setting `-Dtouch.passJava`) whether Java changes shall be passed without considering the changes of the artifact of this project (with group name prepended) or whether they shall be checked
+- `javaArtifactsProperty` (default `okto.service.artifacts`) the Maven property defining the Java artifacts to be checked for changes, may contain a comma-separated list
 
 ## update-archive goal
 

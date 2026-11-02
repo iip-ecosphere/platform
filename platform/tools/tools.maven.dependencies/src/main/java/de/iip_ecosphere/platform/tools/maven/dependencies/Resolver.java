@@ -42,6 +42,7 @@ import de.oktoflow.platform.tools.lib.loader.Constants.UnpackMode;
  * Simple re-usable Maven artifact resolver.
  * 
  * @author Holger Eichelberger, SSE
+ * @author Gemini
  */
 class Resolver {
 
@@ -428,6 +429,73 @@ class Resolver {
             // well, take getName()
         }
         return result.replace('\\', '/');
+    }
+
+    /**
+     * Turns an {@code artifact} coordinate to a file name.
+     * 
+     * @param artifact the artifact coordinated, may be empty or <b>null</b>
+     * @param prependGroup prepend the group id separated by a "." or skip the group id
+     * @return may be <b>null</b> or empty for invalid, the file name otherwise
+     */
+    public static String toFileName(String artifact, boolean prependGroup) {
+        String result = null;
+        if (artifact == null || artifact.trim().isEmpty()) {
+            result = "";
+        } else {
+            String[] parts = artifact.split(":");
+            String groupId = "";
+            String artifactId = "";
+            String packaging = "jar"; // default packaging if omitted
+            String classifier = null;
+            String version = "";
+    
+            switch (parts.length) {
+            case 3:
+                // format: groupId:artifactId:version
+                groupId = parts[0];
+                artifactId = parts[1];
+                version = parts[2];
+                break;
+            case 4:
+                // format: groupId:artifactId:packaging:version
+                groupId = parts[0];
+                artifactId = parts[1];
+                packaging = parts[2];
+                version = parts[3];
+                break;
+            case 5:
+            case 6: // handles extended cases if needed
+                // format: groupId:artifactId:packaging:classifier:version
+                groupId = parts[0];
+                artifactId = parts[1];
+                packaging = parts[2];
+                classifier = parts[3];
+                version = parts[4];
+                break;
+            default:
+                result = "";
+                break;
+            }
+            if (null == result) {
+                // Build extended file name: [groupId.]artifactId-version[-classifier].packaging
+                StringBuilder fileName = new StringBuilder();
+                if (prependGroup && groupId != null && groupId.length() > 0) {
+                    fileName.append(groupId);
+                    fileName.append(".");
+                }
+                fileName
+                    .append(artifactId)
+                    .append("-")
+                    .append(version);
+                if (classifier != null && !classifier.isEmpty()) {
+                    fileName.append("-").append(classifier);
+                }
+                fileName.append(".").append(packaging);
+                result = fileName.toString();
+            }
+        }
+        return result;
     }
     
 }

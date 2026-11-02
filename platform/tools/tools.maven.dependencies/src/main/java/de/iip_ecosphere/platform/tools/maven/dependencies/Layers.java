@@ -171,6 +171,48 @@ public class Layers {
         return file.endsWith(LoaderIndex.INDEX_SUFFIX);
     }
     
+    /**
+     * Composes the own artifact.
+     * 
+     * @param targetDirectory the folder whether the file to prepend
+     * @param classifier optional classifier, may be <b>null</b> or empty for none
+     * @param type the artifact type/file extension (without ".")
+     * @param project the Maven project
+     * @return the artifact file
+     */
+    static File composeArtifact(File targetDirectory, String classifier, String type, MavenProject project) {
+        String postfix = "";
+        if (classifier != null && classifier.length() > 0) {
+            postfix += "-" + classifier;
+        }
+        postfix += "." + type;
+        return new File(targetDirectory, project.getArtifactId() + "-" + project.getVersion() + postfix);
+    }
+    
+    /**
+     * Prepends the group id before an usual Maven artifact as we need it that way for resolution on unpacking.
+     * 
+     * @param file the file to prepend, see {@link #composeArtifact(File, String, String, MavenProject)}
+     * @param project the Maven project
+     * @return the prepended file
+     */
+    static File prependGroup(File file, MavenProject project) {
+        return new File(file.getParent(), project.getGroupId() + "." + file.getName());
+    }
+    
+    /**
+     * Composes the group prepended artifact, i.e., combines 
+     * {@link #composeArtifact(File, String, String, MavenProject)} and {@link #prependGroup(File, MavenProject)}.
+     * 
+     * @param targetDirectory the folder whether the file to prepend
+     * @param classifier optional classifier, may be <b>null</b> or empty for none
+     * @param type the artifact type/file extension (without ".")
+     * @param project the Maven project
+     * @return the group-prepended artifact file
+     */
+    static File composeGroupArtifact(File targetDirectory, String classifier, String type, MavenProject project) {
+        return prependGroup(composeArtifact(targetDirectory, classifier, type, project), project);
+    }
     
     /**
      * Prepends the group id before an usual Maven artifact as we need it that way for resolution on unpacking.
@@ -179,16 +221,13 @@ public class Layers {
      * @param classifier optional classifier, may be <b>null</b> or empty for none
      * @param type the artifact type/file extension (without ".")
      * @param project the Maven project
+     * @param log the log instance
      * @return the prepended file
+     * @see #composeGroupArtifact(File, String, String, MavenProject)
+     * @see #prependGroupAndCopy(File, MavenProject, Log)
      */
     static File copyGroupArtifact(File targetDirectory, String classifier, String type, MavenProject project, Log log) {
-        String postfix = "";
-        if (classifier != null && classifier.length() > 0) {
-            postfix += "-" + classifier;
-        }
-        postfix += "." + type;
-        return prependGroupAndCopy(new File(targetDirectory, project.getArtifactId() + "-" 
-            + project.getVersion() + postfix), project, log);
+        return prependGroupAndCopy(composeArtifact(targetDirectory, classifier, type, project), project, log);
     }
     
     /**
@@ -196,10 +235,11 @@ public class Layers {
      * 
      * @param file the file to prepend, copy from
      * @param project the Maven project
+     * @param log the log instance
      * @return the prepended file
      */
     static File prependGroupAndCopy(File file, MavenProject project, Log log) {
-        File result = new File(file.getParent(), project.getGroupId() + "." + file.getName());
+        File result = prependGroup(file, project);
         try {
             Files.copy(file.toPath(), result.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
