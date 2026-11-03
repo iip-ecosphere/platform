@@ -70,111 +70,6 @@ public class ServiceMapper {
     public ServiceMapper(ProtocolServerBuilder builder) {
         this.builder = builder;
     }
-
-    /**
-     * Maps the given service onto the protocol service builder. Registers the service 
-     * calling {@link Starter#setService(Service)}. [testing]
-     * 
-     * @param service the service to define
-     */
-    /*public void mapService(Service service) { // move to testing
-        mapService(service.getId());
-        Starter.setService(service);
-    }*/
-
-    /**
-     * Maps the given service onto the protocol service builder. Does not register the service in {@link Starter}.
-     * 
-     * @param serviceId the id of the service to define
-     */
-    /*public void mapService(String serviceId) {
-        try {
-            builder.defineProperty(getQName(serviceId, NAME_PROP_ID), 
-                () -> Starter.getMappedServiceSafe(serviceId).getId(), null);
-            builder.defineProperty(getQName(serviceId, NAME_PROP_DESCRIPTION), 
-                () -> Starter.getMappedServiceSafe(serviceId).getDescription(), null);
-            builder.defineProperty(getQName(serviceId, NAME_PROP_ARTIFACT), 
-                () -> Starter.getMappedServiceSafe(serviceId).getArtifact(), null);
-            builder.defineProperty(getQName(serviceId, NAME_PROP_VERSION), 
-                () -> Starter.getMappedServiceSafe(serviceId).getVersion().toString(), null);
-            builder.defineProperty(getQName(serviceId, NAME_PROP_KIND), 
-                () -> Starter.getMappedServiceSafe(serviceId).getKind().toString(), null);
-            builder.defineProperty(getQName(serviceId, NAME_PROP_STATE), // just in case
-                () -> Starter.getMappedServiceSafe(serviceId).getState().toString(), null);
-            builder.defineProperty(getQName(serviceId, NAME_PROP_NAME), 
-                () -> Starter.getMappedServiceSafe(serviceId).getName(), null);
-            builder.defineProperty(getQName(serviceId, NAME_PROP_DEPLOYABLE), 
-                () -> Starter.getMappedServiceSafe(serviceId).isDeployable(), null);
-            builder.defineProperty(getQName(serviceId, NAME_PROP_TOPLEVEL), 
-                () -> Starter.getMappedServiceSafe(serviceId).isTopLevel(), null);
-            builder.defineOperation(getQName(serviceId, NAME_OP_ACTIVATE), 
-                new JsonResultWrapper(p -> {
-                    Starter.getMappedServiceSafe(serviceId).activate(); 
-                    return null;
-                }
-            ));
-            builder.defineOperation(getQName(serviceId, NAME_OP_PASSIVATE), 
-                new JsonResultWrapper(p -> {
-                    Starter.getMappedServiceSafe(serviceId).passivate(); 
-                    return null;
-                }
-            ));
-            builder.defineOperation(getQName(serviceId, NAME_OP_MIGRATE), 
-                new JsonResultWrapper(p -> {
-                    Starter.getMappedServiceSafe(serviceId).migrate(readString(p)); 
-                    return null;
-                }
-            ));
-            builder.defineOperation(getQName(serviceId, NAME_OP_RECONF), 
-                new JsonResultWrapper(p -> {
-                    Map<String, String> values = readMap(p, 0, null);
-                    Transport.sendTraceRecord(new TraceRecord(serviceId, "reconfigure", values)); // disable?
-                    Starter.getMappedServiceSafe(serviceId).reconfigure(values); 
-                    return null;
-                }
-            ));
-            builder.defineOperation(getQName(serviceId, NAME_OP_GET_STATE), 
-                    new JsonResultWrapper(p -> {
-                        return Starter.getMappedServiceSafe(serviceId).getState().toString();
-                    }
-                ));
-            builder.defineOperation(getQName(serviceId, NAME_OP_SET_STATE), 
-                new JsonResultWrapper(p -> {
-                    ServiceState state = ServiceState.valueOf(readString(p, 0, "")); // exception -> wrapper
-                    Service service = Starter.getMappedServiceSafe(serviceId);
-                    service.setState(state);
-                    LoggerFactory.getLogger(ServiceMapper.class).info("Setting state " + state 
-                        + " on " + serviceId + " -> " + service.getState());
-                    return null;
-                }
-            ));
-            builder.defineOperation(getQName(serviceId, NAME_OP_SWITCH), 
-                new JsonResultWrapper(p -> {
-                    Starter.getMappedServiceSafe(serviceId).switchTo(readString(p));
-                    return null;
-                }
-            ));
-            defineUpdateOperation(builder, serviceId);
-        } catch (IllegalArgumentException e) {
-            LoggerFactory.getLogger(ServiceMapper.class).error("Cannot map/register service: " + e.getMessage());
-        }
-    }*/
-    
-    /**
-     * Defines the update operation taking into account {@link Starter#getUpdateHandler(String)}.
-     * 
-     * @param builder the builder 
-     * @param serviceId the service to map the operation to
-     */
-    /*private static void defineUpdateOperation(final ProtocolServerBuilder builder, final String serviceId) {
-        builder.defineOperation(getQName(serviceId, NAME_OP_UPDATE), 
-            new JsonResultWrapper(p -> {
-                updateService(Starter.getMappedServiceSafe(serviceId), readUri(p, 0, EMPTY_URI));
-                return null;
-            }
-        ));
-    }*/
-    
     
     /**
      * Maps the given service onto the protocol service builder.
@@ -283,6 +178,10 @@ public class ServiceMapper {
             Service updatedService = updateHandler.get();
             if (null != updatedService && updatedService != service) {
                 updatedService.transferState(service);
+                ServiceMapper mapper = Starter.getServiceMapper();
+                mapper.builder.enableOverwrite(true);
+                mapper.mapService(updatedService);
+                mapper.builder.enableOverwrite(false);
                 Starter.setService(updatedService);
                 LoggerFactory.getLogger(ServiceMapper.class).info("Updated service '{}'", service.getId());
             }
