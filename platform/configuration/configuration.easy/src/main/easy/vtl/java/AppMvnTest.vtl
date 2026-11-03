@@ -78,6 +78,7 @@ template AppMvnTest(IIPEcosphere config, XmlFileArtifact target, setOf(String) u
         appendMavenDependencyPluginArtifactItem(unpackItems, config.sharedArtifact, "python", 
             "\\${project.build.directory}/pySrc", "pyIf.zip", type="zip");
         appendMavenIipDependencyPluginBuildClasspathPluginExecution(execs, furtherFiles="\\${project.build.directory}/classes/\\${project.groupId}.\\${project.artifactId}");
+        appendMavenIipDependencyPluginCopyArtifactsExecution(execs);
 //appendMavenIipDependencyPluginUnpackPluginsExecution(execs, oktoPlugins, projectVersion, enable=withPlugins(config));
         //appendIipPythonPlugin(plugins, projectVersion);
         //XmlElement pluginMgt = createPlugins(createPluginManagement(build));
