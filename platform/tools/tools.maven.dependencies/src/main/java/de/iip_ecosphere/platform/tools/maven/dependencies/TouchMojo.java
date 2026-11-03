@@ -211,6 +211,8 @@ public class TouchMojo extends AbstractMojo {
                     }
                 }
                 checkedArtifacts.put(artifact, isChanged);
+            } else {
+                isChanged = artifactChanged;
             }
         }
         return isChanged;

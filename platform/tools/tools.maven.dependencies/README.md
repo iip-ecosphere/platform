@@ -297,9 +297,16 @@ Specialized goal to build a plugin classpath file. Based on the refined ``build-
 - `pluginIds` (default empty, user property `mdep.pluginIds`) specifies pluginIds for the `PluginBased` setup descriptor (comma separated, only first considered by now), may also be used with others whereby then the plugin is also announced by `PluginBased`
 - `validateJsl` (default `WARN`, user property `mdep.validateJsl`) specifies whether classes listed in JSL files shall be validated for their counterparts in `target`, leads to warnings (`WARN`), information (`INFO`), errors (`ERROR`) or build failures (`FAIL`) if classes do not exist. Can be switched warnings `OFF`.
 - `resolvedFile` (default `${project.build.directory}/classes/resolved`, user property `mdep.resolvedFile`) specifies where to store the `resolved` file if `unpackMode` is `resolved`
-- `copyArtifacts` (default `false`) copy app artifacts as `copy-plugin-dependencies` would do, needed for standalone execution in apps
+- `copyArtifacts` (default `false`) copy Java service artifacts as `copy-plugin-dependencies` would do, needed for standalone execution in apps
 
 The inherited setting ``excludeArtifactIds`` shall be configured in a way that prerequiste platform layers are excluded. Usually, the plugin detects and determins the respective artifact ids automatically.
+
+## copy-artifacts goal
+
+Goal for copying build Java service artifacts into `target`, with name prefixed by groupId, as `copy-plugin-dependencies` would do. Explicit goal for later phase than `build-plugin-classpath` with same functionality as `copyArtifacts` there.
+
+- `skip` (default `false`) skips the execution
+- `asTest` include test artifacts (default `false`).
 
 ## copy-plugin-dependencies goal
 
