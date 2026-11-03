@@ -17,6 +17,7 @@ RUN sudo apt-get install -y acl
 RUN sudo apt-get install openjdk-21-jdk -y
 RUN sudo apt-get install openjdk-8-jre -y
 RUN sudo apt install git -y 
+RUN sudo apt install unzip -y 
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt-get install -y nodejs
 RUN sudo apt install gedit -y
 # maven
