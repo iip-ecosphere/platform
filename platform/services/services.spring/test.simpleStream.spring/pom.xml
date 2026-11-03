@@ -10,6 +10,7 @@
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependenciesSpring</artifactId>
      <version>0.8.2-SNAPSHOT</version>
+     <relativePath/>
   </parent>
 
   <dependencies>
