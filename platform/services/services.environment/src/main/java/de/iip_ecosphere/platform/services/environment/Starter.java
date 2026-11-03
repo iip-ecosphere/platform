@@ -562,6 +562,7 @@ public class Starter {
                     @Override
                     public void onFileChange(final File file) {
                         getLogger().info("File change detected on {}", file);
+                        long start = System.currentTimeMillis();
                         List<Service> services = mappedServices.values()
                             .stream()
                             .filter(s -> s.getState() == ServiceState.RUNNING)
@@ -592,7 +593,7 @@ public class Starter {
                             servicesStart.forEach(s -> setStateQuietly(s, 
                                 ServiceState.ACTIVATING, ServiceState.RUNNING));
                             services.forEach(s -> s.startData());
-                            getLogger().info("Update completed");
+                            getLogger().info("Update completed in {} ms", System.currentTimeMillis() - start);
                         } else {
                             getLogger().info("No changed services detected. Skipping update.");
                         }
