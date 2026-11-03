@@ -340,6 +340,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
         if (furtherFiles <> "") {
             XmlElement config = appendConfiguration(exec);
             new XmlElement(config, "outputFiles", furtherFiles);
+            new XmlElement(config, "copyArtifacts", "true");
         }    
         exec;
     }

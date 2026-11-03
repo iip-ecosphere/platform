@@ -47,6 +47,19 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
             appendMavenDependencyPluginOverWrite(config); // default settings -> overwriteSnapshots
         }
     }
+    
+    def genServiceResourcesProperties(XmlElement properties, setOf(String) artifacts, IIPEcosphere config) {
+        String arts = "";
+        String sharedArtPostfix = getStringValueSafe(config.sharedArtifact, "");
+        for (String art : artifacts.asSequence()->sortedBy(a|a)) { // sortedBy for testing
+            if (art <> "" and art <> sharedArtPostfix) {
+                arts = appendWithSeparator(arts, ",", art);
+            }
+        }
+        if (arts <> "") {
+            new XmlElement(properties, "okto.service.artifacts", arts);
+        }
+    }
 
     def main(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedServiceTypes, setOf(String) artifacts, sequenceOf(String) oktoPlugins, 
         setOf(DependencyArtifact) bins, setOf(AssemblyInfo) assemblies, setOf(ResourceInfo) resources, String starterCls, String appName, String appVersion, 
@@ -67,6 +80,7 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
         createMavenParent(project, iipGroup, "platformDependenciesSpring", "${config.iipVer}");
         XmlElement properties = new XmlElement(project, "properties");
         new XmlElement(properties, "maven.jar.forceCreation", "true"); // spring-boot-plugin result grows if not re-built, clean plugin prevents creating the result jar
+        genServiceResourcesProperties(properties, artifacts, config);
         addDistributionManagement(project, config);
         XmlElement profiles = appendProfiles(project);
         XmlElement profile = appendProfile(profiles, "App", activateByDefault=true);

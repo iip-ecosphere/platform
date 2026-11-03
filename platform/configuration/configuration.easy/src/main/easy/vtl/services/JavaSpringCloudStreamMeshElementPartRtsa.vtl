@@ -50,7 +50,7 @@ template JavaSpringCloudStreamMeshElementPartRtsa(Configuration config, FileArti
     }
     
     def generateServiceAttribute(MeshElement elt, RtsaService service, JavaCodeClass c) {
-        c.addAttribute("de.iip_ecosphere.platform.services.environment.GenericMultiTypeService", "service");
+        generateServiceAttrs("de.iip_ecosphere.platform.services.environment.GenericMultiTypeService", "service", c);
     }
 
     def genIngestor(RtsaService service, String methodSuffix, String conn, String type, String dir, ServiceBase target, String connPlaceHolder, JavaCodeBlockInterface block) {

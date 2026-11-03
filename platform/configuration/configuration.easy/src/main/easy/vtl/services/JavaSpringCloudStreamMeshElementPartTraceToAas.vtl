@@ -66,7 +66,7 @@ template JavaSpringCloudStreamMeshElementPartTraceToAas(Configuration config, Fi
     }
     
     def generateServiceAttribute(MeshElement elt, TraceToAasService service, JavaCodeClass c) {
-        c.addAttribute("de.iip_ecosphere.platform.services.environment.services.TraceToAasService", "service");
+        generateServiceAttrs("de.iip_ecosphere.platform.services.environment.services.TraceToAasService", "service", c);
     }
     
     def getServiceType(MeshElement elt, TraceToAasService service) {
