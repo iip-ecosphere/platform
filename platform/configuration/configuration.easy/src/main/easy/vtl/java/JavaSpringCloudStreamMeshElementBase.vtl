@@ -171,10 +171,10 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, JavaCodeArti
                     block.SystemOutPrintln().arg('"received in ${base.id}: " + ${d}');
                 }
             }
-if (expr <> "") {
-            block.add(expr + ";"); // add only if expr<>"", returns block
-}
-block;            
+            if (expr <> "") {
+                block.add(expr + ";"); // add only if expr<>"", returns block
+            }
+            block;
         } else {
             new JavaCodeStringExpression(expr);
         }
@@ -360,12 +360,12 @@ block;
         } else {
             methodName = methodSuffix;
         }
-        String expr = '${fallbackToNull(proc, "service.${methodName}(data)", false)}';
+        String expr = '${fallbackToNull(proc, "serviceRef.get().${methodName}(data)", false)}';
         m.return(new JavaCodeLambdaExpression("data").asExpr(genRcvProbe(base, expr, type, "data")));
     }
     
     def generateAsyncProcessorBody(MeshElement proc, Connector conn, String methodSuffix, String methodSuffixWithServiceId, String type, JavaCodeMethod m) {
-        String expr = '${fallbackToNull(proc, "service.send(${type}.class, data)", false)}';
+        String expr = '${fallbackToNull(proc, "serviceRef.get().send(${type}.class, data)", false)}';
         m.return(new JavaCodeLambdaExpression("data").asExpr(genRcvProbe(conn, expr, type, "data")));
     }
 
@@ -388,11 +388,11 @@ block;
         } else {
             methodName = methodSuffix;
         }
-        m.return('data -> ${fallbackToNull(proc, "service.${methodName}(data)", true)}');
+        m.return('data -> ${fallbackToNull(proc, "serviceRef.get().${methodName}(data)", true)}');
     }
 
     def generateSyncProcessorBody(MeshProcessor proc, Connector conn, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType, JavaCodeMethod m) {
-        m.return('data -> ${fallbackToNull(proc, "service.send(${inType}.class, data)", true)}');
+        m.return('data -> ${fallbackToNull(proc, "serviceRef.get().send(${inType}.class, data)", true)}');
     }
     
     // called via MeshBasics.generateDataMethods for MeshSink
@@ -414,13 +414,13 @@ block;
     } 
     
     def generateSinkMethodBody(MeshSink snk, ServiceBase service, String methodName, String methodSuffixWithServiceId, String type, JavaCodeMethod m) {
-        String expr = '${fallbackToNull(snk, "service.${methodName}(data)", false)}';
+        String expr = '${fallbackToNull(snk, "serviceRef.get().${methodName}(data)", false)}';
         m.return(new JavaCodeLambdaExpression("data").asExpr(genRcvProbe(service, expr, type, "data")));
     }
 
     // added v2->v3
     def generateSinkMethodBody(MeshSink snk, Connector service, String methodName, String methodSuffixWithServiceId, String type, JavaCodeMethod m) {
-        String expr = '${fallbackToNull(snk, "service.${methodName}(${type}.class, data)", false)}';
+        String expr = '${fallbackToNull(snk, "serviceRef.get().${methodName}(${type}.class, data)", false)}';
         m.return(new JavaCodeLambdaExpression("data").asExpr(genRcvProbe(service, expr, type, "data")));
     }
     
@@ -495,6 +495,7 @@ block;
         block.assign(attrName).callQualified("de.iip_ecosphere.platform.services.environment.AbstractService.createInstance").stringArg(className)
             .classArg(serviceType).stringArg(service.id).stringArg(getDeploymentDescriptorPath()).arg(attrName);
         if (updateHandlerPresent) {
+            updateHandlerBlock.call("${attrName}Ref.set").arg(attrName);
             updateHandlerBlock.return(attrName);
             m.addCall("get").qualifiedBy(updateHandlerName);
         }
@@ -732,10 +733,15 @@ block;
         }
         cls;
     }
+    
+    def generateServiceAttrs(String serviceType, String varName, JavaCodeClass c) {
+        c.attribute(serviceType, varName);
+        c.attribute("java.util.concurrent.atomic.AtomicReference<${serviceType}>", varName + "Ref").addNew("AtomicReference<>");
+    }
         
     def generateServiceAttribute(MeshElement elt, ServiceBase base, JavaCodeClass c) {
         String serviceType = getServiceType(elt, base);
-        c.attribute(serviceType, "service");
+        generateServiceAttrs(serviceType, "service", c);
         generateUpdateHandler(serviceType, c);
     }
     
@@ -782,7 +788,7 @@ block;
         if (familyInterface.length() == 0 and isDefined(family.selector) and family.selector <> null) {
             generateSelectorServiceAttribute(family, family.selector, c);
         }
-        c.attribute(familyInterfaceName(getClsName(elt)), "service");
+        generateServiceAttrs(familyInterfaceName(getClsName(elt)), "service", c);
         c.attribute("String", "actServiceId").addStringInitializer(init.id);
         c.attribute("de.iip_ecosphere.platform.services.environment.FamilyServiceStub", "familyStub");
     }
