@@ -26,7 +26,7 @@ Please note that there are also data files for service testing. They look simila
 
 Mocked data points pass the connector's cache like real data. With the default `cacheMode = CacheMode::NONE`, every data point is passed on. With `HASH` or `EQUALS`, a data point that equals the cached one is not passed on, so repeated identical data points (e.g., via `$repeats`) may not arrive.
 
-The mocking connector logs its progress. Useful log lines (for oktoflow up to version 0.8.2):
+The mocking connector logs its progress. Useful log lines:
 
 * `Starting data with resource: testData-....yml`: shows the file name expected for a connector.
 * `File testData-....yml not found, falling back to : testData-....json`: normal when using `.json` files.
