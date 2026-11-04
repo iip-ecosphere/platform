@@ -473,7 +473,7 @@
                           </goals>
                           <configuration>
                               <invokeGoals>
-                                  <invokeGoal>install</invokeGoal>
+                                  <invokeGoal>deploy</invokeGoal>
                               </invokeGoals>
                               <pom>test.configuration.configuration</pom>
                           </configuration>

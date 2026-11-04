@@ -15,7 +15,7 @@
             <arg value="${user.home}/cleanOkto.sh"/>
         </exec>	
 		
-	    <maven pomFile="pom.xml" goal="install">
+	    <maven pomFile="pom.xml" goal="deploy">
           <arg value="-Dmodel.parent=${model_parent}"/> <!-- must be set in jenkins ANT build step -->
           <arg value="-Diip.tests=true"/>
           <arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
