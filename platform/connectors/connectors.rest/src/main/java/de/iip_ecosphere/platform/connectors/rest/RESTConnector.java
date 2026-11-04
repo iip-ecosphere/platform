@@ -2,6 +2,8 @@ package de.iip_ecosphere.platform.connectors.rest;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
@@ -24,6 +26,7 @@ import de.iip_ecosphere.platform.connectors.MachineConnector;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
+import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
@@ -34,9 +37,9 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
  * @param <CO> the output type of the connector
  * @param <CI> the input type of the connector
  * 
- *             Determines whether SingleValue or SetValue is retrieved with or
- *             without parameters (WP = WithParameter)
- *             specificSettings.RequestType = {Single, SingleWP, Set, SetWP}
+ * Determines whether SingleValue or SetValue is retrieved with or
+ * without parameters (WP = WithParameter)
+ * specificSettings.RequestType = {Single, SingleWP, Set, SetWP}
  */
 @MachineConnector(hasModel = true, supportsModelStructs = false, supportsEvents = false, specificSettings = {
     "Endpoints", "RequestType" })
@@ -47,6 +50,7 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
 
     private RESTItem item = null;
     private ConnectorParameter params;
+    private String path;
 
     /**
      * The descriptor of this connector (see META-INF/services).
@@ -85,7 +89,6 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
      */
     @SafeVarargs
     public RESTConnector(ProtocolAdapter<RESTItem, Object, CO, CI>... adapter) {
-
         this(null, adapter);
     }
 
@@ -98,7 +101,7 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
      */
     @SafeVarargs
     public RESTConnector(AdapterSelector<RESTItem, Object, CO, CI> selector,
-            ProtocolAdapter<RESTItem, Object, CO, CI>... adapter) {
+        ProtocolAdapter<RESTItem, Object, CO, CI>... adapter) {
         super(selector, adapter);
         configureModelAccess(new RESTModelAccess());
     }
@@ -110,7 +113,6 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
 
     @Override
     protected void connectImpl(ConnectorParameter params) throws IOException {
-
         this.params = params;
         specificSettings();
     }
@@ -119,18 +121,36 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
      * Transfers the specific settings form ConnectorParameter to RESTConnector.
      */
     private void specificSettings() {
+        path = params.getEndpointPath();
+        try {
+            new URL(path);
+            // just test, use path as given (legacy)
+        } catch (MalformedURLException e) {
+            Schema schema = params.getSchema();
+            if (null == schema) {
+                schema = Schema.HTTP;
+            }
+            String pathPart = path;
+            if (null == pathPart) {
+                pathPart = "";
+            }
+            if (!pathPart.startsWith("/")) {
+                pathPart = "/" + pathPart;
+            }
+            path = schema.toUri() + params.getHost() + ":" + params.getPort() + pathPart; 
+        }
+        if (!path.endsWith("/")) { 
+            path += "/";
+        }
 
         Set<String> keys = params.getSpecificSettingKeys();
         RESTEndpointMap map = null;
         RESTEndpointMap lowerCaseMap = new RESTEndpointMap();
 
         for (String key : keys) {
-
             if (key.equals("SERVER_STRUCTURE")) {
-
                 Object endpoints = params.getSpecificSetting(key);
                 map = JsonUtils.fromJson(endpoints, RESTEndpointMap.class);
-
                 for (RESTEndpointMap.Entry<String, RESTEndpoint> entry : map.entrySet()) {
                     lowerCaseMap.put(entry.getKey().toLowerCase(), entry.getValue());
                 }
@@ -154,19 +174,14 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
     }
 
     @Override
-    protected void error(String arg0, Throwable arg1) {
-        LOGGER.error(arg0, arg1);
-
+    protected void error(String msg, Throwable throwable) {
+        LOGGER.error(msg, throwable);
     }
 
     @Override
     protected RESTItem read() throws IOException {
-        String path = params.getEndpointPath();
-
         RESTEndpointMap endpointMap = item.getEndpointMap();
-
         for (Entry<String, RESTEndpoint> entry : endpointMap.entrySet()) {
-
             String key = entry.getKey().toLowerCase();
             String endpoint = entry.getValue().getEndpoint();
             String uri = path + endpoint;
@@ -197,35 +212,27 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
             responseEntity = restTemplate.exchange(uri, HttpMethod.GET, entity, responseClass);
 
             if (responseEntity != null) {
-
                 Object result = (Object) responseEntity.getBody();
                 item.setValue(key, result);
-                LOGGER.info("RESTConnector.read(): " + uri + "[ " + responseType + " ] -> " + result);
-
+                LOGGER.debug("RESTConnector.read(): " + uri + "[ " + responseType + " ] -> " + result);
             } else {
                 LOGGER.info("RESTConnector.read(): Failed to read " + key + " from " + uri);
             }
         }
-
         return item;
     }
 
     @Override
     protected void writeImpl(Object data) throws IOException {
-
         if (item.getKeysToWriteSize() != 0) {
-            
             HashMap<String, Object> toWrite = item.getKeysToWrite();
-            
             for (Entry<String, Object> entry : toWrite.entrySet()) {
                 String qName = entry.getKey();
-                String path = params.getEndpointPath();
                 RESTEndpoint restEndpoint = item.getEndpointMap().get(qName);
                 String endpoint = restEndpoint.getSimpleEndpoint();
                 ResponseEntity<?> responseEntity = null;
                 
                 if (restEndpoint.getAsSingleValue()) {
-
                     Object valueObject = item.getValue(qName);
                     Field valueField = null;
                     Object value = null;
@@ -240,30 +247,21 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
                     }
 
                     String uri = path + endpoint + "?value=" + value;
-
                     RestTemplate restTemplate = new RestTemplate();
                     responseEntity = restTemplate.exchange(uri, HttpMethod.PUT, null, String.class);
-
                 } else {
-
                     Object value = item.getValue(qName);
-
                     HttpHeaders headers = new HttpHeaders();
                     headers.setContentType(MediaType.APPLICATION_JSON);
-
                     HttpEntity<?> requestEntity = new HttpEntity<>(value, headers);
-
                     String uri = path + endpoint;
 
                     RestTemplate restTemplate = new RestTemplate();
                     responseEntity = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String.class);
                 }
-
-                LOGGER.info("Response: " + responseEntity.getBody());
+                LOGGER.debug("Response: " + responseEntity.getBody());
             }
-
         }
-
     }
 
     /**
@@ -307,51 +305,40 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
         @Override
         public Object get(String qName) throws IOException {
             Object result = new Object();
-
             if (objectToAccess != null) {
                 try {
-
                     Field dataField = objectToAccess.getClass().getDeclaredField(qName);
                     dataField.setAccessible(true);
                     result = dataField.get(objectToAccess);
-
                 } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
-                        | IllegalAccessException e) {
+                    | IllegalAccessException e) {
                     throw new IOException(e);
                 }
             } else {
                 result = item.getValue(qName);
             }
-
-            LOGGER.info("RESTModelAccess:get(" + qName + ") -> result: " + result);
+            LOGGER.debug("RESTModelAccess:get(" + qName + ") -> result: " + result);
             return result;
         }
 
         @Override
         public void set(String qName, Object value) throws IOException {
-
             if (objectToAccess != null) {
-
                 Field dataField;
                 try {
                     dataField = objectToAccess.getClass().getDeclaredField(qName);
                     dataField.setAccessible(true);
                     dataField.set(objectToAccess, value);
                 } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
-                        | IllegalAccessException e) {
+                    | IllegalAccessException e) {
                     throw new IOException(e);
                 }
-
                 item.addKeyToWrite(keyToWrite, value);
-
             } else {
                 RESTEndpoint end = item.getEndpointMap().get(qName);
-
                 if (end.getAsSingleValue()) {
-
                     Object valueObject = item.getValue(qName);
                     Field valueField = null;
-
                     try {
                         valueField = valueObject.getClass().getDeclaredField("value");
                         valueField.setAccessible(true);
@@ -360,16 +347,12 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
                             | IllegalAccessException e) {
                         e.printStackTrace();
                     }
-                    
                     item.setValue(qName, valueObject);
-
                 } else {
                     item.setValue(qName, (Object) value);
                 }
-                
                 item.addKeyToWrite(qName, value);
             }
-
         }
 
         /**
@@ -422,7 +405,6 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
         @Override
         public void setStruct(String qName, Object value) throws IOException {
             // Not used for REST
-
         }
 
         @Override
@@ -442,18 +424,15 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
 
         @Override
         public ModelAccess stepInto(String name) throws IOException {
-
             name = name.toLowerCase();
             Object obj = item.getValue(name);
             RESTModelAccess result = new RESTModelAccess(obj);
             result.keyToWrite = name;
-
             return result;
         }
 
         @Override
         public ModelAccess stepOut() {
-
             return new RESTModelAccess();
         }
 
