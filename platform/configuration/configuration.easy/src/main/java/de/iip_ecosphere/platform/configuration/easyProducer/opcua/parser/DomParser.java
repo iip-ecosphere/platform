@@ -30,6 +30,7 @@ import de.iip_ecosphere.platform.support.StringUtils;
  * Denotes the OPC UA element types.
  * 
  * @author Jan-Hendrik Cepok, SSE
+ * @author Elizaveta Andreeva
  */
 enum ElementType {
 
@@ -112,6 +113,11 @@ public class DomParser {
     private static final class StaticNodeList implements NodeList {
         private final ArrayList<Node> items = new ArrayList<>();
 
+        /**
+         * Creates a snapshot from a given node list.
+         * 
+         * @param src the node list
+         */
         StaticNodeList(NodeList src) {
             Node n;
             for (int i = 0; (n = src.item(i)) != null; i++) {
@@ -132,20 +138,6 @@ public class DomParser {
 
     private final Map<Node, Map<String, NodeList>> tagCache = new IdentityHashMap<>();
     private final Map<NodeList, Map<String, Element>> indexCache = new IdentityHashMap<>();
-
-    private static NodeList snapshot(NodeList live) {
-        return new StaticNodeList(live);
-    }
-
-    private NodeList elementsByTag(Document d, String tag) {
-        return tagCache.computeIfAbsent(d, k -> new HashMap<>())
-                .computeIfAbsent(tag, t -> new StaticNodeList(d.getElementsByTagName(t)));
-    }
-
-    private NodeList elementsByTag(Element e, String tag) {
-        return tagCache.computeIfAbsent(e, k -> new HashMap<>())
-                .computeIfAbsent(tag, t -> new StaticNodeList(e.getElementsByTagName(t)));
-    }
 
     // checkstyle: stop parameter number check
 
@@ -176,6 +168,40 @@ public class DomParser {
         variableMap = buildIndexIfBeneficial(variableList);
         methodMap = buildIndexIfBeneficial(methodList);
         dataTypeMap = buildIndexIfBeneficial(dataTypeList);
+    }
+
+    /**
+     * Creates a snapshot for the given node list.
+     * 
+     * @param live the node list to snapshot
+     * @return the node list
+     */
+    private static NodeList snapshot(NodeList live) {
+        return new StaticNodeList(live);
+    }
+
+    /**
+     * Returns elements by tag.
+     * 
+     * @param doc the document to retrieve the elements from
+     * @param tag the tag to look for
+     * @return the elements by tag, may be empty
+     */
+    private NodeList elementsByTag(Document doc, String tag) {
+        return tagCache.computeIfAbsent(doc, k -> new HashMap<>())
+                .computeIfAbsent(tag, t -> new StaticNodeList(doc.getElementsByTagName(t)));
+    }
+
+    /**
+     * Returns elements by tag.
+     * 
+     * @param elt the element to retrieve the elements from
+     * @param tag the tag to look for
+     * @return the elements by tag, may be empty
+     */
+    private NodeList elementsByTag(Element elt, String tag) {
+        return tagCache.computeIfAbsent(elt, k -> new HashMap<>())
+                .computeIfAbsent(tag, t -> new StaticNodeList(elt.getElementsByTagName(t)));
     }
 
     /**
