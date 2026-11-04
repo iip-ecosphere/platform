@@ -195,7 +195,7 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
         addPropertyIfDefined("maven.resolver.validation", args);
 
         println("Calling maven with ${path} ${args}");        
-        maven("${path}", args, isUpdateSnapshots());
+        maven("${path}", args, isUpdateSnapshots(), goals);
     }
     
     setOf(Application) getDefinedApplications() = {
