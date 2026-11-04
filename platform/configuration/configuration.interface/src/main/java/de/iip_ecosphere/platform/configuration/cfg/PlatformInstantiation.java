@@ -94,6 +94,14 @@ public interface PlatformInstantiation {
     public PlatformInstantiation setIncremental(boolean incremental);
 
     /**
+     * Configures the build goal.
+     * 
+     * @param goal the build goal, typically "deploy", "package" or "install"
+     * @return <b>this</b> for chaining
+     */
+    public PlatformInstantiation setGoal(String goal);
+
+    /**
      * Configures whether the instantiation shall run in test mode.
      * 
      * @param test test mode or production mode
