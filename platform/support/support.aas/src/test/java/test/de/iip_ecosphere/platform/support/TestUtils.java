@@ -44,7 +44,7 @@ public class TestUtils {
      * @return {@code true} if we are running on SSE CI, {@code false}
      */
     public static boolean isInCI() {
-        return OsUtils.getBooleanProperty("inCi", false);
+        return OsUtils.getBooleanProperty("inCI", false);
     }
     
     /**
