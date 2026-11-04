@@ -15,14 +15,16 @@
             <arg value="${user.home}/cleanOkto.sh"/>
         </exec>	
 		
-	    <maven pomFile="pom.xml" goal="deploy">
+	    <maven pomFile="pom.xml" goal="install">
           <arg value="-Dmodel.parent=${model_parent}"/> <!-- must be set in jenkins ANT build step -->
           <arg value="-Diip.tests=true"/>
           <arg value="-Diip.ciBuildId=${build_num}"/> <!-- must be set in jenkins ANT build step -->
           <arg value="-Dokto.mvn.home=${maven.bin.dir}/bin"/>
         </maven>
 		
-        <!--<mvnDeployResolveArtifact folderName="IIP-configuration.easy" pomFile="pom.xml" jarFolder="target" artifactPattern="configuration.easy-*.*.*.jar" />
+		<!-- let's keep that, it seems to be faster -->
+		
+        <mvnDeployResolveArtifact folderName="IIP-configuration.easy" pomFile="pom.xml" jarFolder="target" artifactPattern="configuration.easy-*.*.*.jar" />
 
         <ant dir="${genFolderTests}/SimpleMesh/ApplicationInterfaces" antfile="build-jk.xml" />
         <ant dir="${genFolderTests}/SimpleMesh3/ApplicationInterfaces" antfile="build-jk.xml" />
@@ -34,7 +36,7 @@
         <ant dir="${genFolderTests}/SimpleMesh/SimpleMeshTestingApp" antfile="build-jk.xml" />
         <ant dir="${genFolderTests}/SimpleMesh3/SimpleMeshTestingApp3" antfile="build-jk.xml" />
         <ant dir="${genFolderTests}/KodexMesh/SimpleKodexTestingApp" antfile="build-jk.xml" />
-        <ant dir="${genFolderTests}/RoutingTest/RoutingTestApp" antfile="build-jk.xml" />-->
+        <ant dir="${genFolderTests}/RoutingTest/RoutingTestApp" antfile="build-jk.xml" />
 
         <exec executable="/bin/bash">
             <arg value="${user.home}/cleanOkto.sh"/>
