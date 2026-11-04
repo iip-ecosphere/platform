@@ -53,6 +53,7 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
     public static final String PROP_ALL_SERVICES = "okto.easy.allServices";
     public static final String PROP_LOG_PATH = "okto.easy.logPath";
     public static final String PROP_INCREMENTAL = "easy.vil.incremental";
+    public static final String PROP_GOAL = "iip.easy.mvnGoal";
 
     private File localRepo;
     private Consumer<Long> executionTimeConsumer;
@@ -128,6 +129,12 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
     }
 
     @Override
+    public PlatformInstantiation setGoal(String goal) {
+        setProperty(PROP_GOAL, goal);
+        return this;
+    }
+
+    @Override
     public PlatformInstantiation setInTest(boolean test) {
         setProperty(Starter.IIP_TEST, test);
         return this;
@@ -152,6 +159,7 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
         setAllTypes(OsUtils.getBooleanProperty(PROP_ALL_TYPES, false));
         setAllServices(OsUtils.getBooleanProperty(PROP_ALL_SERVICES, false));
         setIncremental(OsUtils.getBooleanProperty(PROP_INCREMENTAL, false));
+        setGoal(System.getProperty(PROP_GOAL, ""));
         setInTest(OsUtils.getBooleanProperty(Starter.IIP_TEST, false));
         setUnpackResources(OsUtils.getBooleanProperty(PlatformInstantiator.KEY_PROPERTY_UNPACKRESOURCES, false));
         setLogPath(System.getProperty(PROP_LOG_PATH, ""));

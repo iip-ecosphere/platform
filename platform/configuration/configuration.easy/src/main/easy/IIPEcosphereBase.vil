@@ -182,6 +182,9 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
         if (addArgs.length() > 0) {
             a = appendWithSeparator(a, ",", addArgs);
         }
+        sequenceOf(String) goals = {};
+        //goals.add("clean"); // easy default
+        goals.add(getProperty("iip.easy.mvnGoal", "install"));
         sequenceOf(String) args = a.split(",")->reject(s|s.trim().length()==0);
         //args.add("-o");  // uncomment for testing
         addPropertyIfDefined("easy.docker.skip", args);

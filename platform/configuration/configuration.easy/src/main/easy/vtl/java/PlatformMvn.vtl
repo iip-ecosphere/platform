@@ -65,8 +65,9 @@ template PlatformMvn(IIPEcosphere config, XmlFileArtifact target, String dir, St
         appendSurefirePlugin(plugins, tests=tests);
 
         sequenceOf(String) files = defltOktoResourceFiles();
-        ex2 = appendMavenResourcesCopyResources(plugins, mavenBuildOutputResourcesDir(), getResourcesFolder(config)+"/software", files, id="sw-res");
-        appendMavenResourcesCopyResourcesExecution(ex2, "copy-resources", mavenBuildOutputResourcesDir(), getResourcesFolder(config)+"/platform", files, id="platf-res");
+        XmlElement rExecs = appendExecutionsParent(appendMavenResourcesPlugin(plugins));
+        appendMavenResourcesCopyIipResourcesSoftwareExecution(rExecs, config, target.getPath().getParent(), files);
+        appendMavenResourcesCopyIipResourcesPlatformExecution(rExecs, config, target.getPath().getParent(), files);
     }
 
 }

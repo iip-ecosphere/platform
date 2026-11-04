@@ -38,6 +38,7 @@ import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.ZipUtils;
 import net.ssehub.easy.reasoning.core.reasoner.ReasoningResult;
 import net.ssehub.easy.varModel.confModel.Configuration;
+import test.de.iip_ecosphere.platform.support.TestUtils;
 import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
 import static test.de.iip_ecosphere.platform.services.environment.PythonEnvironmentTest.*;
@@ -673,6 +674,16 @@ public abstract class AbstractIvmlTests extends TestWithPlugin {
      */
     public static InstantiationConfigurer incremental(InstantiationConfigurer cfg) {
         return cfg.setProperty(PlatformInstantiator.KEY_PROPERTY_INCREMENTAL, "true");
+    }
+
+    /**
+     * Helper method to enable deploying instead of "install", but only if {@link TestUtils#isInCI()}.
+     * 
+     * @param cfg the configurer instance
+     * @return {@code cfg}
+     */
+    public static InstantiationConfigurer deployInCI(InstantiationConfigurer cfg) {
+        return TestUtils.isInCI() ? cfg.setProperty(PlatformInstantiator.KEY_PROPERTY_MVNGOAL, "deploy") : cfg;
     }
 
 }
