@@ -44,6 +44,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -53,7 +54,6 @@ import org.xml.sax.SAXException;
 import de.uni_hildesheim.sse.easy.loader.ManifestLoader;
 import de.iip_ecosphere.platform.configuration.easyProducer.opcua.parser.DomParser;
 import de.iip_ecosphere.platform.support.FileUtils;
-import de.iip_ecosphere.platform.support.Ignore;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 import net.ssehub.easy.varModel.confModel.Configuration;
@@ -1373,7 +1373,7 @@ public class DomParserTest {
      * @throws ReflectiveOperationException shall not occur
      * @throws ParserConfigurationException shall not occur
      */
-    @Ignore // NPE
+    @Ignore("NPE")
     @Test
     public void testRedundancyAndRelationNullList() throws ReflectiveOperationException, ParserConfigurationException {
         DomParser parser = newParser();
@@ -1420,7 +1420,7 @@ public class DomParserTest {
      * @throws ReflectiveOperationException shall not occur
      * @throws ParserConfigurationException shall not occur
      */
-    @Ignore // NPE
+    @Ignore("NPE")
     @Test
     public void testRequiredModelAndNamespaceIndexErrors()
         throws ReflectiveOperationException, ParserConfigurationException {
