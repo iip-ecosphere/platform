@@ -194,7 +194,7 @@ vilScript IIPEcosphereBase (Project source, Configuration config, Project target
         addPropertyIfDefined("aether.remoteRepositoryFilter.prefixes.verifyDenied", args);
         addPropertyIfDefined("maven.resolver.validation", args);
 
-        println("Calling maven with ${path} ${args}");        
+        println("Calling maven with ${path} ${goals} ${args}");        
         maven("${path}", args, isUpdateSnapshots(), goals);
     }
     
