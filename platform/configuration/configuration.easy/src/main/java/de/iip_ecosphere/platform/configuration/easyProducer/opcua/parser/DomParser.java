@@ -21,6 +21,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import java.util.IdentityHashMap;
 
 import de.iip_ecosphere.platform.configuration.easyProducer.opcua.data.*;
 import de.iip_ecosphere.platform.support.StringUtils;
@@ -106,6 +107,45 @@ public class DomParser {
 
     private final Map<String, BaseType> hierarchyByNodeId = new HashMap<>();
     private final Map<String, BaseType> hierarchyByVarName = new HashMap<>();
+    
+    /** Immutable snapshot of a (live) NodeList; O(1) item()/getLength(). */
+    private static final class StaticNodeList implements NodeList {
+        private final ArrayList<Node> items = new ArrayList<>();
+
+        StaticNodeList(NodeList src) {
+            Node n;
+            for (int i = 0; (n = src.item(i)) != null; i++) {
+                items.add(n);
+            }
+        }
+
+        @Override
+        public Node item(int index) {
+            return index >= 0 && index < items.size() ? items.get(index) : null;
+        }
+
+        @Override
+        public int getLength() {
+            return items.size();
+        }
+    }
+
+    private final Map<Node, Map<String, NodeList>> tagCache = new IdentityHashMap<>();
+    private final Map<NodeList, Map<String, Element>> indexCache = new IdentityHashMap<>();
+
+    private static NodeList snapshot(NodeList live) {
+        return new StaticNodeList(live);
+    }
+
+    private NodeList elementsByTag(Document d, String tag) {
+        return tagCache.computeIfAbsent(d, k -> new HashMap<>())
+                .computeIfAbsent(tag, t -> new StaticNodeList(d.getElementsByTagName(t)));
+    }
+
+    private NodeList elementsByTag(Element e, String tag) {
+        return tagCache.computeIfAbsent(e, k -> new HashMap<>())
+                .computeIfAbsent(tag, t -> new StaticNodeList(e.getElementsByTagName(t)));
+    }
 
     // checkstyle: stop parameter number check
 
@@ -416,17 +456,11 @@ public class DomParser {
      * Legacy overload - kept for call sites that pass dynamic NodeLists
      * (e.g. from required model documents). Falls back to linear scan.
      */
-    private static Element checkRelation(String currentNodeId, NodeList nodes) {
+    private Element checkRelation(String currentNodeId, NodeList nodes) {
         if (nodes == null) {
             return null;
         }
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Element node = getNextNodeElement(nodes, i);
-            if (node != null && currentNodeId.equals(node.getAttribute("NodeId"))) {
-                return node;
-            }
-        }
-        return null;
+        return indexCache.computeIfAbsent(nodes, DomParser::buildIndex).get(currentNodeId);
     }
 
     /**
@@ -439,7 +473,7 @@ public class DomParser {
         int start = nodeId.indexOf("ns=") + 3;
         int end = nodeId.indexOf(";", start);
         int namespaceIndex = Integer.parseInt(nodeId.substring(start, end));
-        NodeList uris = ((Element) namespaceUris.item(0)).getElementsByTagName("Uri");
+        NodeList uris = elementsByTag((Element) namespaceUris.item(0), "Uri");
         if (namespaceIndex <= 0 || namespaceIndex > uris.getLength()) {
             throw new IllegalArgumentException("No namespace URI for " + nodeId);
         }
@@ -455,7 +489,7 @@ public class DomParser {
     private Document getRequiredModel(String namespaceUri) {
         Document result = null;
         for (Document document : documents) {
-            Node model = document.getElementsByTagName("Model").item(0);
+            Node model = elementsByTag(document, "Model").item(0);
             if (model instanceof Element && namespaceUri.equals(((Element) model).getAttribute("ModelUri"))) {
                 result = document;
                 break;
@@ -474,9 +508,9 @@ public class DomParser {
      * @param namespaceUri the namespace URI
      * @return the namespace index
      */
-    private static int getNamespaceIndex(Document document, String namespaceUri) {
-        NodeList namespaceUriElements = document.getElementsByTagName("NamespaceUris");
-        NodeList uris = ((Element) namespaceUriElements.item(0)).getElementsByTagName("Uri");
+    private int getNamespaceIndex(Document document, String namespaceUri) {
+        NodeList namespaceUriElements = elementsByTag(document, "NamespaceUris");
+        NodeList uris = elementsByTag((Element) namespaceUriElements.item(0), "Uri");
         for (int i = 0; i < uris.getLength(); i++) {
             if (namespaceUri.equals(uris.item(i).getTextContent())) {
                 return i + 1;
@@ -634,7 +668,7 @@ public class DomParser {
         String dataType = "";
         try {
             for (int k = 0; k < documents.length; k++) {
-                NodeList typeList = documents[k].getElementsByTagName("UADataType");
+                NodeList typeList = elementsByTag(documents[k], "UADataType");
                 String externNodeId = nodeId;
                 if (externNodeId.contains("ns=")) {
                     externNodeId = externNodeId.substring(0, externNodeId.indexOf("=") + 1) + 1
@@ -701,10 +735,10 @@ public class DomParser {
                     String newRefId = replaceNamespaceIndex(refId, getNamespaceIndex(document, namespaceUri));
                     NodeList typeList = null;
                     if (type == ElementType.ROOTOBJECT || type == ElementType.SUBOBJECT) {
-                        typeList = document.getElementsByTagName("UAObjectType");
+                        typeList = elementsByTag(document, "UAObjectType");
                         type = ElementType.OBJECTTYPE;
                     } else if (type == ElementType.FIELDVARIABLE || type == ElementType.ROOTVARIABLE) {
-                        typeList = document.getElementsByTagName("UAVariableType");
+                        typeList = elementsByTag(document, "UAVariableType");
                         type = ElementType.VARIABLETYPE;
                     }
                     Element refElement = checkRelation(newRefId, typeList);
@@ -755,17 +789,17 @@ public class DomParser {
             // core
             if (type.isCore()) {
                 if (reference.equals("HasModellingRule")) {
-                    result.typeList = documents[0].getElementsByTagName("UAObject");
+                    result.typeList = elementsByTag(documents[0], "UAObject");
                 } else {
-                    result.typeList = documents[0].getElementsByTagName("UAObjectType");
+                    result.typeList = elementsByTag(documents[0], "UAObjectType");
                     result.type = ElementType.OBJECTTYPE;
                 }
             } else if (type == ElementType.FIELDVARIABLE || type == ElementType.ROOTVARIABLE) {
                 if (reference.equals("HasModellingRule")) {
-                    result.typeList = documents[0].getElementsByTagName("UAObject");
+                    result.typeList = elementsByTag(documents[0], "UAObject");
                     result.type = ElementType.ROOTOBJECT;
                 } else {
-                    result.typeList = documents[0].getElementsByTagName("UAVariableType");
+                    result.typeList = elementsByTag(documents[0], "UAVariableType");
                     result.type = ElementType.VARIABLETYPE;
                 }
             }
@@ -1619,15 +1653,15 @@ public class DomParser {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(compSpec);
             System.out.println("\n" + compSpec.getName());
-            NodeList nameSpaceUris = doc.getElementsByTagName("NamespaceUris");
-            NodeList objectTypeList = doc.getElementsByTagName("UAObjectType");
-            NodeList objectList = doc.getElementsByTagName("UAObject");
-            NodeList variableList = doc.getElementsByTagName("UAVariable");
-            NodeList methodList = doc.getElementsByTagName("UAMethod");
-            NodeList dataTypeList = doc.getElementsByTagName("UADataType");
-            NodeList variableTypeList = doc.getElementsByTagName("UAVariableType");
-            NodeList aliasList = doc.getElementsByTagName("Aliases");
-            NodeList models = doc.getElementsByTagName("Models");
+            NodeList nameSpaceUris = snapshot(doc.getElementsByTagName("NamespaceUris"));
+            NodeList objectTypeList = snapshot(doc.getElementsByTagName("UAObjectType"));
+            NodeList objectList = snapshot(doc.getElementsByTagName("UAObject"));
+            NodeList variableList = snapshot(doc.getElementsByTagName("UAVariable"));
+            NodeList methodList = snapshot(doc.getElementsByTagName("UAMethod"));
+            NodeList dataTypeList = snapshot(doc.getElementsByTagName("UADataType"));
+            NodeList variableTypeList = snapshot(doc.getElementsByTagName("UAVariableType"));
+            NodeList aliasList = snapshot(doc.getElementsByTagName("Aliases"));
+            NodeList models = snapshot(doc.getElementsByTagName("Models"));
             String modelName = "";
 
             for (int i = 0; i < models.getLength(); i++) {
@@ -1657,7 +1691,7 @@ public class DomParser {
             for (int i = 0; i < reqModels.length; i++) {
                 System.out.println(reqModels[i]);
                 documents[i] = builder.parse(reqModels[i]);
-                NodeList externAliasList = documents[i].getElementsByTagName("Aliases");
+                NodeList externAliasList = snapshot(documents[i].getElementsByTagName("Aliases"));
                 aliasLists.add(externAliasList);
             }
             parser.setExternAliasLists(aliasLists);
