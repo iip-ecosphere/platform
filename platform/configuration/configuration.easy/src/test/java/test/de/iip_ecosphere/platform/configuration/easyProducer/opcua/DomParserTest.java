@@ -21,6 +21,25 @@ import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.Map;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
+import de.iip_ecosphere.platform.configuration.easyProducer.opcua.data.BaseType;
+import de.iip_ecosphere.platform.configuration.easyProducer.opcua.data.FieldMethodType;
+import de.iip_ecosphere.platform.configuration.easyProducer.opcua.data.FieldObjectType;
+import de.iip_ecosphere.platform.configuration.easyProducer.opcua.data.FieldType;
+import de.iip_ecosphere.platform.configuration.easyProducer.opcua.data.FieldVariableType;
+import de.iip_ecosphere.platform.configuration.easyProducer.opcua.data.MethodType;
+import de.iip_ecosphere.platform.configuration.easyProducer.opcua.data.ObjectType;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -625,4 +644,1026 @@ public class DomParserTest {
         return tmp.toString();
     }
 
+    private static final String PARSER_PACKAGE = "de.iip_ecosphere.platform.configuration.easyProducer.opcua.parser";
+    private static final String OWN_MODEL_URI = "http://example.org/Own/";
+    private static final String RESULT_MODEL_URI = "http://opcfoundation.org/UA/Machinery/Result/";
+
+    private static final List<String> CORE_ELEMENT_TYPES = Arrays.asList("ROOTOBJECT", "ROOTMETHOD", "SUBOBJECT",
+        "SUBMETHOD", "FIELDOBJECT", "FIELDMETHOD");
+    private static final List<String> OBJECT_ELEMENT_TYPES = Arrays.asList("ROOTOBJECT", "SUBOBJECT");
+    private static final List<String> VARIABLE_ELEMENT_TYPES = Arrays.asList("FIELDVARIABLE", "ROOTVARIABLE");
+    private static final String[] REFERENCE_TYPES = {"HasModellingRule", "HasTypeDefinition"};
+
+    private static Document newDocument() throws ParserConfigurationException {
+        return DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+    }
+
+    /**
+     * Creates the root element of {@code doc}.
+     *
+     * @param doc the document
+     * @param name the element name
+     * @return the root element
+     */
+    private static Element newRoot(Document doc, String name) {
+        Element root = doc.createElement(name);
+        doc.appendChild(root);
+        return root;
+    }
+
+    /**
+     * Appends an element with a {@code DisplayName} child to {@code root}.
+     *
+     * @param doc the owning document
+     * @param root the parent element
+     * @param tag the element name
+     * @param nodeId the NodeId attribute
+     * @param displayName the display name
+     * @return the created element
+     */
+    private static Element addTyped(Document doc, Element root, String tag, String nodeId, String displayName) {
+        Element e = doc.createElement(tag);
+        e.setAttribute("NodeId", nodeId);
+        Element dn = doc.createElement("DisplayName");
+        dn.setTextContent(displayName);
+        e.appendChild(dn);
+        root.appendChild(e);
+        return e;
+    }
+
+    private static Element typedWithParent(Document doc, Element root, String tag, String nodeId,
+        String displayName, String parentId, String dataType) {
+        Element e = addTyped(doc, root, tag, nodeId, displayName);
+        e.setAttribute("BrowseName", displayName);
+        e.setAttribute("ParentNodeId", parentId);
+        if (dataType != null) {
+            e.setAttribute("DataType", dataType);
+        }
+        return e;
+    }
+
+    private static Element variableElement(Document doc, String dataType, String dimensions, String parentId) {
+        Element e = doc.createElement("UAVariable");
+        e.setAttribute("BrowseName", "Var");
+        e.setAttribute("DataType", dataType);
+        e.setAttribute("ArrayDimensions", dimensions);
+        e.setAttribute("ParentNodeId", parentId);
+        return e;
+    }
+
+    private static void addField(Document doc, Element definition, String name, String dataType) {
+        Element f = doc.createElement("Field");
+        f.setAttribute("Name", name);
+        f.setAttribute("DataType", dataType);
+        definition.appendChild(f);
+    }
+
+    /**
+     * Creates a node set document holding a single {@code UADataType} with some irrelevant children.
+     *
+     * @param nodeId the NodeId of the data type
+     * @param displayName the display name, may be <b>null</b> for none
+     * @return the document
+     * @throws ParserConfigurationException shall not occur
+     */
+    private static Document externDocument(String nodeId, String displayName) throws ParserConfigurationException {
+        Document doc = newDocument();
+        Element root = newRoot(doc, "UANodeSet");
+        Element dt = doc.createElement("UADataType");
+        dt.setAttribute("NodeId", nodeId);
+        dt.setAttribute("BrowseName", "B");
+        dt.appendChild(doc.createTextNode(" "));
+        dt.appendChild(doc.createElement("References"));
+        Element description = doc.createElement("Description");
+        description.setTextContent("d");
+        dt.appendChild(description);
+        if (displayName != null) {
+            Element dn = doc.createElement("DisplayName");
+            dn.setTextContent(displayName);
+            dt.appendChild(dn);
+        }
+        root.appendChild(dt);
+        return doc;
+    }
+
+    private static NodeList orEmpty(NodeList nodes, NodeList empty) {
+        return nodes != null ? nodes : empty;
+    }
+
+    /**
+     * Creates a parser via the private constructor, {@code null} lists are replaced by empty ones.
+     *
+     * @param objectTypes the object types
+     * @param objects the objects
+     * @param variables the variables
+     * @param methods the methods
+     * @param dataTypes the data types
+     * @return the parser
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    private static DomParser newParser(NodeList objectTypes, NodeList objects, NodeList variables,
+        NodeList methods, NodeList dataTypes) throws ReflectiveOperationException, ParserConfigurationException {
+        NodeList empty = createNodeList(0);
+        Constructor<DomParser> ctor = DomParser.class.getDeclaredConstructor(NodeList.class, NodeList.class,
+            NodeList.class, NodeList.class, NodeList.class, NodeList.class, NodeList.class, ArrayList.class);
+        ctor.setAccessible(true);
+        DomParser parser = ctor.newInstance(orEmpty(objectTypes, empty), orEmpty(objects, empty),
+            orEmpty(variables, empty), orEmpty(methods, empty), orEmpty(dataTypes, empty), empty, empty,
+            new ArrayList<BaseType>());
+        parser.setExternAliasLists(new ArrayList<NodeList>());
+        return parser;
+    }
+
+    private static DomParser newParser() throws ReflectiveOperationException, ParserConfigurationException {
+        return newParser(null, null, null, null, null);
+    }
+
+    private static DomParser newParserWithDataTypes(NodeList dataTypes)
+        throws ReflectiveOperationException, ParserConfigurationException {
+        return newParser(null, null, null, null, dataTypes);
+    }
+
+    private static Field parserField(DomParser parser, String name) throws ReflectiveOperationException {
+        Field field = DomParser.class.getDeclaredField(name);
+        field.setAccessible(true);
+        return field;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ArrayList<BaseType> getHierarchy(DomParser parser) throws ReflectiveOperationException {
+        return (ArrayList<BaseType>) parserField(parser, "hierarchy").get(parser);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void registerInHierarchy(DomParser parser, BaseType element) throws ReflectiveOperationException {
+        getHierarchy(parser).add(element);
+        ((Map<String, BaseType>) parserField(parser, "hierarchyByNodeId").get(parser))
+            .put(element.getNodeId(), element);
+    }
+
+    /** Reads a private field of an arbitrary object. */
+    private static Object fieldOf(Object target, String name) throws ReflectiveOperationException {
+        Field f = target.getClass().getDeclaredField(name);
+        f.setAccessible(true);
+        return f.get(target);
+    }
+
+    private static Object call(Object target, String name, Class<?>[] types, Object... args)
+        throws ReflectiveOperationException {
+        Method m = DomParser.class.getDeclaredMethod(name, types);
+        m.setAccessible(true);
+        return m.invoke(target, args);
+    }
+
+    private static Class<?> elementTypeClass() throws ClassNotFoundException {
+        return Class.forName(PARSER_PACKAGE + ".ElementType");
+    }
+
+    private static Object enumConst(String name) throws ClassNotFoundException {
+        for (Object c : elementTypeClass().getEnumConstants()) {
+            if (c.toString().equals(name)) {
+                return c;
+            }
+        }
+        throw new IllegalArgumentException(name);
+    }
+
+    /** Invokes the private {@code createElement} with default values for the unused arguments. */
+    private static void createElement(DomParser parser, String type, Element el, String id, String displayName,
+        ArrayList<FieldType> subFields, ArrayList<FieldType> objectFields) throws ReflectiveOperationException {
+        Class<?>[] sig = {elementTypeClass(), Element.class, String.class, String.class, String.class,
+            String.class, ArrayList.class, ArrayList.class, ArrayList.class, ArrayList.class, String.class,
+            boolean.class};
+        call(parser, "createElement", sig, enumConst(type), el, id, displayName, "", "", subFields, objectFields,
+            null, null, "BaseDataVariableType", false);
+    }
+
+    /** Invokes the private {@code retrieveAttributes}. */
+    private static void retrieveAttributes(DomParser parser, Element el, Object type, ArrayList<FieldType> sub)
+        throws ReflectiveOperationException {
+        call(parser, "retrieveAttributes", new Class<?>[] {Element.class, ArrayList.class, elementTypeClass(),
+            String.class}, el, sub, type, null);
+    }
+
+    private static void invokeAdaptDatatypes(DomParser parser, ObjectType object, MethodType method)
+        throws ReflectiveOperationException {
+        call(parser, "adaptDatatypesToModel", new Class<?>[] {ObjectType.class, MethodType.class}, object, method);
+    }
+
+    private static FieldObjectType fieldObject(String nodeId, String displayName) {
+        return new FieldObjectType(nodeId, "FO", displayName, "", "", false);
+    }
+
+    private static FieldMethodType fieldMethod(String nodeId, String displayName) {
+        return new FieldMethodType(nodeId, "FM", displayName, "", "", false);
+    }
+
+    private static FieldVariableType fieldVariable(String nodeId, String displayName, String dataType) {
+        FieldVariableType result = new FieldVariableType(nodeId, "FV", displayName, "", dataType, "opcTypeType",
+            false, "1", "-1", "");
+        result.setDataType(dataType);
+        return result;
+    }
+
+    /**
+     * Tests {@code changeVariableDataTypes} for all simple mappings, the special values and already translated names.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testChangeVariableDataTypesMappings()
+        throws ReflectiveOperationException, ParserConfigurationException {
+        DomParser parser = newParser();
+        Class<?>[] types = {String.class};
+        String[][] mappings = {
+            {"SByte", "SByteType"}, {"Boolean", "BooleanType"}, {"Byte", "ByteType"},
+            {"ByteString", "ByteStringType"}, {"Integer", "IntegerType"}, {"Int16", "Integer16Type"},
+            {"UInt16", "UnsignedInteger16Type"}, {"Int32", "Integer32Type"}, {"UInt32", "UnsignedInteger32Type"},
+            {"Int64", "Integer64Type"}, {"UInt64", "UnsignedInteger64Type"}, {"Float", "FloatType"},
+            {"Double", "DoubleType"}, {"String", "StringType"}, {"DateTime", "DateTimeType"},
+            {"UInteger", "opcUnsignedIntegerType"}, {"", "opcUnknownDataType"},
+            {"opcAlreadyTranslatedType", "opcAlreadyTranslatedType"}
+        };
+        for (String[] m : mappings) {
+            Assert.assertEquals(m[0], m[1], call(parser, "changeVariableDataTypes", types, m[0]));
+        }
+    }
+
+    /**
+     * Tests that quotes and underscores are removed from internal data type names.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testInternDataTypeNameSanitizing() throws ReflectiveOperationException, ParserConfigurationException {
+        Document doc = newDocument();
+        Element root = newRoot(doc, "types");
+        addTyped(doc, root, "UADataType", "ns=1;i=5", "\u201CFoo_Bar\u201D");
+        DomParser parser = newParserWithDataTypes(root.getChildNodes());
+        parser.setBaseNameSpace("1");
+        Class<?>[] types = {String.class};
+        Assert.assertEquals("opcFooBarType", call(parser, "changeVariableDataTypes", types, "ns=1;i=5"));
+        Assert.assertEquals("opcType", call(parser, "changeVariableDataTypes", types, "ns=1;i=6"));
+    }
+
+    /**
+     * Tests {@code checkForInternDataType} with non-element nodes, foreign ids and a missing display name.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testCheckForInternDataType() throws ReflectiveOperationException, ParserConfigurationException {
+        Document doc = newDocument();
+        Element root = newRoot(doc, "types");
+        root.appendChild(doc.createTextNode(" "));
+        addTyped(doc, root, "UADataType", "ns=1;i=4", "Other");
+
+        Element match = doc.createElement("UADataType");
+        match.setAttribute("NodeId", "ns=1;i=5");
+        match.appendChild(doc.createTextNode(" "));
+        match.appendChild(doc.createElement("References"));
+        Element description = doc.createElement("Description");
+        description.setTextContent("d");
+        match.appendChild(description);
+        Element displayName = doc.createElement("DisplayName");
+        displayName.setTextContent("\u201CA_B\u201D");
+        match.appendChild(displayName);
+        root.appendChild(match);
+
+        Element noName = doc.createElement("UADataType");
+        noName.setAttribute("NodeId", "ns=1;i=7");
+        noName.appendChild(doc.createElement("References"));
+        root.appendChild(noName);
+
+        DomParser parser = newParserWithDataTypes(root.getChildNodes());
+        Class<?>[] sig = {String.class};
+        Assert.assertEquals("AB", call(parser, "checkForInternDataType", sig, "ns=1;i=5"));
+        Assert.assertEquals("", call(parser, "checkForInternDataType", sig, "ns=1;i=7"));
+        Assert.assertEquals("", call(parser, "checkForInternDataType", sig, "ns=1;i=404"));
+    }
+
+    /**
+     * Tests {@code ROOTVARIABLE} with an {@code EnumValueType} whose data type element is missing or present.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testRootVariableEnumValueType() throws ReflectiveOperationException, ParserConfigurationException {
+        Document doc = newDocument();
+        Element root = newRoot(doc, "types");
+        addTyped(doc, root, "UADataType", "ns=1;i=77", "MyEnum");
+
+        Element missing = variableElement(doc, "EnumValueType", "", "ns=1;i=999");
+        DomParser parser = newParserWithDataTypes(root.getChildNodes());
+        createElement(parser, "ROOTVARIABLE", missing, "ns=1;i=1", "Missing", null, new ArrayList<FieldType>());
+        Assert.assertEquals(1, getHierarchy(parser).size());
+        Assert.assertTrue(getHierarchy(parser).get(0).toString().contains("opcEnumValueTypeType"));
+
+        Element present = variableElement(doc, "EnumValueType", "", "ns=1;i=77");
+        parser = newParserWithDataTypes(root.getChildNodes());
+        createElement(parser, "ROOTVARIABLE", present, "ns=1;i=2", "Present", null, new ArrayList<FieldType>());
+        Assert.assertTrue(getHierarchy(parser).get(0).toString().contains("MyEnum"));
+    }
+
+    /**
+     * Tests that only the first array dimension of a {@code ROOTVARIABLE} is kept.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testRootVariableArrayDimensions() throws ReflectiveOperationException, ParserConfigurationException {
+        DomParser parser = newParser();
+        Element var = variableElement(newDocument(), "Double", "5,7", "ns=1;i=999");
+        createElement(parser, "ROOTVARIABLE", var, "ns=1;i=10", "Dim", null, new ArrayList<FieldType>());
+        Assert.assertEquals(1, getHierarchy(parser).size());
+        Assert.assertFalse(getHierarchy(parser).get(0).toString().contains("5,7"));
+    }
+
+    /**
+     * Tests {@code FIELDVARIABLE} with a plain type, repeated creation and an {@code EnumValueType}.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testFieldVariable() throws ReflectiveOperationException, ParserConfigurationException {
+        Document doc = newDocument();
+        DomParser parser = newParser();
+        ArrayList<FieldType> sub = new ArrayList<>();
+        Element var = variableElement(doc, "Double", "5,7", "ns=1;i=999");
+        createElement(parser, "FIELDVARIABLE", var, "ns=1;i=20", "Field", sub, new ArrayList<FieldType>());
+        Assert.assertEquals(1, sub.size());
+        Assert.assertEquals("DoubleType", sub.get(0).getDataType());
+        // same variable name again: not added twice
+        createElement(parser, "FIELDVARIABLE", var, "ns=1;i=20", "Field", sub, new ArrayList<FieldType>());
+        Assert.assertEquals(1, sub.size());
+
+        Element root = newRoot(newDocument(), "types");
+        addTyped(root.getOwnerDocument(), root, "UADataType", "ns=1;i=77", "MyEnum");
+        parser = newParserWithDataTypes(root.getChildNodes());
+        sub = new ArrayList<>();
+        Element enumVar = variableElement(doc, "EnumValueType", "", "ns=1;i=77");
+        createElement(parser, "FIELDVARIABLE", enumVar, "ns=1;i=21", "EnumField", sub, new ArrayList<FieldType>());
+        Assert.assertEquals(1, sub.size());
+        Assert.assertEquals("MyEnum", sub.get(0).getDataType());
+    }
+
+    /**
+     * Tests {@code ROOTMETHOD} without and with fields.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testRootMethod() throws ReflectiveOperationException, ParserConfigurationException {
+        Document doc = newDocument();
+        Element method = doc.createElement("UAMethod");
+        method.setAttribute("BrowseName", "Method");
+        method.setAttribute("ParentNodeId", "ns=1;i=999");
+
+        DomParser parser = newParser();
+        createElement(parser, "ROOTMETHOD", method, "ns=1;i=30", "Method", null, new ArrayList<FieldType>());
+        Assert.assertEquals(1, getHierarchy(parser).size());
+
+        parser = newParser();
+        ArrayList<FieldType> fields = new ArrayList<>();
+        fields.add(fieldVariable("ns=1;i=31", "Arg", "Int32"));
+        createElement(parser, "ROOTMETHOD", method, "ns=1;i=32", "MethodWithArg", null, fields);
+        Assert.assertEquals(1, getHierarchy(parser).size());
+    }
+
+    /**
+     * Tests the field name normalization of data type definitions.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testDataTypeFieldNameNormalization()
+        throws ReflectiveOperationException, ParserConfigurationException {
+        Document doc = newDocument();
+        Element dt = doc.createElement("UADataType");
+        dt.setAttribute("NodeId", "ns=1;i=50");
+        dt.setAttribute("BrowseName", "Struct");
+        Element dn = doc.createElement("DisplayName");
+        dn.setTextContent("Struct");
+        dt.appendChild(dn);
+        Element def = doc.createElement("Definition");
+        def.setAttribute("Name", "Struct");
+        dt.appendChild(def);
+        addField(doc, def, "", "Int32");
+        addField(doc, def, "\u00B5A/m\u00B2\u00B3\u00B0", "Double");
+
+        DomParser parser = newParser();
+        retrieveAttributes(parser, dt, enumConst("DATATYPE"), null);
+
+        String out = getHierarchy(parser).get(0).toString();
+        Assert.assertTrue(out.contains("placeholder_Struct"));
+        Assert.assertTrue(out.contains("_muA_per_m_toPowerOf2_toPowerOf3degree_"));
+    }
+
+    /**
+     * Tests that a modelling rule reference to "Optional" sets the optional flag.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testRetrieveAttributesOptionalModellingRule()
+        throws ReflectiveOperationException, ParserConfigurationException {
+        Document core = newDocument();
+        addTyped(core, newRoot(core, "UANodeSet"), "UAObject", "i=80", "Optional");
+
+        Document doc = newDocument();
+        Element el = doc.createElement("UAObject");
+        el.setAttribute("NodeId", "ns=1;i=61");
+        el.setAttribute("BrowseName", "Opt");
+        Element dn = doc.createElement("DisplayName");
+        dn.setTextContent("Opt");
+        el.appendChild(dn);
+        Element refs = doc.createElement("References");
+        Element ref = doc.createElement("Reference");
+        ref.setAttribute("ReferenceType", "HasModellingRule");
+        ref.setTextContent("i=80");
+        refs.appendChild(ref);
+        el.appendChild(refs);
+
+        DomParser parser = newParser();
+        parser.setDocuments(new Document[] {core});
+        retrieveAttributes(parser, el, enumConst("ROOTOBJECT"), null);
+
+        Assert.assertEquals(1, getHierarchy(parser).size());
+        Assert.assertTrue(getHierarchy(parser).get(0).toString().contains("optional = true"));
+    }
+
+    /**
+     * Tests an empty {@code References} child for every element type.
+     *
+     * @throws Exception shall not occur
+     */
+    @Test
+    public void testRetrieveAttributesEmptyReferences() throws Exception {
+        Document doc = newDocument();
+        for (Object type : elementTypeClass().getEnumConstants()) {
+            Element el = doc.createElement("UAObject");
+            el.setAttribute("NodeId", "ns=1;i=60");
+            el.setAttribute("BrowseName", "X");
+            Element dn = doc.createElement("DisplayName");
+            dn.setTextContent("X" + type);
+            el.appendChild(dn);
+            el.appendChild(doc.createElement("References"));
+
+            // sub objects/methods take their variable name from a field of an already known parent
+            DomParser parser = newParser();
+            FieldObjectType known = fieldObject("ns=1;i=60", "K");
+            known.setVarName("opcK");
+            known.setDataType("opcKnownTarget");
+            ArrayList<FieldType> knownFields = new ArrayList<>();
+            knownFields.add(known);
+            ObjectType knownParent = new ObjectType("ns=1;i=59", "P", "P", "", false, "opcPType", knownFields);
+            knownParent.setVarName("opcP");
+            registerInHierarchy(parser, knownParent);
+
+            retrieveAttributes(parser, el, type, new ArrayList<FieldType>());
+        }
+    }
+
+    /**
+     * Tests the object branch if the targets are not yet in the hierarchy: object and method fields get a predicted
+     * name, variable fields stay untouched.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testAdaptDatatypesObjectPredictedNames()
+        throws ReflectiveOperationException, ParserConfigurationException {
+        FieldObjectType fo = fieldObject("ns=1;i=100", "FieldObj");
+        FieldMethodType fm = fieldMethod("ns=1;i=101", "FieldMeth");
+        FieldVariableType fv = fieldVariable("ns=1;i=102", "FieldVar", "Double");
+        ArrayList<FieldType> fields = new ArrayList<>();
+        fields.add(fo);
+        fields.add(fm);
+        fields.add(fv);
+        ObjectType parent = new ObjectType("ns=1;i=1", "Parent", "Parent", "", false, "opcParentType", fields);
+        parent.setVarName("opcParent");
+
+        invokeAdaptDatatypes(newParser(), parent, null);
+
+        Assert.assertEquals(BaseType.validateVarName("opcParentFieldObj"), fo.getDataType());
+        Assert.assertEquals(BaseType.validateVarName("opcParentFieldMeth"), fm.getDataType());
+        Assert.assertEquals("Double", fv.getDataType());
+    }
+
+    /**
+     * Tests the method branch if the targets are not yet in the hierarchy.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testAdaptDatatypesMethodPredictedNames()
+        throws ReflectiveOperationException, ParserConfigurationException {
+        FieldObjectType fo = fieldObject("ns=1;i=200", "ArgObj");
+        FieldMethodType fm = fieldMethod("ns=1;i=201", "ArgMeth");
+        FieldVariableType fv = fieldVariable("ns=1;i=202", "ArgVar", "Int32");
+        ArrayList<FieldType> fields = new ArrayList<>();
+        fields.add(fo);
+        fields.add(fm);
+        fields.add(fv);
+        MethodType method = new MethodType("ns=1;i=2", "Method", "Method", "", false, fields);
+        method.setVarName("opcMethod");
+
+        invokeAdaptDatatypes(newParser(), null, method);
+
+        Assert.assertEquals(BaseType.validateVarName("opcMethodArgObj"), fo.getDataType());
+        Assert.assertEquals(BaseType.validateVarName("opcMethodArgMeth"), fm.getDataType());
+        Assert.assertEquals("Int32", fv.getDataType());
+    }
+
+    /**
+     * Tests that targets already contained in the hierarchy keep their canonical name, in the object and in the
+     * method branch.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testAdaptDatatypesReusesCanonicalName()
+        throws ReflectiveOperationException, ParserConfigurationException {
+        DomParser parser = newParser();
+        ObjectType sharedObject = new ObjectType("ns=1;i=300", "SharedObj", "SharedObj", "", false,
+            "opcSharedType", new ArrayList<FieldType>());
+        sharedObject.setVarName("opcCanonicalObject");
+        registerInHierarchy(parser, sharedObject);
+        MethodType sharedMethod = new MethodType("ns=1;i=301", "SharedMeth", "SharedMeth", "", false,
+            new ArrayList<FieldType>());
+        sharedMethod.setVarName("opcCanonicalMethod");
+        registerInHierarchy(parser, sharedMethod);
+
+        FieldObjectType foInObject = fieldObject("ns=1;i=300", "SharedObj");
+        FieldMethodType fmInObject = fieldMethod("ns=1;i=301", "SharedMeth");
+        ArrayList<FieldType> objectFields = new ArrayList<>();
+        objectFields.add(foInObject);
+        objectFields.add(fmInObject);
+        ObjectType parent = new ObjectType("ns=1;i=3", "Parent", "Parent", "", false, "opcParentType", objectFields);
+        parent.setVarName("opcParent");
+        invokeAdaptDatatypes(parser, parent, null);
+        Assert.assertEquals("opcCanonicalObject", foInObject.getDataType());
+        Assert.assertEquals("opcCanonicalMethod", fmInObject.getDataType());
+
+        FieldObjectType foInMethod = fieldObject("ns=1;i=300", "SharedObj");
+        FieldMethodType fmInMethod = fieldMethod("ns=1;i=301", "SharedMeth");
+        ArrayList<FieldType> methodFields = new ArrayList<>();
+        methodFields.add(foInMethod);
+        methodFields.add(fmInMethod);
+        MethodType method = new MethodType("ns=1;i=4", "Method", "Method", "", false, methodFields);
+        method.setVarName("opcMethod");
+        invokeAdaptDatatypes(parser, null, method);
+        Assert.assertEquals("opcCanonicalObject", foInMethod.getDataType());
+        Assert.assertEquals("opcCanonicalMethod", fmInMethod.getDataType());
+    }
+
+    /**
+     * Tests {@code checkRedundancy} for field lists and {@code checkRelation} with a {@code null} node list.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testRedundancyAndRelationNullList() throws ReflectiveOperationException, ParserConfigurationException {
+        DomParser parser = newParser();
+        FieldObjectType f = fieldObject("ns=1;i=1", "F");
+        f.setVarName("opcF");
+        ArrayList<FieldType> list = new ArrayList<>();
+        list.add(f);
+        Class<?>[] types = {String.class, ArrayList.class};
+        Assert.assertEquals(Boolean.TRUE, call(parser, "checkRedundancy", types, "opcF", list));
+        Assert.assertEquals(Boolean.FALSE, call(parser, "checkRedundancy", types, "opcOther", list));
+        Assert.assertEquals(Boolean.FALSE, call(parser, "checkRedundancy", types, "opcF", null));
+        Assert.assertNull(call(null, "checkRelation", new Class<?>[] {String.class, NodeList.class}, "x", null));
+    }
+
+    /**
+     * Tests that {@code println} prints only in verbose mode.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testPrintlnVerbose() throws ReflectiveOperationException, ParserConfigurationException {
+        DomParser parser = newParser();
+        Field verbose = parserField(parser, "verbose");
+        PrintStream previous = System.out;
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        try {
+            System.setOut(new PrintStream(buffer));
+            verbose.setBoolean(parser, true);
+            call(parser, "println", new Class<?>[] {String.class}, "visible");
+            verbose.setBoolean(parser, false);
+            call(parser, "println", new Class<?>[] {String.class}, "hidden");
+        } finally {
+            System.setOut(previous);
+        }
+        String out = buffer.toString();
+        Assert.assertTrue(out.contains("visible"));
+        Assert.assertFalse(out.contains("hidden"));
+    }
+
+    /**
+     * Tests the error cases of the required model and namespace index lookup.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testRequiredModelAndNamespaceIndexErrors()
+        throws ReflectiveOperationException, ParserConfigurationException {
+        Document doc = newDocument();
+        Element model = doc.createElement("Model");
+        model.setAttribute("ModelUri", "http://example.org/A/");
+        doc.appendChild(model);
+        DomParser parser = newParser();
+        parser.setDocuments(new Document[] {doc});
+        Class<?>[] modelSig = {String.class};
+        Assert.assertSame(doc, call(parser, "getRequiredModel", modelSig, "http://example.org/A/"));
+        try {
+            call(parser, "getRequiredModel", modelSig, "http://example.org/B/");
+            Assert.fail("Expected missing model to be rejected");
+        } catch (InvocationTargetException e) {
+            Assert.assertTrue(e.getCause() instanceof IllegalArgumentException);
+        }
+
+        Document other = newDocument();
+        Element uris = newRoot(other, "NamespaceUris");
+        Element uri = other.createElement("Uri");
+        uri.setTextContent("http://example.org/A/");
+        uris.appendChild(uri);
+        Class<?>[] indexSig = {Document.class, String.class};
+        Assert.assertEquals(1, call(null, "getNamespaceIndex", indexSig, other, "http://example.org/A/"));
+        try {
+            call(null, "getNamespaceIndex", indexSig, other, "http://example.org/B/");
+            Assert.fail("Expected missing namespace to be rejected");
+        } catch (InvocationTargetException e) {
+            Assert.assertTrue(e.getCause() instanceof IllegalArgumentException);
+        }
+    }
+
+    /**
+     * Creates a model folder holding the core model in {@code RequiredModels} and the Machinery Result model in the
+     * main folder.
+     *
+     * @param folder the folder name below {@code target/tmp}
+     * @return the main folder
+     * @throws IOException shall not occur
+     */
+    private static File prepareModelFolder(String folder) throws IOException {
+        File base = new File("target/tmp", folder);
+        FileUtils.deleteQuietly(base);
+        File required = new File(base, "RequiredModels");
+        Assert.assertTrue(required.mkdirs());
+        Assert.assertTrue(new File(required, "Opc.Ua.NodeSet2.xml").createNewFile());
+        Assert.assertTrue(new File(base, "Opc.Ua.Machinery_Result.NodeSet2.xml").createNewFile());
+        return base;
+    }
+
+    private static File[] invokeCheckRequiredModels(File base, NodeList namespaceUris)
+        throws ReflectiveOperationException, ParserConfigurationException {
+        return (File[]) call(null, "checkRequiredModels", new Class<?>[] {DomParser.class, String.class,
+            String.class, String.class, NodeList.class}, newParser(), OWN_MODEL_URI, base.getPath(), "x",
+            namespaceUris);
+    }
+
+    /**
+     * Runs {@code checkRequiredModels} with the given console input and expects the prompt to run out of input.
+     *
+     * @param base the model folder
+     * @param namespaceUris the namespace URIs
+     * @param input the console input
+     * @return the console output
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    private static String runRequiredModelsPrompt(File base, NodeList namespaceUris, String input)
+        throws ReflectiveOperationException, ParserConfigurationException {
+        InputStream previousIn = System.in;
+        PrintStream previousOut = System.out;
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        try {
+            System.setOut(new PrintStream(buffer));
+            System.setIn(new ByteArrayInputStream(input.getBytes()));
+            try {
+                invokeCheckRequiredModels(base, namespaceUris);
+                Assert.fail("Expected the prompt to run out of input");
+            } catch (InvocationTargetException e) {
+                Assert.assertTrue(e.getCause() instanceof NoSuchElementException);
+            }
+        } finally {
+            System.setIn(previousIn);
+            System.setOut(previousOut);
+        }
+        return buffer.toString();
+    }
+
+    /**
+     * Tests finding required models in both folders, including non-element nodes and non-{@code Uri} children in the
+     * namespace list.
+     *
+     * @throws Exception shall not occur
+     */
+    @Test
+    public void testCheckRequiredModelsFound() throws Exception {
+        Document doc = newDocument();
+        Element uris = newRoot(doc, "NamespaceUris");
+        Element uri = doc.createElement("Uri");
+        uri.setTextContent(RESULT_MODEL_URI);
+        uris.appendChild(uri);
+        File base = prepareModelFolder("requiredModelsFound");
+        Assert.assertEquals(2, invokeCheckRequiredModels(base, doc.getElementsByTagName("NamespaceUris")).length);
+
+        Document noisy = newDocument();
+        Element container = newRoot(noisy, "container");
+        container.appendChild(noisy.createTextNode("  "));
+        Element noisyUris = noisy.createElement("NamespaceUris");
+        container.appendChild(noisyUris);
+        noisyUris.appendChild(noisy.createTextNode("  "));
+        noisyUris.appendChild(noisy.createElement("Other"));
+        Element noisyUri = noisy.createElement("Uri");
+        noisyUri.setTextContent(RESULT_MODEL_URI);
+        noisyUris.appendChild(noisyUri);
+        base = prepareModelFolder("requiredModelsSkip");
+        Assert.assertEquals(2, invokeCheckRequiredModels(base, container.getChildNodes()).length);
+    }
+
+    /**
+     * Tests a missing and an incomplete model folder together with the console prompt.
+     *
+     * @throws Exception shall not occur
+     */
+    @Test
+    public void testCheckRequiredModelsMissingAndPrompt() throws Exception {
+        File base = new File("target/tmp/requiredModelsMissing");
+        FileUtils.deleteQuietly(base);
+        Assert.assertTrue(base.mkdirs());
+        Document doc = newDocument();
+        newRoot(doc, "NamespaceUris");
+        NodeList uris = doc.getElementsByTagName("NamespaceUris");
+
+        // RequiredModels does not exist: it is created, stays empty, then the input is exhausted
+        runRequiredModelsPrompt(base, uris, "y\n");
+        Assert.assertTrue(new File(base, "RequiredModels").isDirectory());
+
+        // folder is not empty but the core model is missing; input other than "y" is ignored
+        Assert.assertTrue(new File(base, "RequiredModels/Other.xml").createNewFile());
+        runRequiredModelsPrompt(base, uris, "n\ny\n");
+    }
+
+    /**
+     * Tests that a model folder which cannot be created is reported.
+     *
+     * @throws Exception shall not occur
+     */
+    @Test
+    public void testCheckRequiredModelsDirectoryCannotBeCreated() throws Exception {
+        FileUtils.deleteQuietly(new File("target/tmp/noSuchParent"));
+        Document doc = newDocument();
+        newRoot(doc, "NamespaceUris");
+        String output = runRequiredModelsPrompt(new File("target/tmp/noSuchParent/deeper"),
+            doc.getElementsByTagName("NamespaceUris"), "y\n");
+        Assert.assertTrue(output.contains("can't be created"));
+    }
+
+    /**
+     * Tests {@code parseFile} with text nodes between the elements and elements with an unknown parent.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testParseFileRootElementsAndNonElementNodes()
+        throws ReflectiveOperationException, ParserConfigurationException {
+        Document doc = newDocument();
+        Element root = newRoot(doc, "root");
+        Element ots = doc.createElement("ots");
+        Element objs = doc.createElement("objs");
+        Element vars = doc.createElement("vars");
+        Element meths = doc.createElement("meths");
+        for (Element e : new Element[] {ots, objs, vars, meths}) {
+            root.appendChild(e);
+            e.appendChild(doc.createTextNode(" "));
+        }
+        typedWithParent(doc, ots, "UAObjectType", "ns=1;i=1", "Type", "", null);
+        typedWithParent(doc, objs, "UAObject", "ns=1;i=2", "Obj", "ns=1;i=1", null);
+        typedWithParent(doc, vars, "UAVariable", "ns=1;i=3", "Var", "ns=1;i=1", "Double");
+        typedWithParent(doc, meths, "UAMethod", "ns=1;i=4", "Meth", "ns=1;i=1", null);
+        typedWithParent(doc, objs, "UAObject", "ns=1;i=5", "Orphan", "ns=1;i=999", null);
+        typedWithParent(doc, meths, "UAMethod", "ns=1;i=6", "OrphanMeth", "ns=1;i=999", null);
+
+        DomParser parser = newParser(ots.getChildNodes(), objs.getChildNodes(), vars.getChildNodes(),
+            meths.getChildNodes(), null);
+        call(parser, "parseFile", new Class<?>[] {});
+
+        Assert.assertEquals(4, getHierarchy(parser).size());
+    }
+
+    /**
+     * Tests {@code parseFile} for no, only data and only object types.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testParseFileElementTypeCondition() throws ReflectiveOperationException, ParserConfigurationException {
+        Document doc = newDocument();
+        Element root = newRoot(doc, "root");
+
+        DomParser none = newParser();
+        call(none, "parseFile", new Class<?>[] {});
+        Assert.assertTrue(getHierarchy(none).isEmpty());
+
+        Element dts = doc.createElement("dts");
+        root.appendChild(dts);
+        addTyped(doc, dts, "UADataType", "ns=1;i=10", "OnlyData");
+        DomParser dataOnly = newParserWithDataTypes(dts.getChildNodes());
+        call(dataOnly, "parseFile", new Class<?>[] {});
+        Assert.assertEquals(1, getHierarchy(dataOnly).size());
+
+        Element ots = doc.createElement("ots");
+        root.appendChild(ots);
+        addTyped(doc, ots, "UAObjectType", "ns=1;i=11", "OnlyType");
+        DomParser typeOnly = newParser(ots.getChildNodes(), null, null, null, null);
+        call(typeOnly, "parseFile", new Class<?>[] {});
+        Assert.assertEquals(1, getHierarchy(typeOnly).size());
+    }
+
+    private static DomParser newParserWithCoreDocument()
+        throws ReflectiveOperationException, ParserConfigurationException {
+        Document core = newDocument();
+        Element coreRoot = newRoot(core, "UANodeSet");
+        addTyped(core, coreRoot, "UAObject", "i=1", "Rule");
+        addTyped(core, coreRoot, "UAObjectType", "i=2", "OT");
+        addTyped(core, coreRoot, "UAVariableType", "i=3", "VT");
+        DomParser parser = newParser();
+        parser.setBaseNameSpace("1");
+        parser.setDocuments(new Document[] {core});
+        return parser;
+    }
+
+    private static Object resolveTypes(DomParser parser, String nodeId, String reference, Object type)
+        throws ReflectiveOperationException {
+        return call(parser, "getTypeListAndTypeRootNs", new Class<?>[] {String.class, String.class,
+            elementTypeClass()}, nodeId, reference, type);
+    }
+
+    private static void assertResolved(Object result, boolean hasList, String expectedType)
+        throws ReflectiveOperationException {
+        Assert.assertEquals(hasList, fieldOf(result, "typeList") != null);
+        Assert.assertEquals(expectedType, fieldOf(result, "type").toString());
+    }
+
+    /**
+     * Tests type resolution for references into the namespace of the companion specification.
+     *
+     * @throws Exception shall not occur
+     */
+    @Test
+    public void testTypeListAndTypeRootNsOwnNamespace() throws Exception {
+        DomParser parser = newParserWithCoreDocument();
+        for (Object type : elementTypeClass().getEnumConstants()) {
+            String name = type.toString();
+            for (String reference : REFERENCE_TYPES) {
+                Object result = resolveTypes(parser, "ns=1;i=5", reference, type);
+                if (OBJECT_ELEMENT_TYPES.contains(name)) {
+                    assertResolved(result, true, name);
+                } else if (VARIABLE_ELEMENT_TYPES.contains(name)) {
+                    assertResolved(result, true, "VARIABLETYPE");
+                } else {
+                    assertResolved(result, false, name);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests type resolution for references into the core namespace.
+     *
+     * @throws Exception shall not occur
+     */
+    @Test
+    public void testTypeListAndTypeRootNsCoreNamespace() throws Exception {
+        DomParser parser = newParserWithCoreDocument();
+        for (Object type : elementTypeClass().getEnumConstants()) {
+            String name = type.toString();
+            for (String reference : REFERENCE_TYPES) {
+                boolean rule = reference.equals("HasModellingRule");
+                Object result = resolveTypes(parser, "i=5", reference, type);
+                NodeList list = (NodeList) fieldOf(result, "typeList");
+                if (CORE_ELEMENT_TYPES.contains(name)) {
+                    Assert.assertEquals(rule ? "UAObject" : "UAObjectType", list.item(0).getNodeName());
+                    Assert.assertEquals(rule ? name : "OBJECTTYPE", fieldOf(result, "type").toString());
+                } else if (VARIABLE_ELEMENT_TYPES.contains(name)) {
+                    Assert.assertEquals(rule ? "UAObject" : "UAVariableType", list.item(0).getNodeName());
+                    Assert.assertEquals(rule ? "ROOTOBJECT" : "VARIABLETYPE", fieldOf(result, "type").toString());
+                } else {
+                    assertResolved(result, false, name);
+                }
+            }
+        }
+    }
+
+    /**
+     * Tests that references into a foreign namespace are not resolved.
+     *
+     * @throws Exception shall not occur
+     */
+    @Test
+    public void testTypeListAndTypeRootNsForeignNamespace() throws Exception {
+        DomParser parser = newParserWithCoreDocument();
+        for (Object type : elementTypeClass().getEnumConstants()) {
+            for (String reference : REFERENCE_TYPES) {
+                assertResolved(resolveTypes(parser, "ns=2;i=5", reference, type), false, type.toString());
+            }
+        }
+    }
+
+    private static String resolveExtern(DomParser parser, String nodeId) throws ReflectiveOperationException {
+        return (String) call(parser, "retrieveAttributesForExternDataType", new Class<?>[] {String.class}, nodeId);
+    }
+
+    /**
+     * Tests resolving an external data type whose namespace index is rewritten, preceded by a document without a
+     * match.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testExternDataTypeNamespaceRewrite() throws ReflectiveOperationException,
+        ParserConfigurationException {
+        DomParser parser = newParser();
+        parser.setDocuments(new Document[] {externDocument("ns=1;i=999", "Nope"),
+            externDocument("ns=1;i=100", "Ext")});
+        Assert.assertEquals("Ext", resolveExtern(parser, "ns=2;i=100"));
+        Assert.assertEquals(1, getHierarchy(parser).size());
+        Assert.assertEquals("ns=2;i=100", getHierarchy(parser).get(0).getNodeId());
+        Assert.assertTrue(((Set<?>) fieldOf(parser, "externalDataTypesInProgress")).isEmpty());
+    }
+
+    /**
+     * Tests resolving a core data type, i.e., without namespace index.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testExternDataTypeCoreId() throws ReflectiveOperationException, ParserConfigurationException {
+        DomParser parser = newParser();
+        parser.setDocuments(new Document[] {externDocument("i=100", "Core")});
+        Assert.assertEquals("Core", resolveExtern(parser, "i=100"));
+        Assert.assertEquals(1, getHierarchy(parser).size());
+    }
+
+    /**
+     * Tests that a type which is already being resolved (recursive structure) is not expanded again.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testExternDataTypeRecursionGuard() throws ReflectiveOperationException,
+        ParserConfigurationException {
+        DomParser parser = newParser();
+        parser.setDocuments(new Document[] {externDocument("ns=1;i=100", "Ext")});
+        Set<String> inProgress = (Set<String>) fieldOf(parser, "externalDataTypesInProgress");
+        inProgress.add("ns=2;i=100");
+        Assert.assertEquals("Ext", resolveExtern(parser, "ns=2;i=100"));
+        Assert.assertTrue(getHierarchy(parser).isEmpty());
+        Assert.assertTrue(inProgress.contains("ns=2;i=100"));
+    }
+
+    /**
+     * Tests an external data type without display name and an unknown external data type.
+     *
+     * @throws ReflectiveOperationException shall not occur
+     * @throws ParserConfigurationException shall not occur
+     */
+    @Test
+    public void testExternDataTypeNameMissingOrUnknown() throws ReflectiveOperationException,
+        ParserConfigurationException {
+        DomParser parser = newParser();
+        parser.setDocuments(new Document[] {externDocument("i=200", null)});
+        Assert.assertEquals("", resolveExtern(parser, "i=200"));
+
+        parser = newParser();
+        parser.setDocuments(new Document[] {externDocument("ns=1;i=1", "X")});
+        Assert.assertEquals("", resolveExtern(parser, "ns=2;i=555"));
+        Assert.assertTrue(getHierarchy(parser).isEmpty());
+    }    
 }
