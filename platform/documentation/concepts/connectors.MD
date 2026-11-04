@@ -24,7 +24,7 @@ MqttV3Connector exampleMQTTCon = {
 
 Connectors are specialized services. The figure below illustrates the connector type hierarchy defined by oktoflow's meta-model. _Model connectors_ require a structured (model-based) access to the underlying information, e.g., through an OPC UA or an AAS model. In contrast, _channel connectors_ listen to input channels and publish to output channels, possibly with a not further specified data format. Therefore, channel connectors are equipped with a parser/formatter pair, which treates the underlying format, e.g., JSON.  By default, we treat a connector as a model connector unless it refines `ChannelConnector`. While all connectors operate on a certain protocol/format version, `MqttConnector` is a kind of meta-connector, as it allows for dynamically deciding which MQTT protocol version to use (either the respective v3 or the v5 connector) based on data provided by the target device AAS (for ad-hoc connections where the communication port is dynamically defined by the device). 
 
-Specialized services may require refined fields in their input/output types, e.g., with more specific (alias) data types types. Further, specialized connectors may define (fixed) default values, e.g., default ports or symbolic service names for ad-hoc connections.
+Specialized services may require refined fields in their input/output types, e.g., with more specific (alias) data types types. Further, specialized connectors may define (fixed) default values, e.g., default ports or symbolic service names for ad-hoc connections. If a connector shall pass through data as it is, e.g., a JSON structure, we recommend using `StringType` rather than `ObjectType` (which may not be tested on all connectors).
 
 ![Connector Hierarchy](ConnectorHierarchy.png)
 
@@ -214,7 +214,7 @@ The REST connector allows for connecting with REST data sources/sinks.
 
 | Field | Defined by | Description | Default |
 | --- | --- | --- | --- |
-| endpointPrefix |  Prefix path to be prepended before each field path. | `""`  |
+| endpointPrefix |  Prefix path to be prepended before each field path. May be a full URL, which is then taking precedence over `host`/`port`, a path (then extended with schema, host and port) or empty for nothing. | `""`  |
 
 Fields in in/output datatypes shall be of the specialized type `RestField` rather than `Field`, which specifies dedicated REST endpoints for fields (if not the field name shall be used instead) or whether a field is considered a single value or a batch/set.
 
