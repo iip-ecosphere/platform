@@ -114,6 +114,7 @@ The goals support the following configuration settings:
   - `allTypes` (default `false`, `-Dconfiguration.allServices=<true|false>`) whether all types shall be considered for instantiation rather than those that are specified as part of apps and their service meshes, may take precedence over `allServices`
   - `incremental` (default `false`, `-Dconfiguration.incremental=<true|false>`) whether incremental builds rather than full builds with cleanup shall be performed
   - `inTest` (default `false`, `-Dconfiguration.inTest=<true|false>`) whether instantiation shall run in test mode, e.g., certain logging may be switched on/off
+  - `nestedGoal` (default `""`, `-Dconfiguration.nestedGoal=...`) the Maven build goal to be passed to the Maven execution of the generated POM. By default empty leads to the `install` goal. Other goals could be, e.g., `deploy`.
   - `skip` (default `false``, `-Dconfiguration.skip=...`) whether the configuration build plugin shall be executed/skipped
   
 All goals take over the maven offline mode and pass it on to the instantiation for further consideration in maven sub-calls.

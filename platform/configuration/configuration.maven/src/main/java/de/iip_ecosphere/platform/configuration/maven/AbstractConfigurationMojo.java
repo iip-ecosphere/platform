@@ -113,6 +113,9 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
     
     @Parameter(property = "configuration.inTest", required = false, defaultValue = "false")
     private boolean inTest;
+    
+    @Parameter(property = "configuration.nestedGoal", required = false, defaultValue = "")
+    private String nestedGoal;
 
     @Parameter(property = "iip.unpackResources", required = false, defaultValue = "false") 
     private boolean unpackResources;
@@ -485,6 +488,9 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
                     .setIncremental(incremental)
                     .setInTest(inTest)
                     .setUnpackResources(unpackResources);
+                if (null != nestedGoal && nestedGoal.length() > 0) {
+                    executor.setGoal(nestedGoal);
+                }
                 try {
                     if (asProcess) {
                         executor.executeAsProcess(getClass().getClassLoader(), resourcesDir, getTracingLevel(), 
