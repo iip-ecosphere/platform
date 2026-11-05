@@ -365,7 +365,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, JavaCodeArti
     }
     
     def generateAsyncProcessorBody(MeshElement proc, Connector conn, String methodSuffix, String methodSuffixWithServiceId, String type, JavaCodeMethod m) {
-        String expr = '${fallbackToNull(proc, "serviceRef.get().send(${type}.class, data)", false)}';
+        String expr = '${fallbackToNull(proc, "service.send(${type}.class, data)", false)}';
         m.return(new JavaCodeLambdaExpression("data").asExpr(genRcvProbe(conn, expr, type, "data")));
     }
 
@@ -392,7 +392,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, JavaCodeArti
     }
 
     def generateSyncProcessorBody(MeshProcessor proc, Connector conn, String methodSuffix, String methodSuffixWithServiceId, String inType, String outType, JavaCodeMethod m) {
-        m.return('data -> ${fallbackToNull(proc, "serviceRef.get().send(${inType}.class, data)", true)}');
+        m.return('data -> ${fallbackToNull(proc, "service.send(${inType}.class, data)", true)}');
     }
     
     // called via MeshBasics.generateDataMethods for MeshSink
@@ -420,7 +420,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, JavaCodeArti
 
     // added v2->v3
     def generateSinkMethodBody(MeshSink snk, Connector service, String methodName, String methodSuffixWithServiceId, String type, JavaCodeMethod m) {
-        String expr = '${fallbackToNull(snk, "serviceRef.get().${methodName}(${type}.class, data)", false)}';
+        String expr = '${fallbackToNull(snk, "service.${methodName}(${type}.class, data)", false)}';
         m.return(new JavaCodeLambdaExpression("data").asExpr(genRcvProbe(service, expr, type, "data")));
     }
     
