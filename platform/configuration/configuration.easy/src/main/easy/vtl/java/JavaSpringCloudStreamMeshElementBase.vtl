@@ -547,6 +547,7 @@ template JavaSpringCloudStreamMeshElementBase(Configuration config, JavaCodeArti
         JavaCodeMethodCall init = new JavaCodeConstructorCall(wrapperCls(conn)).arg("serviceData").arg("() -> param");
         wrapperCtorParam(conn, init);
         m.assign("service", init);
+        m.call("serviceRef.set").arg("service");
         genMultiConnectors(conn, getConnectorCls(conn), "service", m);
         setDataTimeDiffProvider(conn, "service", m);
         initAppInstId("service", m);
