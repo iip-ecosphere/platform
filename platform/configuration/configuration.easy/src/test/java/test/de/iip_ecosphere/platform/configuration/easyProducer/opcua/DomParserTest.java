@@ -1385,7 +1385,7 @@ public class DomParserTest {
         Assert.assertEquals(Boolean.TRUE, call(parser, "checkRedundancy", types, "opcF", list));
         Assert.assertEquals(Boolean.FALSE, call(parser, "checkRedundancy", types, "opcOther", list));
         Assert.assertEquals(Boolean.FALSE, call(parser, "checkRedundancy", types, "opcF", null));
-        Assert.assertNull(call(null, "checkRelation", new Class<?>[] {String.class, NodeList.class}, "x", null));
+        Assert.assertNull(call(parser, "checkRelation", new Class<?>[] {String.class, NodeList.class}, "x", null));
     }
 
     /**
@@ -1445,9 +1445,9 @@ public class DomParserTest {
         uri.setTextContent("http://example.org/A/");
         uris.appendChild(uri);
         Class<?>[] indexSig = {Document.class, String.class};
-        Assert.assertEquals(1, call(null, "getNamespaceIndex", indexSig, other, "http://example.org/A/"));
+        Assert.assertEquals(1, call(parser, "getNamespaceIndex", indexSig, other, "http://example.org/A/"));
         try {
-            call(null, "getNamespaceIndex", indexSig, other, "http://example.org/B/");
+            call(parser, "getNamespaceIndex", indexSig, other, "http://example.org/B/");
             Assert.fail("Expected missing namespace to be rejected");
         } catch (InvocationTargetException e) {
             Assert.assertTrue(e.getCause() instanceof IllegalArgumentException);
