@@ -74,7 +74,7 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
     @Parameter( property = "mdep.createIndex", defaultValue = "true")
     private boolean createIndex;
 
-    @Parameter( property = "mdep.incrementalIndex", defaultValue = "false")
+    @Parameter( property = "mdep.incrementalIndex", defaultValue = "true")
     private boolean incrementalIndex;
 
     // checkstyle: stop parameter number check
@@ -129,10 +129,13 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
         if (incrementalIndex) {
             hashes = new Properties();
             File file = getHashFile();
-            try (FileReader reader = new FileReader(file)) {
-                hashes.load(reader);
-            } catch (IOException e) {
-                getLog().warn("Cannot read hash file " + file + ": " + HashUtils.toMessage(e));
+            if (file.exists()) {
+                try (FileReader reader = new FileReader(file)) {
+                    hashes.load(reader);
+                    getLog().info("Using file hashes from " + file);
+                } catch (IOException e) {
+                    getLog().warn("Cannot read hash file " + file + ": " + HashUtils.toMessage(e));
+                }
             }
         }
         return hashes;
@@ -149,6 +152,7 @@ public class CopyPluginDependenciesMojo extends CopyDependenciesMojo {
             File file = getHashFile();
             try (FileWriter writer = new FileWriter(file)) {
                 hashes.store(writer, "Contents hash file for " + (asTest ? "-test" : "") + " classpath index file");
+                getLog().info("Stored file hashes in " + file);
             } catch (IOException e) {
                 getLog().warn("Cannot write hash file " + file + ": " + HashUtils.toMessage(e));
             }
