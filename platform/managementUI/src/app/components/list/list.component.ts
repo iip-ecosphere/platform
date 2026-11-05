@@ -116,6 +116,9 @@ export class ListComponent extends Utils implements OnInit {
   dashboardingTabsParam = [
     { tabName: "Display", metaProject: "AllTypes", submodelElement: null },
     { tabName: "Types", metaProject: "AllTypes", submodelElement: null },
+    { tabName: "Services", metaProject: null, submodelElement: "ServiceBase" },
+    { tabName: "Meshes", metaProject: null, submodelElement: "ServiceMesh" },
+    { tabName: "Applications", metaProject: null, submodelElement: "Application" }
   ]
   defaultdashboardingTabs = 'Display'
 
