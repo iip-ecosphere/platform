@@ -201,6 +201,9 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
 
     @Parameter(property = "touch.passJava", defaultValue = "") 
     private String touchPassJava;
+    
+    @Parameter(property = "mdep.incrementalIndex", defaultValue = "") 
+    private String incrementalIndex;
 
     @Parameter(property = "inCI", defaultValue = "") 
     private String inCI;
@@ -376,6 +379,7 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
         setPropertyIfDefined(sysProperties, "aether.remoteRepositoryFilter.prefixes.verifyDenied", verifyDenied);
         setPropertyIfDefined(sysProperties, "aether.artifactResolver.existenceCheckRelabel", existenceCheckRelabel);
         setPropertyIfDefined(sysProperties, "touch.passJava", touchPassJava);
+        setPropertyIfDefined(sysProperties, "mdep.incrementalIndex", incrementalIndex);
         setPropertyIfDefined(sysProperties, "inCI", inCI);
         setPropertyIfDefined(sysProperties, "test.exec.args", testExecArgs);
         setPropertyIfDefined(sysProperties, "test.exec.regEx", testExecRegex);
