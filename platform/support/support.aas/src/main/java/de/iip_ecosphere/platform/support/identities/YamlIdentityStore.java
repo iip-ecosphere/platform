@@ -79,7 +79,7 @@ public class YamlIdentityStore extends IdentityStore {
         }
         data = YamlIdentityFile.load(idStream); // can cope with null
         String name = data.getName();
-        if (null != name && name.length() > 0) {
+        if (null != name) { // even if it is empty
             this.name = name;
         }
         LoggerFactory.getLogger(YamlIdentityFile.class).info("Loaded identityStore '{}'", name);
