@@ -10,10 +10,11 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.deviceMgt.basicReg;
+package test.de.iip_ecosphere.platform.deviceMgt.basicReg;
 
 import de.iip_ecosphere.platform.deviceMgt.DeviceDescriptor;
 import de.iip_ecosphere.platform.deviceMgt.DeviceDescriptor.State;
+import de.iip_ecosphere.platform.deviceMgt.basicReg.BasicDeviceRegistry;
 
 import org.junit.Assert;
 import org.junit.Before;
