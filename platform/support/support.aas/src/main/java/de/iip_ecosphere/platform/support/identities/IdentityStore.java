@@ -40,6 +40,7 @@ import de.iip_ecosphere.platform.support.net.SslUtils;
  */
 public abstract class IdentityStore {
 
+    public static final String EMPTY_INSTANCE = "*empty*";
     private static IdentityStore instance;
     
     /**
@@ -59,6 +60,14 @@ public abstract class IdentityStore {
         } 
         return instance;
     }
+    
+    /**
+     * Returns the name of the identity store.
+     * 
+     * @return the name, may contain further information such as the location where it was loaded from, shall be 
+     *    {@link #EMPTY_INSTANCE} if it was not found and it is empty by default.
+     */
+    public abstract String getName();
 
     /**
      * Returns an identity token returning <b>null</b> if none was found.

@@ -51,6 +51,7 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 public class YamlIdentityStore extends IdentityStore {
     
     private YamlIdentityFile data;
+    private String name = EMPTY_INSTANCE;
     
     /**
      * The JSL descriptor for this store.
@@ -77,7 +78,20 @@ public class YamlIdentityStore extends IdentityStore {
             }
         }
         data = YamlIdentityFile.load(idStream); // can cope with null
-        LoggerFactory.getLogger(YamlIdentityFile.class).info("Loaded identityStore '{}'", data.getName());
+        String name = data.getName();
+        if (null != name && name.length() > 0) {
+            this.name = name;
+        }
+        LoggerFactory.getLogger(YamlIdentityFile.class).info("Loaded identityStore '{}'", name);
+    }
+    
+    /**
+     * Returns the name of the identity store.
+     * @return
+     */
+    @Override
+    public String getName() {
+        return name;
     }
     
     /**
