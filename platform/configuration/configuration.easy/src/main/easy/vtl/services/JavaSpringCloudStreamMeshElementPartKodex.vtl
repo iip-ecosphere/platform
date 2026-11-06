@@ -64,6 +64,7 @@ template JavaSpringCloudStreamMeshElementPartKodex(Configuration config, FileArt
         serviceVars.add("service");
         m.addAssignment("service", new JavaCodeMethodCall("de.iip_ecosphere.platform.services.environment.AbstractService.createGenericMultiInstance", JavaCodeImportScope.CLASS)
             .stringArg("service-kodex").classArg("de.iip_ecosphere.platform.services.environment.GenericMultiTypeService").addArgument("serviceData"));
+        m.call("serviceRef.set").arg("service");
         for (IOType in: service.input) {
             String inType = toTypeName(in.type);
             String field = getRtsaFieldName(in);

@@ -17,6 +17,7 @@ template JavaSpringCloudStreamMeshElementPartTraceToAas(Configuration config, Fi
         serviceVars.add("service");
         getYamlServiceFragment("serviceData", clsName, "${service.id}", m, appVar="app");
         m.addAssignment("service", new JavaCodeConstructorCall("TraceToAasService").addArgument("app").addArgument("serviceData"));
+        m.call("serviceRef.set").arg("service");
         if (isDefined(service.outTransport) and service.outTransport <> null) {
             generateOutTransport(service.outTransport, m);
         }

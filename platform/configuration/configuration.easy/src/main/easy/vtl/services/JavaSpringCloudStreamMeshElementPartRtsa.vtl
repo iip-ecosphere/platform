@@ -21,6 +21,7 @@ template JavaSpringCloudStreamMeshElementPartRtsa(Configuration config, FileArti
         String serviceType = getServiceType(elt, service);
         m.addAssignment("service", new JavaCodeMethodCall("de.iip_ecosphere.platform.services.environment.AbstractService.createGenericMultiInstance", JavaCodeImportScope.CLASS)
             .stringArg("de.iip_ecosphere.platform.kiServices.rapidminer.rtsa.MultiRtsaRestService").classArg("de.iip_ecosphere.platform.services.environment.GenericMultiTypeService").arg("serviceData"));
+        m.call("serviceRef.set").arg("service");
         for (IOType in: service.input) {
             String inType = toTypeName(in.type);
             String field = getRtsaFieldName(in);

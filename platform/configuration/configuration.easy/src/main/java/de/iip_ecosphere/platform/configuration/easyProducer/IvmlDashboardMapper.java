@@ -94,7 +94,7 @@ public class IvmlDashboardMapper implements DashboardMapper {
     public static final String KEY_POSTURL = "okto.dashboardMapper.postUrl";
     public static final String KEY_INCONTAINER = "okto.dashboardMapper.inContainer";
     
-    private File projectFolder;
+    private File validatedProjectFolder;
     private boolean inContainer;
     private AasFactory factory;
     private Map<String, Object> unitMapping;
@@ -125,7 +125,7 @@ public class IvmlDashboardMapper implements DashboardMapper {
      */
     @SuppressWarnings("unchecked")
     private IvmlDashboardMapper(AasFactory factory, File projectFolder, boolean inContainer) {
-        this.projectFolder = projectFolder;
+        this.validatedProjectFolder = validateProjectFolder(projectFolder);
         this.factory = factory;
         this.inContainer = inContainer;
         try {
@@ -540,11 +540,12 @@ public class IvmlDashboardMapper implements DashboardMapper {
             createProperty(dbB, "url", Type.STRING, url, "InfluxDB URL");
         }
         createProperty(dbB, "organization", Type.STRING, connInfo.organization, "InfluxDB organization"); 
-        ResourceLoader.registerResourceResolver(new MavenResourceResolver(projectFolder));
+        ResourceLoader.registerResourceResolver(new MavenResourceResolver(validatedProjectFolder));
         if (connInfo.security != null && isNotBlank(connInfo.security.authenticationKey)) {
             String authKey = connInfo.security.authenticationKey;
             if (connInfo.security.enableTokenExport) {
                 IdentityStore store = IdentityStore.getInstance();
+                getLogger().info("Using identity store {}", store.getName());
                 String token = "";
                 IdentityToken tok = store.getToken(authKey);
                 if (null != tok) {
@@ -568,6 +569,24 @@ public class IvmlDashboardMapper implements DashboardMapper {
         }
         dbB.build();
         return uid;
+    }
+
+    /**
+     * Validates the project folder, may step up until it finds a "pom.xml".
+     * 
+     * @param folder the folder
+     * @return {@code folder} if no such folder could be found, {@code folder} or a parent folder containing "pom.xml"
+     */
+    private final File validateProjectFolder(File folder) {
+        File currentDir = folder.isDirectory() ? folder : folder.getParentFile();
+        while (currentDir != null) {
+            File pomFile = new File(currentDir, "pom.xml");
+            if (pomFile.exists() && pomFile.isFile()) {
+                return currentDir;
+            }
+            currentDir = currentDir.getParentFile();
+        }
+        return folder;
     }
 
     /**

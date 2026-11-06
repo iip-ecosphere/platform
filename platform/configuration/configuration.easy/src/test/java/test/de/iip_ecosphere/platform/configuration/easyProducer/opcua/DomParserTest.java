@@ -853,7 +853,7 @@ public class DomParserTest {
      * @param parser the parser
      * @param name the name of the field
      * @return the parser field
-     * @throws ParserConfigurationException shall not occur
+     * @throws ReflectiveOperationException shall not occur
      */
     private static Field parserField(DomParser parser, String name) throws ReflectiveOperationException {
         Field field = DomParser.class.getDeclaredField(name);
@@ -866,7 +866,7 @@ public class DomParserTest {
      * 
      * @param parser the parser instance
      * @return the hierarchy
-     * @throws ParserConfigurationException if there is no field, the access fails
+     * @throws ReflectiveOperationException if there is no field, the access fails
      */
     @SuppressWarnings("unchecked")
     private static ArrayList<BaseType> getHierarchy(DomParser parser) throws ReflectiveOperationException {
@@ -878,7 +878,7 @@ public class DomParserTest {
      * 
      * @param parser the parser instance
      * @param element the element to add
-     * @throws ParserConfigurationException if there is no field, the access fails
+     * @throws ReflectiveOperationException if there is no field, the access fails
      */
     @SuppressWarnings("unchecked")
     private static void registerInHierarchy(DomParser parser, BaseType element) throws ReflectiveOperationException {
@@ -891,8 +891,8 @@ public class DomParserTest {
      * Reads a private field of an arbitrary object. 
      * 
      * @param target the target object
-     * @param the field name
-     * @throws ParserConfigurationException if there is no field, the access fails
+     * @param name the field name
+     * @throws ReflectiveOperationException if there is no field, the access fails
      */
     private static Object fieldOf(Object target, String name) throws ReflectiveOperationException {
         Field f = target.getClass().getDeclaredField(name);
