@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.deviceMgt.minio;
+package test.de.iip_ecosphere.platform.deviceMgt.minio;
 
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
@@ -21,6 +21,8 @@ import io.minio.messages.Item;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+
+import de.iip_ecosphere.platform.deviceMgt.minio.S3PackageStorage;
 
 import java.util.HashSet;
 import java.util.Set;

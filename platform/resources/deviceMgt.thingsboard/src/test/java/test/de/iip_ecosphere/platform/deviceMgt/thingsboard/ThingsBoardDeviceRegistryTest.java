@@ -10,12 +10,14 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.deviceMgt.thingsboard;
+package test.de.iip_ecosphere.platform.deviceMgt.thingsboard;
 
 import com.fasterxml.jackson.core.JsonProcessingException; 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.iip_ecosphere.platform.deviceMgt.DeviceDescriptor;
+import de.iip_ecosphere.platform.deviceMgt.thingsboard.ThingsBoardDeviceRegistry;
+
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Before;

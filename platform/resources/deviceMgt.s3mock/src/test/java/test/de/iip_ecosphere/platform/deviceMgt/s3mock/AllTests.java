@@ -9,7 +9,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.deviceMgt.s3mock;
+package test.de.iip_ecosphere.platform.deviceMgt.s3mock;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

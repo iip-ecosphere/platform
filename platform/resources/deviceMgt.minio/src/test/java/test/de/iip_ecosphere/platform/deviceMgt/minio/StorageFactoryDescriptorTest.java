@@ -10,9 +10,11 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.deviceMgt.minio;
+package test.de.iip_ecosphere.platform.deviceMgt.minio;
 
 import de.iip_ecosphere.platform.deviceMgt.DeviceMgtSetup;
+import de.iip_ecosphere.platform.deviceMgt.minio.S3Storage;
+import de.iip_ecosphere.platform.deviceMgt.minio.S3StorageFactoryDescriptor;
 import de.iip_ecosphere.platform.deviceMgt.storage.PackageStorageSetup;
 import de.iip_ecosphere.platform.deviceMgt.storage.Storage;
 import de.iip_ecosphere.platform.deviceMgt.storage.StorageFactory;

@@ -8,8 +8,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
-
-package de.iip_ecosphere.platform.deviceMgt.minio;
+package test.de.iip_ecosphere.platform.deviceMgt.thingsboard;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -21,9 +20,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    S3StorageTest.class,
-    S3PackageStorageTest.class,
-    StorageFactoryDescriptorTest.class
+    ThingsBoardDeviceRegistryTest.class,
+    //IntegrationTests.class, // disabled for now, requires ThingsBoard on CI
 })
 public class AllTests {
 }

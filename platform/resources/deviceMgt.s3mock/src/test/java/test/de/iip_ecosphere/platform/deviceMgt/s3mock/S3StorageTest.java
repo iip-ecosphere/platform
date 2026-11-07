@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.deviceMgt.s3mock;
+package test.de.iip_ecosphere.platform.deviceMgt.s3mock;
 
 import io.findify.s3mock.S3Mock;
 
@@ -25,6 +25,7 @@ import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
+import de.iip_ecosphere.platform.deviceMgt.s3mock.S3Storage;
 import de.iip_ecosphere.platform.deviceMgt.storage.Storage;
 import de.iip_ecosphere.platform.support.NetUtils;
 

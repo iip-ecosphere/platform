@@ -10,9 +10,13 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.deviceMgt.thingsboard;
+package test.de.iip_ecosphere.platform.deviceMgt.thingsboard;
 
 import de.iip_ecosphere.platform.deviceMgt.DeviceDescriptor;
+import de.iip_ecosphere.platform.deviceMgt.thingsboard.ThingsBoardDeviceDescriptor;
+import de.iip_ecosphere.platform.deviceMgt.thingsboard.ThingsBoardDeviceRegistry;
+import de.iip_ecosphere.platform.deviceMgt.thingsboard.ThingsBoardDeviceRegistryFactoryDescriptor;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

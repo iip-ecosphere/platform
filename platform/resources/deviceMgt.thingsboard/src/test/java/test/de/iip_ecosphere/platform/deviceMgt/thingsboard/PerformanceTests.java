@@ -1,9 +1,12 @@
-package de.iip_ecosphere.platform.deviceMgt.thingsboard;
+package test.de.iip_ecosphere.platform.deviceMgt.thingsboard;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.thingsboard.rest.client.RestClient;
+
+import de.iip_ecosphere.platform.deviceMgt.thingsboard.ThingsBoardDeviceRegistry;
+import de.iip_ecosphere.platform.deviceMgt.thingsboard.ThingsBoardDeviceRegistryFactoryDescriptor;
 
 import java.util.List;
 
