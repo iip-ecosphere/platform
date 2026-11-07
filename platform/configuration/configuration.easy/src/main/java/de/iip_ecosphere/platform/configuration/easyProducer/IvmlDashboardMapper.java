@@ -540,6 +540,7 @@ public class IvmlDashboardMapper implements DashboardMapper {
             createProperty(dbB, "url", Type.STRING, url, "InfluxDB URL");
         }
         createProperty(dbB, "organization", Type.STRING, connInfo.organization, "InfluxDB organization"); 
+        ResourceLoader.registerResourceResolver(new OktoflowResourceResolver(validatedProjectFolder));
         ResourceLoader.registerResourceResolver(new MavenResourceResolver(validatedProjectFolder));
         if (connInfo.security != null && isNotBlank(connInfo.security.authenticationKey)) {
             String authKey = connInfo.security.authenticationKey;
