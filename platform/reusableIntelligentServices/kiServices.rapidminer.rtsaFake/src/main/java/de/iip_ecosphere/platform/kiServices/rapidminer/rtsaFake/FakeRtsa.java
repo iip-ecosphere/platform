@@ -16,23 +16,37 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
-import de.iip_ecosphere.platform.support.ZipUtils;
-import de.iip_ecosphere.platform.support.json.Json;
-import de.iip_ecosphere.platform.support.setup.AbstractSetup;
-import de.iip_ecosphere.platform.support.setup.CmdLine;
+import org.apache.commons.io.IOUtils;
+
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.representer.Representer;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import spark.Route;
 import spark.Spark;
 
@@ -65,6 +79,10 @@ import static spark.Spark.delete;
  */
 public class FakeRtsa {
 
+    public static final String PARAM_PREFIX = "--";
+    public static final String PARAM_ARG_NAME_SEP = ".";
+    public static final String PARAM_VALUE_SEP = "=";
+
     private static Random random = new Random();
     private static Map<String, FunctionMapping> functions = new HashMap<>();
     
@@ -89,9 +107,9 @@ public class FakeRtsa {
         }
         long start = System.currentTimeMillis();
         int serverPort = Integer.parseInt(System.getProperty("server.port", "8090")); 
-        String defaultPath = CmdLine.getArg(args, "iip.rtsa.path", "iip_basic/score_v1");
-        boolean verbose = CmdLine.getBooleanArg(args, "verbose", true);
-        boolean waitAtStart = CmdLine.getBooleanArg(args, "waitAtStart", true);
+        String defaultPath = getArg(args, "iip.rtsa.path", "iip_basic/score_v1");
+        boolean verbose = getBooleanArg(args, "verbose", true);
+        boolean waitAtStart = getBooleanArg(args, "waitAtStart", true);
         File baseDir = new File(System.getProperty("scoring-agent.baseDir", "."));
         System.out.println("This is FakeRtsa on port: " + serverPort + " with basedir " + baseDir);
         extractDeployments(baseDir);
@@ -142,6 +160,40 @@ public class FakeRtsa {
             System.out.println("Started Application in " + (end - start) + " ms"); // output for state change
         }).start();
     }
+
+    /**
+     * Returns a Boolean command line argument.
+     * 
+     * @param args the arguments
+     * @param argName the argument name (without {@link #PARAM_PREFIX} or {@link #PARAM_VALUE_SEP})
+     * @param dflt the default value if the argument cannot be found
+     * @return the value of argument or {@code dflt}
+     */
+    private static boolean getBooleanArg(String[] args, String argName, boolean dflt) {
+        return Boolean.valueOf(getArg(args, argName, String.valueOf(dflt)));
+    }    
+
+    /**
+     * Emulates reading a Spring-like parameter if the configuration is not yet in place.
+     * 
+     * @param args the arguments
+     * @param argName the argument name (without {@link #PARAM_PREFIX} or {@link #PARAM_VALUE_SEP})
+     * @param dflt the default value if the argument cannot be found
+     * @return the value of argument or {@code dflt}
+     */
+    private static String getArg(String[] args, String argName, String dflt) {
+        String result = dflt;
+        String prefix = PARAM_PREFIX + argName + PARAM_VALUE_SEP;
+        for (int a = 0; a < args.length; a++) {
+            String arg = args[a];
+            if (arg.startsWith(prefix)) {
+                result = arg.substring(prefix.length());
+                break;
+            }
+        }
+        return result;
+    }
+    
     
     /**
      * Extracts the deployments.
@@ -158,7 +210,7 @@ public class FakeRtsa {
                 if (d.getName().endsWith(".zip")) {
                     try {
                         FileInputStream fis = new FileInputStream(d);
-                        ZipUtils.extractZip(fis, baseDirPath);
+                        extractZip(fis, baseDirPath);
                         fis.close();
                         System.out.println(" - unzipped: " + d.getName() + " (" + d + ")" + " to " + baseDirPath);
                     } catch (IOException e) {
@@ -168,7 +220,59 @@ public class FakeRtsa {
             }
         }
     }
-    
+
+    /**
+     * Extracts a ZIP/JAR file.
+     * 
+     * @param in the input stream containing the ZIP/JAR file
+     * @param target the target path
+     * @param pred a predicate selecting ZIP entries for creation/extraction (may be <b>null</b> for all contents) 
+     * @param flatten whether directories shall be flattened or unpacked
+     * @throws IOException if something I/O related fails
+     */
+    public static void extractZip(InputStream in, Path target) throws IOException {
+        try (ZipInputStream zis = new ZipInputStream(in)) {
+            ZipEntry zipEntry = zis.getNextEntry();
+            while (zipEntry != null) {
+                boolean isDirectory = zipEntry.isDirectory();
+                Path newPath = zipSlipProtect(zipEntry, target);
+                if (isDirectory) {
+                    Files.createDirectories(newPath);
+                } else {
+                    if (newPath.getParent() != null) {
+                        if (Files.notExists(newPath.getParent())) {
+                            Files.createDirectories(newPath.getParent());
+                        }
+                    }
+                    Files.copy(zis, newPath, StandardCopyOption.REPLACE_EXISTING);
+                }
+                zipEntry = zis.getNextEntry();
+            }
+            zis.closeEntry();
+        } catch (IOException e) {
+            throw e;
+        }
+    }
+
+    /**
+     * Protects from ZIP slip attack.
+     * 
+     * @param zipEntry the ZIP entry
+     * @param targetDir the target directory
+     * @return the normalized/fixed path
+     * @throws IOException if something I/O related fails
+     */
+    private static Path zipSlipProtect(ZipEntry zipEntry, Path targetDir) throws IOException {
+        Path targetDirResolved = targetDir.resolve(zipEntry.getName());
+        // make sure normalized file still has targetDir as its prefix
+        // else throws exception
+        Path normalizePath = targetDirResolved.normalize();
+        if (!normalizePath.startsWith(targetDir)) {
+            throw new IOException("Bad zip entry: " + zipEntry.getName());
+        }
+        return normalizePath;
+    }
+
     /**
      * Represents a deployment specification.
      * 
@@ -206,7 +310,7 @@ public class FakeRtsa {
                 System.out.println(" - No spec in deployment " + file.getName() + ". Assuming defaults.");
             } else {
                 System.out.println(" - Reading spec from spec.yml.");
-                spec = AbstractSetup.readFromYaml(Spec.class, in);
+                spec = readFromYaml(Spec.class, in);
                 if (null != path && path.length() > 0) {
                     path = spec.getPath();
                 }
@@ -490,7 +594,7 @@ public class FakeRtsa {
     private static String createResponse(String request, Deployment deployment) {
         String result;
         try {
-            Json mapper = Json.createInstance();
+            ObjectMapper mapper = new ObjectMapper();
             Input input = mapper.readValue(request, Input.class);
             if (input.data != null) {
                 for (Map<String, Object> values : input.data) {
@@ -530,6 +634,166 @@ public class FakeRtsa {
             result = request;
         }
         return result;
+    }
+    
+    /**
+     * Reads a instance from {@code in}. Unknown properties are ignored.
+     *
+     * @param <C> the specific type of configuration to read
+     * @param cls the class of configuration to read
+     * @param yamlPath path within yaml to read from, may be <b>null</b> or empty for none 
+     * @param in the stream to read from (ignored if <b>null</b>, else being closed)
+     * @param overwrite optional stream to overwrite values taken from {@code in} 
+     * @return the configuration instance
+     * @throws IOException if the data cannot be read, the configuration class cannot be instantiated
+     */
+    public static <C> C readFromYaml(Class<C> cls, InputStream in) throws IOException {
+        C result = null;
+        if (in != null) {
+            try {
+                Iterator<Object> it = loadAll(in, cls);
+                if (it.hasNext()) {
+                    Object o = it.next(); // ignore the other sub-documents here
+                    if (cls.isInstance(o)) {
+                        result = cls.cast(o);
+                    }
+                }
+                in.close();
+            } catch (IOException e) {
+                in.close();
+                throw new IOException(e);
+            }
+        }
+        if (null == result) {
+            System.out.println("No input YAML file, falling back to default instance for " + cls.getName());
+            try {
+                result = cls.getConstructor().newInstance();
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException 
+                | InvocationTargetException e) {
+                throw new IOException(e);
+            }
+        } 
+        return result;
+    }
+    
+    /**
+     * Creates a tolerant YAML object to read objects of type {@code cls}.
+     * 
+     * @param cls the type to read, may be <b>null</b>
+     * @return the yamp object
+     */
+    private static Yaml createYaml(Class<?> cls) {
+        Yaml result;
+        Representer representer = new Representer(new DumperOptions());
+        representer.getPropertyUtils().setSkipMissingProperties(true);
+        DumperOptions dumperOptions = initDumperOptions(representer);
+        if (null == cls) {
+            result = new Yaml(representer, dumperOptions);
+        } else {
+            result = new Yaml(new FocusedConstructor(cls), representer, dumperOptions);
+        }
+        return result;
+    }
+    
+    /**
+     * Extends snakeyaml's constructor by loading via the class loader of the specified class, not
+     * just via the context classloader.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class FocusedConstructor extends Constructor {
+        
+        private ClassLoader loader;
+        
+        /**
+         * Creates a constructor instance for the given class.
+         * 
+         * @param cls the class to construct for, primarily querying the class loader of {@code cls}
+         */
+        public FocusedConstructor(Class<? extends Object> cls) {
+            super(cls, new LoaderOptions());
+            loader = cls.getClassLoader();
+        }
+        
+        @Override
+        protected Class<?> getClassForName(String name) throws ClassNotFoundException {
+            Class<?> cls = null;
+            if (null != loader) {
+                try {
+                    cls = loader.loadClass(name);
+                } catch (ClassNotFoundException e) {
+                }
+            } 
+            if (null == cls) {
+                cls = super.getClassForName(name);
+            }
+            return cls;
+        }        
+
+    }
+    
+    /**
+     * Initialize dumper from {@code representer}, takeover in migration from 1.27 to 2.3.
+     * 
+     * @param representer the representer to initialize from
+     * @return the initialized dumper
+     */
+    private static DumperOptions initDumperOptions(Representer representer) {
+        DumperOptions dumperOptions = new DumperOptions();
+        dumperOptions.setDefaultFlowStyle(representer.getDefaultFlowStyle());
+        dumperOptions.setDefaultScalarStyle(representer.getDefaultScalarStyle());
+        dumperOptions.setAllowReadOnlyProperties(representer.getPropertyUtils().isAllowReadOnlyProperties());
+        dumperOptions.setTimeZone(representer.getTimeZone());
+        return dumperOptions;
+    }    
+
+    /**
+     * Loads all condition-matching documents from a YAML file, trying to apply {@code cls} as type.
+     * 
+     * @param in the input stream to load from
+     * @param cls the class/type of the object to read; if given, only objects of that type will be returned
+     * @return an iterator over all documents
+     * @throws IOException if accessing the input stream fails, if reading the structure fails
+     */
+    public static Iterator<Object> loadAll(InputStream in, Class<?> cls) throws IOException {
+        Iterator<Object> it = null;
+        try {
+            Yaml yaml = createYaml(Map.class);
+            List<Object> documents = new ArrayList<>();
+            String content = IOUtils.toString(in, Charset.defaultCharset());
+            String[] rawDocuments = content.split("(?m)^---$");
+            for (String docText : rawDocuments) {
+                if (docText.trim().isEmpty()) {
+                    continue;
+                }
+                Map<String, Object> map = yaml.load(docText);
+                Map<String, Object> data = map;
+                if (null == cls) {
+                    documents.add(yaml.load(yaml.dump(data)));
+                } else {
+                    documents.add(yaml.loadAs(yaml.dump(data), cls));
+                }
+            }
+            if (documents.size() > 0) {
+                it = documents.iterator();
+            }
+            if (it == null) { // fallback if property not found
+                it = createYaml(cls).loadAll(in).iterator();
+            }
+            if (null != cls) {
+                List<Object> results = new ArrayList<>();
+                if (it.hasNext()) {
+                    Object o = it.next();
+                    if (cls.isInstance(o)) {
+                        results.add(cls.cast(o));
+                    }
+                }
+                it = results.iterator();
+            }
+        } catch (YAMLException e) {
+            throw new IOException(e);
+        }
+        return it;
     }
 
 }

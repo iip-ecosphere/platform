@@ -17,7 +17,6 @@ import java.io.IOException;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.kiServices.rapidminer.rtsaFake.FakeRtsa;
-import de.iip_ecosphere.platform.support.TimeUtils;
 
 /**
  * Tests the fake RTSA.
@@ -33,7 +32,10 @@ public class FakeRtsaTest {
     public void testFakeRtsa() throws IOException {
         System.setProperty("scoring-agent.baseDir", "target/tmp/rtsa"); // folder created as part of packaging
         FakeRtsa.main(new String[] {});
-        TimeUtils.sleep(6000); // wait to be initialized
+        try { // wait to be initialized
+            Thread.sleep(6000);
+        } catch (InterruptedException e) {
+        }
         // could send/receive a bit data here
     }
     
