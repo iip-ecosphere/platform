@@ -126,7 +126,7 @@ public class ApacheCommons extends de.iip_ecosphere.platform.support.commons.Com
     
     @Override
     public String replaceOnce(final String text, final String searchString, final String replacement) {
-        return org.apache.commons.lang3.Strings.CS.replaceOnce(text, searchString, replacement);
+        return org.apache.commons.lang3.StringUtils.replaceOnce(text, searchString, replacement);
     }
 
     @Override
@@ -192,12 +192,12 @@ public class ApacheCommons extends de.iip_ecosphere.platform.support.commons.Com
 
     @Override
     public String removeStart(String str, String remove) {
-        return org.apache.commons.lang3.Strings.CS.removeStart(str, remove);
+        return org.apache.commons.lang3.StringUtils.removeStart(str, remove);
     }
     
     @Override
     public String removeEnd(String str, String remove) {
-        return org.apache.commons.lang3.Strings.CS.removeEnd(str, remove);
+        return org.apache.commons.lang3.StringUtils.removeEnd(str, remove);
     }
     
     // OS
