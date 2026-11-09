@@ -258,7 +258,7 @@ DeployArtifact "${PREFIX}" "monitoring.prometheus" "$OKTO_VERSION" "java plugin"
 
 DeployArtifact "${PREFIX}" "platform" "$OKTO_VERSION" "java"
 
-DeployArtifact "${PREFIX}" "configuration.interface" "$OKTO_VERSION" "java"
+DeployArtifact "${PREFIX}" "configuration.iface" "$OKTO_VERSION" "java"
 DeployArtifact "${PREFIX}" "configuration.easy" "$OKTO_VERSION" "java plugin easy"
 DeployArtifact "${PREFIX}" "apps.ServiceImpl" "$OKTO_VERSION" "java artifacts"
 DeployArtifact "${PREFIX}" "configuration.configuration" "$OKTO_VERSION" "java easy"
