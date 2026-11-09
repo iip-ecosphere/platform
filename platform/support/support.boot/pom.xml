@@ -12,11 +12,6 @@
      <version>0.8.2-SNAPSHOT</version>
      <relativePath/>
   </parent>
-  
-  <properties>
-    <maven.compiler.target>8</maven.compiler.target>
-    <maven.compiler.source>8</maven.compiler.source>
-  </properties>
 
   <dependencies>
     <dependency>
