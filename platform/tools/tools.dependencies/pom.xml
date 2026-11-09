@@ -242,8 +242,9 @@
       <surefireCiLine/>
       <surefireForkCount>1</surefireForkCount>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-      <maven.compiler.target>8</maven.compiler.target>
-      <maven.compiler.source>8</maven.compiler.source>    
+      <maven.compiler.target>11</maven.compiler.target>
+      <maven.compiler.source>11</maven.compiler.source>    
+      <maven.javadoc.source>11</maven.javadoc.source>    
       <java.encoding>Cp1252</java.encoding>
 
      <!-- If changed, check against forced JUnit provider -->
@@ -350,7 +351,7 @@
 		<configuration>
 		  <show>private</show>
 		  <encoding>${java.encoding}</encoding>
-		  <source>8</source>
+		  <source>${maven.javadoc.source}</source>
 		  <excludePackageNames>*.proto.*</excludePackageNames>
 		  <failOnError>false</failOnError>
 		  <detectJavaApiLink>false</detectJavaApiLink> 
