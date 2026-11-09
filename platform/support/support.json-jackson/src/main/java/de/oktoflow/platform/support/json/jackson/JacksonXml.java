@@ -128,8 +128,8 @@ public class JacksonXml extends Xml {
     }
 
     @Override
-    public Xml handleIipDataClasses() {
-        mapper.registerModule(JsonUtils.createIipDataClassesModule());
+    public Xml handleIipDataClasses(String packagePrefix) {
+        mapper.registerModule(JsonUtils.createIipDataClassesModule(packagePrefix));
         return this;
     }
     

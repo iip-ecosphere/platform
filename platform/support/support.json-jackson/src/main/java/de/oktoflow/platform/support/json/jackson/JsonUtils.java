@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -62,6 +61,7 @@ import de.iip_ecosphere.platform.support.ConfiguredName;
 import de.iip_ecosphere.platform.support.IgnoreProperties;
 import de.iip_ecosphere.platform.support.Include;
 import de.iip_ecosphere.platform.support.json.IOIterator;
+import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.json.Json.EnumMapping;
 
 /**
@@ -71,21 +71,38 @@ import de.iip_ecosphere.platform.support.json.Json.EnumMapping;
  * @author Lemur Project (<a href="http://lemurproject.org/galago-license">BSD License</a>) 
  */
 public class JsonUtils {
-
+        
     /**
      * A type resolver for "Impl" classes in "iip.".
      */
-    public static final SimpleAbstractTypeResolver IIP_TYPE_RESOLVER = new SimpleAbstractTypeResolver() {
+    public static final SimpleAbstractTypeResolver IIP_TYPE_RESOLVER = new IipTypeResolver(Json.DEFAULT_IIP_PREFIX);
+
+    /**
+     * A resolver for IIP data packages and types.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static class IipTypeResolver extends SimpleAbstractTypeResolver {
         
         private static final long serialVersionUID = -3746467806797935401L;
+        private String packagePrefix;
         // no instance data here
 
+        /**
+         * Creates a type resolver.
+         * 
+         * @param packagePrefix the package prefix, usually {@link Json#DEFAULT_IIP_PREFIX}.
+         */
+        private IipTypeResolver(String packagePrefix) {
+            this.packagePrefix = packagePrefix;
+        }
+        
         @Override
         public JavaType findTypeMapping(DeserializationConfig config, JavaType type) {
             JavaType result = null;
             // for generated IIP-Ecosphere data interfaces, we can try it with Impl classes
             String className = type.getRawClass().getName();
-            if (type.isInterface() && className.startsWith("iip.")) {
+            if (type.isInterface() && className.startsWith(packagePrefix)) {
                 String name = className + "Impl";
                 try {
                     Class<?> cls = Class.forName(name);
@@ -187,43 +204,33 @@ public class JsonUtils {
     /**
      * Creates a module for handling IIP data/implementation classes according to IIP conventions.
      * 
+     * @param packagePrefix Java package name prefix, ignored if <b>null</b> or empty, complemented if not ending 
+     * with "."
      * @return the module
      */
-    public static SimpleModule createIipDataClassesModule() {
+    public static SimpleModule createIipDataClassesModule(String packagePrefix) {
+        String prefix = Json.DEFAULT_IIP_PREFIX;
+        if (null != packagePrefix && packagePrefix.length() > 0) {
+            prefix = packagePrefix;
+            if (!prefix.endsWith(".")) {
+                prefix += ".";
+            }
+        }
         SimpleModule iipModule = new SimpleModule();
-        iipModule.setAbstractTypes(IIP_TYPE_RESOLVER);
+        iipModule.setAbstractTypes(
+            Json.DEFAULT_IIP_PREFIX.equals(packagePrefix) ? IIP_TYPE_RESOLVER : new IipTypeResolver(prefix));
         return iipModule;
     }
     
     /**
      * Configures a Jackson object mapper for IIP conventions.
      * 
+     * @param packagePrefix the package prefix for the datatypes package
      * @param mapper the mapper to be configured
      * @return {@code mapper}
      */
-    public static ObjectMapper handleIipDataClasses(ObjectMapper mapper) {
-        return mapper.registerModule(createIipDataClassesModule());
-    }
-    
-    /**
-     * Sets the annotation introspector on {@code mapper}.
-     * 
-     * @param mapper the mapper; the introspector is only set if {@code introspector} was <b>null</b> before, else
-     *    the already set introspector may be reconfigured through {@code configurer}
-     * @param introspector the actual introspector, may be <b>null</b>
-     * @param configurer the configurer function, may be <b>null</b> for none
-     * @return the actual introspector (new if <b>null</b> before or reconfigured)
-     */
-    private static OktoAnnotationIntrospector setAnnotationIntrospector(ObjectMapper mapper, 
-        OktoAnnotationIntrospector introspector, Consumer<OktoAnnotationIntrospector> configurer) {
-        if (null == introspector) {
-            introspector = new OktoAnnotationIntrospector();
-            mapper.setAnnotationIntrospector(introspector);
-        }
-        if (null != configurer) {
-            configurer.accept(introspector);
-        }
-        return introspector;
+    public static ObjectMapper handleIipDataClasses(ObjectMapper mapper, String packagePrefix) {
+        return mapper.registerModule(createIipDataClassesModule(packagePrefix));
     }
     
     /**
@@ -429,6 +436,7 @@ public class JsonUtils {
      * 
      * @author Holger Eichelberger, SSE
      */
+    @SuppressWarnings("serial")
     public static class CustomPropertyExclusionModifier extends BeanSerializerModifier {
 
         private final Set<String> propertiesToExclude;
@@ -470,6 +478,7 @@ public class JsonUtils {
      * 
      * @author Holger Eichelberger, SSE
      */
+    @SuppressWarnings("serial")
     public static class CustomPropertyInclusionModifier extends BeanSerializerModifier {
 
         private final Set<String> nonNullInclude;

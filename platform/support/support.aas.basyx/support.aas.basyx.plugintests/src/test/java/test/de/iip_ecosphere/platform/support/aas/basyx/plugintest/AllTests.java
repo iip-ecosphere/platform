@@ -8,7 +8,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
-package test.de.iip_ecosphere.platform.support.aas.basyx2.plugintest;
+package test.de.iip_ecosphere.platform.support.aas.basyx.plugintest;
 
 import org.junit.runner.RunWith;
 

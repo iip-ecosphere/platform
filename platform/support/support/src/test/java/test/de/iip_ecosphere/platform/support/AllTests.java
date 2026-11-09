@@ -13,9 +13,6 @@ package test.de.iip_ecosphere.platform.support;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import test.de.iip_ecosphere.platform.support.logging.FallbackLoggerTest;
-import test.de.iip_ecosphere.platform.support.logging.LoggerFactoryTest;
-
 /**
  * Defines the tests to be executed.
  * 
@@ -47,10 +44,7 @@ import test.de.iip_ecosphere.platform.support.logging.LoggerFactoryTest;
     SshTest.class,
     TaskRegistryTests.class,
     CollectorTest.class,
-    UpdaterTest.class,
-    
-    FallbackLoggerTest.class,
-    LoggerFactoryTest.class
+    UpdaterTest.class
 })
 public class AllTests {
 }

@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package iip.datatypes;
+package test.iip.datatypes;
 
 import de.iip_ecosphere.platform.support.ConfiguredName;
 import de.iip_ecosphere.platform.support.Ignore;

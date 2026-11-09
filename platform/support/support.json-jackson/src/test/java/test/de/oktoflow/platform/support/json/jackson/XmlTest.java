@@ -21,7 +21,8 @@ import de.iip_ecosphere.platform.support.Filter;
 import de.iip_ecosphere.platform.support.IgnoreProperties;
 import de.iip_ecosphere.platform.support.xml.Xml;
 import de.oktoflow.platform.support.json.jackson.JacksonXml;
-import iip.datatypes.DataImpl;
+import de.oktoflow.platform.support.json.jackson.JsonUtils;
+import test.iip.datatypes.DataImpl;
 
 /**
  * Tests {@link Xml}.
@@ -124,36 +125,37 @@ public class XmlTest {
      */
     @Test
     public void testHandleIipDataClasses() {
-        iip.datatypes.Data data = new DataImpl();
+        test.iip.datatypes.Data data = new DataImpl();
         data.setValue(20);
         
         try {
             String str = Xml.writeValueAsStringDflt(data);
             Assert.assertFalse(str.contains("iField"));
             Assert.assertTrue(str.contains("value"));
-            Xml.readValueDflt(str, iip.datatypes.Data.class);
+            Xml.readValueDflt(str, test.iip.datatypes.Data.class);
             Assert.fail("Shall not succeed as cannot instantiate interface");
         } catch (IOException e) {
             // ok
         }
-        Xml xml = Xml.createInstance(iip.datatypes.Data.class, DataImpl.class).handleIipDataClasses();
+        Xml xml = Xml.createInstance(test.iip.datatypes.Data.class, DataImpl.class)
+            .handleIipDataClasses("test.iip.");
         try {
             String str = xml.writeValueAsString(data);
             Assert.assertTrue(str.contains("iField"));
             Assert.assertFalse(str.contains("value"));
-            iip.datatypes.Data d = xml.readValue(str, iip.datatypes.Data.class);
+            test.iip.datatypes.Data d = xml.readValue(str, test.iip.datatypes.Data.class);
             Assert.assertNotNull(d);
             Assert.assertEquals(data.getValue(), d.getValue());
         } catch (IOException e) {
             Assert.fail("Shall not fail");
         }
 
-        xml = Xml.createInstance4All().handleIipDataClasses();
+        xml = Xml.createInstance4All().handleIipDataClasses("test.iip.");
         try {
             String str = xml.writeValueAsString(data);
             Assert.assertTrue(str.contains("iField"));
             Assert.assertFalse(str.contains("value"));
-            iip.datatypes.Data d = xml.readValue(str, iip.datatypes.Data.class);
+            test.iip.datatypes.Data d = xml.readValue(str, test.iip.datatypes.Data.class);
             Assert.assertNotNull(d);
             Assert.assertEquals(data.getValue(), d.getValue());
         } catch (IOException e) {

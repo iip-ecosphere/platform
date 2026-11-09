@@ -1,12 +1,13 @@
-package iip.serializers;
+package test.iip.serializers;
 
 import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import de.iip_ecosphere.platform.support.json.Json;
 import de.oktoflow.platform.support.json.jackson.JsonUtils;
-import iip.datatypes.*;
+import test.iip.datatypes.*;
 
 /**
  * JSON transport serializer for RoutingCommand.
@@ -17,7 +18,7 @@ public class RoutingCommandOldSerializer {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     static {
-        JsonUtils.handleIipDataClasses(MAPPER);
+        JsonUtils.handleIipDataClasses(MAPPER, Json.DEFAULT_IIP_PREFIX);
     }
 
     /**

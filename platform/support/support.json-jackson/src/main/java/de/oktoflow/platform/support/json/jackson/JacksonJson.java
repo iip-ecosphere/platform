@@ -291,8 +291,8 @@ public class JacksonJson extends de.iip_ecosphere.platform.support.json.Json {
     }
 
     @Override
-    public Json handleIipDataClasses() {
-        mapper = JsonUtils.handleIipDataClasses(mapper);
+    public Json handleIipDataClasses(String packagePrefix) {
+        mapper = JsonUtils.handleIipDataClasses(mapper, packagePrefix);
         return this;
     }
     

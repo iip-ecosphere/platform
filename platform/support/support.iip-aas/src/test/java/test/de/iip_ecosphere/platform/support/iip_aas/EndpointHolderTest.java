@@ -19,10 +19,13 @@ import org.junit.Test;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.FileUtils;
 import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.iip_aas.config.BasicEndpointValidator;
 import de.iip_ecosphere.platform.support.iip_aas.config.EndpointHolder;
 import de.iip_ecosphere.platform.support.iip_aas.config.RuntimeSetup;
 import de.iip_ecosphere.platform.support.iip_aas.config.RuntimeSetupEndpointValidator;
+import de.iip_ecosphere.platform.support.iip_aas.config.ServerAddressHolder;
+import de.iip_ecosphere.platform.support.json.JsonUtils;
 import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
 import org.junit.Assert;
@@ -59,6 +62,25 @@ public class EndpointHolderTest extends TestWithPlugin {
 
         FileUtils.deleteQuietly(file);
         RuntimeSetup.clear();
+    }
+    
+    /**
+     * Tests the from/to JSON functions for {@link ServerAddress}.
+     */
+    @Test
+    public void testServerAddress() {
+        ServerAddress addr = null;
+        String json = ServerAddressHolder.toJson(addr);
+        ServerAddress tmp = ServerAddressHolder.serverAddressFromJson(json);
+        Assert.assertNull(tmp);
+        
+        addr = new ServerAddress(Schema.TCP, "me.here", 10321);
+        json = JsonUtils.toJson(addr);
+        tmp = ServerAddressHolder.serverAddressFromJson(json);
+        Assert.assertNotNull(tmp);
+        Assert.assertEquals(addr.getSchema(), tmp.getSchema());
+        Assert.assertEquals(addr.getHost(), tmp.getHost());
+        Assert.assertEquals(addr.getPort(), tmp.getPort());
     }
 
 }

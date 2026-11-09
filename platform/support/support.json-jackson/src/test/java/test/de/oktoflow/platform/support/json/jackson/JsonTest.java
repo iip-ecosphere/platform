@@ -32,16 +32,17 @@ import de.iip_ecosphere.platform.support.json.JsonNumber;
 import de.iip_ecosphere.platform.support.json.JsonObject;
 import de.iip_ecosphere.platform.support.json.JsonString;
 import de.oktoflow.platform.support.json.jackson.JacksonJson;
+import de.oktoflow.platform.support.json.jackson.JsonUtils;
 import de.oktoflow.platform.support.json.jackson.JsoniterAny;
-import iip.datatypes.DataImpl;
-import iip.datatypes.RoutingCommandNew;
-import iip.datatypes.RoutingCommandNewImpl;
-import iip.datatypes.RoutingCommandOld;
-import iip.datatypes.RoutingCommandOldImpl;
-import iip.serializers.RoutingCommandNewImplSerializer;
-import iip.serializers.RoutingCommandNewSerializer;
-import iip.serializers.RoutingCommandOldImplSerializer;
-import iip.serializers.RoutingCommandOldSerializer;
+import test.iip.datatypes.DataImpl;
+import test.iip.datatypes.RoutingCommandNew;
+import test.iip.datatypes.RoutingCommandNewImpl;
+import test.iip.datatypes.RoutingCommandOld;
+import test.iip.datatypes.RoutingCommandOldImpl;
+import test.iip.serializers.RoutingCommandNewImplSerializer;
+import test.iip.serializers.RoutingCommandNewSerializer;
+import test.iip.serializers.RoutingCommandOldImplSerializer;
+import test.iip.serializers.RoutingCommandOldSerializer;
 
 /**
  * Tests {@link Json}.
@@ -306,36 +307,37 @@ public class JsonTest {
      */
     @Test
     public void testHandleIipDataClasses() {
-        iip.datatypes.Data data = new DataImpl();
+        test.iip.datatypes.Data data = new DataImpl();
         data.setValue(20);
         
         try {
             String str = Json.toJsonDflt(data);
             Assert.assertFalse(str.contains("iField"));
             Assert.assertTrue(str.contains("value"));
-            Json.fromJsonDflt(str, iip.datatypes.Data.class);
+            Json.fromJsonDflt(str, test.iip.datatypes.Data.class);
             Assert.fail("Shall not succeed as cannot instantiate interface");
         } catch (IOException e) {
             // ok
         }
-        Json json = Json.createInstance(iip.datatypes.Data.class, DataImpl.class).handleIipDataClasses();
+        Json json = Json.createInstance(test.iip.datatypes.Data.class, DataImpl.class)
+            .handleIipDataClasses("test.iip.");
         try {
             String str = json.toJson(data);
             Assert.assertTrue(str.contains("iField"));
             Assert.assertFalse(str.contains("value"));
-            iip.datatypes.Data d = json.fromJson(str, iip.datatypes.Data.class);
+            test.iip.datatypes.Data d = json.fromJson(str, test.iip.datatypes.Data.class);
             Assert.assertNotNull(d);
             Assert.assertEquals(data.getValue(), d.getValue());
         } catch (IOException e) {
             Assert.fail("Shall not fail");
         }
 
-        json = Json.createInstance4All().handleIipDataClasses();
+        json = Json.createInstance4All().handleIipDataClasses("test.iip.");
         try {
             String str = json.toJson(data);
             Assert.assertTrue(str.contains("iField"));
             Assert.assertFalse(str.contains("value"));
-            iip.datatypes.Data d = json.fromJson(str, iip.datatypes.Data.class);
+            test.iip.datatypes.Data d = json.fromJson(str, test.iip.datatypes.Data.class);
             Assert.assertNotNull(d);
             Assert.assertEquals(data.getValue(), d.getValue());
         } catch (IOException e) {

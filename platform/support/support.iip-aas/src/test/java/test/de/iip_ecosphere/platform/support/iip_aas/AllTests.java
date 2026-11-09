@@ -26,7 +26,6 @@ import org.junit.runners.Suite;
     EndpointHolderTest.class,
     ClassUtilityTest.class,
     AasPartRegistryTest.class,
-    JsonUtilsTest.class,
     NetworkManagerAasTest.class,
     PlatformAasTest.class,
     YamlSemanticIdResolverDescriptorTest.class,
