@@ -6,11 +6,6 @@
   <name>oktoflow HTTP plugin</name>
   <description>HTTP plugin through Apache.</description>
 
-  <properties>
-    <maven.compiler.target>8</maven.compiler.target>
-    <maven.compiler.source>8</maven.compiler.source>
-  </properties>
-
   <parent>
      <groupId>de.iip-ecosphere.platform</groupId>
      <artifactId>platformDependencies</artifactId>
