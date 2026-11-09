@@ -58,6 +58,7 @@
 
     <maven.compiler.target>17</maven.compiler.target>
     <maven.compiler.source>17</maven.compiler.source>
+    <maven.javadoc.source>17</maven.javadoc.source>    
     
     <protobuf.skip>true</protobuf.skip>
     <jacoco.skip>true</jacoco.skip>
