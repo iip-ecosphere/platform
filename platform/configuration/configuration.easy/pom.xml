@@ -141,7 +141,7 @@
     
     <dependency>
      <groupId>de.iip-ecosphere.platform</groupId>
-     <artifactId>configuration.interface</artifactId>
+     <artifactId>configuration.iface</artifactId>
      <version>${project.version}</version>
     </dependency>  
     <dependency>
