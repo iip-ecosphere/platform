@@ -39,6 +39,7 @@ The compiler plugin supports the following configuration settings:
   - `useHash` (default `true`, user property `python-compile.useHash`) use hash file to identify whether python files have changed to speed up testing
   - `hashDir` (default ``, user property `python-compile.hashDir`) use the given directory to store the file (named according to artifact) for ``useHash``.
   - `python.binary` optional absolute path to python binary (may also be given as environment variable `IIP_PYTHON`)
+  - `logDetails` (default `false`) whether details, e.g., about skipped files shall be logged. May be used for debugging.
 
 ## Python exec plugin
 

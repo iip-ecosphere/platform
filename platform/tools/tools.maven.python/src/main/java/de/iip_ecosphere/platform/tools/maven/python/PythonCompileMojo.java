@@ -70,6 +70,9 @@ public class PythonCompileMojo extends AbstractLoggingMojo {
     @Parameter(property = "python.pythonArgs", required = false, defaultValue = "")
     private String pythonArgs;
     
+    @Parameter(required = false, defaultValue = "false")
+    private boolean logDetails;
+    
     /**
      * Estimates the maximum command line length.
      * 
@@ -121,7 +124,7 @@ public class PythonCompileMojo extends AbstractLoggingMojo {
             String output = "";
             String errorLine = "";
             boolean pyflakesExists = true;
-            List<String> files = fcd.checkHashes(pythonFiles)
+            List<String> files = fcd.checkHashes(pythonFiles, logDetails)
                 .stream()
                 .map(f -> f.getAbsolutePath())
                 .collect(Collectors.toList());

@@ -140,6 +140,16 @@ public class FileChangeDetector {
         }
         return path;
     }
+
+    /**
+     * Checks {@code files} for existing/known hashes with informations on skipped files.
+     * 
+     * @param files the files
+     * @return a subset of {@code files} to process
+     */
+    public List<File> checkHashes(List<File> files) {
+        return checkHashes(files, true);
+    }
     
     /**
      * Checks {@code files} for existing/known hashes.
@@ -147,7 +157,7 @@ public class FileChangeDetector {
      * @param files the files
      * @return a subset of {@code files} to process
      */
-    public List<File> checkHashes(List<File> files) {
+    public List<File> checkHashes(List<File> files, boolean inform) {
         List<File> result = new ArrayList<>();
         for (File f: files) {
             if (f.exists()) {
