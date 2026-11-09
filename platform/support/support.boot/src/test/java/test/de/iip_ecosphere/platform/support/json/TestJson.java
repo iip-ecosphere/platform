@@ -86,7 +86,7 @@ public class TestJson extends de.iip_ecosphere.platform.support.json.Json {
     }
     
     @Override
-    public Json handleIipDataClasses() {
+    public Json handleIipDataClasses(String packagePrefix) {
         return this;
     }
     

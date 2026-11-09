@@ -14,6 +14,7 @@ package de.iip_ecosphere.platform.support.xml;
 
 import java.io.IOException;
 
+import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.plugins.PluginManager;
 
 /**
@@ -130,7 +131,18 @@ public abstract class Xml {
      * 
      * @return <b>this</b> for chaining
      */
-    public abstract Xml handleIipDataClasses();
+    public Xml handleIipDataClasses() {
+        return handleIipDataClasses(Json.DEFAULT_IIP_PREFIX);
+    }
+
+    /**
+     * Configures this instance for IIP conventions.
+     * 
+     * @param packagePrefix Java package name prefix, ignored if <b>null</b> or empty, complemented if not ending 
+     * with "."
+     * @return <b>this</b> for chaining
+     */
+    public abstract Xml handleIipDataClasses(String packagePrefix);
 
     /**
      * Configures this instance to fail/fail not on unknown fields/properties.

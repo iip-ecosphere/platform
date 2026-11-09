@@ -56,7 +56,7 @@ public class TestXml extends de.iip_ecosphere.platform.support.xml.Xml {
     }
     
     @Override
-    public Xml handleIipDataClasses() {
+    public Xml handleIipDataClasses(String packagePrefix) {
         return this;
     }
     

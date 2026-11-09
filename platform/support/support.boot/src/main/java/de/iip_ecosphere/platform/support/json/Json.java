@@ -38,6 +38,7 @@ import de.iip_ecosphere.platform.support.plugins.PluginManager;
  */
 public abstract class Json {
     
+    public static final String DEFAULT_IIP_PREFIX = "iip."; 
     private static Json prototype;
     
     static {
@@ -352,8 +353,19 @@ public abstract class Json {
      * 
      * @return <b>this</b> for chaining
      */
-    public abstract Json handleIipDataClasses();
-    
+    public Json handleIipDataClasses() {
+        return handleIipDataClasses(DEFAULT_IIP_PREFIX);
+    }
+
+    /**
+     * Configures this instance for IIP conventions.
+     * 
+     * @param packagePrefix Java package name prefix, ignored if <b>null</b> or empty, complemented if not ending 
+     * with "."
+     * @return <b>this</b> for chaining
+     */
+    public abstract Json handleIipDataClasses(String packagePrefix);
+
     /**
      * Configures this instance for the given {@code fieldNames} as optional during deserialization.
      * 
