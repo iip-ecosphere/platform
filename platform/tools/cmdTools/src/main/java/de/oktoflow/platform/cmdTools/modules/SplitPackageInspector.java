@@ -116,21 +116,10 @@ public class SplitPackageInspector {
                 .filter(Files::isDirectory)
                 .filter(p -> !isExcluded(root, p))
                 .filter(SplitPackageInspector::isProject)
-                .map(p -> emit(p))
+                .map(p -> ModuleUtils.emit(p))
                 .sorted()
                 .toList();
         }
-    }
-    
-    /**
-     * Emit and return {@code path}.
-     * 
-     * @param path the path to emit
-     * @return the emitted path
-     */
-    private static Path emit(Path path) {
-        System.out.println(" - " + path);
-        return path;
     }
 
     /**

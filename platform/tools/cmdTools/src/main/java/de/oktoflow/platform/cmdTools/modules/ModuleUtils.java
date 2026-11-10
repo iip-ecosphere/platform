@@ -12,6 +12,8 @@
 
 package de.oktoflow.platform.cmdTools.modules;
 
+import java.nio.file.Path;
+
 import javax.lang.model.SourceVersion;
 
 /**
@@ -20,7 +22,7 @@ import javax.lang.model.SourceVersion;
  * @author ChatGPT
  * @author Holger Eichelberger, SSE
  */
-public class ModuleUtils {
+class ModuleUtils {
 
     /**
      * Determines whether a Java module name contains invalid identifiers,
@@ -35,5 +37,16 @@ public class ModuleUtils {
         return moduleName != null
             && !SourceVersion.isName(moduleName);
     }
-    
+
+    /**
+     * Emit and return {@code path}.
+     * 
+     * @param path the path to emit
+     * @return the emitted path
+     */
+    static Path emit(Path path) {
+        System.out.println(" - " + path);
+        return path;
+    }
+
 }
