@@ -100,19 +100,21 @@ In turn, `Field` instances may be equipped with more information as summarized b
 | displayRow | Optional reference to display row that shall display this field. If not given, field will occur in some default (top)-row of the dashboard. | - |
 | displayPanel | Optional set of references to display panels that shall display this field. If not given, a field will be placed into it's own panel. If given, fields share the same panel, e.g., being displayed as multiple timeseries. | - |
 
-Again, in turn, `Field` instances may specify a `DisplayRow` or a `DisplayPanel` with the following fields:
+Again, in turn, `Field` instances may specify a `DisplayRow` with the following fields:
 
 | Field | Description | Default |
 | --- | --- | --- |
 | name | Name of the row, must be unique for all `DisplayRow` instances. |     |
 | displayName | Optional display name  for the row. |  ""   |
 
+or a `DisplayPanel` with the following fields:
+
 | Field | Description | Default |
 | --- | --- | --- |
 | name | Name of the panel, must be unique for all `DisplayPanel` instances. |     |
 | displayName | Optional display name for the panel. |  ""   |
 | displayRow | Optional reference to the display row that shall display this panel. If not given, the panel will occur in some default (top)-row of the dashboard. | - |
-| logo | Resolvable file name in classpath or `resources/software` or `http://`/`https://` resource pointing a logo. Turns panel into a logo panel. | `null` |
+| logo | Resolvable file name in classpath or `resources/software` or `http://`/`https://` resource pointing a logo. The logo may also be specified as a file name, although this is discouraged as file paths may be operating system specific. Turns panel into a logo panel. | `null` |
 | fit | How to fit panel image contents, akin to CSS `object-fit`, may be `DisplayPanelFit::None`, `DisplayPanelFit::Contains`, `DisplayPanelFit::Fill`, or `DisplayPanelFit::Cover` | `DisplayPanelFit::None` |
 
 Although all display related fields are optional for usual `Field` instances in a `RecordType`, because an usual `Field` shall not be displayed on a dashboard, they partially become mandatory if a `Field` shall be displayed. The following example illustrates this:

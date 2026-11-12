@@ -970,8 +970,20 @@ public class IvmlDashboardMapper implements DashboardMapper {
         if (panel.logo != null && !panel.logo.isBlank()) {
             String logoSpec = panel.logo;
             if (!(logoSpec.startsWith("http://") || logoSpec.startsWith("https://"))) {
-                InputStream logoFile = ResourceLoader.getResourceAsStream(logoSpec, 
-                    new OktoflowResourceResolver(new File(""), "software"));
+                File f = new File(logoSpec);
+                InputStream logoFile = null;
+                if (f.isAbsolute() && f.exists()) {
+                    try {
+                        logoFile = new FileInputStream(f);
+                    } catch (IOException e) {
+                        getLogger().warn("Logo specification '{}' looks like a file path, but cannot be read: {}", 
+                            logoSpec, e.getMessage());
+                    }
+                }
+                if (null == logoFile) {
+                    logoFile = ResourceLoader.getResourceAsStream(logoSpec, 
+                        new OktoflowResourceResolver(new File(""), "software"));
+                }
                 if (null != logoFile) {
                     try {
                         byte[] imageBytes = IOUtils.toByteArray(logoFile);
