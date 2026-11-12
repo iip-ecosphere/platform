@@ -1,6 +1,7 @@
 # oktoflow platform release guideline
 
 ## For performing a release...
+* On CI, in `global-build.properties` temporarily set `javadoc.force=true`
 * Release/deploy EASy-Producer and change the snapshot versions in the platform to that version
 * Deploy software that is not in Maven Central, e.g., alert manager and its logger, jlxd in EASy-Producer.
 * Inform all developing parties that a release is on the way and no commits shall be done until the release is completed (assuming that all involved parties were informed before that outstanding commits shall be done so that the release can happen in a clean CI state).
@@ -111,6 +112,7 @@
     * `docker push iipecosphere/platform:platform_all.<ver>`
     * `docker push iipecosphere/dev-container:<ver>`
     * `docker logout`
+* On CI, in `global-build.properties` temporarily set back to `javadoc.force=false`
 * Inform all developing parties that the release is done, everybody shall update their workspaces, refresh their Maven dependencies and development can continue.
 
 ## Examples in Eclipse after update
