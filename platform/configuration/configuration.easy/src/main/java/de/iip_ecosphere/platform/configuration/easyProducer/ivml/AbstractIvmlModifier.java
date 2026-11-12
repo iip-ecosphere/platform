@@ -398,7 +398,6 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
             AbstractVariable decl = e.getDeclaration();
             context.currentTemplateVariable = decl.getName(); 
             instantiateTemplateVariable(e, decl.getType().getName(), null, mode, context);
-//TODO substitutions                        
         }        
     }
 
@@ -1094,6 +1093,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
             IDatatype t = findType(root, type);
             Project target = adaptTarget(root, getVariableTarget(root, null, t, varName, null));
             if (null != t) {
+                getLogger().info("Target IVML project for variable {}: {}", target.getName(), varName);
                 DecisionVariableDeclaration var;
                 if (asConst) {
                     var = new ConstantDecisionVariableDeclaration(toIdentifier(varName), t, target);

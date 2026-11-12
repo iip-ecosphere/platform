@@ -741,7 +741,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 result = findOrCreateProject(root, prjName, true);
                 prepareMeshProject(result, root);
             }
-            if (null == result && IvmlUtils.isOfCompoundType(type, "Application")) {
+            if (null == result && (IvmlUtils.isOfCompoundType(type, "Application") 
+                || IvmlUtils.isOfCompoundType(type, "DeploymentPlan"))) {
                 String prjName = getApplicationProjectName(name);
                 result = findOrCreateProject(root, prjName, true);
                 prepareApplicationProject(result, root, meshes);
