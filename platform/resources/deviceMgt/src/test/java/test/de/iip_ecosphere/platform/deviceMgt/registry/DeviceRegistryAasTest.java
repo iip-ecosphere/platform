@@ -10,14 +10,17 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.deviceMgt.registry;
+package test.de.iip_ecosphere.platform.deviceMgt.registry;
 
-import de.iip_ecosphere.platform.deviceMgt.MockInterceptor;
+import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistry;
+import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAas;
+import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAasClient;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.*;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry;
 import de.iip_ecosphere.platform.support.iip_aas.AasPartRegistry.AasSetup;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
+import test.de.iip_ecosphere.platform.deviceMgt.MockInterceptor;
 import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
 import org.junit.*;
@@ -28,7 +31,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import static org.mockito.Mockito.*;
-import static de.iip_ecosphere.platform.deviceMgt.registry.StubDeviceRegistryFactoryDescriptor.mockDeviceRegistry;
+import static test.de.iip_ecosphere.platform.deviceMgt.registry.StubDeviceRegistryFactoryDescriptor.mockDeviceRegistry;
 
 /**
  * Tests the {@link DeviceRegistryAas}.

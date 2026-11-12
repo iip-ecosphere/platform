@@ -10,8 +10,12 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.deviceMgt.registry;
+package test.de.iip_ecosphere.platform.deviceMgt.registry;
 
+import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistrationResponse;
+import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistry;
+import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAas;
+import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAasClient;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.aas.AasPrintVisitor;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
@@ -28,10 +32,10 @@ import org.mockito.Mockito;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-import static de.iip_ecosphere.platform.deviceMgt.registry.StubDeviceRegistryFactoryDescriptor.mockDeviceRegistry;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static test.de.iip_ecosphere.platform.deviceMgt.registry.StubDeviceRegistryFactoryDescriptor.mockDeviceRegistry;
 
 /**
  * Tests the {@link DeviceRegistryAas} with the help of {@link DeviceRegistryAasClient}.
@@ -219,4 +223,5 @@ public class DeviceRegistryAasClientTest extends TestWithPlugin {
         client.imAlive(A_DEVICE_ID);
         verify(mockRegistry).imAlive(eq(A_DEVICE_ID));
     }
+    
 }

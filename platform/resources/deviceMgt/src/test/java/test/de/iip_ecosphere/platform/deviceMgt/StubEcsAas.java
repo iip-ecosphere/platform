@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.deviceMgt;
+package test.de.iip_ecosphere.platform.deviceMgt;
 
 import de.iip_ecosphere.platform.support.aas.*;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;

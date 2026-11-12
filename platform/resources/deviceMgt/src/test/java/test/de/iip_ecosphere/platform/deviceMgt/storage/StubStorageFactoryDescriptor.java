@@ -10,7 +10,11 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.deviceMgt.storage;
+package test.de.iip_ecosphere.platform.deviceMgt.storage;
+
+import de.iip_ecosphere.platform.deviceMgt.storage.PackageStorageSetup;
+import de.iip_ecosphere.platform.deviceMgt.storage.Storage;
+import de.iip_ecosphere.platform.deviceMgt.storage.StorageFactoryDescriptor;
 
 /**
  * A stub storage factory for testing.

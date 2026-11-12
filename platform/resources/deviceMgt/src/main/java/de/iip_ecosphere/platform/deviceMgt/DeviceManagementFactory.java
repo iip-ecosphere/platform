@@ -99,13 +99,13 @@ public class DeviceManagementFactory {
     }
 
     /**
-     * Resets the device management to its default state.
-     * Used for testing only.
+     * Resets the device management to its default state. [testing]
      */
-    protected static void resetDeviceManagement() {
+    public static void resetDeviceManagement() {
         management = null;
         firmwareOperations = null;
         remoteManagementOperations = null;
         resourceConfigOperations = null;
     }
+    
 }

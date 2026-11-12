@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.deviceMgt;
+package test.de.iip_ecosphere.platform.deviceMgt;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -18,12 +18,20 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import de.iip_ecosphere.platform.deviceMgt.AasDeviceResourceConfigOperations;
+import de.iip_ecosphere.platform.deviceMgt.DeviceDescriptor;
+import de.iip_ecosphere.platform.deviceMgt.DeviceFirmwareOperations;
+import de.iip_ecosphere.platform.deviceMgt.DeviceManagementAas;
+import de.iip_ecosphere.platform.deviceMgt.DeviceManagementAasClient;
+import de.iip_ecosphere.platform.deviceMgt.DeviceManagementFactory;
+import de.iip_ecosphere.platform.deviceMgt.DeviceRemoteManagementOperations;
+import de.iip_ecosphere.platform.deviceMgt.DeviceResourceConfigOperations;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAasClient;
-import de.iip_ecosphere.platform.deviceMgt.registry.StubDeviceRegistryFactoryDescriptor;
 import de.iip_ecosphere.platform.support.iip_aas.AasContributor;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
+import test.de.iip_ecosphere.platform.deviceMgt.registry.StubDeviceRegistryFactoryDescriptor;
 import test.de.iip_ecosphere.platform.support.aas.TestWithPlugin;
 
 import org.junit.*;
@@ -37,9 +45,9 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static de.iip_ecosphere.platform.deviceMgt.registry.StubDeviceRegistryFactoryDescriptor.mockDeviceRegistry;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static test.de.iip_ecosphere.platform.deviceMgt.registry.StubDeviceRegistryFactoryDescriptor.mockDeviceRegistry;
 
 /**
  * Tests the {@link DeviceManagementAas} with respect to {@link DeviceManagementAasClient}.

@@ -10,9 +10,12 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.deviceMgt.registry;
+package test.de.iip_ecosphere.platform.deviceMgt.registry;
 
 import static org.mockito.Mockito.mock;
+
+import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistry;
+import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryFactoryDescriptor;
 
 /**
  * Implements a stub device registry factory descriptor for mocking.

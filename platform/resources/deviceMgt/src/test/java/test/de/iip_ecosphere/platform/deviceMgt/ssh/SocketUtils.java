@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.deviceMgt.ssh;
+package test.de.iip_ecosphere.platform.deviceMgt.ssh;
 
 import java.io.IOException;
 import java.io.InputStream;

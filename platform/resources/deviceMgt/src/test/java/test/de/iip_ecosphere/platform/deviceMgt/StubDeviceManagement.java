@@ -10,9 +10,14 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.deviceMgt;
+package test.de.iip_ecosphere.platform.deviceMgt;
 
 import java.util.concurrent.ExecutionException;
+
+import de.iip_ecosphere.platform.deviceMgt.DeviceFirmwareOperations;
+import de.iip_ecosphere.platform.deviceMgt.DeviceManagement;
+import de.iip_ecosphere.platform.deviceMgt.DeviceRemoteManagementOperations;
+import de.iip_ecosphere.platform.deviceMgt.DeviceResourceConfigOperations;
 
 import static org.mockito.Mockito.mock;
 

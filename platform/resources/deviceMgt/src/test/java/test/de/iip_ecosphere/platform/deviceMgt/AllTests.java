@@ -9,13 +9,13 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.deviceMgt;
+package test.de.iip_ecosphere.platform.deviceMgt;
 
-import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAasClientTest;
-import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAasTest;
-import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryFactoryTest;
-import de.iip_ecosphere.platform.deviceMgt.ssh.ProxyTest;
-import de.iip_ecosphere.platform.deviceMgt.storage.StorageFactoryTest;
+import test.de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAasClientTest;
+import test.de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryAasTest;
+import test.de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryFactoryTest;
+import test.de.iip_ecosphere.platform.deviceMgt.ssh.ProxyTest;
+import test.de.iip_ecosphere.platform.deviceMgt.storage.StorageFactoryTest;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

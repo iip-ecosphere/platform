@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.deviceMgt;
+package test.de.iip_ecosphere.platform.deviceMgt;
 
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryClient;
 import de.iip_ecosphere.platform.deviceMgt.registry.DeviceRegistryClientFactory;

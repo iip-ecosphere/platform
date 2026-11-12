@@ -66,10 +66,11 @@ public class DeviceRegistryFactory {
     }
 
     /**
-     * Resets the factory. Only meant for testing!
+     * Resets the factory. [testing]
      */
-    static void resetDeviceRegistryFactory() {
+    public static void resetDeviceRegistryFactory() {
         desc = null;
         proxy = null;
     }
+    
 }

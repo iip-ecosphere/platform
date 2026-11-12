@@ -10,7 +10,7 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.deviceMgt.storage;
+package test.de.iip_ecosphere.platform.deviceMgt.storage;
 
 import java.util.Optional;
 
@@ -21,6 +21,10 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import de.iip_ecosphere.platform.deviceMgt.DeviceMgtSetup;
+import de.iip_ecosphere.platform.deviceMgt.storage.PackageStorageSetup;
+import de.iip_ecosphere.platform.deviceMgt.storage.Storage;
+import de.iip_ecosphere.platform.deviceMgt.storage.StorageFactory;
+import de.iip_ecosphere.platform.deviceMgt.storage.StorageFactoryDescriptor;
 import de.iip_ecosphere.platform.support.jsl.ServiceLoaderUtils;
 
 /**

@@ -10,16 +10,18 @@
  * SPDX-License-Identifier: Apache-2.0 OR EPL-2.0
  ********************************************************************************/
 
-package de.iip_ecosphere.platform.deviceMgt.ssh;
+package test.de.iip_ecosphere.platform.deviceMgt.ssh;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.iip_ecosphere.platform.deviceMgt.ssh.Proxy;
+
 import java.io.*;
 import java.net.Socket;
 
-import static de.iip_ecosphere.platform.deviceMgt.ssh.SocketUtils.mockSocket;
 import static org.mockito.Mockito.*;
+import static test.de.iip_ecosphere.platform.deviceMgt.ssh.SocketUtils.mockSocket;
 
 /**
  * Tests the SSH proxy.
