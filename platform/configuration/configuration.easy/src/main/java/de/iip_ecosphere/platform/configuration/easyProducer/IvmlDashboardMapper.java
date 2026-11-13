@@ -970,19 +970,29 @@ public class IvmlDashboardMapper implements DashboardMapper {
         if (panel.logo != null && !panel.logo.isBlank()) {
             String logoSpec = panel.logo;
             if (!(logoSpec.startsWith("http://") || logoSpec.startsWith("https://"))) {
+                getLogger().info("Trying to read {}", logoSpec);
                 File f = new File(logoSpec);
                 InputStream logoFile = null;
                 if (f.isAbsolute() && f.exists()) {
                     try {
                         logoFile = new FileInputStream(f);
+                        getLogger().info("Using file {} as logo source", f);
                     } catch (IOException e) {
                         getLogger().warn("Logo specification '{}' looks like a file path, but cannot be read: {}", 
                             logoSpec, e.getMessage());
                     }
+                } else {
+                    getLogger().warn("Specified file {} not found (absolute: {}, exists: {})", logoSpec, 
+                        f.isAbsolute(), f.exists());
                 }
                 if (null == logoFile) {
+                    File baseFolder = new File("");
+                    getLogger().info("Trying to read {} as resource within {}", logoSpec, baseFolder.getAbsolutePath());
                     logoFile = ResourceLoader.getResourceAsStream(logoSpec, 
                         new OktoflowResourceResolver(new File(""), "software"));
+                    if (null == logoFile) {
+                        getLogger().warn("While reading logo {}: no such resource", logoSpec);
+                    }
                 }
                 if (null != logoFile) {
                     try {
@@ -1000,7 +1010,6 @@ public class IvmlDashboardMapper implements DashboardMapper {
                         panel.logo = null;
                     }
                 } else {
-                    getLogger().warn("While reading logo {}: no such resource", logoSpec);
                     panel.logo = null;
                 }
             }
