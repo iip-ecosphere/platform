@@ -76,7 +76,7 @@ The plugin supports the following configuration settings:
   - `mavenJavadocSkip` (default `true`, user property `maven.javadoc.skip`) enables/disables JavaDoc generation
   - `mavenAssemblySkip` (default `true`, user property `maven.assembly.skip`) enables/disables Assembly generation
   - `mavenSourceSkip` (default `true`, user property `maven.source.skip`) enables/disables Source packaging
-  - `enableJavadoc` (default `false`, user property `enableJava`) enables JavaDoc generation
+  - `enableJavadoc` (default `false`, user property `enableJavadoc`) enables JavaDoc generation
   - `disablePython` (default `false`, user property `disablePython`) sets system properties to disable platform Python "compilation" and testing.
   - `disablePythonTests` (default `false`, user property `disablePythonTests`) sets system properties to disable platform Python testing.
   - `disableAppTests` (default `false`, user property `disableAppTests`) sets system properties to disable oktoflow app testing.
