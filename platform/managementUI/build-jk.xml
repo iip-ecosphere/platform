@@ -21,12 +21,12 @@
         <mkdir dir="pckg"/>
         <copy file="target/mgtUI.zip" tofile="pckg/IIP-Ecosphere-mgtUi-latest.zip"/>
         <copy file="target/mgtUI.tgz" tofile="pckg/IIP-Ecosphere-mgtUi-latest.tgz"/>
-        <oscp todir="jenkins@projects.sse.uni-hildesheim.de:/var/www/oktoflow" trust="true" keyfile="${user.home}/.ssh/id_rsa">
+        <deployByCopy todir="${www.mount}/oktoflow">
             <fileset dir="pckg">
                 <include name="IIP-Ecosphere-mgtUi-latest.zip"/>
                 <include name="IIP-Ecosphere-mgtUi-latest.tgz"/>
             </fileset>
-        </oscp> 
+        </deployByCopy>
         <exec executable="/bin/bash">
             <arg value="${user.home}/cleanOkto.sh"/>
         </exec> 
