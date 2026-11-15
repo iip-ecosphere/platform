@@ -45,13 +45,13 @@
             <!--<fileset dir="." includes="fullInstallationWin.bat" />-->
             <fileset dir="." includes="summary.pdf" />
         </tar>
-        <oscp todir="jenkins@projects.sse.uni-hildesheim.de:/var/www/oktoflow" trust="true" keyfile="${user.home}/.ssh/id_rsa">
+        <deployByCopy todir="${www.mount}/oktoflow">
             <fileset dir=".">
                 <include name="install.zip"/>
                 <include name="install.tar.gz"/>
                 <include name="fullInstallationLinux.sh"/>
                 <include name="fullInstallationWin.bat"/>
             </fileset>
-        </oscp> 
+        </deployByCopy>
     </target>
 </project>
