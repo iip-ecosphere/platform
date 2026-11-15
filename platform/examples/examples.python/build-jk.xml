@@ -17,10 +17,15 @@
         <zip destFile="target/examples.python-src.zip" basedir=".">
         	<exclude name="target/**"/>
         </zip>
-        <oscp todir="jenkins@projects.sse.uni-hildesheim.de:/var/www/oktoflow" trust="true" keyfile="${user.home}/.ssh/id_rsa">
+		<deployByCopy todir="jenkins@projects.sse.uni-hildesheim.de:/var/www/oktoflow">
             <fileset dir=".">
                 <include name="target/examples.python-src.zip"/>
             </fileset>
-        </oscp> 
+	    </deployByCopy>
+        <!--<oscp todir="jenkins@projects.sse.uni-hildesheim.de:/var/www/oktoflow" trust="true" keyfile="${user.home}/.ssh/id_rsa">
+            <fileset dir=".">
+                <include name="target/examples.python-src.zip"/>
+            </fileset>
+        </oscp>--> 
 	</target>
 </project>
