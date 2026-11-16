@@ -127,7 +127,7 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
             // just test, use path as given (legacy)
         } catch (MalformedURLException e) {
             Schema schema = params.getSchema();
-            if (null == schema) {
+            if (null == schema || (schema != Schema.HTTP && schema != Schema.HTTPS)) {
                 schema = Schema.HTTP;
             }
             String pathPart = path;
