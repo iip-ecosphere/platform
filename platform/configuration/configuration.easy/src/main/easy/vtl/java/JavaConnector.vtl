@@ -1066,5 +1066,10 @@ template JavaConnector(Configuration config, JavaCodeArtifact target) extends Da
         }
         result;
     }
+
+    @DispatchCase
+    def getConnectorSchema(RestConnector conn) { // added v2->v3, default schema, no auth/ssl so far
+        "de.iip_ecosphere.platform.support.Schema.HTTP";
+    }
     
 }
