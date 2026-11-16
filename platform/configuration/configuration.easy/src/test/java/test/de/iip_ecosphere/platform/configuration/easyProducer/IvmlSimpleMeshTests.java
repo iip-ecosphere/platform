@@ -19,6 +19,7 @@ import java.io.PrintStream;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
+import org.junit.After;
 import org.junit.Test;
 
 import de.iip_ecosphere.platform.configuration.easyProducer.EasySetup;
@@ -32,6 +33,8 @@ import de.iip_ecosphere.platform.support.FileUtils;
  */
 public class IvmlSimpleMeshTests extends AbstractIvmlTests {
 
+    private File tmp = new File(FileUtils.getTempDirectory(), "oktoflow2grafana.cfg");
+    
     /**
      * Tests loading, reasoning and instantiating "SimpleMesh", a simple, generated service chain for testing. Here, we 
      * do not instantiate the full platform rather than only the configured apps. Depending on Maven setup/exclusions, 
@@ -43,7 +46,6 @@ public class IvmlSimpleMeshTests extends AbstractIvmlTests {
     @Test
     public void testSimpleMesh() throws ExecutionException, IOException {
         // mvn: stdout now in target/surefire-reports/<qualifiedClassName>-output.txt
-        File tmp = new File(FileUtils.getTempDirectory(), "oktoflow2grafana.cfg");
         FileUtils.deleteQuietly(tmp);
         Properties prop = new Properties();
         prop.put("modelFolder", new File(MODEL_BASE_FOLDER, "simpleMesh").getAbsolutePath());
@@ -59,6 +61,14 @@ public class IvmlSimpleMeshTests extends AbstractIvmlTests {
         FileUtils.deleteQuietly(tmp);
         assertAllFiles(gen);
         assertTemplateZip(gen, "impl.SimpleMeshTestingApp");
+    }
+    
+    /**
+     * Cleans up after the.
+     */
+    @After
+    public void cleanup() {
+        FileUtils.deleteQuietly(tmp);
     }
     
 }
