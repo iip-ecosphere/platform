@@ -16,6 +16,7 @@ import com.hivemq.embedded.EmbeddedHiveMQ;
 import com.hivemq.embedded.EmbeddedHiveMQBuilder;
 
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.Schema;
 import de.iip_ecosphere.platform.support.Server;
 import de.iip_ecosphere.platform.support.ServerAddress;
@@ -48,10 +49,8 @@ public class TestHiveMqServer extends AbstractTestServer {
     @Override
     public Server start() {
         if (null == hiveMQ) {
-            FileUtils.listFiles(FileUtils.getTempDirectory(), 
-                f -> f.getName().startsWith("hivemq_v5"), 
-                f -> FileUtils.deleteQuietly(f)); // try to clean up left-over temp folders
-            hiveTmp = FileUtils.createTmpFolder("hivemq_v5", true);
+            String tmpPrefix = "hivemq_v5-" + OsUtils.getUserName("1") + "-";
+            hiveTmp = FileUtils.createTmpFolder(tmpPrefix + System.currentTimeMillis(), true);
 
             System.setProperty("HIVEMQ_PORT", Integer.toString(addr.getPort()));
             System.setProperty("HIVEMQ_ADDRESS", addr.getHost());

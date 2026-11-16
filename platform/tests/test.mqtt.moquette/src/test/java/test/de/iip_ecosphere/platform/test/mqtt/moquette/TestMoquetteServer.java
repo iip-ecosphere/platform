@@ -111,6 +111,7 @@ public class TestMoquetteServer extends AbstractTestServer {
             if (Authenticator.isInitialized()) {
                 properties.setProperty(IConfig.AUTHENTICATOR_CLASS_NAME, Authenticator.class.getName());
             }
+            properties.setProperty(IConfig.PERSISTENCE_ENABLED_PROPERTY_NAME, "false");
             properties.setProperty(IConfig.ENABLE_TELEMETRY_NAME, "false");
             mqttBroker = new io.moquette.broker.Server();
             try {

@@ -116,8 +116,8 @@ public class TestQpidServer extends AbstractTestServer {
      */
     public static void main(String[] args) {
         if (applyBaseDir(args, 1, "./src/test") != null) {
-            File tmpWork = new File(FileUtils.getTempDirectory(), 
-                "qpid-" + OsUtils.getUserName("1")); // "1" usually not needed, ensure directory name
+            File tmpWork = new File(FileUtils.getTempDirectory(), // "1" usually not needed, ensure directory name
+                "qpid-" + OsUtils.getUserName("1") + "-" + System.currentTimeMillis()); 
             FileUtils.deleteQuietly(tmpWork);
             System.setProperty("QPID_WORK", tmpWork.getAbsolutePath());
         } // leave it as it was, only within process-based plugin executions
