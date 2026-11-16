@@ -47,6 +47,7 @@ import java.util.regex.Pattern;
 public final class JenkinsMavenTimings {
     
     private static final Pattern MAVEN = Pattern.compile("\\[INFO\\]\\s+Total time:\\s*(.+?)\\s*$");
+    private static final Pattern MAVEN_END = Pattern.compile("\\s*\\[echo\\]\\s+<< maven-exec\\s*$");
     private static final Pattern ANT = Pattern.compile(
         "^\\s*(?:(?:\\d{4}-\\d{2}-\\d{2}\\s+)?\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,3})?\\s+)?Total time:\\s*(.+?)\\s*$");
     private static final Pattern ANT_START = Pattern.compile(
@@ -149,6 +150,7 @@ public final class JenkinsMavenTimings {
             response.body().close();
             throw new IOException("HTTP " + response.statusCode() + " for " + url);
         }
+        Double lastMavenSeconds = null;
         Timings timings = new Timings();
         try (BufferedReader reader = new BufferedReader(
             new InputStreamReader(response.body(), StandardCharsets.UTF_8))) {
@@ -172,6 +174,10 @@ public final class JenkinsMavenTimings {
                         && ANT_START.matcher(line).matches()) {
                     timings.antStart = currentStamp;
                 }
+                Matcher mavenEnd = MAVEN_END.matcher(line); // custom, by macros.xml
+                if (mavenEnd.matches()) {
+                    lastMavenSeconds = aggregateMaven(timings, lastMavenSeconds);
+                }
                 if (!line.contains("Total time:")) {
                     continue;
                 }
@@ -179,7 +185,7 @@ public final class JenkinsMavenTimings {
                 if (maven.find()) {
                     Double parsed = parseTime(maven.group(1));
                     if (parsed != null) {
-                        timings.mavenSeconds = parsed;
+                        lastMavenSeconds = parsed; // keep until last one, aggregate with MAVEN_END or file end
                     }
                 }
                 Matcher ant = ANT.matcher(line);
@@ -193,8 +199,27 @@ public final class JenkinsMavenTimings {
                     }
                 }
             }
+            lastMavenSeconds = aggregateMaven(timings, lastMavenSeconds);
         }
         return timings;
+    }
+    
+    /**
+     * Aggregates the Maven time reading.
+     * 
+     * @param timings the collected timings
+     * @param time the time
+     * @return <b>null</b>
+     */
+    private Double aggregateMaven(Timings timings, Double time) {
+        if (null != time) {
+            if (null == timings.mavenSeconds) {
+                timings.mavenSeconds = time;
+            } else {
+                timings.mavenSeconds += time;
+            }
+        }
+        return null;
     }
 
     /**
@@ -410,7 +435,7 @@ public final class JenkinsMavenTimings {
      * @throws InterruptedException if timeouts occur during the a request
      */
     private List<String[]> processJob(String[] job, int limit) throws IOException, InterruptedException {
-        System.err.println("Processing " + job[0]);
+        System.out.println("Processing " + job[0]);
         List<String[]> builds = new ArrayList<>();
         if (limit == 1) {
             // Use the latest completed build directly; no build-list parsing needed.
@@ -512,7 +537,7 @@ public final class JenkinsMavenTimings {
                 }
             }
         }
-        System.err.println("Wrote " + count + " builds from " + jobs.size() + " jobs to " + output);
+        System.out.println("Wrote " + count + " builds from " + jobs.size() + " jobs to " + output);
     }
 
     /**
