@@ -43,6 +43,7 @@ import java.util.regex.Pattern;
  * Extracts Maven and Ant total times from historical Jenkins Freestyle builds. 
  * 
  * @author ChatGPT
+ * @author Holger Eichelberger, SSE
  */
 public final class JenkinsMavenTimings {
     
@@ -131,6 +132,17 @@ public final class JenkinsMavenTimings {
         private Instant lastLog;
         private Instant antEnd;
         private Instant antStart;
+    }
+
+    /**
+     * Stores the overall timings of all builds.
+     * 
+     * @author Holger Eichelberger, SSE
+     */
+    private static final class OverallTimings {
+        private long earliestStart = Long.MAX_VALUE;
+        private long latestEnd = Long.MIN_VALUE;
+        private int buildCount = 0;        
     }
 
     /**
@@ -379,6 +391,16 @@ public final class JenkinsMavenTimings {
         }
         return timings;
     }
+    
+    /**
+     * Job names excluded from overall timing collection.
+     * 
+     * @param job the job
+     * @return {@code true} for exclusion, {@code false} else
+     */
+    private static boolean excludedFromOverallTimings(String job) {
+        return "IIP_buildAnalysis".equals(job) || "IIP_buildData".equals(job);
+    }
 
     /**
      * Turns build/job to a CSV row.
@@ -386,12 +408,13 @@ public final class JenkinsMavenTimings {
      * @param timestamps 
      * @param job the job names
      * @param build the build identifiers
+     * @param overallTimings the overall timings to be modified as a side effect
      * @param extractedAt the time of execution of this program/data extraction
      * @return the row or <b>null</b> if the data cannot be extracted, e.g., the job is currently building
      * @throws IOException if I/O issues occur during the a request
      * @throws InterruptedException if timeouts occur during the a request
      */
-    private String toCsv(boolean timestamps, String[] job, String[] build, String extractedAt) 
+    private String toCsv(boolean timestamps, String[] job, String[] build, OverallTimings overall, String extractedAt) 
         throws IOException, InterruptedException {
         String info = fetch(build[1] + "api/json" + treeQuery("building,duration,timestamp,result"));
         if (info.contains("\"building\":true")) {
@@ -403,13 +426,22 @@ public final class JenkinsMavenTimings {
         if (!duration.find() || !timestamp.find()) {
             throw new IOException("Missing build metadata");
         }
-        double jenkinsSeconds = Long.parseLong(duration.group(1)) / 1000.0;
+        long durationVal = Long.parseLong(duration.group(1));
+        long timestampVal = Long.parseLong(timestamp.group(1)); // also start
+        long endVal = timestampVal + durationVal;
+        if (!excludedFromOverallTimings(job[0])) {
+            overall.earliestStart = Math.min(overall.earliestStart, timestampVal);
+            overall.latestEnd = Math.max(overall.latestEnd, endVal);
+            overall.buildCount++;
+        }
+        
+        double jenkinsSeconds = durationVal / 1000.0;
         Timings timings = readTimings(timestamps, job, build);
         Double jenkinsAntDifference = timings.antSeconds == null ? null 
             : jenkinsSeconds - timings.antSeconds;
         Double antMavenDifference = timings.antSeconds == null || timings.mavenSeconds == null
                 ? null : timings.antSeconds - timings.mavenSeconds;
-        String date = DATE.format(Instant.ofEpochMilli(Long.parseLong(timestamp.group(1))));
+        String date = DATE.format(Instant.ofEpochMilli(timestampVal));
         String row = String.join(";", csv(job[0]), build[0], csv(date), csv(extractedAt),
                 csv(result.find() ? result.group(1) : ""), number(jenkinsSeconds),
                 number(timings.antSeconds), number(timings.mavenSeconds),
@@ -516,6 +548,7 @@ public final class JenkinsMavenTimings {
         }
         jobs.sort((a, b) -> a[0].compareTo(b[0]));
         int count = 0;
+        OverallTimings overall = new OverallTimings();
         try (PrintWriter csv = new PrintWriter(Files.newBufferedWriter(output, StandardCharsets.UTF_8))) {
             csv.println("Job;Build;Date;ExtractedAt;Result;JenkinsSeconds;AntSeconds;MavenSeconds;"
                 + "JenkinsAntDifference;AntMavenDifference"
@@ -525,7 +558,7 @@ public final class JenkinsMavenTimings {
                 List<String[]> builds = processJob(job, limit);
                 for (String[] build : builds) {
                     try {
-                        String row = toCsv(timestamps, job, build, extractedAt);
+                        String row = toCsv(timestamps, job, build, overall, extractedAt);
                         if (null == row) {
                             continue;
                         }
@@ -536,8 +569,51 @@ public final class JenkinsMavenTimings {
                     }
                 }
             }
+            if (overall.buildCount > 0) {
+                long elapsed = overall.latestEnd - overall.earliestStart;
+                csv.printf("Overall: %02d:%02d:%02d%n", elapsed / 3_600_000, (elapsed / 60_000) % 60, 
+                    (elapsed / 1_000) % 60);
+            }
         }
         System.out.println("Wrote " + count + " builds from " + jobs.size() + " jobs to " + output);
+        if (overall.buildCount > 0) {
+            long elapsed = overall.latestEnd - overall.earliestStart;
+
+            System.out.printf(
+                "Overall build time, only valid for full builds (%d jobs): %02d:%02d:%02d%n",
+                overall.buildCount, elapsed / 3_600_000, (elapsed / 60_000) % 60, (elapsed / 1_000) % 60
+            );
+        }
+        downloadJenkinsPage(opts);
+    }
+
+    /**
+     * Downloads and stores the Jenkins HTML page.
+     * 
+     * @param opts the command line options
+     * @throws IOException if the HTML page cannot be obtained
+     * @throws InterruptedException if waiting for the HTML response is interrupted
+     */
+    public static void downloadJenkinsPage(Map<String, String> opts) throws IOException, InterruptedException {
+        String url = opts.getOrDefault("--htmlUri", "https://jenkins-2.sse.uni-hildesheim.de/view/IIP-Ecosphere/");
+        String defaultOutput = "IIP-Ecosphere - Jenkins-" + FILE_DATE.format(LocalDateTime.now()) + ".html";
+        Path output = Path.of(opts.getOrDefault("--outputHtml", defaultOutput));
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .GET()
+            .build();
+        HttpResponse<String> response = client.send(
+            request,
+            HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8)
+        );
+        if (response.statusCode() != 200) {
+            throw new IOException(
+                "HTTP " + response.statusCode() + " for " + url);
+        }
+        Files.writeString(output, response.body());
+        System.out.println("Downloaded corresponding Jenkins task page to " + output);
     }
 
     /**
