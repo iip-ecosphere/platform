@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("TestServer/api/endpoints")
+@RequestMapping({"TestServer/api/endpoints", "TestServer/api1/endpoints"})
 public class TestServerController {
 
     private String stringValue = "Hello World!";

@@ -3,11 +3,13 @@ package de.iip_ecosphere.platform.connectors.rest;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -23,6 +25,9 @@ import de.iip_ecosphere.platform.connectors.Connector;
 import de.iip_ecosphere.platform.connectors.ConnectorExtensionDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.MachineConnector;
+import de.iip_ecosphere.platform.connectors.events.ConnectorTriggerQuery;
+import de.iip_ecosphere.platform.connectors.events.EventHandlingConnector;
+import de.iip_ecosphere.platform.connectors.events.StringTriggerQuery;
 import de.iip_ecosphere.platform.connectors.model.AbstractModelAccess;
 import de.iip_ecosphere.platform.connectors.model.ModelAccess;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
@@ -39,18 +44,23 @@ import de.iip_ecosphere.platform.support.logging.LoggerFactory;
  * 
  * Determines whether SingleValue or SetValue is retrieved with or
  * without parameters (WP = WithParameter)
- * specificSettings.RequestType = {Single, SingleWP, Set, SetWP}
+ * specificSettings.RequestType = {Single, SingleWP, Set, SetWP}. Allows a {@link StringTriggerQuery} to change the 
+ * path used for connection: if {@link StringTriggerQuery#getQuery()} starts with "/" either replace the path part of 
+ * the actual path to the rest server or (if no such path part is specified so far) append the value of 
+ * {@link StringTriggerQuery#getQuery()}; if {@link StringTriggerQuery#getQuery()} does not start with "/", just 
+ * replace the actual path.
  */
 @MachineConnector(hasModel = true, supportsModelStructs = false, supportsEvents = false, specificSettings = {
     "Endpoints", "RequestType" })
-public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, CO, CI> {
+public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, CO, CI> 
+    implements EventHandlingConnector {
 
     public static final String NAME = "REST";
     private static final Logger LOGGER = LoggerFactory.getLogger(RESTConnector.class);
 
     private RESTItem item = null;
     private ConnectorParameter params;
-    private String path;
+    private AtomicReference<String> path = new AtomicReference<>();
 
     /**
      * The descriptor of this connector (see META-INF/services).
@@ -121,28 +131,28 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
      * Transfers the specific settings form ConnectorParameter to RESTConnector.
      */
     private void specificSettings() {
-        path = params.getEndpointPath();
+        path.set(params.getEndpointPath());
         try {
-            new URL(path);
+            new URL(path.get());
             // just test, use path as given (legacy)
         } catch (MalformedURLException e) {
             Schema schema = params.getSchema();
             if (null == schema || (schema != Schema.HTTP && schema != Schema.HTTPS)) {
                 schema = Schema.HTTP;
             }
-            String pathPart = path;
+            String pathPart = path.get();
             if (null == pathPart) {
                 pathPart = "";
             }
             if (!pathPart.startsWith("/")) {
                 pathPart = "/" + pathPart;
             }
-            path = schema.toUri() + params.getHost() + ":" + params.getPort() + pathPart; 
+            path.set(schema.toUri() + params.getHost() + ":" + params.getPort() + pathPart); 
         }
-        if (!path.endsWith("/")) { 
-            path += "/";
+        if (!path.get().endsWith("/")) { 
+            path.set(path.get() + "/");
         }
-        LOGGER.info("RESTConnector: using path {}", path);
+        LOGGER.info("RESTConnector: using path {}", path.get());
 
         Set<String> keys = params.getSpecificSettingKeys();
         RESTEndpointMap map = null;
@@ -181,7 +191,7 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
             new URL(endpoint);
             result = endpoint; // full URL, use as given
         } catch (MalformedURLException e) {
-            result = path + endpoint;
+            result = path.get() + endpoint;
         }
         return result;
     }
@@ -468,6 +478,28 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
     public String enabledEncryption() {
         // Not used for REST
         return null;
+    }
+    
+    @Override
+    public void trigger(ConnectorTriggerQuery query) {
+        if (query instanceof StringTriggerQuery) {
+            StringTriggerQuery stq = (StringTriggerQuery) query;
+            String qs = stq.getQuery();
+            if (qs != null && qs.length() > 0) {
+                if (qs.startsWith("/")) {
+                    try {
+                        URI uri = URI.create(path.get());
+                        URI newUri = uri.resolve(qs);
+                        path.set(newUri.toString());
+                    } catch (IllegalArgumentException e) {
+                        LoggerFactory.getLogger(RESTConnector.class).warn("Cannot replace URI path: {}", 
+                            e.getMessage());
+                    }
+                } else {
+                    path.set(qs);
+                }
+            }
+        }
     }
 
 }

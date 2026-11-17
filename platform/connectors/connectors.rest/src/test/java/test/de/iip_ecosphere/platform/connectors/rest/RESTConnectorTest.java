@@ -15,6 +15,7 @@ import de.iip_ecosphere.platform.connectors.ConnectorDescriptor;
 import de.iip_ecosphere.platform.connectors.ConnectorExtensionDescriptor.DefaultConnectorExtension;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter;
 import de.iip_ecosphere.platform.connectors.ConnectorParameter.ConnectorParameterBuilder;
+import de.iip_ecosphere.platform.connectors.events.StringTriggerQuery;
 import de.iip_ecosphere.platform.connectors.rest.RESTConnector;
 import de.iip_ecosphere.platform.connectors.rest.RESTItem;
 import de.iip_ecosphere.platform.connectors.types.ProtocolAdapter;
@@ -37,6 +38,7 @@ public class RESTConnectorTest extends TestWithPlugin {
     private static final String CONN_SINGLE_ID = "single";
     private static final Logger LOGGER = LoggerFactory.getLogger(RESTConnectorTest.class);
     private static TestServer testServer;
+    private static String expectedStringValue = "Hello World!";
     
     static {
         addPluginLocation("support", "support.json-jackson");
@@ -46,7 +48,6 @@ public class RESTConnectorTest extends TestWithPlugin {
      * Creates an instance of this test.
      */
     public RESTConnectorTest() {
-
     }
 
     /**
@@ -58,7 +59,6 @@ public class RESTConnectorTest extends TestWithPlugin {
         testServer = new TestServer();
         testServer.start();
         LOGGER.info("RESTConnectorTest -> REST server started");
-
     }
 
     /**
@@ -83,17 +83,19 @@ public class RESTConnectorTest extends TestWithPlugin {
         Assume.assumeTrue(OsUtils.isWindows());
         LOGGER.info("RESTConnectorTest -> testWithPolling()");
 
-        testRequestTypeSingle();
+        testRequestTypeSingle(null);
+        testRequestTypeSingle("/TestServer/api1/");
         testRequestTypeSingleWP();
         testRequestTypeSet();
         testRequestTypeSetWP();
-
     }
 
     /**
      * Test with RequestType = Single.
+     * 
+     * @param path to send in via {@link StringTriggerQuery}, may be <b>null</b> for none
      */
-    private void testRequestTypeSingle() {
+    private void testRequestTypeSingle(String path) {
         LOGGER.info("RESTConnectorTest -> testWithPolling() -> testRequestTypeSingle()");
 
         ActiveAasBase.setNotificationMode(NotificationMode.NONE);
@@ -104,6 +106,9 @@ public class RESTConnectorTest extends TestWithPlugin {
 
         try {
             connector.connect(getConnectorParameter("single"));
+            if (null != path) {
+                connector.trigger(new StringTriggerQuery(path));
+            }                
             AtomicReference<MachineOutputSingle> restReference = new AtomicReference<MachineOutputSingle>();
             AtomicInteger count = new AtomicInteger(0);
             connector.setReceptionCallback(createCallbackSingle(restReference, count));
@@ -117,7 +122,7 @@ public class RESTConnectorTest extends TestWithPlugin {
             }
 
             Assert.assertNotNull(rest);
-            Assert.assertEquals("Hello World!", rest.getStringValue().getValue());
+            Assert.assertEquals(expectedStringValue, rest.getStringValue().getValue());
             Assert.assertEquals(1, rest.getShortValue().getValue());
             Assert.assertEquals(100, rest.getIntegerValue().getValue());
             Assert.assertEquals(10000, rest.getLongValue().getValue());
@@ -129,7 +134,8 @@ public class RESTConnectorTest extends TestWithPlugin {
             Assert.assertTrue(diffDouble < 0.001);
 
             MachineInputSingle input = new MachineInputSingle();
-            input.setStringValue("New String Value");
+            expectedStringValue = "New String Value";
+            input.setStringValue(expectedStringValue);
             connector.write(input);
 
             int currentCount = count.get();
@@ -141,7 +147,7 @@ public class RESTConnectorTest extends TestWithPlugin {
                 currentCount = count.get();
             }
 
-            Assert.assertEquals("New String Value", rest.getStringValue().getValue());
+            Assert.assertEquals(expectedStringValue, rest.getStringValue().getValue());
 
             System.out.println("");
             LOGGER.info("testRequestTypeSingle() -> success" + "\n");
