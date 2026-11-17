@@ -441,6 +441,48 @@
                   <artifactId>invoker-plugin</artifactId>
                   <version>${project.version}</version>
                   <executions>
+                    <execution>
+                      <id>initialBuildStage1</id>
+                      <goals>
+                          <goal>install</goal>
+                      </goals>
+                      <configuration>
+                          <invokeProfiles>
+                              <invokeProfile>Cfg</invokeProfile>
+                          </invokeProfiles>
+                          <invokeGoals>
+                              <invokeGoal>install</invokeGoal>
+                          </invokeGoals>
+                          <environmentVariables>
+                              <iipbuildinitial>true</iipbuildinitial>
+                          </environmentVariables>
+                          <systemProperties>
+                              <systemProperty>
+                                  <key>skipTests</key>
+                                  <value>true</value>
+                              </systemProperty>
+                          </systemProperties>
+                          <skipIfExists>target/initial1-${project.version}</skipIfExists>
+                      </configuration>
+                    </execution>
+                    <execution>
+                      <id>initialBuildStage2</id>
+                      <goals>
+                          <goal>install</goal>
+                      </goals>
+                      <configuration>
+                          <invokeProfiles>
+                              <invokeProfile>Cfg</invokeProfile>
+                          </invokeProfiles>
+                          <invokeGoals>
+                              <invokeGoal>install</invokeGoal>
+                          </invokeGoals>
+                          <environmentVariables>
+                              <iipbuildinitial>true</iipbuildinitial>
+                          </environmentVariables>
+                          <skipIfExists>target/initial2-${project.version}</skipIfExists>
+                      </configuration>
+                    </execution>
                       <execution>
                           <id>genInterfaces</id>
                           <goals>

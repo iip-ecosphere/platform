@@ -198,6 +198,8 @@ Some of the test models include the RapidMiner RTSA integration. As RTSA is an I
 
 ## Initial build
 
+This component needs special handling for an initial build. Since version 0.8.2, we aim at making this step implicit through additional marker files. If an initial build fails, you may run explicitly
+
    ```
    export iipbuildinitial=true
    mvn -P Cfg install -DskipTests
