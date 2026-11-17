@@ -214,7 +214,7 @@ The REST connector allows for connecting with REST data sources/sinks.
 
 | Field | Defined by | Description | Default |
 | --- | --- | --- | --- |
-| endpointPrefix |  Prefix path to be prepended before each field path. May be a full URL, which is then taking precedence over `host`/`port`, a path (then extended with schema, host and port) or empty for nothing. | `""`  |
+| endpointPrefix |  Prefix path to be prepended before each field path. May be a full URL, which is then taking precedence over `host`/`port`, a path (then extended with schema, host and port) or empty for nothing. Full URLs are taken over into the field-endpoint mapping and may lead to more runtime effort in requesting data. | `""`  |
 
 Fields in in/output datatypes shall be of the specialized type `RestField` rather than `Field`, which specifies dedicated REST endpoints for fields (if not the field name shall be used instead) or whether a field is considered a single value or a batch/set.
 
