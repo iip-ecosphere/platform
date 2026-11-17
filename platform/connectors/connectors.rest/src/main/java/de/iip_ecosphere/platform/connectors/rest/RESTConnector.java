@@ -167,6 +167,25 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
         }
     }
 
+    /**
+     * Turns an endpoint into the URI to call. An endpoint that is already a full URL (the generator prepends
+     * {@code endpointPrefix}, which may be a full URL) takes precedence over host/port. Other endpoints are
+     * relative to {@link #path}.
+     * 
+     * @param endpoint the endpoint
+     * @return the URI to call
+     */
+    private String toUri(String endpoint) {
+        String result;
+        try {
+            new URL(endpoint);
+            result = endpoint; // full URL, use as given
+        } catch (MalformedURLException e) {
+            result = path + endpoint;
+        }
+        return result;
+    }
+
     @Override
     protected void disconnectImpl() throws IOException {
         this.params = null;
@@ -185,7 +204,7 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
         for (Entry<String, RESTEndpoint> entry : endpointMap.entrySet()) {
             String key = entry.getKey().toLowerCase();
             String endpoint = entry.getValue().getEndpoint();
-            String uri = path + endpoint;
+            String uri = toUri(endpoint);
 
             String responseType = null;
             responseType = entry.getValue().getType();
@@ -247,7 +266,7 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
                         e.printStackTrace();
                     }
 
-                    String uri = path + endpoint + "?value=" + value;
+                    String uri = toUri(endpoint) + "?value=" + value;
                     RestTemplate restTemplate = new RestTemplate();
                     responseEntity = restTemplate.exchange(uri, HttpMethod.PUT, null, String.class);
                 } else {
@@ -255,7 +274,7 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
                     HttpHeaders headers = new HttpHeaders();
                     headers.setContentType(MediaType.APPLICATION_JSON);
                     HttpEntity<?> requestEntity = new HttpEntity<>(value, headers);
-                    String uri = path + endpoint;
+                    String uri = toUri(endpoint);
 
                     RestTemplate restTemplate = new RestTemplate();
                     responseEntity = restTemplate.exchange(uri, HttpMethod.PUT, requestEntity, String.class);
