@@ -186,16 +186,22 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
      * @param endpoint the endpoint
      * @return the URI to call
      */
-    private String toUri(String endpoint) { // runtime check/resolution may lead to performance degradation
+    private String toUri(String endpoint) {
         String result;
-        try {
-            URL epUrl = new URL(endpoint);
-            if (triggeredPath) {
-                URI uri = URI.create(path.get());
-                endpoint = uri.resolve(epUrl.getPath()).toString();
+        // if endpoint is dominated
+        int pos = endpoint.indexOf("://");
+        if (pos > 0) { // endpoint probably has explicit schema, from endpointPrefix set to full URL, then check it
+            try {  // runtime check/resolution may lead to performance degradation
+                URL epUrl = new URL(endpoint);
+                if (triggeredPath) {
+                    URI uri = URI.create(path.get());
+                    endpoint = uri.resolve(epUrl.getPath()).toString();
+                }
+                result = endpoint; // full URL, use as given
+            } catch (MalformedURLException e) {
+                result = path.get() + endpoint;
             }
-            result = endpoint; // full URL, use as given
-        } catch (MalformedURLException e) {
+        } else {
             result = path.get() + endpoint;
         }
         return result;
