@@ -142,6 +142,7 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
         if (!path.endsWith("/")) { 
             path += "/";
         }
+        LOGGER.info("RESTConnector: using path {}", path);
 
         Set<String> keys = params.getSpecificSettingKeys();
         RESTEndpointMap map = null;
