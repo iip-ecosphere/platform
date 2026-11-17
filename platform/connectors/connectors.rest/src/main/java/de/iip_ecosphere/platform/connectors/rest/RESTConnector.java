@@ -61,6 +61,7 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
     private RESTItem item = null;
     private ConnectorParameter params;
     private AtomicReference<String> path = new AtomicReference<>();
+    private boolean triggeredPath = false;
 
     /**
      * The descriptor of this connector (see META-INF/services).
@@ -185,10 +186,14 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
      * @param endpoint the endpoint
      * @return the URI to call
      */
-    private String toUri(String endpoint) {
+    private String toUri(String endpoint) { // runtime check/resolution may lead to performance degradation
         String result;
         try {
-            new URL(endpoint);
+            URL epUrl = new URL(endpoint);
+            if (triggeredPath) {
+                URI uri = URI.create(path.get());
+                endpoint = uri.resolve(epUrl.getPath()).toString();
+            }
             result = endpoint; // full URL, use as given
         } catch (MalformedURLException e) {
             result = path.get() + endpoint;
@@ -491,12 +496,14 @@ public class RESTConnector<CO, CI> extends AbstractConnector<RESTItem, Object, C
                         URI uri = URI.create(path.get());
                         URI newUri = uri.resolve(qs);
                         path.set(newUri.toString());
+                        triggeredPath = true;
                     } catch (IllegalArgumentException e) {
                         LoggerFactory.getLogger(RESTConnector.class).warn("Cannot replace URI path: {}", 
                             e.getMessage());
                     }
                 } else {
                     path.set(qs);
+                    triggeredPath = true;
                 }
             }
         }
