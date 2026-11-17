@@ -491,6 +491,10 @@ public abstract class AbstractConfigurationMojo extends AbstractLoggingMojo impl
                 if (null != nestedGoal && nestedGoal.length() > 0) {
                     executor.setGoal(nestedGoal);
                 }
+                // mvn -U: nested app builds update snapshots, too (PlatformInstantiator.KEY_PROPERTY_UPDATE_SNAPSHOTS)
+                if (session.getRequest().isUpdateSnapshots()) {
+                    executor.setProperty("iip.updateSnapshots", true);
+                }
                 try {
                     if (asProcess) {
                         executor.executeAsProcess(getClass().getClassLoader(), resourcesDir, getTracingLevel(), 
