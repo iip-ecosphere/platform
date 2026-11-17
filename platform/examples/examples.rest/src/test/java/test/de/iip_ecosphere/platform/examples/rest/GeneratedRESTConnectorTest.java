@@ -31,10 +31,6 @@ import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
 import de.iip_ecosphere.platform.transport.connectors.ReceptionCallback;
 
-
-
-
-
 public class GeneratedRESTConnectorTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GeneratedRESTConnectorTest.class);
@@ -106,14 +102,14 @@ public class GeneratedRESTConnectorTest {
             }
             
             Assert.assertNotNull(rest);
-            Assert.assertEquals(3, rest.getTn1().getValue());
-            Assert.assertEquals(50.000, rest.getF().getValue());
-            Assert.assertEquals(229.845, rest.getU1().getValue());
-            Assert.assertEquals(229.805, rest.getU2().getValue());
-            Assert.assertEquals(229.853, rest.getU3().getValue());
-            Assert.assertEquals(2.533, rest.getAll().getItems()[7].getValue());
-            Assert.assertEquals(2.468, rest.getAll().getItems()[8].getValue());
-            Assert.assertEquals(2.476, rest.getAll().getItems()[9].getValue());           
+            Assert.assertEquals("3", rest.getTn1().getValue());
+            Assert.assertEquals("50.0", rest.getF().getValue());
+            Assert.assertEquals("229.845", rest.getU1().getValue());
+            Assert.assertEquals("229.805", rest.getU2().getValue());
+            Assert.assertEquals("229.853", rest.getU3().getValue());
+            Assert.assertEquals("2.533", rest.getAll().getItems()[7].getValue());
+            Assert.assertEquals("2.468", rest.getAll().getItems()[8].getValue());
+            Assert.assertEquals("2.476", rest.getAll().getItems()[9].getValue());           
             Assert.assertEquals("Device information", rest.getInformation().getRootItems()[0].getDescription());
             Assert.assertEquals("Instantaneous values", rest.getInformation().getRootItems()[1].getDescription());
             Assert.assertEquals("EEM-MA370", rest.getInformation().getInfoItems()[0].getValue());
@@ -127,7 +123,7 @@ public class GeneratedRESTConnectorTest {
 
             rest = waitUntilReceived(count, restReference, rest);
             
-            Assert.assertEquals(1, rest.getTn1().getValue());                        
+            Assert.assertEquals("1", rest.getTn1().getValue());                        
             Assert.assertEquals("", rest.getTn2().getContext());
             Assert.assertEquals("", rest.getTn2().getId());
             Assert.assertEquals("", rest.getTn2().getTimestamp());
@@ -152,7 +148,7 @@ public class GeneratedRESTConnectorTest {
             Assert.assertEquals("tn2", rest.getTn2().getId());
             Assert.assertEquals("timestamp", rest.getTn2().getTimestamp());
             Assert.assertEquals("TN2", rest.getTn2().getName());
-            Assert.assertEquals(3, rest.getTn2().getValue());
+            Assert.assertEquals("3", rest.getTn2().getValue());
             Assert.assertEquals("Tariff Number 2", rest.getTn2().getDescription());
                    
             System.out.println("");

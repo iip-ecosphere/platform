@@ -3,8 +3,10 @@ package de.iip_ecosphere.platform.examples.rest;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
+@ComponentScan("test.de.iip_ecosphere.platform.examples.rest") 
 public class TestServerEEM {
 
     private ConfigurableApplicationContext context;
