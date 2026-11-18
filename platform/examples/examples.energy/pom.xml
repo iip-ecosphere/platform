@@ -1,4 +1,7 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>examples.energy</artifactId>
@@ -28,13 +31,64 @@
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>services.environment</artifactId>
       <version>${project.version}</version>
-     </dependency>
-      
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>1.7.25</version>
+    </dependency>
+
+    <!-- ModbusTCP client (Jamod, same library as connectors.modbustcpipv1) -->
+    <dependency>
+      <groupId>net.wimpi</groupId>
+      <artifactId>jamod</artifactId>
+      <version>1.2</version>
+    </dependency>
+
+    <!-- Eclipse Milo OPC UA server SDK (includes stack-server) -->
+    <dependency>
+      <groupId>org.eclipse.milo</groupId>
+      <artifactId>sdk-server</artifactId>
+      <version>0.6.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.milo</groupId>
+      <artifactId>sdk-core</artifactId>
+      <version>0.6.4</version>
+    </dependency>
+
+    <!-- MQTT client (Shelly) -->
+    <dependency>
+      <groupId>org.eclipse.paho</groupId>
+      <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+      <version>1.2.5</version>
+    </dependency>
+
+    <!-- JSON (Jackson, managed by platformDependenciesBOM) -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>5.10.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>5.10.0</version>
+      <scope>test</scope>
+    </dependency>
+
     <dependency>
       <groupId>de.iip-ecosphere.platform</groupId>
       <artifactId>support</artifactId>
@@ -67,7 +121,7 @@
   <properties>
         <generated.class>de.iip_ecosphere.platform.examples.energy.GeneratedConnector</generated.class>
         <iip.resources>resources</iip.resources>
-        <test.docker.skip>true</test.docker.skip> <!-- default for local execution -->
+        <test.docker.skip>true</test.docker.skip>
         <test.exec.args>--skip</test.exec.args>
         <test.exec.regEx>.*Energy OPCUA Connector test.*</test.exec.regEx>
         <iip.gen>target/gen/energy</iip.gen>
@@ -81,11 +135,11 @@
               <artifactId>apps.EnergyOpcAppInterfaces</artifactId>
               <groupId>de.iip-ecosphere.platform</groupId>
               <version>${project.version}</version>
-            </dependency>    
+            </dependency>
             <dependency>
               <artifactId>SimpleEnergyOPCDemoApp</artifactId>
               <groupId>de.iip-ecosphere.platform.apps</groupId>
-              <version>0.1.0-SNAPSHOT</version> <!-- from config -->
+              <version>0.1.0-SNAPSHOT</version>
             </dependency>
           </dependencies>
           <build>
@@ -104,18 +158,28 @@
                               </arguments>
                           </configuration>
                        </execution>
+                       <execution>
+                          <id>energyServer</id>
+                          <goals>
+                              <goal>java</goal>
+                          </goals>
+                          <configuration>
+                              <mainClass>de.iip_ecosphere.platform.examples.energy.EnergyAggregatorMain</mainClass>
+                          </configuration>
+                       </execution>
                    </executions>
                 </plugin>
              </plugins>
-          </build> 
+          </build>
      </profile>
+
      <profile>
         <id>EasyGen</id>
         <properties>
             <maven.main.skip>true</maven.main.skip>
             <maven.test.skip>true</maven.test.skip>
             <maven.javadoc.skip>true</maven.javadoc.skip>
-        </properties> 
+        </properties>
           <build>
             <plugins>
                <plugin>
@@ -158,86 +222,39 @@
                    </execution>
                  </executions>
                </plugin>
-               <!-- <plugin>
-				   <groupId>io.fabric8</groupId>
-				   <artifactId>docker-maven-plugin</artifactId>
-				   <version>0.43.4</version>
-				   <executions>
-                     <execution>
-                       <id>start</id>
-                       <phase>package</phase>
-                       <goals>
-                         <goal>start</goal>
-                       </goals>
-                     </execution>
-                     <execution>
-                       <id>stop</id>
-                       <phase>verify</phase>
-                       <goals>
-                         <goal>stop</goal>
-                       </goals>
-                     </execution>
-                     <execution>
-                       <id>build</id>
-                       <phase></phase>
-                       <goals>
-                         <goal>prepare-package</goal>
-                       </goals>
-                     </execution>
-                   </executions>
-                   <configuration>
-                       <skip>${test.docker.skip}</skip>
-                   </configuration>
-                   <images>
-                       <image>
-                           <name>NAME</name>
-                           <build>
-                             <dockerFileDir>src/test/docker</dockerFileDir>
-                           </build>
-                           <run>
-	                           <wait>
-	                             <http>
-	                               <url></url>
-	                             </http>
-	                           </wait>
-                           </run>
-                       </image>
-                   </images>
-               </plugin> -->
                <plugin>
                    <groupId>de.iip-ecosphere.platform</groupId>
                    <artifactId>configuration-plugin</artifactId>
                    <version>${project.version}</version>
                    <executions>
-	                   <execution>
-	                      <id>generateBootstrappedApps</id>
-	                      <goals>
-	                          <goal>generateBootstrappedApps</goal>
-	                      </goals>
-	                   </execution>
+                       <execution>
+                          <id>generateBootstrappedApps</id>
+                          <goals>
+                              <goal>generateBootstrappedApps</goal>
+                          </goals>
+                       </execution>
                        <execution>
                          <id>generateAppsDirect</id>
                          <goals>
                            <goal>generateAppsDirect</goal>
                          </goals>
                        </execution>
-	                    <execution>
-	                        <id>testApp</id>
-	                        <goals>
-	                            <goal>testApp</goal>
-	                        </goals>
-	                        <!-- WARNING: Jenkins cannot contact UMATI OPCUA service. Disabling execution! -->
-	                        <configuration>
-	                            <appId>generatedConnector</appId>
-	                            <mvnArgs>
-	                                <mvnArg>-Dexec.args="${test.exec.args}"</mvnArg>
-	                            </mvnArgs>
-	                            <brokerPort>0</brokerPort>
-	                            <logRegExprs>
-	                                <logRegExpr>${test.exec.regEx}</logRegExpr>
-	                            </logRegExprs>
-	                        </configuration>
-	                    </execution>
+                        <execution>
+                            <id>testApp</id>
+                            <goals>
+                                <goal>testApp</goal>
+                            </goals>
+                            <configuration>
+                                <appId>generatedConnector</appId>
+                                <mvnArgs>
+                                    <mvnArg>-Dexec.args="${test.exec.args}"</mvnArg>
+                                </mvnArgs>
+                                <brokerPort>0</brokerPort>
+                                <logRegExprs>
+                                    <logRegExpr>${test.exec.regEx}</logRegExpr>
+                                </logRegExprs>
+                            </configuration>
+                        </execution>
                    </executions>
                    <configuration>
                        <model>Energy</model>
@@ -247,9 +264,9 @@
                    </configuration>
                </plugin>
             </plugins>
-          </build> 
+          </build>
      </profile>
-     
+
      <profile>
         <id>Main</id>
         <activation>
@@ -260,8 +277,7 @@
             <maven.test.skip>true</maven.test.skip>
             <python-compile.skip>true</python-compile.skip>
             <maven.javadoc.skip>true</maven.javadoc.skip>
-        </properties>        
-
+        </properties>
         <build>
             <plugins>
               <plugin>
@@ -329,6 +345,5 @@
             </plugins>
         </build>
      </profile>
-     
   </profiles>
 </project>

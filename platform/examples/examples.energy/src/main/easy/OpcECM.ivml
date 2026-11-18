@@ -1,0 +1,4961 @@
+project OpcECM {
+
+	import IIPEcosphere;
+	import DataTypes;
+	import OpcUaDataTypes;
+
+	annotate BindingTime bindingTime = BindingTime::compile to .;
+
+	UAVariableTypeType opcPropertyTypeType = {
+		name = "opcPropertyTypeType",
+		nodeId = {nameSpaceIndex = 0, identifier = 68},
+		nodeClass = NodeClass::UAVariableType,
+		browseName = "PropertyType",
+		displayName = "PropertyType",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/7.3",
+		type = refBy(opcUnknownDataType)
+	};
+
+	UADataType opcNumberType = {
+		name = "opcNumberType",
+		nodeId = {nameSpaceIndex = 0, identifier = 26},
+		nodeClass = NodeClass::UADataType,
+		browseName = "Number",
+		displayName = "Number",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/12.2.9",
+		literals = {
+		}
+	};
+
+	UAVariableTypeType opcAnalogUnitTypeType = {
+		name = "opcAnalogUnitTypeType",
+		nodeId = {nameSpaceIndex = 0, identifier = 17497},
+		nodeClass = NodeClass::UAVariableType,
+		browseName = "AnalogUnitType",
+		displayName = "AnalogUnitType",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part8/5.3.2/#5.3.2.4",
+		type = refBy(opcNumberType)
+	};
+
+	UAVariableTypeType opcBaseDataVariableTypeType = {
+		name = "opcBaseDataVariableTypeType",
+		nodeId = {nameSpaceIndex = 0, identifier = 63},
+		nodeClass = NodeClass::UAVariableType,
+		browseName = "BaseDataVariableType",
+		displayName = "BaseDataVariableType",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/7.4",
+		type = refBy(opcUnknownDataType)
+	};
+
+	UADataType opcDurationType = {
+		name = "opcDurationType",
+		nodeId = {nameSpaceIndex = 0, identifier = 290},
+		nodeClass = NodeClass::UADataType,
+		browseName = "Duration",
+		displayName = "Duration",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/12.2.9/#12.2.9.3",
+		literals = {
+		}
+	};
+
+	UARootObjectType opcEnergySavingModesContainerTypeEnergySavingModes = {
+		name = "opcEnergySavingModesContainerTypeEnergySavingModes",
+		nodeId = {nameSpaceIndex = 1, identifier = 5016},
+		nodeClass = NodeClass::UAObject,
+		browseName = "1:<EnergySavingModes>",
+		displayName = "<EnergySavingModes>",
+		description = "",
+		optional = false,
+		typeDefinition = refBy(opcEnergySavingModeType),
+		rootParent = refBy(opcEnergySavingModesContainerType),
+		fields = {
+			UAFieldVariableType {
+				name = "opcEnergySavingModesDynamicData",
+				nodeId = {nameSpaceIndex = 1, identifier = 6140},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:DynamicData",
+				displayName = "DynamicData",
+				description = "",
+				type = refBy(BooleanType),
+				typeDefinition = refBy(opcPropertyTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcEnergySavingModesEnergyConsumptionToOperate",
+				nodeId = {nameSpaceIndex = 1, identifier = 6141},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:EnergyConsumptionToOperate",
+				displayName = "EnergyConsumptionToOperate",
+				description = "",
+				type = refBy(FloatType),
+				typeDefinition = refBy(opcAnalogUnitTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcEnergySavingModesEnergyConsumptionToPause",
+				nodeId = {nameSpaceIndex = 1, identifier = 6143},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:EnergyConsumptionToPause",
+				displayName = "EnergyConsumptionToPause",
+				description = "",
+				type = refBy(FloatType),
+				typeDefinition = refBy(opcAnalogUnitTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcEnergySavingModesID",
+				nodeId = {nameSpaceIndex = 1, identifier = 6200},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:ID",
+				displayName = "ID",
+				description = "",
+				type = refBy(ByteType),
+				typeDefinition = refBy(opcPropertyTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcEnergySavingModesModePowerConsumption",
+				nodeId = {nameSpaceIndex = 1, identifier = 6145},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:ModePowerConsumption",
+				displayName = "ModePowerConsumption",
+				description = "",
+				type = refBy(FloatType),
+				typeDefinition = refBy(opcAnalogUnitTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcEnergySavingModesRegularTimeToOperate",
+				nodeId = {nameSpaceIndex = 1, identifier = 6147},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:RegularTimeToOperate",
+				displayName = "RegularTimeToOperate",
+				description = "",
+				type = refBy(opcDurationType),
+				typeDefinition = refBy(opcBaseDataVariableTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcEnergySavingModesTimeMaxLengthOfStay",
+				nodeId = {nameSpaceIndex = 1, identifier = 6148},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:TimeMaxLengthOfStay",
+				displayName = "TimeMaxLengthOfStay",
+				description = "",
+				type = refBy(opcDurationType),
+				typeDefinition = refBy(opcBaseDataVariableTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcEnergySavingModesTimeMinLengthOfStay",
+				nodeId = {nameSpaceIndex = 1, identifier = 6149},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:TimeMinLengthOfStay",
+				displayName = "TimeMinLengthOfStay",
+				description = "",
+				type = refBy(opcDurationType),
+				typeDefinition = refBy(opcBaseDataVariableTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcEnergySavingModesTimeMinPause",
+				nodeId = {nameSpaceIndex = 1, identifier = 6150},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:TimeMinPause",
+				displayName = "TimeMinPause",
+				description = "",
+				type = refBy(opcDurationType),
+				typeDefinition = refBy(opcBaseDataVariableTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcEnergySavingModesTimeToPause",
+				nodeId = {nameSpaceIndex = 1, identifier = 6151},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:TimeToPause",
+				displayName = "TimeToPause",
+				description = "",
+				type = refBy(opcDurationType),
+				typeDefinition = refBy(opcBaseDataVariableTypeType),
+				optional = false
+			}
+		}
+	};
+
+	UARootObjectType opcEnergyStandbyManagementTypeEnergySavingModes = {
+		name = "opcEnergyStandbyManagementTypeEnergySavingModes",
+		nodeId = {nameSpaceIndex = 1, identifier = 5018},
+		nodeClass = NodeClass::UAObject,
+		browseName = "1:EnergySavingModes",
+		displayName = "EnergySavingModes",
+		description = "",
+		optional = true,
+		typeDefinition = refBy(opcEnergySavingModesContainerType),
+		rootParent = refBy(opcEnergyStandbyManagementType),
+		fields = {
+			UAFieldObjectType {
+				name = "EnergySavingModes",
+				nodeId = {nameSpaceIndex = 1, identifier = 5007},
+				nodeClass = NodeClass::UAObject,
+				browseName = "1:EnergySavingModes",
+				displayName = "EnergySavingModes",
+				description = "",
+				optional = false,
+				type = refBy(opcEnergyStandbyManagementTypeEnergySavingModesEnergySavingModes)
+			}
+		}
+	};
+
+	UAObjectType opcEnergyStandbyManagementTypeEnergySavingModesEnergySavingModes = {
+		name = "opcEnergyStandbyManagementTypeEnergySavingModesEnergySavingModes",
+		nodeId = {nameSpaceIndex = 1, identifier = 5007},
+		nodeClass = NodeClass::UAObject,
+		browseName = "1:EnergySavingModes",
+		displayName = "EnergySavingModes",
+		description = "",
+		optional = false,
+		typeDefinition = refBy(opcEnergySavingModeType),
+		fields = {
+			UAFieldVariableType {
+				name = "opcEnergySavingModesDynamicData",
+				nodeId = {nameSpaceIndex = 1, identifier = 6278},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:DynamicData",
+				displayName = "DynamicData",
+				description = "",
+				type = refBy(BooleanType),
+				typeDefinition = refBy(opcPropertyTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcEnergySavingModesEnergyConsumptionToOperate",
+				nodeId = {nameSpaceIndex = 1, identifier = 6279},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:EnergyConsumptionToOperate",
+				displayName = "EnergyConsumptionToOperate",
+				description = "",
+				type = refBy(FloatType),
+				typeDefinition = refBy(opcAnalogUnitTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcEnergySavingModesEnergyConsumptionToPause",
+				nodeId = {nameSpaceIndex = 1, identifier = 6281},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:EnergyConsumptionToPause",
+				displayName = "EnergyConsumptionToPause",
+				description = "",
+				type = refBy(FloatType),
+				typeDefinition = refBy(opcAnalogUnitTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcEnergySavingModesID",
+				nodeId = {nameSpaceIndex = 1, identifier = 6283},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:ID",
+				displayName = "ID",
+				description = "",
+				type = refBy(ByteType),
+				typeDefinition = refBy(opcPropertyTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcEnergySavingModesModePowerConsumption",
+				nodeId = {nameSpaceIndex = 1, identifier = 6284},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:ModePowerConsumption",
+				displayName = "ModePowerConsumption",
+				description = "",
+				type = refBy(FloatType),
+				typeDefinition = refBy(opcAnalogUnitTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcEnergySavingModesRegularTimeToOperate",
+				nodeId = {nameSpaceIndex = 1, identifier = 6286},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:RegularTimeToOperate",
+				displayName = "RegularTimeToOperate",
+				description = "",
+				type = refBy(opcDurationType),
+				typeDefinition = refBy(opcBaseDataVariableTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcEnergySavingModesTimeMaxLengthOfStay",
+				nodeId = {nameSpaceIndex = 1, identifier = 6287},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:TimeMaxLengthOfStay",
+				displayName = "TimeMaxLengthOfStay",
+				description = "",
+				type = refBy(opcDurationType),
+				typeDefinition = refBy(opcBaseDataVariableTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcEnergySavingModesTimeMinLengthOfStay",
+				nodeId = {nameSpaceIndex = 1, identifier = 6288},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:TimeMinLengthOfStay",
+				displayName = "TimeMinLengthOfStay",
+				description = "",
+				type = refBy(opcDurationType),
+				typeDefinition = refBy(opcBaseDataVariableTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcEnergySavingModesTimeMinPause",
+				nodeId = {nameSpaceIndex = 1, identifier = 6289},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:TimeMinPause",
+				displayName = "TimeMinPause",
+				description = "",
+				type = refBy(opcDurationType),
+				typeDefinition = refBy(opcBaseDataVariableTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcEnergySavingModesTimeToPause",
+				nodeId = {nameSpaceIndex = 1, identifier = 6290},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:TimeToPause",
+				displayName = "TimeToPause",
+				description = "",
+				type = refBy(opcDurationType),
+				typeDefinition = refBy(opcBaseDataVariableTypeType),
+				optional = false
+			}
+		}
+	};
+
+	UARootObjectType opcEnergyStandbyManagementTypeEnergySavingModeStatus = {
+		name = "opcEnergyStandbyManagementTypeEnergySavingModeStatus",
+		nodeId = {nameSpaceIndex = 1, identifier = 5017},
+		nodeClass = NodeClass::UAObject,
+		browseName = "1:EnergySavingModeStatus",
+		displayName = "EnergySavingModeStatus",
+		description = "",
+		optional = false,
+		typeDefinition = refBy(opcEnergySavingModeStatusType),
+		rootParent = refBy(opcEnergyStandbyManagementType),
+		fields = {
+			UAFieldVariableType {
+				name = "opcEnergySavingModeStatusStateInformation",
+				nodeId = {nameSpaceIndex = 1, identifier = 6039},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "1:StateInformation",
+				displayName = "StateInformation",
+				description = "",
+				type = refBy(opcEnergyStateInformationDataTypeType),
+				typeDefinition = refBy(opcBaseDataVariableTypeType),
+				optional = false
+			}
+		}
+	};
+
+	UAObjectTypeType opcLockingServicesType = {
+		name = "opcLockingServicesType",
+		nodeId = {nameSpaceIndex = 3, identifier = 6388},
+		nodeClass = NodeClass::UAObjectType,
+		browseName = "1:LockingServicesType",
+		displayName = "LockingServicesType",
+		description = "An interface for Locking.",
+		documentation = "https://reference.opcfoundation.org/DI/v104/docs/7.2"
+	};
+
+	UARootObjectType opcEnergyStandbyManagementTypeLock = {
+		name = "opcEnergyStandbyManagementTypeLock",
+		nodeId = {nameSpaceIndex = 1, identifier = 5020},
+		nodeClass = NodeClass::UAObject,
+		browseName = "3:Lock",
+		displayName = "Lock",
+		description = "",
+		optional = true,
+		typeDefinition = refBy(opcLockingServicesType),
+		rootParent = refBy(opcEnergyStandbyManagementType),
+		fields = {
+			UAFieldMethodType {
+				name = "BreakLock",
+				nodeId = {nameSpaceIndex = 1, identifier = 7001},
+				nodeClass = NodeClass::UAMethod,
+				browseName = "3:BreakLock",
+				displayName = "BreakLock",
+				optional = false,
+				type = refBy(opcEnergyStandbyManagementTypeLockBreakLock)
+			}, UAFieldMethodType {
+				name = "ExitLock",
+				nodeId = {nameSpaceIndex = 1, identifier = 7002},
+				nodeClass = NodeClass::UAMethod,
+				browseName = "3:ExitLock",
+				displayName = "ExitLock",
+				optional = false,
+				type = refBy(opcEnergyStandbyManagementTypeLockExitLock)
+			}, UAFieldMethodType {
+				name = "InitLock",
+				nodeId = {nameSpaceIndex = 1, identifier = 7003},
+				nodeClass = NodeClass::UAMethod,
+				browseName = "3:InitLock",
+				displayName = "InitLock",
+				optional = false,
+				type = refBy(opcEnergyStandbyManagementTypeLockInitLock)
+			}, UAFieldVariableType {
+				name = "opcLockLocked",
+				nodeId = {nameSpaceIndex = 1, identifier = 6045},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "3:Locked",
+				displayName = "Locked",
+				description = "",
+				type = refBy(BooleanType),
+				typeDefinition = refBy(opcPropertyTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcLockLockingClient",
+				nodeId = {nameSpaceIndex = 1, identifier = 6046},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "3:LockingClient",
+				displayName = "LockingClient",
+				description = "",
+				type = refBy(StringType),
+				typeDefinition = refBy(opcPropertyTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcLockLockingUser",
+				nodeId = {nameSpaceIndex = 1, identifier = 6047},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "3:LockingUser",
+				displayName = "LockingUser",
+				description = "",
+				type = refBy(StringType),
+				typeDefinition = refBy(opcPropertyTypeType),
+				optional = false
+			}, UAFieldVariableType {
+				name = "opcLockRemainingLockTime",
+				nodeId = {nameSpaceIndex = 1, identifier = 6048},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "3:RemainingLockTime",
+				displayName = "RemainingLockTime",
+				description = "",
+				type = refBy(opcDurationType),
+				typeDefinition = refBy(opcPropertyTypeType),
+				optional = false
+			}, UAFieldMethodType {
+				name = "RenewLock",
+				nodeId = {nameSpaceIndex = 1, identifier = 7004},
+				nodeClass = NodeClass::UAMethod,
+				browseName = "3:RenewLock",
+				displayName = "RenewLock",
+				optional = false,
+				type = refBy(opcEnergyStandbyManagementTypeLockRenewLock)
+			}
+		}
+	};
+
+	UADataType opcNodeIdType = {
+		name = "opcNodeIdType",
+		nodeId = {nameSpaceIndex = 0, identifier = 17},
+		nodeClass = NodeClass::UADataType,
+		browseName = "NodeId",
+		displayName = "NodeId",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/12.2.8",
+		literals = {
+		}
+	};
+
+	UADataType opcInt32Type = {
+		name = "opcInt32Type",
+		nodeId = {nameSpaceIndex = 0, identifier = 6},
+		nodeClass = NodeClass::UADataType,
+		browseName = "Int32",
+		displayName = "Int32",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/12.2.9/#12.2.9.7",
+		literals = {
+		}
+	};
+
+	UADataType opcLocalizedTextType = {
+		name = "opcLocalizedTextType",
+		nodeId = {nameSpaceIndex = 0, identifier = 21},
+		nodeClass = NodeClass::UADataType,
+		browseName = "LocalizedText",
+		displayName = "LocalizedText",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/12.2.7",
+		literals = {
+		}
+	};
+
+	UADataType opcArgumentType = {
+		name = "opcArgumentType",
+		nodeId = {nameSpaceIndex = 0, identifier = 296},
+		nodeClass = NodeClass::UADataType,
+		browseName = "Argument",
+		displayName = "Argument",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/12.2.12/#12.2.12.1",
+		literals = {
+			DataLiteral {
+				name = "_Name",
+				type = refBy(StringType),
+				description = ""
+			}, DataLiteral {
+				name = "_DataType",
+				type = refBy(opcNodeIdType),
+				description = ""
+			}, DataLiteral {
+				name = "_ValueRank",
+				type = refBy(opcInt32Type),
+				description = ""
+			}, DataLiteral {
+				name = "_ArrayDimensions",
+				type = refBy(UnsignedInteger32Type),
+				description = ""
+			}, DataLiteral {
+				name = "_Description",
+				type = refBy(opcLocalizedTextType),
+				description = ""
+			}
+		}
+	};
+
+	UAMethodType opcEnergyStandbyManagementTypeLockBreakLock = {
+		name = "opcEnergyStandbyManagementTypeLockBreakLock",
+		nodeId = {nameSpaceIndex = 1, identifier = 7001},
+		nodeClass = NodeClass::UAMethod,
+		browseName = "3:BreakLock",
+		displayName = "BreakLock",
+		optional = false,
+		fields = {
+			UAFieldVariableType {
+				name = "OutputArguments",
+				nodeId = {nameSpaceIndex = 1, identifier = 6041},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "OutputArguments",
+				displayName = "OutputArguments",
+				description = "",
+				type = refBy(opcArgumentType),
+				typeDefinition = refBy(opcPropertyTypeType),
+				optional = false,
+				valueRank = 1,
+				arrayDimensions = 0
+			}
+		}
+	};
+
+	UAMethodType opcEnergyStandbyManagementTypeLockExitLock = {
+		name = "opcEnergyStandbyManagementTypeLockExitLock",
+		nodeId = {nameSpaceIndex = 1, identifier = 7002},
+		nodeClass = NodeClass::UAMethod,
+		browseName = "3:ExitLock",
+		displayName = "ExitLock",
+		optional = false,
+		fields = {
+			UAFieldVariableType {
+				name = "OutputArguments",
+				nodeId = {nameSpaceIndex = 1, identifier = 6042},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "OutputArguments",
+				displayName = "OutputArguments",
+				description = "",
+				type = refBy(opcArgumentType),
+				typeDefinition = refBy(opcPropertyTypeType),
+				optional = false,
+				valueRank = 1,
+				arrayDimensions = 0
+			}
+		}
+	};
+
+	UAMethodType opcEnergyStandbyManagementTypeLockInitLock = {
+		name = "opcEnergyStandbyManagementTypeLockInitLock",
+		nodeId = {nameSpaceIndex = 1, identifier = 7003},
+		nodeClass = NodeClass::UAMethod,
+		browseName = "3:InitLock",
+		displayName = "InitLock",
+		optional = false,
+		fields = {
+			UAFieldVariableType {
+				name = "InputArguments",
+				nodeId = {nameSpaceIndex = 1, identifier = 6043},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "InputArguments",
+				displayName = "InputArguments",
+				description = "",
+				type = refBy(opcArgumentType),
+				typeDefinition = refBy(opcPropertyTypeType),
+				optional = false,
+				valueRank = 1,
+				arrayDimensions = 0
+			}, UAFieldVariableType {
+				name = "OutputArguments",
+				nodeId = {nameSpaceIndex = 1, identifier = 6044},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "OutputArguments",
+				displayName = "OutputArguments",
+				description = "",
+				type = refBy(opcArgumentType),
+				typeDefinition = refBy(opcPropertyTypeType),
+				optional = false,
+				valueRank = 1,
+				arrayDimensions = 0
+			}
+		}
+	};
+
+	UAMethodType opcEnergyStandbyManagementTypeLockRenewLock = {
+		name = "opcEnergyStandbyManagementTypeLockRenewLock",
+		nodeId = {nameSpaceIndex = 1, identifier = 7004},
+		nodeClass = NodeClass::UAMethod,
+		browseName = "3:RenewLock",
+		displayName = "RenewLock",
+		optional = false,
+		fields = {
+			UAFieldVariableType {
+				name = "OutputArguments",
+				nodeId = {nameSpaceIndex = 1, identifier = 6049},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "OutputArguments",
+				displayName = "OutputArguments",
+				description = "",
+				type = refBy(opcArgumentType),
+				typeDefinition = refBy(opcPropertyTypeType),
+				optional = false,
+				valueRank = 1,
+				arrayDimensions = 0
+			}
+		}
+	};
+
+	UADataType opcInt64Type = {
+		name = "opcInt64Type",
+		nodeId = {nameSpaceIndex = 0, identifier = 8},
+		nodeClass = NodeClass::UADataType,
+		browseName = "Int64",
+		displayName = "Int64",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/12.2.9/#12.2.9.8",
+		literals = {
+		}
+	};
+
+	UADataType opcEnumValueTypeType = {
+		name = "opcEnumValueTypeType",
+		nodeId = {nameSpaceIndex = 0, identifier = 7594},
+		nodeClass = NodeClass::UADataType,
+		browseName = "EnumValueType",
+		displayName = "EnumValueType",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part5/12.2.12/#12.2.12.6",
+		literals = {
+			DataLiteral {
+				name = "_Value",
+				type = refBy(opcInt64Type),
+				description = ""
+			}, DataLiteral {
+				name = "_DisplayName",
+				type = refBy(opcLocalizedTextType),
+				description = ""
+			}, DataLiteral {
+				name = "_Description",
+				type = refBy(opcLocalizedTextType),
+				description = ""
+			}
+		}
+	};
+
+	UARootVariableType opcAccuracyDomainTypeEnumValues = {
+		name = "opcAccuracyDomainTypeEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6201},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcAccuracyDomainType),
+		accessLevel = 3,
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UAVariableTypeType opcEnergyMeasurementValueTypeType = {
+		name = "opcEnergyMeasurementValueTypeType",
+		nodeId = {nameSpaceIndex = 1, identifier = 2002},
+		nodeClass = NodeClass::UAVariableType,
+		browseName = "1:EnergyMeasurementValueType",
+		displayName = "EnergyMeasurementValueType",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/8.1",
+		type = refBy(opcUnknownDataType)
+	};
+
+	UARootVariableType opcIEnergyProfileD0TypeDcCurrent = {
+		name = "opcIEnergyProfileD0TypeDcCurrent",
+		nodeId = {nameSpaceIndex = 1, identifier = 6102},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:DcCurrent",
+		displayName = "DcCurrent",
+		description = "",
+		optional = false,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileD0Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcActivePower = {
+		name = "opcIEnergyProfileD1TypeDcActivePower",
+		nodeId = {nameSpaceIndex = 1, identifier = 6307},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:DcActivePower",
+		displayName = "DcActivePower",
+		description = "",
+		optional = false,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileD1Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcCurrent = {
+		name = "opcIEnergyProfileD1TypeDcCurrent",
+		nodeId = {nameSpaceIndex = 1, identifier = 6291},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:DcCurrent",
+		displayName = "DcCurrent",
+		description = "",
+		optional = false,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileD1Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcElectricalCharge = {
+		name = "opcIEnergyProfileD1TypeDcElectricalCharge",
+		nodeId = {nameSpaceIndex = 1, identifier = 6331},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:DcElectricalCharge",
+		displayName = "DcElectricalCharge",
+		description = "",
+		optional = false,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileD1Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcEnergyTotalExportLp = {
+		name = "opcIEnergyProfileD1TypeDcEnergyTotalExportLp",
+		nodeId = {nameSpaceIndex = 1, identifier = 6323},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:DcEnergyTotalExportLp",
+		displayName = "DcEnergyTotalExportLp",
+		description = "",
+		optional = false,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileD1Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcEnergyTotalImportLp = {
+		name = "opcIEnergyProfileD1TypeDcEnergyTotalImportLp",
+		nodeId = {nameSpaceIndex = 1, identifier = 6315},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:DcEnergyTotalImportLp",
+		displayName = "DcEnergyTotalImportLp",
+		description = "",
+		optional = false,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileD1Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcRelativeCharge = {
+		name = "opcIEnergyProfileD1TypeDcRelativeCharge",
+		nodeId = {nameSpaceIndex = 1, identifier = 6339},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:DcRelativeCharge",
+		displayName = "DcRelativeCharge",
+		description = "",
+		optional = false,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileD1Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcVoltage = {
+		name = "opcIEnergyProfileD1TypeDcVoltage",
+		nodeId = {nameSpaceIndex = 1, identifier = 6299},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:DcVoltage",
+		displayName = "DcVoltage",
+		description = "",
+		optional = false,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileD1Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE0TypeAcCurrentPe = {
+		name = "opcIEnergyProfileE0TypeAcCurrentPe",
+		nodeId = {nameSpaceIndex = 1, identifier = 6060},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AcCurrentPe",
+		displayName = "AcCurrentPe",
+		description = "",
+		optional = false,
+		type = refBy(opcAcPeDataTypeType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileE0Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE1TypeAcActivePowerTotal = {
+		name = "opcIEnergyProfileE1TypeAcActivePowerTotal",
+		nodeId = {nameSpaceIndex = 1, identifier = 6064},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AcActivePowerTotal",
+		displayName = "AcActivePowerTotal",
+		description = "",
+		optional = false,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileE1Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLp = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLp",
+		nodeId = {nameSpaceIndex = 1, identifier = 6076},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AcActiveEnergyTotalExportLp",
+		displayName = "AcActiveEnergyTotalExportLp",
+		description = "",
+		optional = false,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileE2Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLp = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLp",
+		nodeId = {nameSpaceIndex = 1, identifier = 6072},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AcActiveEnergyTotalImportLp",
+		displayName = "AcActiveEnergyTotalImportLp",
+		description = "",
+		optional = false,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileE2Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActivePowerTotal = {
+		name = "opcIEnergyProfileE2TypeAcActivePowerTotal",
+		nodeId = {nameSpaceIndex = 1, identifier = 6068},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AcActivePowerTotal",
+		displayName = "AcActivePowerTotal",
+		description = "",
+		optional = false,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileE2Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHp = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHp",
+		nodeId = {nameSpaceIndex = 1, identifier = 6086},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AcActiveEnergyTotalExportHp",
+		displayName = "AcActiveEnergyTotalExportHp",
+		description = "",
+		optional = false,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileE3Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHp = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHp",
+		nodeId = {nameSpaceIndex = 1, identifier = 6082},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AcActiveEnergyTotalImportHp",
+		displayName = "AcActiveEnergyTotalImportHp",
+		description = "",
+		optional = false,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileE3Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActivePowerPe = {
+		name = "opcIEnergyProfileE3TypeAcActivePowerPe",
+		nodeId = {nameSpaceIndex = 1, identifier = 6080},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AcActivePowerPe",
+		displayName = "AcActivePowerPe",
+		description = "",
+		optional = false,
+		type = refBy(opcAcPeDataTypeType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileE3Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcCurrentPe = {
+		name = "opcIEnergyProfileE3TypeAcCurrentPe",
+		nodeId = {nameSpaceIndex = 1, identifier = 6100},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AcCurrentPe",
+		displayName = "AcCurrentPe",
+		description = "",
+		optional = false,
+		type = refBy(opcAcPeDataTypeType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileE3Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcPowerFactorPe = {
+		name = "opcIEnergyProfileE3TypeAcPowerFactorPe",
+		nodeId = {nameSpaceIndex = 1, identifier = 6101},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AcPowerFactorPe",
+		displayName = "AcPowerFactorPe",
+		description = "",
+		optional = false,
+		type = refBy(opcAcPeDataTypeType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileE3Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHp = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHp",
+		nodeId = {nameSpaceIndex = 1, identifier = 6094},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AcReactiveEnergyTotalExportHp",
+		displayName = "AcReactiveEnergyTotalExportHp",
+		description = "",
+		optional = false,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileE3Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHp = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHp",
+		nodeId = {nameSpaceIndex = 1, identifier = 6090},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AcReactiveEnergyTotalImportHp",
+		displayName = "AcReactiveEnergyTotalImportHp",
+		description = "",
+		optional = false,
+		type = refBy(DoubleType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileE3Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactivePowerPe = {
+		name = "opcIEnergyProfileE3TypeAcReactivePowerPe",
+		nodeId = {nameSpaceIndex = 1, identifier = 6081},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AcReactivePowerPe",
+		displayName = "AcReactivePowerPe",
+		description = "",
+		optional = false,
+		type = refBy(opcAcPeDataTypeType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileE3Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePe = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePe",
+		nodeId = {nameSpaceIndex = 1, identifier = 6098},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AcVoltagePe",
+		displayName = "AcVoltagePe",
+		description = "",
+		optional = false,
+		type = refBy(opcAcPeDataTypeType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileE3Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePp = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePp",
+		nodeId = {nameSpaceIndex = 1, identifier = 6099},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AcVoltagePp",
+		displayName = "AcVoltagePp",
+		description = "",
+		optional = false,
+		type = refBy(opcAcPpDataTypeType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcIEnergyProfileE3Type),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcEnergyDevicePowerOffTypeModePowerConsumption = {
+		name = "opcEnergyDevicePowerOffTypeModePowerConsumption",
+		nodeId = {nameSpaceIndex = 1, identifier = 6108},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:ModePowerConsumption",
+		displayName = "ModePowerConsumption",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcBaseDataVariableTypeType),
+		rootParent = refBy(opcEnergyDevicePowerOffType)
+	};
+
+	UARootVariableType opcEnergyDevicePowerOffTypeRegularTimeToOperate = {
+		name = "opcEnergyDevicePowerOffTypeRegularTimeToOperate",
+		nodeId = {nameSpaceIndex = 1, identifier = 6106},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:RegularTimeToOperate",
+		displayName = "RegularTimeToOperate",
+		description = "",
+		optional = false,
+		type = refBy(opcDurationType),
+		typeDefinition = refBy(opcBaseDataVariableTypeType),
+		rootParent = refBy(opcEnergyDevicePowerOffType)
+	};
+
+	UARootVariableType opcEnergyDevicePowerOffTypeTimeMinPause = {
+		name = "opcEnergyDevicePowerOffTypeTimeMinPause",
+		nodeId = {nameSpaceIndex = 1, identifier = 6107},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:TimeMinPause",
+		displayName = "TimeMinPause",
+		description = "",
+		optional = false,
+		type = refBy(opcDurationType),
+		typeDefinition = refBy(opcBaseDataVariableTypeType),
+		rootParent = refBy(opcEnergyDevicePowerOffType)
+	};
+
+	UARootVariableType opcEnergyDevicePowerOffTypeWOLMagicPacket = {
+		name = "opcEnergyDevicePowerOffTypeWOLMagicPacket",
+		nodeId = {nameSpaceIndex = 1, identifier = 6109},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:WOLMagicPacket",
+		displayName = "WOLMagicPacket",
+		description = "",
+		optional = false,
+		type = refBy(ByteStringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcEnergyDevicePowerOffType)
+	};
+
+	UARootVariableType opcEnergyMeasurementTypeMeasurementValue = {
+		name = "opcEnergyMeasurementTypeMeasurementValue",
+		nodeId = {nameSpaceIndex = 1, identifier = 6056},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:<MeasurementValue>",
+		displayName = "<MeasurementValue>",
+		description = "",
+		optional = false,
+		type = refBy(opcUnknownDataType),
+		typeDefinition = refBy(opcEnergyMeasurementValueTypeType),
+		rootParent = refBy(opcEnergyMeasurementType),
+		valueRank = -2
+	};
+
+	UARootVariableType opcEnergyMeasurementTypeApplicationTag = {
+		name = "opcEnergyMeasurementTypeApplicationTag",
+		nodeId = {nameSpaceIndex = 1, identifier = 6055},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:ApplicationTag",
+		displayName = "ApplicationTag",
+		description = "",
+		optional = false,
+		type = refBy(StringType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcEnergyMeasurementType),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcEnergyMeasurementTypeStartTime = {
+		name = "opcEnergyMeasurementTypeStartTime",
+		nodeId = {nameSpaceIndex = 1, identifier = 6009},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "2:StartTime",
+		displayName = "StartTime",
+		description = "",
+		optional = true,
+		type = refBy(DateTimeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcEnergyMeasurementType),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcEnergySavingModeStatusTypeCurrentTransitionData = {
+		name = "opcEnergySavingModeStatusTypeCurrentTransitionData",
+		nodeId = {nameSpaceIndex = 1, identifier = 6023},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:CurrentTransitionData",
+		displayName = "CurrentTransitionData",
+		description = "",
+		optional = true,
+		type = refBy(opcStandbyModeTransitionDataTypeType),
+		typeDefinition = refBy(opcBaseDataVariableTypeType),
+		rootParent = refBy(opcEnergySavingModeStatusType)
+	};
+
+	UARootVariableType opcEnergySavingModeStatusTypeStateInformation = {
+		name = "opcEnergySavingModeStatusTypeStateInformation",
+		nodeId = {nameSpaceIndex = 1, identifier = 6024},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:StateInformation",
+		displayName = "StateInformation",
+		description = "",
+		optional = false,
+		type = refBy(opcEnergyStateInformationDataTypeType),
+		typeDefinition = refBy(opcBaseDataVariableTypeType),
+		rootParent = refBy(opcEnergySavingModeStatusType)
+	};
+
+	UARootVariableType opcEnergySavingModeTypeDynamicData = {
+		name = "opcEnergySavingModeTypeDynamicData",
+		nodeId = {nameSpaceIndex = 1, identifier = 6026},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:DynamicData",
+		displayName = "DynamicData",
+		description = "",
+		optional = false,
+		type = refBy(BooleanType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcEnergySavingModeType)
+	};
+
+	UARootVariableType opcEnergySavingModeTypeEnergyConsumptionToOperate = {
+		name = "opcEnergySavingModeTypeEnergyConsumptionToOperate",
+		nodeId = {nameSpaceIndex = 1, identifier = 6036},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:EnergyConsumptionToOperate",
+		displayName = "EnergyConsumptionToOperate",
+		description = "",
+		optional = false,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcAnalogUnitTypeType),
+		rootParent = refBy(opcEnergySavingModeType)
+	};
+
+	UARootVariableType opcEnergySavingModeTypeEnergyConsumptionToPause = {
+		name = "opcEnergySavingModeTypeEnergyConsumptionToPause",
+		nodeId = {nameSpaceIndex = 1, identifier = 6034},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:EnergyConsumptionToPause",
+		displayName = "EnergyConsumptionToPause",
+		description = "",
+		optional = false,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcAnalogUnitTypeType),
+		rootParent = refBy(opcEnergySavingModeType)
+	};
+
+	UARootVariableType opcEnergySavingModeTypeID = {
+		name = "opcEnergySavingModeTypeID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6025},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:ID",
+		displayName = "ID",
+		description = "",
+		optional = false,
+		type = refBy(ByteType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcEnergySavingModeType)
+	};
+
+	UARootVariableType opcEnergySavingModeTypeModePowerConsumption = {
+		name = "opcEnergySavingModeTypeModePowerConsumption",
+		nodeId = {nameSpaceIndex = 1, identifier = 6032},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:ModePowerConsumption",
+		displayName = "ModePowerConsumption",
+		description = "",
+		optional = false,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcAnalogUnitTypeType),
+		rootParent = refBy(opcEnergySavingModeType)
+	};
+
+	UARootVariableType opcEnergySavingModeTypeRegularTimeToOperate = {
+		name = "opcEnergySavingModeTypeRegularTimeToOperate",
+		nodeId = {nameSpaceIndex = 1, identifier = 6031},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:RegularTimeToOperate",
+		displayName = "RegularTimeToOperate",
+		description = "",
+		optional = false,
+		type = refBy(opcDurationType),
+		typeDefinition = refBy(opcBaseDataVariableTypeType),
+		rootParent = refBy(opcEnergySavingModeType)
+	};
+
+	UARootVariableType opcEnergySavingModeTypeTimeMaxLengthOfStay = {
+		name = "opcEnergySavingModeTypeTimeMaxLengthOfStay",
+		nodeId = {nameSpaceIndex = 1, identifier = 6030},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:TimeMaxLengthOfStay",
+		displayName = "TimeMaxLengthOfStay",
+		description = "",
+		optional = false,
+		type = refBy(opcDurationType),
+		typeDefinition = refBy(opcBaseDataVariableTypeType),
+		rootParent = refBy(opcEnergySavingModeType)
+	};
+
+	UARootVariableType opcEnergySavingModeTypeTimeMinLengthOfStay = {
+		name = "opcEnergySavingModeTypeTimeMinLengthOfStay",
+		nodeId = {nameSpaceIndex = 1, identifier = 6029},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:TimeMinLengthOfStay",
+		displayName = "TimeMinLengthOfStay",
+		description = "",
+		optional = false,
+		type = refBy(opcDurationType),
+		typeDefinition = refBy(opcBaseDataVariableTypeType),
+		rootParent = refBy(opcEnergySavingModeType)
+	};
+
+	UARootVariableType opcEnergySavingModeTypeTimeMinPause = {
+		name = "opcEnergySavingModeTypeTimeMinPause",
+		nodeId = {nameSpaceIndex = 1, identifier = 6027},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:TimeMinPause",
+		displayName = "TimeMinPause",
+		description = "",
+		optional = false,
+		type = refBy(opcDurationType),
+		typeDefinition = refBy(opcBaseDataVariableTypeType),
+		rootParent = refBy(opcEnergySavingModeType)
+	};
+
+	UARootVariableType opcEnergySavingModeTypeTimeToPause = {
+		name = "opcEnergySavingModeTypeTimeToPause",
+		nodeId = {nameSpaceIndex = 1, identifier = 6028},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:TimeToPause",
+		displayName = "TimeToPause",
+		description = "",
+		optional = false,
+		type = refBy(opcDurationType),
+		typeDefinition = refBy(opcBaseDataVariableTypeType),
+		rootParent = refBy(opcEnergySavingModeType)
+	};
+
+	UARootVariableType opcEnergyStandbyManagementTypePauseTime = {
+		name = "opcEnergyStandbyManagementTypePauseTime",
+		nodeId = {nameSpaceIndex = 1, identifier = 6040},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:PauseTime",
+		displayName = "PauseTime",
+		description = "",
+		optional = false,
+		type = refBy(opcDurationType),
+		typeDefinition = refBy(opcBaseDataVariableTypeType),
+		rootParent = refBy(opcEnergyStandbyManagementType),
+		accessLevel = 3
+	};
+
+	UAVariableTypeType opcMultiStateDiscreteTypeType = {
+		name = "opcMultiStateDiscreteTypeType",
+		nodeId = {nameSpaceIndex = 0, identifier = 2376},
+		nodeClass = NodeClass::UAVariableType,
+		browseName = "MultiStateDiscreteType",
+		displayName = "MultiStateDiscreteType",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part8/5.3.3/#5.3.3.3",
+		type = refBy(opcUnsignedIntegerType)
+	};
+
+	UARootVariableType opcEnergyStandbyManagementTypeStandbyManagementStatus = {
+		name = "opcEnergyStandbyManagementTypeStandbyManagementStatus",
+		nodeId = {nameSpaceIndex = 1, identifier = 6016},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:StandbyManagementStatus",
+		displayName = "StandbyManagementStatus",
+		description = "",
+		optional = false,
+		type = refBy(ByteType),
+		typeDefinition = refBy(opcMultiStateDiscreteTypeType),
+		rootParent = refBy(opcEnergyStandbyManagementType)
+	};
+
+	UARootMethodType opcEnergyDevicePowerOffTypeSwitchOffWOL = {
+		name = "opcEnergyDevicePowerOffTypeSwitchOffWOL",
+		nodeId = {nameSpaceIndex = 1, identifier = 7009},
+		nodeClass = NodeClass::UAMethod,
+		browseName = "1:SwitchOffWOL",
+		displayName = "SwitchOffWOL",
+		optional = false,
+		rootParent = refBy(opcEnergyDevicePowerOffType),
+		fields = {
+			UAFieldVariableType {
+				name = "OutputArguments",
+				nodeId = {nameSpaceIndex = 1, identifier = 6110},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "OutputArguments",
+				displayName = "OutputArguments",
+				description = "",
+				type = refBy(opcArgumentType),
+				typeDefinition = refBy(opcPropertyTypeType),
+				optional = false,
+				valueRank = 1,
+				arrayDimensions = 5
+			}
+		}
+	};
+
+	UARootMethodType opcEnergyMeasurementTypeResetStatistics = {
+		name = "opcEnergyMeasurementTypeResetStatistics",
+		nodeId = {nameSpaceIndex = 1, identifier = 7008},
+		nodeClass = NodeClass::UAMethod,
+		browseName = "2:ResetStatistics",
+		displayName = "ResetStatistics",
+		optional = true,
+		rootParent = refBy(opcEnergyMeasurementType),
+		fields = {
+		}
+	};
+
+	UARootMethodType opcEnergyStandbyManagementTypeEndPause = {
+		name = "opcEnergyStandbyManagementTypeEndPause",
+		nodeId = {nameSpaceIndex = 1, identifier = 7006},
+		nodeClass = NodeClass::UAMethod,
+		browseName = "1:EndPause",
+		displayName = "EndPause",
+		optional = true,
+		rootParent = refBy(opcEnergyStandbyManagementType),
+		fields = {
+			UAFieldVariableType {
+				name = "OutputArguments",
+				nodeId = {nameSpaceIndex = 1, identifier = 6054},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "OutputArguments",
+				displayName = "OutputArguments",
+				description = "",
+				type = refBy(opcArgumentType),
+				typeDefinition = refBy(opcPropertyTypeType),
+				optional = false,
+				valueRank = 1,
+				arrayDimensions = 2
+			}
+		}
+	};
+
+	UARootMethodType opcEnergyStandbyManagementTypeStartPause = {
+		name = "opcEnergyStandbyManagementTypeStartPause",
+		nodeId = {nameSpaceIndex = 1, identifier = 7005},
+		nodeClass = NodeClass::UAMethod,
+		browseName = "1:StartPause",
+		displayName = "StartPause",
+		optional = true,
+		rootParent = refBy(opcEnergyStandbyManagementType),
+		fields = {
+			UAFieldVariableType {
+				name = "InputArguments",
+				nodeId = {nameSpaceIndex = 1, identifier = 6050},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "InputArguments",
+				displayName = "InputArguments",
+				description = "",
+				type = refBy(opcArgumentType),
+				typeDefinition = refBy(opcPropertyTypeType),
+				optional = false,
+				valueRank = 1,
+				arrayDimensions = 1
+			}, UAFieldVariableType {
+				name = "OutputArguments",
+				nodeId = {nameSpaceIndex = 1, identifier = 6051},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "OutputArguments",
+				displayName = "OutputArguments",
+				description = "",
+				type = refBy(opcArgumentType),
+				typeDefinition = refBy(opcPropertyTypeType),
+				optional = false,
+				valueRank = 1,
+				arrayDimensions = 5
+			}
+		}
+	};
+
+	UARootMethodType opcEnergyStandbyManagementTypeSwitchToEnergySavingMode = {
+		name = "opcEnergyStandbyManagementTypeSwitchToEnergySavingMode",
+		nodeId = {nameSpaceIndex = 1, identifier = 7007},
+		nodeClass = NodeClass::UAMethod,
+		browseName = "1:SwitchToEnergySavingMode",
+		displayName = "SwitchToEnergySavingMode",
+		optional = true,
+		rootParent = refBy(opcEnergyStandbyManagementType),
+		fields = {
+			UAFieldVariableType {
+				name = "InputArguments",
+				nodeId = {nameSpaceIndex = 1, identifier = 6052},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "InputArguments",
+				displayName = "InputArguments",
+				description = "",
+				type = refBy(opcArgumentType),
+				typeDefinition = refBy(opcPropertyTypeType),
+				optional = false,
+				valueRank = 1,
+				arrayDimensions = 1
+			}, UAFieldVariableType {
+				name = "OutputArguments",
+				nodeId = {nameSpaceIndex = 1, identifier = 6053},
+				nodeClass = NodeClass::UAVariable,
+				browseName = "OutputArguments",
+				displayName = "OutputArguments",
+				description = "",
+				type = refBy(opcArgumentType),
+				typeDefinition = refBy(opcPropertyTypeType),
+				optional = false,
+				valueRank = 1,
+				arrayDimensions = 5
+			}
+		}
+	};
+
+	UAObjectTypeType opcAccuracyDomainType = {
+		name = "opcAccuracyDomainType",
+		nodeId = {nameSpaceIndex = 1, identifier = 1014},
+		nodeClass = NodeClass::UAObjectType,
+		browseName = "1:AccuracyDomainType",
+		displayName = "AccuracyDomainType",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/7.1.2"
+	};
+
+	UAObjectTypeType opcIEnergyProfileD0Type = {
+		name = "opcIEnergyProfileD0Type",
+		nodeId = {nameSpaceIndex = 1, identifier = 1011},
+		nodeClass = NodeClass::UAObjectType,
+		browseName = "1:IEnergyProfileD0Type",
+		displayName = "IEnergyProfileD0Type",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/7.1.3.5"
+	};
+
+	UAObjectTypeType opcIEnergyProfileD1Type = {
+		name = "opcIEnergyProfileD1Type",
+		nodeId = {nameSpaceIndex = 1, identifier = 1015},
+		nodeClass = NodeClass::UAObjectType,
+		browseName = "1:IEnergyProfileD1Type",
+		displayName = "IEnergyProfileD1Type",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/7.1.3.6"
+	};
+
+	UAObjectTypeType opcIEnergyProfileE0Type = {
+		name = "opcIEnergyProfileE0Type",
+		nodeId = {nameSpaceIndex = 1, identifier = 1007},
+		nodeClass = NodeClass::UAObjectType,
+		browseName = "1:IEnergyProfileE0Type",
+		displayName = "IEnergyProfileE0Type",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/7.1.3.1"
+	};
+
+	UAObjectTypeType opcIEnergyProfileE1Type = {
+		name = "opcIEnergyProfileE1Type",
+		nodeId = {nameSpaceIndex = 1, identifier = 1008},
+		nodeClass = NodeClass::UAObjectType,
+		browseName = "1:IEnergyProfileE1Type",
+		displayName = "IEnergyProfileE1Type",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/7.1.3.2"
+	};
+
+	UAObjectTypeType opcIEnergyProfileE2Type = {
+		name = "opcIEnergyProfileE2Type",
+		nodeId = {nameSpaceIndex = 1, identifier = 1009},
+		nodeClass = NodeClass::UAObjectType,
+		browseName = "1:IEnergyProfileE2Type",
+		displayName = "IEnergyProfileE2Type",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/7.1.3.3"
+	};
+
+	UAObjectTypeType opcIEnergyProfileE3Type = {
+		name = "opcIEnergyProfileE3Type",
+		nodeId = {nameSpaceIndex = 1, identifier = 1010},
+		nodeClass = NodeClass::UAObjectType,
+		browseName = "1:IEnergyProfileE3Type",
+		displayName = "IEnergyProfileE3Type",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/7.1.3.4"
+	};
+
+	UAObjectTypeType opcEnergyDevicePowerOffType = {
+		name = "opcEnergyDevicePowerOffType",
+		nodeId = {nameSpaceIndex = 1, identifier = 1012},
+		nodeClass = NodeClass::UAObjectType,
+		browseName = "1:EnergyDevicePowerOffType",
+		displayName = "EnergyDevicePowerOffType",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/7.3.1.1"
+	};
+
+	UAObjectTypeType opcEnergyMeasurementType = {
+		name = "opcEnergyMeasurementType",
+		nodeId = {nameSpaceIndex = 1, identifier = 1006},
+		nodeClass = NodeClass::UAObjectType,
+		browseName = "1:EnergyMeasurementType",
+		displayName = "EnergyMeasurementType",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/7.1.1"
+	};
+
+	UAObjectTypeType opcEnergySavingModesContainerType = {
+		name = "opcEnergySavingModesContainerType",
+		nodeId = {nameSpaceIndex = 1, identifier = 1004},
+		nodeClass = NodeClass::UAObjectType,
+		browseName = "1:EnergySavingModesContainerType",
+		displayName = "EnergySavingModesContainerType",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/7.2.2"
+	};
+
+	UAObjectTypeType opcEnergySavingModeStatusType = {
+		name = "opcEnergySavingModeStatusType",
+		nodeId = {nameSpaceIndex = 1, identifier = 1002},
+		nodeClass = NodeClass::UAObjectType,
+		browseName = "1:EnergySavingModeStatusType",
+		displayName = "EnergySavingModeStatusType",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/7.2.3"
+	};
+
+	UAObjectTypeType opcEnergySavingModeType = {
+		name = "opcEnergySavingModeType",
+		nodeId = {nameSpaceIndex = 1, identifier = 1003},
+		nodeClass = NodeClass::UAObjectType,
+		browseName = "1:EnergySavingModeType",
+		displayName = "EnergySavingModeType",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/7.2.4"
+	};
+
+	UAObjectTypeType opcEnergyStandbyManagementType = {
+		name = "opcEnergyStandbyManagementType",
+		nodeId = {nameSpaceIndex = 1, identifier = 1005},
+		nodeClass = NodeClass::UAObjectType,
+		browseName = "1:EnergyStandbyManagementType",
+		displayName = "EnergyStandbyManagementType",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/7.2.1.1"
+	};
+
+	UAEnumType opcMeasurementPeriodEnumType = {
+		name = "opcMeasurementPeriodEnumType",
+		nodeId = {nameSpaceIndex = 1, identifier = 3010},
+		nodeClass = NodeClass::UADataType,
+		browseName = "1:MeasurementPeriodEnum",
+		displayName = "MeasurementPeriodEnum",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/9.5",
+		literals = {
+			EnumLiteral {
+				name = "_SlidingDemand",
+				ordinal = 0,
+				description = "The measurement period is interpreted to consider the last measurement period."
+			}, EnumLiteral {
+				name = "_FixedBlockCompleted",
+				ordinal = 1,
+				description = "The measurement period is interpreted to take the last completed measurement period aligned to the full hour."
+			}, EnumLiteral {
+				name = "_FixedBlockInstantaneous",
+				ordinal = 2,
+				description = "The measurement period is interpreted to take the current measurement period aligned to the full hour. That means, if for example only have of the measurement period has passed, only that half is considered."
+			}, EnumLiteral {
+				name = "_FixedBlockPredicted",
+				ordinal = 3,
+				description = "The measurement period is interpreted to take the current measurement period aligned to the full hour and predicts the duration that has not been passed. That means, if for example only have of the measurement period has passed, the first half of the considered values is based on real measurements while the second half takes predicted values."
+			}
+		}
+	};
+
+	UADataType opcAcPeDataTypeType = {
+		name = "opcAcPeDataTypeType",
+		nodeId = {nameSpaceIndex = 1, identifier = 3005},
+		nodeClass = NodeClass::UADataType,
+		browseName = "1:AcPeDataType",
+		displayName = "AcPeDataType",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/9.3",
+		literals = {
+			DataLiteral {
+				name = "_L1",
+				type = refBy(FloatType),
+				description = "Phase L1-N (or phase a-n)"
+			}, DataLiteral {
+				name = "_L2",
+				type = refBy(FloatType),
+				description = "Phase L2-N (or phase b-n)"
+			}, DataLiteral {
+				name = "_L3",
+				type = refBy(FloatType),
+				description = "Phase L3-N (or phase c-n)"
+			}
+		}
+	};
+
+	UADataType opcAcPpDataTypeType = {
+		name = "opcAcPpDataTypeType",
+		nodeId = {nameSpaceIndex = 1, identifier = 3006},
+		nodeClass = NodeClass::UADataType,
+		browseName = "1:AcPpDataType",
+		displayName = "AcPpDataType",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/9.4",
+		literals = {
+			DataLiteral {
+				name = "_L1L2",
+				type = refBy(FloatType),
+				description = "Phase L1-L2 (or phase a-b)"
+			}, DataLiteral {
+				name = "_L2L3",
+				type = refBy(FloatType),
+				description = "Phase L2-L3 (or phase b-c)"
+			}, DataLiteral {
+				name = "_L3L1",
+				type = refBy(FloatType),
+				description = "Phase L3-L1 (or phase c-a)"
+			}
+		}
+	};
+
+	UADataType opcEnergyStateInformationDataTypeType = {
+		name = "opcEnergyStateInformationDataTypeType",
+		nodeId = {nameSpaceIndex = 1, identifier = 3003},
+		nodeClass = NodeClass::UADataType,
+		browseName = "1:EnergyStateInformationDataType",
+		displayName = "EnergyStateInformationDataType",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/9.2",
+		literals = {
+			DataLiteral {
+				name = "_IDSource",
+				type = refBy(ByteType),
+				description = "PROFIenergy mode ID of current energy saving mode. Servers not implementing PROFIenergy shall always set this field to 0."
+			}, DataLiteral {
+				name = "_IDDestination",
+				type = refBy(ByteType),
+				description = "PROFIenergy mode ID of destination energy saving mode. Servers not implementing PROFIenergy shall always set this field to 0."
+			}, DataLiteral {
+				name = "_RegularTimeToOperate",
+				type = refBy(opcDurationType),
+				description = "Time needed to reach READY_TO_OPERATE if the energy saving mode is regularly terminated. Shall be 0 if IDSource is equal to 0xFF (The StandbyManagementStatus variable has the value READY_TO_OPERATE)."
+			}, DataLiteral {
+				name = "_ModePowerConsumption",
+				type = refBy(FloatType),
+				description = "Power consumption in actual state."
+			}
+		}
+	};
+
+	UADataType opcMeasurementPeriodDataTypeType = {
+		name = "opcMeasurementPeriodDataTypeType",
+		nodeId = {nameSpaceIndex = 1, identifier = 3007},
+		nodeClass = NodeClass::UADataType,
+		browseName = "1:MeasurementPeriodDataType",
+		displayName = "MeasurementPeriodDataType",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/9.6",
+		literals = {
+			DataLiteral {
+				name = "_Duration",
+				type = refBy(opcDurationType),
+				description = "The duration of the measurement period in ms."
+			}, DataLiteral {
+				name = "_Definition",
+				type = refBy(opcMeasurementPeriodEnumType),
+				description = "Defines how to interpret the duration of the measurement period."
+			}
+		}
+	};
+
+	UADataType opcStandbyModeTransitionDataTypeType = {
+		name = "opcStandbyModeTransitionDataTypeType",
+		nodeId = {nameSpaceIndex = 1, identifier = 3002},
+		nodeClass = NodeClass::UADataType,
+		browseName = "1:StandbyModeTransitionDataType",
+		displayName = "StandbyModeTransitionDataType",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/specs/OPC-34100/9.1",
+		literals = {
+			DataLiteral {
+				name = "_IDDestination",
+				type = refBy(ByteType),
+				description = "Identification of destination energy saving mode."
+			}, DataLiteral {
+				name = "_CurrentTimeToDestination",
+				type = refBy(opcDurationType),
+				description = "Time needed to reach the mode IDDestination. Shall be a Worst case value if ongoing (dynamic) time value is not supported. Shall be 0 if destination energy saving mode is reached."
+			}, DataLiteral {
+				name = "_CurrentTimeToOperate",
+				type = refBy(opcDurationType),
+				description = "Time needed to reach READY_TO_OPERATE if the energy saving mode is not regularly terminated. The server might update the value after reaching the destination state as long as the TimeMinLengthOfStay of the destination state is not reached."
+			}, DataLiteral {
+				name = "_EnergyConsumptionToDestination",
+				type = refBy(FloatType),
+				description = "Energy consumption for actual transition. Shall be 0 if not in a transition state."
+			}
+		}
+	};
+
+	UAVariableTypeType opcMultiStateValueDiscreteTypeType = {
+		name = "opcMultiStateValueDiscreteTypeType",
+		nodeId = {nameSpaceIndex = 0, identifier = 11238},
+		nodeClass = NodeClass::UAVariableType,
+		browseName = "MultiStateValueDiscreteType",
+		displayName = "MultiStateValueDiscreteType",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part8/5.3.3/#5.3.3.4",
+		type = refBy(opcNumberType)
+	};
+
+	UARootVariableType opcIEnergyProfileD0TypeDcCurrentAccuracyClass = {
+		name = "opcIEnergyProfileD0TypeDcCurrentAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6235},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileD0TypeDcCurrent)
+	};
+
+	UARootVariableType opcIEnergyProfileD0TypeDcCurrentAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileD0TypeDcCurrentAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6236},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD0TypeDcCurrentAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileD0TypeDcCurrentAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileD0TypeDcCurrentAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6237},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD0TypeDcCurrentAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileD0TypeDcCurrentAccuracyDomain = {
+		name = "opcIEnergyProfileD0TypeDcCurrentAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6104},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD0TypeDcCurrent)
+	};
+
+	UARootVariableType opcIEnergyProfileD0TypeDcCurrentAccuracyRange = {
+		name = "opcIEnergyProfileD0TypeDcCurrentAccuracyRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6198},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyRange",
+		displayName = "AccuracyRange",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD0TypeDcCurrent),
+		accessLevel = 3
+	};
+
+	UADataType opcEUInformationType = {
+		name = "opcEUInformationType",
+		nodeId = {nameSpaceIndex = 0, identifier = 887},
+		nodeClass = NodeClass::UADataType,
+		browseName = "EUInformation",
+		displayName = "EUInformation",
+		description = "",
+		documentation = "https://reference.opcfoundation.org/v105/Core/docs/Part8/5.6.3/#5.6.3.2",
+		literals = {
+			DataLiteral {
+				name = "_NamespaceUri",
+				type = refBy(StringType),
+				description = ""
+			}, DataLiteral {
+				name = "_UnitId",
+				type = refBy(opcInt32Type),
+				description = ""
+			}, DataLiteral {
+				name = "_DisplayName",
+				type = refBy(opcLocalizedTextType),
+				description = ""
+			}, DataLiteral {
+				name = "_Description",
+				type = refBy(opcLocalizedTextType),
+				description = ""
+			}
+		}
+	};
+
+	UARootVariableType opcIEnergyProfileD0TypeDcCurrentEngineeringUnits = {
+		name = "opcIEnergyProfileD0TypeDcCurrentEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6105},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD0TypeDcCurrent)
+	};
+
+	UARootVariableType opcIEnergyProfileD0TypeDcCurrentMeasurementID = {
+		name = "opcIEnergyProfileD0TypeDcCurrentMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6168},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD0TypeDcCurrent)
+	};
+
+	UARootVariableType opcIEnergyProfileD0TypeDcCurrentResource = {
+		name = "opcIEnergyProfileD0TypeDcCurrentResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6269},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileD0TypeDcCurrent),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileD0TypeDcCurrentResourceEnumValues = {
+		name = "opcIEnergyProfileD0TypeDcCurrentResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6270},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD0TypeDcCurrentResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileD0TypeDcCurrentResourceValueAsText = {
+		name = "opcIEnergyProfileD0TypeDcCurrentResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6271},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD0TypeDcCurrentResource)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcActivePowerAccuracyClass = {
+		name = "opcIEnergyProfileD1TypeDcActivePowerAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6308},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcActivePower)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcActivePowerAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileD1TypeDcActivePowerAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6309},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcActivePowerAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcActivePowerAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileD1TypeDcActivePowerAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6310},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcActivePowerAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcActivePowerAccuracyDomain = {
+		name = "opcIEnergyProfileD1TypeDcActivePowerAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6311},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcActivePower)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcActivePowerEngineeringUnits = {
+		name = "opcIEnergyProfileD1TypeDcActivePowerEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6351},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcActivePower)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcActivePowerMeasurementID = {
+		name = "opcIEnergyProfileD1TypeDcActivePowerMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6352},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcActivePower)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcActivePowerResource = {
+		name = "opcIEnergyProfileD1TypeDcActivePowerResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6312},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcActivePower),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcActivePowerResourceEnumValues = {
+		name = "opcIEnergyProfileD1TypeDcActivePowerResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6313},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcActivePowerResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcActivePowerResourceValueAsText = {
+		name = "opcIEnergyProfileD1TypeDcActivePowerResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6314},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcActivePowerResource)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcCurrentAccuracyClass = {
+		name = "opcIEnergyProfileD1TypeDcCurrentAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6292},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcCurrent)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcCurrentAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileD1TypeDcCurrentAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6293},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcCurrentAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcCurrentAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileD1TypeDcCurrentAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6294},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcCurrentAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcCurrentAccuracyDomain = {
+		name = "opcIEnergyProfileD1TypeDcCurrentAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6295},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcCurrent)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcCurrentEngineeringUnits = {
+		name = "opcIEnergyProfileD1TypeDcCurrentEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6347},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcCurrent)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcCurrentMeasurementID = {
+		name = "opcIEnergyProfileD1TypeDcCurrentMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6348},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcCurrent)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcCurrentResource = {
+		name = "opcIEnergyProfileD1TypeDcCurrentResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6296},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcCurrent),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcCurrentResourceEnumValues = {
+		name = "opcIEnergyProfileD1TypeDcCurrentResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6297},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcCurrentResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcCurrentResourceValueAsText = {
+		name = "opcIEnergyProfileD1TypeDcCurrentResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6298},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcCurrentResource)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcElectricalChargeAccuracyClass = {
+		name = "opcIEnergyProfileD1TypeDcElectricalChargeAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6332},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcElectricalCharge)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcElectricalChargeAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileD1TypeDcElectricalChargeAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6333},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcElectricalChargeAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcElectricalChargeAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileD1TypeDcElectricalChargeAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6334},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcElectricalChargeAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcElectricalChargeAccuracyDomain = {
+		name = "opcIEnergyProfileD1TypeDcElectricalChargeAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6335},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcElectricalCharge)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcElectricalChargeEngineeringUnits = {
+		name = "opcIEnergyProfileD1TypeDcElectricalChargeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6355},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcElectricalCharge)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcElectricalChargeMeasurementID = {
+		name = "opcIEnergyProfileD1TypeDcElectricalChargeMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6356},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcElectricalCharge)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcElectricalChargeResource = {
+		name = "opcIEnergyProfileD1TypeDcElectricalChargeResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6336},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcElectricalCharge),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcElectricalChargeResourceEnumValues = {
+		name = "opcIEnergyProfileD1TypeDcElectricalChargeResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6337},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcElectricalChargeResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcElectricalChargeResourceValueAsText = {
+		name = "opcIEnergyProfileD1TypeDcElectricalChargeResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6338},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcElectricalChargeResource)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcEnergyTotalExportLpAccuracyClass = {
+		name = "opcIEnergyProfileD1TypeDcEnergyTotalExportLpAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6324},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcEnergyTotalExportLp)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcEnergyTotalExportLpAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileD1TypeDcEnergyTotalExportLpAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6325},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcEnergyTotalExportLpAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcEnergyTotalExportLpAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileD1TypeDcEnergyTotalExportLpAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6326},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcEnergyTotalExportLpAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcEnergyTotalExportLpAccuracyDomain = {
+		name = "opcIEnergyProfileD1TypeDcEnergyTotalExportLpAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6327},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcEnergyTotalExportLp)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcEnergyTotalExportLpEngineeringUnits = {
+		name = "opcIEnergyProfileD1TypeDcEnergyTotalExportLpEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6362},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcEnergyTotalExportLp)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcEnergyTotalExportLpMeasurementID = {
+		name = "opcIEnergyProfileD1TypeDcEnergyTotalExportLpMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6363},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcEnergyTotalExportLp)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcEnergyTotalExportLpResource = {
+		name = "opcIEnergyProfileD1TypeDcEnergyTotalExportLpResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6328},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcEnergyTotalExportLp),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcEnergyTotalExportLpResourceEnumValues = {
+		name = "opcIEnergyProfileD1TypeDcEnergyTotalExportLpResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6329},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcEnergyTotalExportLpResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcEnergyTotalExportLpResourceValueAsText = {
+		name = "opcIEnergyProfileD1TypeDcEnergyTotalExportLpResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6330},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcEnergyTotalExportLpResource)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcEnergyTotalImportLpAccuracyClass = {
+		name = "opcIEnergyProfileD1TypeDcEnergyTotalImportLpAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6316},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcEnergyTotalImportLp)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcEnergyTotalImportLpAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileD1TypeDcEnergyTotalImportLpAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6317},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcEnergyTotalImportLpAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcEnergyTotalImportLpAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileD1TypeDcEnergyTotalImportLpAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6318},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcEnergyTotalImportLpAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcEnergyTotalImportLpAccuracyDomain = {
+		name = "opcIEnergyProfileD1TypeDcEnergyTotalImportLpAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6319},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcEnergyTotalImportLp)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcEnergyTotalImportLpEngineeringUnits = {
+		name = "opcIEnergyProfileD1TypeDcEnergyTotalImportLpEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6353},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcEnergyTotalImportLp)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcEnergyTotalImportLpMeasurementID = {
+		name = "opcIEnergyProfileD1TypeDcEnergyTotalImportLpMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6354},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcEnergyTotalImportLp)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcEnergyTotalImportLpResource = {
+		name = "opcIEnergyProfileD1TypeDcEnergyTotalImportLpResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6320},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcEnergyTotalImportLp),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcEnergyTotalImportLpResourceEnumValues = {
+		name = "opcIEnergyProfileD1TypeDcEnergyTotalImportLpResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6321},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcEnergyTotalImportLpResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcEnergyTotalImportLpResourceValueAsText = {
+		name = "opcIEnergyProfileD1TypeDcEnergyTotalImportLpResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6322},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcEnergyTotalImportLpResource)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcRelativeChargeAccuracyClass = {
+		name = "opcIEnergyProfileD1TypeDcRelativeChargeAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6340},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcRelativeCharge)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcRelativeChargeAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileD1TypeDcRelativeChargeAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6341},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcRelativeChargeAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcRelativeChargeAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileD1TypeDcRelativeChargeAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6342},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcRelativeChargeAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcRelativeChargeAccuracyDomain = {
+		name = "opcIEnergyProfileD1TypeDcRelativeChargeAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6343},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcRelativeCharge)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcRelativeChargeEngineeringUnits = {
+		name = "opcIEnergyProfileD1TypeDcRelativeChargeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6357},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcRelativeCharge)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcRelativeChargeMeasurementID = {
+		name = "opcIEnergyProfileD1TypeDcRelativeChargeMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6358},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcRelativeCharge)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcRelativeChargeResource = {
+		name = "opcIEnergyProfileD1TypeDcRelativeChargeResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6344},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcRelativeCharge),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcRelativeChargeResourceEnumValues = {
+		name = "opcIEnergyProfileD1TypeDcRelativeChargeResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6345},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcRelativeChargeResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcRelativeChargeResourceValueAsText = {
+		name = "opcIEnergyProfileD1TypeDcRelativeChargeResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6346},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcRelativeChargeResource)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcVoltageAccuracyClass = {
+		name = "opcIEnergyProfileD1TypeDcVoltageAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6300},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcVoltage)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcVoltageAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileD1TypeDcVoltageAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6301},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcVoltageAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcVoltageAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileD1TypeDcVoltageAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6302},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcVoltageAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcVoltageAccuracyDomain = {
+		name = "opcIEnergyProfileD1TypeDcVoltageAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6303},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcVoltage)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcVoltageEngineeringUnits = {
+		name = "opcIEnergyProfileD1TypeDcVoltageEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6349},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcVoltage)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcVoltageMeasurementID = {
+		name = "opcIEnergyProfileD1TypeDcVoltageMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6350},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcVoltage)
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcVoltageResource = {
+		name = "opcIEnergyProfileD1TypeDcVoltageResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6304},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcVoltage),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcVoltageResourceEnumValues = {
+		name = "opcIEnergyProfileD1TypeDcVoltageResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6305},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcVoltageResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileD1TypeDcVoltageResourceValueAsText = {
+		name = "opcIEnergyProfileD1TypeDcVoltageResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6306},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileD1TypeDcVoltageResource)
+	};
+
+	UARootVariableType opcIEnergyProfileE0TypeAcCurrentPeAccuracyClass = {
+		name = "opcIEnergyProfileE0TypeAcCurrentPeAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6077},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE0TypeAcCurrentPe)
+	};
+
+	UARootVariableType opcIEnergyProfileE0TypeAcCurrentPeAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileE0TypeAcCurrentPeAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6083},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE0TypeAcCurrentPeAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE0TypeAcCurrentPeAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileE0TypeAcCurrentPeAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6087},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE0TypeAcCurrentPeAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileE0TypeAcCurrentPeAccuracyDomain = {
+		name = "opcIEnergyProfileE0TypeAcCurrentPeAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6062},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE0TypeAcCurrentPe)
+	};
+
+	UARootVariableType opcIEnergyProfileE0TypeAcCurrentPeAccuracyRange = {
+		name = "opcIEnergyProfileE0TypeAcCurrentPeAccuracyRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6114},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyRange",
+		displayName = "AccuracyRange",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE0TypeAcCurrentPe),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE0TypeAcCurrentPeEngineeringUnits = {
+		name = "opcIEnergyProfileE0TypeAcCurrentPeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6063},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE0TypeAcCurrentPe)
+	};
+
+	UARootVariableType opcIEnergyProfileE0TypeAcCurrentPeMeasurementID = {
+		name = "opcIEnergyProfileE0TypeAcCurrentPeMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6153},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE0TypeAcCurrentPe)
+	};
+
+	UARootVariableType opcIEnergyProfileE0TypeAcCurrentPeResource = {
+		name = "opcIEnergyProfileE0TypeAcCurrentPeResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6173},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE0TypeAcCurrentPe),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE0TypeAcCurrentPeResourceEnumValues = {
+		name = "opcIEnergyProfileE0TypeAcCurrentPeResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6175},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE0TypeAcCurrentPeResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE0TypeAcCurrentPeResourceValueAsText = {
+		name = "opcIEnergyProfileE0TypeAcCurrentPeResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6177},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE0TypeAcCurrentPeResource)
+	};
+
+	UARootVariableType opcIEnergyProfileE1TypeAcActivePowerTotalAccuracyClass = {
+		name = "opcIEnergyProfileE1TypeAcActivePowerTotalAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6091},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE1TypeAcActivePowerTotal)
+	};
+
+	UARootVariableType opcIEnergyProfileE1TypeAcActivePowerTotalAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileE1TypeAcActivePowerTotalAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6095},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE1TypeAcActivePowerTotalAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE1TypeAcActivePowerTotalAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileE1TypeAcActivePowerTotalAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6103},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE1TypeAcActivePowerTotalAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileE1TypeAcActivePowerTotalAccuracyDomain = {
+		name = "opcIEnergyProfileE1TypeAcActivePowerTotalAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6066},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE1TypeAcActivePowerTotal)
+	};
+
+	UARootVariableType opcIEnergyProfileE1TypeAcActivePowerTotalAccuracyRange = {
+		name = "opcIEnergyProfileE1TypeAcActivePowerTotalAccuracyRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6170},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyRange",
+		displayName = "AccuracyRange",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE1TypeAcActivePowerTotal),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE1TypeAcActivePowerTotalEngineeringUnits = {
+		name = "opcIEnergyProfileE1TypeAcActivePowerTotalEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6067},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE1TypeAcActivePowerTotal)
+	};
+
+	UARootVariableType opcIEnergyProfileE1TypeAcActivePowerTotalMeasurementID = {
+		name = "opcIEnergyProfileE1TypeAcActivePowerTotalMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6154},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE1TypeAcActivePowerTotal)
+	};
+
+	UARootVariableType opcIEnergyProfileE1TypeAcActivePowerTotalResource = {
+		name = "opcIEnergyProfileE1TypeAcActivePowerTotalResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6179},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE1TypeAcActivePowerTotal),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE1TypeAcActivePowerTotalResourceEnumValues = {
+		name = "opcIEnergyProfileE1TypeAcActivePowerTotalResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6181},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE1TypeAcActivePowerTotalResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE1TypeAcActivePowerTotalResourceValueAsText = {
+		name = "opcIEnergyProfileE1TypeAcActivePowerTotalResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6183},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE1TypeAcActivePowerTotalResource)
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpAccuracyClass = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6202},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLp)
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6203},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6204},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpAccuracyDomain = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6078},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLp)
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpAccuracyRange = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpAccuracyRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6176},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyRange",
+		displayName = "AccuracyRange",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLp),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpEngineeringUnits = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6079},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLp)
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpMeasurementID = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6157},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLp)
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpResource = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6197},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLp),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpResourceEnumValues = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6199},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpResourceValueAsText = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6238},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActiveEnergyTotalExportLpResource)
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpAccuracyClass = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6131},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLp)
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6134},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6137},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpAccuracyDomain = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6074},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLp)
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpAccuracyRange = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpAccuracyRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6174},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyRange",
+		displayName = "AccuracyRange",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLp),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpEngineeringUnits = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6075},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLp)
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpMeasurementID = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6156},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLp)
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpResource = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6191},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLp),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpResourceEnumValues = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6193},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpResourceValueAsText = {
+		name = "opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6195},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActiveEnergyTotalImportLpResource)
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActivePowerTotalAccuracyClass = {
+		name = "opcIEnergyProfileE2TypeAcActivePowerTotalAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6122},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActivePowerTotal)
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActivePowerTotalAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileE2TypeAcActivePowerTotalAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6125},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActivePowerTotalAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActivePowerTotalAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileE2TypeAcActivePowerTotalAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6128},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActivePowerTotalAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActivePowerTotalAccuracyDomain = {
+		name = "opcIEnergyProfileE2TypeAcActivePowerTotalAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6070},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActivePowerTotal)
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActivePowerTotalAccuracyRange = {
+		name = "opcIEnergyProfileE2TypeAcActivePowerTotalAccuracyRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6172},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyRange",
+		displayName = "AccuracyRange",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActivePowerTotal),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActivePowerTotalEngineeringUnits = {
+		name = "opcIEnergyProfileE2TypeAcActivePowerTotalEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6071},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActivePowerTotal)
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActivePowerTotalMeasurementID = {
+		name = "opcIEnergyProfileE2TypeAcActivePowerTotalMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6155},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActivePowerTotal)
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActivePowerTotalResource = {
+		name = "opcIEnergyProfileE2TypeAcActivePowerTotalResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6185},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActivePowerTotal),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActivePowerTotalResourceEnumValues = {
+		name = "opcIEnergyProfileE2TypeAcActivePowerTotalResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6187},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActivePowerTotalResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE2TypeAcActivePowerTotalResourceValueAsText = {
+		name = "opcIEnergyProfileE2TypeAcActivePowerTotalResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6189},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE2TypeAcActivePowerTotalResource)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpAccuracyClass = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6214},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHp)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6215},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6216},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpAccuracyDomain = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6088},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHp)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpAccuracyRange = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpAccuracyRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6184},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyRange",
+		displayName = "AccuracyRange",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHp),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpEngineeringUnits = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6089},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHp)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpMeasurementID = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6161},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHp)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpResource = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6248},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHp),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpResourceEnumValues = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6249},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpResourceValueAsText = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6250},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActiveEnergyTotalExportHpResource)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpAccuracyClass = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6211},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHp)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6212},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6213},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpAccuracyDomain = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6084},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHp)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpAccuracyRange = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpAccuracyRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6182},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyRange",
+		displayName = "AccuracyRange",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHp),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpEngineeringUnits = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6085},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHp)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpMeasurementID = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6160},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHp)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpResource = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6245},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHp),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpResourceEnumValues = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6246},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpResourceValueAsText = {
+		name = "opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6247},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActiveEnergyTotalImportHpResource)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActivePowerPeAccuracyClass = {
+		name = "opcIEnergyProfileE3TypeAcActivePowerPeAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6205},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActivePowerPe)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActivePowerPeAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileE3TypeAcActivePowerPeAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6206},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActivePowerPeAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActivePowerPeAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileE3TypeAcActivePowerPeAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6207},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActivePowerPeAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActivePowerPeAccuracyDomain = {
+		name = "opcIEnergyProfileE3TypeAcActivePowerPeAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6123},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActivePowerPe)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActivePowerPeAccuracyRange = {
+		name = "opcIEnergyProfileE3TypeAcActivePowerPeAccuracyRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6178},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyRange",
+		displayName = "AccuracyRange",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActivePowerPe),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActivePowerPeEngineeringUnits = {
+		name = "opcIEnergyProfileE3TypeAcActivePowerPeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6124},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActivePowerPe)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActivePowerPeMeasurementID = {
+		name = "opcIEnergyProfileE3TypeAcActivePowerPeMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6158},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActivePowerPe)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActivePowerPeResource = {
+		name = "opcIEnergyProfileE3TypeAcActivePowerPeResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6239},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActivePowerPe),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActivePowerPeResourceEnumValues = {
+		name = "opcIEnergyProfileE3TypeAcActivePowerPeResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6240},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActivePowerPeResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcActivePowerPeResourceValueAsText = {
+		name = "opcIEnergyProfileE3TypeAcActivePowerPeResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6241},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcActivePowerPeResource)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcCurrentPeAccuracyClass = {
+		name = "opcIEnergyProfileE3TypeAcCurrentPeAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6229},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcCurrentPe)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcCurrentPeAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileE3TypeAcCurrentPeAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6230},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcCurrentPeAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcCurrentPeAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileE3TypeAcCurrentPeAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6231},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcCurrentPeAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcCurrentPeAccuracyDomain = {
+		name = "opcIEnergyProfileE3TypeAcCurrentPeAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6126},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcCurrentPe)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcCurrentPeAccuracyRange = {
+		name = "opcIEnergyProfileE3TypeAcCurrentPeAccuracyRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6194},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyRange",
+		displayName = "AccuracyRange",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcCurrentPe),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcCurrentPeEngineeringUnits = {
+		name = "opcIEnergyProfileE3TypeAcCurrentPeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6127},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcCurrentPe)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcCurrentPeMeasurementID = {
+		name = "opcIEnergyProfileE3TypeAcCurrentPeMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6166},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcCurrentPe)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcCurrentPeResource = {
+		name = "opcIEnergyProfileE3TypeAcCurrentPeResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6263},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcCurrentPe),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcCurrentPeResourceEnumValues = {
+		name = "opcIEnergyProfileE3TypeAcCurrentPeResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6264},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcCurrentPeResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcCurrentPeResourceValueAsText = {
+		name = "opcIEnergyProfileE3TypeAcCurrentPeResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6265},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcCurrentPeResource)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcPowerFactorPeAccuracyClass = {
+		name = "opcIEnergyProfileE3TypeAcPowerFactorPeAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6232},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcPowerFactorPe)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcPowerFactorPeAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileE3TypeAcPowerFactorPeAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6233},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcPowerFactorPeAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcPowerFactorPeAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileE3TypeAcPowerFactorPeAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6234},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcPowerFactorPeAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcPowerFactorPeAccuracyDomain = {
+		name = "opcIEnergyProfileE3TypeAcPowerFactorPeAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6129},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcPowerFactorPe)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcPowerFactorPeAccuracyRange = {
+		name = "opcIEnergyProfileE3TypeAcPowerFactorPeAccuracyRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6196},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyRange",
+		displayName = "AccuracyRange",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcPowerFactorPe),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcPowerFactorPeMeasurementID = {
+		name = "opcIEnergyProfileE3TypeAcPowerFactorPeMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6167},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcPowerFactorPe)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcPowerFactorPeResource = {
+		name = "opcIEnergyProfileE3TypeAcPowerFactorPeResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6266},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcPowerFactorPe),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcPowerFactorPeResourceEnumValues = {
+		name = "opcIEnergyProfileE3TypeAcPowerFactorPeResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6267},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcPowerFactorPeResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcPowerFactorPeResourceValueAsText = {
+		name = "opcIEnergyProfileE3TypeAcPowerFactorPeResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6268},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcPowerFactorPeResource)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpAccuracyClass = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6220},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHp)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6221},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6222},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpAccuracyDomain = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6096},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHp)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpAccuracyRange = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpAccuracyRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6188},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyRange",
+		displayName = "AccuracyRange",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHp),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpEngineeringUnits = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6097},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHp)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpMeasurementID = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6163},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHp)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpResource = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6254},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHp),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpResourceEnumValues = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6255},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpResourceValueAsText = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6256},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactiveEnergyTotalExportHpResource)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpAccuracyClass = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6217},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHp)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6218},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6219},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpAccuracyDomain = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6092},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHp)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpAccuracyRange = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpAccuracyRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6186},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyRange",
+		displayName = "AccuracyRange",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHp),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpEngineeringUnits = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6093},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHp)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpMeasurementID = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6162},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHp)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpResource = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6251},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHp),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpResourceEnumValues = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6252},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpResourceValueAsText = {
+		name = "opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6253},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactiveEnergyTotalImportHpResource)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactivePowerPeAccuracyClass = {
+		name = "opcIEnergyProfileE3TypeAcReactivePowerPeAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6208},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactivePowerPe)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactivePowerPeAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileE3TypeAcReactivePowerPeAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6209},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactivePowerPeAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactivePowerPeAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileE3TypeAcReactivePowerPeAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6210},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactivePowerPeAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactivePowerPeAccuracyDomain = {
+		name = "opcIEnergyProfileE3TypeAcReactivePowerPeAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6132},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactivePowerPe)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactivePowerPeAccuracyRange = {
+		name = "opcIEnergyProfileE3TypeAcReactivePowerPeAccuracyRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6180},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyRange",
+		displayName = "AccuracyRange",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactivePowerPe),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactivePowerPeEngineeringUnits = {
+		name = "opcIEnergyProfileE3TypeAcReactivePowerPeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6133},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactivePowerPe)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactivePowerPeMeasurementID = {
+		name = "opcIEnergyProfileE3TypeAcReactivePowerPeMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6159},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactivePowerPe)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactivePowerPeResource = {
+		name = "opcIEnergyProfileE3TypeAcReactivePowerPeResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6242},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactivePowerPe),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactivePowerPeResourceEnumValues = {
+		name = "opcIEnergyProfileE3TypeAcReactivePowerPeResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6243},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactivePowerPeResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcReactivePowerPeResourceValueAsText = {
+		name = "opcIEnergyProfileE3TypeAcReactivePowerPeResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6244},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcReactivePowerPeResource)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePeAccuracyClass = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePeAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6223},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcVoltagePe)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePeAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePeAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6224},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcVoltagePeAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePeAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePeAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6225},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcVoltagePeAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePeAccuracyDomain = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePeAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6135},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcVoltagePe)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePeAccuracyRange = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePeAccuracyRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6190},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyRange",
+		displayName = "AccuracyRange",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcVoltagePe),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePeEngineeringUnits = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePeEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6136},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcVoltagePe)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePeMeasurementID = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePeMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6164},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcVoltagePe)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePeResource = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePeResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6257},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcVoltagePe),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePeResourceEnumValues = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePeResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6258},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcVoltagePeResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePeResourceValueAsText = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePeResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6259},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcVoltagePeResource)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePpAccuracyClass = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePpAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6226},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcVoltagePp)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePpAccuracyClassEnumValues = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePpAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6227},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcVoltagePpAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePpAccuracyClassValueAsText = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePpAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6228},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcVoltagePpAccuracyClass)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePpAccuracyDomain = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePpAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6138},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcVoltagePp)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePpAccuracyRange = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePpAccuracyRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6192},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyRange",
+		displayName = "AccuracyRange",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcVoltagePp),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePpEngineeringUnits = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePpEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6139},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcVoltagePp)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePpMeasurementID = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePpMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6165},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcVoltagePp)
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePpResource = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePpResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6260},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcVoltagePp),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePpResourceEnumValues = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePpResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6261},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcVoltagePpResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcIEnergyProfileE3TypeAcVoltagePpResourceValueAsText = {
+		name = "opcIEnergyProfileE3TypeAcVoltagePpResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6262},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcIEnergyProfileE3TypeAcVoltagePpResource)
+	};
+
+	UARootVariableType opcEnergyMeasurementTypeMeasurementValueAccuracyClass = {
+		name = "opcEnergyMeasurementTypeMeasurementValueAccuracyClass",
+		nodeId = {nameSpaceIndex = 1, identifier = 6065},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyClass",
+		displayName = "AccuracyClass",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcEnergyMeasurementTypeMeasurementValue)
+	};
+
+	UARootVariableType opcEnergyMeasurementTypeMeasurementValueAccuracyClassEnumValues = {
+		name = "opcEnergyMeasurementTypeMeasurementValueAccuracyClassEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6069},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcEnergyMeasurementTypeMeasurementValueAccuracyClass),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcEnergyMeasurementTypeMeasurementValueAccuracyClassValueAsText = {
+		name = "opcEnergyMeasurementTypeMeasurementValueAccuracyClassValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6073},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcEnergyMeasurementTypeMeasurementValueAccuracyClass)
+	};
+
+	UARootVariableType opcEnergyMeasurementTypeMeasurementValueAccuracyDomain = {
+		name = "opcEnergyMeasurementTypeMeasurementValueAccuracyDomain",
+		nodeId = {nameSpaceIndex = 1, identifier = 6058},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyDomain",
+		displayName = "AccuracyDomain",
+		description = "",
+		optional = false,
+		type = refBy(opcNodeIdType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcEnergyMeasurementTypeMeasurementValue)
+	};
+
+	UARootVariableType opcEnergyMeasurementTypeMeasurementValueAccuracyRange = {
+		name = "opcEnergyMeasurementTypeMeasurementValueAccuracyRange",
+		nodeId = {nameSpaceIndex = 1, identifier = 6112},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:AccuracyRange",
+		displayName = "AccuracyRange",
+		description = "",
+		optional = true,
+		type = refBy(FloatType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcEnergyMeasurementTypeMeasurementValue),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcEnergyMeasurementTypeMeasurementValueEngineeringUnits = {
+		name = "opcEnergyMeasurementTypeMeasurementValueEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6059},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = true,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcEnergyMeasurementTypeMeasurementValue)
+	};
+
+	UARootVariableType opcEnergyMeasurementTypeMeasurementValueMeasurementID = {
+		name = "opcEnergyMeasurementTypeMeasurementValueMeasurementID",
+		nodeId = {nameSpaceIndex = 1, identifier = 6152},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:MeasurementID",
+		displayName = "MeasurementID",
+		description = "",
+		optional = true,
+		type = refBy(UnsignedInteger16Type),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcEnergyMeasurementTypeMeasurementValue)
+	};
+
+	UARootVariableType opcEnergyMeasurementTypeMeasurementValueResource = {
+		name = "opcEnergyMeasurementTypeMeasurementValueResource",
+		nodeId = {nameSpaceIndex = 1, identifier = 6130},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "1:Resource",
+		displayName = "Resource",
+		description = "",
+		optional = false,
+		type = refBy(UnsignedInteger32Type),
+		typeDefinition = refBy(opcMultiStateValueDiscreteTypeType),
+		rootParent = refBy(opcEnergyMeasurementTypeMeasurementValue),
+		accessLevel = 3
+	};
+
+	UARootVariableType opcEnergyMeasurementTypeMeasurementValueResourceEnumValues = {
+		name = "opcEnergyMeasurementTypeMeasurementValueResourceEnumValues",
+		nodeId = {nameSpaceIndex = 1, identifier = 6169},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumValues",
+		displayName = "EnumValues",
+		description = "",
+		optional = false,
+		type = refBy(opcEnumValueTypeType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcEnergyMeasurementTypeMeasurementValueResource),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	UARootVariableType opcEnergyMeasurementTypeMeasurementValueResourceValueAsText = {
+		name = "opcEnergyMeasurementTypeMeasurementValueResourceValueAsText",
+		nodeId = {nameSpaceIndex = 1, identifier = 6171},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "ValueAsText",
+		displayName = "ValueAsText",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcEnergyMeasurementTypeMeasurementValueResource)
+	};
+
+	UARootVariableType opcEnergySavingModeTypeEnergyConsumptionToOperateEngineeringUnits = {
+		name = "opcEnergySavingModeTypeEnergyConsumptionToOperateEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6037},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = false,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcEnergySavingModeTypeEnergyConsumptionToOperate)
+	};
+
+	UARootVariableType opcEnergySavingModeTypeEnergyConsumptionToPauseEngineeringUnits = {
+		name = "opcEnergySavingModeTypeEnergyConsumptionToPauseEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6035},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = false,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcEnergySavingModeTypeEnergyConsumptionToPause)
+	};
+
+	UARootVariableType opcEnergySavingModeTypeModePowerConsumptionEngineeringUnits = {
+		name = "opcEnergySavingModeTypeModePowerConsumptionEngineeringUnits",
+		nodeId = {nameSpaceIndex = 1, identifier = 6033},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EngineeringUnits",
+		displayName = "EngineeringUnits",
+		description = "",
+		optional = false,
+		type = refBy(opcEUInformationType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcEnergySavingModeTypeModePowerConsumption)
+	};
+
+	UARootVariableType opcEnergyStandbyManagementTypeStandbyManagementStatusEnumStrings = {
+		name = "opcEnergyStandbyManagementTypeStandbyManagementStatusEnumStrings",
+		nodeId = {nameSpaceIndex = 1, identifier = 6038},
+		nodeClass = NodeClass::UAVariable,
+		browseName = "EnumStrings",
+		displayName = "EnumStrings",
+		description = "",
+		optional = false,
+		type = refBy(opcLocalizedTextType),
+		typeDefinition = refBy(opcPropertyTypeType),
+		rootParent = refBy(opcEnergyStandbyManagementTypeStandbyManagementStatus),
+		valueRank = 1,
+		arrayDimensions = 0
+	};
+
+	freeze {
+		.; // every variable declared in this project
+	} but (f|f.bindingTime >= BindingTime.compile);
+
+}
