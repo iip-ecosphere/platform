@@ -16,7 +16,7 @@ public class TestServer {
     private String endDesSingleWP;
     private String endpointDescriptionSet;
     private String endpointDescriptionSetWP;
-
+    private String endpointPrefix;
 
     /**
      * Creates a TestServer instance.
@@ -39,7 +39,6 @@ public class TestServer {
      * Stops the TestServer.
      */
     public void stop() {
-
         if (context != null) {
             context.close();
         }
@@ -50,19 +49,48 @@ public class TestServer {
      */
     private void createEndpointDescriptionSingle() {
         endpointDescriptionSingle = "{";
-        endpointDescriptionSingle += "\"string\" : {\"name\" : \"string\",\"endpoint\" : \"endpoints/string\", "
+        endpointDescriptionSingle += "\"string\" : {\"name\" : \"string\",\"endpoint\" : \"" 
+                + endpoint("endpoints/string") + "\", " 
                 + "\"type\" : \"TestServerResponsSingle\", \"asSingleValue\" : true},";
-        endpointDescriptionSingle += "\"short\" : {\"name\" : \"short\",\"endpoint\" : \"endpoints/short\", "
+        endpointDescriptionSingle += "\"short\" : {\"name\" : \"short\",\"endpoint\" : \"" 
+                + endpoint("endpoints/short") + "\", "
                 + "\"type\" : \"TestServerResponsSingle\"},";
-        endpointDescriptionSingle += "\"integer\" : {\"name\" : \"integer\",\"endpoint\" : \"endpoints/integer\", "
+        endpointDescriptionSingle += "\"integer\" : {\"name\" : \"integer\",\"endpoint\" : \"" 
+                + endpoint("endpoints/integer") + "\", "
                 + "\"type\" : \"TestServerResponsSingle\"},";
-        endpointDescriptionSingle += "\"long\" : {\"name\" : \"long\",\"endpoint\" : \"endpoints/long\", "
+        endpointDescriptionSingle += "\"long\" : {\"name\" : \"long\",\"endpoint\" : \"" 
+                + endpoint("endpoints/long") + "\", "
                 + "\"type\" : \"TestServerResponsSingle\"},";
-        endpointDescriptionSingle += "\"float\" : {\"name\" : \"float\",\"endpoint\" : \"endpoints/float\", "
+        endpointDescriptionSingle += "\"float\" : {\"name\" : \"float\",\"endpoint\" : \"" 
+                + endpoint("endpoints/float") + "\", "
                 + "\"type\" : \"TestServerResponsSingle\"},";
-        endpointDescriptionSingle += "\"double\" : {\"name\" : \"double\",\"endpoint\" : \"endpoints/double\", "
+        endpointDescriptionSingle += "\"double\" : {\"name\" : \"double\",\"endpoint\" : \"" 
+                + endpoint("endpoints/double") + "\", "
                 + "\"type\" : \"TestServerResponsSingle\"}";
         endpointDescriptionSingle += "}";
+    }
+    
+    /**
+     * Adjusts the given {@code endpoint} by prefixing {@link #endpointPrefix} if not <b>null</b>.
+     * 
+     * @param endpoint the endpoint to modify
+     * @return {@code endpoint} or {@code endpoint} prefixed by {@link #endpointPrefix}
+     */
+    private String endpoint(String endpoint) {
+        return null == endpointPrefix ? endpoint : endpointPrefix + endpoint;
+    }
+
+    /**
+     * Sets the endpoint prefix.
+     * 
+     * @param endpointPrefix the endpoint prefix, shall be a URL ending with "/" or <b>null</b> for none
+     */
+    public void setEndpointPrefix(String endpointPrefix) {
+        this.endpointPrefix = endpointPrefix;
+        createEndpointDescriptionSingle();
+        createEndpointDescriptionSingleWP();
+        createEndpointDescriptionSet();
+        createEndpointDescriptionSetWP();
     }
 
     /**
@@ -70,7 +98,7 @@ public class TestServer {
      */
     private void createEndpointDescriptionSet() {
         endpointDescriptionSet = "{";
-        endpointDescriptionSet += "\"all\" : {\"endpoint\" : \"endpoints/all\", "
+        endpointDescriptionSet += "\"all\" : {\"endpoint\" : \"" + endpoint("endpoints/all") + "\", "
                 + "\"type\" : \"TestServerResponseSet\"}";
         endpointDescriptionSet += "}";
     }
@@ -80,17 +108,17 @@ public class TestServer {
      */
     private void createEndpointDescriptionSingleWP() {
         endDesSingleWP = "{";
-        endDesSingleWP += "\"string\" : {\"endpoint\" : \"endpoints?path=string\","
+        endDesSingleWP += "\"string\" : {\"endpoint\" : \"" + endpoint("endpoints?path=string") + "\","
                 + " \"type\" : \"TestServerResponsSingle\", \"asSingleValue\" : true},";
-        endDesSingleWP += "\"short\" : {\"endpoint\" : \"endpoints?path=short\", "
+        endDesSingleWP += "\"short\" : {\"endpoint\" : \"" + endpoint("endpoints?path=short") + "\", "
                 + "\"type\" : \"TestServerResponsSingle\"},";
-        endDesSingleWP += "\"integer\" : {\"endpoint\" : \"endpoints?path=integer\", "
+        endDesSingleWP += "\"integer\" : {\"endpoint\" : \"" + endpoint("endpoints?path=integer") + "\", "
                 + "\"type\" : \"TestServerResponsSingle\"},";
-        endDesSingleWP += "\"long\" : {\"endpoint\" : \"endpoints?path=long\", "
+        endDesSingleWP += "\"long\" : {\"endpoint\" : \"" + endpoint("endpoints?path=long") + "\", "
                 + "\"type\" : \"TestServerResponsSingle\"},";
-        endDesSingleWP += "\"float\" : {\"endpoint\" : \"endpoints?path=float\", "
+        endDesSingleWP += "\"float\" : {\"endpoint\" : \"" + endpoint("endpoints?path=float") + "\", "
                 + "\"type\" : \"TestServerResponsSingle\"},";
-        endDesSingleWP += "\"double\" : {\"endpoint\" : \"endpoints?path=double\", "
+        endDesSingleWP += "\"double\" : {\"endpoint\" : \"" + endpoint("endpoints?path=double") + "\", "
                 + "\"type\" : \"TestServerResponsSingle\"}";
         endDesSingleWP += "}";
     }
@@ -101,7 +129,7 @@ public class TestServer {
     private void createEndpointDescriptionSetWP() {
         endpointDescriptionSetWP = "{";
         endpointDescriptionSetWP += "\"AllWP\" : {\"endpoint\" : "
-                + "\"endpoints/set?paths=string,short,integer,long,float,double\", "
+                + "\"" + endpoint("endpoints/set?paths=string,short,integer,long,float,double") + "\", "
                 + "\"type\" : \"TestServerResponseSet\"}";
         endpointDescriptionSetWP += "}";
     }

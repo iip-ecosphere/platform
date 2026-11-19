@@ -23,6 +23,7 @@ import de.iip_ecosphere.platform.connectors.types.TranslatingProtocolAdapter;
 import de.iip_ecosphere.platform.support.Endpoint;
 import de.iip_ecosphere.platform.support.OsUtils;
 import de.iip_ecosphere.platform.support.Schema;
+import de.iip_ecosphere.platform.support.ServerAddress;
 import de.iip_ecosphere.platform.support.TimeUtils;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase;
 import de.iip_ecosphere.platform.support.iip_aas.ActiveAasBase.NotificationMode;
@@ -39,6 +40,9 @@ public class RESTConnectorTest extends TestWithPlugin {
     private static final Logger LOGGER = LoggerFactory.getLogger(RESTConnectorTest.class);
     private static TestServer testServer;
     private static String expectedStringValue = "Hello World!";
+    private static Schema schema = Schema.HTTP;
+    private static String host = ServerAddress.LOCALHOST;
+    private static int port = 8080; // TODO ephemeral
     
     static {
         addPluginLocation("support", "support.json-jackson");
@@ -85,6 +89,7 @@ public class RESTConnectorTest extends TestWithPlugin {
 
         testRequestTypeSingle(null);
         testRequestTypeSingle("/TestServer/api1/");
+        testRequestTypeSingle(schema.toUri() + host + ":" + port + "/TestServer/api/");
         testRequestTypeSingleWP();
         testRequestTypeSet();
         testRequestTypeSetWP();
@@ -105,7 +110,7 @@ public class RESTConnectorTest extends TestWithPlugin {
         connector.setInstanceIdentification(CONN_SINGLE_ID);
 
         try {
-            connector.connect(getConnectorParameter("single"));
+            connector.connect(getConnectorParameter("single", path));
             if (null != path) {
                 connector.trigger(new StringTriggerQuery(path));
             }                
@@ -172,7 +177,7 @@ public class RESTConnectorTest extends TestWithPlugin {
         connector.setInstanceIdentification(CONN_SINGLE_ID);
 
         try {
-            connector.connect(getConnectorParameter("singleWP"));
+            connector.connect(getConnectorParameter("singleWP", null));
             AtomicReference<MachineOutputSingle> restReference = new AtomicReference<MachineOutputSingle>();
             AtomicInteger count = new AtomicInteger(0);
             connector.setReceptionCallback(createCallbackSingle(restReference, count));
@@ -269,7 +274,7 @@ public class RESTConnectorTest extends TestWithPlugin {
         connector.setInstanceIdentification(CONN_SET_ID);
 
         try {
-            connector.connect(getConnectorParameter("set"));
+            connector.connect(getConnectorParameter("set", null));
             AtomicReference<MachineOutputSet> restReference = new AtomicReference<MachineOutputSet>();
             AtomicInteger count = new AtomicInteger(0);
             connector.setReceptionCallback(createCallbackSet(restReference, count));
@@ -318,7 +323,7 @@ public class RESTConnectorTest extends TestWithPlugin {
         connector.setInstanceIdentification(CONN_SET_ID);
 
         try {
-            connector.connect(getConnectorParameter("setWP"));
+            connector.connect(getConnectorParameter("setWP", null));
             AtomicReference<MachineOutputSet> restReference = new AtomicReference<MachineOutputSet>();
             AtomicInteger count = new AtomicInteger(0);
             connector.setReceptionCallback(createCallbackSet(restReference, count));
@@ -450,30 +455,39 @@ public class RESTConnectorTest extends TestWithPlugin {
      * Returns the connector parameters for
      * {@link Connector#connect(ConnectorParameter)}.
      * 
+     * @param type the type to create the connector parameter for
+     * @param path to send in via {@link StringTriggerQuery}, may be <b>null</b> for none; only taken into account 
+     *   here if full URL
      * @return the connector parameters
      */
-    protected ConnectorParameter getConnectorParameter(String type) {
+    protected ConnectorParameter getConnectorParameter(String type, String path) {
+        testServer.setEndpointPrefix(null); // reset
 
-        Endpoint endpoint = null;
+        Endpoint endpoint = new Endpoint(schema, host, port, "TestServer/api/");
+        String endpointPath = endpoint.toUri();
+        // special case, only if specified and full URI, then take over as endpoint path
+        if (null != path && path.contains("://")) {
+            try {
+                endpointPath = path;
+                testServer.setEndpointPrefix(endpointPath);
+            } catch (IllegalArgumentException e) {
+            }
+        }
+
         String endpoints = null;
-
         if (type.equals("single")) {
             endpoints = testServer.getEndpointDescriptionSingle();
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServer/api/");
         } else if (type.equals("singleWP")) {
             endpoints = testServer.getEndpointDescriptionSingleWP();
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServer/api/");
         } else if (type.equals("set")) {
             endpoints = testServer.getEndpointDescriptionSet();
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServer/api/");
         } else if (type.equals("setWP")) {
             endpoints = testServer.getEndpointDescriptionSetWP();
-            endpoint = new Endpoint(Schema.HTTP, "localhost", 8080, "TestServer/api/");
         }
 
         ConnectorParameterBuilder testParameter = ConnectorParameterBuilder.newBuilder(endpoint);
         testParameter.setApplicationInformation("App_Id", "App_Description");
-        testParameter.setEndpointPath(endpoint.toUri());
+        testParameter.setEndpointPath(endpointPath);
         testParameter.setSpecificSetting("SERVER_STRUCTURE", endpoints);
 
         return testParameter.build();
