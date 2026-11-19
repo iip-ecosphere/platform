@@ -151,7 +151,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     private static final String[] TOP_FOLDERS = {META_TYPE_NAME, "Dependency", "Manufacturer", "ServiceBase", 
         "Server", "ServiceMesh", "Application"}; // top level SM folders, mostly meta-model type names -> mgtUI
     private static final Pattern DEPLOYMENT_PLAN_PATTERN = Pattern.compile(
-        ".*application\\s*=\\s*refBy\\(\\s*(\\S*)\\s*\\).*");
+        ".*application\\s*=\\s*refBy\\(\\s*(\\S*)\\s*\\).*", Pattern.DOTALL);
 
     private Supplier<Configuration> cfgSupplier;
     private Function<String, String> metaShortId = SHORTID_PREFIX_META;
@@ -753,7 +753,7 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 result = findOrCreateProject(root, prjName, true);
                 prepareApplicationProject(result, root, meshes);
             }
-            LoggerFactory.getLogger(AasIvmlMapper.class).info("Checking DeplyoymentPlan for {}", valueEx);
+            LoggerFactory.getLogger(AasIvmlMapper.class).info("Checking DeploymentPlan for {}", valueEx);
             if (null == result && null != valueEx && IvmlUtils.isOfCompoundType(type, "DeploymentPlan")) {
                 LoggerFactory.getLogger(AasIvmlMapper.class).info("Mapping DeploymentPlan for {}", valueEx);
                 Matcher matcher = DEPLOYMENT_PLAN_PATTERN.matcher(valueEx);
@@ -765,10 +765,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                             AbstractVariable.class);
                         LoggerFactory.getLogger(AasIvmlMapper.class).info("Found IVML variable {}", elt);
                         if (null != elt) {
-                            String prjName = getApplicationProjectName(elt.getName());
-                            LoggerFactory.getLogger(AasIvmlMapper.class).info("Assumed project name {}", prjName);
-                            result = findOrCreateProject(root, prjName, true);
-                            LoggerFactory.getLogger(AasIvmlMapper.class).info("Found IVML project name {}", result);
+                            result = elt.getProject();
+                            LoggerFactory.getLogger(AasIvmlMapper.class).info("Using project name {}", result);
                         }
                     } catch (ModelQueryException e) {
                         LoggerFactory.getLogger(AasIvmlMapper.class).warn(

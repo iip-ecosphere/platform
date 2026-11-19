@@ -592,7 +592,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
      * @return the deployment plan value
      */
     private static String deploymentPlanValue(String appVar) {
-        return "{"
+        return "{\r\n" // line break according to formatting of managementUI
             + "name = \"test\","
             + "application = refBy(" + appVar + ")," 
             + "id = \"test\"," 
@@ -601,7 +601,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
             + "onUndeployRemoveArtifact = false,"
             + "allowMultiExecution = true,"
             + "disabled = false, "
-            + "ensembles = {}"
+            + "ensembles = {}\r\n"
             + "}";
     }
     
