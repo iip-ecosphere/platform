@@ -753,20 +753,18 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 result = findOrCreateProject(root, prjName, true);
                 prepareApplicationProject(result, root, meshes);
             }
-            LoggerFactory.getLogger(AasIvmlMapper.class).info("Checking DeploymentPlan for {}", valueEx);
             if (null == result && null != valueEx && IvmlUtils.isOfCompoundType(type, "DeploymentPlan")) {
-                LoggerFactory.getLogger(AasIvmlMapper.class).info("Mapping DeploymentPlan for {}", valueEx);
                 Matcher matcher = DEPLOYMENT_PLAN_PATTERN.matcher(valueEx);
                 if (matcher.matches()) {
                     String appVar = matcher.group(1);
-                    LoggerFactory.getLogger(AasIvmlMapper.class).info("Matches appVar {}", appVar);
                     try {
                         ContainableModelElement elt = ModelQuery.findElementByName(root, appVar, 
                             AbstractVariable.class);
-                        LoggerFactory.getLogger(AasIvmlMapper.class).info("Found IVML variable {}", elt);
                         if (null != elt) {
                             result = elt.getProject();
                             LoggerFactory.getLogger(AasIvmlMapper.class).info("Using project name {}", result);
+                        } else {
+                            LoggerFactory.getLogger(AasIvmlMapper.class).warn("Cannot find IVML variable {}", appVar);
                         }
                     } catch (ModelQueryException e) {
                         LoggerFactory.getLogger(AasIvmlMapper.class).warn(
