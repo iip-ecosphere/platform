@@ -28,6 +28,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import de.iip_ecosphere.platform.configuration.cfg.ConfigurationChangeType;
 import de.iip_ecosphere.platform.configuration.cfg.ConfigurationFactory;
@@ -148,6 +150,8 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
     private static final TypeVisitor TYPE_VISITOR = new TypeVisitor();
     private static final String[] TOP_FOLDERS = {META_TYPE_NAME, "Dependency", "Manufacturer", "ServiceBase", 
         "Server", "ServiceMesh", "Application"}; // top level SM folders, mostly meta-model type names -> mgtUI
+    private static final Pattern DEPLOYMENT_PLAN_PATTERN = Pattern.compile(
+        ".*application\\s*=\\s*refBy\\(\\s*(\\S*)\\s*\\).*");
 
     private Supplier<Configuration> cfgSupplier;
     private Function<String, String> metaShortId = SHORTID_PREFIX_META;
@@ -716,9 +720,12 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         return JsonUtils.toJson(tmp);
     }
         
+    // checkstyle: stop parameter number check
+
+    
     @Override
     protected Project getVariableTarget(Project root, Project varParent, IDatatype type, String name, 
-        List<String> meshes) throws ExecutionException {
+        List<String> meshes, String valueEx) throws ExecutionException {
         Project result = null;
         if (null != type) {
             for (Map.Entry<String, String> ent : PROJECT_MAPPING.entrySet()) {
@@ -741,11 +748,28 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
                 result = findOrCreateProject(root, prjName, true);
                 prepareMeshProject(result, root);
             }
-            if (null == result && (IvmlUtils.isOfCompoundType(type, "Application") 
-                || IvmlUtils.isOfCompoundType(type, "DeploymentPlan"))) {
+            if (null == result && IvmlUtils.isOfCompoundType(type, "Application")) {
                 String prjName = getApplicationProjectName(name);
                 result = findOrCreateProject(root, prjName, true);
                 prepareApplicationProject(result, root, meshes);
+            }
+            if (null == result && null != valueEx && IvmlUtils.isOfCompoundType(type, "DeploymentPlan")) {
+                Matcher matcher = DEPLOYMENT_PLAN_PATTERN.matcher(valueEx);
+                if (matcher.matches()) {
+                    String appVar = matcher.group(1);
+                    try {
+                        ContainableModelElement elt = ModelQuery.findElementByName(root, appVar, 
+                            AbstractVariable.class);
+                        if (null != elt) {
+                            String prjName = getApplicationProjectName(elt.getName());
+                            result = findOrCreateProject(root, prjName, true);
+                        }
+                    } catch (ModelQueryException e) {
+                        LoggerFactory.getLogger(AasIvmlMapper.class).warn(
+                            "Cannot find app variable {} when checking for target IVML project {}: {}", appVar, 
+                            valueEx, e.getMessage());
+                    }
+                }
             }
             if (null == result) { // immediate fallback
                 if (null != varParent) {
@@ -764,7 +788,9 @@ public class AasIvmlMapper extends AbstractIvmlModifier {
         }
         return result;
     }
-    
+
+    // checkstyle: resume parameter number check
+
     @Override
     protected boolean isAllowedForModification(Project prj) {
         String name = prj.getName();

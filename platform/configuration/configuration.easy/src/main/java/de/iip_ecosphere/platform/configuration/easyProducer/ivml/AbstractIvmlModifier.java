@@ -820,7 +820,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
         Project root = cfg.getProject();
         IDatatype appType = findType(root, targetType);
         Project appPrj = adaptTarget(root, null == context.targetProject 
-            ? getVariableTarget(root, null, appType, varName, context.getMeshNames()) : context.targetProject);
+            ? getVariableTarget(root, null, appType, varName, context.getMeshNames(), null) : context.targetProject);
         if (null != appType) {
             DecisionVariableDeclaration var;
             if (mode.create) {
@@ -946,6 +946,8 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
             }
         }
     }
+    
+    // checkstyle: stop parameter number check
 
     /**
      * Returns the target for a variable to be created.
@@ -955,16 +957,19 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
      * @param type the actual type of the variable to be created, may be <b>null</b> then anyway no variable will 
      *     be created
      * @param name optional name if the name may influence the target, may be <b>null</b>
-     * @param meshes mesh project names in case of an application project, else ignored; may be <b>null</b>
+     * @param meshes mesh project names in case of an application project, else ignored, may be <b>null</b>
+     * @param valueEx the value expression, may be <b>null</b>
      * @return the target project
      * @see #isAllowedForModification(Project prj)
      * @throws ExecutionException if model management operations fail
      */
     protected Project getVariableTarget(Project root, Project varParent, IDatatype type, String name, 
-        List<String> meshes) throws ExecutionException {
+        List<String> meshes, String valueEx) throws ExecutionException {
         return root;
     }
-    
+
+    // checkstyle: resume parameter number check
+
     /**
      * Allows to adapt a target IVML project, e.g., in testing context.
      * 
@@ -1091,9 +1096,9 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
         Project root = cfg.getProject();
         try {
             IDatatype t = findType(root, type);
-            Project target = adaptTarget(root, getVariableTarget(root, null, t, varName, null));
+            Project target = adaptTarget(root, getVariableTarget(root, null, t, varName, null, valueEx));
             if (null != t) {
-                getLogger().info("Target IVML project for variable {}: {}", target.getName(), varName);
+                getLogger().info("Target IVML project for variable {}: {}", varName, target.getName());
                 DecisionVariableDeclaration var;
                 if (asConst) {
                     var = new ConstantDecisionVariableDeclaration(toIdentifier(varName), t, target);
@@ -1230,7 +1235,7 @@ public abstract class AbstractIvmlModifier implements DecisionVariableProvider {
                 AbstractVariable varDecl = var.getDeclaration();
                 //Project target = varDecl.getProject();
                 Project target = adaptTarget(root, getVariableTarget(root, varDecl.getProject(), 
-                    varDecl.getType(), varDecl.getName(), null));
+                    varDecl.getType(), varDecl.getName(), null, ent.getValue()));
                 String subpath = getIvmlSubpathForChange(target);
                 if (null == subpath) { // if it is one of the "writable" wildcard imports
                     target = root;

@@ -586,6 +586,26 @@ public class AasIvmlMapperTest extends TestWithPlugin {
     }
     
     /**
+     * Creates a deployment plan variable expression referring to {@code appVar}.
+     * 
+     * @param appVar the application variable name
+     * @return the deployment plan value
+     */
+    private static String deploymentPlanValue(String appVar) {
+        return "{"
+            + "name = \"test\","
+            + "application = refBy(" + appVar + ")," 
+            + "id = \"test\"," 
+            + "description = \"test\","
+            + "parallelize = false," 
+            + "onUndeployRemoveArtifact = false,"
+            + "allowMultiExecution = true,"
+            + "disabled = false, "
+            + "ensembles = {}"
+            + "}";
+    }
+    
+    /**
      * Tests the set/delete graph functions.
      * 
      * @throws IOException if copying/resetting files fails
@@ -658,6 +678,10 @@ public class AasIvmlMapperTest extends TestWithPlugin {
             "graphSnk", "conn_0", "graphRec1", "myTestApp");
         mapper.clearChanges();
 
+        System.out.println(deploymentPlanValue("myTestApp"));
+        mapper.createVariable("deploymentPlan_test", "DeploymentPlan", false, deploymentPlanValue("myTestApp"));
+        mapper.clearChanges();
+
         mapper.deleteGraph("myTestApp", "myTestMesh"); // delete mesh without app
         Assert.assertFalse(resolveIvmlFile("meshes/ServiceMeshPartMyAppMyTestMesh").exists());
         assertIvmlFileChange("apps/ApplicationPartMyTestApp", false, "myTestApp");
@@ -669,7 +693,7 @@ public class AasIvmlMapperTest extends TestWithPlugin {
         Assert.assertFalse(resolveIvmlFile("meshes/ServiceMeshPartMyTestAppMyMesh").exists());
         Assert.assertFalse(resolveIvmlFile("apps/ApplicationPartMyTestApp").exists());
         mapper.assertChanges(ConfigurationChangeType.DELETED, "myTestApp"); // delete mesh without app
-        mapper.assertChangesCount(1);
+        mapper.assertChangesCount(2); // + deployment plan
         mapper.clearChanges();
         
         stopEasy(lcd);
