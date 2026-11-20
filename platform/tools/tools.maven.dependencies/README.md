@@ -108,12 +108,20 @@ The ``copy-resources`` is a variant of the equally named goal of the maven resou
                     <include>*.json</include>
                     <include>*.png</include>
                     <include>*.yml</include>
+                    <mappings>
+                        <mapping>
+                           <source>x.jpg</source>
+                           <target>j.jpeg</target>
+                        </mapping>
+                    </mappings>
                 </resource>
             </resources>
         </configuration>
     </execution>
 
 ```
+
+A `resource` configuration may optional contain file name `mappings`, i.e., how a certain `source` file shall be named after copying the resource (`target`).
 
 The following parameters are supported:
 * `resources` the resources to be copied from `directory`, similar to the resources-plugin, but without filtering. May specify includes/excludes with usual patterns. If `prependResourceDirectories` is `true`, starting with `${project.basedir}` and its parent folders (at least one level, up to `maxLevels`) are searched for contained folders `resources.ipr` or `resources` and the first existing in this sequence postfixed with the original folder name of `directory` is taken as source directory; then `directory` and, if not existing, additional entires from the string list `directories` are considered.

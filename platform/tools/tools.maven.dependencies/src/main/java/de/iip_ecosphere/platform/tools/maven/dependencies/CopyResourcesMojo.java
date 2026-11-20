@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -55,11 +57,17 @@ public class CopyResourcesMojo extends AbstractMojo {
     @Parameter( defaultValue = "${project.basedir}", required = true, readonly = true )
     private File basedir;
     
+    public static class FileMapping {
+        private String source;
+        private String target;
+    }
+    
     @SuppressWarnings("serial")
     public static class Resource extends org.apache.maven.model.Resource {
         
         private boolean prependResourceDirectories;
         private List<String> directories;
+        private List<FileMapping> mappings;
 
         /**
          * Sets {@code dir} as directory of this resource if {@code dir} exists.
@@ -90,6 +98,21 @@ public class CopyResourcesMojo extends AbstractMojo {
                 done = true;
             }
             return done;
+        }
+        
+        /**
+         * Returns the file mappings as map.
+         * 
+         * @return the file mappings
+         */
+        private Map<String, String> getMappings() {
+            Map<String, String> result = new HashMap<>();
+            if (mappings != null) {
+                for (FileMapping fm : mappings) {
+                    result.put(fm.source, fm.target);
+                }
+            }
+            return result;
         }
 
     }
@@ -166,9 +189,11 @@ public class CopyResourcesMojo extends AbstractMojo {
                     getLog().warn("Filtering is currently not supported for files in directory " + dir);
                 }
                 outputDirectory.mkdirs();
+                Map<String, String> fileMappings = r.getMappings();
                 for (File f: files) {
                     try {
-                        File target = new File(outputDirectory, f.getName());
+                        String name = fileMappings.getOrDefault(fileMappings.get(f.getName()), f.getName());
+                        File target = new File(outputDirectory, name);
                         if (getLog().isDebugEnabled()) {
                             getLog().info("Copying " + f + " to " + target);
                         }
