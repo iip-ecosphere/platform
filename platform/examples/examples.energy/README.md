@@ -15,6 +15,7 @@ This example currently contains two parts:
     * The generated connector writes `opcTest.txt` containing measurements provided through a micrometer timing probe.
     * By default, full test execution is disabled as a specifically prepared docker container is required. If this docker container shall be built/executed, set ``-Dtest.docker.skip=true -Dtest.exec.args=--all``
 * A hand-crafted connector for comparison: `mvn -P App exec:java@manualConnector`
+* The energy data aggregator ([tools.energyAggregator](../../tools/tools.energyAggregator/README.md)) as OPC UA server for the generated connector: `mvn -P App exec:java@energyServer` (system properties see there)
 
 Shortcuts for Eclipse: 
   * Run `test.de.iip_ecosphere.platform.examples.vdw.OpcUaModelTest` as JUnit test to execute the model instantiation/code generation. Generation may require in Eclipse a Maven update of the project (including Snapshots). 

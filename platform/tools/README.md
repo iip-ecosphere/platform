@@ -11,3 +11,4 @@ This part contains development tools for
 * Maven build plugins for Python: [tools.maven.python](tools.maven.python/README.md).
 * Extended Maven build plugins for dependencies (delete for unpack): [tools.maven.dependencies](tools.maven.dependencies/README.md).
 * Maven build plugins to orchestrate goals in profiles in the same POM: [tools.maven.invoker](tools.maven.invoker/README.md).
+* Standalone energy data aggregator (MQTT, ModbusTCP to OPC UA): [tools.energyAggregator](tools.energyAggregator/README.md).
