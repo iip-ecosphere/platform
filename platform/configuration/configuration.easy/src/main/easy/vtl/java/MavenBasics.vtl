@@ -697,7 +697,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
         execs;
     }
     
-    def XmlElement appendMavenResourcesCopyResourcesExecution(XmlElement execs, String goal, String outputDirectory, String resourceDirectory, sequenceOf(String) files, String phase="validate", String id="", Boolean prependResourceDirs=false) {
+    def XmlElement appendMavenResourcesCopyResourcesExecution(XmlElement execs, String goal, String outputDirectory, String resourceDirectory, sequenceOf(String) files, String phase="validate", String id="", Boolean prependResourceDirs=false, mapOf(String, String) mapping= {}) {
         XmlElement exec = new XmlElement(execs, "execution");
         if (length(id) == 0) { // fallback
             id = goal;
@@ -716,6 +716,14 @@ template MavenBasics(Configuration config, FileArtifact target) {
         new XmlElement(resource, "filtering", "false");
         for (String f: files->sortedBy(g|g)) { // sorted for testing
             new XmlElement(resource, "include", f);
+        }
+        if (mapping.isNotEmpty()) {
+            XmlElement rMappings = new XmlElement(resource, "mappings");
+            for (String source: mapping.getKeys()->sortedBy(k|k)) {
+                XmlElement rMapping = new XmlElement(resource, "mapping");
+                new XmlElement(rMapping, "source", source);
+                new XmlElement(rMapping, "target", mapping.get(source));
+            }
         }
         config;
     }

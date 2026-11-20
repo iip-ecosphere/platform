@@ -139,6 +139,10 @@ template Basics(Configuration config, FileArtifact target) {
         s.firstToLowerCase().toIdentifier();
     }
     
+    def String toAppArtifactName(String appId, String appVer) {
+        app.id + "-" + app.ver + "-bin.jar";        
+    }
+    
     def String getResourcesFolder(IIPEcosphere config) {
         String dflt = getStringValueSafe(config.resourcesDir, config.resourcesDirDflt);
         getProperty("iip.resources", dflt);
@@ -164,8 +168,12 @@ template Basics(Configuration config, FileArtifact target) {
         getProperty("iip.unpackResources.skip", "false") == "true";
     }
 
+    def String getPlatformHomeProperty(String dflt) {
+        getProperty("iip.homeDir", dflt);
+    }
+
     def String getPlatformHome(IIPEcosphere config) {
-        getProperty("iip.homeDir", getResourcesFolder(config)+"/..");
+        getPlatformHomeProperty(getResourcesFolder(config)+"/..");
     }
 	
 	def setOf(MeshElement) nextMeshNodes(MeshElement elt, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {

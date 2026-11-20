@@ -756,9 +756,9 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
     // ------------------------------------------ generating apps: generating app-specific containers --------------------------------------------
 
     String getArtifactsFolder(Path appRoot, IIPEcosphere config) = {
-        String artifactsFolder = config.artifactsFolder;
+        String artifactsFolder = getStringValueSafe(config.artifactsFolder, config.artifactsFolderDflt);
         if (artifactsFolder == config.artifactsFolderDflt) { // default is in appRoot
-            artifactsFolder = "${appRoot}/../${artifactsFolder}";
+            artifactsFolder =  "${getPlatformHome(config)}/${artifactsFolder}";
         }
         artifactsFolder;
     }

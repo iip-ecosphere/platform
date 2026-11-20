@@ -169,8 +169,6 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
                 appendMavenDependencyPluginExecutionSplitClasspath(execs, archiveFiles);
             }
             
-            //XmlElement depPlugin = appendMavenResourcesPlugin(plugins);
-            //XmlElement rExecs = appendExecutionsParent(depPlugin);
             if (resources.size() > 0) {
                 mapOf(String, sequenceOf(String)) resMap = {};
                 for (ResourceInfo res: resources.asSequence()->sortedBy(r|r.srcDir)) { // sortedBy for testing
@@ -182,6 +180,15 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
                 for (String res: resMap.keys().asSequence()->sortedBy(b|b)) { // sortedBy for testing
                     appendMavenResourcesCopyResourcesExecution(execs, "copy-resources", "\\${project.build.outputDirectory}", res, resMap.get(res));
                 }
+            }
+            String platfHome = getPlatformHomeProperty("");
+            if (platfHome <> "") {
+                sequenceOf(String) files = {};                
+                String source = "\\${project.artifactId}-\\${project.version}-bin.jar";
+                files.add(source);
+                mapOf(String, String) fileMapping = {};
+                fileMapping.add(source, toAppArtifactName(appName, appVersion));
+                appendMavenResourcesCopyResourcesExecution(execs, "copy-resources", platfHome, "\\${project.build.directory}", files, phase="install", id="copy-bin", mapping=fileMapping);
             }
     
             sequenceOf(String) files = defltOktoResourceFiles();
