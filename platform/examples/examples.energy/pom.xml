@@ -87,6 +87,11 @@
               <groupId>de.iip-ecosphere.platform.apps</groupId>
               <version>0.1.0-SNAPSHOT</version> <!-- from config -->
             </dependency>
+            <dependency> <!-- OPC UA energy server the generated connector reads from -->
+              <artifactId>tools.energyAggregator</artifactId>
+              <groupId>de.iip-ecosphere.platform</groupId>
+              <version>${project.version}</version>
+            </dependency>
           </dependencies>
           <build>
              <plugins>
@@ -102,6 +107,12 @@
                               <arguments>
                                   <argument>--add-opens=java.base/java.lang=ALL-UNNAMED</argument>
                               </arguments>
+                          </configuration>
+                       </execution>
+                       <execution>
+                          <id>energyServer</id>
+                          <configuration>
+                              <mainClass>de.oktoflow.platform.tools.energyAggregator.EnergyAggregatorMain</mainClass>
                           </configuration>
                        </execution>
                    </executions>

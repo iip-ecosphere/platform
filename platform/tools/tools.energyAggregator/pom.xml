@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>tools.energyAggregator</artifactId>
+  <packaging>jar</packaging>
+  <name>Energy data aggregator</name>
+  <description>Standalone tool collecting energy measurements from heterogeneous sources (MQTT, ModbusTCP) and
+    exposing them uniformly through an own OPC UA server.</description>
+
+  <parent>
+     <groupId>de.iip-ecosphere.platform</groupId>
+     <artifactId>platformDependenciesBOM</artifactId>
+     <version>0.8.2-SNAPSHOT</version>
+     <relativePath/>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency> <!-- OPC UA server -->
+      <groupId>org.eclipse.milo</groupId>
+      <artifactId>sdk-server</artifactId>
+    </dependency>
+    <dependency> <!-- MQTT source, e.g., Shelly Pro3EM -->
+      <groupId>org.eclipse.paho</groupId>
+      <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+    </dependency>
+    <dependency> <!-- MQTT payloads -->
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency> <!-- ModbusTCP source, e.g., Siemens SENTRON PAC; same library as in connectors.modbustcpipv1 -->
+      <groupId>net.wimpi</groupId>
+      <artifactId>jamod</artifactId>
+      <version>1.2</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>${org.codehaus.mojo.exec-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>energyServer</id>
+            <configuration>
+              <mainClass>de.oktoflow.platform.tools.energyAggregator.EnergyAggregatorMain</mainClass>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
