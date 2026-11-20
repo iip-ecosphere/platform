@@ -175,6 +175,14 @@ template Basics(Configuration config, FileArtifact target) {
     def String getPlatformHome(IIPEcosphere config) {
         getPlatformHomeProperty(getResourcesFolder(config)+"/..");
     }
+    
+    def String getArtifactsFolder(Path fallback, IIPEcosphere config) {
+        String artifactsFolder = getStringValueSafe(config.artifactsFolder, config.artifactsFolderDflt);
+        if (artifactsFolder == config.artifactsFolderDflt) { // default is in appRoot
+            artifactsFolder =  "${getPlatformHome(config)}/${artifactsFolder}";
+        }
+        artifactsFolder;
+    }
 	
 	def setOf(MeshElement) nextMeshNodes(MeshElement elt, mapOf(MeshElement, setOf(MeshConnector)) mappedMesh) {
 	    getNextMeshNodes(elt, mappedMesh);

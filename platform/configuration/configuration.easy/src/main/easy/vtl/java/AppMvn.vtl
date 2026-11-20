@@ -182,13 +182,15 @@ template AppMvn(IIPEcosphere config, XmlFileArtifact target, setOf(String) usedS
                 }
             }
             String platfHome = getPlatformHomeProperty("");
-            if (platfHome <> "") {
+            if (platfHome <> "" and !ifArtifact) {
+                Path parent = target.getPath().getParent();
+                String artifactsDir = parent.relativizeFolder(getArtifactsFolder(parent, config));
                 sequenceOf(String) files = {};                
                 String source = "\\${project.artifactId}-\\${project.version}-bin.jar";
                 files.add(source);
                 mapOf(String, String) fileMapping = {};
                 fileMapping.add(source, toAppArtifactName(appName, appVersion));
-                appendMavenResourcesCopyResourcesExecution(execs, "copy-resources", platfHome, "\\${project.build.directory}", files, phase="install", id="copy-bin", mapping=fileMapping);
+                appendMavenResourcesCopyResourcesExecution(execs, "copy-resources", artifactsDir, "\\${project.build.directory}", files, phase="install", id="copy-bin", mapping=fileMapping);
             }
     
             sequenceOf(String) files = defltOktoResourceFiles();

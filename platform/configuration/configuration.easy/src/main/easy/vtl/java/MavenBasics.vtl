@@ -720,7 +720,7 @@ template MavenBasics(Configuration config, FileArtifact target) {
         if (mapping.isNotEmpty()) {
             XmlElement rMappings = new XmlElement(resource, "mappings");
             for (String source: mapping.getKeys()->sortedBy(k|k)) {
-                XmlElement rMapping = new XmlElement(resource, "mapping");
+                XmlElement rMapping = new XmlElement(rMappings, "mapping");
                 new XmlElement(rMapping, "source", source);
                 new XmlElement(rMapping, "target", mapping.get(source));
             }
