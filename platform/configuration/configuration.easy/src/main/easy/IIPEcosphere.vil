@@ -312,7 +312,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     }
                     
                     if (appArtifact == null or appArtifact.length() == 0) {
-                        appArtifact = appName + "-" + appVersion + "-bin.jar"; // currently not other packaging
+                        appArtifact = toAppArtifactName(a.id, a.ver);  // currently no other packaging      
                     }
                     generateDeploymentPlans(appRoot, cfg, a, elements, appArtifact);
                 }
