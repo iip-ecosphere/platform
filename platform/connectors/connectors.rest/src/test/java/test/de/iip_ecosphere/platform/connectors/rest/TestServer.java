@@ -6,7 +6,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan("de.iip_ecosphere.platform.connectors.rest") 
 @ComponentScan("test.de.iip_ecosphere.platform.connectors.rest") 
 public class TestServer {
     
