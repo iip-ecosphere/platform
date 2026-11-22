@@ -172,6 +172,27 @@ public class OsUtils {
         }
         return null == result ? dflt : result;
     }
+    
+    /**
+     * Returns a value from the system properties.
+     * 
+     * @param key the key to look for
+     * @return the value, <b>null</b> for none
+     */
+    public static String getProperty(String key) {
+        return System.getProperty(key);
+    }
+
+    /**
+     * Returns a value from the system properties.
+     * 
+     * @param key the key to look for
+     * @param dflt the default value for none
+     * @return the value, may by {@code dflt} for none
+     */
+    public static String getProperty(String key, String dflt) {
+        return System.getProperty(key, dflt);
+    }
 
     /**
      * Returns a boolean value from the system properties or system environment, either as given or all in capital 
@@ -282,12 +303,16 @@ public class OsUtils {
     /**
      * Sets a system property. [move to OSUtils]
      * 
-     * @param key the name of the system property (ignored if <b>null</b>)
+     * @param key the name of the system property (clears the property if <b>null</b>)
      * @param value the value (ignored if <b>null</b>)
      */
     public static void setProperty(String key, String value) {
-        if (null != key && null != value) {
-            System.setProperty(key, value);
+        if (null != key) {
+            if (null != value) {
+                System.setProperty(key, value);
+            } else {
+                System.clearProperty(key);
+            }
         }
     }
 

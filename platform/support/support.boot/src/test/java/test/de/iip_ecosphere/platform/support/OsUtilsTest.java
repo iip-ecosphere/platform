@@ -62,6 +62,20 @@ public class OsUtilsTest {
         OsUtils.setProperty("iip.test.intVal", "2");
         Assert.assertEquals(2, OsUtils.getIntProperty("iip.test.intVal", 1));
     }
+
+    /**
+     * Tests {@link OsUtils#getProperty(String)}, {@link OsUtils#getProperty(String, String)} and 
+     * {@link OsUtils#setProperty(String, String)}.
+     */
+    @Test
+    public void testGetSetProperty() {
+        Assert.assertNull(OsUtils.getProperty("iip.nonsense2"));
+        Assert.assertEquals("xyz", OsUtils.getProperty("iip.nonsense2", "xyz"));
+        OsUtils.setProperty("iip.nonsense2", "abc");
+        Assert.assertEquals("abc", OsUtils.getProperty("iip.nonsense2", "xyz"));
+        OsUtils.setProperty("iip.nonsense2", null);
+        Assert.assertNull(OsUtils.getProperty("iip.nonsense2"));
+    }
     
     /**
      * Tests the Windows, Linux, Unix, Mac methods.
