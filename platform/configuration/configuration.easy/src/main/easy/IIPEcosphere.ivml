@@ -6,7 +6,7 @@ project IIPEcosphere {
     annotate String semanticId = "" to .;
     //annotate Integer uiGroup = UiMandatoryGroup1 to .;
     
-    String javaModuleOpts = "--add-opens java.base/jdk.internal.misc=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED";
+    String javaModuleOpts = "--add-opens java.base/jdk.internal.misc=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens=java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED";
     String javaOpts = "-Dio.netty.tryReflectionSetAccessible=true -Dlog4j2.formatMsgNoLookups=true";
     String pidDir = "/run"; // linux only, windows goes to tmp
     const String instDirDflt = "/opt/iip";
