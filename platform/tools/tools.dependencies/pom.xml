@@ -240,6 +240,7 @@
       <jacocoArgLine/>
       <surefireArgLine/>
       <surefireCiLine/>
+      <surefireModulesLine>--add-opens=java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED</surefireModulesLine>
       <surefireForkCount>1</surefireForkCount>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <maven.compiler.target>11</maven.compiler.target>
@@ -337,7 +338,7 @@
           </includes>
           <forkedProcessTimeoutInSeconds>${surefireProcessTimeout}</forkedProcessTimeoutInSeconds>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
-          <argLine>@{jacocoArgLine} @{surefireArgLine} @{surefireCiLine} --add-opens=java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED</argLine>
+          <argLine>@{jacocoArgLine} @{surefireArgLine} @{surefireCiLine} @{surefireModulesLine}</argLine>
           <forkCount>${surefireForkCount}</forkCount>
         </configuration>
       </plugin>
