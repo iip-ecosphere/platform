@@ -20,6 +20,7 @@ Improvements:
 * [#216](https://github.com/iip-ecosphere/platform/issues/216): Disentagle service and app dependencies
 * [#205](https://github.com/iip-ecosphere/platform/issues/216): Hide service start/stop commands in CLI, i.e., service commands like `add`, `startService` and `startAll` now require `--expert` due to their technical prerequisites. Please use deployment plans instead.
 * [#217](https://github.com/iip-ecosphere/platform/issues/217): Disable/remove unused maven repos
+* [#228](https://github.com/iip-ecosphere/platform/issues/228): Insecure XML reading
 * Upgrade of BaSyx>2 integration to BaSyx2 milestone 8.
 * Platform `tools` layer now on JDK 11 (for Maven support), JDK 17 now starting at `support.boot`
 
