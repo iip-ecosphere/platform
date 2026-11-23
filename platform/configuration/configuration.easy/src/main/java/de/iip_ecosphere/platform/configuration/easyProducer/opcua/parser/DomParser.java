@@ -25,6 +25,7 @@ import java.util.IdentityHashMap;
 
 import de.iip_ecosphere.platform.configuration.easyProducer.opcua.data.*;
 import de.iip_ecosphere.platform.support.StringUtils;
+import de.oktoflow.platform.tools.lib.XmlUtilities;
 
 /**
  * Denotes the OPC UA element types.
@@ -1673,7 +1674,7 @@ public class DomParser {
      * @return the DOM parser after parsing
      */
     private static DomParser createParser(String path, File compSpec, boolean verbose) {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory factory = XmlUtilities.newSecureInstance();
         DomParser parser = null;
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();

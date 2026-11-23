@@ -40,7 +40,6 @@ import de.iip_ecosphere.platform.configuration.easyProducer.opcua.data.FieldVari
 import de.iip_ecosphere.platform.configuration.easyProducer.opcua.data.MethodType;
 import de.iip_ecosphere.platform.configuration.easyProducer.opcua.data.ObjectType;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
@@ -54,6 +53,7 @@ import org.xml.sax.SAXException;
 import de.uni_hildesheim.sse.easy.loader.ManifestLoader;
 import de.iip_ecosphere.platform.configuration.easyProducer.opcua.parser.DomParser;
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.oktoflow.platform.tools.lib.XmlUtilities;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
 import net.ssehub.easy.varModel.confModel.Configuration;
@@ -94,7 +94,7 @@ public class DomParserTest {
         Assert.assertEquals(51, thresholdIndex.size());
         Assert.assertSame(indexedNodes.item(50), thresholdIndex.get("node-50"));
 
-        Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        Document document = XmlUtilities.newSecureInstance().newDocumentBuilder().newDocument();
         Element root = document.createElement("nodes");
         document.appendChild(root);
         Element first = appendNode(document, root, "duplicate");
@@ -117,7 +117,7 @@ public class DomParserTest {
      * @throws ParserConfigurationException shall not occur
      */
     private static NodeList createNodeList(int count) throws ParserConfigurationException {
-        Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        Document document = XmlUtilities.newSecureInstance().newDocumentBuilder().newDocument();
         Element root = document.createElement("nodes");
         document.appendChild(root);
         for (int i = 0; i < count; i++) {
@@ -663,7 +663,7 @@ public class DomParserTest {
      * @throws ParserConfigurationException if the parser configuration is erroneous
      */
     private static Document newDocument() throws ParserConfigurationException {
-        return DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        return XmlUtilities.newSecureInstance().newDocumentBuilder().newDocument();
     }
 
     /**

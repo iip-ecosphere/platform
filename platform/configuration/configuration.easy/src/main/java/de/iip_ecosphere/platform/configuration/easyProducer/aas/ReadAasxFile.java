@@ -45,6 +45,7 @@ import de.iip_ecosphere.platform.support.aas.IdentifierType;
 import de.iip_ecosphere.platform.support.aas.SemanticIdRecognizer;
 import de.iip_ecosphere.platform.support.logging.Logger;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.oktoflow.platform.tools.lib.XmlUtilities;
 
 /**
  * Translates AASX IDTA spec files to IVML. Does not rely on AAS abstraction/Basyx as these AASX files cannot be read.
@@ -112,7 +113,7 @@ public class ReadAasxFile {
             if (name.startsWith("aasx/") && name.endsWith(".xml")) {
                 getLogger().info("Reading " + name);                
                 try {
-                    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+                    DocumentBuilderFactory docBuilderFactory = XmlUtilities.newSecureInstance();
                     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
                     document = docBuilder.parse(zin);        
                 } catch (SAXException | ParserConfigurationException e) {

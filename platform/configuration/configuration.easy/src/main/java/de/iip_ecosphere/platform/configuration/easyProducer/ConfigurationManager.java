@@ -157,7 +157,6 @@ public class ConfigurationManager {
     }
     
     static {
-        XmlFileArtifact.enableSecureParsingDefault(false);
         observer = new BasicProgressObserver();
         observer.register(progressMonitor);
     }
