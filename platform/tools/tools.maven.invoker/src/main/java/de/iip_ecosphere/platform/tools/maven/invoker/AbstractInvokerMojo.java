@@ -287,6 +287,11 @@ public class AbstractInvokerMojo extends AbstractMojo implements Logger { // Abs
         request.setDebug(debug);        
         request.setMavenExecutable(mavenExecutable);
         request.setTimeoutInSeconds(timeoutInSeconds);
+
+        String opts = request.getMavenOpts();
+        String opens = "--add-opens=java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED";
+        request.setMavenOpts((opts == null || opts.isBlank()) ? opens : opts + " " + opens);
+        
         return request;
     }
     
