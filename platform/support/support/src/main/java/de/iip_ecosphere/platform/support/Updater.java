@@ -38,6 +38,7 @@ import org.xml.sax.SAXException;
 import de.iip_ecosphere.platform.support.json.Json;
 import de.iip_ecosphere.platform.support.json.JsonIterator;
 import de.iip_ecosphere.platform.support.logging.LoggerFactory;
+import de.oktoflow.platform.tools.lib.XmlUtilities;
 import de.oktoflow.platform.tools.lib.loader.LoaderIndex;
 
 /**
@@ -276,7 +277,7 @@ public class Updater {
                 String name = pluginUrl.substring(pos + 1);
                 URL url = new URL(base + "maven-metadata.xml");
                 try {
-                    DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                    DocumentBuilder builder = XmlUtilities.newSecureInstance().newDocumentBuilder();
                     Document doc = builder.parse(url.openStream());
                     Node versioning = getElement(doc.getDocumentElement().getChildNodes(), "versioning");
                     Node snapshot = getElement(versioning, "snapshot");
