@@ -202,6 +202,7 @@ public class PlatformInstantiatorExecutor implements PlatformInstantiation {
                 getLogger().info("Cannot write args file. Falling back to classpath as argument. {}", e.getMessage());
             }
         }
+        pArgs.add("--add-opens=java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED");
         if (null != tracingLevel) {
             pArgs.add(createJvmArg(PlatformInstantiator.KEY_PROPERTY_TRACING, tracingLevel));
         }
