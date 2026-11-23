@@ -338,6 +338,7 @@
           <forkedProcessTimeoutInSeconds>${surefireProcessTimeout}</forkedProcessTimeoutInSeconds>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <argLine>@{jacocoArgLine} @{surefireArgLine} @{surefireCiLine}</argLine>
+          <jvmarg value="--add-opens=java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED"/>
           <forkCount>${surefireForkCount}</forkCount>
         </configuration>
       </plugin>
