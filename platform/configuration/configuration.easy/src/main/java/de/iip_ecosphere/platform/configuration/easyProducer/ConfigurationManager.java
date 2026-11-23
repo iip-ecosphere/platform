@@ -33,6 +33,7 @@ import de.iip_ecosphere.platform.transport.status.ActionTypes;
 import de.iip_ecosphere.platform.transport.status.StatusMessage;
 import net.ssehub.easy.basics.modelManagement.ModelManagementException;
 import net.ssehub.easy.basics.progress.BasicProgressObserver;
+import net.ssehub.easy.instantiation.core.model.artifactModel.xml.XmlFileArtifact;
 import net.ssehub.easy.instantiation.core.model.common.VilException;
 import net.ssehub.easy.instantiation.core.model.vilTypes.configuration.NoVariableFilter;
 import net.ssehub.easy.producer.core.mgmt.EasyExecutor;
@@ -156,6 +157,7 @@ public class ConfigurationManager {
     }
     
     static {
+        XmlFileArtifact.enableSecureParsingDefault(false);
         observer = new BasicProgressObserver();
         observer.register(progressMonitor);
     }
