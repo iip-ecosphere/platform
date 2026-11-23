@@ -27,6 +27,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import de.iip_ecosphere.platform.support.FileUtils;
+import de.oktoflow.platform.tools.lib.XmlUtilities;
 
 /**
  * Implements some functions regarding pom files. Taken over from Qualimaster.
@@ -366,7 +367,7 @@ public class PomReader {
         //parse the file
         if (file != null && file.exists() && file.length() > 0) {
             try { 
-                factory = DocumentBuilderFactory.newInstance();
+                factory = XmlUtilities.newSecureInstance();
                 builder = factory.newDocumentBuilder();
                 doc = builder.parse(file);
             } catch (SAXException exc) {

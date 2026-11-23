@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -114,9 +115,10 @@ public class Standalone {
     private static String getOktoVer() throws IOException {
         String result = "";
         try {
-            Document doc = DocumentBuilderFactory.newInstance()
-                .newDocumentBuilder()
-                .parse(pom);
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            Document doc = dbf.newDocumentBuilder().parse(pom);
 
             NodeList parents = doc.getElementsByTagName("parent");
             if (parents.getLength() > 0) {

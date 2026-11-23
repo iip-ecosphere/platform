@@ -12,6 +12,8 @@ import java.util.jar.*;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.*;
 
+import de.oktoflow.platform.tools.lib.XmlUtilities;
+
 /** Finds the closest explicitly modular JPMS release on Maven Central (Java 17+). */
 public final class JpmsUpgradeAnalyzer {
     private static final String CENTRAL = "https://repo.maven.apache.org/maven2/";
@@ -344,7 +346,7 @@ public final class JpmsUpgradeAnalyzer {
      * @throws Exception if the document cannot be parsed
      */
     private static Document parseXml(Path path) throws Exception {
-        DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory f = XmlUtilities.newSecureInstance();
         f.setNamespaceAware(true);
         f.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         f.setFeature("http://xml.org/sax/features/external-general-entities", false);
