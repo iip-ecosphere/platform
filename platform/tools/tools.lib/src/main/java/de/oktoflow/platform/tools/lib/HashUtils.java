@@ -71,7 +71,6 @@ public class HashUtils {
      * @param file the file to hash
      * @param considerContents whether the contents of ZIP/JAR files shall be considered or the file hash shall 
      *      be returned
-     * @param log a log consumer
      * @return the MD5 hash, <b>null</b> if hashing is not possible (see log)
      * @throws NoSuchAlgorithmException if the digest 
      */
@@ -85,7 +84,6 @@ public class HashUtils {
      * @param file the file to hash
      * @param considerContents whether the contents of ZIP/JAR files shall be considered or the file hash shall 
      *      be returned
-     * @param log a log consumer
      * @return the MD5 hash, <b>null</b> if hashing is not possible (see log)
      * @throws NoSuchAlgorithmException if the digest algorithm is not available
      * @throws IOException if the {@code file} cannot be read
