@@ -3,6 +3,10 @@
     <!-- <img src="/assets/aas.png" alt="image" class="img-aas"> -->
     Deployment Plans
     <app-file-upload (result)="uploadFile($event)" [enabled]="uploadEnabled" [accept]="uploadFileType"></app-file-upload>
+    <button mat-mini-fab class="okto-button" id="btnNew"
+      (click)="new()">
+      <mat-icon>add</mat-icon>
+    </button>
   </div>
 
   <table id="data" *ngIf="deploymentPlans; else noPlans" style="margin: 0px;" >
@@ -11,17 +15,25 @@
       <td style="width: 100%;">
         <span class="row-title" id="data.idShort">
           {{getId(plan)}}
-        </span><br>
+        </span>
+        <br>
         <span class="subtext" id="data.description"> {{getDescription(plan)}}</span>
+        <br>
+        <span class="subtext" id="data.description"> {{getPlanType(plan)}}</span>
       </td>
 
-      <td *ngIf="getEnabled(plan)" class="cell-with-button">
+      <td *ngIf="!isArtifact(plan)" class="cell-with-button">
+        <button id="data.btnEdit" mat-icon-button class="okto-button" (click)="edit(plan)">
+          <mat-icon>menu_open</mat-icon>
+        </button>
+      </td>
+      <td *ngIf="getEnabled(plan) && isArtifact(plan)" class="cell-with-button">
         <button mat-icon-button class="button okto-button" id="data.btnDeploy"
           (click)="deploy(plan)">
           <mat-icon>start</mat-icon>
         </button>
       </td>
-      <td *ngIf="!getEnabled(plan)" class="cell-with-button">
+      <td *ngIf="!getEnabled(plan) && isArtifact(plan)" class="cell-with-button">
         <button mat-icon-button class="button okto-button-disabled" id="data.btnDeploy"
           (click)="deploy(plan)" disabled>
           <mat-icon>start</mat-icon>

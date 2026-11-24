@@ -210,7 +210,6 @@ export class EditorComponent extends Utils implements OnInit {
    */
   public saveEventHandler(event: SaveEvent) {
     let prop; // sub-level editor comes from an existing property, shall exist
-    let name = '';
     if (this.type && this.type.value) {
       prop = DataUtils.getProperty(this.type?.value, event.idShort);
     } 
@@ -218,7 +217,15 @@ export class EditorComponent extends Utils implements OnInit {
     if (!prop || !prop.value || prop.value === null) {
        prop = DataUtils.getEditorInputByName(this.uiGroups, event.idShort);
     }
-    
+
+    // Remove old value in case of single input field
+    if (!event.multipleInputs) {
+      prop.value = '';
+    }
+
+    let name = prop.idShort + ' ';
+    name += prop.value.length ?? "";
+
     let host;
     if (event.multipleInputs) {
       host = { value: [] };

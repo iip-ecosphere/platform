@@ -56,10 +56,6 @@ export class SubeditorButtonComponent extends Utils implements OnInit {
 
   public openSubeditor(type: editorInput, selectedType: Resource | undefined) {
     if (this.meta) {
-      // Clear previous selected value for refined abstract types e.g. change machine formatter for Json File connector from "TextLineFormatter" to "JavaMachineFormatter"
-      if (selectedType && selectedType.idShort !== DataUtils.stripGenericType(type.type)) {
-        type.value = '';
-      }
       type.type = getFieldType(type.type, selectedType);
       let uiGroups = this.ivmlFormatter.calculateUiGroupsInf(type, this.meta);
       if (uiGroups.length == 0) {

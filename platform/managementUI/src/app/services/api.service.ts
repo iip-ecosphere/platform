@@ -60,7 +60,7 @@ export class ApiService extends UtilsService {
   }
 
   public async getSubmodelElement(submodel: any, submodelElement: any) {
-    return await this.getData(`/aas/submodels/${submodel}/submodel/submodelElements/${submodelElement}`);
+    return await this.getData(`/aas/submodels/${submodel}/submodel/submodelElements/${submodelElement}`) as SubmodelElementCollection;
   }
 
   public async getData(url: string) {
@@ -375,7 +375,7 @@ export class ApiService extends UtilsService {
                         return data;
                       }
                     }
-                    let fId = getValue(fVal["id"]) || getValue(fVal["name"]) || getValue(fVal["type"]) || String(i);
+                    let fId = getValue(fVal["id"]) || getValue(fVal["name"]) || getValue(fVal["type"]) || fName;
                     fVal[DR_idShort] = fId;
                   }
                   this.addPropertyFromData(fVal, DR_type, fProp.value, MT_metaType);
