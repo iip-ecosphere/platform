@@ -306,7 +306,7 @@ vilScript IIPEcosphere (Project source, Configuration config, Project target) ex
                     generatePlugins(cfg, appRoot);
                     mvn(appRoot);
     
-                    String appArtifact;
+                    String appArtifact = "";
                     if (platformInstantiation) {
                         appArtifact = generateServiceContainer(appRoot, cfg, a, elements);
                     }
