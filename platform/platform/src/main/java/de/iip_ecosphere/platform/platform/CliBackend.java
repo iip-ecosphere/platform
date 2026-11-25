@@ -30,6 +30,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import de.iip_ecosphere.platform.deviceMgt.DeviceRemoteManagementOperations;
@@ -57,6 +58,7 @@ import de.iip_ecosphere.platform.support.aas.SubmodelElement;
 import de.iip_ecosphere.platform.support.aas.SubmodelElementCollection;
 import de.iip_ecosphere.platform.support.iip_aas.ApplicationInstancesAasClient;
 import de.iip_ecosphere.platform.support.json.JsonUtils;
+import de.iip_ecosphere.platform.support.logging.LoggerFactory;
 import de.iip_ecosphere.platform.support.net.UriResolver;
 
 /**
@@ -509,7 +511,7 @@ class CliBackend {
         URI result = artifact;
         String art = ServiceDeploymentPlan.getArtifactSubstituted(assng.getArtifact());
         if (art != null && art.length() > 0) {
-            result = toUri(art);
+            result = toUri(art, CliBackend::validateArtifact);
         }
         return result;
     }
@@ -673,7 +675,7 @@ class CliBackend {
             }
             appInstanceId = PlatformAas.notifyAppNewInstance(p.getAppId(), p.getId());
             deployContainers(p);
-            URI artifact = toUri(ServiceDeploymentPlan.getArtifactSubstituted(p.getArtifact()));
+            URI artifact = toArtifactUri(p);
             Map<String, ServicesClient> serviceClients = new HashMap<>();
             for (ServiceResourceAssignment a: p.getAssignments()) {
                 URI art = getArtifact(artifact, a);
@@ -727,6 +729,51 @@ class CliBackend {
     }
     
     /**
+     * Turns the artifact of {@code plan} into an URI.
+     * 
+     * @param plan the plan
+     * @return the URI
+     * @throws URISyntaxException if no URI can be constructed due to syntax errors
+     * @see {@link #toUri(String, Function)}
+     * @see #validateArtifact(File)
+     */
+    private static URI toArtifactUri(ServiceDeploymentPlan plan) throws URISyntaxException {
+        return toUri(ServiceDeploymentPlan.getArtifactSubstituted(plan.getArtifact()), CliBackend::validateArtifact);   
+    }
+
+    /**
+     * Validates {@code file} as artifact. If {@code file} does not exist, try the absolute path of platform (some
+     * deployment plans use that), if that does not exist, use the configured artifacts folder (relative or absolute).
+     *  
+     * @param file the file to validate
+     * @return the validated file or {@code file}
+     */
+    private static File validateArtifact(File file) {
+        File result = file;
+        LoggerFactory.getLogger(CliBackend.class).info("Validating artifact {} (fallback result)", file);
+        if (!file.exists()) {
+            File f = file.getAbsoluteFile(); // legacy, how it initially was, some deployment plans work with that
+            LoggerFactory.getLogger(CliBackend.class).info("Validating artifact {}", f);
+            if (f.exists()) {
+                LoggerFactory.getLogger(CliBackend.class).info("Exists, using", f);
+                result = f;
+            } else { // use artifacts directory
+                File artifactsFolder = PlatformSetup.getInstance().getArtifactsFolder();
+                f = new File(artifactsFolder, file.toString());
+                if (!artifactsFolder.isAbsolute()) { //artifactsFolder may be relative, turn into absolute 
+                    f = f.getAbsoluteFile();
+                }
+                LoggerFactory.getLogger(CliBackend.class).info("Validating artifact {}", f);
+                if (f.exists()) {
+                    LoggerFactory.getLogger(CliBackend.class).info("Exists, using", f);
+                    result = f;
+                }
+            }
+        }
+        return result;
+    }
+    
+    /**
      * Collects the exception messages of {@code runnables}.
      * 
      * @param runnables the runnables
@@ -774,7 +821,7 @@ class CliBackend {
         ServiceDeploymentPlan p = loadPlan(plan);
         List<ExecutionException> exceptions = new ArrayList<>();
         try {
-            URI artifact = toUri(ServiceDeploymentPlan.getArtifactSubstituted(p.getArtifact()));
+            URI artifact = toArtifactUri(p);
             Map<String, ServicesClient> serviceClients = new HashMap<>();
             Map<String, Integer> stillRunning = new HashMap<>();
             List<ServiceResourceAssignment> assignments = new ArrayList<>(p.getAssignments());
@@ -998,6 +1045,18 @@ class CliBackend {
      * @throws URISyntaxException if no URI can be constructed due to syntax errors
      */
     protected static URI toUri(String text) throws URISyntaxException {
+        return toUri(text, null);
+    }
+    
+    /**
+     * Turns a given path/URI text into an URI. Adds "file:/" if there is no ":" in {@code text}.
+     * 
+     * @param text the text to be turned into an URI
+     * @param fallbackValidator optional artifact fallback (to file) validator, may be <b>null</b> for none
+     * @return the URI
+     * @throws URISyntaxException if no URI can be constructed due to syntax errors
+     */
+    protected static URI toUri(String text, Function<File, File> fallbackValidator) throws URISyntaxException {
         URI result;
         if (null == text) {
             text = ""; // shall result in an URISyntaxException, not an NPE  
@@ -1008,7 +1067,11 @@ class CliBackend {
                 throw new URISyntaxException(text, "URI is not absolute"); // -> file
             }
         } catch (URISyntaxException e) {
-            result = new File(text).getAbsoluteFile().toURI();
+            File f = new File(text);
+            if (null != fallbackValidator) {
+                f = fallbackValidator.apply(f);
+            }
+            result = f.toURI();
         }
         return result;
     }
