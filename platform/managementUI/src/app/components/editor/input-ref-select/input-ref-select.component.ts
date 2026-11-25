@@ -174,6 +174,9 @@ export class InputRefSelectComponent extends Utils implements OnInit {
       response.value = DataUtils.filterMetaTemplate(response.value);
       for (let dep of response.value) {
         if (dep.idShort && metaTypes.indexOf(dep.idShort) === -1) {
+          if (type == 'MeshElement') {
+            this.updateServiceName(dep);
+          }
           this.references.push(dep);
         }
       }
@@ -298,6 +301,21 @@ export class InputRefSelectComponent extends Utils implements OnInit {
     return reference.idShort;
   }
 
+  async updateServiceName(dep: any): Promise<any> {
+    let services = (await this.ivmlFormatter.getCacheType('ServiceBase'));
+    let name = dep.value?.find((item: { idShort: string; }) => item.idShort == 'name');
+    let nameValue = name?.value?.find((item: { idShort: string; }) => item.idShort == 'varValue');
+    
+    let impl = dep.value?.find((item: { idShort: string; }) => item.idShort == 'impl');
+    let implValue = impl?.value?.find((item: { idShort: string; }) => item.idShort == 'varValue');
+    if (impl && implValue.idShort) {
+      let service = services.value.find((item: { idShort: string; }) => item.idShort == implValue.value);
+      let serviceValue = service.value.find((item: { idShort: string; }) => item.idShort == 'name');
+      let serviceName = serviceValue.value.find((item: { idShort: string; }) => item.idShort == 'varValue');
+      nameValue.value = serviceName.value;
+    }
+  }
+
 }
 
 export interface SaveEvent {
@@ -306,3 +324,5 @@ export interface SaveEvent {
   value: IvmlRecordValue; 
   multipleInputs?: boolean;
 }
+
+

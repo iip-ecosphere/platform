@@ -186,14 +186,14 @@ export class Utils {
           temp = element.value?.find((item: { idShort: string; }) => item.idShort == 'name');
           temp = temp?.value?.find((item: { idShort: string; }) => item.idShort == 'varValue');
         }
-        if (temp && temp.idShort) {
+        if (temp && temp.idShort && temp.value) {
           idShort = temp.value;
         } else {
           idShort = element.idShort;
         }
       } else if (element.idShort) {
         // AAS top-level value
-        idShort = element.idShort;
+        idShort = element.idShort.replace(/_/g," ");
       } else if (element.value && element._type) {
         // editor IVML value
         if (DataUtils.isIvmlRefTo(element._type)) {
