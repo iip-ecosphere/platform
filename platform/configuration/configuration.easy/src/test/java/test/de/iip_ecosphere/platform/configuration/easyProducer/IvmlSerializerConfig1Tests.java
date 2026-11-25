@@ -20,9 +20,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
 
-import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiator;
 import de.iip_ecosphere.platform.configuration.easyProducer.PlatformInstantiatorExecutor;
-import de.iip_ecosphere.platform.support.OsUtils;
 
 /**
  * Tests the SerializerConfig1 model.
@@ -42,10 +40,7 @@ public class IvmlSerializerConfig1Tests extends AbstractIvmlSerializerConfigTest
     public void testSerializerConfig1() throws ExecutionException, IOException {
         // mvn: stdout now in target/surefire-reports/<qualifiedClassName>-output.txt
         assumeFalse(isIipBuildInitial()); // first build, allow for initialization
-        String homeDir = System.getProperty(PlatformInstantiator.KEY_PROPERTY_HOME_DIR);
-        File testHomeDir = new File("target/test");
-        testHomeDir.mkdirs();
-        OsUtils.setProperty(PlatformInstantiator.KEY_PROPERTY_HOME_DIR, testHomeDir.getAbsolutePath());
+        String homeDir = setArtifactsDirectory();
 
         File gen = new File(TEST_BASE_FOLDER, "SerializerConfig1");
         PlatformInstantiatorExecutor.instantiate(
@@ -59,6 +54,6 @@ public class IvmlSerializerConfig1Tests extends AbstractIvmlSerializerConfigTest
         assertAllFiles(gen);
         assertTemplateZip(gen, "impl.MyAppExample");
         
-        OsUtils.setProperty(PlatformInstantiator.KEY_PROPERTY_HOME_DIR, homeDir);
+        resetArtifactsDirectory(homeDir);
     }    
 }

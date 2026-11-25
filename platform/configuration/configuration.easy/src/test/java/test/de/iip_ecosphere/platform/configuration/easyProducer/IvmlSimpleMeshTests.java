@@ -46,6 +46,8 @@ public class IvmlSimpleMeshTests extends AbstractIvmlTests {
     @Test
     public void testSimpleMesh() throws ExecutionException, IOException {
         // mvn: stdout now in target/surefire-reports/<qualifiedClassName>-output.txt
+        String homeDir = setArtifactsDirectory();
+
         FileUtils.deleteQuietly(tmp);
         Properties prop = new Properties();
         prop.put("modelFolder", new File(MODEL_BASE_FOLDER, "simpleMesh").getAbsolutePath());
@@ -61,6 +63,8 @@ public class IvmlSimpleMeshTests extends AbstractIvmlTests {
         FileUtils.deleteQuietly(tmp);
         assertAllFiles(gen);
         assertTemplateZip(gen, "impl.SimpleMeshTestingApp");
+
+        resetArtifactsDirectory(homeDir);
     }
     
     /**

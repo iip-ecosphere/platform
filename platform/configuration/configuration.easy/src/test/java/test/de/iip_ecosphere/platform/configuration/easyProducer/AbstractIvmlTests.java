@@ -686,4 +686,27 @@ public abstract class AbstractIvmlTests extends TestWithPlugin {
         return TestUtils.isInCI() ? cfg.setProperty(PlatformInstantiator.KEY_PROPERTY_MVNGOAL, "deploy") : cfg;
     }
 
+    /**
+     * Sets the artifacts directory for testing, i.e., in parent {@code target/test}.
+     * 
+     * @return the artifacts directory that was set before changing
+     */
+    protected static String setArtifactsDirectory() {
+        String homeDir = System.getProperty(PlatformInstantiator.KEY_PROPERTY_HOME_DIR);
+        File testHomeDir = new File("target/test");
+        testHomeDir.mkdirs();
+        OsUtils.setProperty(PlatformInstantiator.KEY_PROPERTY_HOME_DIR, testHomeDir.getAbsolutePath());
+        return homeDir;
+    }
+    
+    /**
+     * Sets the artifacts directory after testing.
+     * 
+     * @param homeDir the artifacts directory that was set before changing, as returned by 
+     *     {@link #setArtifactsDirectory()}
+     */
+    protected static void resetArtifactsDirectory(String homeDir) {
+        OsUtils.setProperty(PlatformInstantiator.KEY_PROPERTY_HOME_DIR, homeDir);
+    }
+
 }

@@ -13,6 +13,22 @@ project ApplicationPartMyApp {
         displayRows = {refBy(mainRow)}
     };
     
+    DeploymentPlan testDeploymentPlan = {
+        name = "TestPlan (all local)", 
+        application = refBy(myApp), 
+        id = "TestPlan_all_local", 
+        description = "Default deployment plan with all services running local.", 
+        assignments = {
+            NamedServiceAssignment {
+                resource = "local", 
+                services = {
+                    refBy(myReceiver), refBy(mySource)
+                }
+            }
+        }, 
+        ensembles = {}
+    };    
+    
     freeze {
         .;
     }
