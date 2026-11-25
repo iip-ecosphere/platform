@@ -144,7 +144,7 @@ goto :answerJava
 
 :installJava
 
-curl https://download.oracle.com/java/17/archive/jdk-17.0.10_windows-x64_bin.zip -o openjdk.zip
+curl -fL https://aka.ms/download-jdk/microsoft-jdk-17.0.21.1-windows-x64.zip -o openjdk.zip
 tar xzpvf openjdk.zip
 setx JAVA_HOME "%cd%\jdk-17.0.10"
 SET JAVA_HOME=%cd%\jdk-17.0.10
