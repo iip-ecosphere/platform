@@ -17,6 +17,7 @@ For installation and first steps, see [install guide](platform/documentation/INS
 
 ## News
 
+* 25.11.2026: Upgrade to most recent Java 17/21 due to mitigate Java4Shell (CVE-2026-114938); upgrade to more secure XML processing
 * 19.10.2026: Upgrade of OPC UA translator as well as `examples.energy` for OPC 40001-4 by Elizaveta Andreeva, Muhammad Asad Ullah, Rhoda Ikhuohon-Eboreime and Kodjo Adjroloh
 * 19.10.2026: Upgrade of build processes completed - oktoflow builds with Maven 3.9.16; also 3.10.0 works, but currently not for staged builds
 * 16.10.2026: Faster app build processes possible, shown in oktoflow app examples

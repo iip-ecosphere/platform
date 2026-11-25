@@ -23,6 +23,7 @@ Improvements:
 * [#228](https://github.com/iip-ecosphere/platform/issues/228): Insecure XML reading
 * Upgrade of BaSyx>2 integration to BaSyx2 milestone 8.
 * Platform `tools` layer now on JDK 11 (for Maven support), JDK 17 now starting at `support.boot`
+* Upgrade to most recent Java 17/21 due to mitigate Java4Shell (CVE-2026-114938); upgrade to more secure XML processing see [#228](https://github.com/iip-ecosphere/platform/issues/228)
 
 Changes:
 * code template POM contains assembly for `resources` folder requiring a manual sync of your service implementation POM with the template POM; if app is built by platform, deployed `resources` artefacts are considered and packaged into the app, e.g., for mock data files
