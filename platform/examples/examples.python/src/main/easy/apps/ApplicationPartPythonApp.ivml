@@ -12,6 +12,22 @@ project ApplicationPartPythonApp {
         services = {refBy(myPythonMesh)}        
     };
     
+    DeploymentPlan pythonDeploymentPlan = {
+        name = "Python Deployment Plan (all local)", 
+        application = refBy(myPythonApp), 
+        id = "PythonPlan_all_local", 
+        description = "Python deployment plan with all services running local.", 
+        assignments = {
+            NamedServiceAssignment {
+                resource = "local", 
+                services = {
+                    refBy(myPythonReceiver), refBy(myPythonTransformer), refBy(myPythonSource)
+                }
+            }
+        }, 
+        ensembles = {}
+    };
+    
     freeze {
         .;
     }
