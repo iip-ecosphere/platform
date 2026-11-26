@@ -6,10 +6,10 @@ project ServiceMeshPartMyMesh {
 
     ServiceMesh myMesh = {
         description = "initial service net",
-        sources = {refBy(mySource)}
+        sources = {refBy(node_Simple_Data_Source)}
     };
     
-    MeshSource mySource = {
+    MeshSource node_Simple_Data_Source = {
         pollInterval = 800, // only if source is synchronous
         impl = refBy(mySourceService),
         next = {refBy(myConnMySourceMyReceiver)},
@@ -19,10 +19,10 @@ project ServiceMeshPartMyMesh {
     
     MeshConnector myConnMySourceMyReceiver = {
         name = "Source->Receiver",
-        next = refBy(myReceiver)
+        next = refBy(node_Simple_Data_Receiver)
     };
 
-    MeshSink myReceiver = {
+    MeshSink node_Simple_Data_Receiver = {
         impl = refBy(myReceiverService),
         pos_x = 300,
         pos_y = 10

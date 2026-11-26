@@ -22,7 +22,7 @@ project ApplicationPartMyApp {
             NamedServiceAssignment {
                 resource = "local", 
                 services = {
-                    refBy(myReceiver), refBy(mySource)
+                    refBy(node_Simple_Data_Receiver), refBy(node_Simple_Data_Source)
                 }
             }
         }, 
