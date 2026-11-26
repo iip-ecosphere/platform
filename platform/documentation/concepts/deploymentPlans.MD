@@ -2,9 +2,10 @@
 
 Applications running on the oktoflow typically run distributed and, thus, need a deployment plan. Applications that shall be started/stopped from the management user interface require a deployment plan, even if the deployment is "local" on the same device.
 
-Deployment plans can be specified in two forms that complement each other:
+Deployment plans can be specified in three forms that complement each other:
 * In the application model, i.e., in IVML. Such deployment plans can also be created and maintained via the management user interface. Deployment plans in the application model are bound to that application and can be shared along with the application, which is particularly important for application templates so that an instantiated application in the best case directly becomes executable, at least on a local device. However, adjustments regarding the specific distribution to multiple devices may be needed as the specific setup in an application context is not known upfront. The application code generation turns modeled deployment plans into YAML files on the file system (see below).
-* As YAML file that is copied manually into the configured `artifacts` folder of oktoflow. The platform takes these files up when they occur in the `artifacts` folder and makes them available via the user interface. In contrast to modeled deployment plans, these files can currently not be modified through the user interface and they also do not become automatically available with an application (template).
+* Upload a YAML file through the UI, which saves it into the configured `artifacts` folder of oktoflow. The platform takes these files up when they occur in the `artifacts` folder and makes them available via the user interface. In contrast to modeled deployment plans, these files currently can not be modified through the user interface and they also do not become automatically available with an application (template).
+* As YAML file that is copied manually into the configured `artifacts` folder of oktoflow. Same as upload a YAML file, these files currently can not be modified through the user interface and they also do not become automatically available with an application (template).
 
 We encourage using modeled deployment plans although, in particular for testing, experiments and temporary purposes, authored YAML files may be more easily usable and more agile.
 
