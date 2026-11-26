@@ -753,7 +753,6 @@ class CliBackend {
         LoggerFactory.getLogger(CliBackend.class).info("Validating artifact {} (fallback result)", file);
         if (!file.exists()) {
             File f = file.getAbsoluteFile(); // legacy, how it initially was, some deployment plans work with that
-            LoggerFactory.getLogger(CliBackend.class).info("Validating artifact {}", f);
             if (f.exists()) {
                 LoggerFactory.getLogger(CliBackend.class).info("Exists, using", f);
                 result = f;
@@ -763,7 +762,6 @@ class CliBackend {
                 if (!artifactsFolder.isAbsolute()) { //artifactsFolder may be relative, turn into absolute 
                     f = f.getAbsoluteFile();
                 }
-                LoggerFactory.getLogger(CliBackend.class).info("Validating artifact {}", f);
                 if (f.exists()) {
                     LoggerFactory.getLogger(CliBackend.class).info("Exists, using", f);
                     result = f;
