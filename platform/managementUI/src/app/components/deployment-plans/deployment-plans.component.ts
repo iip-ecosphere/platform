@@ -294,6 +294,21 @@ export class DeploymentPlansComponent extends Utils implements OnInit {
     }
   }
 
+  public async del(item: any) {
+    this.snackBar.open(
+      `Deleting: ${item.idShort}`,
+      undefined,
+      { 
+        duration: 7000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top' 
+      }
+    );
+    await this.ivmlFormatter.deleteVariable(item.idShort);
+
+    this.getDisplayData();
+  }
+
   /**
    * Filters the row data/display data for the deployment plan category.
    */

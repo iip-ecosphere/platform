@@ -151,10 +151,14 @@ export class ListComponent extends Utils implements OnInit {
     ) {
       if (this.configExpertMode.expertMode) {
         this.selectedTabIndex = this.expertTabsParam.findIndex(tab => tab.tabName === this.currentTab);
-        //this.currentTab = 'Setup';
+        //this.currentTab = this.defaultTab;
       } else if (this.configDashboardingMode.dashboardingMode) {
         this.selectedTabIndex = this.dashboardingTabsParam.findIndex(tab => tab.tabName === this.currentTab);
-        //this.currentTab = 'Setup';
+        //this.currentTab = this.defaultdashboardingTabs;
+        if (this.selectedTabIndex == -1) {
+          this.selectedTabIndex = 0;
+          this.currentTab = this.defaultdashboardingTabs;
+        }
       } else {
         this.selectedTabIndex = this.normalTabsParam.findIndex(tab => tab.tabName === this.currentTab);
         if (this.selectedTabIndex == -1) {
@@ -169,7 +173,7 @@ export class ListComponent extends Utils implements OnInit {
   }
 
   private async populateMeta() {
-    let defaultTab = this.configExpertMode.expertMode ? this.defaultExpertTab : this.defaultNormalTab;
+    let defaultTab = this.defaultTab;
     const tabName = this.currentTab === '' ? defaultTab : this.currentTab;
     this.metaBackup = await this.api.getMeta();
     this.meta = this.ivmlFormatter.filterMeta(this.metaBackup, this.currentTab);
@@ -191,9 +195,9 @@ export class ListComponent extends Utils implements OnInit {
     if (this.metaBackup) {
       this.meta = this.ivmlFormatter.filterMeta(this.metaBackup, this.currentTab);
       if (this.meta && this.meta.value && this.meta.value?.length > 0) {
-        if (this.selectedType) {
-          this.selectedType = this.meta.value.find(value => value.idShort == this.selectedType?.idShort)
-        } else {
+        // if (this.selectedType) {
+        this.selectedType = this.meta.value.find(value => value.idShort == this.selectedType?.idShort)
+        if (!this.selectedType) {
           this.selectedType = this.meta.value[0]; // TODO sort, select most frequent/plausible
         }
       }
@@ -762,10 +766,10 @@ export class ListComponent extends Utils implements OnInit {
     return result;
   }
 
-    /**
-   * Return the list of tabs based expert mode.
+  /**
+   * Return the list of tabs based expert or dashboarding mode.
    * 
-   * @returns the list of tabs
+   * @returns list of tabs
    */
   get visibleTabs() {
     if (this.configDashboardingMode.dashboardingMode) {
@@ -779,4 +783,20 @@ export class ListComponent extends Utils implements OnInit {
     return this.normalTabsParam;
   }
 
+  /**
+   * Return the default tab based expert mode or dashboarding mode.
+   * 
+   * @returns tabs
+   */
+  private get defaultTab() {
+  if (this.configDashboardingMode.dashboardingMode) {
+    return this.defaultdashboardingTabs;
+  }
+
+  if (this.configExpertMode.expertMode) {
+    return this.defaultExpertTab;
+  }
+
+  return this.defaultNormalTab;
+}
 }

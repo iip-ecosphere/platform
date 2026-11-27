@@ -223,8 +223,15 @@ export class EditorComponent extends Utils implements OnInit {
       prop.value = '';
     }
 
-    let name = prop.idShort + ' ';
-    name += prop.value.length ?? "";
+    let name = '';
+    if (event.idShort) {
+      if (event.index == -1) {
+        name = event.idShort + ' ' + (prop.value?.length != null ? prop.value.length + 1 : '');
+      } else {
+        name = event.idShort + ' ' + (event.index + 1);
+      }
+      
+    }
 
     let host;
     if (event.multipleInputs) {

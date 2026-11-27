@@ -27,6 +27,11 @@
           <mat-icon>menu_open</mat-icon>
         </button>
       </td>
+      <td *ngIf="!isArtifact(plan)" class="cell-with-button">
+        <button id="data.btnDelete" mat-icon-button class="okto-button" (click)="del(plan)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
       <td *ngIf="getEnabled(plan) && isArtifact(plan)" class="cell-with-button">
         <button mat-icon-button class="button okto-button" id="data.btnDeploy"
           (click)="deploy(plan)">

@@ -193,7 +193,10 @@ export class Utils {
         }
       } else if (element.idShort) {
         // AAS top-level value
-        idShort = element.idShort.replace(/_/g," ");
+        idShort = element.idShort
+                .replace(/_/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
       } else if (element.value && element._type) {
         // editor IVML value
         if (DataUtils.isIvmlRefTo(element._type)) {
